@@ -1,0 +1,8 @@
+[package]
+name = "kami-postfx"
+version.workspace = true
+edition.workspace = true
+description = "Post-processing effects (bloom, outline, CRT, SSAO)"
+[dependencies]
+glam.workspace = true
+bytemuck.workspace = true

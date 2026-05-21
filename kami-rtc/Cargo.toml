@@ -1,0 +1,33 @@
+[package]
+name = "kami-rtc"
+version.workspace = true
+edition.workspace = true
+
+[features]
+default = []
+knp = ["kami-knp"]
+
+[dependencies]
+kami-core = { path = "../kami-core" }
+kami-audio = { path = "../kami-audio" }
+kami-knp = { path = "../kami-knp", optional = true }
+glam = { workspace = true }
+log = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+web-sys = { version = "0.3", features = [
+    "RtcPeerConnection", "RtcPeerConnectionIceEvent",
+    "RtcConfiguration", "RtcIceServer",
+    "RtcSessionDescription", "RtcSessionDescriptionInit", "RtcSdpType",
+    "RtcIceCandidate", "RtcIceCandidateInit",
+    "RtcDataChannel", "RtcDataChannelInit", "RtcDataChannelEvent",
+    "RtcTrackEvent", "RtcRtpSender", "RtcRtpReceiver",
+    "MediaStream", "MediaStreamTrack", "MediaStreamConstraints",
+    "MediaDevices", "Navigator", "Window",
+    "MessageEvent", "Event", "EventTarget",
+] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
