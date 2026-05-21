@@ -1,0 +1,10 @@
+[package]
+name = "kami-mine-ai"
+description = "KAMI Mine AI — risk assessment and extraction planning"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+kami-mine-pds = { path = "../kami-mine-pds" }

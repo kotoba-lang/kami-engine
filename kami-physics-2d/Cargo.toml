@@ -1,0 +1,7 @@
+[package]
+name = "kami-physics-2d"
+version.workspace = true
+edition.workspace = true
+description = "Lightweight 2D physics (AABB, circle, collision, impulse)"
+[dependencies]
+glam.workspace = true

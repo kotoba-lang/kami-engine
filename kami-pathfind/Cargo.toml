@@ -1,0 +1,7 @@
+[package]
+name = "kami-pathfind"
+version.workspace = true
+edition.workspace = true
+description = "A* grid pathfinding + NavMesh for NPC navigation"
+[dependencies]
+glam.workspace = true

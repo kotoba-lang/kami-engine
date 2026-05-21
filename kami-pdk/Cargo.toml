@@ -1,0 +1,13 @@
+[package]
+name = "kami-pdk"
+description = "KAMI PDK — Process Design Kit (technology nodes, Liberty timing, LEF physical, standard cell library, memory compiler)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+glam = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+thiserror = { workspace = true }
