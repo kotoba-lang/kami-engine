@@ -1,0 +1,25 @@
+[package]
+name = "kami-live"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# kami-live — Live music venue SDK for KAMI Engine.
+#
+# Pure-Rust domain layer that composes engine primitives (audio, postfx,
+# atlas-vis, particle, character) into a virtual concert experience:
+#   - BeatGrid (BPM, bar, phrase, swing)
+#   - Setlist (track schedule, cue points)
+#   - LightingCue (par / spot / strobe / laser, beat-synced)
+#   - Stage (truss / risers / LED wall geometry)
+#   - Crowd (fan agents with reactive jump/clap/lightstick)
+#   - VJDeck (visual track palette)
+#   - Performer (dance avatar driver + dance pose timeline)
+#
+# No GPU deps. Game crate `kami-app-live` consumes this and renders.
+
+[dependencies]
+glam = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }

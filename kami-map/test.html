@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAMI Map — Visual Test</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: system-ui, sans-serif; }
+  #kami-map-canvas { width: 100%; height: 100%; display: block; }
+  #status {
+    position: fixed; top: 12px; left: 12px; z-index: 10;
+    background: rgba(0,0,0,0.8); color: #0f0; padding: 8px 14px;
+    border-radius: 8px; font-size: 12px; font-family: monospace;
+    pointer-events: none; white-space: pre-line;
+  }
+  #controls {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 10;
+    display: flex; gap: 8px;
+  }
+  #controls button {
+    background: rgba(0,0,0,0.7); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  }
+  #controls button:hover { background: rgba(60,60,60,0.9); }
+</style>
+</head>
+<body>
+<canvas id="kami-map-canvas"></canvas>
+<div id="status">Loading...</div>
+<div id="controls">
+  <button onclick="flyTokyo()">Tokyo</button>
+  <button onclick="flyNY()">New York</button>
+  <button onclick="flyLondon()">London</button>
+  <button onclick="zoomIn()">+</button>
+  <button onclick="zoomOut()">-</button>
+</div>
+
+<script type="module">
+import init, { KamiMap } from './pkg/kami_map.js';
+
+const status = document.getElementById('status');
+let map = null;
+let tileCache = new Set();
+let pendingFetches = 0;
+let totalUploaded = 0;
+
+// Offscreen canvas for tile RGBA extraction
+const offCanvas = document.createElement('canvas');
+offCanvas.width = 256;
+offCanvas.height = 256;
+const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
+
+function log(msg) {
+  console.log('[kami-map]', msg);
+  status.textContent = msg;
+}
+
+async function main() {
+  try {
+    log('Loading WASM...');
+    await init();
+    log('WASM loaded. Checking WebGPU...');
+
+    if (!navigator.gpu) {
+      log('ERROR: WebGPU not supported in this browser.\nUse Chrome 113+ or Edge 113+.');
+      return;
+    }
+    log('WebGPU available. Creating map...');
+
+    const canvas = document.getElementById('kami-map-canvas');
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+
+    map = await KamiMap.create('kami-map-canvas', JSON.stringify({
+      center: [139.7671, 35.6812],
+      zoom: 12,
+      tile_url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    }));
+    log('Map created! Starting render loop...');
+
+    // Fetch initial tiles
+    fetchNewTiles();
+
+    // Render loop
+    let lastTime = performance.now();
+    let frameCount = 0;
+    let lastFpsTime = lastTime;
+
+    function frame(now) {
+      const dt = now - lastTime;
+      lastTime = now;
+
+      map.frame(dt);
+
+      frameCount++;
+      if (now - lastFpsTime > 500) {
+        const fps = Math.round(frameCount * 1000 / (now - lastFpsTime));
+        const vp = JSON.parse(map.get_viewport());
+        status.textContent =
+          `${fps} fps | zoom ${vp.zoom.toFixed(1)}\n` +
+          `lat ${vp.lat.toFixed(4)} lng ${vp.lng.toFixed(4)}\n` +
+          `tiles: ${totalUploaded} loaded, ${pendingFetches} pending\n` +
+          `gpu_tiles in cache: ${tileCache.size}`;
+        frameCount = 0;
+        lastFpsTime = now;
+
+        // Fetch new tiles periodically
+        fetchNewTiles();
+      }
+
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    // Input
+    canvas.addEventListener('pointerdown', (e) => {
+      canvas.setPointerCapture(e.pointerId);
+      map.on_pointer_down(e.offsetX, e.offsetY, e.button);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      map.on_pointer_move(e.offsetX, e.offsetY, e.movementX, e.movementY);
+    });
+    canvas.addEventListener('pointerup', (e) => {
+      map.on_pointer_up(e.offsetX, e.offsetY);
+    });
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      map.on_wheel(e.deltaY);
+      // Refetch tiles after zoom
+      setTimeout(fetchNewTiles, 50);
+    }, { passive: false });
+
+    // Resize
+    new ResizeObserver(() => {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      if (w > 0 && h > 0) {
+        canvas.width = w;
+        canvas.height = h;
+        map.resize(w, h);
+      }
+    }).observe(canvas);
+
+  } catch (e) {
+    log(`ERROR: ${e}\n\n${e.stack || ''}`);
+    console.error(e);
+  }
+}
+
+function fetchNewTiles() {
+  if (!map) return;
+  let tilesJson;
+  try {
+    tilesJson = map.tiles_to_fetch();
+  } catch (e) {
+    console.warn('tiles_to_fetch error:', e);
+    return;
+  }
+  const tiles = JSON.parse(tilesJson);
+  if (tiles.length > 0) {
+    console.log(`[kami-map] ${tiles.length} tiles to fetch`);
+  }
+
+  for (const t of tiles) {
+    const key = `${t.z}/${t.x}/${t.y}`;
+    if (tileCache.has(key)) continue;
+    tileCache.add(key);
+    pendingFetches++;
+
+    fetchTile(t).then(() => {
+      pendingFetches--;
+      totalUploaded++;
+    }).catch(err => {
+      console.warn(`Tile ${key} failed:`, err);
+      tileCache.delete(key);
+      pendingFetches--;
+    });
+  }
+}
+
+async function fetchTile(t) {
+  const resp = await fetch(t.url, { mode: 'cors' });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const blob = await resp.blob();
+  const bmp = await createImageBitmap(blob);
+
+  offCtx.clearRect(0, 0, 256, 256);
+  offCtx.drawImage(bmp, 0, 0, 256, 256);
+  const imageData = offCtx.getImageData(0, 0, 256, 256);
+  const rgba = new Uint8Array(imageData.data.buffer);
+
+  map.upload_tile(t.z, t.x, t.y, rgba, 256, 256);
+  bmp.close();
+}
+
+// Controls
+window.flyTokyo = () => { map?.fly_to(139.7671, 35.6812, 14, 1500); setTimeout(fetchNewTiles, 200); };
+window.flyNY = () => { map?.fly_to(-74.006, 40.7128, 13, 2000); setTimeout(fetchNewTiles, 200); };
+window.flyLondon = () => { map?.fly_to(-0.1276, 51.5074, 13, 2000); setTimeout(fetchNewTiles, 200); };
+window.zoomIn = () => { map?.set_zoom(map.get_zoom() + 1); setTimeout(fetchNewTiles, 50); };
+window.zoomOut = () => { map?.set_zoom(map.get_zoom() - 1); setTimeout(fetchNewTiles, 50); };
+
+main();
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+[package]
+name = "kami-map"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "KAMI Engine map and cosmic renderer for maps.gftd.ai"
+repository = "https://github.com/gftdcojp/ai-gftd-apps-gftdcojp"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+kami-core = { path = "../kami-core" }
+kami-render = { path = "../kami-render", features = ["wgpu-backend"] }
+kami-geo = { path = "../kami-geo" }
+kami-atmosphere = { path = "../kami-atmosphere" }
+glam = { workspace = true }
+bytemuck = { workspace = true }
+log = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+wgpu = "24"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = [
+    "Window", "Document", "HtmlCanvasElement", "HtmlImageElement", "Element",
+    "console", "Performance",
+    "KeyboardEvent", "MouseEvent", "PointerEvent", "WheelEvent", "TouchEvent", "Touch", "TouchList",
+    "EventTarget",
+    "Request", "RequestInit", "RequestMode", "Response", "Headers",
+    "ImageBitmap", "ImageData",
+    "CanvasRenderingContext2d",
+] }
+js-sys = "0.3"
+console_log = "1"
+console_error_panic_hook = "0.1"
+sgp4 = "2.4.0"

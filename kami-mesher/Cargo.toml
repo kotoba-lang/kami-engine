@@ -1,0 +1,13 @@
+[package]
+name = "kami-mesher"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+glam = { workspace = true }
+kami-voxel = { path = "../kami-voxel" }
+kami-render = { path = "../kami-render", default-features = false }
+
+[dev-dependencies]
+kami-sdf = { path = "../kami-sdf" }

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KAMI Map — Color Compare</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; font-family: system-ui; color: #fff; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; height: 100vh; gap: 2px; }
+  .panel { position: relative; overflow: hidden; }
+  .panel canvas { width: 100%; height: 100%; }
+  .label {
+    position: absolute; top: 8px; left: 8px; z-index: 10;
+    background: rgba(0,0,0,0.8); padding: 6px 12px; border-radius: 6px;
+    font-size: 13px; font-weight: 700;
+  }
+  img { width: 100%; height: 100%; object-fit: cover; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <!-- A: Original OSM (no filter) -->
+  <div class="panel" id="panelA">
+    <div class="label">A: Original OSM</div>
+    <canvas id="canvasA"></canvas>
+  </div>
+  <!-- B: Current KAMI shader -->
+  <div class="panel" id="panelB">
+    <div class="label">B: Nintendo Style (current)</div>
+    <canvas id="canvasB"></canvas>
+  </div>
+  <!-- C: CSS filter comparison -->
+  <div class="panel" id="panelC">
+    <div class="label">C: Soft Pastel (CSS)</div>
+    <canvas id="canvasC" style="filter: saturate(0.7) contrast(1.1) brightness(1.05) sepia(0.08);"></canvas>
+  </div>
+</div>
+
+<script type="module">
+// All three panels show the same tile grid rendered via 2D canvas (no WebGPU)
+// This lets us compare color treatments side-by-side instantly.
+
+const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const CENTER = { lng: 139.7671, lat: 35.6812 };
+const ZOOM = 12;
+
+function lngLatToTile(lng, lat, z) {
+  const n = 2 ** z;
+  const x = Math.floor((lng + 180) / 360 * n);
+  const latRad = lat * Math.PI / 180;
+  const y = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n);
+  return { x, y };
+}
+
+async function loadTile(z, x, y) {
+  const url = TILE_URL.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  return new Promise((resolve, reject) => {
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+async function renderPanel(canvasId, colorFn) {
+  const canvas = document.getElementById(canvasId);
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  const ctx = canvas.getContext('2d');
+
+  const center = lngLatToTile(CENTER.lng, CENTER.lat, ZOOM);
+  const tilesX = Math.ceil(rect.width / 256) + 2;
+  const tilesY = Math.ceil(rect.height / 256) + 2;
+  const halfX = Math.floor(tilesX / 2);
+  const halfY = Math.floor(tilesY / 2);
+
+  for (let dy = -halfY; dy <= halfY; dy++) {
+    for (let dx = -halfX; dx <= halfX; dx++) {
+      const tx = center.x + dx;
+      const ty = center.y + dy;
+      try {
+        const img = await loadTile(ZOOM, tx, ty);
+        const px = (dx + halfX) * 256 - 128;
+        const py = (dy + halfY) * 256 - 128;
+
+        if (colorFn) {
+          // Draw to offscreen, apply color transform, draw result
+          const off = new OffscreenCanvas(256, 256);
+          const octx = off.getContext('2d');
+          octx.drawImage(img, 0, 0);
+          const imgData = octx.getImageData(0, 0, 256, 256);
+          colorFn(imgData.data);
+          octx.putImageData(imgData, 0, 0);
+          ctx.drawImage(off, px, py);
+        } else {
+          ctx.drawImage(img, px, py);
+        }
+      } catch (error) { console.warn("[silent-fail] packages/engine/kami-engine/kami-map/compare.html: suppressed error", error); }
+    }
+  }
+}
+
+// Color transform A: none (original)
+function colorOriginal(data) { /* no-op */ }
+
+// Color transform B: current Nintendo shader (JS approximation)
+function colorNintendoCurrent(d) {
+  for (let i = 0; i < d.length; i += 4) {
+    let r = d[i] / 255, g = d[i+1] / 255, b = d[i+2] / 255;
+    // warm tint
+    r *= 1.02; b *= 0.94;
+    // green boost
+    const gb = Math.max(g - Math.max(r, b), 0) * 0.3;
+    g += gb;
+    // S-curve contrast
+    r = r*r*(3-2*r); g = g*g*(3-2*g); b = b*b*(3-2*b);
+    // gamma lift
+    r = Math.pow(r+0.01, 0.92); g = Math.pow(g+0.01, 0.92); b = Math.pow(b+0.01, 0.92);
+    d[i] = Math.min(r*255,255); d[i+1] = Math.min(g*255,255); d[i+2] = Math.min(b*255,255);
+  }
+}
+
+// Color transform C: rendered via CSS filter (no JS transform needed)
+
+await Promise.all([
+  renderPanel('canvasA', null),
+  renderPanel('canvasB', colorNintendoCurrent),
+  renderPanel('canvasC', null), // CSS filter handles this
+]);
+</script>
+</body>
+</html>
