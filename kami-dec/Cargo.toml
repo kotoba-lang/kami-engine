@@ -1,0 +1,36 @@
+[package]
+name = "kami-dec"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# KAMI Discrete Exterior Calculus (DEC) — experimental v3 physics model.
+#
+# Ships k-forms (ScalarField=0-form on voxel cells, EdgeField=1-form
+# on voxel edges, FaceField=2-form on voxel faces) and the exterior
+# derivative / Hodge star / Laplacian operators over a 6-connected
+# voxel cubical complex.
+#
+# v3 thesis: every physical phenomenon (heat diffusion, wave propagation,
+# electrostatics, reaction-diffusion, incompressible flow) can be
+# expressed as compositions of d / * / ∧ applied to k-forms on the
+# voxel lattice. This replaces the N hand-coded rules of v2 (kami-pipelines
+# rule system) with a small algebraic vocabulary.
+#
+# Scope in this initial drop:
+#   - ScalarField (0-form) with Laplacian diffusion
+#   - Source/sink terms driven by voxel material
+#   - Sparse activation (only chunks with non-zero field tick)
+#   - No advection / Hodge / edge-forms yet (follow-up)
+
+[dependencies]
+glam = { workspace = true }
+bytemuck = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
+
+[[bench]]
+name = "ns_vs_rule"
+harness = false
