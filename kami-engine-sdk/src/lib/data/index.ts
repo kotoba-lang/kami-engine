@@ -1,0 +1,10 @@
+export { JOINT_LIMITS, clampBoneDeg, clampBoneRad } from './joint-limits.js';
+export { MOTION_KEY_TO_WASM, toWasmMotionKey } from './motion-key-map.js';
+export { POSE_PRESETS } from './pose-presets.js';
+export { MOTION_PRESETS } from './motion-presets.js';
+export { EXPRESSION_PRESETS } from './expression-presets.js';
+export { MORPH_TARGETS } from './morph-targets.js';
+export { HAIR_STYLES, HAIR_COLORS, OUTFIT_STYLES, OUTFIT_COLORS } from './part-catalog.js';
+export { VOICE_TYPES, KOKORO_VOICES, KOKORO_VISEME_MAP, PROSODY_MODULATION, VISEME_INDICES, VISEME_CYCLE } from './voice-catalog.js';
+export { CHARACTER_PRESETS, applyCharacterColors, type CharacterPreset } from './character-presets.js';
+export { analyzeTextEmotion, emotionToMorphWeights } from './emotion-patterns.js';
