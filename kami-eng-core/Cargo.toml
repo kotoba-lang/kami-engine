@@ -1,0 +1,14 @@
+[package]
+name = "kami-eng-core"
+description = "KAMI Engineering SDK — shared foundation: constraint solver, parametric engine, undo/redo, measurement, selection, layer, grid, DRC base"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+glam = { workspace = true }
+hecs = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+thiserror = { workspace = true }

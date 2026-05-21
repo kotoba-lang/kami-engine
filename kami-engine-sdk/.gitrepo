@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/gftdcojp/kami-engine-sdk.git
+	branch = main
+	commit = 4b31179b7fa1009b1e6278abf3ce02f44b78f257
+	method = merge
+	cmdver = 0.4.9

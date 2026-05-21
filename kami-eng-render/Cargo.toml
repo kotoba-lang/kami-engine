@@ -1,0 +1,15 @@
+[package]
+name = "kami-eng-render"
+description = "KAMI Engineering SDK — 2D/3D engineering rendering: schematic lines, pads, dimension annotations, hatching, grid overlay, ruler, crosshair cursor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+glam = { workspace = true }
+bytemuck = { workspace = true }
+log = { workspace = true }
+kami-render = { path = "../kami-render" }
+kami-text = { path = "../kami-text" }
+kami-ui-gpu = { path = "../kami-ui-gpu" }
+kami-eng-core = { path = "../kami-eng-core" }

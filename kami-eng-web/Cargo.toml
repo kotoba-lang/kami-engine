@@ -1,0 +1,35 @@
+[package]
+name = "kami-eng-web"
+description = "KAMI Engineering SDK — WASM entry point: wasm-bindgen exports for EDA/CAD/CAM/RTL/CAE"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+glam = { workspace = true }
+kami-eng-core = { path = "../kami-eng-core" }
+kami-eng-render = { path = "../kami-eng-render" }
+kami-eng-io = { path = "../kami-eng-io" }
+kami-eda = { path = "../kami-eda" }
+kami-cad = { path = "../kami-cad" }
+kami-cam = { path = "../kami-cam" }
+kami-rtl = { path = "../kami-rtl" }
+kami-cae = { path = "../kami-cae" }
+kami-spice = { path = "../kami-spice" }
+kami-pdk = { path = "../kami-pdk" }
+kami-pnr = { path = "../kami-pnr" }
+kami-dft = { path = "../kami-dft" }
+kami-verify = { path = "../kami-verify" }
+kami-power = { path = "../kami-power" }
+kami-si = { path = "../kami-si" }
+kami-pkg = { path = "../kami-pkg" }
+kami-yield = { path = "../kami-yield" }
+kami-ip = { path = "../kami-ip" }
+kami-flow = { path = "../kami-flow" }

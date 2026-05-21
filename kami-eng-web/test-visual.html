@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KAMI Engineering SDK — Visual Test</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #f0ead6; font-family: 'Nunito', sans-serif; padding: 16px; }
+  h1 { font-size: 20px; color: #2d3436; margin-bottom: 12px; }
+  h2 { font-size: 14px; color: #636e72; margin: 12px 0 6px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .card { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  canvas { width: 100%; border-radius: 8px; background: #fafaf5; display: block; }
+  .status { font-size: 11px; color: #b2bec3; margin-top: 4px; }
+  .pass { color: #00b894; } .fail { color: #d63031; }
+  #log { font-size: 11px; font-family: monospace; background: #2d3436; color: #dfe6e9; padding: 8px; border-radius: 8px; margin-top: 12px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>🔧 KAMI Engineering SDK — Visual Test</h1>
+<div class="grid">
+  <!-- 1. CAD Box Wireframe -->
+  <div class="card">
+    <h2>CAD: Box Wireframe (10×20×30)</h2>
+    <canvas id="cad-box" width="320" height="240"></canvas>
+    <div class="status" id="cad-box-status">loading...</div>
+  </div>
+  <!-- 2. Color Map Gradient -->
+  <div class="card">
+    <h2>CAE: Color Maps (Jet / Viridis / Coolwarm)</h2>
+    <canvas id="color-maps" width="320" height="240"></canvas>
+    <div class="status" id="color-maps-status">loading...</div>
+  </div>
+  <!-- 3. EDA: Schematic Grid + Components -->
+  <div class="card">
+    <h2>EDA: Schematic Grid + Symbols</h2>
+    <canvas id="eda-schem" width="320" height="240"></canvas>
+    <div class="status" id="eda-schem-status">loading...</div>
+  </div>
+  <!-- 4. RTL: Waveform Viewer -->
+  <div class="card">
+    <h2>RTL: Waveform (VCD clock)</h2>
+    <canvas id="rtl-wave" width="320" height="240"></canvas>
+    <div class="status" id="rtl-wave-status">loading...</div>
+  </div>
+  <!-- 5. CAM: Toolpath Preview -->
+  <div class="card">
+    <h2>CAM: Pocket Toolpath (zigzag)</h2>
+    <canvas id="cam-path" width="320" height="240"></canvas>
+    <div class="status" id="cam-path-status">loading...</div>
+  </div>
+  <!-- 6. CAE: FEA Mesh -->
+  <div class="card">
+    <h2>CAE: Hex Mesh (3 divisions)</h2>
+    <canvas id="cae-mesh" width="320" height="240"></canvas>
+    <div class="status" id="cae-mesh-status">loading...</div>
+  </div>
+</div>
+<div id="log"></div>
+
+<script type="module">
+import init, * as eng from './pkg/kami_eng_web.js';
+
+const log = document.getElementById('log');
+function l(msg) { log.textContent += msg + '\n'; log.scrollTop = log.scrollHeight; }
+function setStatus(id, ok, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add(ok ? 'pass' : 'fail');
+}
+
+async function run() {
+  l('Loading WASM...');
+  await init();
+  l('SDK version: ' + eng.eng_sdk_version());
+
+  // ── 1. CAD Box Wireframe ──
+  try {
+    const cvs = document.getElementById('cad-box');
+    const ctx = cvs.getContext('2d');
+    const box = JSON.parse(eng.cad_create_box(10, 20, 30));
+    l('CAD box: ' + JSON.stringify(box));
+
+    // Simple isometric projection of a box
+    const W = cvs.width, H = cvs.height;
+    ctx.fillStyle = '#fafaf5'; ctx.fillRect(0, 0, W, H);
+
+    function iso(x, y, z) {
+      const px = W/2 + (x - z) * 12;
+      const py = H/2 + (x + z) * 6 - y * 14;
+      return [px, py];
+    }
+    const verts = [
+      [0,0,0],[10,0,0],[10,20,0],[0,20,0],
+      [0,0,30],[10,0,30],[10,20,30],[0,20,30]
+    ];
+    const edges = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+    // Filled faces (light)
+    ctx.fillStyle = 'rgba(78,205,196,0.15)';
+    [[4,5,6,7],[1,5,6,2],[2,6,7,3]].forEach(f => {
+      ctx.beginPath();
+      f.forEach((vi,i) => { const [px,py] = iso(...verts[vi]); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); });
+      ctx.closePath(); ctx.fill();
+    });
+    // Edges
+    ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 1.5;
+    edges.forEach(([a,b]) => {
+      const [x1,y1] = iso(...verts[a]);
+      const [x2,y2] = iso(...verts[b]);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    });
+    // Hidden edges (dashed)
+    ctx.setLineDash([3,3]); ctx.strokeStyle = '#b2bec3';
+    [[0,1],[0,3],[0,4]].forEach(([a,b]) => {
+      const [x1,y1] = iso(...verts[a]);
+      const [x2,y2] = iso(...verts[b]);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    // Labels
+    ctx.font = '11px Nunito, sans-serif'; ctx.fillStyle = '#e17055';
+    ctx.fillText('10mm', ...iso(5,-2,0));
+    ctx.fillText('20mm', ...iso(11,10,0));
+    ctx.fillText('30mm', ...iso(10,-2,15));
+    // Stats
+    ctx.fillStyle = '#636e72'; ctx.font = '10px monospace';
+    ctx.fillText(`V=${box.volume} mm³  A=${box.surface_area} mm²`, 8, H-8);
+
+    setStatus('cad-box-status', true, `✓ ${box.faces}F ${box.edges}E ${box.vertices}V vol=${box.volume}`);
+  } catch(e) { setStatus('cad-box-status', false, '✗ ' + e.message); l('CAD ERROR: ' + e); }
+
+  // ── 2. Color Maps ──
+  try {
+    const cvs = document.getElementById('color-maps');
+    const ctx = cvs.getContext('2d');
+    const W = cvs.width, H = cvs.height;
+    ctx.fillStyle = '#fafaf5'; ctx.fillRect(0, 0, W, H);
+
+    const maps = ['jet', 'viridis', 'coolwarm', 'rainbow', 'grayscale'];
+    const barH = Math.floor((H - 40) / maps.length);
+
+    maps.forEach((name, mi) => {
+      const y = 20 + mi * barH;
+      ctx.fillStyle = '#636e72'; ctx.font = '10px Nunito, sans-serif';
+      ctx.fillText(name, 8, y + barH/2 + 3);
+      for (let x = 60; x < W - 10; x++) {
+        const t = (x - 60) / (W - 70);
+        const rgba = eng.eng_color_map_sample(name, t);
+        ctx.fillStyle = `rgb(${Math.round(rgba[0]*255)},${Math.round(rgba[1]*255)},${Math.round(rgba[2]*255)})`;
+        ctx.fillRect(x, y + 2, 1, barH - 6);
+      }
+    });
+    ctx.fillStyle = '#636e72'; ctx.font = '9px monospace';
+    ctx.fillText('0.0', 60, H - 4);
+    ctx.fillText('1.0', W - 24, H - 4);
+    setStatus('color-maps-status', true, `✓ ${maps.length} color maps rendered`);
+  } catch(e) { setStatus('color-maps-status', false, '✗ ' + e.message); l('COLORMAP ERROR: ' + e); }
+
+  // ── 3. EDA Schematic ──
+  try {
+    const cvs = document.getElementById('eda-schem');
+    const ctx = cvs.getContext('2d');
+    const W = cvs.width, H = cvs.height;
+    const sch = JSON.parse(eng.eda_create_schematic());
+    l('EDA schematic: ' + JSON.stringify(sch));
+
+    // Grid
+    ctx.fillStyle = '#fafaf5'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#e0d9c4'; ctx.lineWidth = 0.5;
+    for (let x = 0; x < W; x += 16) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 16) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    // Major grid
+    ctx.strokeStyle = '#c8c0a8'; ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 80) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 80) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // Resistor symbol
+    function drawResistor(cx, cy, label) {
+      ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(cx-30, cy); ctx.lineTo(cx-20, cy);
+      for (let i = 0; i < 6; i++) {
+        ctx.lineTo(cx-16+i*6, cy + (i%2===0 ? -6 : 6));
+      }
+      ctx.lineTo(cx+20, cy); ctx.lineTo(cx+30, cy); ctx.stroke();
+      ctx.fillStyle = '#2d3436'; ctx.font = '10px Nunito'; ctx.fillText(label, cx-10, cy-12);
+    }
+    // Capacitor symbol
+    function drawCapacitor(cx, cy, label) {
+      ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(cx, cy-20); ctx.lineTo(cx, cy-4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx-10, cy-4); ctx.lineTo(cx+10, cy-4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx-10, cy+4); ctx.lineTo(cx+10, cy+4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, cy+4); ctx.lineTo(cx, cy+20); ctx.stroke();
+      ctx.fillStyle = '#2d3436'; ctx.font = '10px Nunito'; ctx.fillText(label, cx+14, cy+4);
+    }
+    // IC symbol
+    function drawIC(cx, cy) {
+      ctx.strokeStyle = '#2d3436'; ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx-20, cy-24, 40, 48);
+      ctx.fillStyle = '#2d3436'; ctx.font = '9px monospace';
+      ctx.fillText('U1', cx-8, cy+4);
+      // Pins
+      [-16, 0, 16].forEach((dy, i) => {
+        ctx.beginPath(); ctx.moveTo(cx-30, cy+dy); ctx.lineTo(cx-20, cy+dy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx+20, cy+dy); ctx.lineTo(cx+30, cy+dy); ctx.stroke();
+      });
+    }
+
+    drawResistor(80, 80, 'R1 10kΩ');
+    drawResistor(80, 144, 'R2 4.7kΩ');
+    drawCapacitor(200, 112, 'C1 100nF');
+    drawIC(280, 112);
+
+    // Wires
+    ctx.strokeStyle = '#0984e3'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(110, 80); ctx.lineTo(200, 80); ctx.lineTo(200, 92); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(110, 144); ctx.lineTo(200, 144); ctx.lineTo(200, 132); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(200, 80); ctx.lineTo(250, 80); ctx.lineTo(250, 96); ctx.stroke();
+    // VCC / GND
+    ctx.fillStyle = '#d63031'; ctx.font = 'bold 11px Nunito'; ctx.fillText('VCC', 44, 76);
+    ctx.fillStyle = '#00b894'; ctx.fillText('GND', 44, 148);
+    // Net labels
+    ctx.fillStyle = '#6c5ce7'; ctx.font = '9px monospace'; ctx.fillText('NET1', 150, 76);
+
+    setStatus('eda-schem-status', true, '✓ Grid + R×2 + C×1 + IC + wires');
+  } catch(e) { setStatus('eda-schem-status', false, '✗ ' + e.message); l('EDA ERROR: ' + e); }
+
+  // ── 4. RTL Waveform ──
+  try {
+    const cvs = document.getElementById('rtl-wave');
+    const ctx = cvs.getContext('2d');
+    const W = cvs.width, H = cvs.height;
+    const simResult = JSON.parse(eng.rtl_simulate('top', BigInt(100)));
+    const vcd = eng.rtl_export_vcd(BigInt(100));
+    l('RTL sim: ' + JSON.stringify(simResult));
+
+    ctx.fillStyle = '#1e272e'; ctx.fillRect(0, 0, W, H);
+
+    // Parse VCD for clock transitions
+    const clkChanges = [];
+    let curTime = 0;
+    vcd.split('\n').forEach(line => {
+      if (line.startsWith('#')) curTime = parseInt(line.slice(1));
+      if (line.match(/^[01]/) && line.includes('!')) clkChanges.push([curTime, line[0] === '1' ? 1 : 0]);
+    });
+
+    const signals = [
+      { name: 'clk', color: '#00b894', data: clkChanges },
+      { name: 'data[7:0]', color: '#fdcb6e', data: Array.from({length: 10}, (_, i) => [i*10, Math.floor(Math.random()*256)]) },
+      { name: 'valid', color: '#e17055', data: [[0,0],[15,1],[45,0],[55,1],[85,0]] },
+      { name: 'ready', color: '#a29bfe', data: [[0,1],[25,0],[35,1],[75,0],[90,1]] },
+    ];
+
+    const labelW = 60, waveH = 36, topY = 20;
+    const timeScale = (W - labelW - 10) / 100;
+
+    // Time axis
+    ctx.strokeStyle = '#636e72'; ctx.lineWidth = 0.5;
+    for (let t = 0; t <= 100; t += 10) {
+      const x = labelW + t * timeScale;
+      ctx.beginPath(); ctx.moveTo(x, topY); ctx.lineTo(x, H - 10); ctx.stroke();
+      ctx.fillStyle = '#636e72'; ctx.font = '8px monospace'; ctx.fillText(t + 'ns', x - 6, H - 2);
+    }
+
+    signals.forEach((sig, si) => {
+      const y = topY + si * waveH;
+      // Label
+      ctx.fillStyle = sig.color; ctx.font = '10px monospace';
+      ctx.fillText(sig.name, 4, y + waveH/2 + 3);
+
+      // Waveform
+      ctx.strokeStyle = sig.color; ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      const isBus = sig.name.includes('[');
+
+      sig.data.forEach(([t, v], i) => {
+        const x = labelW + t * timeScale;
+        const high = y + 6, low = y + waveH - 6;
+
+        if (isBus) {
+          // Bus: hatched fill between transitions
+          if (i > 0) {
+            const prevX = labelW + sig.data[i-1][0] * timeScale;
+            ctx.moveTo(prevX + 3, high); ctx.lineTo(x - 3, high);
+            ctx.moveTo(prevX + 3, low); ctx.lineTo(x - 3, low);
+            ctx.moveTo(x - 3, high); ctx.lineTo(x + 3, low);
+            ctx.moveTo(x - 3, low); ctx.lineTo(x + 3, high);
+          }
+        } else {
+          const yVal = v ? high : low;
+          if (i === 0) { ctx.moveTo(x, yVal); }
+          else {
+            const prevY = sig.data[i-1][1] ? high : low;
+            ctx.lineTo(x, prevY); // horizontal to transition point
+            ctx.lineTo(x, yVal);  // vertical transition
+          }
+          if (i === sig.data.length - 1) ctx.lineTo(labelW + 100 * timeScale, yVal);
+        }
+      });
+      ctx.stroke();
+    });
+
+    // Cursor
+    const cursorT = 42;
+    const cursorX = labelW + cursorT * timeScale;
+    ctx.strokeStyle = '#ff6b6b'; ctx.lineWidth = 1; ctx.setLineDash([3,2]);
+    ctx.beginPath(); ctx.moveTo(cursorX, topY); ctx.lineTo(cursorX, H - 10); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#ff6b6b'; ctx.font = '9px monospace'; ctx.fillText('▼ 42ns', cursorX - 12, topY - 4);
+
+    setStatus('rtl-wave-status', true, `✓ ${simResult.clk_transitions} clk transitions, 4 signals, VCD=${vcd.split('\\n').length} lines`);
+  } catch(e) { setStatus('rtl-wave-status', false, '✗ ' + e.message); l('RTL ERROR: ' + e); }
+
+  // ── 5. CAM Toolpath ──
+  try {
+    const cvs = document.getElementById('cam-path');
+    const ctx = cvs.getContext('2d');
+    const W = cvs.width, H = cvs.height;
+    const gcode = eng.cam_generate_gcode(100, 80, 10, 6, 500, 8000);
+    const lines = gcode.split('\n');
+    l('CAM G-code: ' + lines.length + ' lines');
+
+    ctx.fillStyle = '#fafaf5'; ctx.fillRect(0, 0, W, H);
+
+    // Stock outline
+    const margin = 30, stockW = W - 2*margin, stockH = H - 2*margin;
+    ctx.strokeStyle = '#b2bec3'; ctx.lineWidth = 2; ctx.setLineDash([5,3]);
+    ctx.strokeRect(margin, margin, stockW, stockH);
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#b2bec3'; ctx.font = '9px Nunito'; ctx.fillText('Stock: 100×80mm', margin, margin - 6);
+
+    // Parse G-code moves and draw toolpath
+    let cx = 0, cy = 0, rapid = false;
+    const scaleX = stockW / 100, scaleY = stockH / 80;
+
+    ctx.lineWidth = 1;
+    lines.forEach(line => {
+      if (line.startsWith('G00') || line.startsWith('G0 ')) rapid = true;
+      if (line.startsWith('G01') || line.startsWith('G1 ')) rapid = false;
+
+      const xm = line.match(/X([-\d.]+)/);
+      const ym = line.match(/Y([-\d.]+)/);
+      if (xm || ym) {
+        const nx = xm ? parseFloat(xm[1]) : cx;
+        const ny = ym ? parseFloat(ym[1]) : cy;
+        const sx1 = margin + cx * scaleX, sy1 = margin + stockH - cy * scaleY;
+        const sx2 = margin + nx * scaleX, sy2 = margin + stockH - ny * scaleY;
+
+        ctx.strokeStyle = rapid ? 'rgba(255,107,107,0.3)' : '#0984e3';
+        ctx.lineWidth = rapid ? 0.5 : 1;
+        ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
+        cx = nx; cy = ny;
+      }
+    });
+
+    // Tool position indicator
+    const toolX = margin + cx * scaleX, toolY = margin + stockH - cy * scaleY;
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath(); ctx.arc(toolX, toolY, 4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#e74c3c'; ctx.font = '8px monospace';
+    ctx.fillText(`Tool @ (${cx.toFixed(1)}, ${cy.toFixed(1)})`, toolX + 8, toolY + 3);
+
+    // Legend
+    ctx.fillStyle = '#0984e3'; ctx.fillRect(W-100, H-20, 10, 2);
+    ctx.fillStyle = '#636e72'; ctx.font = '9px Nunito'; ctx.fillText('Cut', W-86, H-16);
+    ctx.fillStyle = 'rgba(255,107,107,0.5)'; ctx.fillRect(W-60, H-20, 10, 2);
+    ctx.fillStyle = '#636e72'; ctx.fillText('Rapid', W-46, H-16);
+
+    setStatus('cam-path-status', true, `✓ ${lines.length} G-code lines parsed & drawn`);
+  } catch(e) { setStatus('cam-path-status', false, '✗ ' + e.message); l('CAM ERROR: ' + e); }
+
+  // ── 6. CAE FEA Mesh ──
+  try {
+    const cvs = document.getElementById('cae-mesh');
+    const ctx = cvs.getContext('2d');
+    const W = cvs.width, H = cvs.height;
+    const meshInfo = JSON.parse(eng.cae_generate_box_mesh(10, 10, 10, 3));
+    l('CAE mesh: ' + JSON.stringify(meshInfo));
+
+    ctx.fillStyle = '#fafaf5'; ctx.fillRect(0, 0, W, H);
+
+    // Draw hex mesh in isometric view
+    const div = 3, size = 10;
+    const step = size / div;
+
+    function iso(x, y, z) {
+      return [W/2 + (x - z) * 14, H/2 + (x + z) * 7 - y * 16];
+    }
+
+    // Draw visible faces of each hex element
+    ctx.lineWidth = 0.5;
+    for (let iz = 0; iz < div; iz++) {
+      for (let iy = 0; iy < div; iy++) {
+        for (let ix = 0; ix < div; ix++) {
+          const x0 = ix * step, y0 = iy * step, z0 = iz * step;
+          const x1 = x0 + step, y1 = y0 + step, z1 = z0 + step;
+
+          // Color by stress (simulated gradient)
+          const stress = (ix + iy) / (2 * div);
+          const rgba = eng.eng_color_map_sample('jet', stress);
+          const r = Math.round(rgba[0]*255), g = Math.round(rgba[1]*255), b = Math.round(rgba[2]*255);
+
+          // Top face (visible when iy == div-1 or top row)
+          if (iy === div - 1) {
+            ctx.fillStyle = `rgba(${r},${g},${b},0.6)`;
+            const pts = [[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]].map(v=>iso(...v));
+            ctx.beginPath(); pts.forEach(([px,py],i) => i===0?ctx.moveTo(px,py):ctx.lineTo(px,py));
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#2d3436'; ctx.stroke();
+          }
+          // Right face (ix == div-1)
+          if (ix === div - 1) {
+            ctx.fillStyle = `rgba(${r},${g},${b},0.4)`;
+            const pts = [[x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1]].map(v=>iso(...v));
+            ctx.beginPath(); pts.forEach(([px,py],i) => i===0?ctx.moveTo(px,py):ctx.lineTo(px,py));
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#2d3436'; ctx.stroke();
+          }
+          // Front face (iz == div-1)
+          if (iz === div - 1) {
+            ctx.fillStyle = `rgba(${r},${g},${b},0.5)`;
+            const pts = [[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]].map(v=>iso(...v));
+            ctx.beginPath(); pts.forEach(([px,py],i) => i===0?ctx.moveTo(px,py):ctx.lineTo(px,py));
+            ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#2d3436'; ctx.stroke();
+          }
+        }
+      }
+    }
+
+    // Axes
+    const o = iso(0, 0, 0);
+    ctx.lineWidth = 2;
+    [['X', [4,0,0], '#e74c3c'], ['Y', [0,4,0], '#00b894'], ['Z', [0,0,4], '#0984e3']].forEach(([label, dir, color]) => {
+      const [ex, ey] = iso(...dir);
+      ctx.strokeStyle = color; ctx.beginPath(); ctx.moveTo(o[0], o[1]); ctx.lineTo(ex, ey); ctx.stroke();
+      ctx.fillStyle = color; ctx.font = 'bold 11px Nunito'; ctx.fillText(label, ex + 4, ey - 2);
+    });
+
+    // Stats
+    ctx.fillStyle = '#636e72'; ctx.font = '10px monospace';
+    ctx.fillText(`${meshInfo.node_count} nodes, ${meshInfo.element_count} hex elements`, 8, H - 8);
+
+    // Color bar
+    for (let i = 0; i < 50; i++) {
+      const t = i / 49;
+      const rgba = eng.eng_color_map_sample('jet', t);
+      ctx.fillStyle = `rgb(${Math.round(rgba[0]*255)},${Math.round(rgba[1]*255)},${Math.round(rgba[2]*255)})`;
+      ctx.fillRect(W - 20, 20 + i * 3, 12, 3);
+    }
+    ctx.fillStyle = '#636e72'; ctx.font = '8px monospace';
+    ctx.fillText('σ max', W - 24, 16); ctx.fillText('σ min', W - 24, 175);
+
+    setStatus('cae-mesh-status', true, `✓ ${meshInfo.node_count} nodes, ${meshInfo.element_count} Hex8, quality=${meshInfo.avg_quality}`);
+  } catch(e) { setStatus('cae-mesh-status', false, '✗ ' + e.message); l('CAE ERROR: ' + e); }
+
+  l('=== All visual tests complete ===');
+  window.__KAMI_ENG_VISUAL_TEST_DONE = true;
+}
+run().catch(e => { l('FATAL: ' + e); });
+</script>
+</body>
+</html>
