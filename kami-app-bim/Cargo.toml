@@ -1,0 +1,26 @@
+[package]
+name = "kami-app-bim"
+description = "BIM viewer / editor entry (bim.gftd.ai) — storey LOD + space highlight + IFC-aware overlay, composed on KamiApp Builder"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+kami-app = { path = "../kami-app" }
+kami-pipelines = { path = "../kami-pipelines" }
+kami-bim = { path = "../kami-bim" }
+kami-render = { path = "../kami-render" }
+glam = { workspace = true }
+log = { workspace = true }
+serde_json = { workspace = true }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = ["console", "Window"] }
+js-sys = "0.3"
+console_error_panic_hook = "0.1"
+console_log = "1"
