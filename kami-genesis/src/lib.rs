@@ -25,6 +25,7 @@ pub const SOLVERS_IMPLEMENTED_R1_1: &[&str] = &["rigid (cartpole closed-form)"];
 
 mod cartpole;
 mod double_pendulum;
+mod planar_chain;
 mod vectorized;
 mod world;
 
@@ -33,6 +34,7 @@ mod wgpu_backend;
 
 pub use cartpole::{CartpoleConfig, CartpoleState};
 pub use double_pendulum::{DoublePendulumConfig, DoublePendulumState};
+pub use planar_chain::{PlanarChainConfig, PlanarChainState};
 pub use vectorized::{WGSL_SOURCE, step_vectorized};
 pub use world::{Articulation, ArticulationHandle, LinkState, World};
 
