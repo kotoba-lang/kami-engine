@@ -6,8 +6,30 @@
 
 use crate::cartpole::{CartpoleConfig, CartpoleState};
 use crate::double_pendulum::{DoublePendulumConfig, DoublePendulumState};
+use glam::{Quat, Vec3};
 use kami_articulated::{ArticulatedSystem, JointKind};
 use thiserror::Error;
+
+/// Per-link kinematic state in world frame.
+/// Mirrors `isaacsim.core.api.RigidPrim.get_velocities + get_world_pose`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct LinkState {
+    pub position: Vec3,
+    pub orientation: Quat,
+    pub linear_velocity: Vec3,
+    pub angular_velocity: Vec3,
+}
+
+impl LinkState {
+    pub fn at_origin() -> Self {
+        LinkState {
+            position: Vec3::ZERO,
+            orientation: Quat::IDENTITY,
+            linear_velocity: Vec3::ZERO,
+            angular_velocity: Vec3::ZERO,
+        }
+    }
+}
 
 #[derive(Debug, Error)]
 pub enum WorldError {
@@ -212,6 +234,118 @@ impl Articulation {
             }
         }
     }
+
+    /// World-frame kinematic state for a named link.
+    /// Returns None if the link name is not present in this articulation.
+    ///
+    /// Convention (matches kami-genesis URDF assumptions):
+    ///   - Cartpole `world`: static at origin.
+    ///   - Cartpole `cart`: lin_pos = (x, 0, 0); lin_vel = (x_dot, 0, 0); no rotation.
+    ///   - Cartpole `pole_link`: revolute about cart's +y axis; com at half-length
+    ///     0.25 m below pivot in the local frame; world com obtained by rotating
+    ///     by theta about world +y and translating by cart pos. Angular velocity
+    ///     about world +y.
+    ///   - Double pendulum `link1`: revolute about world origin's +y; com at
+    ///     lc1=0.5 along the link's -z axis in local; world com = (l1*sin(q1)*?,
+    ///     0, -l1*cos(q1)*?) etc. (Uniform-rod convention.)
+    ///   - Double pendulum `link2`: base at link1 tip; cumulative angle q1+q2.
+    pub fn link_state(&self, link_name: &str) -> Option<LinkState> {
+        match &self.topology {
+            ArticulationTopology::Cartpole { state, cfg } => {
+                cartpole_link_state(state, cfg, link_name)
+            }
+            ArticulationTopology::DoublePendulum { state, cfg } => {
+                double_pendulum_link_state(state, cfg, link_name)
+            }
+        }
+    }
+}
+
+fn cartpole_link_state(s: &CartpoleState, _cfg: &CartpoleConfig, link: &str) -> Option<LinkState> {
+    match link {
+        "world" => Some(LinkState::at_origin()),
+        "cart" => Some(LinkState {
+            position: Vec3::new(s.x, 0.0, 0.0),
+            orientation: Quat::IDENTITY,
+            linear_velocity: Vec3::new(s.x_dot, 0.0, 0.0),
+            angular_velocity: Vec3::ZERO,
+        }),
+        "pole_link" => {
+            // Pole revolves about cart's +y axis (revolute joint axis = (0,1,0)).
+            // Local com offset = (0, 0, 0.25) BEFORE rotation. At theta = 0 the
+            // pole points up (+z). theta rotates about +y, so the tilted com is
+            // at (0.25*sin(theta), 0, 0.25*cos(theta)) relative to the cart.
+            let lc = 0.25_f32;
+            let st = s.theta.sin();
+            let ct = s.theta.cos();
+            let pos = Vec3::new(s.x + lc * st, 0.0, lc * ct);
+            // d/dt of pos with respect to (x, theta) state:
+            let vel = Vec3::new(
+                s.x_dot + lc * ct * s.theta_dot,
+                0.0,
+                -lc * st * s.theta_dot,
+            );
+            let orient = Quat::from_axis_angle(Vec3::Y, s.theta);
+            Some(LinkState {
+                position: pos,
+                orientation: orient,
+                linear_velocity: vel,
+                angular_velocity: Vec3::new(0.0, s.theta_dot, 0.0),
+            })
+        }
+        _ => None,
+    }
+}
+
+fn double_pendulum_link_state(
+    s: &DoublePendulumState,
+    cfg: &DoublePendulumConfig,
+    link: &str,
+) -> Option<LinkState> {
+    match link {
+        "world" => Some(LinkState::at_origin()),
+        "link1" => {
+            // q1=0: link1 hangs straight down (-z), rotates about world y.
+            let lc1 = cfg.l1 * 0.5;
+            let s1 = s.q1.sin();
+            let c1 = s.q1.cos();
+            let pos = Vec3::new(lc1 * s1, 0.0, -lc1 * c1);
+            let vel = Vec3::new(lc1 * c1 * s.q1_dot, 0.0, lc1 * s1 * s.q1_dot);
+            let orient = Quat::from_axis_angle(Vec3::Y, s.q1);
+            Some(LinkState {
+                position: pos,
+                orientation: orient,
+                linear_velocity: vel,
+                angular_velocity: Vec3::new(0.0, s.q1_dot, 0.0),
+            })
+        }
+        "link2" => {
+            // Base of link2 = link1 tip = (l1*sin(q1), 0, -l1*cos(q1)).
+            // Link2 com is at lc2 along link2's down direction relative to its
+            // base, where link2 makes angle (q1+q2) with vertical.
+            let lc2 = cfg.l2 * 0.5;
+            let s1 = s.q1.sin();
+            let c1 = s.q1.cos();
+            let s12 = (s.q1 + s.q2).sin();
+            let c12 = (s.q1 + s.q2).cos();
+            let base = Vec3::new(cfg.l1 * s1, 0.0, -cfg.l1 * c1);
+            let pos = Vec3::new(base.x + lc2 * s12, 0.0, base.z - lc2 * c12);
+            // Velocity = base_vel + lc2 * (q1_dot + q2_dot) * (cos(s12), 0, sin(s12))
+            // base_vel = derivative of base wrt q1: (l1*c1*q1_dot, 0, l1*s1*q1_dot)
+            let base_vel = Vec3::new(cfg.l1 * c1 * s.q1_dot, 0.0, cfg.l1 * s1 * s.q1_dot);
+            let q12_dot = s.q1_dot + s.q2_dot;
+            let vel = base_vel
+                + Vec3::new(lc2 * c12 * q12_dot, 0.0, lc2 * s12 * q12_dot);
+            let orient = Quat::from_axis_angle(Vec3::Y, s.q1 + s.q2);
+            Some(LinkState {
+                position: pos,
+                orientation: orient,
+                linear_velocity: vel,
+                angular_velocity: Vec3::new(0.0, q12_dot, 0.0),
+            })
+        }
+        _ => None,
+    }
 }
 
 fn detect_topology(
@@ -389,6 +523,57 @@ mod tests {
         }
         let s = world.get(h).unwrap().double_pendulum_state().unwrap();
         assert!(s.q1 < std::f32::consts::FRAC_PI_2, "should swing toward 0 under gravity");
+    }
+
+    #[test]
+    fn cartpole_link_state_cart_tracks_x() {
+        let sys = kami_articulated::parse_urdf(CARTPOLE_URDF).unwrap();
+        let mut world = World::default();
+        let h = world.add_articulation(sys).unwrap();
+        world.get_mut(h).unwrap().set_cartpole_state(CartpoleState {
+            x: 0.5,
+            x_dot: 1.0,
+            theta: 0.1,
+            theta_dot: 0.2,
+            ..Default::default()
+        });
+        let cart = world.get(h).unwrap().link_state("cart").unwrap();
+        assert!((cart.position.x - 0.5).abs() < 1e-6);
+        assert!((cart.linear_velocity.x - 1.0).abs() < 1e-6);
+
+        let pole = world.get(h).unwrap().link_state("pole_link").unwrap();
+        // theta=0.1; cart at x=0.5; pole com at (x + lc*sin(θ), 0, lc*cos(θ))
+        let expected_x = 0.5 + 0.25 * 0.1f32.sin();
+        let expected_z = 0.25 * 0.1f32.cos();
+        assert!((pole.position.x - expected_x).abs() < 1e-5);
+        assert!((pole.position.z - expected_z).abs() < 1e-5);
+        // angular velocity about y axis = theta_dot
+        assert!((pole.angular_velocity.y - 0.2).abs() < 1e-6);
+    }
+
+    #[test]
+    fn dp_link_state_returns_consistent_kinematics() {
+        let sys = kami_articulated::parse_urdf(DP_URDF).unwrap();
+        let mut world = World::new(9.81, 1.0 / 240.0);
+        let h = world.add_articulation(sys).unwrap();
+        world.get_mut(h).unwrap().set_double_pendulum_state(DoublePendulumState {
+            q1: std::f32::consts::FRAC_PI_2, // link1 horizontal
+            q2: 0.0,
+            q1_dot: 0.5,
+            q2_dot: 0.0,
+        });
+        let l1 = world.get(h).unwrap().link_state("link1").unwrap();
+        // q1=π/2: lc1*sin(q1) = 0.5*1 = 0.5; -lc1*cos(q1) = 0
+        assert!((l1.position.x - 0.5).abs() < 1e-5);
+        assert!(l1.position.z.abs() < 1e-5);
+        assert!((l1.angular_velocity.y - 0.5).abs() < 1e-6);
+
+        let l2 = world.get(h).unwrap().link_state("link2").unwrap();
+        // Base = (l1*sin(q1)=1, 0, -l1*cos(q1)=0); com at base + lc2*(sin(q1+q2), 0, -cos(q1+q2))
+        //  with q1+q2 = π/2 still → +x, z stays 0
+        assert!((l2.position.x - 1.5).abs() < 1e-5);
+        assert!(l2.position.z.abs() < 1e-5);
+        assert!((l2.angular_velocity.y - 0.5).abs() < 1e-6); // q1_dot + q2_dot = 0.5
     }
 
     #[test]

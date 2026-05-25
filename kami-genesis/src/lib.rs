@@ -34,7 +34,7 @@ mod wgpu_backend;
 pub use cartpole::{CartpoleConfig, CartpoleState};
 pub use double_pendulum::{DoublePendulumConfig, DoublePendulumState};
 pub use vectorized::{WGSL_SOURCE, step_vectorized};
-pub use world::{Articulation, ArticulationHandle, World};
+pub use world::{Articulation, ArticulationHandle, LinkState, World};
 
 #[cfg(feature = "gpu")]
 pub use wgpu_backend::WgpuBackend;
