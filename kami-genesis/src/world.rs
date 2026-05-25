@@ -6,6 +6,7 @@
 
 use crate::cartpole::{CartpoleConfig, CartpoleState};
 use crate::double_pendulum::{DoublePendulumConfig, DoublePendulumState};
+use crate::jacobian::{Jacobian, cartpole_link_jacobian, dp_link_jacobian};
 use glam::{Quat, Vec3};
 use kami_articulated::{ArticulatedSystem, JointKind};
 use thiserror::Error;
@@ -231,6 +232,20 @@ impl Articulation {
             }
             ArticulationTopology::DoublePendulum { state, .. } => {
                 vec![state.q1_dot, state.q2_dot]
+            }
+        }
+    }
+
+    /// 6×n geometric Jacobian for the named link in world frame.
+    /// Mirrors `isaacsim.core.api.Articulation.get_jacobians()` (Isaac Sim 4.x).
+    /// Returns None if the link is not in this articulation.
+    pub fn jacobian(&self, link_name: &str) -> Option<Jacobian> {
+        match &self.topology {
+            ArticulationTopology::Cartpole { state, cfg } => {
+                cartpole_link_jacobian(state.theta, link_name, cfg)
+            }
+            ArticulationTopology::DoublePendulum { state, cfg } => {
+                dp_link_jacobian(state.q1, state.q2, link_name, cfg)
             }
         }
     }
