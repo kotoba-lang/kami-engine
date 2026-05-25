@@ -1,6 +1,6 @@
 [package]
 name = "kami-sensor-sim"
-description = "Camera / lidar / IMU / contact sensor synth on WebGPU compute. isaacsim.sensors API-compat target. R1.0 path reservation per ADR-2605261800."
+description = "Camera / lidar / IMU / contact sensor synth on WebGPU compute. isaacsim.sensors API-compat target. R1.1: minimum viable PinholeCamera (intrinsics + extrinsics + point projection + depth image). R1.6+ adds Lidar / IMU / Contact for wadachi-sim DriveSim parity. ADR-2605261800."
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,3 +9,5 @@ license.workspace = true
 log = { workspace = true }
 thiserror = { workspace = true }
 glam = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
