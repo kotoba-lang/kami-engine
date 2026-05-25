@@ -16,7 +16,9 @@ pub const NV_COMPAT_TARGET: &str = "isaaclab.envs.ManagerBasedRLEnv";
 mod cartpole_env;
 mod scene_cfg;
 pub mod traits;
+mod vectorized_env;
 
 pub use cartpole_env::CartpoleEnv;
 pub use scene_cfg::{SceneCfg, load_scene_yaml};
 pub use traits::{RLEnv, StepResult};
+pub use vectorized_env::VectorizedCartpoleEnv;
