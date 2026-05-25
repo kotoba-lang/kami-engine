@@ -5,6 +5,7 @@
 //! via the kami-articulated `ArticulatedSystem` and Featherstone solver.
 
 use crate::cartpole::{CartpoleConfig, CartpoleState};
+use crate::double_pendulum::{DoublePendulumConfig, DoublePendulumState};
 use kami_articulated::{ArticulatedSystem, JointKind};
 use thiserror::Error;
 
@@ -97,11 +98,13 @@ pub struct Articulation {
     pub system: ArticulatedSystem,
     topology: ArticulationTopology,
     applied_action_cartpole: f32,
+    applied_action_double_pendulum: [f32; 2],
 }
 
 #[derive(Debug)]
 enum ArticulationTopology {
     Cartpole { state: CartpoleState, cfg: CartpoleConfig },
+    DoublePendulum { state: DoublePendulumState, cfg: DoublePendulumConfig },
 }
 
 impl Articulation {
@@ -117,6 +120,7 @@ impl Articulation {
             system: sys,
             topology,
             applied_action_cartpole: 0.0,
+            applied_action_double_pendulum: [0.0, 0.0],
         })
     }
 
@@ -127,6 +131,11 @@ impl Articulation {
                 state.step(action, cfg);
                 self.applied_action_cartpole = 0.0;
             }
+            ArticulationTopology::DoublePendulum { state, cfg } => {
+                let action = self.applied_action_double_pendulum;
+                state.step(action, cfg);
+                self.applied_action_double_pendulum = [0.0, 0.0];
+            }
         }
     }
 
@@ -136,10 +145,35 @@ impl Articulation {
         self.applied_action_cartpole = force;
     }
 
+    /// Set joint torques for a double pendulum articulation [shoulder, elbow].
+    pub fn set_joint_torques(&mut self, torques: &[f32]) {
+        match &mut self.topology {
+            ArticulationTopology::Cartpole { .. } => {
+                if !torques.is_empty() {
+                    self.applied_action_cartpole = torques[0];
+                }
+            }
+            ArticulationTopology::DoublePendulum { .. } => {
+                if torques.len() >= 2 {
+                    self.applied_action_double_pendulum = [torques[0], torques[1]];
+                }
+            }
+        }
+    }
+
     /// Read the current state (Cartpole only at R1.1).
     pub fn cartpole_state(&self) -> Option<CartpoleState> {
         match &self.topology {
             ArticulationTopology::Cartpole { state, .. } => Some(*state),
+            _ => None,
+        }
+    }
+
+    /// Read the current state (double pendulum).
+    pub fn double_pendulum_state(&self) -> Option<DoublePendulumState> {
+        match &self.topology {
+            ArticulationTopology::DoublePendulum { state, .. } => Some(*state),
+            _ => None,
         }
     }
 
@@ -147,6 +181,35 @@ impl Articulation {
     pub fn set_cartpole_state(&mut self, new_state: CartpoleState) {
         match &mut self.topology {
             ArticulationTopology::Cartpole { state, .. } => *state = new_state,
+            _ => {}
+        }
+    }
+
+    /// Mutate state (used by `reset` for double pendulum).
+    pub fn set_double_pendulum_state(&mut self, new_state: DoublePendulumState) {
+        match &mut self.topology {
+            ArticulationTopology::DoublePendulum { state, .. } => *state = new_state,
+            _ => {}
+        }
+    }
+
+    /// Flat joint positions (Cartpole: [x, theta]; DP: [q1, q2]).
+    pub fn joint_positions(&self) -> Vec<f32> {
+        match &self.topology {
+            ArticulationTopology::Cartpole { state, .. } => vec![state.x, state.theta],
+            ArticulationTopology::DoublePendulum { state, .. } => vec![state.q1, state.q2],
+        }
+    }
+
+    /// Flat joint velocities (Cartpole: [x_dot, theta_dot]; DP: [q1_dot, q2_dot]).
+    pub fn joint_velocities(&self) -> Vec<f32> {
+        match &self.topology {
+            ArticulationTopology::Cartpole { state, .. } => {
+                vec![state.x_dot, state.theta_dot]
+            }
+            ArticulationTopology::DoublePendulum { state, .. } => {
+                vec![state.q1_dot, state.q2_dot]
+            }
         }
     }
 }
@@ -168,6 +231,48 @@ fn detect_topology(
         .iter()
         .filter(|j| matches!(j.kind, JointKind::Prismatic | JointKind::Revolute))
         .count();
+
+    // Double pendulum signature: exactly 2 revolute joints, first parent=world,
+    // second parent = first child (serial chain), no prismatic.
+    let revolutes: Vec<&kami_articulated::Joint> =
+        sys.joints.iter().filter(|j| j.kind == JointKind::Revolute).collect();
+    let no_prismatic = !sys.joints.iter().any(|j| j.kind == JointKind::Prismatic);
+    let is_double_pendulum = revolutes.len() == 2
+        && no_prismatic
+        && total_dofs == 2
+        && revolutes[0].parent == "world"
+        && revolutes[1].parent == revolutes[0].child;
+
+    if is_double_pendulum {
+        // Extract masses + link lengths from URDF. Each link's |com z| × 2
+        // approximates link length (uniform rod assumption used in
+        // DoublePendulumConfig). Use revolutes[1].origin |z| as l1.
+        let link1 = sys
+            .links
+            .iter()
+            .find(|l| l.name == revolutes[0].child)
+            .ok_or_else(|| WorldError::UnsupportedTopology("dp link1 missing".into()))?;
+        let link2 = sys
+            .links
+            .iter()
+            .find(|l| l.name == revolutes[1].child)
+            .ok_or_else(|| WorldError::UnsupportedTopology("dp link2 missing".into()))?;
+        let l1 = revolutes[1].origin.xyz.z.abs().max(1e-3);
+        let l2 = link2.inertia.com.xyz.z.abs() * 2.0;
+        let cfg = DoublePendulumConfig {
+            m1: link1.inertia.mass,
+            m2: link2.inertia.mass,
+            l1,
+            l2: if l2 > 1e-3 { l2 } else { l1 },
+            gravity,
+            effort_limit: revolutes[0].effort.max(revolutes[1].effort).max(1.0),
+            dt,
+        };
+        return Ok(ArticulationTopology::DoublePendulum {
+            state: DoublePendulumState::default(),
+            cfg,
+        });
+    }
 
     if has_prismatic_to_world && has_one_revolute && total_dofs == 2 {
         let cart = sys
@@ -253,6 +358,50 @@ mod tests {
         }
         let s = world.get(h).unwrap().cartpole_state().unwrap();
         assert!(s.x > 0.0, "force should push cart in +x direction");
+    }
+
+    const DP_URDF: &str = include_str!(
+        "../../../../70-tools/e7m-sim/scenes/double_pendulum/double_pendulum.urdf"
+    );
+
+    #[test]
+    fn world_loads_double_pendulum_urdf() {
+        let sys = kami_articulated::parse_urdf(DP_URDF).unwrap();
+        let mut world = World::default();
+        let h = world.add_articulation(sys).unwrap();
+        assert!(world.get(h).unwrap().double_pendulum_state().is_some());
+        // joint dim = 2; positions/velocities reflect q1, q2
+        assert_eq!(world.get(h).unwrap().joint_positions().len(), 2);
+        assert_eq!(world.get(h).unwrap().joint_velocities().len(), 2);
+    }
+
+    #[test]
+    fn dp_horizontal_release_swings_downward() {
+        let sys = kami_articulated::parse_urdf(DP_URDF).unwrap();
+        let mut world = World::new(9.81, 1.0 / 240.0);
+        let h = world.add_articulation(sys).unwrap();
+        world.get_mut(h).unwrap().set_double_pendulum_state(DoublePendulumState {
+            q1: std::f32::consts::FRAC_PI_2,
+            ..Default::default()
+        });
+        for _ in 0..120 {
+            world.step();
+        }
+        let s = world.get(h).unwrap().double_pendulum_state().unwrap();
+        assert!(s.q1 < std::f32::consts::FRAC_PI_2, "should swing toward 0 under gravity");
+    }
+
+    #[test]
+    fn dp_joint_torques_drive_motion() {
+        let sys = kami_articulated::parse_urdf(DP_URDF).unwrap();
+        let mut world = World::new(9.81, 1.0 / 240.0);
+        let h = world.add_articulation(sys).unwrap();
+        for _ in 0..60 {
+            world.get_mut(h).unwrap().set_joint_torques(&[2.0, 1.0]);
+            world.step();
+        }
+        let s = world.get(h).unwrap().double_pendulum_state().unwrap();
+        assert!(s.q1.abs() > 0.001, "torques should drive shoulder motion");
     }
 
     #[test]
