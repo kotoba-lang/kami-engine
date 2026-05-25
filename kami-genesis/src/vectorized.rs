@@ -16,6 +16,8 @@ use crate::cartpole::{CartpoleConfig, CartpoleState};
 pub const WGSL_SOURCE: &str = include_str!("wgsl/cartpole_step.wgsl");
 
 /// Run one `step` per env in `states` with per-env `actions`, mirroring WGSL.
+/// All envs share the same physics config — use `step_vectorized_per_env` for
+/// per-env domain randomisation (sim2real).
 pub fn step_vectorized(
     states: &mut [CartpoleState],
     actions: &[f32],
@@ -28,6 +30,21 @@ pub fn step_vectorized(
     );
     for i in 0..states.len() {
         states[i].step(actions[i], cfg);
+    }
+}
+
+/// Per-env-config variant for domain randomisation: each env gets its own
+/// CartpoleConfig (cart_mass / pole_mass / pole_half_length / gravity /
+/// force_mag / dt). `states.len() == actions.len() == cfgs.len()` is required.
+pub fn step_vectorized_per_env(
+    states: &mut [CartpoleState],
+    actions: &[f32],
+    cfgs: &[CartpoleConfig],
+) {
+    assert_eq!(states.len(), actions.len(), "states.len() must equal actions.len()");
+    assert_eq!(states.len(), cfgs.len(), "states.len() must equal cfgs.len()");
+    for i in 0..states.len() {
+        states[i].step(actions[i], &cfgs[i]);
     }
 }
 

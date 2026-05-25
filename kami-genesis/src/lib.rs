@@ -52,7 +52,7 @@ pub use trajectory::{
     CubicPolynomialTrajectory, JointTrajectory, QuinticPolynomialTrajectory,
     WaypointTrajectory,
 };
-pub use vectorized::{WGSL_SOURCE, step_vectorized};
+pub use vectorized::{WGSL_SOURCE, step_vectorized, step_vectorized_per_env};
 pub use world::{Articulation, ArticulationHandle, LinkState, World};
 
 #[cfg(feature = "gpu")]

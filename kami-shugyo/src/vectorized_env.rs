@@ -13,7 +13,7 @@
 use crate::scene_cfg::SceneCfg;
 use crate::traits::StepResult;
 use kami_articulated::parse_urdf;
-use kami_genesis::{CartpoleConfig, CartpoleState, step_vectorized};
+use kami_genesis::{CartpoleConfig, CartpoleState, step_vectorized, step_vectorized_per_env};
 
 /// Deterministic LCG per-env (no rand-crate dep — keeps WASM build slim).
 #[derive(Clone, Copy)]
@@ -39,8 +39,14 @@ pub struct VectorizedCartpoleEnv {
     rngs: Vec<Lcg>,
     /// Per-env steps-in-episode counter (auto-resets on termination).
     steps_in_episode: Vec<u32>,
-    /// Shared physics config (all envs use identical dynamics).
+    /// Shared physics config (all envs use identical dynamics when
+    /// `per_env_cfgs` is None). Kept as a back-compat anchor for the existing
+    /// single-cfg path; also serves as the base for `DomainRandomizationCfg`.
     cartpole_cfg: CartpoleConfig,
+    /// Optional per-env physics configs for domain randomisation. When set
+    /// (length == num_envs), step_all() uses step_vectorized_per_env(); when
+    /// None, step_all() uses the shared cartpole_cfg path.
+    per_env_cfgs: Option<Vec<CartpoleConfig>>,
     /// Step decimation (control / physics ratio).
     decimation: u32,
     /// Maximum control-steps per episode (used for truncated flag).
@@ -97,10 +103,34 @@ impl VectorizedCartpoleEnv {
             rngs,
             steps_in_episode: vec![0; num_envs],
             cartpole_cfg: cfg_cp,
+            per_env_cfgs: None,
             decimation,
             max_episode_control_steps,
             actions_scratch: vec![0.0; num_envs],
         })
+    }
+
+    /// Install per-env physics configs (domain randomisation). Length must
+    /// equal `num_envs`. Subsequent `step_all()` calls will use these instead
+    /// of the shared cartpole_cfg.
+    pub fn set_per_env_configs(&mut self, cfgs: Vec<CartpoleConfig>) {
+        assert_eq!(cfgs.len(), self.num_envs);
+        self.per_env_cfgs = Some(cfgs);
+    }
+
+    /// Drop per-env DR and revert to the shared cartpole_cfg.
+    pub fn clear_per_env_configs(&mut self) {
+        self.per_env_cfgs = None;
+    }
+
+    /// Access the per-env cfg slice (for diagnostic/sampling), or None.
+    pub fn per_env_configs(&self) -> Option<&[CartpoleConfig]> {
+        self.per_env_cfgs.as_deref()
+    }
+
+    /// Shared base cfg accessor (used by DR builders).
+    pub fn base_cfg(&self) -> &CartpoleConfig {
+        &self.cartpole_cfg
     }
 
     /// Reset all envs (optionally seeded per-env). Returns observations stacked
@@ -148,8 +178,18 @@ impl VectorizedCartpoleEnv {
         // multiple `decimation` substeps).
         self.actions_scratch.copy_from_slice(actions);
 
-        for _ in 0..self.decimation {
-            step_vectorized(&mut self.states, &self.actions_scratch, &self.cartpole_cfg);
+        // Choose dispatch path: per-env DR if installed, else shared cfg.
+        match self.per_env_cfgs.as_deref() {
+            Some(cfgs) => {
+                for _ in 0..self.decimation {
+                    step_vectorized_per_env(&mut self.states, &self.actions_scratch, cfgs);
+                }
+            }
+            None => {
+                for _ in 0..self.decimation {
+                    step_vectorized(&mut self.states, &self.actions_scratch, &self.cartpole_cfg);
+                }
+            }
         }
         for i in 0..self.num_envs {
             self.steps_in_episode[i] += self.decimation;
@@ -328,5 +368,47 @@ mod tests {
             let r = env.step_all(&actions);
             assert!(r.iter().all(|x| x.reward.is_finite()));
         }
+    }
+
+    #[test]
+    fn per_env_dr_drives_state_divergence() {
+        // Same action, different per-env physics → divergent states.
+        use crate::dr::DomainRandomizationCfg;
+        let mut env = make_env(16);
+        let dr = DomainRandomizationCfg::around(env.base_cfg());
+        let cfgs = dr.sample_n(env.base_cfg(), 16, 7);
+        env.set_per_env_configs(cfgs);
+        env.reset_all(Some(1));
+        let actions = vec![3.0_f32; 16];
+        for _ in 0..50 {
+            let _ = env.step_all(&actions);
+        }
+        let obs = env.observations_flat();
+        let mut min_x_dot = f32::INFINITY;
+        let mut max_x_dot = f32::NEG_INFINITY;
+        for i in 0..16 {
+            let x_dot = obs[i * 4 + 1];
+            if x_dot < min_x_dot {
+                min_x_dot = x_dot;
+            }
+            if x_dot > max_x_dot {
+                max_x_dot = x_dot;
+            }
+        }
+        assert!(
+            max_x_dot - min_x_dot > 1e-3,
+            "per-env DR should diverge x_dot across envs: got range [{min_x_dot}, {max_x_dot}]"
+        );
+    }
+
+    #[test]
+    fn clear_per_env_configs_reverts_to_shared() {
+        use crate::dr::DomainRandomizationCfg;
+        let mut env = make_env(4);
+        let dr = DomainRandomizationCfg::around(env.base_cfg());
+        env.set_per_env_configs(dr.sample_n(env.base_cfg(), 4, 1));
+        assert!(env.per_env_configs().is_some());
+        env.clear_per_env_configs();
+        assert!(env.per_env_configs().is_none());
     }
 }
