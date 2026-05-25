@@ -14,12 +14,14 @@ pub const ADR: &str = "ADR-2605261800";
 pub const PHASE: &str = "R1.1-pinhole-camera";
 pub const KAMI_NAME: &str = "kami-sensor-sim";
 pub const NV_COMPAT_TARGET: &str = "isaacsim.sensors";
-pub const SUPPORTED_SENSORS_R1_1: &[&str] = &["camera", "lidar", "imu"];
+pub const SUPPORTED_SENSORS_R1_1: &[&str] = &["camera", "lidar", "imu", "contact"];
 
 mod camera;
+mod contact;
 mod imu;
 mod lidar;
 
 pub use camera::{Camera, CameraIntrinsics, DepthImage, Projection};
+pub use contact::{ContactReading, ContactSensor};
 pub use imu::{Imu, ImuReading};
 pub use lidar::{Lidar, LidarIntrinsics, LidarReturn, Primitive, Scene};
