@@ -29,6 +29,7 @@ mod double_pendulum;
 mod ik;
 mod jacobian;
 mod planar_chain;
+mod trajectory;
 mod vectorized;
 mod world;
 
@@ -45,6 +46,10 @@ pub use jacobian::{
     Jacobian, cartpole_link_jacobian, dp_link_jacobian, planar_chain_link_jacobian,
 };
 pub use planar_chain::{PlanarChainConfig, PlanarChainState};
+pub use trajectory::{
+    CubicPolynomialTrajectory, JointTrajectory, QuinticPolynomialTrajectory,
+    WaypointTrajectory,
+};
 pub use vectorized::{WGSL_SOURCE, step_vectorized};
 pub use world::{Articulation, ArticulationHandle, LinkState, World};
 
