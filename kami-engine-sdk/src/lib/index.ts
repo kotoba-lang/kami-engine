@@ -119,7 +119,7 @@ export type {
   DocumentTheme,
 } from './document/index.js';
 
-// WebVR (choice-based VR incident-response walkthrough — smartphone WebXR)
+// WebVR (headless choice-based incident-response engine; no built-in renderer)
 // Use `import { ... } from '@etzhayyim/kami-engine-sdk/webvr'` for tree-shaking
 export type {
   IncidentScenario,
@@ -131,12 +131,11 @@ export type {
   LocationKind,
   Stage,
   Severity,
+  NodeEffectKind,
   SceneDescriptor,
   IncidentBridge,
   CreateIncidentVrEngineOpts,
   IncidentVrEngine,
-  MountOpts,
-  SceneHandle,
 } from './webvr/index.js';
 export {
   ZERO_KPI,
@@ -144,7 +143,6 @@ export {
   INCIDENT_GRAPH,
   applySelection,
   initialState,
-  mountIncidentScene,
   createIncidentVrEngine,
   createCineBridge,
   createMockCineBridge,

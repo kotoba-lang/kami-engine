@@ -90,77 +90,17 @@ interface GPUTextureView {}
 
 type GPUTextureFormat = string;
 
-// three is an OPTIONAL peer dependency (see package.json). Declare the
-// subset of named exports used by webvr-scene.ts as `any`-classes so the
-// SDK type-checks without requiring @types/three. Each class is both a
-// value (constructor) and a type. Downstream consumers with @types/three
-// installed get the real types via lib-augmentation.
-declare module 'three' {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  // Classes — usable both as `new THREE.X(...)` and as a TS type `THREE.X`.
-  export class WebGLRenderer       { constructor(...args: any[]); [k: string]: any }
-  export class Scene               { constructor(...args: any[]); [k: string]: any }
-  export class PerspectiveCamera   { constructor(...args: any[]); [k: string]: any }
-  export class Group               { constructor(...args: any[]); [k: string]: any }
-  export class Mesh                { constructor(...args: any[]); [k: string]: any }
-  export class Object3D            { constructor(...args: any[]); [k: string]: any }
-  export class HemisphereLight     { constructor(...args: any[]); [k: string]: any }
-  export class DirectionalLight    { constructor(...args: any[]); [k: string]: any }
-  export class AmbientLight        { constructor(...args: any[]); [k: string]: any }
-  export class SphereGeometry      { constructor(...args: any[]); [k: string]: any }
-  export class Color               { constructor(...args: any[]); [k: string]: any }
-  export class Fog                 { constructor(...args: any[]); [k: string]: any }
-  export class CanvasTexture       { constructor(...args: any[]); [k: string]: any }
-  export class Material            { constructor(...args: any[]); [k: string]: any }
-  export class MeshBasicMaterial   { constructor(...args: any[]); [k: string]: any }
-  export class MeshLambertMaterial { constructor(...args: any[]); [k: string]: any }
-  export class MeshToonMaterial    { constructor(...args: any[]); [k: string]: any }
-  export class MeshDepthMaterial   { constructor(...args: any[]); [k: string]: any }
-  export class DataTexture         { constructor(...args: any[]); [k: string]: any }
-  export class PlaneGeometry       { constructor(...args: any[]); [k: string]: any }
-  export class BoxGeometry         { constructor(...args: any[]); [k: string]: any }
-  export class CylinderGeometry    { constructor(...args: any[]); [k: string]: any }
-  export class RingGeometry        { constructor(...args: any[]); [k: string]: any }
-  export class BufferGeometry      { constructor(...args: any[]); [k: string]: any }
-  export class Raycaster           { constructor(...args: any[]); [k: string]: any }
-  export class Vector2             { constructor(...args: any[]); [k: string]: any }
-  export class Vector3             { constructor(...args: any[]); [k: string]: any }
-  export class Vector4             { constructor(...args: any[]); [k: string]: any }
-  export class Quaternion          { constructor(...args: any[]); [k: string]: any }
-  export class Euler               { constructor(...args: any[]); [k: string]: any }
-  export class Matrix4             { constructor(...args: any[]); [k: string]: any }
-  // Additional classes used by the `spark` sample suite.
-  export class Points                    { constructor(...args: any[]); [k: string]: any }
-  export class PointsMaterial            { constructor(...args: any[]); [k: string]: any }
-  export class ShaderMaterial            { constructor(...args: any[]); [k: string]: any }
-  export class RawShaderMaterial         { constructor(...args: any[]); [k: string]: any }
-  export class BufferAttribute           { constructor(...args: any[]); [k: string]: any }
-  export class Float32BufferAttribute    { constructor(...args: any[]); [k: string]: any }
-  export class Uint16BufferAttribute     { constructor(...args: any[]); [k: string]: any }
-  export class InstancedMesh             { constructor(...args: any[]); [k: string]: any }
-  export class InstancedBufferAttribute  { constructor(...args: any[]); [k: string]: any }
-  export class InstancedBufferGeometry   { constructor(...args: any[]); [k: string]: any }
-  export class Clock                     { constructor(...args: any[]); [k: string]: any }
-  export class Texture                   { constructor(...args: any[]); [k: string]: any }
-  export class OrthographicCamera        { constructor(...args: any[]); [k: string]: any }
-  // Enums / consts.
-  export const BackSide: any;
-  export const FrontSide: any;
-  export const DoubleSide: any;
-  export const SRGBColorSpace: any;
-  export const AdditiveBlending: any;
-  export const NormalBlending: any;
-  export const DynamicDrawUsage: any;
-  export const RGBAFormat: any;
-  export const FloatType: any;
-  export const ClampToEdgeWrapping: any;
-  export const LinearFilter: any;
-  export const NearestFilter: any;
-}
+// three.js was previously declared as an OPTIONAL peer dependency for the
+// (now-removed) `spark/` and `webvr/webvr-scene.ts` modules. As of
+// 2026-05-26 the SDK is three-free: 3DGS rendering goes through the
+// canonical `GsplatAdapter` (Rust + wgpu, kami-pipelines crate) via the
+// `gsplat/` WASM bridge, and webvr is a headless engine whose surface is
+// owned by a `kami-app-{game}` crate. No `declare module 'three'` block
+// is needed any more — keep this comment as a removal marker.
 
-// Minimal WebXR shape — keeps webvr-scene.ts type-checking without
-// requiring @types/webxr. Apps with their own @types/webxr will
-// override this via interface merging.
+// Minimal WebXR shape — kept for downstream callers that still consume
+// SceneDescriptor.cameraHint to drive their own WebXR surfaces.
+// Apps with their own @types/webxr will override this via interface merging.
 interface XRSession extends EventTarget {
   end(): Promise<void>;
 }

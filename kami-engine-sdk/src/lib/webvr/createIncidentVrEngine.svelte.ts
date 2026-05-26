@@ -1,7 +1,15 @@
 /**
  * webvr/createIncidentVrEngine.svelte.ts — Svelte 5 runes builder that
- * wires a `mountIncidentScene` Three.js scene to the `INCIDENT_GRAPH`
- * Pregel pipeline.
+ * runs the `INCIDENT_GRAPH` Pregel pipeline as a *headless* engine and
+ * republishes a `SceneDescriptor` on every transition.
+ *
+ * The renderer is intentionally pluggable: kami-engine-sdk owns the
+ * scenario logic, KPI math, cine-bridge resolution and decision log;
+ * the actual scene rendering belongs to a `kami-app-{game}` crate
+ * (kami-engine wgpu, per ADR-0031 + the "独自レンダラ禁止 — kami-render
+ * wgpu PBR pipeline が唯一" constitutional rule in 40-engine/kami-engine
+ * CLAUDE.md). Callers pass an `onScene` callback to receive the latest
+ * descriptor and drive their own wgpu / WebXR surface.
  *
  * Usage (Svelte 5):
  *
@@ -9,16 +17,25 @@
  * <script lang="ts">
  *   import { createIncidentVrEngine } from '@etzhayyim/kami-engine-sdk/webvr';
  *   import { SEMI_PLANT_INCIDENT } from '$lib/scenarios/semiconductor-chem-plant';
+ *   import { mountWebvrSurface } from '$lib/kami-app-webvr';
+ *
  *   let canvas: HTMLCanvasElement;
- *   const engine = createIncidentVrEngine({ scenario: SEMI_PLANT_INCIDENT });
- *   $effect(() => { if (canvas) engine.attach(canvas); return () => engine.detach(); });
+ *   const engine = createIncidentVrEngine({
+ *     scenario: SEMI_PLANT_INCIDENT,
+ *     onScene: (scene) => surface?.update(scene),
+ *   });
+ *   let surface: ReturnType<typeof mountWebvrSurface> | undefined;
+ *   $effect(() => {
+ *     if (!canvas) return;
+ *     surface = mountWebvrSurface(canvas, { onSelect: engine.select });
+ *     return () => surface?.dispose();
+ *   });
  * </script>
  *
  * <canvas bind:this={canvas} style="width:100vw;height:100vh"></canvas>
  * ```
  */
 
-import { mountIncidentScene, type SceneHandle } from './webvr-scene.js';
 import {
   INCIDENT_GRAPH,
   applySelection,
@@ -35,27 +52,10 @@ import type { CineBridge, CineSceneArtifacts, CinePanelArtifact } from './cine-b
 
 export interface CreateIncidentVrEngineOpts {
   scenario: IncidentScenario;
+  /** Called on every published `SceneDescriptor` (initial + transitions + cine landings). */
+  onScene?: (scene: SceneDescriptor) => void;
   /** Optional sink for op-log entries (XRPC dispatch, AT Record persist). */
   onOpLog?: IncidentBridge['onOpLog'];
-  /** Gaze-dwell ms before auto-confirm. Default 3000 (3s). */
-  gazeDwellMs?: number;
-  /**
-   * Per-node selection deadline in ms. Auto-fires the inaction choice on
-   * timeout. Default 10000 (10s). Set 0 to disable.
-   */
-  selectionDeadlineMs?: number;
-  /** Show Enter VR button. Default true. */
-  enableVrButton?: boolean;
-  /** Auto-speak the briefing on scene transition. Default true. */
-  narrate?: boolean;
-  /** BCP-47 voice language. Default 'ja-JP'. */
-  narrateLang?: string;
-  /** Transition fade duration in ms. Default 280, 0 disables. */
-  transitionFadeMs?: number;
-  /** Render the Gaussian splat ambient backdrop. Default true. */
-  useSparkBackdrop?: boolean;
-  /** Splat budget per backdrop. Default 6000. */
-  sparkSplatBudget?: number;
   /**
    * Optional kami-cine pipeline bridge. When supplied, every IncidentNode
    * that declares a `cine` prompt has its scene artifacts resolved before
@@ -73,21 +73,15 @@ export interface IncidentVrEngine {
   /** Decision history (alias of state.history). */
   readonly history: IncidentDecisionLog[];
 
-  /** Attach to a canvas — call once on mount. */
-  attach(canvas: HTMLCanvasElement): void;
-  /** Tear down the renderer + listeners. */
-  detach(): void;
   /** Restart the scenario from `start`. */
   reset(): void;
-  /** Programmatic choice select (also called by gaze/tap from the scene). */
+  /** Programmatic choice select — also wired by the host renderer's gaze/tap. */
   select(choiceId: string): void;
 }
 
 export function createIncidentVrEngine(opts: CreateIncidentVrEngineOpts): IncidentVrEngine {
   let state = $state<IncidentState>(initialState(opts.scenario));
   let scene = $state<SceneDescriptor | undefined>(undefined);
-  let handle: SceneHandle | undefined;
-  let canvasEl: HTMLCanvasElement | undefined;
 
   // Per-node caches — both Stage 1-4 (cine) and Stage 5-6 (panel).
   const cineCache  = new Map<string, CineSceneArtifacts>();
@@ -158,25 +152,22 @@ export function createIncidentVrEngine(opts: CreateIncidentVrEngineOpts): Incide
 
   function publish() {
     scene = buildScene();
-    handle?.update(scene);
+    opts.onScene?.(scene);
     opts.onOpLog?.({
       op: state.done ? 'terminate' : 'enter',
       nodeId: state.current,
       kpi: state.kpi,
       at: new Date().toISOString(),
     });
-    // Async cine resolution — Stage 1-4 first, then chain Stage 5-6.
-    // Each landing re-emits the SceneDescriptor so the renderer can swap
-    // mood / camera / gsplat / panel illustration on arrival.
     void (async () => {
       const cine = await resolveCine();
       if (!cine) return;
       scene = buildScene({ cine });
-      handle?.update(scene);
+      opts.onScene?.(scene);
       const panel = await resolvePanel(cine);
       if (!panel) return;
       scene = buildScene({ cine, panel });
-      handle?.update(scene);
+      opts.onScene?.(scene);
     })();
   }
 
@@ -198,29 +189,6 @@ export function createIncidentVrEngine(opts: CreateIncidentVrEngineOpts): Incide
     publish();
   }
 
-  function attach(canvas: HTMLCanvasElement) {
-    canvasEl = canvas;
-    handle = mountIncidentScene(canvas, {
-      onSelect: select,
-      gazeDwellMs: opts.gazeDwellMs,
-      selectionDeadlineMs: opts.selectionDeadlineMs,
-      enableVrButton: opts.enableVrButton,
-      narrate: opts.narrate,
-      narrateLang: opts.narrateLang,
-      transitionFadeMs: opts.transitionFadeMs,
-      useSparkBackdrop: opts.useSparkBackdrop,
-      sparkSplatBudget: opts.sparkSplatBudget,
-      initial: buildScene(),
-    });
-    publish();
-  }
-
-  function detach() {
-    handle?.dispose();
-    handle = undefined;
-    canvasEl = undefined;
-  }
-
   function reset() {
     state = initialState(opts.scenario);
     publish();
@@ -230,12 +198,14 @@ export function createIncidentVrEngine(opts: CreateIncidentVrEngineOpts): Incide
   // Studio or run a headless dry-run from the same engine instance.
   void INCIDENT_GRAPH;
 
+  // Emit the initial descriptor synchronously so callers can attach a
+  // renderer in a Svelte `$effect` without missing the first frame.
+  publish();
+
   return {
     get state() { return state; },
     get scene() { return scene; },
     get history() { return state.history; },
-    attach,
-    detach,
     reset,
     select,
   };

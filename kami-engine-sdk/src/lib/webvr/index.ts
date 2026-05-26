@@ -1,16 +1,20 @@
 /**
- * @etzhayyim/kami-engine-sdk/webvr — Choice-based VR incident-response
- * walkthrough runtime for smartphone WebXR.
+ * @etzhayyim/kami-engine-sdk/webvr — Headless choice-based incident-response
+ * runtime (state + KPI math + decision log + kami-cine bridge).
+ *
+ * The renderer is intentionally NOT included — kami-engine-sdk is
+ * three.js-free as of 2026-05-26, and the canonical scene surface is a
+ * `kami-app-{game}` wgpu crate (see 40-engine/kami-engine CLAUDE.md
+ * "独自レンダラ禁止 — kami-render wgpu PBR pipeline が唯一"). Pass an
+ * `onScene` callback to `createIncidentVrEngine` and drive your own
+ * surface from there.
  *
  * Public surface:
  *   - Types: IncidentScenario, IncidentNode, IncidentChoice, IncidentKpi,
  *     IncidentState, IncidentDecisionLog, LocationKind, Stage, Severity
  *   - Pregel: INCIDENT_GRAPH (compiled LangGraph), applySelection, initialState
- *   - Renderer: mountIncidentScene, SceneDescriptor
- *   - Builder: createIncidentVrEngine (Svelte 5 runes)
- *
- * Scenarios themselves are NOT exported from this SDK — the SDK provides
- * the engine; downstream apps supply the scenario data.
+ *   - Engine: createIncidentVrEngine (Svelte 5 runes, headless)
+ *   - Cine bridge: createCineBridge / createMockCineBridge
  */
 
 export type {
@@ -23,6 +27,7 @@ export type {
   LocationKind,
   Stage,
   Severity,
+  NodeEffectKind,
 } from './types.js';
 
 export { ZERO_KPI, applyKpiDelta } from './types.js';
@@ -34,8 +39,6 @@ export {
   type SceneDescriptor,
   type IncidentBridge,
 } from './incident-pregel.js';
-
-export { mountIncidentScene, type MountOpts, type SceneHandle } from './webvr-scene.js';
 
 export {
   createIncidentVrEngine,

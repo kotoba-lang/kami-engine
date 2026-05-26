@@ -46,7 +46,7 @@ import {
 import type { CineBridge, CineSceneArtifacts } from './cine-bridge.js';
 
 // ─────────────────────────────────────────────────────────────────────────
-// Scene descriptor (consumed by webvr-scene.ts)
+// Scene descriptor (consumed by the host renderer; the SDK no longer ships a built-in renderer)
 
 export interface SceneDescriptor {
   location: LocationKind;

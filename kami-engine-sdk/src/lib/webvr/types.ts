@@ -84,7 +84,7 @@ export interface IncidentNode {
   choices: IncidentChoice[];
   /** Set iff this is a terminal node. */
   terminal?: 'success' | 'partial' | 'failure';
-  /** Cinematic camera hint for the VR scene (string label, picked up by webvr-scene.ts). */
+  /** Cinematic camera hint for the VR scene (string label, consumed by the host renderer). */
   cameraHint?: 'overview' | 'console' | 'tankClose' | 'doorway' | 'briefingTable';
   /**
    * Optional kami-cine generation hint for this node. When set, the Pregel
@@ -101,17 +101,19 @@ export interface IncidentNode {
 
   /**
    * Optional per-node visual effects layered on top of the location's
-   * splat backdrop. Each kind maps to a small `NodeEffectInstance` that
-   * the renderer mounts on scene entry and disposes on exit. See
-   * `node-effects.ts` for the registry.
+   * splat backdrop. Each kind is a string label that the host renderer
+   * maps to its own effect implementation (kami-engine-sdk no longer
+   * ships a built-in renderer registry — see ADR-0031 + the "独自レンダラ
+   * 禁止" rule in 40-engine/kami-engine CLAUDE.md).
    */
   effects?: NodeEffectKind[];
 }
 
 /**
- * Built-in per-node visual effects. Each is a self-contained Three.js
- * Group with an animation tick. Stack multiple effects per node by
- * listing them in `IncidentNode.effects`.
+ * Per-node visual effect labels. Each is a stable string id that the host
+ * renderer (a `kami-app-{game}` wgpu surface, per the "独自レンダラ禁止"
+ * rule in 40-engine/kami-engine CLAUDE.md) maps to its own effect.
+ * Stack multiple effects per node by listing them in `IncidentNode.effects`.
  *
  * - `redAlarm`        — Pulsing red beacon overhead.
  * - `orangeSmoke`     — Rising particle column (chemical fire / runaway).

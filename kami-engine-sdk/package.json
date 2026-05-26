@@ -16,10 +16,11 @@
     "kami",
     "svelte",
     "vrm",
-    "three",
+    "wgpu",
     "manga",
     "genko",
-    "manufacturing"
+    "manufacturing",
+    "gsplat"
   ],
   "exports": {
     ".": {
@@ -71,10 +72,6 @@
       "types": "./dist/gsplat/index.d.ts",
       "default": "./dist/gsplat/index.js"
     },
-    "./spark": {
-      "types": "./dist/spark/index.d.ts",
-      "default": "./dist/spark/index.js"
-    },
     "./webvr": {
       "types": "./dist/webvr/index.d.ts",
       "svelte": "./dist/webvr/index.js",
@@ -92,14 +89,10 @@
   },
   "peerDependencies": {
     "svelte": "^5.0.0",
-    "@pixiv/three-vrm": ">=3.0.0",
-    "three": ">=0.160.0",
     "@langchain/langgraph": ">=1.0.0",
     "@langchain/core": ">=1.0.0"
   },
   "peerDependenciesMeta": {
-    "@pixiv/three-vrm": { "optional": true },
-    "three": { "optional": true },
     "@langchain/langgraph": { "optional": true },
     "@langchain/core": { "optional": true }
   },
