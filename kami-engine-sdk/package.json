@@ -92,10 +92,6 @@
     "@langchain/langgraph": ">=1.0.0",
     "@langchain/core": ">=1.0.0"
   },
-  "peerDependenciesMeta": {
-    "@langchain/langgraph": { "optional": true },
-    "@langchain/core": { "optional": true }
-  },
   "devDependencies": {
     "@sveltejs/package": "^2.5.7",
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
