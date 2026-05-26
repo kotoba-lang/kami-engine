@@ -1,7 +1,7 @@
 {
   "name": "@etzhayyim/kami-engine-sdk",
   "version": "0.1.0",
-  "description": "KAMI Engine SDK: Svelte 5 VRM character components, headless builders, Genko manga editor, trackpad embeds, and manufacturing planning helpers.",
+  "description": "KAMI Engine SDK: Svelte 5 VRM viewer (wgpu via WASM, three.js-free since 2026-05-26), headless builders, 3D Gaussian Splat preview bridge, headless incident-response engine, Genko manga editor, trackpad embeds, and manufacturing planning helpers.",
   "type": "module",
   "license": "Apache-2.0",
   "homepage": "https://github.com/etzhayyim/kami-engine-sdk#readme",
@@ -90,6 +90,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "peerDependencies": {
     "svelte": "^5.0.0",
