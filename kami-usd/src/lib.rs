@@ -304,6 +304,112 @@ fn parse_vec3(s: &str) -> Option<[f32; 3]> {
     Some([x, y, z])
 }
 
+/// Serialize a `Stage` back into USDA text.
+///
+/// Inverse of [`parse_usda`] over the supported prim subset, so a
+/// programmatically-constructed `Stage` (e.g. a generated ISEKAI world)
+/// can be emitted as a `.usda` document and either rendered in-engine or
+/// handed to an external USD tool. The round-trip
+/// `parse_usda(to_usda(&s))` preserves prim kinds, transforms, and the
+/// physics-scene gravity vector.
+///
+/// Like the parser, this is deliberately small — it covers exactly the
+/// `PrimKind` set the R1.1 mini-parser understands. When `tinyusdz` lands
+/// at R1.2 (§D10.3) this body is replaced without touching callers.
+pub fn to_usda(stage: &Stage) -> String {
+    let up = match stage.up_axis {
+        UpAxis::X => "X",
+        UpAxis::Y => "Y",
+        UpAxis::Z => "Z",
+    };
+    let mut out = String::new();
+    out.push_str("#usda 1.0\n(\n");
+    out.push_str(&format!("    upAxis = \"{up}\"\n"));
+    out.push_str(&format!("    metersPerUnit = {}\n", fnum(stage.meters_per_unit)));
+    out.push_str(")\n");
+
+    for prim in &stage.prims {
+        let name = prim.path.trim_start_matches('/');
+        let kind_tok = match &prim.kind {
+            PrimKind::Xform => "Xform",
+            PrimKind::Cube { .. } => "Cube",
+            PrimKind::Sphere { .. } => "Sphere",
+            PrimKind::Plane { .. } => "Plane",
+            PrimKind::Mesh => "Mesh",
+            PrimKind::PhysicsScene { .. } => "PhysicsScene",
+            PrimKind::Cartpole { .. } => "Cartpole",
+        };
+        out.push_str(&format!("\ndef {kind_tok} \"{name}\"\n{{\n"));
+
+        // Transform ops (skip identity to keep output terse).
+        let t = prim.xform.translate;
+        if t != [0.0, 0.0, 0.0] {
+            out.push_str(&format!("    double3 xformOp:translate = {}\n", fvec3(t)));
+        }
+        let r = prim.xform.rotate_xyz_deg;
+        if r != [0.0, 0.0, 0.0] {
+            out.push_str(&format!("    double3 xformOp:rotateXYZ = {}\n", fvec3(r)));
+        }
+        let s = prim.xform.scale;
+        if s != [1.0, 1.0, 1.0] {
+            out.push_str(&format!("    double3 xformOp:scale = {}\n", fvec3(s)));
+        }
+
+        // Kind-specific attributes.
+        match &prim.kind {
+            PrimKind::Cube { size } => {
+                out.push_str(&format!("    double size = {}\n", fnum(*size)));
+            }
+            PrimKind::Sphere { radius } => {
+                out.push_str(&format!("    double radius = {}\n", fnum(*radius)));
+            }
+            PrimKind::Plane { width, length } => {
+                out.push_str(&format!("    double width = {}\n", fnum(*width)));
+                out.push_str(&format!("    double length = {}\n", fnum(*length)));
+            }
+            PrimKind::PhysicsScene { gravity } => {
+                let mag = (gravity[0].powi(2) + gravity[1].powi(2) + gravity[2].powi(2)).sqrt();
+                let dir = if mag > 1e-6 {
+                    [gravity[0] / mag, gravity[1] / mag, gravity[2] / mag]
+                } else {
+                    [0.0, -1.0, 0.0]
+                };
+                out.push_str(&format!(
+                    "    vector3f physics:gravityDirection = {}\n",
+                    fvec3(dir)
+                ));
+                out.push_str(&format!(
+                    "    float physics:gravityMagnitude = {}\n",
+                    fnum(if mag > 1e-6 { mag } else { 9.81 })
+                ));
+            }
+            PrimKind::Cartpole { urdf_ref } => {
+                let r = if urdf_ref.is_empty() {
+                    "./cartpole.urdf"
+                } else {
+                    urdf_ref.as_str()
+                };
+                out.push_str(&format!("    custom string urdf = \"@{r}@\"\n"));
+            }
+            PrimKind::Xform | PrimKind::Mesh => {}
+        }
+
+        out.push_str("}\n");
+    }
+
+    out
+}
+
+/// Compact float formatting: integers print without a trailing `.0`,
+/// fractionals keep their natural shortest representation.
+fn fnum(v: f32) -> String {
+    format!("{v}")
+}
+
+fn fvec3(v: [f32; 3]) -> String {
+    format!("({}, {}, {})", fnum(v[0]), fnum(v[1]), fnum(v[2]))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -368,6 +474,86 @@ def Cartpole "cart"
     fn empty_stage_round_trips() {
         let st = parse_usda("#usda 1.0\n").expect("parse");
         assert!(st.prims.is_empty());
+    }
+
+    #[test]
+    fn to_usda_round_trips() {
+        let original = parse_usda(ISEKAI_OMNIVERSE).expect("parse");
+        let text = to_usda(&original);
+        let reparsed = parse_usda(&text).expect("reparse generated usda");
+
+        assert_eq!(reparsed.up_axis, original.up_axis);
+        assert_eq!(reparsed.meters_per_unit, original.meters_per_unit);
+        assert_eq!(reparsed.prims.len(), original.prims.len());
+
+        for (a, b) in original.prims.iter().zip(reparsed.prims.iter()) {
+            assert_eq!(a.path, b.path);
+            assert_eq!(a.xform.translate, b.xform.translate);
+            // Kind tag must survive the round-trip.
+            assert_eq!(
+                std::mem::discriminant(&a.kind),
+                std::mem::discriminant(&b.kind)
+            );
+        }
+
+        // PhysicsScene gravity vector survives within tolerance.
+        if let (PrimKind::PhysicsScene { gravity: ga }, PrimKind::PhysicsScene { gravity: gb }) =
+            (&original.prims[0].kind, &reparsed.prims[0].kind)
+        {
+            for k in 0..3 {
+                assert!((ga[k] - gb[k]).abs() < 1e-2, "gravity[{k}] drift");
+            }
+        } else {
+            panic!("prim 0 expected PhysicsScene");
+        }
+    }
+
+    #[test]
+    fn generated_cube_world_round_trips() {
+        let stage = Stage {
+            up_axis: UpAxis::Y,
+            meters_per_unit: 1.0,
+            prims: vec![
+                Prim {
+                    path: "/physics".into(),
+                    kind: PrimKind::PhysicsScene {
+                        gravity: [0.0, -9.81, 0.0],
+                    },
+                    xform: Xform {
+                        scale: [1.0, 1.0, 1.0],
+                        ..Default::default()
+                    },
+                    attrs: vec![],
+                },
+                Prim {
+                    path: "/block_a".into(),
+                    kind: PrimKind::Cube { size: 2.0 },
+                    xform: Xform {
+                        translate: [-10.0, 34.0, 18.0],
+                        scale: [1.0, 1.0, 1.0],
+                        ..Default::default()
+                    },
+                    attrs: vec![],
+                },
+                Prim {
+                    path: "/orb".into(),
+                    kind: PrimKind::Sphere { radius: 1.5 },
+                    xform: Xform {
+                        translate: [-6.0, 35.0, 18.0],
+                        scale: [1.0, 1.0, 1.0],
+                        ..Default::default()
+                    },
+                    attrs: vec![],
+                },
+            ],
+        };
+        let st = parse_usda(&to_usda(&stage)).expect("round-trip");
+        assert_eq!(st.prims.len(), 3);
+        assert!(matches!(st.prims[1].kind, PrimKind::Cube { size } if (size - 2.0).abs() < 1e-3));
+        assert!(
+            matches!(st.prims[2].kind, PrimKind::Sphere { radius } if (radius - 1.5).abs() < 1e-3)
+        );
+        assert_eq!(st.prims[1].xform.translate, [-10.0, 34.0, 18.0]);
     }
 
     #[test]
