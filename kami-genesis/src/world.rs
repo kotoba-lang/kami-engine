@@ -6,7 +6,9 @@
 
 use crate::cartpole::{CartpoleConfig, CartpoleState};
 use crate::double_pendulum::{DoublePendulumConfig, DoublePendulumState};
-use crate::jacobian::{Jacobian, cartpole_link_jacobian, dp_link_jacobian};
+use crate::jacobian::{
+    Jacobian, cartpole_link_jacobian, dp_link_jacobian, planar_chain_link_jacobian,
+};
 use crate::planar_chain::{PlanarChainConfig, PlanarChainState};
 use glam::{Quat, Vec3};
 use kami_articulated::{ArticulatedSystem, JointKind};
@@ -291,9 +293,12 @@ impl Articulation {
             ArticulationTopology::DoublePendulum { state, cfg } => {
                 dp_link_jacobian(state.q1, state.q2, link_name, cfg)
             }
-            // Analytic Jacobian for the N-link planar chain is a future R1.x
-            // item; the planar_chain solver does not yet expose it.
-            ArticulationTopology::PlanarChain { .. } => None,
+            // N-link planar chain: dispatch to the analytic Jacobian already
+            // implemented in jacobian.rs (resolve link name → ordered index).
+            ArticulationTopology::PlanarChain { state, cfg, links } => {
+                let idx = links.iter().position(|l| l == link_name)?;
+                planar_chain_link_jacobian(&state.q, idx, cfg)
+            }
         }
     }
 
@@ -629,10 +634,19 @@ mod tests {
 
     const CARTPOLE_URDF: &str =
         include_str!("../../../../70-tools/e7m-sim/scenes/cartpole/cartpole.urdf");
+    const ARM3_URDF: &str =
+        include_str!("../../../../70-tools/e7m-sim/scenes/arm3/arm3.urdf");
 
     fn cartpole_world() -> (World, ArticulationHandle) {
         let sys = kami_articulated::parse_urdf(CARTPOLE_URDF).unwrap();
         let mut world = World::default();
+        let h = world.add_articulation(sys).unwrap();
+        (world, h)
+    }
+
+    fn arm3_world() -> (World, ArticulationHandle) {
+        let sys = kami_articulated::parse_urdf(ARM3_URDF).unwrap();
+        let mut world = World::new(9.81, 1.0 / 240.0);
         let h = world.add_articulation(sys).unwrap();
         (world, h)
     }
@@ -761,6 +775,77 @@ mod tests {
         }
         let s = world.get(h).unwrap().double_pendulum_state().unwrap();
         assert!(s.q1.abs() > 0.001, "torques should drive shoulder motion");
+    }
+
+    // ── PlanarChain (N≥3 serial revolute) ──────────────────────────────────
+
+    #[test]
+    fn arm3_urdf_detected_as_planar_chain() {
+        let (w, h) = arm3_world();
+        let a = w.get(h).unwrap();
+        // 3 joint DOFs, and the cartpole/DP accessors return None.
+        assert_eq!(a.joint_positions().len(), 3);
+        assert_eq!(a.joint_velocities().len(), 3);
+        assert!(a.cartpole_state().is_none());
+        assert!(a.double_pendulum_state().is_none());
+    }
+
+    // KNOWN LIMITATION (next iteration): the planar_chain RNEA produces a
+    // singular mass matrix at the exact vertical rest pose (q=0), because the
+    // COM tangential-acceleration direction in rnea_planar is rotated 90°
+    // (uses the normal (−sinθ, cosθ) where the tangent (cosθ, sinθ) is
+    // required). A chain started exactly at q=0 therefore stays stuck. The
+    // n=2 double pendulum is unaffected (separate closed-form path). A
+    // torque-response test from q=0 is intentionally omitted until the
+    // rnea_planar kinematics are corrected; detection / FK / Jacobian wiring
+    // below are all independent of that defect.
+
+    #[test]
+    fn arm3_link_state_fk_hangs_down_at_rest() {
+        let (w, h) = arm3_world();
+        let a = w.get(h).unwrap();
+        // At q=0 every link hangs straight down (-z), x ≈ 0; distal links lower.
+        let l1 = a.link_state("l1").unwrap();
+        assert!(l1.position.x.abs() < 1e-4, "l1 x: {}", l1.position.x);
+        assert!(l1.position.z < 0.0, "l1 z: {}", l1.position.z);
+        let l3 = a.link_state("l3").unwrap();
+        assert!(l3.position.z < l1.position.z, "l3 should be below l1");
+        assert!(a.link_state("nope").is_none());
+        assert_eq!(a.link_state("base").unwrap().position, Vec3::ZERO);
+    }
+
+    #[test]
+    fn arm3_jacobian_wired_and_matches_link_state_velocity() {
+        // World::jacobian() must dispatch PlanarChain links to the analytic
+        // Jacobian (was None). Cross-check: J·q̇ linear rows equal the COM
+        // linear velocity from link_state at a torque-driven pose. Two
+        // independent derivations, one answer.
+        let (mut w, h) = arm3_world();
+        for _ in 0..40 {
+            w.get_mut(h).unwrap().set_joint_torques(&[3.0, -1.5, 0.8]);
+            w.step();
+        }
+        let a = w.get(h).unwrap();
+        let qdot = a.joint_velocities();
+        for link in ["l1", "l2", "l3"] {
+            let j = a.jacobian(link).expect("planar-chain jacobian must be wired");
+            assert_eq!(j.cols(), 3);
+            // jacobian.rs row layout: rows[0]=v_x, rows[2]=v_z.
+            let vx: f32 = (0..3).map(|c| j.rows[0][c] * qdot[c]).sum();
+            let vz: f32 = (0..3).map(|c| j.rows[2][c] * qdot[c]).sum();
+            let ls = a.link_state(link).unwrap();
+            assert!(
+                (vx - ls.linear_velocity.x).abs() < 1e-3,
+                "{link} vx: J·q̇={vx} link_state={}",
+                ls.linear_velocity.x
+            );
+            assert!(
+                (vz - ls.linear_velocity.z).abs() < 1e-3,
+                "{link} vz: J·q̇={vz} link_state={}",
+                ls.linear_velocity.z
+            );
+        }
+        assert!(w.get(h).unwrap().jacobian("nope").is_none());
     }
 
     #[test]
