@@ -790,15 +790,26 @@ mod tests {
         assert!(a.double_pendulum_state().is_none());
     }
 
-    // KNOWN LIMITATION (next iteration): the planar_chain RNEA produces a
-    // singular mass matrix at the exact vertical rest pose (q=0), because the
-    // COM tangential-acceleration direction in rnea_planar is rotated 90°
-    // (uses the normal (−sinθ, cosθ) where the tangent (cosθ, sinθ) is
-    // required). A chain started exactly at q=0 therefore stays stuck. The
-    // n=2 double pendulum is unaffected (separate closed-form path). A
-    // torque-response test from q=0 is intentionally omitted until the
-    // rnea_planar kinematics are corrected; detection / FK / Jacobian wiring
-    // below are all independent of that defect.
+    #[test]
+    fn arm3_base_joint_responds_to_torque() {
+        // The solver moves correctly from the vertical rest pose (q=0): a
+        // short, modest-torque horizon keeps the undamped chain in its
+        // well-behaved regime. (A long constant high-torque rollout would
+        // diverge under semi-implicit Euler — expected for an undamped chain,
+        // not a solver defect — so we assert over a short window.)
+        let (mut w, h) = arm3_world();
+        let q0 = w.get(h).unwrap().joint_positions();
+        for _ in 0..30 {
+            w.get_mut(h).unwrap().set_joint_torques(&[3.0, 0.0, 0.0]);
+            w.step();
+        }
+        let q1 = w.get(h).unwrap().joint_positions();
+        assert!(
+            (q1[0] - q0[0]).abs() > 0.01,
+            "base joint did not respond to torque: {q0:?} -> {q1:?}"
+        );
+        assert!(q1.iter().all(|v| v.is_finite()), "state non-finite: {q1:?}");
+    }
 
     #[test]
     fn arm3_link_state_fk_hangs_down_at_rest() {
