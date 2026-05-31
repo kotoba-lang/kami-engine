@@ -13,12 +13,13 @@
 //! Clean-room (no NVIDIA/PhysX/Isaac); sim is z-up, the renderer is y-up, so the
 //! whole scene is rotated −90° about X for display.
 
-use glam::{Mat4, Quat, Vec3};
+use glam::{Mat4, Vec3};
 #[cfg(target_family = "wasm")]
 use kami_app::{CameraMode, InputMode, KamiApp};
 use kami_genesis::{
     Articulation3dConfig, Articulation3dState, Collider, ContactParams, ContactWorld, Obstacle,
 };
+#[cfg(target_family = "wasm")]
 use kami_pipelines::unit_box;
 use serde::Deserialize;
 
@@ -39,6 +40,29 @@ pub struct Scene {
     pub bbox_m: [f32; 4],
     pub buildings: Vec<Building>,
     pub roads: Vec<Road>,
+    #[serde(default)]
+    pub objects: Vec<CityObject>,
+}
+
+/// A point asset (pole / lamp / signal / tree / hydrant …) — rendered as
+/// clickable geometry, registered as a kotoba EAVT entity (`*.assets.edn`).
+#[derive(Deserialize, Clone)]
+pub struct CityObject {
+    pub id: String,
+    pub kind: String,
+    pub pos: [f32; 2],
+    pub h: f32,
+    pub attrs: ObjectAttrs,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct ObjectAttrs {
+    #[serde(rename = "installYear")]
+    pub install_year: i64,
+    pub company: String,
+    #[serde(rename = "costJpy")]
+    pub cost_jpy: i64,
+    pub provenance: String,
 }
 
 #[derive(Deserialize)]
@@ -261,6 +285,47 @@ const AGENT_COLORS: [[f32; 3]; 6] = [
     [0.90, 0.50, 0.70],
 ];
 
+/// Render footprint (metres) for a point asset by kind.
+fn object_footprint(kind: &str) -> (f32, f32) {
+    match kind {
+        "tree" => (4.0, 4.0),
+        "bench" => (1.6, 0.5),
+        "vending_machine" => (1.2, 0.8),
+        "telephone" => (0.9, 0.9),
+        "fire_hydrant" => (0.6, 0.6),
+        "waste_basket" => (0.7, 0.7),
+        "advertising" => (1.2, 0.3),
+        _ => (0.5, 0.5), // poles: lamp / utility / signal
+    }
+}
+
+fn object_color(kind: &str) -> [f32; 3] {
+    match kind {
+        "tree" => [0.20, 0.58, 0.24],
+        "traffic_signals" => [0.96, 0.74, 0.10],
+        "street_lamp" => [0.78, 0.78, 0.82],
+        "utility_pole" => [0.52, 0.46, 0.40],
+        "fire_hydrant" => [0.86, 0.16, 0.13],
+        "bench" => [0.60, 0.45, 0.30],
+        "vending_machine" => [0.22, 0.52, 0.82],
+        "telephone" => [0.12, 0.60, 0.42],
+        "advertising" => [0.90, 0.30, 0.55],
+        _ => [0.70, 0.70, 0.72],
+    }
+}
+
+/// Publish the clicked asset's kotoba record to `window.__shibuya_pick` (JSON).
+#[cfg(target_family = "wasm")]
+fn publish_pick(json: &str) {
+    if let Some(w) = web_sys::window() {
+        let _ = js_sys::Reflect::set(
+            &w,
+            &JsValue::from_str("__shibuya_pick"),
+            &JsValue::from_str(json),
+        );
+    }
+}
+
 #[cfg(target_family = "wasm")]
 #[wasm_bindgen]
 pub async fn run_shibuya_v1(canvas_id: &str) -> Result<(), JsValue> {
@@ -282,10 +347,10 @@ pub async fn run_shibuya_v1(canvas_id: &str) -> Result<(), JsValue> {
         .with_label("shibuya")
         .with_hud_publish(true)
         .with_camera(CameraMode::Orbit {
-            target: Vec3::new(0.0, 40.0, 0.0),
-            distance: 620.0,
+            target: Vec3::new(0.0, 20.0, 0.0),
+            distance: 480.0,
             yaw: 0.6,
-            pitch: 0.55,
+            pitch: 0.62,
         })
         .with_input(InputMode::OrbitMouse);
 
@@ -350,6 +415,25 @@ pub async fn run_shibuya_v1(canvas_id: &str) -> Result<(), JsValue> {
     push_mesh(ctx, &cad, "buildings_low", &low, CONCRETE);
     push_mesh(ctx, &cad, "buildings_tall", &tall, GLASS);
 
+    // Point assets (poles / lamps / signals / trees / hydrants …) — each is its
+    // own pickable batch keyed by its kotoba entity id, so a click resolves to
+    // the EAVT record (kind / company / installYear / costJpy / provenance).
+    let mut pick_map: std::collections::HashMap<String, CityObject> = std::collections::HashMap::new();
+    for o in &scene.objects {
+        let (fx, fy) = object_footprint(&o.kind);
+        let m = to_render
+            * Mat4::from_translation(Vec3::new(o.pos[0], o.pos[1], o.h * 0.5))
+            * Mat4::from_scale(Vec3::new(fx, fy, o.h));
+        let (lp, ln, li) = unit_box();
+        let wp: Vec<[f32; 3]> = lp.iter().map(|v| {
+            let w = m.transform_point3(Vec3::from_array(*v));
+            [w.x, w.y, w.z]
+        }).collect();
+        cad.push_triangles(ctx, o.id.clone(), o.kind.clone(), &wp, &ln, &li, object_color(&o.kind), Mat4::IDENTITY);
+        pick_map.insert(o.id.clone(), o.clone());
+    }
+    log::info!("[shibuya] {} clickable assets (kotoba-linked)", scene.objects.len());
+
     // Agents.
     let obstacles = scene.building_obstacles();
     let spawns = scene.spawn_points(6);
@@ -374,11 +458,30 @@ pub async fn run_shibuya_v1(canvas_id: &str) -> Result<(), JsValue> {
     log::info!("[shibuya] spawned {} agents", agents.len());
 
     let render = cad.clone();
+    let picker = cad.clone();
     let mut step: u64 = 0;
     let app = app
         .with_pipeline(sky)
         .with_pipeline(cad)
-        .on_update(move |_world, _camera, _dt| {
+        .on_update(move |_world, camera, _dt| {
+            // The default far plane (256 m) clips this ~900 m city block; widen
+            // the frustum so the whole scene is visible (reset each frame in
+            // case a resize rebuilds the projection).
+            {
+                let rc = camera.as_render_mut();
+                rc.near = 1.0;
+                rc.far = 4000.0;
+            }
+            // Click an asset → resolve its kotoba EAVT record → publish to HUD.
+            if let Some(p) = picker.pick_from_camera_if_clicked(camera) {
+                picker.set_highlighted_by_id(&p.feature_id);
+                if let Some(o) = pick_map.get(&p.feature_id) {
+                    publish_pick(&format!(
+                        r#"{{"id":"{}","kind":"{}","company":"{}","installYear":{},"costJpy":{},"provenance":"{}"}}"#,
+                        o.id, o.kind, o.attrs.company, o.attrs.install_year, o.attrs.cost_jpy, o.attrs.provenance
+                    ));
+                }
+            }
             // 2 substeps/frame at 120 Hz ≈ 60 fps wall.
             for _ in 0..2 {
                 let t = step as f32 * DT;
@@ -421,6 +524,22 @@ mod tests {
         assert!(s.buildings.len() > 50, "buildings: {}", s.buildings.len());
         assert!(s.roads.len() > 50, "roads: {}", s.roads.len());
         assert_eq!(s.building_obstacles().len(), s.buildings.len());
+    }
+
+    #[test]
+    fn scene_has_kotoba_linked_objects() {
+        // Point assets carry the attributes a click surfaces from kotoba.
+        let s = Scene::load();
+        assert!(!s.objects.is_empty(), "expected clickable point assets");
+        for o in &s.objects {
+            assert!(!o.id.is_empty() && !o.kind.is_empty());
+            assert!(o.attrs.install_year >= 1900 && o.attrs.install_year <= 2025);
+            assert!(o.attrs.cost_jpy > 0 && !o.attrs.company.is_empty());
+            assert!(o.attrs.provenance == "osm" || o.attrs.provenance == "synthesized-demo");
+            // every asset kind has a render footprint + colour
+            let _ = object_footprint(&o.kind);
+            let _ = object_color(&o.kind);
+        }
     }
 
     #[test]
