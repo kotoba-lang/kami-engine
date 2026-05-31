@@ -75,7 +75,7 @@ grid each tick. `Fleet` drives many agents that sense each other.
 - Lidar **and** depth-camera perception (multi-modal fusion)
 - Static + **dynamic** obstacles (fresh-each-tick map + path-blocked replan)
 - Reactive emergency braking + goal-approach deceleration + latched arrival
-- Multi-agent right-of-way yielding (`Fleet`)
+- Multi-agent right-of-way yielding (`Fleet`), including **heterogeneous** fleets (car + drone + ship sharing a world)
 - Telemetry (state / distance-to-goal / cross-track error / target speed)
 - Dead-reckoning state estimation that survives absolute-fix dropout
 - Verified on a dense city street-grid, under noisy lidar, and with lidar+camera fusion
