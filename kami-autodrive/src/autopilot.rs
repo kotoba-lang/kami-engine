@@ -6,7 +6,7 @@ use kami_sensor_sim::{Camera, DepthImage, LidarReturn};
 
 use crate::classes::{VehicleClass, VehicleLimits};
 use crate::control::{curvature_speed_limit, PurePursuit, SpeedController};
-use crate::perception::{forward_clearance, OccupancyGrid};
+use crate::perception::{forward_clearance, forward_clearance_camera, OccupancyGrid};
 use crate::planner;
 use crate::types::{Command, Pose2};
 
@@ -271,9 +271,11 @@ impl Autopilot {
             self.grid.ingest_camera_depth(depth, camera, self.cfg.camera_z_band);
         }
 
-        // 2. Reactive emergency stop, independent of the planner.
+        // 2. Reactive emergency stop, independent of the planner — fused over
+        //    the lidar forward cone AND every depth camera (so a camera-only
+        //    rig still has a reflex).
         let stop_dist = self.braking_distance(speed);
-        if let Some(clear) = forward_clearance(lidar, self.cfg.emergency_cone, self.cfg.z_band)
+        if let Some(clear) = self.fwd_clearance(lidar, cameras, self.cfg.emergency_cone)
             && clear <= stop_dist + self.cfg.limits.footprint_radius
         {
             self.speed_ctl.reset();
@@ -318,8 +320,7 @@ impl Autopilot {
         // Decelerate to (near) rest at the goal: v ≤ √(2·d_max·distance).
         let d_goal = pose.pos().distance(goal);
         target_speed = target_speed.min((2.0 * self.cfg.limits.max_decel * d_goal).sqrt());
-        if let Some(clear) = forward_clearance(lidar, self.cfg.emergency_cone * 2.0, self.cfg.z_band)
-        {
+        if let Some(clear) = self.fwd_clearance(lidar, cameras, self.cfg.emergency_cone * 2.0) {
             // Linear taper: full speed at >2x brake dist, zero at brake dist.
             let near = self.braking_distance(self.cfg.limits.max_speed);
             let t = ((clear - stop_dist) / (near + 1e-3)).clamp(0.0, 1.0);
@@ -398,6 +399,23 @@ impl Autopilot {
         // while reversing (speed < 0 ⇒ yaw_rate = v/L·tanδ), steer the opposite
         // sign: nose-left needs steer right.
         if left_min >= right_min { -1.0 } else { 1.0 }
+    }
+
+    /// Nearest forward obstacle range fused over the lidar cone and every depth
+    /// camera (min of all available sources), or `None` if nothing is ahead.
+    fn fwd_clearance(
+        &self,
+        lidar: &[LidarReturn],
+        cameras: &[(&DepthImage, &Camera)],
+        cone: f32,
+    ) -> Option<f32> {
+        let mut best = forward_clearance(lidar, cone, self.cfg.z_band);
+        for (depth, cam) in cameras {
+            if let Some(c) = forward_clearance_camera(depth, cam, cone, self.cfg.camera_z_band) {
+                best = Some(best.map_or(c, |b| b.min(c)));
+            }
+        }
+        best
     }
 
     /// Kinematic stopping distance `v² / (2·d_max)` with a safety margin.

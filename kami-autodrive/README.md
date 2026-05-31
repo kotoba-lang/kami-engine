@@ -74,7 +74,7 @@ grid each tick. `Fleet` drives many agents that sense each other.
 - 4 vehicle classes, one GNC loop, real per-class physics plants
 - Lidar **and** depth-camera perception (multi-modal fusion)
 - Static + **dynamic** obstacles (fresh-each-tick map + path-blocked replan)
-- Reactive emergency braking + goal-approach deceleration + latched arrival
+- Reactive emergency braking (fused over lidar **and** depth cameras) + goal-approach deceleration + latched arrival
 - Multi-agent right-of-way yielding (`Fleet`), including **heterogeneous** fleets (car + drone + ship sharing a world)
 - Telemetry (state / distance-to-goal / cross-track error / target speed)
 - Dead-reckoning state estimation that survives absolute-fix dropout
@@ -89,7 +89,6 @@ grid each tick. `Fleet` drives many agents that sense each other.
 - Reverse K-turn recovery exists but is **opt-in / off by default**
   (`stuck_limit = 0`); it backs out safely and gives up bounded, but does not
   yet reliably escape arbitrary tight corners.
-- No camera-only reactive reflex (emergency braking uses the lidar cone).
 
 ## Governance
 

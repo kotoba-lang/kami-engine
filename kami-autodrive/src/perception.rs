@@ -201,6 +201,46 @@ impl OccupancyGrid {
     }
 }
 
+/// Smallest forward-cone obstacle range from a depth **camera**, for a reactive
+/// emergency reflex when running camera-only (no forward lidar). Mirrors
+/// [`forward_clearance`]: returns the nearest ground-plane range within a
+/// half-angle `cone` of the camera's optical axis and within `world_z_band`
+/// (after back-projection), or `None`.
+pub fn forward_clearance_camera(
+    depth: &DepthImage,
+    camera: &Camera,
+    cone: f32,
+    world_z_band: (f32, f32),
+) -> Option<f32> {
+    let intr = camera.intrinsics;
+    let cam_to_world = camera.view.inverse();
+    let mut nearest = f32::INFINITY;
+    for v in 0..depth.height {
+        for u in 0..depth.width {
+            let d = depth.pixels[(v * depth.width + u) as usize];
+            if !d.is_finite() {
+                continue;
+            }
+            // Camera frame: +x right, +y down, +z forward.
+            let x = (u as f32 + 0.5 - intr.cx) * d / intr.fx;
+            // Azimuth off the optical axis in the ground plane.
+            if x.atan2(d).abs() > cone {
+                continue;
+            }
+            let y = (v as f32 + 0.5 - intr.cy) * d / intr.fy;
+            let w = cam_to_world.transform_point3(Vec3::new(x, y, d));
+            if w.z < world_z_band.0 || w.z > world_z_band.1 {
+                continue;
+            }
+            let ground_range = (x * x + d * d).sqrt();
+            if ground_range < nearest {
+                nearest = ground_range;
+            }
+        }
+    }
+    nearest.is_finite().then_some(nearest)
+}
+
 /// Smallest forward-cone obstacle range from a raw lidar sweep, for reactive
 /// emergency braking (independent of the grid/planner). Returns the nearest
 /// hit distance within a half-angle `cone` of straight-ahead and within
@@ -336,6 +376,34 @@ mod tests {
             }
         }
         assert!(any, "depth back-projection should mark the box near x=8");
+    }
+
+    #[test]
+    fn camera_forward_clearance_reports_wall_distance() {
+        use kami_sensor_sim::{Camera, CameraIntrinsics};
+        let intr = CameraIntrinsics::from_hfov(160, 120, 70f32.to_radians());
+        let mut cam = Camera::new("c", "/c", intr);
+        cam.look_at(Vec3::new(0.0, 0.0, 1.0), Vec3::new(10.0, 0.0, 1.0), Vec3::new(0.0, 0.0, 1.0));
+
+        // Wall face 8 m ahead, within the obstacle height band.
+        let mut pts = Vec::new();
+        let mut y = -1.5;
+        while y <= 1.5 {
+            let mut z = 0.5;
+            while z <= 2.0 {
+                pts.push(Vec3::new(8.0, y, z));
+                z += 0.15;
+            }
+            y += 0.15;
+        }
+        let depth = cam.render_points_to_depth_image(&pts);
+        let c = forward_clearance_camera(&depth, &cam, 0.35, (0.3, 2.5)).expect("sees the wall");
+        assert!((c - 8.0).abs() < 1.0, "should report ≈8 m ahead, got {c}");
+
+        // Overhead-only structure is rejected (no reflex on a gantry).
+        let high: Vec<Vec3> = (0..20).map(|i| Vec3::new(8.0, -1.5 + 0.15 * i as f32, 6.0)).collect();
+        let depth_high = cam.render_points_to_depth_image(&high);
+        assert!(forward_clearance_camera(&depth_high, &cam, 0.35, (0.3, 2.5)).is_none());
     }
 
     #[test]
