@@ -73,6 +73,8 @@ members = [
     "kami-app-bim",
     "kami-app-giemon",
     "kami-app-shibuya",
+    "kami-app-giemon-factory",
+    "kami-app-tatekata",
     "kami-live",
     "kami-app-live",
     "kami-mangaka-scene",
