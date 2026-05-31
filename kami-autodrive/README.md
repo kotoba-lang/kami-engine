@@ -103,4 +103,6 @@ Transparent-Force gated, post-Council ratification.
 cargo test -p kami-autodrive                       # default (kinematic + dynamics + fleet + city + noise)
 cargo test -p kami-autodrive --features soft-body-car   # + real soft-body sedan
 cargo run  -p kami-autodrive --example drive_to_goal    # headless wall-avoidance demo
+cargo run  -p kami-autodrive --example render_run > run.svg   # SVG of a city-grid run (buildings + path + trajectory)
+cargo bench -p kami-autodrive                          # criterion throughput baselines
 ```
