@@ -57,37 +57,32 @@ fn hizukue_urdf_parses_with_expected_topology() {
 
 /// Hizukue is a 6-DoF (3 prismatic + 3 revolute) general-purpose serial chain.
 ///
-/// kami-genesis R1.1 (ADR-2605261800) supports only three closed-form topologies:
-/// cartpole (1P + 1R), double-pendulum (2R), planar-chain (N R). General 3P+3R
-/// chains require a generalized articulated-body solver, scoped to R1.2+.
+/// Through ADR-2605311500 this was rejected as `UnsupportedTopology`: the
+/// engine only had the closed-form / planar topologies (cartpole, double
+/// pendulum, planar chain). ADR-2605311800 added the full 3-D spatial-vector
+/// solver (`articulation3d`, Featherstone RNEA + CRBA) as the `Spatial3d`
+/// fallback, so a mixed prismatic+revolute 3-D chain now loads and simulates.
 ///
-/// This test LOCKS IN that current limit as a structured `UnsupportedTopology`
-/// error rather than a silent garbage simulation. When R1.2 ships generalized
-/// dynamics, this test will need to flip to a successful-load assertion.
+/// This test was flipped (as its prior incarnation predicted it would be) from
+/// a rejection assertion to a successful-load + stable-step assertion.
 #[test]
-fn hizukue_world_load_rejected_as_unsupported_until_r12_generalized_dynamics() {
-    // WorldError is in a private module; match on Display + Debug surface instead.
+fn hizukue_world_loads_as_spatial3d_and_steps() {
     let sys = parse_urdf(HIZUKUE_URDF).expect("hizukue.urdf must parse");
     let mut world = World::default();
-    let err = world.add_articulation(sys).expect_err(
-        "kami-genesis R1.1 must reject 6-DoF general topologies; pre-R1.2 invariant",
-    );
+    let h = world
+        .add_articulation(sys)
+        .expect("6-DoF general topology now supported via the 3-D spatial solver");
 
-    let err_dbg = format!("{:?}", err);
-    let err_disp = format!("{}", err);
+    // 6 DOF: 3 prismatic mobile base + 3 revolute arm.
+    let q0 = world.get(h).unwrap().joint_positions();
+    assert_eq!(q0.len(), 6, "3 prismatic + 3 revolute = 6 DOF");
 
-    assert!(
-        err_dbg.starts_with("UnsupportedTopology"),
-        "expected UnsupportedTopology, got {err_dbg} \
-         (kami-genesis R1.1 → R1.2 gap classifier broken)"
-    );
-
-    // Operator-facing detail string MUST surface DOF count + joint-kind breakdown
-    // so a sim-team triaging an R1.2 escalation has all the context inline.
-    for needle in ["hizukue", "dofs=6", "revolute_count=3"] {
-        assert!(
-            err_disp.contains(needle) || err_dbg.contains(needle),
-            "diagnostic missing `{needle}`: display={err_disp}  debug={err_dbg}"
-        );
+    // Steps under gravity without blow-up (no NaN from the LDLᵀ solve).
+    for _ in 0..120 {
+        world.step();
     }
+    assert!(
+        world.get(h).unwrap().joint_positions().iter().all(|v| v.is_finite()),
+        "hizukue state went non-finite"
+    );
 }

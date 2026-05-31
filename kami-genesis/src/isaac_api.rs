@@ -169,6 +169,8 @@ mod tests {
         include_str!("../../../../70-tools/e7m-sim/scenes/cartpole/cartpole.urdf");
     const ARM3_URDF: &str =
         include_str!("../../../../70-tools/e7m-sim/scenes/arm3/arm3.urdf");
+    const ARM6_URDF: &str =
+        include_str!("../../../../70-tools/e7m-sim/scenes/giemon_arm6/giemon_arm6.urdf");
 
     #[test]
     fn isaac_world_cartpole_lifecycle() {
@@ -222,6 +224,38 @@ mod tests {
         // Unknown link → None (Isaac raises; we return Option).
         assert!(view.get_world_pose("nope").is_none());
         assert!(view.get_jacobian("nope").is_none());
+    }
+
+    #[test]
+    fn isaac_world_drives_6dof_arm_via_spatial_solver() {
+        // The 6-DOF giemon arm (no special topology) routes through the
+        // Spatial3d fallback and is fully usable via the Isaac surface:
+        //   world.scene.add(Articulation(arm6)); set_joint_efforts; step;
+        //   get_joint_positions / get_world_pose / get_jacobian.
+        let sys = kami_articulated::parse_urdf(ARM6_URDF).unwrap();
+        let mut world = IsaacWorld::new(1.0 / 240.0);
+        let h = world.add_articulation(sys).unwrap();
+
+        assert_eq!(world.articulation(h).unwrap().num_dof(), 6, "6-DOF arm");
+
+        // Drive joint 1 (base yaw) with a steady effort; it must rotate.
+        let q0 = world.articulation(h).unwrap().get_joint_positions();
+        for _ in 0..60 {
+            world.articulation_mut(h).unwrap().set_joint_efforts(&[5.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
+            world.step();
+        }
+        let q1 = world.articulation(h).unwrap().get_joint_positions();
+        assert!(q1.iter().all(|v| v.is_finite()));
+        assert!((q1[0] - q0[0]).abs() > 1e-3, "base joint did not move: {q0:?} -> {q1:?}");
+
+        // Isaac-shaped accessors on a named link.
+        let view = world.articulation(h).unwrap();
+        let (_pos, quat) = view.get_world_pose("link6").expect("link6 pose");
+        let qn = (quat.iter().map(|c| c * c).sum::<f32>()).sqrt();
+        assert!((qn - 1.0).abs() < 1e-4, "quat not unit: {quat:?}");
+        let j = view.get_jacobian("link6").expect("link6 jacobian");
+        assert_eq!(j.rows.len(), 6);
+        assert_eq!(j.cols(), 6);
     }
 
     #[test]

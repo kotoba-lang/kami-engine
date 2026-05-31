@@ -126,6 +126,7 @@ pub struct Articulation {
     applied_action_cartpole: f32,
     applied_action_double_pendulum: [f32; 2],
     applied_action_planar: Vec<f32>,
+    applied_action_spatial: Vec<f32>,
 }
 
 #[derive(Debug)]
@@ -140,6 +141,15 @@ enum ArticulationTopology {
         state: PlanarChainState,
         cfg: PlanarChainConfig,
         links: Vec<String>,
+    },
+    /// General 3-D articulation (arbitrary-axis revolute/prismatic chain or
+    /// tree). Backed by the full spatial-vector solver (`articulation3d`:
+    /// Featherstone RNEA + CRBA). The fallback for any URDF that isn't one of
+    /// the special closed-form/planar topologies above — e.g. the 6-DOF
+    /// giemon arm.
+    Spatial3d {
+        state: crate::articulation3d::Articulation3dState,
+        cfg: crate::articulation3d::Articulation3dConfig,
     },
 }
 
@@ -157,6 +167,10 @@ impl Articulation {
             ArticulationTopology::PlanarChain { cfg, .. } => cfg.n as usize,
             _ => 0,
         };
+        let n_spatial = match &topology {
+            ArticulationTopology::Spatial3d { cfg, .. } => cfg.ndof,
+            _ => 0,
+        };
         Ok(Articulation {
             name,
             system: sys,
@@ -164,6 +178,7 @@ impl Articulation {
             applied_action_cartpole: 0.0,
             applied_action_double_pendulum: [0.0, 0.0],
             applied_action_planar: vec![0.0; n_planar],
+            applied_action_spatial: vec![0.0; n_spatial],
         })
     }
 
@@ -188,6 +203,15 @@ impl Articulation {
                 }
                 state.step(&self.applied_action_planar, cfg);
                 for t in self.applied_action_planar.iter_mut() {
+                    *t = 0.0;
+                }
+            }
+            ArticulationTopology::Spatial3d { state, cfg } => {
+                if self.applied_action_spatial.len() != cfg.ndof {
+                    self.applied_action_spatial.resize(cfg.ndof, 0.0);
+                }
+                cfg.step(state, &self.applied_action_spatial);
+                for t in self.applied_action_spatial.iter_mut() {
                     *t = 0.0;
                 }
             }
@@ -221,6 +245,13 @@ impl Articulation {
                 self.applied_action_planar.resize(n, 0.0);
                 for i in 0..n {
                     self.applied_action_planar[i] = torques.get(i).copied().unwrap_or(0.0);
+                }
+            }
+            ArticulationTopology::Spatial3d { cfg, .. } => {
+                let n = cfg.ndof;
+                self.applied_action_spatial.resize(n, 0.0);
+                for i in 0..n {
+                    self.applied_action_spatial[i] = torques.get(i).copied().unwrap_or(0.0);
                 }
             }
         }
@@ -273,10 +304,16 @@ impl Articulation {
             ArticulationTopology::PlanarChain { state, cfg, .. } => {
                 *state = PlanarChainState::zeros(cfg.n);
             }
+            ArticulationTopology::Spatial3d { state, cfg } => {
+                *state = crate::articulation3d::Articulation3dState::zeros(cfg.ndof);
+            }
         }
         self.applied_action_cartpole = 0.0;
         self.applied_action_double_pendulum = [0.0, 0.0];
         for t in self.applied_action_planar.iter_mut() {
+            *t = 0.0;
+        }
+        for t in self.applied_action_spatial.iter_mut() {
             *t = 0.0;
         }
     }
@@ -288,6 +325,7 @@ impl Articulation {
             ArticulationTopology::Cartpole { state, .. } => vec![state.x, state.theta],
             ArticulationTopology::DoublePendulum { state, .. } => vec![state.q1, state.q2],
             ArticulationTopology::PlanarChain { state, .. } => state.q.clone(),
+            ArticulationTopology::Spatial3d { state, .. } => state.q.clone(),
         }
     }
 
@@ -302,6 +340,7 @@ impl Articulation {
                 vec![state.q1_dot, state.q2_dot]
             }
             ArticulationTopology::PlanarChain { state, .. } => state.qdot.clone(),
+            ArticulationTopology::Spatial3d { state, .. } => state.qdot.clone(),
         }
     }
 
@@ -321,6 +360,11 @@ impl Articulation {
             ArticulationTopology::PlanarChain { state, cfg, links } => {
                 let idx = links.iter().position(|l| l == link_name)?;
                 planar_chain_link_jacobian(&state.q, idx, cfg)
+            }
+            ArticulationTopology::Spatial3d { state, cfg } => {
+                let idx = cfg.body_index(link_name)?;
+                let rows = cfg.geometric_jacobian(idx, &state.q);
+                Some(Jacobian { rows })
             }
         }
     }
@@ -349,6 +393,16 @@ impl Articulation {
             }
             ArticulationTopology::PlanarChain { state, cfg, links } => {
                 planar_chain_link_state(state, cfg, links, link_name)
+            }
+            ArticulationTopology::Spatial3d { state, cfg } => {
+                let idx = cfg.body_index(link_name)?;
+                let (pos, orient, lin, ang) = cfg.link_state_world(idx, &state.q, &state.qdot);
+                Some(LinkState {
+                    position: pos,
+                    orientation: orient,
+                    linear_velocity: lin,
+                    angular_velocity: ang,
+                })
             }
         }
     }
@@ -557,9 +611,17 @@ fn detect_topology(
 
     // PlanarChain signature: a serial revolute chain of N≥3 joints, no
     // prismatic. joint[0] roots at the base; joint[k].parent == joint[k-1].child.
+    // Genuinely planar only if every revolute axis is parallel (the planar
+    // solver assumes a single shared rotation axis). Mixed-axis chains (e.g.
+    // the 6-DOF giemon arm: z, y, y, z, y, z) fall through to the full 3-D
+    // spatial solver below.
+    let axes_parallel = revolutes
+        .windows(2)
+        .all(|w| w[0].axis.normalize_or_zero().cross(w[1].axis.normalize_or_zero()).length() < 1e-3);
     let is_serial_revolute_chain = no_prismatic
         && revolutes.len() >= 3
         && revolutes.len() == total_dofs
+        && axes_parallel
         && revolutes
             .windows(2)
             .all(|w| w[1].parent == w[0].child);
@@ -641,13 +703,22 @@ fn detect_topology(
             cfg,
         })
     } else {
-        Err(WorldError::UnsupportedTopology(format!(
-            "{} (prismatic_to_world={}, revolute_count={}, dofs={})",
-            sys.name,
-            has_prismatic_to_world,
-            sys.joints.iter().filter(|j| j.kind == JointKind::Revolute).count(),
-            total_dofs
-        )))
+        // General fallback: any other URDF (arbitrary-axis revolute/prismatic
+        // chain or tree, e.g. the 6-DOF giemon arm) is driven by the full 3-D
+        // spatial-vector solver.
+        let cfg = crate::articulation3d::Articulation3dConfig::from_articulated_system(
+            sys,
+            Vec3::new(0.0, 0.0, -gravity),
+            dt,
+        );
+        if cfg.ndof == 0 {
+            return Err(WorldError::UnsupportedTopology(format!(
+                "{} has no movable joints",
+                sys.name
+            )));
+        }
+        let state = crate::articulation3d::Articulation3dState::zeros(cfg.ndof);
+        Ok(ArticulationTopology::Spatial3d { state, cfg })
     }
 }
 

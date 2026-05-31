@@ -1339,6 +1339,7 @@ dependencies = [
  "glam",
  "js-sys",
  "kami-app",
+ "kami-articulated",
  "kami-genesis",
  "kami-pipelines",
  "kami-render",
