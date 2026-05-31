@@ -1526,6 +1526,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-autodrive"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "glam",
+ "kami-pathfind",
+ "kami-sensor-sim",
+ "kami-vehicle",
+]
+
+[[package]]
 name = "kami-bim"
 version = "0.1.0"
 dependencies = [
