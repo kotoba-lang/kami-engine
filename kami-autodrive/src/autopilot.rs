@@ -23,6 +23,8 @@ pub enum DriveState {
     Stop,
     /// Planner found no route this tick.
     Blocked,
+    /// Backing out of a stuck pose (K-turn) before re-planning.
+    Recovering,
     /// Within goal tolerance.
     Arrived,
 }
@@ -58,6 +60,14 @@ pub struct AutopilotConfig {
     /// **World-frame** height band (m above ground) kept from depth-camera
     /// back-projection — rejects the ground plane and overhead structure.
     pub camera_z_band: (f32, f32),
+    /// Consecutive stuck ticks (emergency-stop / blocked) before a reverse
+    /// K-turn recovery is attempted. **0 disables recovery (the default)** — a
+    /// stuck agent just holds a safe stop. Recovery is opt-in: it backs out and
+    /// gives up after a bounded number of attempts (never ramming, always
+    /// terminating), but does not yet reliably escape arbitrary tight corners.
+    pub stuck_limit: u32,
+    /// Duration (ticks) of the reverse K-turn once recovery starts.
+    pub recovery_ticks: u32,
 }
 
 impl AutopilotConfig {
@@ -75,6 +85,8 @@ impl AutopilotConfig {
             brake_margin: 1.6,
             dynamic_obstacles: true,
             camera_z_band: (0.3, 2.5),
+            stuck_limit: 0, // recovery off by default (opt-in)
+            recovery_ticks: 60,
         }
     }
 }
@@ -94,6 +106,16 @@ pub struct Autopilot {
     pursuit: PurePursuit,
     speed_ctl: SpeedController,
     steps_since_replan: u32,
+    /// Consecutive ticks spent stuck (emergency-stop / blocked).
+    stuck_ticks: u32,
+    /// Remaining ticks of an active reverse K-turn (0 = not recovering).
+    recovery_ticks: u32,
+    /// Steer held during the reverse K-turn.
+    recovery_steer: f32,
+    /// Best (smallest) distance-to-goal achieved, for no-progress give-up.
+    best_dist: f32,
+    /// Recoveries attempted since the last real progress toward the goal.
+    recoveries_since_progress: u32,
 }
 
 impl Autopilot {
@@ -115,6 +137,11 @@ impl Autopilot {
             pursuit,
             speed_ctl: SpeedController::new(0.6, 0.05, 0.02),
             steps_since_replan: u32::MAX, // force a plan on first goal
+            stuck_ticks: 0,
+            recovery_ticks: 0,
+            recovery_steer: 0.0,
+            best_dist: f32::INFINITY,
+            recoveries_since_progress: 0,
         }
     }
 
@@ -130,6 +157,10 @@ impl Autopilot {
         self.goal = Some(goal);
         self.arrived = false;
         self.steps_since_replan = u32::MAX;
+        self.stuck_ticks = 0;
+        self.recovery_ticks = 0;
+        self.best_dist = f32::INFINITY;
+        self.recoveries_since_progress = 0;
         self.state = DriveState::Cruise;
     }
 
@@ -180,6 +211,19 @@ impl Autopilot {
             return Command::stop();
         }
 
+        // Active K-turn recovery: back out for a fixed window, then force a
+        // fresh plan from the (now clearer) pose.
+        if self.recovery_ticks > 0 {
+            self.recovery_ticks -= 1;
+            self.state = DriveState::Recovering;
+            if self.recovery_ticks == 0 {
+                self.stuck_ticks = 0;
+                self.path.clear();
+                self.steps_since_replan = u32::MAX;
+            }
+            return Command::reverse_with(0.6, self.recovery_steer);
+        }
+
         // 1. Perception — refresh (dynamic) or accumulate (static) the map,
         //    fusing lidar + every depth camera into one occupancy grid.
         if self.cfg.dynamic_obstacles {
@@ -195,9 +239,8 @@ impl Autopilot {
         if let Some(clear) = forward_clearance(lidar, self.cfg.emergency_cone, self.cfg.z_band)
             && clear <= stop_dist + self.cfg.limits.footprint_radius
         {
-            self.state = DriveState::Stop;
             self.speed_ctl.reset();
-            return Command::stop();
+            return self.register_stuck(lidar);
         }
 
         // 3. (Re)plan if needed: no path, the period elapsed, or the current
@@ -221,8 +264,7 @@ impl Autopilot {
                     // No route this tick. If the prior path is also blocked,
                     // hold position rather than drive into the obstacle.
                     if self.path.len() < 2 || path_blocked {
-                        self.state = DriveState::Blocked;
-                        return Command::stop();
+                        return self.register_stuck(lidar);
                     }
                 }
             }
@@ -253,10 +295,68 @@ impl Autopilot {
             DriveState::Cruise
         };
 
+        // Progress this tick — clear the stuck count, and on *substantial*
+        // progress toward the goal, reset the recovery-attempt budget.
+        self.stuck_ticks = 0;
+        if d_goal < self.best_dist - 2.0 {
+            self.best_dist = d_goal;
+            self.recoveries_since_progress = 0;
+        }
+
         let (throttle, brake) = self.speed_ctl.update(target_speed, speed, dt);
-        let mut cmd = Command { throttle, brake, steer, handbrake: 0.0 };
+        let mut cmd = Command { throttle, brake, steer, handbrake: 0.0, reverse: false };
         cmd.clamp();
         cmd
+    }
+
+    /// Count a stuck tick (emergency-stop or no route). Once `stuck_limit`
+    /// consecutive stuck ticks accrue, kick off a reverse K-turn toward the
+    /// more-open side; otherwise just hold a stop.
+    fn register_stuck(&mut self, lidar: &[LidarReturn]) -> Command {
+        self.stuck_ticks = self.stuck_ticks.saturating_add(1);
+        // Give up recovering after a bounded number of attempts without
+        // substantial progress — an impassable obstacle, where repeated K-turns
+        // would only oscillate (and risk nosing into it). Hold a stop (Blocked).
+        // This budget only resets on real progress, guaranteeing termination.
+        let exhausted = self.recoveries_since_progress >= 4;
+        if self.cfg.stuck_limit > 0 && self.stuck_ticks >= self.cfg.stuck_limit && !exhausted {
+            self.recovery_steer = self.open_side_steer(lidar);
+            self.recovery_ticks = self.cfg.recovery_ticks;
+            self.recoveries_since_progress += 1;
+            self.stuck_ticks = 0;
+            self.state = DriveState::Recovering;
+            self.recovery_ticks -= 1;
+            return Command::reverse_with(0.6, self.recovery_steer);
+        }
+        self.state = DriveState::Blocked;
+        Command::stop()
+    }
+
+    /// Pick the reverse steer that swings the nose toward the more-open side.
+    /// Compares nearest obstacle range in the left vs right forward quadrants;
+    /// reversing with the returned steer rotates the nose toward open space.
+    fn open_side_steer(&self, lidar: &[LidarReturn]) -> f32 {
+        let (mut left_min, mut right_min) = (f32::INFINITY, f32::INFINITY);
+        for r in lidar {
+            if !r.range.is_finite() {
+                continue;
+            }
+            let p = r.point_sensor;
+            if p.z < self.cfg.z_band.0 || p.z > self.cfg.z_band.1 {
+                continue;
+            }
+            let az = p.y.atan2(p.x); // +left, −right
+            let gr = (p.x * p.x + p.y * p.y).sqrt();
+            if (0.2..1.4).contains(&az) {
+                left_min = left_min.min(gr);
+            } else if (-1.4..-0.2).contains(&az) {
+                right_min = right_min.min(gr);
+            }
+        }
+        // Open side = farther nearest obstacle. To rotate the nose toward it
+        // while reversing (speed < 0 ⇒ yaw_rate = v/L·tanδ), steer the opposite
+        // sign: nose-left needs steer right.
+        if left_min >= right_min { -1.0 } else { 1.0 }
     }
 
     /// Kinematic stopping distance `v² / (2·d_max)` with a safety margin.

@@ -60,11 +60,15 @@ pub struct Command {
     pub steer: f32,
     /// `[0, 1]` handbrake.
     pub handbrake: f32,
+    /// Reverse gear: when `true`, `throttle` drives the vehicle backward (used
+    /// by the autopilot's stuck-recovery K-turn). Plants without a reverse gear
+    /// ignore it.
+    pub reverse: bool,
 }
 
 impl Default for Command {
     fn default() -> Self {
-        Self { throttle: 0.0, brake: 0.0, steer: 0.0, handbrake: 0.0 }
+        Self { throttle: 0.0, brake: 0.0, steer: 0.0, handbrake: 0.0, reverse: false }
     }
 }
 
@@ -75,7 +79,12 @@ impl Command {
 
     /// Full-brake, wheels-straight stop.
     pub fn stop() -> Self {
-        Self { throttle: 0.0, brake: 1.0, steer: 0.0, handbrake: 0.0 }
+        Self { throttle: 0.0, brake: 1.0, steer: 0.0, handbrake: 0.0, reverse: false }
+    }
+
+    /// Reverse at `throttle` with `steer` (for K-turn recovery).
+    pub fn reverse_with(throttle: f32, steer: f32) -> Self {
+        Self { throttle, brake: 0.0, steer, handbrake: 0.0, reverse: true }
     }
 
     pub fn clamp(&mut self) {
@@ -129,7 +138,7 @@ mod tests {
 
     #[test]
     fn command_clamp_saturates() {
-        let mut c = Command { throttle: 2.0, brake: -1.0, steer: -3.0, handbrake: 5.0 };
+        let mut c = Command { throttle: 2.0, brake: -1.0, steer: -3.0, handbrake: 5.0, reverse: false };
         c.clamp();
         assert_eq!(c.throttle, 1.0);
         assert_eq!(c.brake, 0.0);

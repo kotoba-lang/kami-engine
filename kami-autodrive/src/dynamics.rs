@@ -322,7 +322,7 @@ mod tests {
     use crate::classes::VehicleClass;
 
     fn full_throttle() -> Command {
-        Command { throttle: 1.0, brake: 0.0, steer: 0.0, handbrake: 0.0 }
+        Command { throttle: 1.0, brake: 0.0, steer: 0.0, handbrake: 0.0, reverse: false }
     }
 
     #[test]
@@ -348,7 +348,7 @@ mod tests {
     fn ship_rudder_has_no_authority_at_rest() {
         // Rudder moment ∝ u²: a stationary ship cannot yaw (physically real).
         let mut ship = ShipHydro::new(Pose2::new(0.0, 0.0, 0.0), VehicleClass::Ship.limits());
-        let hard_over = Command { throttle: 0.0, brake: 0.0, steer: 1.0, handbrake: 0.0 };
+        let hard_over = Command { throttle: 0.0, brake: 0.0, steer: 1.0, handbrake: 0.0, reverse: false };
         for _ in 0..50 {
             ship.step(hard_over, 0.1);
         }
