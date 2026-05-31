@@ -524,6 +524,117 @@ pub async fn run_giemon_kabitori_sim_v1(canvas_id: &str) -> Result<(), JsValue> 
     app.run().await.map_err(|e| JsValue::from_str(&e.to_string()))
 }
 
+// ── otete (御手) — 6-axis arm + gripper, 7-DOF physics sim ───────────────────
+// The Giemon Otete kit (open-robo BOM) as a fixed-base 7-DOF articulation
+// (6 revolute arm joints + 1 prismatic gripper) on the kami-genesis 3-D spatial
+// solver + ground contact. Shares the J/L + 1–6 keyboard controls with arm6.
+
+const OTETE_URDF: &str =
+    include_str!("../../../../70-tools/e7m-sim/scenes/giemon_otete/giemon_otete.urdf");
+
+/// Parse the otete URDF → 3-D articulation config (7 DOF).
+pub fn giemon_otete_config() -> kami_genesis::Articulation3dConfig {
+    let sys = kami_articulated::parse_urdf(OTETE_URDF).expect("giemon_otete.urdf parses");
+    kami_genesis::Articulation3dConfig::from_articulated_system(
+        &sys,
+        Vec3::new(0.0, 0.0, -9.81),
+        ARM_DT,
+    )
+}
+
+#[cfg(target_family = "wasm")]
+#[wasm_bindgen]
+pub async fn run_giemon_otete_sim_v1(canvas_id: &str) -> Result<(), JsValue> {
+    use kami_genesis::{Articulation3dState, Collider, ContactParams, ContactWorld};
+
+    console_error_panic_hook::set_once();
+    let _ = console_log::init_with_level(log::Level::Info);
+
+    let app = KamiApp::new_web(canvas_id)
+        .await
+        .map_err(|e| JsValue::from_str(&e.to_string()))?
+        .with_label("giemon-otete")
+        .with_hud_publish(true)
+        .with_camera(CameraMode::Orbit {
+            target: Vec3::new(0.0, 0.32, 0.0),
+            distance: 1.15,
+            yaw: 0.7,
+            pitch: 0.22,
+        })
+        .with_input(InputMode::OrbitMouse);
+
+    let ctx = app.render_context();
+    let sky = kami_pipelines::SkyAdapter::new(ctx);
+    let cad = kami_pipelines::CadSceneAdapter::new(ctx);
+    let (bp, bn, bi) = unit_box();
+
+    let cfg = giemon_otete_config();
+    let nb = cfg.n_bodies();
+    log::info!("[otete-sim] arm: bodies={nb} ndof={}", cfg.ndof);
+
+    let to_render = Mat4::from_rotation_x(-std::f32::consts::FRAC_PI_2);
+
+    push_box(ctx, &cad, "ground", "Ground", GROUND,
+        Vec3::new(2.0, 0.01, 2.0), Vec3::new(0.0, -0.005, 0.0), Quat::IDENTITY);
+    push_box(ctx, &cad, "base_plate", "Base plate", ALUMINIUM,
+        Vec3::new(0.20, 0.02, 0.20), Vec3::new(0.0, 0.01, 0.0), Quat::IDENTITY);
+
+    let segs: Vec<Vec3> = (0..nb).map(|i| link_segment(&cfg, i)).collect();
+    let thicks: Vec<f32> = (0..nb).map(|i| (0.044 - 0.004 * i as f32).max(0.014)).collect();
+    let link_local: Vec<Mat4> = (0..nb).map(|i| segment_box(segs[i], thicks[i])).collect();
+
+    let link_start = cad.batch_count();
+    let fk0 = cfg.fk_world(&vec![0.0; cfg.ndof]);
+    for i in 0..nb {
+        cad.push_triangles(ctx, format!("link_{i}"), format!("Link {i}"),
+            &bp, &bn, &bi, SHELL, to_render * fk0[i] * link_local[i]);
+    }
+    let joint_start = cad.batch_count();
+    for i in 0..nb {
+        let color = if cfg.bodies[i].movable() { SERVO } else { ACCENT };
+        cad.push_triangles(ctx, format!("joint_{i}"), format!("Joint {i}"),
+            &bp, &bn, &bi, color,
+            to_render * fk0[i] * Mat4::from_scale(Vec3::splat(thicks[i] * 1.3)));
+    }
+
+    let colliders: Vec<(usize, Collider)> = (1..nb)
+        .map(|i| (i, Collider::Sphere { center: segs[i], radius: thicks[i] * 0.6 }))
+        .collect();
+    let contacts = ContactWorld::new(colliders, ContactParams { ground_z: 0.0, friction: 0.9, ..Default::default() });
+
+    let mut state = Articulation3dState::zeros(cfg.ndof);
+    if cfg.ndof >= 3 { state.q[1] = 0.5; state.q[2] = 0.9; }
+
+    let render = cad.clone();
+    let pick = cad.clone();
+    let app = app
+        .with_pipeline(sky)
+        .with_pipeline(cad)
+        .on_update(move |_world, camera, _dt| {
+            let torque = JOINT_TORQUE.with(|t| t.get());
+            let sel = SELECTED_JOINT.with(|s| s.get()).min(cfg.ndof.saturating_sub(1));
+            let mut tau = vec![0.0_f32; cfg.ndof];
+            if cfg.ndof > 0 { tau[sel] = torque; }
+            for _ in 0..4 {
+                contacts.step(&cfg, &mut state, &tau);
+            }
+            let fk = cfg.fk_world(&state.q);
+            for i in 0..nb {
+                render.replace_batch_world(link_start + i, &bp, &bn, &bi, SHELL,
+                    to_render * fk[i] * link_local[i]);
+                let color = if cfg.bodies[i].movable() { SERVO } else { ACCENT };
+                render.replace_batch_world(joint_start + i, &bp, &bn, &bi, color,
+                    to_render * fk[i] * Mat4::from_scale(Vec3::splat(thicks[i] * 1.3)));
+            }
+            if let Some(p) = pick.pick_from_camera_if_clicked(camera) {
+                pick.set_highlighted_by_id(&p.feature_id);
+            }
+        });
+
+    log::info!("[otete-sim] backend={:?}", app.backend());
+    app.run().await.map_err(|e| JsValue::from_str(&e.to_string()))
+}
+
 // ── model builder ─────────────────────────────────────────────────────────
 
 pub fn build_armcrawler(ctx: &RenderContext, cad: &kami_pipelines::CadSceneAdapter) {
@@ -1311,5 +1422,36 @@ mod tests {
             y_abs_max <= 0.18 + KABITORI_BRUSH_RADIUS + 0.03,
             "brush escaped the gap walls: |y|max={y_abs_max}"
         );
+    }
+
+    // ── otete (御手) 6-axis arm + gripper ────────────────────────────────────
+
+    #[test]
+    fn otete_urdf_loads_7dof_mixed() {
+        use kami_genesis::JointType3d;
+        let cfg = giemon_otete_config();
+        assert_eq!(cfg.ndof, 7, "6 revolute arm + 1 prismatic gripper");
+        assert_eq!(cfg.n_bodies(), 8, "base + 7 links");
+        let prismatic = cfg.bodies.iter().filter(|b| b.joint_type == JointType3d::Prismatic).count();
+        let revolute = cfg.bodies.iter().filter(|b| b.joint_type == JointType3d::Revolute).count();
+        assert_eq!(prismatic, 1, "gripper is prismatic");
+        assert_eq!(revolute, 6, "6 arm joints");
+        assert!(cfg.body_index("link_grip").is_some());
+    }
+
+    #[test]
+    fn otete_steps_under_gravity_stays_finite() {
+        let cfg = giemon_otete_config();
+        let mut st = kami_genesis::Articulation3dState::zeros(cfg.ndof);
+        st.q[1] = 0.5;
+        st.q[2] = 0.9;
+        let q0 = st.q.clone();
+        let tau = vec![0.0_f32; cfg.ndof];
+        for _ in 0..240 {
+            cfg.step(&mut st, &tau);
+        }
+        assert!(st.q.iter().all(|x| x.is_finite()), "q finite");
+        assert!(st.qdot.iter().all(|x| x.is_finite()), "qdot finite");
+        assert!(st.q != q0, "arm should move under gravity");
     }
 }
