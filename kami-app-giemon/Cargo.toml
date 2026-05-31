@@ -12,6 +12,7 @@ crate-type = ["cdylib", "rlib"]
 kami-app = { path = "../kami-app" }
 kami-pipelines = { path = "../kami-pipelines" }
 kami-render = { path = "../kami-render" }
+kami-genesis = { path = "../kami-genesis" }
 glam = { workspace = true }
 log = { workspace = true }
 

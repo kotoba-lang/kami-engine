@@ -101,6 +101,46 @@ impl SceneMeshCore {
         self.batches.push(MeshBatch { vb, ib, index_count: indices.len() as u32 });
     }
 
+    /// Re-bake a previously-pushed batch from model-local geometry with a new
+    /// `world` transform (and colour). Mirrors `push_batch` but replaces the
+    /// buffers at `index` in place. Used by animated scenes (e.g. the
+    /// kami-genesis physics arm) that move parts every frame.
+    pub(crate) fn replace_batch(
+        &mut self,
+        device: &wgpu::Device,
+        index: usize,
+        positions: &[[f32; 3]],
+        normals: &[[f32; 3]],
+        indices: &[u32],
+        base_color: [f32; 3],
+        world: Mat4,
+    ) {
+        if index >= self.batches.len() || positions.is_empty() || indices.is_empty() {
+            return;
+        }
+        let normal_mat = world.inverse().transpose();
+        let verts: Vec<MeshVertex> = positions.iter().zip(normals.iter()).map(|(p, n)| {
+            let wp = (world * glam::Vec4::new(p[0], p[1], p[2], 1.0)).xyz();
+            let wn = (normal_mat * glam::Vec4::new(n[0], n[1], n[2], 0.0)).xyz().normalize_or_zero();
+            MeshVertex {
+                pos: [wp.x, wp.y, wp.z],
+                norm: [wn.x, wn.y, wn.z],
+                col: base_color,
+            }
+        }).collect();
+        let vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some(self.label),
+            contents: bytemuck::cast_slice(&verts),
+            usage: wgpu::BufferUsages::VERTEX,
+        });
+        let ib = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some(self.label),
+            contents: bytemuck::cast_slice(indices),
+            usage: wgpu::BufferUsages::INDEX,
+        });
+        self.batches[index] = MeshBatch { vb, ib, index_count: indices.len() as u32 };
+    }
+
     /// Re-upload a previously-pushed batch with a new colour. Used by
     /// `Bim/CadSceneAdapter::set_highlighted` to flip selection colour
     /// without rebuilding every buffer in the scene.

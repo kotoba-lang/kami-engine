@@ -110,6 +110,53 @@ impl CadSceneAdapter {
         self.inner.core.borrow().batches.len()
     }
 
+    /// Re-bake batch `idx` from model-local geometry with a new `world`
+    /// transform. Lets an animated scene (e.g. the kami-genesis physics arm)
+    /// move a part every frame without rebuilding the whole scene. Keeps the
+    /// CPU pick data in sync so ray-pick still hits the moved part. A no-op if
+    /// `idx` is out of range or the batch is currently highlighted (selection
+    /// colour is restored on the next `set_highlighted`).
+    pub fn replace_batch_world(
+        &self,
+        idx: usize,
+        positions: &[[f32; 3]],
+        normals: &[[f32; 3]],
+        indices: &[u32],
+        base_color: [f32; 3],
+        world: Mat4,
+    ) {
+        if positions.is_empty() || indices.is_empty() {
+            return;
+        }
+        let normal_mat = world.inverse().transpose();
+        let world_positions: Vec<[f32; 3]> = positions
+            .iter()
+            .map(|p| {
+                let wp = world.transform_point3(Vec3::new(p[0], p[1], p[2]));
+                [wp.x, wp.y, wp.z]
+            })
+            .collect();
+        let world_normals: Vec<[f32; 3]> = normals
+            .iter()
+            .map(|n| {
+                let wn = normal_mat.transform_vector3(Vec3::new(n[0], n[1], n[2])).normalize_or_zero();
+                [wn.x, wn.y, wn.z]
+            })
+            .collect();
+
+        {
+            let mut core = self.inner.core.borrow_mut();
+            core.replace_batch(&self.inner.device, idx, positions, normals, indices, base_color, world);
+        }
+        let mut cpu = self.inner.cpu.borrow_mut();
+        if let Some(batch) = cpu.get_mut(idx) {
+            batch.positions = world_positions;
+            batch.normals = world_normals;
+            batch.indices = indices.to_vec();
+            batch.base_color = base_color;
+        }
+    }
+
     pub fn pick_ray(&self, origin: Vec3, dir: Vec3) -> Option<CadPick> {
         let dir = dir.normalize_or_zero();
         if dir.length_squared() < 1.0e-6 {

@@ -64,6 +64,166 @@ pub async fn run_giemon_v1(canvas_id: &str) -> Result<(), JsValue> {
     app.run().await.map_err(|e| JsValue::from_str(&e.to_string()))
 }
 
+// ── physics arm (kami-genesis PlanarChain) ──────────────────────────────────
+// ArmCrawler "physics-arm" model for giemon.htm: a 3-link planar revolute arm
+// driven by the kami-genesis reduced-coordinate solver (RNEA bias + CRBA mass
+// matrix + LDLᵀ solve, semi-implicit Euler — see kami-genesis/src/planar_chain.rs).
+//
+// The solver lives in the xz-plane with gravity along -z. We map chain
+// (x, z) → render (x, y) so the arm hangs and swings in the camera-facing
+// vertical plane below the mount. J / L torque joint 0 (the shoulder) via
+// `giemonSetJointTorque`.
+
+const ARM_N: usize = 3;
+const ARM_LENGTHS: [f32; ARM_N] = [0.100, 0.085, 0.065];
+const ARM_THICK: [f32; ARM_N] = [0.020, 0.017, 0.014];
+const ARM_MOUNT: Vec3 = Vec3::new(0.0, 0.18, 0.0);
+/// Initial joint angles (rad): a folded pose that swings under gravity.
+const ARM_Q0: [f32; ARM_N] = [0.7, -0.5, -0.4];
+
+fn arm_config() -> kami_genesis::PlanarChainConfig {
+    kami_genesis::PlanarChainConfig {
+        n: ARM_N as u32,
+        masses: vec![0.20, 0.15, 0.10],
+        lengths: ARM_LENGTHS.to_vec(),
+        gravity: 9.81,
+        effort_limit: 4.0,
+        dt: 1.0 / 240.0,
+    }
+}
+
+/// Forward kinematics → world-space joint positions (joint 0 = mount, then one
+/// per link end). Chain hangs along render -Y at q = 0.
+fn arm_fk_joints(q: &[f32]) -> [Vec3; ARM_N + 1] {
+    let mut out = [ARM_MOUNT; ARM_N + 1];
+    let mut theta = 0.0_f32;
+    let (mut px, mut pz) = (0.0_f32, 0.0_f32);
+    for i in 0..ARM_N {
+        theta += q[i];
+        px += ARM_LENGTHS[i] * theta.sin();
+        pz -= ARM_LENGTHS[i] * theta.cos();
+        out[i + 1] = ARM_MOUNT + Vec3::new(px, pz, 0.0);
+    }
+    out
+}
+
+/// Box transform for link `i`, spanning joints[i]..joints[i+1] (local +Y = length).
+fn arm_link_world(i: usize, joints: &[Vec3]) -> Mat4 {
+    let a = joints[i];
+    let b = joints[i + 1];
+    let d = b - a;
+    let len = d.length().max(1.0e-4);
+    let phi = (-d.x).atan2(d.y); // rotate local +Y onto link direction (about Z)
+    Mat4::from_scale_rotation_translation(
+        Vec3::new(ARM_THICK[i], len, ARM_THICK[i]),
+        Quat::from_rotation_z(phi),
+        (a + b) * 0.5,
+    )
+}
+
+fn arm_joint_world(j: usize, joints: &[Vec3]) -> Mat4 {
+    let size = if j == 0 { 0.030 } else { 0.024 };
+    Mat4::from_scale_rotation_translation(Vec3::splat(size), Quat::IDENTITY, joints[j])
+}
+
+#[cfg(target_family = "wasm")]
+thread_local! {
+    static JOINT_TORQUE: std::cell::Cell<f32> = std::cell::Cell::new(0.0);
+}
+
+/// JS control hook: set the constant torque (N·m) applied to the shoulder
+/// joint. The page maps J → −T, L → +T, key-up → 0.
+#[cfg(target_family = "wasm")]
+#[wasm_bindgen(js_name = giemonSetJointTorque)]
+pub fn giemon_set_joint_torque(torque: f32) {
+    JOINT_TORQUE.with(|t| t.set(torque));
+}
+
+#[cfg(target_family = "wasm")]
+fn build_sim_base(ctx: &RenderContext, cad: &kami_pipelines::CadSceneAdapter) {
+    push_box(ctx, cad, "sim_base", "Base plate", ALUMINIUM,
+        Vec3::new(0.160, 0.040, 0.120), Vec3::new(0.0, 0.020, 0.0), Quat::IDENTITY);
+    push_box(ctx, cad, "sim_pillar", "Mount pillar", STEEL,
+        Vec3::new(0.040, 0.140, 0.040), Vec3::new(0.0, 0.110, 0.0), Quat::IDENTITY);
+}
+
+#[cfg(target_family = "wasm")]
+#[wasm_bindgen]
+pub async fn run_giemon_sim_v1(canvas_id: &str) -> Result<(), JsValue> {
+    console_error_panic_hook::set_once();
+    let _ = console_log::init_with_level(log::Level::Info);
+
+    let app = KamiApp::new_web(canvas_id)
+        .await
+        .map_err(|e| JsValue::from_str(&e.to_string()))?
+        .with_label("giemon")
+        .with_hud_publish(true)
+        .with_camera(CameraMode::Orbit {
+            target: Vec3::new(0.0, 0.10, 0.0),
+            distance: 0.62,
+            yaw: 0.60,
+            pitch: 0.18,
+        })
+        .with_input(InputMode::OrbitMouse);
+
+    let ctx = app.render_context();
+    let sky = kami_pipelines::SkyAdapter::new(ctx);
+    let cad = kami_pipelines::CadSceneAdapter::new(ctx);
+
+    build_sim_base(ctx, &cad);
+
+    // Push the animated batches once; remember their indices for per-frame
+    // re-bake. `unit_box` is the shared model-local cube (±0.5).
+    let (bp, bn, bi) = unit_box();
+    let joints0 = arm_fk_joints(&ARM_Q0);
+    let link_start = cad.batch_count();
+    for i in 0..ARM_N {
+        cad.push_triangles(ctx, format!("arm_link_{i}"), format!("Link {}", i + 1),
+            &bp, &bn, &bi, ARM_BODY, arm_link_world(i, &joints0));
+    }
+    let joint_start = cad.batch_count();
+    for j in 0..=ARM_N {
+        cad.push_triangles(ctx, format!("arm_joint_{j}"), format!("Joint {j}"),
+            &bp, &bn, &bi, SERVO, arm_joint_world(j, &joints0));
+    }
+    log::info!("[giemon-sim] batches={} link@{} joint@{}",
+        cad.batch_count(), link_start, joint_start);
+
+    let cfg = arm_config();
+    let mut state = kami_genesis::PlanarChainState { q: ARM_Q0.to_vec(), qdot: vec![0.0; ARM_N] };
+
+    let render = cad.clone();
+    let pick = cad.clone();
+    let app = app
+        .with_pipeline(sky)
+        .with_pipeline(cad)
+        .on_update(move |_world, camera, _dt| {
+            // Fixed-substep integration (4 × 1/240 s ≈ one 60 Hz frame).
+            let torque = JOINT_TORQUE.with(|t| t.get());
+            let mut tau = vec![0.0_f32; ARM_N];
+            tau[0] = torque;
+            for _ in 0..4 {
+                state.step(&tau, &cfg);
+            }
+            let joints = arm_fk_joints(&state.q);
+            for i in 0..ARM_N {
+                render.replace_batch_world(link_start + i, &bp, &bn, &bi, ARM_BODY,
+                    arm_link_world(i, &joints));
+            }
+            for j in 0..=ARM_N {
+                render.replace_batch_world(joint_start + j, &bp, &bn, &bi, SERVO,
+                    arm_joint_world(j, &joints));
+            }
+            if let Some(p) = pick.pick_from_camera_if_clicked(camera) {
+                pick.set_highlighted_by_id(&p.feature_id);
+                log::info!("[giemon-sim] pick id={} dist={:.3}", p.feature_id, p.distance);
+            }
+        });
+
+    log::info!("[giemon-sim] backend={:?}", app.backend());
+    app.run().await.map_err(|e| JsValue::from_str(&e.to_string()))
+}
+
 // ── model builder ─────────────────────────────────────────────────────────
 
 pub fn build_armcrawler(ctx: &RenderContext, cad: &kami_pipelines::CadSceneAdapter) {
@@ -587,6 +747,7 @@ fn caterpillar_sensors(ctx: &RenderContext, cad: &kami_pipelines::CadSceneAdapte
 #[cfg(all(test, not(target_family = "wasm")))]
 mod tests {
     use super::*;
+    use kami_app::CameraMode;
 
     #[test]
     fn camera_mode_compiles() {
@@ -596,5 +757,52 @@ mod tests {
             yaw: 0.55,
             pitch: 0.30,
         };
+    }
+
+    #[test]
+    fn arm_fk_hangs_straight_down_at_rest() {
+        // q = 0 ⇒ each joint stacks straight down along render -Y from the mount.
+        let joints = arm_fk_joints(&[0.0; ARM_N]);
+        assert_eq!(joints[0], ARM_MOUNT);
+        let mut expect_y = ARM_MOUNT.y;
+        for i in 0..ARM_N {
+            expect_y -= ARM_LENGTHS[i];
+            assert!((joints[i + 1].x).abs() < 1.0e-5, "link {i} should stay on x=0");
+            assert!((joints[i + 1].y - expect_y).abs() < 1.0e-5, "link {i} y mismatch");
+        }
+    }
+
+    #[test]
+    fn arm_link_world_lengths_match_config() {
+        // The baked link box must span exactly its configured length.
+        let joints = arm_fk_joints(&ARM_Q0);
+        for i in 0..ARM_N {
+            let w = arm_link_world(i, &joints);
+            let scale = w.to_scale_rotation_translation().0;
+            assert!((scale.y - ARM_LENGTHS[i]).abs() < 1.0e-4, "link {i} length");
+        }
+        // Joint servos sit exactly on their joint positions.
+        for j in 0..=ARM_N {
+            let t = arm_joint_world(j, &joints).to_scale_rotation_translation().2;
+            assert!((t - joints[j]).length() < 1.0e-5, "joint {j} placement");
+        }
+    }
+
+    #[test]
+    fn arm_solver_steps_and_stays_finite() {
+        // A few solver steps under gravity must keep the state finite (no NaN
+        // blow-up from the LDLᵀ solve) and actually move the arm.
+        let cfg = arm_config();
+        let mut state = kami_genesis::PlanarChainState {
+            q: ARM_Q0.to_vec(),
+            qdot: vec![0.0; ARM_N],
+        };
+        let tau = vec![0.0_f32; ARM_N];
+        for _ in 0..240 {
+            state.step(&tau, &cfg);
+        }
+        assert!(state.q.iter().all(|x| x.is_finite()));
+        assert!(state.qdot.iter().all(|x| x.is_finite()));
+        assert!(state.q != ARM_Q0.to_vec(), "arm should swing under gravity");
     }
 }
