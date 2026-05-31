@@ -83,7 +83,9 @@ grid each tick. `Fleet` drives many agents that sense each other.
 ## Honest limitations (future work)
 
 - Non-car plants are 3-DOF reduced-order, **not** 6-DOF CFD.
-- Fixed-wing holds cruise altitude and **cannot hover** (it overflies a goal).
+- Fixed-wing holds cruise altitude and **cannot hover**; it reaches a waypoint
+  by flying to it and **loitering** (orbiting within a turn radius), since it
+  can't capture a point — realistic for a fixed-wing, but not a precise stop.
 - Multi-agent is decentralised yielding, **not** cooperative negotiation; two
   agents head-on in the *same* lane can still deadlock.
 - Reverse K-turn recovery exists but is **opt-in / off by default**

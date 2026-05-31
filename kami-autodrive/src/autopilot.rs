@@ -25,6 +25,9 @@ pub enum DriveState {
     Blocked,
     /// Backing out of a stuck pose (K-turn) before re-planning.
     Recovering,
+    /// Orbiting the goal (a non-stopping vehicle, e.g. a fixed-wing, that can't
+    /// capture a point and instead loiters over the waypoint).
+    Loitering,
     /// Within goal tolerance.
     Arrived,
 }
@@ -68,6 +71,11 @@ pub struct AutopilotConfig {
     pub stuck_limit: u32,
     /// Duration (ticks) of the reverse K-turn once recovery starts.
     pub recovery_ticks: u32,
+    /// For non-stopping vehicles (e.g. a fixed-wing that can't hover or capture
+    /// a point inside its turn radius): orbit the goal at this radius (m)
+    /// instead of stopping, counting the waypoint reached when established on
+    /// station. `None` = a normal stopping vehicle.
+    pub loiter_radius: Option<f32>,
 }
 
 impl AutopilotConfig {
@@ -87,6 +95,9 @@ impl AutopilotConfig {
             camera_z_band: (0.3, 2.5),
             stuck_limit: 0, // recovery off by default (opt-in)
             recovery_ticks: 60,
+            // A fixed-wing can't hover or capture a point inside its turn
+            // radius — it loiters over the waypoint instead.
+            loiter_radius: matches!(class, VehicleClass::Aircraft).then_some(200.0),
         }
     }
 }
@@ -240,6 +251,11 @@ impl Autopilot {
             self.state = DriveState::Idle;
             return Command::stop();
         };
+
+        // Non-stopping (loiter) vehicles orbit the goal instead of stopping.
+        if let Some(r) = self.cfg.loiter_radius {
+            return self.loiter_step(pose, speed, goal, r, dt);
+        }
 
         // Arrival (latched — stays arrived even if the plant coasts past).
         if self.arrived || pose.pos().distance(goal) <= self.cfg.goal_tol {
@@ -399,6 +415,36 @@ impl Autopilot {
         // while reversing (speed < 0 ⇒ yaw_rate = v/L·tanδ), steer the opposite
         // sign: nose-left needs steer right.
         if left_min >= right_min { -1.0 } else { 1.0 }
+    }
+
+    /// Guidance for a non-stopping vehicle: fly straight to the waypoint until
+    /// near the loiter ring, then orbit it (chase a carrot that leads around
+    /// the circle). Counts the waypoint reached once established within ~1.5·r.
+    fn loiter_step(&mut self, pose: Pose2, speed: f32, goal: Vec2, r: f32, dt: f32) -> Command {
+        let d = pose.pos().distance(goal);
+        if d <= 1.2 * r {
+            self.arrived = true;
+        }
+
+        let (target, speed_frac) = if d > 2.0 * r {
+            (goal, 1.0) // ingress at cruise
+        } else {
+            // Carrot on the ring, leading the vehicle's angular position (CCW)
+            // — chasing it produces a steady orbit; slower speed tightens it.
+            let from = pose.pos() - goal;
+            let ang = from.y.atan2(from.x) + 0.5;
+            (goal + Vec2::new(ang.cos(), ang.sin()) * r, 0.6)
+        };
+
+        let (steer, _) = self.pursuit.steer(pose, speed, &[pose.pos(), target]);
+        self.state = if self.arrived { DriveState::Arrived } else { DriveState::Loitering };
+
+        self.last_target_speed = self.cfg.limits.max_speed * speed_frac;
+        self.last_cross_track = (d - r).abs();
+        let (throttle, brake) = self.speed_ctl.update(self.last_target_speed, speed, dt);
+        let mut cmd = Command { throttle, brake, steer, handbrake: 0.0, reverse: false };
+        cmd.clamp();
+        cmd
     }
 
     /// Nearest forward obstacle range fused over the lidar cone and every depth
