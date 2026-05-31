@@ -20,6 +20,7 @@ members = [
     "kami-ui-gpu",
     "kami-physics-2d",
     "kami-vehicle",
+    "kami-autodrive",
     "kami-tilemap",
     "kami-audio",
     "kami-pathfind",

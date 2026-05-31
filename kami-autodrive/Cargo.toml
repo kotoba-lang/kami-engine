@@ -1,0 +1,21 @@
+[package]
+name = "kami-autodrive"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Vehicle-class-agnostic autonomy (GNC) layer: lidar perception -> A* planning -> pure-pursuit + PID control. Closes the loop over a kinematic plant or the kami-vehicle soft-body car."
+
+[dependencies]
+glam = { workspace = true }
+kami-pathfind = { path = "../kami-pathfind" }
+kami-sensor-sim = { path = "../kami-sensor-sim" }
+kami-vehicle = { path = "../kami-vehicle", optional = true }
+
+[features]
+# High-fidelity car: drive a kami-vehicle BeamNG-grade soft-body sedan with the
+# same Autopilot used by the kinematic plants.
+soft-body-car = ["dep:kami-vehicle"]
+
+[[example]]
+name = "drive_to_goal"
+path = "examples/drive_to_goal.rs"
