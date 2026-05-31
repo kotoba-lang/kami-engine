@@ -87,6 +87,10 @@ pub struct Autopilot {
     home: Vec2,
     path: Vec<Vec2>,
     goal: Option<Vec2>,
+    /// Latched once the goal is reached, so coasting past `goal_tol` doesn't
+    /// un-arrive and send the agent looping back (matters when something keeps
+    /// stepping the autopilot after arrival, e.g. a multi-agent `Fleet`).
+    arrived: bool,
     pursuit: PurePursuit,
     speed_ctl: SpeedController,
     steps_since_replan: u32,
@@ -107,6 +111,7 @@ impl Autopilot {
             home: start.pos(),
             path: Vec::new(),
             goal: None,
+            arrived: false,
             pursuit,
             speed_ctl: SpeedController::new(0.6, 0.05, 0.02),
             steps_since_replan: u32::MAX, // force a plan on first goal
@@ -123,6 +128,7 @@ impl Autopilot {
         self.grid = OccupancyGrid::centered(center, half, self.cfg.grid_res);
 
         self.goal = Some(goal);
+        self.arrived = false;
         self.steps_since_replan = u32::MAX;
         self.state = DriveState::Cruise;
     }
@@ -167,8 +173,9 @@ impl Autopilot {
             return Command::stop();
         };
 
-        // Arrival.
-        if pose.pos().distance(goal) <= self.cfg.goal_tol {
+        // Arrival (latched — stays arrived even if the plant coasts past).
+        if self.arrived || pose.pos().distance(goal) <= self.cfg.goal_tol {
+            self.arrived = true;
             self.state = DriveState::Arrived;
             return Command::stop();
         }
