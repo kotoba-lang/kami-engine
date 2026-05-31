@@ -260,6 +260,44 @@ impl Agv {
         self.contact.step(&self.cfg, &mut self.state, &tau);
     }
 
+    /// Free body: zero control — gravity + ground/obstacle contact only. A
+    /// material payload dropped from height settles physically with this.
+    pub fn step_free(&mut self) {
+        let tau = vec![0.0_f32; self.cfg.ndof];
+        self.contact.step(&self.cfg, &mut self.state, &tau);
+    }
+
+    /// Drive physically toward a world-frame target with a clamped
+    /// position-PD on the (world-axis) prismatic joints, then one contact step.
+    /// Yaw is steered to the heading cosmetically. Used by the delivery cart.
+    pub fn step_toward(&mut self, tx: f32, ty: f32) {
+        let dx = tx - self.state.q[0];
+        let dy = ty - self.state.q[1];
+        // gains sized to overcome ground friction (μN ≈ mass·g; drive = mass·1.6).
+        let kp = self.drive * 6.0;
+        let cap = self.drive * 10.0;
+        let drag = 60.0;
+        let mut tau = vec![0.0_f32; self.cfg.ndof];
+        tau[0] = (kp * dx).clamp(-cap, cap) - drag * self.state.qdot[0];
+        tau[1] = (kp * dy).clamp(-cap, cap) - drag * self.state.qdot[1];
+        // cosmetic yaw toward the bearing.
+        let target_yaw = dy.atan2(dx);
+        let mut dyaw = target_yaw - self.state.q[3];
+        let pi = std::f32::consts::PI;
+        while dyaw > pi {
+            dyaw -= 2.0 * pi;
+        }
+        while dyaw < -pi {
+            dyaw += 2.0 * pi;
+        }
+        tau[3] = 60.0 * dyaw - 20.0 * self.state.qdot[3];
+        self.contact.step(&self.cfg, &mut self.state, &tau);
+    }
+
+    pub fn pos_z(&self) -> f32 {
+        self.state.q[2]
+    }
+
     pub fn body_world(&self) -> Mat4 {
         self.cfg.fk_world(&self.state.q)[self.body_idx]
     }
@@ -1019,6 +1057,38 @@ mod tests {
         assert!(agv.state.q.iter().all(|v| v.is_finite()));
         // sanity: the loaded factory has AGVs to spawn.
         assert!(!f.agvs.is_empty());
+    }
+
+    #[test]
+    fn payload_free_falls_and_settles() {
+        // a dropped material payload settles physically on the ground (z→rest).
+        let mut p = Agv::new(Vec3::new(1.5, 1.5, 1.5), 400.0, vec![]);
+        p.place(Vec3::new(0.0, 0.0, 14.0), 0.0);
+        for _ in 0..2000 {
+            p.step_free();
+        }
+        let z = p.pos_z();
+        assert!(z.is_finite() && z < 1.5, "payload did not fall: z={z}");
+        assert!(
+            p.state.qdot[2].abs() < 0.3,
+            "still falling: {}",
+            p.state.qdot[2]
+        );
+    }
+
+    #[test]
+    fn cart_drives_toward_target() {
+        // the delivery cart physically approaches a target point.
+        let mut cart = Agv::new(Vec3::new(3.0, 2.0, 1.2), 300.0, vec![]);
+        cart.place(Vec3::new(-30.0, 0.0, 0.6), 0.0);
+        let (tx, ty) = (10.0, 6.0);
+        let d0 = ((tx + 30.0_f32).powi(2) + (ty as f32).powi(2)).sqrt();
+        for _ in 0..3000 {
+            cart.step_toward(tx, ty);
+        }
+        let d1 = ((tx - cart.state.q[0]).powi(2) + (ty - cart.state.q[1]).powi(2)).sqrt();
+        assert!(d1 < d0 * 0.4, "cart did not approach: d0={d0} d1={d1}");
+        assert!(cart.state.q.iter().all(|v| v.is_finite()));
     }
 
     #[test]

@@ -1,16 +1,19 @@
-//! kami-app-tatekata — 建方: the giemon factory built BY robotics.
+//! kami-app-tatekata — 建方: the giemon factory built BY robotics, **physics-driven**.
 //!
 //! Replays the 4D construction sequence (`construction.order.json`) where each
-//! step's **assigned construction robot** (`robots.json`, from `robots.edn`)
-//! performs the work on kami-genesis and the building geometry "grows" as it is
-//! built. Concrete steps (`robot:printer`) drive a `DepositField`
-//! (deposition/levelling height grid); steel steps (`robot:bolter`) drive a
-//! `WeldField` (moving heat-source fusion). Everything else (layout, materials,
-//! 4D order, robot registry) is reused from `kami-app-giemon-factory`.
+//! step's assigned robot (`robots.json`) executes its op procedure (procure →
+//! deliver → stage → build → fasten → inspect, `process.json`). The construction
+//! PROCESS is physics-simulated on kami-genesis:
+//!   - a delivery **cart** (floating-base body) physically DRIVES 受入 → work-zone
+//!     during 搬入/搬送, colliding with the built structure (`Agv::step_toward`);
+//!   - a material **payload** is DROPPED from height and FALLS + SETTLES under
+//!     gravity + contact (`Agv::step_free`) — its settling drives the build pace;
+//!   - concrete steps drive a `DepositField`, steel steps a `WeldField`.
 //!
-//! Clean-room (no NVIDIA/PhysX/Isaac). Honest scope: the material-process fields
-//! are application-layer stand-ins (no granular/MPM/thermal-FEM); they model
-//! coverage/fusion *progress + tool path*, not real concrete/weld physics.
+//! Clean-room (no NVIDIA/PhysX/Isaac). Honest scope: rigid-body physics for the
+//! cart/payload/robot is real (kami-genesis), but the material-process fields are
+//! application-layer stand-ins (no granular/MPM/thermal-FEM), and this is a robot
+//! task graph, not a validated motion plan / cycle-time / safety case.
 
 pub mod deposit_field;
 pub mod process;
@@ -24,7 +27,7 @@ pub use weld_field::WeldField;
 use glam::{Mat4, Vec3};
 #[cfg(target_family = "wasm")]
 use kami_app_giemon_factory::{
-    ArmCell, ConstructionOrder, Factory, Robots, arm6_config, static_boxes,
+    Agv, ArmCell, ConstructionOrder, Factory, Robots, arm6_config, static_boxes,
 };
 
 #[cfg(target_family = "wasm")]
@@ -171,16 +174,43 @@ pub async fn run_tatekata_v1(canvas_id: &str) -> Result<(), JsValue> {
         })
         .collect();
 
-    // Material-delivery cart (搬入/搬送) — a box ferried from 受入 to the work zone.
+    // PHYSICS bodies (kami-genesis floating base + gravity + contact):
+    //  - cart: drives 受入 → work-zone (搬入/搬送) with obstacle collision.
+    //  - payload: a material body dropped from height that FALLS and SETTLES
+    //    physically; its settling drives the build pace (工事プロセス = 物理).
+    let obstacles = f.agv_obstacles();
+    let cart_size = Vec3::new(3.0, 2.0, 1.3);
+    let pay_size = Vec3::new(2.2, 2.2, 1.6);
+    let mut cart = Agv::new(cart_size, 320.0, obstacles.clone());
+    let mut payload = Agv::new(pay_size, 400.0, obstacles.clone());
+    let cart_lp: Vec<[f32; 3]> = bp
+        .iter()
+        .map(|v| [v[0] * cart_size.x, v[1] * cart_size.y, v[2] * cart_size.z])
+        .collect();
+    let pay_lp: Vec<[f32; 3]> = bp
+        .iter()
+        .map(|v| [v[0] * pay_size.x, v[1] * pay_size.y, v[2] * pay_size.z])
+        .collect();
     let cart_idx = cad.batch_count();
     cad.push_triangles(
         ctx,
         "cart".to_string(),
         "搬送カート".to_string(),
-        &bp,
+        &cart_lp,
         &bn,
         &bi,
         [0.85, 0.65, 0.20],
+        HIDDEN,
+    );
+    let pay_idx = cad.batch_count();
+    cad.push_triangles(
+        ctx,
+        "payload".to_string(),
+        "搬入材料".to_string(),
+        &pay_lp,
+        &bn,
+        &bi,
+        [0.70, 0.45, 0.25],
         HIDDEN,
     );
 
@@ -190,10 +220,12 @@ pub async fn run_tatekata_v1(canvas_id: &str) -> Result<(), JsValue> {
     let plans: Vec<StepPlan> = process.plans(&step_ids);
     // staging point (受入 zone centre) in sim coords.
     let stage_xy = f.step_center(&["zone_recv".to_string()]);
+    const DROP_Z: f32 = 14.0;
 
     let render = cad.clone();
     let mut clock = 0.0_f32;
     let mut active_prev: isize = -1;
+    let mut placed_for: isize = -1;
     let mut deposit: Option<DepositField> = None;
     let mut weld: Option<WeldField> = None;
     let mut sim_t = 0.0_f32;
@@ -211,6 +243,7 @@ pub async fn run_tatekata_v1(canvas_id: &str) -> Result<(), JsValue> {
             if clock > loop_len {
                 clock = 0.0;
                 active_prev = -1;
+                placed_for = -1;
                 deposit = None;
                 weld = None;
             }
@@ -224,11 +257,12 @@ pub async fn run_tatekata_v1(canvas_id: &str) -> Result<(), JsValue> {
                 }
             }
 
-            // material-process field setup on step change.
+            // on step change: reset fields + re-stage the delivery cart at 受入.
             if active.map(|k| k as isize) != Some(active_prev) {
                 active_prev = active.map(|k| k as isize).unwrap_or(-1);
                 deposit = None;
                 weld = None;
+                cart.place(Vec3::new(stage_xy.0, stage_xy.1, 0.6), 0.0);
                 if let Some(k) = active {
                     match proc_of[k].as_str() {
                         "deposition" => {
@@ -245,35 +279,59 @@ pub async fn run_tatekata_v1(canvas_id: &str) -> Result<(), JsValue> {
                 }
             }
 
-            // progress of the active step + its op timeline. Geometry only grows
-            // during the BUILD window (据付/締結) — after 調達/搬入/搬送, before 検査.
+            // Physics-driven construction: the delivery cart DRIVES to the work
+            // zone during 搬入/搬送, then a material payload is DROPPED and SETTLES
+            // under gravity+contact — its settling drives the build pace.
             let (p, p_geom) = if let Some(k) = active {
                 let start = if k == 0 { 0.0 } else { reveal_at[k - 1] };
                 let span = (reveal_at[k] - start).max(1e-3);
                 let p = ((clock - start) / span).clamp(0.0, 1.0);
-                let bp_frac = plans[k].build_progress(p); // 0 before build, ramps in build window
+                let (cx, cy) = centroids[k];
+
+                // cart physics during logistics ops (else hold at staging).
+                if plans[k].logistics_at(p).is_some() {
+                    for _ in 0..2 {
+                        cart.step_toward(cx, cy);
+                    }
+                }
+
+                // payload physics during the build window.
+                let in_build = p >= plans[k].build_start;
+                let settle = if in_build {
+                    if placed_for != k as isize {
+                        payload.place(Vec3::new(cx, cy, DROP_Z), 0.0);
+                        placed_for = k as isize;
+                    }
+                    for _ in 0..3 {
+                        payload.step_free();
+                    }
+                    ((DROP_Z - payload.pos_z()) / (DROP_Z - 0.9)).clamp(0.0, 1.0)
+                } else {
+                    0.0
+                };
+
+                // build progress: payload settling for placement; the material
+                // field (driven by settle) for concrete/steel.
                 let pg = match proc_of[k].as_str() {
                     "deposition" => {
                         if let Some(d) = deposit.as_mut() {
-                            // sweep the print head across the footprint as the build window opens
-                            let (cx, cy) = centroids[k];
                             let span_x = (f.bbox_m[2] - f.bbox_m[0]) * 0.5;
-                            let hx = cx + lerp(-span_x, span_x, bp_frac);
+                            let hx = cx + lerp(-span_x, span_x, settle);
                             d.deposit_at(hx, cy, 6.0, 0.05, 1.0 / 30.0);
                             d.progress()
                         } else {
-                            bp_frac
+                            settle
                         }
                     }
                     "thermal-weld" => {
                         if let Some(w) = weld.as_mut() {
-                            w.pass(bp_frac, 9000.0, 1.0 / 60.0);
+                            w.pass(settle, 9000.0, 1.0 / 60.0);
                             w.fused_fraction()
                         } else {
-                            bp_frac
+                            settle
                         }
                     }
-                    _ => bp_frac,
+                    _ => settle,
                 };
                 (p, pg)
             } else {
@@ -327,22 +385,46 @@ pub async fn run_tatekata_v1(canvas_id: &str) -> Result<(), JsValue> {
                         to_render * base * fk[i] * arm.link_local[i],
                     );
                 }
-                // delivery cart (搬入/搬送): ferry a material box 受入 → work zone.
-                if let Some(sub) = plans[k].logistics_at(p) {
-                    let sx = lerp(stage_xy.0, cx, sub) - c.x;
-                    let sy = lerp(stage_xy.1, cy, sub) - c.y;
+                // PHYSICS delivery cart (搬入/搬送): real floating-base body that
+                // drove toward the work zone (rendered at its settled pose).
+                if plans[k].logistics_at(p).is_some() {
                     render.replace_batch_world(
                         cart_idx,
-                        &bp,
+                        &cart_lp,
                         &bn,
                         &bi,
                         [0.85, 0.65, 0.20],
-                        to_render
-                            * Mat4::from_translation(Vec3::new(sx, sy, 1.0))
-                            * Mat4::from_scale(Vec3::new(3.0, 2.0, 2.0)),
+                        to_render * cart.body_world(),
                     );
                 } else {
-                    render.replace_batch_world(cart_idx, &bp, &bn, &bi, [0.85, 0.65, 0.20], HIDDEN);
+                    render.replace_batch_world(
+                        cart_idx,
+                        &cart_lp,
+                        &bn,
+                        &bi,
+                        [0.85, 0.65, 0.20],
+                        HIDDEN,
+                    );
+                }
+                // PHYSICS payload (搬入材料): falls + settles during the build window.
+                if p >= plans[k].build_start && p < 0.97 {
+                    render.replace_batch_world(
+                        pay_idx,
+                        &pay_lp,
+                        &bn,
+                        &bi,
+                        [0.70, 0.45, 0.25],
+                        to_render * payload.body_world(),
+                    );
+                } else {
+                    render.replace_batch_world(
+                        pay_idx,
+                        &pay_lp,
+                        &bn,
+                        &bi,
+                        [0.70, 0.45, 0.25],
+                        HIDDEN,
+                    );
                 }
 
                 // current robot OP (procure→deliver→stage→build→fasten→inspect).
@@ -365,7 +447,15 @@ pub async fn run_tatekata_v1(canvas_id: &str) -> Result<(), JsValue> {
                 for i in 0..nb {
                     render.replace_batch_world(robot_start + i, &bp, &bn, &bi, [0.2; 3], HIDDEN);
                 }
-                render.replace_batch_world(cart_idx, &bp, &bn, &bi, [0.85, 0.65, 0.20], HIDDEN);
+                render.replace_batch_world(
+                    cart_idx,
+                    &cart_lp,
+                    &bn,
+                    &bi,
+                    [0.85, 0.65, 0.20],
+                    HIDDEN,
+                );
+                render.replace_batch_world(pay_idx, &pay_lp, &bn, &bi, [0.70, 0.45, 0.25], HIDDEN);
                 STATUS.with(|s| *s.borrow_mut() = "竣工 — 全工程完了".into());
             }
         });
