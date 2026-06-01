@@ -1,0 +1,28 @@
+[package]
+name = "kami-app-sarutahiko-factory"
+description = "猿田彦 Class-8 truck assembly plant (sarutahiko-factory.etzhayyim.com) — full-robotics layout + 建材 + 4D 建築手順 + 積込ロボット in kami-genesis + kotoba EAVT (ADR-2606013100 / 2605252500)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+kami-app = { path = "../kami-app" }
+kami-pipelines = { path = "../kami-pipelines" }
+kami-render = { path = "../kami-render" }
+kami-genesis = { path = "../kami-genesis" }
+kami-articulated = { path = "../kami-articulated" }
+glam = { workspace = true }
+log = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = ["console", "Window"] }
+js-sys = "0.3"
+console_error_panic_hook = "0.1"
+console_log = "1"
