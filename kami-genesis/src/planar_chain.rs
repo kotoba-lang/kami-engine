@@ -80,7 +80,11 @@ impl PlanarChainState {
         // M(q) via CRBA (column by column: M[:,j] = rnea(0, 0, e_j, no_gravity)).
         let m = mass_matrix_crba(&self.q, cfg);
         // Solve M·qddot = τ − h.
-        let mut rhs: Vec<f32> = tau_clamped.iter().zip(h.iter()).map(|(t, hi)| t - hi).collect();
+        let mut rhs: Vec<f32> = tau_clamped
+            .iter()
+            .zip(h.iter())
+            .map(|(t, hi)| t - hi)
+            .collect();
         let qddot = solve_ldlt(&m, &mut rhs).unwrap_or_else(|| vec![0.0; n]);
 
         // Semi-implicit Euler.
@@ -116,7 +120,8 @@ impl PlanarChainState {
             let v_com_x = v_joint_x + lc * omega_cum * c;
             let v_com_z = v_joint_z + lc * omega_cum * s;
             let i_com = m * l * l / 12.0;
-            ke += 0.5 * m * (v_com_x * v_com_x + v_com_z * v_com_z) + 0.5 * i_com * omega_cum * omega_cum;
+            ke += 0.5 * m * (v_com_x * v_com_x + v_com_z * v_com_z)
+                + 0.5 * i_com * omega_cum * omega_cum;
             pe += m * cfg.gravity * p_com_z;
             // Advance to next joint.
             p_joint_x += l * s;
@@ -358,16 +363,33 @@ mod tests {
             effort_limit: dp_cfg.effort_limit,
             dt: dp_cfg.dt,
         };
-        let mut dp = DoublePendulumState { q1: 0.4, q2: 0.2, ..Default::default() };
-        let mut chain = PlanarChainState { q: vec![0.4, 0.2], qdot: vec![0.0, 0.0] };
+        let mut dp = DoublePendulumState {
+            q1: 0.4,
+            q2: 0.2,
+            ..Default::default()
+        };
+        let mut chain = PlanarChainState {
+            q: vec![0.4, 0.2],
+            qdot: vec![0.0, 0.0],
+        };
         // 0.5 s rollout under no torque.
         for _ in 0..(0.5 / dp_cfg.dt) as usize {
             dp.step([0.0, 0.0], &dp_cfg);
             chain.step(&[0.0, 0.0], &chain_cfg);
         }
         // Both should agree on q1, q2 within numerical tolerance after 0.5 s.
-        assert!((chain.q[0] - dp.q1).abs() < 5e-3, "q1: chain={}, dp={}", chain.q[0], dp.q1);
-        assert!((chain.q[1] - dp.q2).abs() < 5e-3, "q2: chain={}, dp={}", chain.q[1], dp.q2);
+        assert!(
+            (chain.q[0] - dp.q1).abs() < 5e-3,
+            "q1: chain={}, dp={}",
+            chain.q[0],
+            dp.q1
+        );
+        assert!(
+            (chain.q[1] - dp.q2).abs() < 5e-3,
+            "q2: chain={}, dp={}",
+            chain.q[1],
+            dp.q2
+        );
     }
 
     #[test]
@@ -497,12 +519,14 @@ mod tests {
         }
         // Peak-to-peak energy oscillation stays small relative to the kinetic
         // scale (|PE| swing ~ m·g·L). Symplectic ⇒ bounded, not growing.
-        let scale = (cfg.masses.iter().sum::<f32>()
-            * cfg.gravity
-            * cfg.lengths.iter().sum::<f32>())
-        .max(1.0);
+        let scale =
+            (cfg.masses.iter().sum::<f32>() * cfg.gravity * cfg.lengths.iter().sum::<f32>())
+                .max(1.0);
         let drift = (e_max - e_min) / scale;
-        assert!(drift < 0.05, "energy drift too large: {drift:.4} (e0={e0:.4})");
+        assert!(
+            drift < 0.05,
+            "energy drift too large: {drift:.4} (e0={e0:.4})"
+        );
     }
 
     #[test]
@@ -526,5 +550,40 @@ mod tests {
         let mut b = vec![1.0, 2.0, 3.0];
         let x = solve_ldlt(&m, &mut b);
         assert!(x.is_some());
+    }
+
+    #[test]
+    fn crba_mass_matrix_matches_kinetic_energy() {
+        // Two independent derivations must agree: the CRBA mass matrix M(q)
+        // and the kinematic energy recursion. With gravity off, energy() is
+        // pure kinetic energy, which by definition equals ½·q̇ᵀ M(q) q̇.
+        // Non-uniform link masses/lengths make this a real cross-check.
+        let mut cfg = PlanarChainConfig::uniform(4);
+        cfg.gravity = 0.0;
+        cfg.masses = vec![1.3, 0.7, 1.1, 0.9];
+        cfg.lengths = vec![0.8, 1.2, 0.6, 1.0];
+        let q = vec![0.4_f32, -0.6, 0.25, -0.15];
+        let qd = vec![0.9_f32, -0.5, 1.3, 0.2];
+
+        let st = PlanarChainState {
+            q: q.clone(),
+            qdot: qd.clone(),
+        };
+        let ke_direct = st.energy(&cfg); // gravity = 0 → pure KE
+
+        let m = mass_matrix_crba(&q, &cfg);
+        let n = cfg.n as usize;
+        let mut ke_matrix = 0.0_f32;
+        for i in 0..n {
+            for j in 0..n {
+                ke_matrix += qd[i] * m[i][j] * qd[j];
+            }
+        }
+        ke_matrix *= 0.5;
+
+        assert!(
+            (ke_direct - ke_matrix).abs() < 1e-4 * ke_direct.abs().max(1.0),
+            "KE mismatch: kinematic {ke_direct} vs ½q̇ᵀMq̇ {ke_matrix}"
+        );
     }
 }

@@ -24,48 +24,62 @@ pub const SOLVERS: &[&str] = &["rigid", "mpm", "sph", "fem", "pbd"];
 pub const SOLVERS_IMPLEMENTED_R1_1: &[&str] = &["rigid (cartpole closed-form)"];
 
 mod articulation3d;
+mod batched;
 mod cartpole;
+mod ccd;
 mod contact;
 mod controllers;
+mod convex;
 mod double_pendulum;
 mod ik;
 mod isaac_api;
 mod jacobian;
 mod lqr;
+mod mpm;
+mod obb;
 mod planar_chain;
 mod spatial;
+mod thermal;
 mod trajectory;
 mod vectorized;
 mod world;
 
 #[cfg(feature = "gpu")]
 mod wgpu_backend;
+#[cfg(feature = "gpu")]
+mod wgpu_planar;
 
-pub use articulation3d::{
-    Articulation3dConfig, Articulation3dState, Body3d, JointType3d,
-};
+pub use articulation3d::{Articulation3dConfig, Articulation3dState, Body3d, JointType3d};
 pub use cartpole::{CartpoleConfig, CartpoleState};
 pub use contact::{Collider, ContactParams, ContactWorld, Obstacle};
 pub use controllers::{ArticulationAction, ArticulationController};
 pub use double_pendulum::{DoublePendulumConfig, DoublePendulumState};
-pub use isaac_api::{ArticulationView, ArticulationViewMut, IsaacWorld};
 pub use ik::{
     IkOptions, IkResult, TargetPose, solve_ik_cartpole, solve_ik_dp, solve_ik_planar_chain,
 };
+pub use isaac_api::{ArticulationView, ArticulationViewMut, IsaacWorld};
 pub use jacobian::{
     Jacobian, cartpole_link_jacobian, dp_link_jacobian, planar_chain_link_jacobian,
 };
 pub use lqr::{LqrController, LqrWeights};
 pub use planar_chain::{PlanarChainConfig, PlanarChainState};
 pub use trajectory::{
-    CubicPolynomialTrajectory, JointTrajectory, QuinticPolynomialTrajectory,
-    WaypointTrajectory,
+    CubicPolynomialTrajectory, JointTrajectory, QuinticPolynomialTrajectory, WaypointTrajectory,
 };
 pub use vectorized::{WGSL_SOURCE, step_vectorized, step_vectorized_per_env};
 pub use world::{Articulation, ArticulationHandle, LinkState, World};
+// continuum + narrow-phase additions (R2 — close the PhysX/Isaac gap)
+pub use batched::{ArticulationBatch, px};
+pub use ccd::{conservative_advancement_toi, sphere_plane_toi};
+pub use convex::{ConvexPoly, epa_penetration, gjk_closest_vec, gjk_distance, gjk_intersects};
+pub use mpm::{MpmMaterial, MpmObstacle, MpmSolver};
+pub use obb::{Manifold, Obb, obb_manifold, obb_sat};
+pub use thermal::{Bc, ThermalField};
 
 #[cfg(feature = "gpu")]
 pub use wgpu_backend::WgpuBackend;
+#[cfg(feature = "gpu")]
+pub use wgpu_planar::PlanarChainGpu;
 
 /// Solver coverage by R1 sub-phase.
 pub fn solver_for_phase(phase: &str) -> Option<&'static str> {

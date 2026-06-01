@@ -10,13 +10,15 @@
 //! (`Articulation3dConfig::point_jacobian`). Penetration is corrected with
 //! Baumgarte stabilization; restitution is supported (default 0 = inelastic).
 //!
-//! Collision shapes are spheres / capsules attached to links, resolved against
-//! a static ground plane (z = `ground_z`, normal +z). This is the
-//! contact-against-environment case; broadphase is trivial all-pairs (link
-//! counts are small). Self-collision broad/narrow phase is a documented
-//! follow-up.
+//! Collision shapes are spheres / capsules / **boxes** attached to links,
+//! resolved against a static ground plane (z = `ground_z`, normal +z), `Plane`
+//! / `Aabb` / `Convex` obstacles. A `Collider::Box` emits a **multi-point
+//! manifold** (one contact per corner) so a box rests flat and stably rather
+//! than balancing on a single deepest point. Broadphase is trivial all-pairs
+//! (link counts are small). Self-collision broad/narrow phase is a follow-up.
 
-use crate::articulation3d::{solve_ldlt, Articulation3dConfig, Articulation3dState};
+use crate::articulation3d::{Articulation3dConfig, Articulation3dState, solve_ldlt};
+use crate::convex::{ConvexPoly, epa_penetration, gjk_closest_vec};
 use glam::Vec3;
 
 #[derive(Clone, Debug)]
@@ -25,6 +27,15 @@ pub enum Collider {
     Sphere { center: Vec3, radius: f32 },
     /// Capsule between `a` and `b` (body frame), swept radius `radius`.
     Capsule { a: Vec3, b: Vec3, radius: f32 },
+    /// Oriented box: `center` + half-extents (body frame), optional corner
+    /// `radius` (rounded box). Resolved as a **multi-point manifold** — one
+    /// contact per corner — so a box rests flat and stably (no wobble) instead
+    /// of needing 8 separate sphere colliders.
+    Box {
+        center: Vec3,
+        half: Vec3,
+        radius: f32,
+    },
 }
 
 /// A static environment obstacle, in addition to the implicit ground plane
@@ -41,6 +52,10 @@ pub enum Obstacle {
     /// (nearest-face push-out; interior centres exit along the min-penetration
     /// axis).
     Aabb { min: Vec3, max: Vec3 },
+    /// Solid arbitrary **convex polytope** (tilted box, hull). Sphere colliders
+    /// are resolved against it with GJK (separation) / EPA (penetration), the
+    /// general narrow-phase. The convex-vs-convex piece the proxy shapes lacked.
+    Convex(ConvexPoly),
 }
 
 impl Obstacle {
@@ -52,7 +67,12 @@ impl Obstacle {
                 let n = normal.normalize();
                 let d = c.dot(n) - offset; // signed distance, +n = free side
                 let depth = radius - d;
-                (depth > -slop).then(|| Contact { link, p: c - n * d, n, depth })
+                (depth > -slop).then(|| Contact {
+                    link,
+                    p: c - n * d,
+                    n,
+                    depth,
+                })
             }
             Obstacle::Aabb { min, max } => {
                 let cp = c.clamp(*min, *max); // nearest point on/in the box
@@ -62,7 +82,12 @@ impl Obstacle {
                     let dist = dist2.sqrt();
                     let n = diff / dist;
                     let depth = radius - dist;
-                    (depth > -slop).then(|| Contact { link, p: cp, n, depth })
+                    (depth > -slop).then(|| Contact {
+                        link,
+                        p: cp,
+                        n,
+                        depth,
+                    })
                 } else {
                     // Centre inside the box: exit along the axis of least
                     // penetration (closest face).
@@ -80,7 +105,43 @@ impl Obstacle {
                             n = axis;
                         }
                     }
-                    Some(Contact { link, p: c, n, depth: radius + best })
+                    Some(Contact {
+                        link,
+                        p: c,
+                        n,
+                        depth: radius + best,
+                    })
+                }
+            }
+            Obstacle::Convex(poly) => {
+                // sphere centre as a degenerate (1-vertex) convex; GJK gives the
+                // separation vector from the polytope toward the centre.
+                let pt = ConvexPoly::new(vec![c]);
+                let cv = gjk_closest_vec(&pt, poly);
+                let d = cv.length();
+                if d > 1e-6 {
+                    let n = cv / d; // poly → centre (push-out direction)
+                    let depth = radius - d;
+                    (depth > -slop).then(|| Contact {
+                        link,
+                        p: c - n * radius,
+                        n,
+                        depth,
+                    })
+                } else {
+                    // centre inside the polytope → EPA for the exit direction.
+                    let (pd, mut n) = epa_penetration(&pt, poly)?;
+                    let centroid =
+                        poly.verts.iter().copied().sum::<Vec3>() / poly.verts.len().max(1) as f32;
+                    if n.dot(c - centroid) < 0.0 {
+                        n = -n; // orient outward (away from the polytope interior)
+                    }
+                    Some(Contact {
+                        link,
+                        p: c,
+                        n,
+                        depth: radius + pd,
+                    })
                 }
             }
         }
@@ -129,7 +190,11 @@ struct Contact {
 
 impl ContactWorld {
     pub fn new(colliders: Vec<(usize, Collider)>, params: ContactParams) -> Self {
-        Self { colliders, params, obstacles: Vec::new() }
+        Self {
+            colliders,
+            params,
+            obstacles: Vec::new(),
+        }
     }
 
     /// Add static environment obstacles (walls / boxes) for boxing-in a
@@ -192,8 +257,32 @@ impl ContactWorld {
             match col {
                 Collider::Sphere { center, radius } => probe(*center, *radius),
                 Collider::Capsule { a, b, radius } => {
-                    probe(*a, *radius);
-                    probe(*b, *radius);
+                    // Sample the capsule axis with spacing ≤ radius so no contact
+                    // along the segment (not just the two endpoints) is missed.
+                    let seg = *b - *a;
+                    let len = seg.length();
+                    let n_samp = ((len / radius.max(1.0e-4)).ceil() as usize + 1).max(2);
+                    for s in 0..n_samp {
+                        let t = s as f32 / (n_samp - 1) as f32;
+                        probe(*a + seg * t, *radius);
+                    }
+                }
+                Collider::Box {
+                    center,
+                    half,
+                    radius,
+                } => {
+                    // 8 corners → a multi-point contact manifold. Resting on the
+                    // four lower corners keeps the box flat and stable.
+                    for sx in [-1.0f32, 1.0] {
+                        for sy in [-1.0f32, 1.0] {
+                            for sz in [-1.0f32, 1.0] {
+                                let corner =
+                                    *center + Vec3::new(sx * half.x, sy * half.y, sz * half.z);
+                                probe(corner, *radius);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -238,7 +327,11 @@ impl ContactWorld {
             // Penetration push-out (Baumgarte), capped at the slop band.
             let pen = (c.depth - self.params.slop).max(0.0);
             let vn_pre = dotv(&jn, &st.qdot);
-            let restitution = if vn_pre < 0.0 { -self.params.restitution * vn_pre } else { 0.0 };
+            let restitution = if vn_pre < 0.0 {
+                -self.params.restitution * vn_pre
+            } else {
+                0.0
+            };
             let bias_n = (self.params.baumgarte / dt) * pen + restitution;
             rows.push(Row {
                 jn,
@@ -362,8 +455,17 @@ mod tests {
             ndof: 1,
         };
         let cw = ContactWorld::new(
-            vec![(0, Collider::Sphere { center: Vec3::new(0.0, 0.0, -l), radius: 0.05 })],
-            ContactParams { ground_z, ..Default::default() },
+            vec![(
+                0,
+                Collider::Sphere {
+                    center: Vec3::new(0.0, 0.0, -l),
+                    radius: 0.05,
+                },
+            )],
+            ContactParams {
+                ground_z,
+                ..Default::default()
+            },
         );
         (cfg, cw)
     }
@@ -378,7 +480,10 @@ mod tests {
         // Start horizontal (q=π/2 about −y swings tip toward −x/down). Ground
         // at z=−0.6 catches the tip (radius 0.05 → rest near −0.55).
         let (cfg, cw) = one_link_with_ground(-0.6);
-        let mut st = Articulation3dState { q: vec![std::f32::consts::FRAC_PI_2], qdot: vec![0.0] };
+        let mut st = Articulation3dState {
+            q: vec![std::f32::consts::FRAC_PI_2],
+            qdot: vec![0.0],
+        };
         for _ in 0..2000 {
             cw.step(&cfg, &mut st, &[0.0]);
         }
@@ -387,13 +492,20 @@ mod tests {
         assert!(z >= -0.62, "tip penetrated: z={z}");
         assert!(z <= -0.45, "tip should have fallen to the ground, z={z}");
         // At rest: joint velocity ≈ 0.
-        assert!(st.qdot[0].abs() < 0.05, "should be at rest, qdot={}", st.qdot[0]);
+        assert!(
+            st.qdot[0].abs() < 0.05,
+            "should be at rest, qdot={}",
+            st.qdot[0]
+        );
     }
 
     #[test]
     fn no_contact_when_ground_is_far_below() {
         let (cfg, cw) = one_link_with_ground(-5.0);
-        let st = Articulation3dState { q: vec![std::f32::consts::FRAC_PI_2], qdot: vec![0.0] };
+        let st = Articulation3dState {
+            q: vec![std::f32::consts::FRAC_PI_2],
+            qdot: vec![0.0],
+        };
         assert_eq!(cw.contact_count(&cfg, &st.q), 0);
     }
 
@@ -437,12 +549,27 @@ mod tests {
         // Tip sphere; ground far below so only the wall matters.
         let radius = 0.05;
         let cw = ContactWorld::new(
-            vec![(0, Collider::Sphere { center: Vec3::new(0.0, 0.0, -l), radius })],
-            ContactParams { ground_z: -10.0, ..Default::default() },
+            vec![(
+                0,
+                Collider::Sphere {
+                    center: Vec3::new(0.0, 0.0, -l),
+                    radius,
+                },
+            )],
+            ContactParams {
+                ground_z: -10.0,
+                ..Default::default()
+            },
         )
-        .with_obstacles(vec![Obstacle::Plane { normal: Vec3::X, offset: -0.30 }]);
+        .with_obstacles(vec![Obstacle::Plane {
+            normal: Vec3::X,
+            offset: -0.30,
+        }]);
         // Start so the tip is on the free side and swings toward the wall.
-        let mut st = Articulation3dState { q: vec![std::f32::consts::FRAC_PI_2], qdot: vec![0.0] };
+        let mut st = Articulation3dState {
+            q: vec![std::f32::consts::FRAC_PI_2],
+            qdot: vec![0.0],
+        };
         let tip_x = |st: &Articulation3dState| {
             let (r, p0) = cfg.link_world(&st.q)[0];
             (p0 + r * Vec3::new(0.0, 0.0, -1.0)).x
@@ -451,7 +578,11 @@ mod tests {
             cw.step(&cfg, &mut st, &[0.0]);
         }
         // Wall holds the tip centre at x ≥ -0.30 - radius (minus a little slop).
-        assert!(tip_x(&st) >= -0.30 - radius - 0.02, "wall breached: x={}", tip_x(&st));
+        assert!(
+            tip_x(&st) >= -0.30 - radius - 0.02,
+            "wall breached: x={}",
+            tip_x(&st)
+        );
         assert!(st.q.iter().all(|v| v.is_finite()) && st.qdot.iter().all(|v| v.is_finite()));
     }
 
@@ -459,14 +590,301 @@ mod tests {
     fn aabb_obstacle_keeps_sphere_outside() {
         // A static AABB obstacle yields an outward contact for a sphere that
         // would otherwise overlap it.
-        let ob = Obstacle::Aabb { min: Vec3::new(-1.0, -1.0, -1.0), max: Vec3::new(0.0, 1.0, 1.0) };
+        let ob = Obstacle::Aabb {
+            min: Vec3::new(-1.0, -1.0, -1.0),
+            max: Vec3::new(0.0, 1.0, 1.0),
+        };
         // Sphere centre just to the +x side of the box face at x=0.
-        let ct = ob.contact(7, Vec3::new(0.03, 0.0, 0.0), 0.05, 1.0e-3).expect("overlap → contact");
+        let ct = ob
+            .contact(7, Vec3::new(0.03, 0.0, 0.0), 0.05, 1.0e-3)
+            .expect("overlap → contact");
         assert_eq!(ct.link, 7);
-        assert!(ct.n.dot(Vec3::X) > 0.9, "normal should push out +x: n={:?}", ct.n);
+        assert!(
+            ct.n.dot(Vec3::X) > 0.9,
+            "normal should push out +x: n={:?}",
+            ct.n
+        );
         assert!(ct.depth > 0.0, "penetration positive");
         // Far away → no contact.
-        assert!(ob.contact(7, Vec3::new(0.5, 0.0, 0.0), 0.05, 1.0e-3).is_none());
+        assert!(
+            ob.contact(7, Vec3::new(0.5, 0.0, 0.0), 0.05, 1.0e-3)
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn restitution_controls_the_rebound_height() {
+        // A sphere dropped from z=1 onto the ground: with restitution e=0.6 it
+        // bounces back high (but below the drop, since e<1); with e=0 it does not.
+        let urdf = r#"<robot name="d">
+<link name="world"/>
+<joint name="jz" type="prismatic"><parent link="world"/><child link="body"/><origin xyz="0 0 0"/><axis xyz="0 0 1"/><limit lower="-1e4" upper="1e4" effort="1e9" velocity="1e4"/></joint>
+<link name="body"><inertial><origin xyz="0 0 0"/><mass value="5"/><inertia ixx="0.05" iyy="0.05" izz="0.05" ixy="0" ixz="0" iyz="0"/></inertial></link>
+</robot>"#;
+        let sys = kami_articulated::parse_urdf(urdf).expect("urdf");
+        let cfg = Articulation3dConfig::from_articulated_system(
+            &sys,
+            Vec3::new(0.0, 0.0, -9.81),
+            1.0 / 240.0,
+        );
+        let body = cfg.body_index("body").expect("body");
+        let radius = 0.1;
+
+        let first_bounce_apex = |e: f32| -> f32 {
+            let cw = ContactWorld::new(
+                vec![(
+                    body,
+                    Collider::Sphere {
+                        center: Vec3::ZERO,
+                        radius,
+                    },
+                )],
+                ContactParams {
+                    ground_z: 0.0,
+                    restitution: e,
+                    friction: 0.0,
+                    ..Default::default()
+                },
+            );
+            let mut st = Articulation3dState::zeros(cfg.ndof);
+            st.q[0] = 1.0; // centre at z = 1 (drop distance ≈ 0.9 above the rest)
+            let (mut hit, mut apex, mut done) = (false, 0.0_f32, false);
+            for _ in 0..2400 {
+                cw.step(&cfg, &mut st, &[0.0]);
+                let z = st.q[0];
+                if !hit {
+                    if z < radius + 0.02 {
+                        hit = true;
+                    }
+                } else if !done {
+                    apex = apex.max(z);
+                    if z < radius + 0.02 && apex > radius + 0.03 {
+                        done = true; // returned to the ground → end of first bounce
+                    }
+                }
+            }
+            apex
+        };
+
+        let bouncy = first_bounce_apex(0.6);
+        let dead = first_bounce_apex(0.0);
+        assert!(bouncy > 0.3, "e=0.6 should rebound high: apex={bouncy}");
+        assert!(
+            bouncy < 1.0,
+            "e<1 must not exceed the drop height: apex={bouncy}"
+        );
+        assert!(dead < 0.18, "e=0 should barely rebound: apex={dead}");
+        assert!(
+            bouncy > dead + 0.2,
+            "restitution had no effect: {dead} vs {bouncy}"
+        );
+    }
+
+    #[test]
+    fn friction_cone_holds_below_angle_and_slides_above() {
+        // A sphere on a plane tilted by θ stays (static friction) when
+        // tanθ < μ and slides down-slope when tanθ > μ — the Coulomb-cone law.
+        let urdf = r#"<robot name="s">
+<link name="world"/>
+<joint name="jx" type="prismatic"><parent link="world"/><child link="lx"/><origin xyz="0 0 0"/><axis xyz="1 0 0"/><limit lower="-1e4" upper="1e4" effort="1e9" velocity="1e4"/></joint>
+<link name="lx"><inertial><mass value="0.0001"/><inertia ixx="1e-7" iyy="1e-7" izz="1e-7" ixy="0" ixz="0" iyz="0"/></inertial></link>
+<joint name="jy" type="prismatic"><parent link="lx"/><child link="ly"/><origin xyz="0 0 0"/><axis xyz="0 1 0"/><limit lower="-1e4" upper="1e4" effort="1e9" velocity="1e4"/></joint>
+<link name="ly"><inertial><mass value="0.0001"/><inertia ixx="1e-7" iyy="1e-7" izz="1e-7" ixy="0" ixz="0" iyz="0"/></inertial></link>
+<joint name="jz" type="prismatic"><parent link="ly"/><child link="body"/><origin xyz="0 0 0"/><axis xyz="0 0 1"/><limit lower="-1e4" upper="1e4" effort="1e9" velocity="1e4"/></joint>
+<link name="body"><inertial><origin xyz="0 0 0"/><mass value="10"/><inertia ixx="0.1" iyy="0.1" izz="0.1" ixy="0" ixz="0" iyz="0"/></inertial></link>
+</robot>"#;
+        let sys = kami_articulated::parse_urdf(urdf).expect("urdf");
+        let cfg = Articulation3dConfig::from_articulated_system(
+            &sys,
+            Vec3::new(0.0, 0.0, -9.81),
+            1.0 / 240.0,
+        );
+        let body = cfg.body_index("body").expect("body");
+        let r = 0.2;
+        let mu = 0.8; // friction angle ≈ 38.7°
+
+        let down_slope_drift = |theta_deg: f32| -> f32 {
+            let th = theta_deg.to_radians();
+            let (s, c) = (th.sin(), th.cos());
+            let n = Vec3::new(s, 0.0, c); // plane normal (tilted about y)
+            let cw = ContactWorld::new(
+                vec![(
+                    body,
+                    Collider::Sphere {
+                        center: Vec3::ZERO,
+                        radius: r,
+                    },
+                )],
+                ContactParams {
+                    ground_z: -100.0,
+                    friction: mu,
+                    ..Default::default()
+                },
+            )
+            .with_obstacles(vec![Obstacle::Plane {
+                normal: n,
+                offset: 0.0,
+            }]);
+            let mut st = Articulation3dState::zeros(cfg.ndof);
+            let start = n * r; // rest the sphere on the plane (centre at distance r)
+            st.q[0] = start.x;
+            st.q[1] = start.y;
+            st.q[2] = start.z;
+            for _ in 0..800 {
+                cw.step(&cfg, &mut st, &[0.0, 0.0, 0.0]);
+            }
+            let center = Vec3::new(st.q[0], st.q[1], st.q[2]);
+            let t = Vec3::new(c, 0.0, -s); // unit down-slope direction
+            (center - start).dot(t)
+        };
+
+        let stays = down_slope_drift(20.0); // tan20°=0.36 < 0.8 → static
+        let slides = down_slope_drift(55.0); // tan55°=1.43 > 0.8 → slides
+        assert!(
+            stays.abs() < 0.05,
+            "should stick on a 20° slope: drift={stays}"
+        );
+        assert!(
+            slides > 0.5,
+            "should slide down a 55° slope: drift={slides}"
+        );
+    }
+
+    #[test]
+    fn capsule_mid_span_contact_is_not_missed() {
+        // A long horizontal capsule whose two endpoints clear an AABB obstacle
+        // but whose MIDDLE presses on it. Endpoint-only sampling would miss it;
+        // the axis sampling catches it.
+        let urdf = r#"<robot name="c">
+<link name="world"/>
+<joint name="jx" type="prismatic"><parent link="world"/><child link="body"/><origin xyz="0 0 0"/><axis xyz="1 0 0"/><limit lower="-100" upper="100" effort="1e8" velocity="1000"/></joint>
+<link name="body"><inertial><origin xyz="0 0 0"/><mass value="10"/><inertia ixx="1" iyy="1" izz="1" ixy="0" ixz="0" iyz="0"/></inertial></link>
+</robot>"#;
+        let sys = kami_articulated::parse_urdf(urdf).expect("urdf");
+        let cfg = Articulation3dConfig::from_articulated_system(
+            &sys,
+            Vec3::new(0.0, 0.0, -9.81),
+            1.0 / 240.0,
+        );
+        let body = cfg.body_index("body").expect("body");
+        // capsule along x at z = 0.5, half-length 1.0, radius 0.2.
+        let cw = ContactWorld::new(
+            vec![(
+                body,
+                Collider::Capsule {
+                    a: Vec3::new(-1.0, 0.0, 0.5),
+                    b: Vec3::new(1.0, 0.0, 0.5),
+                    radius: 0.2,
+                },
+            )],
+            ContactParams {
+                ground_z: -10.0,
+                ..Default::default()
+            }, // ground far below
+        )
+        .with_obstacles(vec![Obstacle::Aabb {
+            min: Vec3::new(-0.3, -0.3, 0.0),
+            max: Vec3::new(0.3, 0.3, 0.45), // top at z=0.45; capsule mid bottom = 0.3
+        }]);
+        let st = Articulation3dState::zeros(cfg.ndof);
+        // the two endpoints (x=±1) are clear; only the mid-span samples contact.
+        assert!(
+            cw.contact_count(&cfg, &st.q) >= 1,
+            "mid-span capsule contact missed"
+        );
+    }
+
+    #[test]
+    fn box_collider_makes_a_four_point_manifold_and_rests() {
+        // A 4-DOF floating base (x,y,z + yaw) carrying a Box collider. The box
+        // stays axis-aligned, so its 4 lower corners form a stable manifold —
+        // it rests flat on the ground instead of balancing on one point.
+        let urdf = r#"<robot name="b">
+<link name="world"/>
+<joint name="jx" type="prismatic"><parent link="world"/><child link="lx"/><origin xyz="0 0 0"/><axis xyz="1 0 0"/><limit lower="-100" upper="100" effort="1e8" velocity="1000"/></joint>
+<link name="lx"><inertial><mass value="0.0001"/><inertia ixx="1e-7" iyy="1e-7" izz="1e-7" ixy="0" ixz="0" iyz="0"/></inertial></link>
+<joint name="jy" type="prismatic"><parent link="lx"/><child link="ly"/><origin xyz="0 0 0"/><axis xyz="0 1 0"/><limit lower="-100" upper="100" effort="1e8" velocity="1000"/></joint>
+<link name="ly"><inertial><mass value="0.0001"/><inertia ixx="1e-7" iyy="1e-7" izz="1e-7" ixy="0" ixz="0" iyz="0"/></inertial></link>
+<joint name="jz" type="prismatic"><parent link="ly"/><child link="lz"/><origin xyz="0 0 0"/><axis xyz="0 0 1"/><limit lower="-100" upper="100" effort="1e8" velocity="1000"/></joint>
+<link name="lz"><inertial><mass value="0.0001"/><inertia ixx="1e-7" iyy="1e-7" izz="1e-7" ixy="0" ixz="0" iyz="0"/></inertial></link>
+<joint name="jyaw" type="continuous"><parent link="lz"/><child link="body"/><origin xyz="0 0 0"/><axis xyz="0 0 1"/></joint>
+<link name="body"><inertial><origin xyz="0 0 0"/><mass value="50"/><inertia ixx="8" iyy="8" izz="8" ixy="0" ixz="0" iyz="0"/></inertial></link>
+</robot>"#;
+        let sys = kami_articulated::parse_urdf(urdf).expect("urdf");
+        let cfg = Articulation3dConfig::from_articulated_system(
+            &sys,
+            Vec3::new(0.0, 0.0, -9.81),
+            1.0 / 240.0,
+        );
+        let body = cfg.body_index("body").expect("body");
+        let half = Vec3::splat(0.5);
+        let cw = ContactWorld::new(
+            vec![(
+                body,
+                Collider::Box {
+                    center: Vec3::ZERO,
+                    half,
+                    radius: 0.0,
+                },
+            )],
+            ContactParams {
+                ground_z: 0.0,
+                friction: 1.0,
+                ..Default::default()
+            },
+        );
+
+        // placed with the box centre at z = 0.4 → 4 lower corners below ground.
+        let mut st = Articulation3dState::zeros(cfg.ndof);
+        st.q[2] = 0.4;
+        assert_eq!(
+            cw.contact_count(&cfg, &st.q),
+            4,
+            "expected a 4-corner manifold"
+        );
+
+        // dropped from z = 2, it falls and rests flat (centre ≈ half-height).
+        st = Articulation3dState::zeros(cfg.ndof);
+        st.q[2] = 2.0;
+        for _ in 0..3000 {
+            cw.step(&cfg, &mut st, &vec![0.0; cfg.ndof]);
+        }
+        assert!(
+            st.q[2] > 0.35 && st.q[2] < 0.65,
+            "did not rest flat: z={}",
+            st.q[2]
+        );
+        assert!(st.qdot[2].abs() < 0.2, "still moving: {}", st.qdot[2]);
+        assert!(st.q.iter().all(|v| v.is_finite()));
+    }
+
+    #[test]
+    fn convex_obstacle_resolves_sphere_via_gjk_epa() {
+        use glam::Quat;
+        // a 45°-tilted box (corner points along +x at ~0.707) as a Convex obstacle.
+        let poly = ConvexPoly::box_at(Vec3::ZERO, Vec3::splat(0.5), Quat::from_rotation_z(0.785));
+        let ob = Obstacle::Convex(poly);
+        // far away → no contact
+        assert!(
+            ob.contact(3, Vec3::new(3.0, 0.0, 0.0), 0.1, 1.0e-3)
+                .is_none()
+        );
+        // just outside the +x corner, within the sphere radius → outward contact
+        let ct = ob
+            .contact(3, Vec3::new(0.78, 0.0, 0.0), 0.1, 1.0e-3)
+            .expect("near corner → contact (GJK)");
+        assert_eq!(ct.link, 3);
+        assert!(ct.depth > 0.0 && ct.depth.is_finite(), "depth={}", ct.depth);
+        assert!(ct.n.x > 0.3, "normal should push out +x: n={:?}", ct.n);
+        // centre inside the polytope → EPA push-out (large depth)
+        let ci = ob
+            .contact(3, Vec3::ZERO, 0.1, 1.0e-3)
+            .expect("inside → contact (EPA)");
+        assert!(
+            ci.depth > 0.1 && ci.depth.is_finite(),
+            "epa depth={}",
+            ci.depth
+        );
     }
 
     #[test]
@@ -474,13 +892,19 @@ mod tests {
         // With restitution 0, total energy must not rise over the contact phase
         // (Baumgarte can add a little; bound generously but finite).
         let (cfg, cw) = one_link_with_ground(-0.6);
-        let mut st = Articulation3dState { q: vec![std::f32::consts::FRAC_PI_2], qdot: vec![0.0] };
+        let mut st = Articulation3dState {
+            q: vec![std::f32::consts::FRAC_PI_2],
+            qdot: vec![0.0],
+        };
         let e0 = cfg.energy(&st);
         let mut emax = e0;
         for _ in 0..2000 {
             cw.step(&cfg, &mut st, &[0.0]);
             emax = emax.max(cfg.energy(&st));
         }
-        assert!(emax <= e0 + 0.05 * e0.abs().max(1.0), "energy grew: e0={e0} emax={emax}");
+        assert!(
+            emax <= e0 + 0.05 * e0.abs().max(1.0),
+            "energy grew: e0={e0} emax={emax}"
+        );
     }
 }
