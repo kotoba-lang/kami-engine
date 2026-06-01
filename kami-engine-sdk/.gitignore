@@ -1,6 +1,0 @@
-node_modules/
-dist/
-.svelte-kit/
-coverage/
-.DS_Store
-*.log
