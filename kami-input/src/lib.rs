@@ -5,6 +5,9 @@
 
 use glam::Vec2;
 
+pub mod gamepad;
+pub use gamepad::{Axis, ControllerProfile, Deadzone, GamepadState, Pad};
+
 /// Input action (abstract, mapped from physical input).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Action {

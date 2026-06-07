@@ -1,0 +1,12 @@
+[package]
+name = "kami-teleop"
+description = "Teleoperation pipeline: PS5/Switch/Xbox/Steam controller → safety-gated robot command → Isaac-parity (kami-genesis) simulation + analysis. The kami-engine body of the tazuna 手綱 remote-robotics actor (etzhayyim ADR-2606042100). Sim/design only (dry-run); live actuation is Council-gated."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+glam = { workspace = true }
+kami-input = { path = "../kami-input" }
+kami-genesis = { path = "../kami-genesis" }
+kami-articulated = { path = "../kami-articulated" }

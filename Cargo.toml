@@ -21,6 +21,7 @@ members = [
     "kami-physics-2d",
     "kami-vehicle",
     "kami-autodrive",
+    "kami-teleop",
     "kami-tilemap",
     "kami-audio",
     "kami-pathfind",

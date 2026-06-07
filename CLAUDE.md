@@ -25,7 +25,7 @@ See also: `ARCHITECTURE.md` for ownership boundaries and authority rules across 
 | **kami-core** | ECS (hecs) + Actor model + KAMI IPC (columnar zero-copy) |
 | **kami-render** | wgpu 統一レンダラ (PBR shader, mesh, camera, texture) |
 | **kami-engine** | 統合 (World + Clock + Net) |
-| **kami-input** | 統一入力 (keyboard, mouse, touch, gamepad, gesture, FocusManager) |
+| **kami-input** | 統一入力 (keyboard, mouse, touch, gamepad, gesture, FocusManager)。`gamepad` module: PS5/Switch/Xbox/Steam profiles (vendor detect + glyphs), radial Deadzone, poll-model GamepadState |
 | **kami-scene-graph** | Scene DAG (parent-child transform hierarchy, hecs 統合) |
 
 ### Game Systems
@@ -37,6 +37,7 @@ See also: `ARCHITECTURE.md` for ownership boundaries and authority rules across 
 | **kami-vehicle** | BeamNG-grade soft-body vehicle physics (~80 mass nodes / ~220 beams / Pacejka tire / full powertrain — engine curve / clutch / 6-spd gearbox / open / locked / LSD diff / FWD-RWD-AWD). XPBD integrator with rigid-chassis projection (Müller 2005 shape match) + implicit-Euler+CG alternate. 8 SurfaceKind presets (Dry/Wet/Gravel/Sand/Snow/Ice/Mud/Grass) with grip + friction coefficients. JBeam-subset JSON loader. Garage: 6 vehicles (sedan / hatchback / SUV / sports / pickup / bus). 54 tests |
 | **kami-tilemap** | 2D タイルマップ (tile layers, auto-tile, collision map) |
 | **kami-pathfind** | A* grid pathfinding + NavMesh (NPC navigation) |
+| **kami-teleop** | Teleoperation pipeline (tazuna 手綱 body, etzhayyim ADR-2606042100): PS5/Switch/Xbox/Steam controller → `TeleopMapper` → `SafetyEnvelope` (deadman/e-stop/latency, dry-run G7) → `ArmTeleopSim` over Isaac-parity kami-genesis → `TeleopMetrics` analysis. 14 tests (kami-input 7 + kami-teleop 7). Browser front = `@etzhayyim/kami-engine-sdk/teleoperation` |
 | **kami-skeleton** | Skeletal animation (bone hierarchy, GPU skinning, blend) |
 | **kami-audio** | Spatial audio (HRTF, 3D panning, mixer, priority channels) |
 

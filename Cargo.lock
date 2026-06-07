@@ -2115,6 +2115,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-teleop"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "kami-articulated",
+ "kami-genesis",
+ "kami-input",
+]
+
+[[package]]
 name = "kami-terrain"
 version = "0.1.0"
 dependencies = [
