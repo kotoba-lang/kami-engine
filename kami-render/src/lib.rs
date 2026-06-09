@@ -13,6 +13,15 @@ pub mod texture;
 #[cfg(feature = "gltf-loader")]
 pub mod gltf_loader;
 
+#[cfg(feature = "gltf-loader")]
+pub mod meshopt;
+
+#[cfg(feature = "gltf-loader")]
+pub mod basisu;
+
+#[cfg(feature = "gltf-loader")]
+pub(crate) mod uastc_tables;
+
 #[cfg(feature = "wgpu-backend")]
 pub mod pipeline;
 

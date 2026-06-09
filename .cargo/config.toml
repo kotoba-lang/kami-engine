@@ -1,0 +1,16 @@
+# Headless WASM testing (no browser).
+#
+# Lets `cargo test --target wasm32-wasip1` run the test binary under wasmtime
+# automatically. Only affects the wasip1 target — native builds are untouched.
+#
+# Quick start:
+#   ./scripts/test-wasm.sh                 # runs the pure-Rust decoder tests on wasm
+# or manually (note: this repo's `cargo`/`rustc` may be Homebrew's, which lacks
+# wasm std — drive the rustup toolchain explicitly, see scripts/test-wasm.sh):
+#   cargo test -p kami-render --no-default-features --features gltf-loader \
+#     --target wasm32-wasip1
+#
+# wgpu does not run under WASI, so wasm test runs use --no-default-features to
+# exclude the `wgpu-backend`. GPU/rendering paths still require a real browser.
+[target.wasm32-wasip1]
+runner = "wasmtime"

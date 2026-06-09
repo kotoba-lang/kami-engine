@@ -401,3 +401,20 @@ node /tmp/visual-test-full-interact.mjs
 # Rust tests
 cargo test -p kami-graph
 ```
+
+### Headless WASM tests (no browser)
+
+Run the pure-Rust asset decoders (spz / EXT_meshopt_compression / KHR_mesh_quantization /
+KHR_texture_basisu-UASTC) on `wasm32-wasip1` under `wasmtime` — no browser, no GPU:
+
+```bash
+brew install wasmtime          # one-time
+./scripts/test-wasm.sh         # all kami-render decoder unit tests on wasm
+./scripts/test-wasm.sh basisu  # filter (passes through to cargo test)
+```
+
+`.cargo/config.toml` wires `wasmtime` as the wasip1 test runner. The script drives the
+**rustup** toolchain explicitly (`RUSTC`/`cargo`) because a Homebrew `rustc` on `PATH`
+ships no wasm std (`can't find crate for core/std`). Tests use `--no-default-features`
+to drop `wgpu-backend` (wgpu/GPU can't run under WASI — those paths still need a browser,
+e.g. `wasm-pack build --target web` + headless Chrome).

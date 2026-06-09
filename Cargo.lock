@@ -1960,9 +1960,11 @@ version = "0.1.0"
 dependencies = [
  "ash",
  "bytemuck",
+ "flate2",
  "glam",
  "gltf",
  "gpu-allocator",
+ "image",
  "kami-core",
  "log",
  "serde_json",
