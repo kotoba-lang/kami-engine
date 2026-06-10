@@ -108,3 +108,10 @@ serde_yaml = "0.9"
 rapier3d = { version = "0.22", features = ["simd-nightly"] }
 roxmltree = "0.20"
 wasm-bindgen = "0.2"
+
+# glTF 2.0 + asset codecs (kami-render gltf-loader). flate2 uses the pure-Rust
+# miniz_oxide backend and image is feature-trimmed so the whole loader stays
+# wasm-safe (no C deps); see 90-docs/adr/0032.
+gltf = "1"
+flate2 = { version = "1", default-features = false, features = ["rust_backend"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
