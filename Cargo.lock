@@ -1841,6 +1841,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-clj-host"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "js-sys",
+ "kami-core",
+ "kami-render",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "wgpu",
+]
+
+[[package]]
 name = "kami-core"
 version = "0.1.0"
 dependencies = [

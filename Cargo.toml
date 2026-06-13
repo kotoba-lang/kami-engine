@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     # Clojure WASM scripting (ADR-0035)
     "kami-clj",
+    "kami-clj-host",
     "kami-script-runtime",
     "kami-core",
     "kami-knp",

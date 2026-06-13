@@ -1,0 +1,49 @@
+;; kami-engine-sdk-clj — KAMI Engine Clojure SDK (clj + Datomic + WebGPU)
+;; See ARCHITECTURE.md. clj is the brain; kami-render (Rust/wgpu) is the GPU arm.
+;;
+;; Datomic flavor is an open question (ADR-CLJ-02 / §13). The schema and kami.db
+;; API are Datalog-portable; datalevin is the default here as an OSS, embeddable,
+;; blockchain-friendly Datalog store aligned with root/'s "no proprietary Datomic"
+;; platform note. Swap the :datomic alias for Cloud/Peer if desired.
+{:paths ["src" "resources"]
+
+ :deps {org.clojure/clojure       {:mvn/version "1.12.0"}
+        com.cognitect/transit-clj {:mvn/version "1.0.333"}} ; snapshot transport (JVM↔browser)
+
+ :aliases
+ {;; ----- JVM authoring / Datomic source of truth -----------------------------
+  :datomic  {:extra-deps {datalevin/datalevin {:mvn/version "0.9.22"}}}
+  ;; alt: com.datomic/peer {:mvn/version "..."}  | com.datomic/client-cloud {:mvn/version "..."}
+
+  :dev      {:extra-paths ["dev" "examples"]
+             :extra-deps  {datalevin/datalevin   {:mvn/version "0.9.22"}
+                           org.clojure/tools.namespace {:mvn/version "1.5.0"}}
+             :jvm-opts    ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                           "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"]
+             :main-opts   ["-e" "(println \"kami-engine-sdk-clj dev REPL — see ARCHITECTURE.md §12\")"]}
+
+  ;; Real-datalevin round-trip: connect → tx → snapshot → ECS → render-IR → pack → commit
+  :roundtrip {:extra-paths ["dev"]
+              :extra-deps  {datalevin/datalevin {:mvn/version "0.9.22"}}
+              :jvm-opts    ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                            "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"]
+              :main-opts   ["-m" "roundtrip"]}
+
+  ;; Regenerate cross-language artifacts consumed by the Rust side:
+  ;;   -m gen-fixture  → ../kami-clj-host/tests/fixtures/frame.bin (decoder contract test)
+  ;;   -m gen-demo     → ../kami-clj-host/demo/{frame.bin,frame.json} (browser smoke test)
+  :gen      {:extra-paths ["dev"]
+             :extra-deps  {org.clojure/data.json {:mvn/version "2.5.0"}}}
+
+  ;; ----- Browser runtime (ClojureScript → kami-render WASM → WebGPU) ---------
+  :shadow   {:extra-paths ["src"]
+             :extra-deps  {thheller/shadow-cljs            {:mvn/version "2.28.20"}
+                           org.clojure/clojurescript       {:mvn/version "1.11.132"}
+                           com.cognitect/transit-cljs      {:mvn/version "0.8.280"}}
+             :main-opts   ["-m" "shadow.cljs.devtools.cli"]}
+
+  ;; ----- Contract tests (no GPU): render-IR golden, WGSL emit, IPC packing ---
+  :test     {:extra-paths ["test"]
+             :extra-deps  {io.github.cognitect-labs/test-runner
+                           {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+             :main-opts   ["-m" "cognitect.test-runner"]}}}
