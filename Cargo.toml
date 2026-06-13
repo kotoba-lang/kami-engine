@@ -1,6 +1,9 @@
 [workspace]
 resolver = "2"
 members = [
+    # Clojure WASM scripting (ADR-0035)
+    "kami-clj",
+    "kami-script-runtime",
     "kami-core",
     "kami-knp",
     "kami-render",
@@ -95,6 +98,9 @@ edition = "2024"
 license = "MIT"
 
 [workspace.dependencies]
+# kami-clj / kami-script-runtime
+wasm-encoder  = "0.221"
+wasmtime      = "22"
 hecs = "0.10"
 glam = { version = "0.33", features = ["bytemuck", "serde"] }
 bytemuck = { version = "1", features = ["derive"] }

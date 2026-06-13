@@ -14,3 +14,11 @@
 # exclude the `wgpu-backend`. GPU/rendering paths still require a real browser.
 [target.wasm32-wasip1]
 runner = "wasmtime"
+
+# Native-host cargo aliases (used because the org-level config.toml forces
+# build.target = "wasm32-unknown-unknown" for the whole com-junkawasaki tree).
+# Run host-side crates (kami-clj, kami-script-runtime) with:
+#   cargo test-native -p kami-clj
+[alias]
+test-native  = "test  --target aarch64-apple-darwin"
+check-native = "check --target aarch64-apple-darwin"
