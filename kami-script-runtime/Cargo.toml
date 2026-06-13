@@ -1,0 +1,18 @@
+[package]
+name = "kami-script-runtime"
+version.workspace = true
+edition.workspace = true
+description = "kami-script-runtime — wasmtime host that binds kami:engine/* imports to live Rust game-engine state. Loads compiled kami-clj WASM modules and drives init/tick/on-event lifecycle."
+
+[dependencies]
+kami-clj  = { path = "../kami-clj", features = ["run"] }
+kami-core = { path = "../kami-core" }
+kami-input = { path = "../kami-input" }
+kami-audio = { path = "../kami-audio" }
+wasmtime   = { workspace = true }
+hecs       = { workspace = true }
+thiserror  = { workspace = true }
+log        = { workspace = true }
+
+[dev-dependencies]
+hecs = { workspace = true }

@@ -1,0 +1,730 @@
+//! Lowering from EDN → typed AST for the Clojure-subset compiler.
+//!
+//! Extends the kotoba-clj value model with:
+//!   - `Expr::Float(f32)` — float literals (compiled to f32.const → i32.reinterpret → i64.extend).
+//!   - Game-engine host-import builtins (scene / physics / input / render / audio / time).
+//!   - `defsystem` top-level form: sugar for a `(defn name-tick [dt] …)` exported fn.
+//!
+//! ## Value model
+//!
+//! All values on the WASM stack are `i64` (same as kotoba-clj).  F32 values
+//! are represented as their IEEE-754 bit-pattern zero-extended to i64.
+//!
+//! Host imports that take f32 parameters receive the low 32 bits of the i64
+//! (via `i32.wrap_i64`); the codegen handles this wrapping automatically per
+//! the `ParamKind` annotation on each `HostImport`.
+
+use kotoba_edn::{EdnValue, Symbol};
+
+use crate::CljError;
+
+// ---------------------------------------------------------------------------
+// Top-level program
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct Program {
+    pub defs:      Vec<Def>,
+    pub functions: Vec<Function>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Def {
+    pub name:  String,
+    pub value: Expr,
+}
+
+#[derive(Debug, Clone)]
+pub struct Function {
+    pub name:   String,
+    pub params: Vec<String>,
+    pub body:   Vec<Expr>,
+}
+
+// ---------------------------------------------------------------------------
+// Builtins — split into kotoba-core ops and kami-engine host imports
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Builtin {
+    // ---- arithmetic ---------------------------------------------------------
+    Add, Sub, Mul, Div, Mod,
+    Inc, Dec, Abs,
+    // ---- comparison ---------------------------------------------------------
+    Eq, NotEq, Lt, Gt, Le, Ge,
+    Zero, Pos, Neg,
+    // ---- logic --------------------------------------------------------------
+    And, Or, Not,
+    // ---- string / bytes (kotoba-clj core) -----------------------------------
+    StrLen, ByteAt,
+    BytesAlloc, ByteAppend, BytesLen, BytesFinish,
+    // ---- raw memory ---------------------------------------------------------
+    Alloc,
+    Load64, Store64,
+    Load32, Store32,
+    // ---- f32 bit-pattern helpers -------------------------------------------
+    /// `(f32->bits x)` — alias for clarity; at the WASM level this is a NOP
+    /// because f32 literals already arrive as their bit-pattern i64.
+    F32Bits,
+    /// `(bits->f32 x)` — extract the low 32 bits of an i64 as f32.  Used when
+    /// passing the result of arithmetic back to a host import.
+    BitsF32,
+
+    // ---- KAMI scene / ECS --------------------------------------------------
+    /// `(spawn-entity kind-str)` → entity-id (i64)
+    SpawnEntity,
+    /// `(despawn-entity eid)` → void (returns 0)
+    DespawnEntity,
+    /// `(get-x eid)` → f32 bits (i64)
+    GetX, GetY, GetZ,
+    /// `(set-position! eid x y z)` — x/y/z are f32 bits
+    SetPosition,
+    /// `(get-vx eid)`, `(get-vy eid)`, `(get-vz eid)` → f32 bits
+    GetVx, GetVy, GetVz,
+    /// `(set-velocity! eid vx vy vz)` — vx/vy/vz are f32 bits
+    SetVelocity,
+    /// `(get-rx eid)` etc. → quaternion component as f32 bits
+    GetRx, GetRy, GetRz, GetRw,
+    /// `(set-rotation! eid rx ry rz rw)`
+    SetRotation,
+
+    // ---- KAMI physics -------------------------------------------------------
+    /// `(apply-impulse! eid ix iy iz)` — f32 bits
+    ApplyImpulse,
+    /// `(apply-force! eid fx fy fz)` — f32 bits
+    ApplyForce,
+    /// `(raycast ox oy oz dx dy dz)` → entity-id (i64) or 0
+    Raycast,
+
+    // ---- KAMI input ---------------------------------------------------------
+    /// `(key-down? key-str)` → 1/0
+    KeyDown,
+    /// `(key-pressed? key-str)` → 1/0 (edge detect)
+    KeyPressed,
+    /// `(axis name-str)` → f32 bits (i64) in [-1, 1]
+    Axis,
+    /// `(pointer-x)` / `(pointer-y)` → f32 bits (canvas pixels)
+    PointerX, PointerY,
+
+    // ---- KAMI render --------------------------------------------------------
+    /// `(draw-mesh! mesh-str x y z)` — x/y/z are f32 bits
+    DrawMesh,
+    /// `(spawn-particle! preset-str x y z)`
+    SpawnParticle,
+    /// `(draw-line! x0 y0 z0 x1 y1 z1 color)`
+    DrawLine,
+
+    // ---- KAMI audio ---------------------------------------------------------
+    /// `(play-sound name-str)` → void
+    PlaySound,
+    /// `(stop-sound name-str)` → void
+    StopSound,
+    /// `(play-sound-at name-str x y z)` — spatial audio
+    PlaySoundAt,
+
+    // ---- KAMI time ----------------------------------------------------------
+    /// `(delta-ms)` → i64
+    DeltaMs,
+    /// `(elapsed-ms)` → i64
+    ElapsedMs,
+    /// `(tick-n)` → i64 (current tick number)
+    TickN,
+}
+
+impl Builtin {
+    pub fn host_import(self) -> Option<HostImport> {
+        use Builtin::*;
+        match self {
+            SpawnEntity    => Some(HostImport::SceneSpawn),
+            DespawnEntity  => Some(HostImport::SceneDespawn),
+            GetX           => Some(HostImport::SceneGetX),
+            GetY           => Some(HostImport::SceneGetY),
+            GetZ           => Some(HostImport::SceneGetZ),
+            SetPosition    => Some(HostImport::SceneSetPosition),
+            GetVx          => Some(HostImport::SceneGetVx),
+            GetVy          => Some(HostImport::SceneGetVy),
+            GetVz          => Some(HostImport::SceneGetVz),
+            SetVelocity    => Some(HostImport::SceneSetVelocity),
+            GetRx          => Some(HostImport::SceneGetRx),
+            GetRy          => Some(HostImport::SceneGetRy),
+            GetRz          => Some(HostImport::SceneGetRz),
+            GetRw          => Some(HostImport::SceneGetRw),
+            SetRotation    => Some(HostImport::SceneSetRotation),
+            ApplyImpulse   => Some(HostImport::PhysicsApplyImpulse),
+            ApplyForce     => Some(HostImport::PhysicsApplyForce),
+            Raycast        => Some(HostImport::PhysicsRaycast),
+            KeyDown        => Some(HostImport::InputKeyDown),
+            KeyPressed     => Some(HostImport::InputKeyPressed),
+            Axis           => Some(HostImport::InputAxis),
+            PointerX       => Some(HostImport::InputPointerX),
+            PointerY       => Some(HostImport::InputPointerY),
+            DrawMesh       => Some(HostImport::RenderDrawMesh),
+            SpawnParticle  => Some(HostImport::RenderSpawnParticle),
+            DrawLine       => Some(HostImport::RenderDrawLine),
+            PlaySound      => Some(HostImport::AudioPlay),
+            StopSound      => Some(HostImport::AudioStop),
+            PlaySoundAt    => Some(HostImport::AudioPlayAt),
+            DeltaMs        => Some(HostImport::TimeDeltaMs),
+            ElapsedMs      => Some(HostImport::TimeElapsedMs),
+            TickN          => Some(HostImport::TimeTick),
+            _              => None,
+        }
+    }
+
+    fn from_name(s: &str) -> Option<Builtin> {
+        use Builtin::*;
+        Some(match s {
+            // arithmetic
+            "+"          => Add,
+            "-"          => Sub,
+            "*"          => Mul,
+            "/" | "quot" => Div,
+            "mod" | "rem"=> Mod,
+            "inc"        => Inc,
+            "dec"        => Dec,
+            "abs"        => Abs,
+            // comparison
+            "="          => Eq,
+            "!=" | "not="=> NotEq,
+            "<"          => Lt,
+            ">"          => Gt,
+            "<="         => Le,
+            ">="         => Ge,
+            "zero?"      => Zero,
+            "pos?"       => Pos,
+            "neg?"       => Neg,
+            // logic
+            "and"        => And,
+            "or"         => Or,
+            "not"        => Not,
+            // strings / bytes
+            "str-len"    => StrLen,
+            "byte-at"    => ByteAt,
+            "bytes-alloc"=> BytesAlloc,
+            "byte-append!"=> ByteAppend,
+            "bytes-len"  => BytesLen,
+            "bytes-finish"=> BytesFinish,
+            // raw memory
+            "alloc"      => Alloc,
+            "load64"     => Load64,
+            "store64!"   => Store64,
+            "load32"     => Load32,
+            "store32!"   => Store32,
+            // f32 helpers
+            "f32->bits"  => F32Bits,
+            "bits->f32"  => BitsF32,
+            // scene / ECS
+            "spawn-entity"    => SpawnEntity,
+            "despawn-entity"  => DespawnEntity,
+            "get-x"           => GetX,
+            "get-y"           => GetY,
+            "get-z"           => GetZ,
+            "set-position!"   => SetPosition,
+            "get-vx"          => GetVx,
+            "get-vy"          => GetVy,
+            "get-vz"          => GetVz,
+            "set-velocity!"   => SetVelocity,
+            "get-rx"          => GetRx,
+            "get-ry"          => GetRy,
+            "get-rz"          => GetRz,
+            "get-rw"          => GetRw,
+            "set-rotation!"   => SetRotation,
+            // physics
+            "apply-impulse!"  => ApplyImpulse,
+            "apply-force!"    => ApplyForce,
+            "raycast"         => Raycast,
+            // input
+            "key-down?"       => KeyDown,
+            "key-pressed?"    => KeyPressed,
+            "axis"            => Axis,
+            "pointer-x"       => PointerX,
+            "pointer-y"       => PointerY,
+            // render
+            "draw-mesh!"      => DrawMesh,
+            "spawn-particle!" => SpawnParticle,
+            "draw-line!"      => DrawLine,
+            // audio
+            "play-sound"      => PlaySound,
+            "stop-sound"      => StopSound,
+            "play-sound-at"   => PlaySoundAt,
+            // time
+            "delta-ms"        => DeltaMs,
+            "elapsed-ms"      => ElapsedMs,
+            "tick-n"          => TickN,
+            _                 => return None,
+        })
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Host imports — each maps to a (module, field) WASM import
+// ---------------------------------------------------------------------------
+
+/// Describes the core-WASM type of a parameter as the codegen sees it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ParamKind {
+    /// Plain i64 value (entity IDs, string handles, booleans, integers).
+    I64,
+    /// f32 bit-pattern stored in an i64; codegen emits `i32.wrap_i64` +
+    /// `f32.reinterpret_i32` before the host call.
+    F32,
+    /// String handle (packed `(offset<<32)|len`) lowered to a `(ptr:i32, len:i32)` pair.
+    StringHandle,
+}
+
+/// Core WASM return type from the host function, before the codegen lifts it
+/// to i64 for the all-i64 guest value model.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReturnKind {
+    /// No return value; codegen pushes a `0_i64` placeholder so the stack stays balanced.
+    Void,
+    /// Returns i32 (entity low half, bool); codegen zero-extends to i64.
+    I32,
+    /// Returns i64 directly (entity IDs, tick counter).
+    I64,
+    /// Returns f32; codegen emits `i32.reinterpret_f32` + `i64.extend_i32_u`.
+    F32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum HostImport {
+    // scene
+    SceneSpawn, SceneDespawn,
+    SceneGetX, SceneGetY, SceneGetZ, SceneSetPosition,
+    SceneGetVx, SceneGetVy, SceneGetVz, SceneSetVelocity,
+    SceneGetRx, SceneGetRy, SceneGetRz, SceneGetRw, SceneSetRotation,
+    // physics
+    PhysicsApplyImpulse, PhysicsApplyForce, PhysicsRaycast,
+    // input
+    InputKeyDown, InputKeyPressed, InputAxis, InputPointerX, InputPointerY,
+    // render
+    RenderDrawMesh, RenderSpawnParticle, RenderDrawLine,
+    // audio
+    AudioPlay, AudioStop, AudioPlayAt,
+    // time
+    TimeDeltaMs, TimeElapsedMs, TimeTick,
+}
+
+impl HostImport {
+    /// WASM import `(module, field)` matching `wit/kami-game/world.wit`.
+    pub fn module_field(self) -> (&'static str, &'static str) {
+        use HostImport::*;
+        match self {
+            SceneSpawn        => ("kami:engine/scene@1.0.0",   "spawn"),
+            SceneDespawn      => ("kami:engine/scene@1.0.0",   "despawn"),
+            SceneGetX         => ("kami:engine/scene@1.0.0",   "get-x"),
+            SceneGetY         => ("kami:engine/scene@1.0.0",   "get-y"),
+            SceneGetZ         => ("kami:engine/scene@1.0.0",   "get-z"),
+            SceneSetPosition  => ("kami:engine/scene@1.0.0",   "set-position"),
+            SceneGetVx        => ("kami:engine/scene@1.0.0",   "get-vx"),
+            SceneGetVy        => ("kami:engine/scene@1.0.0",   "get-vy"),
+            SceneGetVz        => ("kami:engine/scene@1.0.0",   "get-vz"),
+            SceneSetVelocity  => ("kami:engine/scene@1.0.0",   "set-velocity"),
+            SceneGetRx        => ("kami:engine/scene@1.0.0",   "get-rx"),
+            SceneGetRy        => ("kami:engine/scene@1.0.0",   "get-ry"),
+            SceneGetRz        => ("kami:engine/scene@1.0.0",   "get-rz"),
+            SceneGetRw        => ("kami:engine/scene@1.0.0",   "get-rw"),
+            SceneSetRotation  => ("kami:engine/scene@1.0.0",   "set-rotation"),
+            PhysicsApplyImpulse=> ("kami:engine/physics@1.0.0","apply-impulse"),
+            PhysicsApplyForce => ("kami:engine/physics@1.0.0", "apply-force"),
+            PhysicsRaycast    => ("kami:engine/physics@1.0.0", "raycast"),
+            InputKeyDown      => ("kami:engine/input@1.0.0",   "key-down"),
+            InputKeyPressed   => ("kami:engine/input@1.0.0",   "key-pressed"),
+            InputAxis         => ("kami:engine/input@1.0.0",   "axis"),
+            InputPointerX     => ("kami:engine/input@1.0.0",   "pointer-x"),
+            InputPointerY     => ("kami:engine/input@1.0.0",   "pointer-y"),
+            RenderDrawMesh    => ("kami:engine/render@1.0.0",  "draw-mesh"),
+            RenderSpawnParticle=> ("kami:engine/render@1.0.0", "spawn-particle"),
+            RenderDrawLine    => ("kami:engine/render@1.0.0",  "draw-line"),
+            AudioPlay         => ("kami:engine/audio@1.0.0",   "play"),
+            AudioStop         => ("kami:engine/audio@1.0.0",   "stop"),
+            AudioPlayAt       => ("kami:engine/audio@1.0.0",   "play-at"),
+            TimeDeltaMs       => ("kami:engine/time@1.0.0",    "delta-ms"),
+            TimeElapsedMs     => ("kami:engine/time@1.0.0",    "elapsed-ms"),
+            TimeTick          => ("kami:engine/time@1.0.0",    "tick"),
+        }
+    }
+
+    /// Parameter kinds from the guest's perspective (each i64 on the value stack).
+    /// `StringHandle` lowers to 2 × i32 (ptr, len) — must be accounted for in
+    /// the WASM function type.
+    pub fn param_kinds(self) -> &'static [ParamKind] {
+        use HostImport::*;
+        use ParamKind::*;
+        match self {
+            SceneSpawn        => &[StringHandle],
+            SceneDespawn      => &[I64],
+            SceneGetX | SceneGetY | SceneGetZ   => &[I64],
+            SceneSetPosition  => &[I64, F32, F32, F32],
+            SceneGetVx | SceneGetVy | SceneGetVz => &[I64],
+            SceneSetVelocity  => &[I64, F32, F32, F32],
+            SceneGetRx | SceneGetRy | SceneGetRz | SceneGetRw => &[I64],
+            SceneSetRotation  => &[I64, F32, F32, F32, F32],
+            PhysicsApplyImpulse | PhysicsApplyForce => &[I64, F32, F32, F32],
+            PhysicsRaycast    => &[F32, F32, F32, F32, F32, F32],
+            InputKeyDown | InputKeyPressed => &[StringHandle],
+            InputAxis         => &[StringHandle],
+            InputPointerX | InputPointerY  => &[],
+            RenderDrawMesh    => &[StringHandle, F32, F32, F32],
+            RenderSpawnParticle=> &[StringHandle, F32, F32, F32],
+            RenderDrawLine    => &[F32, F32, F32, F32, F32, F32, I64],
+            AudioPlay | AudioStop => &[StringHandle],
+            AudioPlayAt       => &[StringHandle, F32, F32, F32],
+            TimeDeltaMs | TimeElapsedMs | TimeTick => &[],
+        }
+    }
+
+    pub fn return_kind(self) -> ReturnKind {
+        use HostImport::*;
+        use ReturnKind::*;
+        match self {
+            SceneSpawn                         => I64,
+            SceneDespawn                       => Void,
+            SceneGetX | SceneGetY | SceneGetZ  => F32,
+            SceneSetPosition                   => Void,
+            SceneGetVx | SceneGetVy | SceneGetVz => F32,
+            SceneSetVelocity                   => Void,
+            SceneGetRx | SceneGetRy | SceneGetRz | SceneGetRw => F32,
+            SceneSetRotation                   => Void,
+            PhysicsApplyImpulse | PhysicsApplyForce => Void,
+            PhysicsRaycast                     => I64,
+            InputKeyDown | InputKeyPressed     => I32,
+            InputAxis                          => F32,
+            InputPointerX | InputPointerY      => F32,
+            RenderDrawMesh | RenderSpawnParticle | RenderDrawLine => Void,
+            AudioPlay | AudioStop | AudioPlayAt => Void,
+            TimeDeltaMs | TimeElapsedMs | TimeTick => I64,
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Expression AST  (superset of kotoba-clj)
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub enum Expr {
+    /// Integer literal (booleans lower to 1/0).
+    Int(i64),
+    /// Float literal — compiled to `f32.const` → `i32.reinterpret_f32` → `i64.extend_i32_u`.
+    Float(f32),
+    /// String literal — stored in a data segment; value is `(offset<<32)|len`.
+    Str(Vec<u8>),
+    /// Bare symbol — resolves to param, let binding, or def constant.
+    Var(String),
+    If {
+        cond: Box<Expr>,
+        then: Box<Expr>,
+        els:  Box<Expr>,
+    },
+    Let {
+        bindings: Vec<(String, Expr)>,
+        body:     Vec<Expr>,
+    },
+    Do(Vec<Expr>),
+    Loop {
+        bindings: Vec<(String, Expr)>,
+        body:     Vec<Expr>,
+    },
+    Recur(Vec<Expr>),
+    Builtin {
+        op:   Builtin,
+        args: Vec<Expr>,
+    },
+    Call {
+        name: String,
+        args: Vec<Expr>,
+    },
+}
+
+// ---------------------------------------------------------------------------
+// Parser
+// ---------------------------------------------------------------------------
+
+pub fn parse_program(src: &str) -> Result<Program, CljError> {
+    let forms = kotoba_edn::parse_all(src).map_err(|e| CljError::Read(e.to_string()))?;
+    let mut defs      = Vec::new();
+    let mut functions = Vec::new();
+
+    for form in &forms {
+        let items = match form {
+            EdnValue::List(items) => items,
+            other => {
+                return Err(CljError::Lower(format!(
+                    "top-level form must be a list, found: {other:?}"
+                )))
+            }
+        };
+        let head = list_head_symbol(items)?;
+        match head.name.as_str() {
+            "ns"        => { /* namespace declaration — ignored */ }
+            "def"       => defs.push(lower_def(items)?),
+            "defn"      => functions.push(lower_defn(items)?),
+            "defsystem" => functions.push(lower_defsystem(items)?),
+            other       => {
+                return Err(CljError::Lower(format!(
+                    "unsupported top-level form `({other} …)` — expected def/defn/ns/defsystem"
+                )))
+            }
+        }
+    }
+    Ok(Program { defs, functions })
+}
+
+// ---------------------------------------------------------------------------
+// Lowering helpers
+// ---------------------------------------------------------------------------
+
+fn list_head_symbol(items: &[EdnValue]) -> Result<&Symbol, CljError> {
+    match items.first() {
+        Some(EdnValue::Symbol(s)) => Ok(s),
+        _ => Err(CljError::Lower(
+            "list must begin with a symbol in head position".into(),
+        )),
+    }
+}
+
+fn lower_def(items: &[EdnValue]) -> Result<Def, CljError> {
+    if items.len() != 3 {
+        return Err(CljError::Lower("def takes exactly: (def name value)".into()));
+    }
+    Ok(Def {
+        name:  sym_name(&items[1], "def name")?,
+        value: lower_expr(&items[2])?,
+    })
+}
+
+fn lower_defn(items: &[EdnValue]) -> Result<Function, CljError> {
+    if items.len() < 4 {
+        return Err(CljError::Lower("defn requires: (defn name [params…] body…)".into()));
+    }
+    let name   = sym_name(&items[1], "defn name")?;
+    let params = lower_param_vec(&items[2], &name)?;
+    let body   = items[3..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    Ok(Function { name, params, body })
+}
+
+/// `(defsystem name [dt] body…)` — sugar for a tick handler.
+///
+/// Exported as `name-tick` and takes a single `dt-ms` parameter (i64).
+/// Example:
+/// ```clojure
+/// (defsystem player-controller [dt]
+///   (when (key-down? "ArrowRight")
+///     (set-velocity! player (f32 1.0) (f32 0.0) (f32 0.0))))
+/// ```
+fn lower_defsystem(items: &[EdnValue]) -> Result<Function, CljError> {
+    if items.len() < 4 {
+        return Err(CljError::Lower(
+            "defsystem requires: (defsystem name [dt] body…)".into(),
+        ));
+    }
+    let name = sym_name(&items[1], "defsystem name")?;
+    let tick_name = format!("{name}-tick");
+    let params = lower_param_vec(&items[2], &name)?;
+    let body   = items[3..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    Ok(Function { name: tick_name, params, body })
+}
+
+fn lower_param_vec(v: &EdnValue, ctx: &str) -> Result<Vec<String>, CljError> {
+    match v {
+        EdnValue::Vector(ps) => ps
+            .iter()
+            .map(|p| sym_name(p, "parameter"))
+            .collect::<Result<Vec<_>, _>>(),
+        _ => Err(CljError::Lower(format!(
+            "`{ctx}` parameter list must be a vector `[…]`"
+        ))),
+    }
+}
+
+fn lower_expr(v: &EdnValue) -> Result<Expr, CljError> {
+    match v {
+        EdnValue::Integer(i) => Ok(Expr::Int(*i)),
+        EdnValue::Bool(b)    => Ok(Expr::Int(if *b { 1 } else { 0 })),
+        EdnValue::Float(f)   => Ok(Expr::Float(f.into_inner() as f32)),
+        EdnValue::String(s)  => Ok(Expr::Str(s.clone().into_bytes())),
+        EdnValue::Symbol(s)  => Ok(Expr::Var(s.to_qualified())),
+        EdnValue::List(items) => lower_call(items),
+        other => Err(CljError::Lower(format!(
+            "unsupported expression: {other:?}"
+        ))),
+    }
+}
+
+fn lower_call(items: &[EdnValue]) -> Result<Expr, CljError> {
+    let head = list_head_symbol(items)?;
+    let args = &items[1..];
+    match head.name.as_str() {
+        "if"    => lower_if(args),
+        "when"  => lower_when(args),
+        "let"   => lower_let(args),
+        "cond"  => lower_cond(args),
+        "loop"  => lower_loop(args),
+        "recur" => Ok(Expr::Recur(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
+        "do"    => Ok(Expr::Do(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
+        // `(f32 1.5)` — explicit float literal form for disambiguation
+        "f32" => {
+            if args.len() != 1 {
+                return Err(CljError::Lower("(f32 val) takes exactly one argument".into()));
+            }
+            match &args[0] {
+                EdnValue::Float(f)   => Ok(Expr::Float(f.into_inner() as f32)),
+                EdnValue::Integer(i) => Ok(Expr::Float(*i as f32)),
+                other => Err(CljError::Lower(format!(
+                    "(f32 …) argument must be a number, found {other:?}"
+                ))),
+            }
+        }
+        name => {
+            let lowered: Vec<Expr> = args.iter().map(lower_expr).collect::<Result<_, _>>()?;
+            if let Some(op) = Builtin::from_name(name) {
+                check_builtin_arity(op, lowered.len())?;
+                Ok(Expr::Builtin { op, args: lowered })
+            } else {
+                Ok(Expr::Call { name: head.to_qualified(), args: lowered })
+            }
+        }
+    }
+}
+
+fn lower_if(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.len() != 3 {
+        return Err(CljError::Lower("if takes: (if cond then else)".into()));
+    }
+    Ok(Expr::If {
+        cond: Box::new(lower_expr(&args[0])?),
+        then: Box::new(lower_expr(&args[1])?),
+        els:  Box::new(lower_expr(&args[2])?),
+    })
+}
+
+fn lower_when(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.is_empty() {
+        return Err(CljError::Lower("when takes: (when cond body…)".into()));
+    }
+    let cond = lower_expr(&args[0])?;
+    let body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    Ok(Expr::If {
+        cond: Box::new(cond),
+        then: Box::new(Expr::Do(body)),
+        els:  Box::new(Expr::Int(0)),
+    })
+}
+
+fn lower_let(args: &[EdnValue]) -> Result<Expr, CljError> {
+    let binding_vec = match args.first() {
+        Some(EdnValue::Vector(v)) => v,
+        _ => return Err(CljError::Lower("let requires a binding vector".into())),
+    };
+    if binding_vec.len() % 2 != 0 {
+        return Err(CljError::Lower("let binding vector must have an even number of forms".into()));
+    }
+    let mut bindings = Vec::with_capacity(binding_vec.len() / 2);
+    let mut it = binding_vec.iter();
+    while let (Some(name), Some(val)) = (it.next(), it.next()) {
+        bindings.push((sym_name(name, "let binding name")?, lower_expr(val)?));
+    }
+    let body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    if body.is_empty() {
+        return Err(CljError::Lower("let requires at least one body expression".into()));
+    }
+    Ok(Expr::Let { bindings, body })
+}
+
+fn lower_cond(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.len() % 2 != 0 {
+        return Err(CljError::Lower("cond requires an even number of test/expr forms".into()));
+    }
+    let mut acc = Expr::Int(0);
+    for pair in args.chunks_exact(2).rev() {
+        let (test, expr) = (&pair[0], &pair[1]);
+        let then = lower_expr(expr)?;
+        if is_else_test(test) {
+            acc = then;
+        } else {
+            acc = Expr::If {
+                cond: Box::new(lower_expr(test)?),
+                then: Box::new(then),
+                els:  Box::new(acc),
+            };
+        }
+    }
+    Ok(acc)
+}
+
+fn is_else_test(v: &EdnValue) -> bool {
+    match v {
+        EdnValue::Keyword(k) => k.0.name == "else",
+        EdnValue::Bool(true) => true,
+        _ => false,
+    }
+}
+
+fn lower_loop(args: &[EdnValue]) -> Result<Expr, CljError> {
+    let binding_vec = match args.first() {
+        Some(EdnValue::Vector(v)) => v,
+        _ => return Err(CljError::Lower("loop requires a binding vector".into())),
+    };
+    if binding_vec.len() % 2 != 0 {
+        return Err(CljError::Lower("loop binding vector must have an even number of forms".into()));
+    }
+    let mut bindings = Vec::with_capacity(binding_vec.len() / 2);
+    let mut it = binding_vec.iter();
+    while let (Some(name), Some(val)) = (it.next(), it.next()) {
+        bindings.push((sym_name(name, "loop binding name")?, lower_expr(val)?));
+    }
+    let body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    if body.is_empty() {
+        return Err(CljError::Lower("loop requires at least one body expression".into()));
+    }
+    Ok(Expr::Loop { bindings, body })
+}
+
+fn check_builtin_arity(op: Builtin, n: usize) -> Result<(), CljError> {
+    use Builtin::*;
+    let ok = match op {
+        Not | Inc | Dec | Abs | Zero | Pos | Neg
+        | StrLen | BytesAlloc | BytesLen | BytesFinish
+        | Alloc | Load64 | Load32
+        | F32Bits | BitsF32
+        | DespawnEntity
+        | GetX | GetY | GetZ | GetVx | GetVy | GetVz
+        | GetRx | GetRy | GetRz | GetRw
+        | PlaySound | StopSound
+        | KeyDown | KeyPressed | Axis
+        | SpawnEntity => n == 1,
+
+        PointerX | PointerY | DeltaMs | ElapsedMs | TickN => n == 0,
+
+        Store64 | Store32 | ByteAt | ByteAppend => n == 2,
+
+        SetPosition | SetVelocity | ApplyImpulse | ApplyForce
+        | DrawMesh | SpawnParticle | PlaySoundAt => n == 4,
+
+        SetRotation => n == 5,
+        Raycast     => n == 6,
+        DrawLine    => n == 7,
+
+        Sub => n >= 1,
+        Add | Mul | And | Or => n >= 1,
+        Div | Mod => n == 2,
+        Eq | NotEq | Lt | Gt | Le | Ge => n >= 1,
+    };
+    if ok {
+        Ok(())
+    } else {
+        Err(CljError::Lower(format!(
+            "builtin {op:?} called with wrong number of arguments ({n})"
+        )))
+    }
+}
+
+fn sym_name(v: &EdnValue, ctx: &str) -> Result<String, CljError> {
+    match v {
+        EdnValue::Symbol(s) => Ok(s.to_qualified()),
+        other => Err(CljError::Lower(format!(
+            "{ctx} must be a symbol, found {other:?}"
+        ))),
+    }
+}

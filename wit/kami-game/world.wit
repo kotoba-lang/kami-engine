@@ -1,0 +1,123 @@
+package kami:engine@1.0.0;
+
+// ---------------------------------------------------------------------------
+// kami:engine/scene — ECS entity lifecycle and transform queries
+//
+// All positions/velocities are f32 bit-patterns passed as i32.
+// Entity IDs are i64 (hecs Entity bits).  A return of 0 means "not found".
+// ---------------------------------------------------------------------------
+interface scene {
+    // Spawn a named entity type; returns a stable entity handle.
+    spawn: func(kind-ptr: s32, kind-len: s32) -> s64;
+    despawn: func(entity: s64);
+
+    // Read transform components — returns IEEE-754 f32 bit-pattern as i32.
+    get-x: func(entity: s64) -> s32;
+    get-y: func(entity: s64) -> s32;
+    get-z: func(entity: s64) -> s32;
+    // Write all three translation components atomically.
+    set-position: func(entity: s64, x: s32, y: s32, z: s32);
+
+    // Velocity
+    get-vx: func(entity: s64) -> s32;
+    get-vy: func(entity: s64) -> s32;
+    get-vz: func(entity: s64) -> s32;
+    set-velocity: func(entity: s64, vx: s32, vy: s32, vz: s32);
+
+    // Rotation (unit quaternion, f32 bit-patterns)
+    get-rx: func(entity: s64) -> s32;
+    get-ry: func(entity: s64) -> s32;
+    get-rz: func(entity: s64) -> s32;
+    get-rw: func(entity: s64) -> s32;
+    set-rotation: func(entity: s64, rx: s32, ry: s32, rz: s32, rw: s32);
+}
+
+// ---------------------------------------------------------------------------
+// kami:engine/physics — impulse / force application and raycast
+// ---------------------------------------------------------------------------
+interface physics {
+    apply-impulse: func(entity: s64, ix: s32, iy: s32, iz: s32);
+    apply-force:   func(entity: s64, fx: s32, fy: s32, fz: s32);
+    // Cast a ray; returns entity hit (i64) or 0 if miss.
+    // Origin + direction as f32 bit-patterns.
+    raycast: func(ox: s32, oy: s32, oz: s32, dx: s32, dy: s32, dz: s32) -> s64;
+}
+
+// ---------------------------------------------------------------------------
+// kami:engine/input — discrete and analog input queries
+// ---------------------------------------------------------------------------
+interface input {
+    // Returns 1 if the named key is currently held, 0 otherwise.
+    key-down:    func(key-ptr: s32, key-len: s32) -> s32;
+    // Returns 1 on the first frame the key was pressed (edge detect).
+    key-pressed: func(key-ptr: s32, key-len: s32) -> s32;
+    // Returns f32 bit-pattern of an analog axis in [-1, 1].
+    axis:        func(name-ptr: s32, name-len: s32) -> s32;
+    // Mouse / touch screen position in canvas pixels (f32 bits).
+    pointer-x:   func() -> s32;
+    pointer-y:   func() -> s32;
+}
+
+// ---------------------------------------------------------------------------
+// kami:engine/render — draw calls issued from script
+// (the real renderer is wgpu; these are command insertions)
+// ---------------------------------------------------------------------------
+interface render {
+    // Queue a mesh draw at position (f32 bits).  mesh-name must be registered.
+    draw-mesh: func(mesh-ptr: s32, mesh-len: s32, x: s32, y: s32, z: s32);
+    // Emit a billboard particle burst.
+    spawn-particle: func(preset-ptr: s32, preset-len: s32, x: s32, y: s32, z: s32);
+    // Debug line (start / end as f32 bits, colour as 0xRRGGBBAA).
+    draw-line: func(x0: s32, y0: s32, z0: s32, x1: s32, y1: s32, z1: s32, color: s32);
+}
+
+// ---------------------------------------------------------------------------
+// kami:engine/audio — fire-and-forget sound triggers
+// ---------------------------------------------------------------------------
+interface audio {
+    play:  func(name-ptr: s32, name-len: s32);
+    stop:  func(name-ptr: s32, name-len: s32);
+    // Spatial: play sound at world position.
+    play-at: func(name-ptr: s32, name-len: s32, x: s32, y: s32, z: s32);
+}
+
+// ---------------------------------------------------------------------------
+// kami:engine/time — game clock
+// ---------------------------------------------------------------------------
+interface time {
+    // Milliseconds elapsed this frame.
+    delta-ms:   func() -> s64;
+    // Total milliseconds since engine start (monotonic).
+    elapsed-ms: func() -> s64;
+    // Tick number (fixed-timestep tick counter).
+    tick:       func() -> s64;
+}
+
+// ---------------------------------------------------------------------------
+// kami-game world — what a Clojure game-script component imports/exports
+//
+// Lifecycle:
+//   init()         called once after the WASM module is instantiated.
+//   tick(dt-ms)    called every engine tick with the delta time in ms.
+//   on-event(kind, payload-ptr, payload-len)
+//                  called for input / collision / custom events; kind is a
+//                  well-known integer constant (see kami-script-runtime).
+// ---------------------------------------------------------------------------
+world kami-game {
+    import kami:engine/scene@1.0.0;
+    import kami:engine/physics@1.0.0;
+    import kami:engine/input@1.0.0;
+    import kami:engine/render@1.0.0;
+    import kami:engine/audio@1.0.0;
+    import kami:engine/time@1.0.0;
+
+    // Every compiled Clojure module exposes linear memory + the cabi bump allocator
+    // so the host can lower string arguments into the guest.
+    export memory;
+    export cabi_realloc: func(old-ptr: s32, old-size: s32, align: s32, new-size: s32) -> s32;
+
+    // Script entry points.
+    export init: func();
+    export tick: func(dt-ms: s64);
+    export on-event: func(kind: s32, payload-ptr: s32, payload-len: s32) -> s32;
+}

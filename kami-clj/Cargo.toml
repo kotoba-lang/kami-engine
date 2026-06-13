@@ -1,0 +1,27 @@
+[package]
+name = "kami-clj"
+version.workspace = true
+edition.workspace = true
+description = "kami-clj — Clojure/EDN-subset → WebAssembly compiler for KAMI game scripting. Extends the kotoba-clj value model with game-engine host imports (scene/input/audio/time) and f32 support."
+
+[dependencies]
+# EDN reader (shared with kotoba-clj; pinned to the same workspace copy via path dep on kotoba)
+kotoba-edn  = { path = "../../kotoba/crates/kotoba-edn" }
+# WASM code generation
+wasm-encoder = { workspace = true }
+thiserror    = { workspace = true }
+
+# Optional runner (wasmtime) for unit tests and the kami-script-runtime crate.
+wasmtime = { workspace = true, optional = true }
+
+# WIT Component Model wrapping — produces a real kami:engine/kami-game component.
+wit-component = { version = "0.221", optional = true }
+wit-parser    = { version = "0.221", optional = true }
+
+[features]
+default = []
+run       = ["dep:wasmtime"]
+component = ["dep:wit-component", "dep:wit-parser", "run"]
+
+[dev-dependencies]
+wat = "1"
