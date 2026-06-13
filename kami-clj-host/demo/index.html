@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>kami-engine-sdk-clj — WebGPU smoke test</title>
+  <style>
+    /* Nintendo cream, per KAMI prohibitions (no dark theme) */
+    html, body { margin: 0; background: #f0ead6;
+      font-family: -apple-system, "Nunito", sans-serif; color: #5a513a; }
+    #wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px; }
+    canvas { border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.15); background: #f0ead6; }
+    #status { font-weight: 700; padding: 8px 16px; background: #fff;
+      border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    .ok { color: #2e8b57; } .err { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <div id="status">booting…</div>
+    <canvas id="c" width="640" height="480"></canvas>
+  </div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

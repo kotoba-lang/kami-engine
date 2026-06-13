@@ -1,0 +1,35 @@
+[package]
+name = "kami-clj-host"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# Host bridge for the Clojure SDK (kami-engine-sdk-clj). Decodes the KAMI
+# columnar render-IR that `kami.ipc/pack` emits and drives `kami-render`
+# (wgpu) — the concrete Rust side of the `kami:engine/frame` WIT (wit/kami-frame.wit).
+#
+# The `frame` decoder is pure and GPU-free, so `cargo test -p kami-clj-host`
+# runs the cross-language contract test with no wgpu/GPU. The browser `host`
+# module (wasm-bindgen + wgpu) is behind the optional `host` feature.
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = []
+# Browser GPU host: wasm-bindgen exports (register_*, submit_frame) over kami-render.
+host = ["dep:wgpu", "dep:kami-render", "dep:kami-core", "dep:glam",
+        "dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:js-sys", "dep:web-sys",
+        "dep:serde", "dep:serde_json"]
+
+[dependencies]
+wgpu = { version = "24", optional = true }
+glam = { workspace = true, optional = true }
+kami-render = { path = "../kami-render", optional = true }
+kami-core = { path = "../kami-core", optional = true }
+wasm-bindgen = { workspace = true, optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+js-sys = { version = "0.3", optional = true }
+web-sys = { version = "0.3", optional = true, features = ["HtmlCanvasElement", "Window", "console"] }
+serde = { workspace = true, optional = true, features = ["derive"] }
+serde_json = { workspace = true, optional = true }

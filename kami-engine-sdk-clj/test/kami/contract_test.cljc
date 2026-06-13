@@ -1,0 +1,177 @@
+(ns kami.contract-test
+  "GPU-free, Datomic-free contract tests for the pure core: scene → ECS →
+  render-IR → KAMI columnar packing, plus WGSL emission and matrix math.
+  These pin the clj ↔ Rust contracts (ARCHITECTURE.md §7/§9) so they can be
+  validated long before a GPU is wired up."
+  (:require [clojure.test :refer [deftest testing is]]
+            [kami.scene  :as scene]
+            [kami.ecs    :as ecs]
+            [kami.render :as render]
+            [kami.ipc    :as ipc]
+            [kami.wgsl   :as wgsl]
+            [kami.math   :as m]))
+
+;; --- fixtures ---------------------------------------------------------------
+
+(def cam-eid #uuid "00000000-0000-0000-0000-0000000000ca")
+(def tree-a  #uuid "00000000-0000-0000-0000-00000000000a")
+(def tree-b  #uuid "00000000-0000-0000-0000-00000000000b")
+
+(def assets
+  [{:asset/id "mesh/conifer" :asset/kind :mesh     :asset/uri "b2://m/conifer"}
+   {:asset/id "mat/bark"     :asset/kind :material :asset/uri "b2://m/bark"}])
+
+(def entities
+  [{:kami/eid cam-eid :kami/name "cam" :camera/active? true :camera/fov 60.0
+    :camera/near 0.1 :camera/far 100.0 :transform/translation [0.0 0.0 5.0]}
+   {:kami/eid tree-a :kami/name "tree-a" :transform/translation [-2.0 0.0 0.0]
+    :mesh/asset [:asset/id "mesh/conifer"] :material/asset [:asset/id "mat/bark"]}
+   {:kami/eid tree-b :kami/name "tree-b" :transform/translation [2.0 0.0 0.0]
+    :mesh/asset [:asset/id "mesh/conifer"] :material/asset [:asset/id "mat/bark"]}])
+
+(def snap (scene/build-snapshot entities assets {:t 1 :scene "test" :env {}}))
+
+;; --- scene ------------------------------------------------------------------
+
+(deftest scene-add-entity
+  (testing "unknown attrs rejected"
+    (is (thrown? #?(:clj Exception :cljs js/Error)
+                 (scene/add-entity {:bogus/attr 1}))))
+  (testing "auto eid"
+    (is (uuid? (-> (scene/add-entity {:kami/name "x"}) first :kami/eid)))))
+
+(deftest scene-valid
+  (testing "well-formed snapshot validates"
+    (is (true? (scene/valid? snap))))
+  (testing "dangling asset ref caught"
+    (is (thrown? #?(:clj Exception :cljs js/Error)
+                 (scene/valid?
+                  (scene/build-snapshot
+                   [{:kami/eid tree-a :mesh/asset [:asset/id "missing"]}] [] {})))))
+  (testing "two active cameras caught"
+    (is (thrown? #?(:clj Exception :cljs js/Error)
+                 (scene/valid?
+                  (scene/build-snapshot
+                   [{:kami/eid cam-eid :camera/active? true}
+                    {:kami/eid tree-a :camera/active? true}] [] {})))))
+  (testing "parent cycle caught"
+    (is (thrown? #?(:clj Exception :cljs js/Error)
+                 (scene/valid?
+                  (scene/build-snapshot
+                   [{:kami/eid tree-a :transform/parent {:kami/eid tree-b}}
+                    {:kami/eid tree-b :transform/parent {:kami/eid tree-a}}] [] {}))))))
+
+(deftest scene-tree
+  (let [t (scene/tree [{:kami/eid tree-a}
+                       {:kami/eid tree-b :transform/parent {:kami/eid tree-a}}]
+                      tree-a)]
+    (is (= tree-b (-> t (get tree-a) :children first :entity :kami/eid)))))
+
+;; --- ecs --------------------------------------------------------------------
+
+(deftest ecs-load+query
+  (let [w (ecs/load-snapshot snap)]
+    (is (= 1 (:basis-t w)))
+    (is (= 2 (count (ecs/query w #{:mesh/asset}))))
+    (is (= 1 (count (ecs/query w #{:camera/active?}))))
+    (is (= 0 (count (ecs/query w #{:mesh/asset :camera/active?}))))))
+
+(deftest ecs-dirty+tx
+  (let [w0 (ecs/load-snapshot snap)
+        w1 (ecs/set-component w0 tree-a :transform/translation [9.0 0.0 0.0])
+        tx (ecs/->tx w1)]
+    (testing "only the changed entity is in the tx"
+      (is (= 1 (count tx)))
+      (is (= tree-a (:kami/eid (first tx))))
+      (is (= [9.0 0.0 0.0] (:transform/translation (first tx)))))
+    (testing "no-op change yields empty tx"
+      (is (empty? (ecs/->tx w0))))
+    (testing "removal emits retractEntity"
+      (let [tx2 (ecs/->tx (ecs/remove-entity w0 tree-b))]
+        (is (= [[:db/retractEntity [:kami/eid tree-b]]] tx2))))
+    (testing "mark-saved clears dirty and re-anchors t"
+      (is (empty? (ecs/->tx (ecs/mark-saved w1 2)))))))
+
+;; --- render-IR --------------------------------------------------------------
+
+(deftest render-frame
+  (let [w  (ecs/load-snapshot snap)
+        fr (render/frame w {:n 7 :aspect 1.0})]
+    (testing "frame shape"
+      (is (= 7 (:frame/n fr)))
+      (is (= render/nintendo-cream (:frame/clear fr)))
+      (is (= 16 (count (-> fr :frame/camera :view))))
+      (is (= 16 (count (-> fr :frame/camera :proj)))))
+    (testing "two trees with the same (pipeline,mesh,material) merge into one instanced draw"
+      (let [draws (-> fr :frame/passes first :pass/draws)]
+        (is (= 1 (count draws)))
+        (is (= :pbr (:draw/pipeline (first draws))))
+        (is (= 2 (-> draws first :draw/instances :count)))
+        (is (= 32 (-> draws first :draw/instances :model count))))) ; 2 × mat4(16)
+    (testing "frame is serializable plain data (record/replay surface)"
+      (is (= fr (read-string (pr-str fr)))))))
+
+(deftest render-camera-translation
+  (let [w (ecs/load-snapshot snap)
+        view (-> (render/camera-ir w 1.0) :view)]
+    ;; camera at +5 z → view translation column is -5 z
+    (is (= -5.0 (nth view 14)))))
+
+;; --- KAMI columnar packing --------------------------------------------------
+
+(deftest ipc-pack
+  (let [w  (ecs/load-snapshot snap)
+        fr (render/frame w {:n 3 :aspect 1.0})
+        {:keys [buffer len ncols layout]} (ipc/pack fr)]
+    (testing "header magic 'KAMI' little-endian"
+      (is (= [0x4B 0x41 0x4D 0x49] (subvec buffer 0 4))))
+    (testing "buffer length is 16-byte aligned and matches :len"
+      (is (= len (count buffer)))
+      (is (zero? (mod len 16))))
+    (testing "column count = camera + 1 instanced draw"
+      (is (= 2 ncols))
+      (is (= 2 (count layout))))
+    (testing "every column payload offset is 16-byte aligned"
+      (is (every? #(zero? (mod (:offset %) 16)) layout)))
+    (testing "camera column is 2 mat4 items (view+proj), draw column is 2 instances"
+      (is (= [2 2] (mapv :len layout)))
+      (is (every? #(= :mat4 (:dtype %)) layout)))))
+
+(deftest ipc-byte-len
+  (is (= 64  (ipc/byte-len :mat4 1 1)))   ; one mat4 = 64B
+  (is (= 128 (ipc/byte-len :mat4 2 1)))
+  (is (= 16  (ipc/byte-len :f32 4 1))))
+
+;; --- WGSL emission ----------------------------------------------------------
+
+(def ripple-shader
+  {:wgsl/name "ripple"
+   :wgsl/bindings [{:group 0 :binding 0 :var :uniform :name "u" :type :Globals}]
+   :wgsl/structs  {:Globals [[:mvp :mat4x4<f32>]]}
+   :wgsl/vertex   {:in  [[:pos :vec3<f32> {:location 0}]]
+                   :out [[:clip :vec4<f32> :builtin/position]]
+                   :body '[(set! out.clip (* u.mvp (vec4 in.pos 1.0)))]}
+   :wgsl/fragment {:out [[:color :vec4<f32> {:location 0}]]
+                   :body '[(set! out.color (vec4 0.3 0.6 1.0 1.0))]}})
+
+(deftest wgsl-emit
+  (let [src (wgsl/emit ripple-shader)]
+    (is (re-find #"@group\(0\) @binding\(0\) var<uniform> u: Globals;" src))
+    (is (re-find #"struct Globals" src))
+    (is (re-find #"@vertex" src))
+    (is (re-find #"@fragment" src))
+    (is (re-find #"@builtin\(position\)" src))
+    (is (re-find #"out.clip = \(u.mvp \* vec4<f32>\(in.pos, 1.0\)\);" src))
+    (is (re-find #"out.color = vec4<f32>\(0.3, 0.6, 1.0, 1.0\);" src)))
+  (testing "built-in pipelines need no WGSL"
+    (is (wgsl/builtin? :pbr))
+    (is (not (wgsl/builtin? "custom/ripple")))))
+
+;; --- math -------------------------------------------------------------------
+
+(deftest math-identity-mul
+  (is (= m/identity4 (m/mul m/identity4 m/identity4))))
+
+(deftest math-trs-translation
+  (let [mm (m/from-trs [1.0 2.0 3.0] [0.0 0.0 0.0 1.0] [1.0 1.0 1.0])]
+    (is (= [1.0 2.0 3.0] [(nth mm 12) (nth mm 13) (nth mm 14)]))))

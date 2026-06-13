@@ -1,0 +1,6 @@
+.cpcache/
+target/
+.shadow-cljs/
+out/
+*.log
+/db/
