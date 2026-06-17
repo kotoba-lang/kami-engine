@@ -240,7 +240,10 @@ impl KamiScriptRuntime {
             .get_typed_func::<(i64,), (i64,)>(&mut self.store, "tick")
             .map_err(|_| RuntimeError::MissingExport("tick".into(), name.to_string()))?;
         f.call(&mut self.store, (dt_ms,))?;
-        self.store.data_mut().keys_pressed.clear();
+        let s = self.store.data_mut();
+        s.keys_pressed.clear();
+        s.query_cursors.clear(); // within-tick ephemeral; reap abandoned cursors
+
         Ok(())
     }
 
@@ -272,7 +275,11 @@ impl KamiScriptRuntime {
                 f.call(&mut self.store, (dt_ms,))?;
             }
         }
-        self.store.data_mut().keys_pressed.clear();
+        let s = self.store.data_mut();
+        s.keys_pressed.clear();
+        // Query cursors are within-tick ephemeral (a doseq opens + drains one);
+        // reap any a guest abandoned early so query_cursors can't grow unbounded.
+        s.query_cursors.clear();
         Ok(())
     }
 

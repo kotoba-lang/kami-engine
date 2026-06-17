@@ -576,9 +576,12 @@ impl<'a> FnCtx<'a> {
         })?;
         // Exactly the enclosing loop's variable locals (not unrelated lets).
         let let_locals: Vec<u32> = self.loop_var_locals.last().cloned().unwrap_or_default();
-        if args.len() > let_locals.len() {
+        // Clojure recur must rebind EXACTLY the loop vars — under-arity would
+        // leave the unlisted vars at their prior values (silent infinite loop /
+        // wrong result), so reject any mismatch, not just over-arity.
+        if args.len() != let_locals.len() {
             return Err(CljError::Codegen(format!(
-                "recur arity {} > loop variables {}",
+                "recur arity {} != loop variables {}",
                 args.len(), let_locals.len()
             )));
         }
@@ -675,12 +678,14 @@ impl<'a> FnCtx<'a> {
                 out.push(Instruction::I64Const(0));
                 out.push(Instruction::I64LtS);
                 out.push(Instruction::If(BlockType::Result(ValType::I64)));
+                self.ctrl_depth += 1; // keep the recur br-index invariant intact
                 out.push(Instruction::I64Const(0));
                 out.push(Instruction::LocalGet(local));
                 out.push(Instruction::I64Sub);
                 out.push(Instruction::Else);
                 out.push(Instruction::LocalGet(local));
                 out.push(Instruction::End);
+                self.ctrl_depth -= 1;
             }
             Eq => {
                 out.extend(self.emit(&args[0])?);
