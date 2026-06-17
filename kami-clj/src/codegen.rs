@@ -131,6 +131,9 @@ pub fn compile(program: &Program) -> Result<Vec<u8>, CljError> {
                 .collect(),
             locals_count: f.params.len() as u32,
             loop_depth: 0,
+            ctrl_depth: 0,
+            loop_levels: Vec::new(),
+            loop_var_locals: Vec::new(),
             heap_global: HEAP_GLOBAL,
             realloc_fn,
         };
@@ -389,6 +392,16 @@ struct FnCtx<'a> {
     scope:        HashMap<String, Local>,
     locals_count: u32,
     loop_depth:   u32,
+    /// Count of WASM control blocks (block/loop/if) currently open at the
+    /// emit cursor. Updated in lockstep with every block open/End so `recur`
+    /// can compute the relative branch index to its enclosing loop.
+    ctrl_depth:   u32,
+    /// `ctrl_depth` recorded at each enclosing `loop` (stack; supports nesting).
+    loop_levels:  Vec<u32>,
+    /// Loop-variable local indices for each enclosing `loop` (parallel to
+    /// `loop_levels`), so `recur` rebinds exactly the loop vars — not unrelated
+    /// `let` locals that happen to precede them.
+    loop_var_locals: Vec<Vec<u32>>,
     heap_global:  u32,
     realloc_fn:   u32,
 }
@@ -473,10 +486,12 @@ impl<'a> FnCtx<'a> {
         out.push(Instruction::I64Const(0));
         out.push(Instruction::I64Ne);
         out.push(Instruction::If(BlockType::Result(ValType::I64)));
+        self.ctrl_depth += 1; // the if-block is open across both arms
         out.extend(self.emit(then)?);
         out.push(Instruction::Else);
         out.extend(self.emit(els)?);
         out.push(Instruction::End);
+        self.ctrl_depth -= 1;
         Ok(out)
     }
 
@@ -515,13 +530,39 @@ impl<'a> FnCtx<'a> {
             loop_vars.push((name.clone(), idx));
         }
 
+        // Lowering (so a loop yields the body's non-recur value, and `recur`
+        // re-enters even when nested inside an `if`):
+        //
+        //   block $exit (result i64)     ;; carries the final value out
+        //     loop $cont                 ;; recur targets this
+        //       <body → i64>
+        //       br $exit                 ;; deliver the value, leave the loop
+        //     end
+        //     unreachable                ;; body always br's ($exit or $cont)
+        //   end
+        //
+        // `recur` sets the loop locals then branches to $cont; that path is
+        // unreachable afterwards, so the body's value type still checks out.
         self.loop_depth += 1;
-        // block (result i64) + loop (void)
         let mut out = init;
         out.push(Instruction::Block(BlockType::Result(ValType::I64)));
+        self.ctrl_depth += 1;
         out.push(Instruction::Loop(BlockType::Empty));
-        out.extend(self.emit_body(body)?);
+        self.ctrl_depth += 1;
+        self.loop_levels.push(self.ctrl_depth);
+        self.loop_var_locals.push(loop_vars.iter().map(|(_, i)| *i).collect());
+
+        out.extend(self.emit_body(body)?); // leaves the non-recur i64 on the stack
+        // Deliver that value to $exit. The block sits exactly one level out from
+        // the (balanced) loop body, so the branch index is always 1.
+        out.push(Instruction::Br(1));
+
+        self.loop_var_locals.pop();
+        self.loop_levels.pop();
+        self.ctrl_depth -= 1;
         out.push(Instruction::End); // loop
+        out.push(Instruction::Unreachable); // loop never falls through
+        self.ctrl_depth -= 1;
         out.push(Instruction::End); // block
         self.loop_depth -= 1;
 
@@ -530,16 +571,11 @@ impl<'a> FnCtx<'a> {
     }
 
     fn emit_recur(&mut self, args: &[Expr]) -> Result<Vec<Instruction<'static>>, CljError> {
-        // Evaluate all recur args, set the loop locals, then branch to the loop.
-        // We collect the loop-variable locals by scanning the current scope for
-        // `Let` entries added by the enclosing loop.
-        // Simple approach: find all Let locals with indices starting at the loop base.
-        // (Proper: track loop frame on a stack — TODO for nested loops.)
-        let let_locals: Vec<u32> = {
-            let param_count = self.scope.values()
-                .filter(|l| matches!(l, Local::Param(_))).count() as u32;
-            (param_count..self.locals_count).collect()
-        };
+        let loop_level = *self.loop_levels.last().ok_or_else(|| {
+            CljError::Codegen("recur outside of a loop".into())
+        })?;
+        // Exactly the enclosing loop's variable locals (not unrelated lets).
+        let let_locals: Vec<u32> = self.loop_var_locals.last().cloned().unwrap_or_default();
         if args.len() > let_locals.len() {
             return Err(CljError::Codegen(format!(
                 "recur arity {} > loop variables {}",
@@ -547,19 +583,25 @@ impl<'a> FnCtx<'a> {
             )));
         }
         let mut out = Vec::new();
-        for a in args { out.extend(self.emit(a)?); }
-        // Set in reverse so the stack unwinds correctly.
-        for (i, idx) in let_locals[..args.len()].iter().enumerate().rev() {
-            // The values are on the stack in order: first arg deepest.
-            // Since we pushed args in order (0, 1, 2…) and now set them in
-            // reverse, we need a tmp local approach for correctness with > 1 arg.
-            // For a single arg this is fine; for multiple args use tmp locals.
-            let _ = i;
+        // Evaluate args to tmp locals first so multi-arg recur doesn't clobber
+        // a loop var that a later arg still reads.
+        let mut tmps = Vec::with_capacity(args.len());
+        for a in args {
+            out.extend(self.emit(a)?);
+            let t = self.alloc_local();
+            out.push(Instruction::LocalSet(t));
+            tmps.push(t);
+        }
+        for (t, idx) in tmps.iter().zip(let_locals.iter()) {
+            out.push(Instruction::LocalGet(*t));
             out.push(Instruction::LocalSet(*idx));
         }
-        // Branch to the loop (depth 0 = inner-most loop).
-        out.push(Instruction::Br(0));
-        // Dead code — push a dummy value so the type-checker is satisfied.
+        // Branch to the enclosing loop. The relative index accounts for any
+        // blocks (e.g. an `if`) the recur is nested inside.
+        let br_index = self.ctrl_depth - loop_level;
+        out.push(Instruction::Br(br_index));
+        // Unreachable after the branch; a dummy keeps any enclosing
+        // result-typed block's type-checker happy.
         out.push(Instruction::I64Const(0));
         Ok(out)
     }
@@ -713,6 +755,7 @@ impl<'a> FnCtx<'a> {
                 out.push(Instruction::I64Const(0));
                 out.push(Instruction::I64Ne);
                 out.push(Instruction::If(BlockType::Result(ValType::I64)));
+                self.ctrl_depth += 1;
                 if args.len() == 1 {
                     out.push(Instruction::LocalGet(tmp));
                 } else {
@@ -722,6 +765,7 @@ impl<'a> FnCtx<'a> {
                 out.push(Instruction::Else);
                 out.push(Instruction::LocalGet(tmp));
                 out.push(Instruction::End);
+                self.ctrl_depth -= 1;
             }
             Or => {
                 out.extend(self.emit(&args[0])?);
@@ -730,6 +774,7 @@ impl<'a> FnCtx<'a> {
                 out.push(Instruction::I64Const(0));
                 out.push(Instruction::I64Ne);
                 out.push(Instruction::If(BlockType::Result(ValType::I64)));
+                self.ctrl_depth += 1;
                 out.push(Instruction::LocalGet(tmp));
                 out.push(Instruction::Else);
                 if args.len() == 1 {
@@ -739,6 +784,7 @@ impl<'a> FnCtx<'a> {
                     out.extend(self.emit(&rest)?);
                 }
                 out.push(Instruction::End);
+                self.ctrl_depth -= 1;
             }
             StrLen => {
                 // Low 32 bits = len.
