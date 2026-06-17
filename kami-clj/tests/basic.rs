@@ -80,3 +80,74 @@ fn vec3_prelude_compiles() {
     let wasm = compile_str_with_prelude(src).expect("compile");
     assert!(wasm.starts_with(b"\0asm"));
 }
+
+// ── survivors core-loop surface (rand-int / query / nearest / move-toward) ──
+
+#[test]
+fn rand_int_compiles() {
+    let wasm = kami_clj::compile_str(r#"(defsystem s [dt] (rand-int 1000))"#)
+        .expect("rand-int compile");
+    assert!(wasm.starts_with(b"\0asm"));
+}
+
+#[test]
+fn count_tagged_compiles() {
+    let wasm = kami_clj::compile_str(r#"(defsystem s [dt] (when (< (count-tagged "enemy") 400) 1))"#)
+        .expect("count-tagged compile");
+    assert!(wasm.starts_with(b"\0asm"));
+}
+
+#[test]
+fn doseq_entities_compiles() {
+    // enemy AI over ALL enemies — impossible before (no iteration/lambda).
+    let src = r#"
+        (def player 1)
+        (defsystem enemy-ai [dt]
+          (doseq-entities [e "enemy"]
+            (move-toward! e player (f32 40.0))))
+    "#;
+    let wasm = kami_clj::compile_str(src).expect("doseq-entities compile");
+    assert!(wasm.starts_with(b"\0asm"));
+}
+
+#[test]
+fn nested_doseq_and_nearest_compiles() {
+    // bullet collision: each bullet despawns the nearest enemy in range.
+    let src = r#"
+        (defsystem bullet-collision [dt]
+          (doseq-entities [b "bullet"]
+            (let [hit (nearest-tagged "enemy" (get-x b) (get-y b) (f32 12.0))]
+              (when (not= hit -1)
+                (despawn-entity hit)
+                (despawn-entity b)))))
+    "#;
+    let wasm = kami_clj::compile_str(src).expect("nearest/doseq compile");
+    assert!(wasm.starts_with(b"\0asm"));
+}
+
+#[test]
+fn survivors_core_loop_compiles() {
+    // The full loop that FAILED before the extension: spawn (rng + cap),
+    // enemy AI (iterate all), targeting/collision (iterate + broadphase).
+    let src = r#"
+        (def player 1)
+        (defsystem wave-spawn [dt]
+          (when (< (count-tagged "enemy") 400)
+            (when (zero? (mod (tick-n) 30))
+              (let [roll (rand-int 100)
+                    e (spawn-entity "shambler")]
+                (set-position! e (f32 0.0) (f32 0.0) (f32 0.0))))))
+        (defsystem enemy-ai [dt]
+          (doseq-entities [e "enemy"]
+            (move-toward! e player (f32 40.0))))
+        (defsystem weapon-pistol [dt]
+          (when (zero? (mod (tick-n) 42))
+            (let [hit (nearest-tagged "enemy" (get-x player) (get-y player) (f32 220.0))]
+              (when (not= hit -1)
+                (despawn-entity hit)
+                (play-sound "shot")))))
+    "#;
+    let wasm = kami_clj::compile_str(src).expect("survivors core loop compile");
+    assert!(wasm.starts_with(b"\0asm"), "missing WASM magic");
+    assert!(wasm.len() > 200, "suspiciously small module");
+}

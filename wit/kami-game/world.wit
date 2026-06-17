@@ -30,6 +30,19 @@ interface scene {
     get-rz: func(entity: s64) -> s32;
     get-rw: func(entity: s64) -> s32;
     set-rotation: func(entity: s64, rx: s32, ry: s32, rz: s32, rw: s32);
+
+    // ---- ECS queries (survivors core loop) ----
+    // Snapshot the entities tagged `tag`; returns an opaque cursor handle.
+    query-begin:  func(tag-ptr: s32, tag-len: s32) -> s64;
+    // Advance the cursor; returns the next entity id, or -1 when drained.
+    query-next:   func(it: s64) -> s64;
+    // Count entities tagged `tag`.
+    count-tagged: func(tag-ptr: s32, tag-len: s32) -> s64;
+    // Nearest entity tagged `tag` within `maxd` of (x,y) [f32 bits]; -1 if none.
+    nearest:      func(tag-ptr: s32, tag-len: s32, x: s32, y: s32, maxd: s32) -> s64;
+    // Set entity velocity toward `target` at `speed` px/s [f32 bits]. Host does
+    // the normalize×speed vector math so scripts need no in-guest f32 arithmetic.
+    move-toward:  func(entity: s64, target: s64, speed: s32);
 }
 
 // ---------------------------------------------------------------------------
@@ -94,6 +107,18 @@ interface time {
 }
 
 // ---------------------------------------------------------------------------
+// kami:engine/random — host-owned seeded PRNG
+//
+// The host owns the seed so online co-op stays deterministic (shared-seed):
+// the same seed + same inputs replay identically, which also backs async
+// race / ghost / anti-cheat. The guest never holds or advances the seed.
+// ---------------------------------------------------------------------------
+interface random {
+    // Uniform integer in [0, n).
+    int: func(n: s64) -> s64;
+}
+
+// ---------------------------------------------------------------------------
 // kami-game world — what a Clojure game-script component imports/exports
 //
 // Lifecycle:
@@ -110,6 +135,7 @@ world kami-game {
     import kami:engine/render@1.0.0;
     import kami:engine/audio@1.0.0;
     import kami:engine/time@1.0.0;
+    import kami:engine/random@1.0.0;
 
     // Every compiled Clojure module exposes linear memory + the cabi bump allocator
     // so the host can lower string arguments into the guest.

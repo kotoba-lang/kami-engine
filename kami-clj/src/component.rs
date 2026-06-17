@@ -22,5 +22,5 @@ pub fn wrap_as_component(core_wasm: Vec<u8>) -> Result<Vec<u8>, CljError> {
 
 /// Return the WIT world source for `kami:engine/kami-game`.
 pub fn kami_game_wit() -> &'static str {
-    include_str!("../../../wit/kami-game/world.wit")
+    include_str!("../../wit/kami-game/world.wit")
 }

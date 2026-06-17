@@ -14,9 +14,19 @@
 //! (via `i32.wrap_i64`); the codegen handles this wrapping automatically per
 //! the `ParamKind` annotation on each `HostImport`.
 
+use std::sync::atomic::{AtomicU32, Ordering};
+
 use kotoba_edn::{EdnValue, Symbol};
 
 use crate::CljError;
+
+/// Monotonic counter for hygienic temp names (e.g. doseq-entities iterators),
+/// so nested expansions never shadow each other.
+static GENSYM: AtomicU32 = AtomicU32::new(0);
+
+fn gensym(prefix: &str) -> String {
+    format!("__{prefix}{}", GENSYM.fetch_add(1, Ordering::Relaxed))
+}
 
 // ---------------------------------------------------------------------------
 // Top-level program
@@ -129,6 +139,27 @@ pub enum Builtin {
     ElapsedMs,
     /// `(tick-n)` → i64 (current tick number)
     TickN,
+
+    // ---- KAMI query / RNG (survivors core loop) ----------------------------
+    /// `(rand-int n)` → i64 in [0, n). Host owns the seeded PRNG so co-op runs
+    /// stay deterministic (shared-seed) — the guest never holds the seed.
+    RandInt,
+    /// `(query-begin tag-str)` → iterator handle (i64). Snapshots the entities
+    /// tagged `tag` on the host and returns an opaque cursor handle.
+    QueryBegin,
+    /// `(query-next it)` → next entity-id (i64), or -1 when the cursor is drained.
+    QueryNext,
+    /// `(count-tagged tag-str)` → i64 count of entities tagged `tag`.
+    CountTagged,
+    /// `(nearest-tagged tag-str x y maxd)` → nearest entity tagged `tag` within
+    /// `maxd` of (x,y) [f32], or -1. Host does the f32 distance (broadphase),
+    /// so weapon targeting + bullet/contact collision need no f32 math in clj.
+    NearestTagged,
+    /// `(move-toward! eid target-eid speed)` — set `eid`'s velocity toward
+    /// `target-eid` at `speed` px/s [f32]. Host does the normalize×speed vector
+    /// math, so enemy-chase / homing need no in-guest f32 arithmetic (guest
+    /// `+`/`-`/`*` are integer ops; this avoids operating on f32 bit-patterns).
+    MoveToward,
 }
 
 impl Builtin {
@@ -167,6 +198,12 @@ impl Builtin {
             DeltaMs        => Some(HostImport::TimeDeltaMs),
             ElapsedMs      => Some(HostImport::TimeElapsedMs),
             TickN          => Some(HostImport::TimeTick),
+            RandInt        => Some(HostImport::RandomInt),
+            QueryBegin     => Some(HostImport::SceneQueryBegin),
+            QueryNext      => Some(HostImport::SceneQueryNext),
+            CountTagged    => Some(HostImport::SceneCountTagged),
+            NearestTagged  => Some(HostImport::SceneNearest),
+            MoveToward     => Some(HostImport::SceneMoveToward),
             _              => None,
         }
     }
@@ -251,6 +288,13 @@ impl Builtin {
             "delta-ms"        => DeltaMs,
             "elapsed-ms"      => ElapsedMs,
             "tick-n"          => TickN,
+            // query / RNG (survivors)
+            "rand-int"        => RandInt,
+            "query-begin"     => QueryBegin,
+            "query-next"      => QueryNext,
+            "count-tagged"    => CountTagged,
+            "nearest-tagged"  => NearestTagged,
+            "move-toward!"    => MoveToward,
             _                 => return None,
         })
     }
@@ -303,6 +347,9 @@ pub enum HostImport {
     AudioPlay, AudioStop, AudioPlayAt,
     // time
     TimeDeltaMs, TimeElapsedMs, TimeTick,
+    // query / RNG (survivors)
+    RandomInt,
+    SceneQueryBegin, SceneQueryNext, SceneCountTagged, SceneNearest, SceneMoveToward,
 }
 
 impl HostImport {
@@ -342,6 +389,12 @@ impl HostImport {
             TimeDeltaMs       => ("kami:engine/time@1.0.0",    "delta-ms"),
             TimeElapsedMs     => ("kami:engine/time@1.0.0",    "elapsed-ms"),
             TimeTick          => ("kami:engine/time@1.0.0",    "tick"),
+            RandomInt         => ("kami:engine/random@1.0.0",  "int"),
+            SceneQueryBegin   => ("kami:engine/scene@1.0.0",   "query-begin"),
+            SceneQueryNext    => ("kami:engine/scene@1.0.0",   "query-next"),
+            SceneCountTagged  => ("kami:engine/scene@1.0.0",   "count-tagged"),
+            SceneNearest      => ("kami:engine/scene@1.0.0",   "nearest"),
+            SceneMoveToward   => ("kami:engine/scene@1.0.0",   "move-toward"),
         }
     }
 
@@ -371,6 +424,12 @@ impl HostImport {
             AudioPlay | AudioStop => &[StringHandle],
             AudioPlayAt       => &[StringHandle, F32, F32, F32],
             TimeDeltaMs | TimeElapsedMs | TimeTick => &[],
+            RandomInt         => &[I64],
+            SceneQueryBegin   => &[StringHandle],
+            SceneQueryNext    => &[I64],
+            SceneCountTagged  => &[StringHandle],
+            SceneNearest      => &[StringHandle, F32, F32, F32],
+            SceneMoveToward   => &[I64, I64, F32],
         }
     }
 
@@ -394,6 +453,9 @@ impl HostImport {
             RenderDrawMesh | RenderSpawnParticle | RenderDrawLine => Void,
             AudioPlay | AudioStop | AudioPlayAt => Void,
             TimeDeltaMs | TimeElapsedMs | TimeTick => I64,
+            RandomInt | SceneQueryBegin | SceneQueryNext
+            | SceneCountTagged | SceneNearest => I64,
+            SceneMoveToward => Void,
         }
     }
 }
@@ -563,6 +625,7 @@ fn lower_call(items: &[EdnValue]) -> Result<Expr, CljError> {
         "loop"  => lower_loop(args),
         "recur" => Ok(Expr::Recur(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
         "do"    => Ok(Expr::Do(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
+        "doseq-entities" => lower_doseq_entities(args),
         // `(f32 1.5)` — explicit float literal form for disambiguation
         "f32" => {
             if args.len() != 1 {
@@ -681,6 +744,68 @@ fn lower_loop(args: &[EdnValue]) -> Result<Expr, CljError> {
     Ok(Expr::Loop { bindings, body })
 }
 
+/// `(doseq-entities [e tag] body…)` — iterate every entity tagged `tag`,
+/// binding each entity-id to `e` for the body. The survivors core-loop sugar
+/// (enemy AI over all enemies, bullet/contact collision, wave checks). No
+/// lambdas needed: it desugars to a host-driven cursor loop —
+///
+/// ```clojure
+/// (let [it (query-begin tag)]
+///   (loop [e (query-next it)]
+///     (when (not= e -1)
+///       body…
+///       (recur (query-next it)))))
+/// ```
+fn lower_doseq_entities(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.len() < 2 {
+        return Err(CljError::Lower(
+            "doseq-entities requires: (doseq-entities [e tag] body…)".into(),
+        ));
+    }
+    let binding = match &args[0] {
+        EdnValue::Vector(v) if v.len() == 2 => v,
+        _ => {
+            return Err(CljError::Lower(
+                "doseq-entities binding must be `[entity-sym tag]`".into(),
+            ))
+        }
+    };
+    let evar = sym_name(&binding[0], "doseq-entities entity binding")?;
+    let tag = lower_expr(&binding[1])?;
+    let it = gensym("it");
+
+    let next = || Expr::Builtin {
+        op: Builtin::QueryNext,
+        args: vec![Expr::Var(it.clone())],
+    };
+
+    let mut body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    if body.is_empty() {
+        return Err(CljError::Lower("doseq-entities requires at least one body form".into()));
+    }
+    body.push(Expr::Recur(vec![next()]));
+
+    let loop_expr = Expr::Loop {
+        bindings: vec![(evar.clone(), next())],
+        body: vec![Expr::If {
+            cond: Box::new(Expr::Builtin {
+                op: Builtin::NotEq,
+                args: vec![Expr::Var(evar), Expr::Int(-1)],
+            }),
+            then: Box::new(Expr::Do(body)),
+            els: Box::new(Expr::Int(0)),
+        }],
+    };
+
+    Ok(Expr::Let {
+        bindings: vec![(
+            it.clone(),
+            Expr::Builtin { op: Builtin::QueryBegin, args: vec![tag] },
+        )],
+        body: vec![loop_expr],
+    })
+}
+
 fn check_builtin_arity(op: Builtin, n: usize) -> Result<(), CljError> {
     use Builtin::*;
     let ok = match op {
@@ -693,14 +818,18 @@ fn check_builtin_arity(op: Builtin, n: usize) -> Result<(), CljError> {
         | GetRx | GetRy | GetRz | GetRw
         | PlaySound | StopSound
         | KeyDown | KeyPressed | Axis
+        | RandInt | QueryBegin | QueryNext | CountTagged
         | SpawnEntity => n == 1,
 
         PointerX | PointerY | DeltaMs | ElapsedMs | TickN => n == 0,
 
         Store64 | Store32 | ByteAt | ByteAppend => n == 2,
 
+        MoveToward => n == 3,
+
         SetPosition | SetVelocity | ApplyImpulse | ApplyForce
-        | DrawMesh | SpawnParticle | PlaySoundAt => n == 4,
+        | DrawMesh | SpawnParticle | PlaySoundAt
+        | NearestTagged => n == 4,
 
         SetRotation => n == 5,
         Raycast     => n == 6,
