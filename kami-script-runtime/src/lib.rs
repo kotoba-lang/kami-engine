@@ -82,6 +82,19 @@ pub struct HostState {
     pub delta_ms:   i64,
     pub elapsed_ms: i64,
     pub tick_n:     i64,
+
+    // --- ECS query cursors (survivors core loop) ---------------------------
+    /// Open `query-begin` cursors: handle → remaining entity ids (popped by
+    /// `query-next`, removed when drained). `doseq-entities` always drains, so
+    /// these don't accumulate across a normal tick.
+    pub query_cursors: HashMap<i64, Vec<u32>>,
+    /// Next cursor handle to hand out.
+    pub next_query: i64,
+
+    // --- Seeded PRNG (deterministic co-op / replay) ------------------------
+    /// xorshift64 state. The host owns the seed so the same seed + inputs
+    /// replay identically (shared-seed co-op, async race/ghost, anti-cheat).
+    pub rng: u64,
 }
 
 #[derive(Debug)]
@@ -89,6 +102,11 @@ pub struct DrawCommand {
     pub mesh: String,
     pub pos:  [f32; 3],
 }
+
+/// Entity tag = the kind string it was spawned with (`(spawn-entity "enemy")`).
+/// `query-begin` / `count-tagged` / `nearest-tagged` filter on an exact match,
+/// so a script queries the same tag it spawned with.
+pub struct Tag(pub String);
 
 impl HostState {
     pub fn new(world: Arc<Mutex<hecs::World>>) -> Self {
@@ -106,6 +124,9 @@ impl HostState {
             delta_ms:         0,
             elapsed_ms:       0,
             tick_n:           0,
+            query_cursors:    HashMap::new(),
+            next_query:       1,
+            rng:              0x9E37_79B9_7F4A_7C15,
         }
     }
 }
@@ -134,8 +155,15 @@ impl KamiScriptRuntime {
         bind_render(&mut linker)?;
         bind_audio(&mut linker)?;
         bind_time(&mut linker)?;
+        bind_random(&mut linker)?;
 
         Ok(Self { engine, linker, store, modules: HashMap::new() })
+    }
+
+    /// Seed the deterministic PRNG (shared-seed co-op / replay). The value is
+    /// forced odd/non-zero so xorshift64 never degenerates.
+    pub fn set_seed(&mut self, seed: u64) {
+        self.store.data_mut().rng = seed | 1;
     }
 
     // -----------------------------------------------------------------------
@@ -216,6 +244,52 @@ impl KamiScriptRuntime {
         Ok(())
     }
 
+    /// Run every `defsystem` in a module for one tick.
+    ///
+    /// `defsystem` compiles to a `<name>-tick` export; this calls all of them
+    /// (in module export order, which is definition order), so a game made of
+    /// several systems ticks with one call. Time counters advance once;
+    /// `keys_pressed` is cleared after.
+    pub fn call_systems(&mut self, name: &str, dt_ms: i64) -> Result<(), RuntimeError> {
+        {
+            let s = self.store.data_mut();
+            s.delta_ms = dt_ms;
+            s.elapsed_ms += dt_ms;
+            s.tick_n += 1;
+        }
+        let (_, instance) = self.modules.get(name)
+            .ok_or_else(|| RuntimeError::NotLoaded(name.to_string()))?;
+        let instance = *instance;
+        let systems: Vec<String> = instance
+            .exports(&mut self.store)
+            .filter_map(|e| {
+                let n = e.name();
+                if n.ends_with("-tick") { Some(n.to_string()) } else { None }
+            })
+            .collect();
+        for sys in &systems {
+            if let Ok(f) = instance.get_typed_func::<(i64,), (i64,)>(&mut self.store, sys) {
+                f.call(&mut self.store, (dt_ms,))?;
+            }
+        }
+        self.store.data_mut().keys_pressed.clear();
+        Ok(())
+    }
+
+    /// Fixed-step Euler integration: advance every entity's Position by its
+    /// Velocity over `dt_ms`. The minimal engine motion step so scripts that
+    /// only set velocity (move-toward!, controllers) actually move things.
+    pub fn integrate(&mut self, dt_ms: i64) {
+        let dt = dt_ms as f32 / 1000.0;
+        let world = self.store.data().world.clone();
+        let mut w = world.lock().unwrap();
+        for (_, (p, v)) in w.query::<(&mut Position, &Velocity)>().iter() {
+            p.0[0] += v.0[0] * dt;
+            p.0[1] += v.0[1] * dt;
+            p.0[2] += v.0[2] * dt;
+        }
+    }
+
     /// Call `on_event(kind, payload_ptr, payload_len)` on a loaded module.
     pub fn call_event(
         &mut self,
@@ -290,11 +364,19 @@ fn bind_scene(linker: &mut Linker<HostState>) -> Result<(), RuntimeError> {
     linker.func_wrap(m, "spawn", |mut caller: wasmtime::Caller<'_, HostState>, ptr: i32, len: i32| -> i64 {
         let name = read_guest_str(&mut caller, ptr, len);
         let world_arc = caller.data().world.clone();
-        let entity = world_arc.lock().unwrap().spawn((
-            Position([0.0, 0.0, 0.0]),
-            Velocity([0.0, 0.0, 0.0]),
-            Rotation([0.0, 0.0, 0.0, 1.0]),
-        ));
+        let entity = {
+            let mut w = world_arc.lock().unwrap();
+            let e = w.spawn((
+                Position([0.0, 0.0, 0.0]),
+                Velocity([0.0, 0.0, 0.0]),
+                Rotation([0.0, 0.0, 0.0, 1.0]),
+            ));
+            // Tag the entity with its kind so query/count/nearest can find it.
+            if !name.is_empty() {
+                let _ = w.insert_one(e, Tag(name.clone()));
+            }
+            e
+        };
         let id = entity.id();
         let s = caller.data_mut();
         if !name.is_empty() {
@@ -415,6 +497,124 @@ fn bind_scene(linker: &mut Linker<HostState>) -> Result<(), RuntimeError> {
         }
     })?;
 
+    // ---- ECS queries (survivors core loop) --------------------------------
+
+    // query-begin(tag_ptr, tag_len) -> cursor handle (i64). Snapshots the ids
+    // of all entities tagged `tag`; the cursor is drained by query-next.
+    linker.func_wrap(m, "query-begin", |mut caller: wasmtime::Caller<'_, HostState>, ptr: i32, len: i32| -> i64 {
+        let tag = read_guest_str(&mut caller, ptr, len);
+        let world = caller.data().world.clone();
+        let ids: Vec<u32> = {
+            let w = world.lock().unwrap();
+            let mut q = w.query::<&Tag>();
+            q.iter()
+                .filter_map(|(e, t)| if t.0 == tag { Some(e.id()) } else { None })
+                .collect()
+        };
+        let s = caller.data_mut();
+        let handle = s.next_query;
+        s.next_query += 1;
+        s.query_cursors.insert(handle, ids);
+        handle
+    })?;
+
+    // query-next(handle) -> next entity-id (i64), or -1 when drained (which
+    // also frees the cursor).
+    linker.func_wrap(m, "query-next", |mut caller: wasmtime::Caller<'_, HostState>, handle: i64| -> i64 {
+        let s = caller.data_mut();
+        match s.query_cursors.get_mut(&handle) {
+            Some(v) => match v.pop() {
+                Some(id) => id as i64,
+                None => {
+                    s.query_cursors.remove(&handle);
+                    -1
+                }
+            },
+            None => -1,
+        }
+    })?;
+
+    // count-tagged(tag_ptr, tag_len) -> i64
+    linker.func_wrap(m, "count-tagged", |mut caller: wasmtime::Caller<'_, HostState>, ptr: i32, len: i32| -> i64 {
+        let tag = read_guest_str(&mut caller, ptr, len);
+        let world = caller.data().world.clone();
+        let w = world.lock().unwrap();
+        let mut q = w.query::<&Tag>();
+        q.iter().filter(|(_, t)| t.0 == tag).count() as i64
+    })?;
+
+    // nearest(tag_ptr, tag_len, x: f32, y: f32, maxd: f32) -> entity-id, or -1.
+    // 2D (x,y) broadphase done host-side so scripts need no f32 math.
+    linker.func_wrap(m, "nearest", |mut caller: wasmtime::Caller<'_, HostState>, ptr: i32, len: i32, x: f32, y: f32, maxd: f32| -> i64 {
+        let tag = read_guest_str(&mut caller, ptr, len);
+        let world = caller.data().world.clone();
+        let w = world.lock().unwrap();
+        let max2 = maxd * maxd;
+        let mut best: Option<(u32, f32)> = None;
+        let mut q = w.query::<(&Tag, &Position)>();
+        for (e, (t, p)) in q.iter() {
+            if t.0 != tag {
+                continue;
+            }
+            let dx = p.0[0] - x;
+            let dy = p.0[1] - y;
+            let d2 = dx * dx + dy * dy;
+            if d2 <= max2 && best.map_or(true, |(_, bd)| d2 < bd) {
+                best = Some((e.id(), d2));
+            }
+        }
+        best.map(|(id, _)| id as i64).unwrap_or(-1)
+    })?;
+
+    // move-toward(entity, target, speed: f32) — set entity velocity toward
+    // target at speed px/s in the XY plane. Host does the normalize×speed math.
+    linker.func_wrap(m, "move-toward", |caller: wasmtime::Caller<'_, HostState>, eid: i64, target: i64, speed: f32| {
+        let src = entity_for_id(caller.data(), eid);
+        let tgt = entity_for_id(caller.data(), target);
+        if let (Some(e), Some(t)) = (src, tgt) {
+            let world = caller.data().world.clone();
+            let w = world.lock().unwrap();
+            let sp = w.get::<&Position>(e).ok().map(|p| p.0);
+            let tp = w.get::<&Position>(t).ok().map(|p| p.0);
+            if let (Some(sp), Some(tp)) = (sp, tp) {
+                let dx = tp[0] - sp[0];
+                let dy = tp[1] - sp[1];
+                let len = (dx * dx + dy * dy).sqrt();
+                let (vx, vy) = if len > 1e-6 {
+                    (dx / len * speed, dy / len * speed)
+                } else {
+                    (0.0, 0.0)
+                };
+                if let Ok(mut vel) = w.get::<&mut Velocity>(e) {
+                    vel.0 = [vx, vy, 0.0];
+                }
+            }
+        }
+    })?;
+
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// Random host bindings — host-owned seeded PRNG (deterministic co-op)
+// ---------------------------------------------------------------------------
+
+fn bind_random(linker: &mut Linker<HostState>) -> Result<(), RuntimeError> {
+    let m = "kami:engine/random@1.0.0";
+    // int(n) -> uniform i64 in [0, n); 0 if n <= 0. xorshift64 advances the
+    // host-owned seed so runs are reproducible (set via KamiScriptRuntime::set_seed).
+    linker.func_wrap(m, "int", |mut caller: wasmtime::Caller<'_, HostState>, n: i64| -> i64 {
+        if n <= 0 {
+            return 0;
+        }
+        let s = caller.data_mut();
+        let mut x = s.rng;
+        x ^= x << 13;
+        x ^= x >> 7;
+        x ^= x << 17;
+        s.rng = x;
+        (x % (n as u64)) as i64
+    })?;
     Ok(())
 }
 
@@ -530,4 +730,135 @@ pub fn load_and_init(
 ) -> Result<(), RuntimeError> {
     runtime.load_clj(name, src)?;
     runtime.call_init(name)
+}
+
+// ---------------------------------------------------------------------------
+// Tests — survivors host bindings (query / nearest / move-toward / rand)
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn world() -> Arc<Mutex<hecs::World>> {
+        Arc::new(Mutex::new(hecs::World::new()))
+    }
+
+    #[test]
+    fn doseq_visits_every_tagged_entity() {
+        // doseq-entities + nearest-tagged + move-toward over 3 enemies → all
+        // three end the tick moving toward the player. This is the survivors
+        // core loop that could not even compile before the kami-clj extension.
+        let w = world();
+        let mut rt = KamiScriptRuntime::new(w.clone()).unwrap();
+        let src = r#"
+            (defn init []
+              (let [p (spawn-entity "player")]
+                (set-position! p (f32 100.0) (f32 0.0) (f32 0.0))
+                (spawn-entity "enemy")
+                (spawn-entity "enemy")
+                (spawn-entity "enemy")))
+            (defn tick [dt]
+              (doseq-entities [e "enemy"]
+                (let [p (nearest-tagged "player" (get-x e) (get-y e) (f32 100000.0))]
+                  (when (not= p -1)
+                    (move-toward! e p (f32 7.0))))))
+        "#;
+        rt.load_clj("g", src).unwrap();
+        rt.call_init("g").unwrap();
+        rt.call_tick("g", 16).unwrap();
+
+        let world = w.lock().unwrap();
+        let mut enemies = 0;
+        let mut moving = 0;
+        let mut q = world.query::<(&Tag, &Velocity)>();
+        for (_, (t, v)) in q.iter() {
+            if t.0 == "enemy" {
+                enemies += 1;
+                // player is at +x, enemies spawned at origin → vx ≈ +7, vy ≈ 0
+                if v.0[0] > 6.9 && v.0[0] < 7.1 && v.0[1].abs() < 1e-3 {
+                    moving += 1;
+                }
+            }
+        }
+        assert_eq!(enemies, 3, "all enemies present");
+        assert_eq!(moving, 3, "doseq-entities must visit + move every enemy");
+    }
+
+    #[test]
+    fn nearest_respects_max_distance() {
+        // An enemy outside maxd gets no target (nearest returns -1 → no move).
+        let w = world();
+        let mut rt = KamiScriptRuntime::new(w.clone()).unwrap();
+        let src = r#"
+            (defn init []
+              (let [p (spawn-entity "player")
+                    e (spawn-entity "enemy")]
+                (set-position! p (f32 1000.0) (f32 0.0) (f32 0.0))
+                (set-position! e (f32 0.0) (f32 0.0) (f32 0.0))))
+            (defn tick [dt]
+              (doseq-entities [e "enemy"]
+                (let [p (nearest-tagged "player" (get-x e) (get-y e) (f32 50.0))]
+                  (when (not= p -1)
+                    (move-toward! e p (f32 7.0))))))
+        "#;
+        rt.load_clj("g", src).unwrap();
+        rt.call_init("g").unwrap();
+        rt.call_tick("g", 16).unwrap();
+
+        let world = w.lock().unwrap();
+        let mut q = world.query::<(&Tag, &Velocity)>();
+        for (_, (t, v)) in q.iter() {
+            if t.0 == "enemy" {
+                assert_eq!(v.0, [0.0, 0.0, 0.0], "player out of range → no movement");
+            }
+        }
+    }
+
+    #[test]
+    fn rand_int_is_seed_deterministic() {
+        // Same seed → identical spawn decisions (shared-seed co-op / replay).
+        let run = |seed: u64| -> usize {
+            let w = world();
+            let mut rt = KamiScriptRuntime::new(w.clone()).unwrap();
+            rt.set_seed(seed);
+            let src = r#"
+                (defn init [] 0)
+                (defn tick [dt]
+                  (when (zero? (mod (rand-int 100) 3))
+                    (spawn-entity "hit")))
+            "#;
+            rt.load_clj("g", src).unwrap();
+            rt.call_init("g").unwrap();
+            for _ in 0..20 {
+                rt.call_tick("g", 16).unwrap();
+            }
+            let world = w.lock().unwrap();
+            let mut q = world.query::<&Tag>();
+            q.iter().filter(|(_, t)| t.0 == "hit").count()
+        };
+        let a = run(42);
+        assert_eq!(a, run(42), "same seed must replay identically");
+        // sanity: the PRNG actually fired some-but-not-all of 20 ticks
+        assert!(a > 0 && a < 20, "expected a non-trivial spawn count, got {a}");
+    }
+
+    #[test]
+    fn count_tagged_via_world() {
+        // spawn tags entities so count/query can see them.
+        let w = world();
+        let mut rt = KamiScriptRuntime::new(w.clone()).unwrap();
+        let src = r#"
+            (defn init []
+              (spawn-entity "enemy")
+              (spawn-entity "enemy")
+              (spawn-entity "bullet"))
+        "#;
+        rt.load_clj("g", src).unwrap();
+        rt.call_init("g").unwrap();
+        let world = w.lock().unwrap();
+        let mut q = world.query::<&Tag>();
+        let enemies = q.iter().filter(|(_, t)| t.0 == "enemy").count();
+        assert_eq!(enemies, 2);
+    }
 }
