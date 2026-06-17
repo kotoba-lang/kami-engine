@@ -244,6 +244,52 @@ impl KamiScriptRuntime {
         Ok(())
     }
 
+    /// Run every `defsystem` in a module for one tick.
+    ///
+    /// `defsystem` compiles to a `<name>-tick` export; this calls all of them
+    /// (in module export order, which is definition order), so a game made of
+    /// several systems ticks with one call. Time counters advance once;
+    /// `keys_pressed` is cleared after.
+    pub fn call_systems(&mut self, name: &str, dt_ms: i64) -> Result<(), RuntimeError> {
+        {
+            let s = self.store.data_mut();
+            s.delta_ms = dt_ms;
+            s.elapsed_ms += dt_ms;
+            s.tick_n += 1;
+        }
+        let (_, instance) = self.modules.get(name)
+            .ok_or_else(|| RuntimeError::NotLoaded(name.to_string()))?;
+        let instance = *instance;
+        let systems: Vec<String> = instance
+            .exports(&mut self.store)
+            .filter_map(|e| {
+                let n = e.name();
+                if n.ends_with("-tick") { Some(n.to_string()) } else { None }
+            })
+            .collect();
+        for sys in &systems {
+            if let Ok(f) = instance.get_typed_func::<(i64,), (i64,)>(&mut self.store, sys) {
+                f.call(&mut self.store, (dt_ms,))?;
+            }
+        }
+        self.store.data_mut().keys_pressed.clear();
+        Ok(())
+    }
+
+    /// Fixed-step Euler integration: advance every entity's Position by its
+    /// Velocity over `dt_ms`. The minimal engine motion step so scripts that
+    /// only set velocity (move-toward!, controllers) actually move things.
+    pub fn integrate(&mut self, dt_ms: i64) {
+        let dt = dt_ms as f32 / 1000.0;
+        let world = self.store.data().world.clone();
+        let mut w = world.lock().unwrap();
+        for (_, (p, v)) in w.query::<(&mut Position, &Velocity)>().iter() {
+            p.0[0] += v.0[0] * dt;
+            p.0[1] += v.0[1] * dt;
+            p.0[2] += v.0[2] * dt;
+        }
+    }
+
     /// Call `on_event(kind, payload_ptr, payload_len)` on a loaded module.
     pub fn call_event(
         &mut self,
