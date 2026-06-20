@@ -1438,6 +1438,55 @@ mod tests {
     }
 
     #[test]
+    fn lang_string_handle_abi() {
+        // The all-i64 string ABI: a literal is a packed (offset<<32 | len) handle;
+        // str-len / byte-at read it + the linear-memory data section.
+        assert_eq!(
+            run_init_count(r#"(defn init [] (when (= (str-len "hello") 5) (spawn-entity "ok")))"#, "ok"),
+            1
+        );
+        // "hello"[1] = 'e' = 101
+        assert_eq!(
+            run_init_count(r#"(defn init [] (when (= (byte-at "hello" 1) 101) (spawn-entity "ok")))"#, "ok"),
+            1
+        );
+    }
+
+    #[test]
+    fn lang_raw_memory_store_load() {
+        // alloc + store64!/load64 and store32!/load32 round-trip through the heap.
+        assert_eq!(
+            run_init_count(
+                r#"(defn init [] (let [p (alloc 8)] (store64! p 42) (when (= (load64 p) 42) (spawn-entity "ok"))))"#,
+                "ok",
+            ),
+            1
+        );
+        assert_eq!(
+            run_init_count(
+                r#"(defn init [] (let [p (alloc 4)] (store32! p 7) (when (= (load32 p) 7) (spawn-entity "ok"))))"#,
+                "ok",
+            ),
+            1
+        );
+    }
+
+    #[test]
+    fn lang_loop_recur_accumulator() {
+        // multi-binding loop/recur with an accumulator: sum 1..5 = 15.
+        assert_eq!(
+            run_init_count(
+                r#"(defn init []
+                      (let [s (loop [i 1 acc 0]
+                                (if (<= i 5) (recur (+ i 1) (+ acc i)) acc))]
+                        (when (= s 15) (spawn-entity "ok"))))"#,
+                "ok",
+            ),
+            1
+        );
+    }
+
+    #[test]
     fn count_tagged_via_world() {
         // spawn tags entities so count/query can see them.
         let w = world();
