@@ -1858,6 +1858,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-clj-play3d"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "glam",
+ "hecs",
+ "kami-core",
+ "kami-script-runtime",
+ "kotoba-edn",
+ "pollster",
+ "wgpu",
+ "winit",
+]
+
+[[package]]
 name = "kami-core"
 version = "0.1.0"
 dependencies = [

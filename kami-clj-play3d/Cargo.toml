@@ -1,0 +1,25 @@
+[package]
+name = "kami-clj-play3d"
+version.workspace = true
+edition.workspace = true
+description = "kami-clj-play3d — native 3rd-person 3D player (winit + wgpu/Metal) for kami-clj/EDN games. The GPU arm; the game (logic.clj + scene.edn) is data. A stylized battle-royale demo."
+
+[[bin]]
+name = "kami-clj-play3d"
+path = "src/main.rs"
+
+[dependencies]
+kami-script-runtime = { path = "../kami-script-runtime", default-features = false }
+kami-core  = { path = "../kami-core" }
+kotoba-edn = { path = "../../kotoba/crates/kotoba-edn" }
+hecs       = { workspace = true }
+glam       = { workspace = true }
+wgpu       = "24"
+winit      = "0.30"
+pollster   = "0.4"
+bytemuck   = { workspace = true }
+
+[features]
+default          = ["backend-wasmtime"]
+backend-wasmtime = ["kami-script-runtime/backend-wasmtime"]
+backend-wasmi    = ["kami-script-runtime/backend-wasmi"]
