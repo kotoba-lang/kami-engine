@@ -1,0 +1,16 @@
+[package]
+name = "kami-groot"
+description = "Clean-room NVIDIA Isaac GR00T N1.x foundation-policy compat surface. Mirrors the public VLA obs->action policy API names/shapes only (no NVIDIA library/weight linked or vendored; ADR-2605261800 §2(b) N1..N9 NEVER). Policy-pluggable EmbodimentHead seat; the shipped default backend is KAMI-native (kami-shugyo LinearPolicy generalized to the VLA I/O shape), so the surface builds, tests, and runs with zero NVIDIA assets. EmbodimentConfig/ModalityConfig bind a robot's DOF order + camera streams + language slot onto typed I/O heads; Observation{state,video,language} / Action{[horizon,n_dof] chunk}; clean-room LeRobot-shaped Episode record format. ADR-0037 / ADR-0033 / ADR-0034."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+log = { workspace = true }
+serde = { workspace = true }
+# The native default backend is the kami-shugyo gradient-free policy generalized
+# to the VLA I/O shape — no foundation-model weights, charter-clean (ADR-0037).
+kami-shugyo = { path = "../kami-shugyo" }
+
+[dev-dependencies]
+serde_json = { workspace = true }

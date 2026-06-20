@@ -84,6 +84,8 @@ members = [
     "kami-replicator",
     "kami-app-amenominaka",
     "kami-shugyo",
+    # GR00T N1.x foundation-policy compat seat (ADR-0037)
+    "kami-groot",
     # ADR-2605261800 §D10.4 contingent fallback crates (activated only on Council Lv6+ attestation
     # after Genesis / Mitsuba 3 / tinyusdz upstream WebGPU+WASM viability gate failure)
     "kami-physics-solvers",

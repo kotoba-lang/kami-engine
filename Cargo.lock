@@ -2090,6 +2090,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-groot"
+version = "0.1.0"
+dependencies = [
+ "kami-shugyo",
+ "log",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "kami-input"
 version = "0.1.0"
 dependencies = [
