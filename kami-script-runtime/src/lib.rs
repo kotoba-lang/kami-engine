@@ -1515,6 +1515,47 @@ mod tests {
     }
 
     #[test]
+    fn golden_frame_with_despawn_determinism() {
+        // Extends the determinism guard to a DESPAWN-heavy game (spawn + chase +
+        // weapon culls nearest). Despawn touches the entity registry (HashMap
+        // remove) and nearest-tagged iterates the world — a second place the
+        // system-order class of nondeterminism could hide. Both backends must hit
+        // the same GOLDEN, proving cross-backend lockstep holds through despawn.
+        const GAME: &str = r#"
+            (defn player [] (nearest-tagged "player" (f32 0.0) (f32 0.0) (f32 9000000.0)))
+            (defn init [] (set-position! (spawn-entity "player") (f32 0.0) (f32 0.0) (f32 0.0)))
+            (defsystem spawn [dt]
+              (when (zero? (mod (tick-n) 3))
+                (let [r (rand-int 4) e (spawn-entity "e")]
+                  (cond
+                    (= r 0) (set-position! e (f32 80.0)  (f32 0.0)  (f32 0.0))
+                    (= r 1) (set-position! e (f32 -80.0) (f32 0.0)  (f32 0.0))
+                    (= r 2) (set-position! e (f32 0.0)   (f32 80.0) (f32 0.0))
+                    :else   (set-position! e (f32 0.0)   (f32 -80.0)(f32 0.0))))))
+            (defsystem ai [dt]
+              (let [p (player)]
+                (when (not= p -1)
+                  (doseq-entities [e "e"] (move-toward! e p (f32 40.0))))))
+            (defsystem weapon [dt]
+              (when (zero? (mod (tick-n) 4))
+                (let [hit (nearest-tagged "e" (f32 0.0) (f32 0.0) (f32 1000.0))]
+                  (when (not= hit -1) (despawn-entity hit)))))
+        "#;
+        let w = world();
+        let mut rt = KamiScriptRuntime::new(w.clone()).unwrap();
+        rt.set_seed(0xBADC_0FFE);
+        rt.load_clj("g", GAME).unwrap();
+        rt.call_init("g").unwrap();
+        for _ in 0..30 {
+            rt.call_systems("g", 16).unwrap();
+            rt.integrate(16);
+        }
+        let h = world_hash(&w);
+        const GOLDEN: u64 = 0xa86ffa76713b5595;
+        assert_eq!(h, GOLDEN, "despawn-game world hash 0x{h:016x} ≠ GOLDEN");
+    }
+
+    #[test]
     fn count_tagged_via_world() {
         // spawn tags entities so count/query can see them.
         let w = world();
