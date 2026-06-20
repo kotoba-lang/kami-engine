@@ -10,6 +10,32 @@ fn empty_defn_compiles() {
     assert!(wasm.starts_with(b"\0asm"), "missing WASM magic");
 }
 
+/// The compiler must REJECT malformed source with an `Err`, never panic — a
+/// guest author (or a tool) can feed it anything. Each input below should return
+/// `Err(CljError)`; if any panics, this test fails (which is the point).
+#[test]
+fn compiler_rejects_malformed_input() {
+    let bad = [
+        "(defn)",                       // defn: too few forms
+        "(defn f)",                     // defn: missing params + body
+        "(def x)",                      // def: needs exactly (def name value)
+        "(defn f [1] 0)",               // param list must be symbols
+        "(defn f [] (f32))",            // f32 takes exactly one arg
+        "(defn f [] (f32 1 2))",        // f32 takes exactly one arg
+        "(defn f [] (let [a] a))",      // let binding vector must be even
+        "(defn f [] (+))",             // + needs at least one arg
+        "(weird-top-level-form 1 2)",   // unsupported top-level form
+        "(123 456)",                    // list head must be a symbol
+        "(defn f [] (",                 // unterminated — reader error
+    ];
+    for src in bad {
+        assert!(
+            compile_str(src).is_err(),
+            "compiler should reject `{src}` with Err, not accept it or panic",
+        );
+    }
+}
+
 #[test]
 fn float_literal_compiles() {
     let src = "(defn get-speed [] (f32 5.0))";
