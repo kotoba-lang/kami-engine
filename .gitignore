@@ -7,3 +7,4 @@ Cargo.lock.bak
 /pkg
 **/pkg
 node_modules
+/dist/

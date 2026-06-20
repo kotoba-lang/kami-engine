@@ -82,5 +82,47 @@
               :task (shell "cargo" "run" "--target" "aarch64-apple-darwin"
                            "-p" "kami-clj-play")}
 
+  package    {:doc  "Assemble a relocatable artifact:  bb package mac [survivors]"
+              :requires ([babashka.fs :as fs] [babashka.process :as p])
+              :task (let [target (or (first *command-line-args*) "mac")
+                          game   (or (second *command-line-args*) "survivors")
+                          spec   (-> (p/shell {:out :string}
+                                              "cargo" "run" "-q" "--target" "aarch64-apple-darwin"
+                                              "-p" "kami-script-runtime" "--bin" "kami" "--" "spec" target)
+                                     :out edn/read-string)
+                          {:keys [triple feature]} spec
+                          gdir   (str "kami-clj-play/games/" game)]
+                      (when (nil? triple)
+                        (println "✗" target "packaging needs the NDA console SDK toolchain.") (System/exit 3))
+                      (when-not (= target "mac")
+                        (println "note: only the mac .app bundle is assembled here;"
+                                 target "needs its native shell (Swift/NativeActivity/SDK).") (System/exit 0))
+                      ;; build release host
+                      (let [base ["cargo" "build" "--release" "-p" "kami-clj-play" "--target" triple]
+                            args (if (= feature "backend-wasmtime") base
+                                     (into base ["--no-default-features" "--features" feature]))]
+                        (apply shell args))
+                      ;; assemble <dist>/KamiSurvivors.app
+                      (let [app  (str "dist/" (str/capitalize game) ".app")
+                            cont (str app "/Contents")]
+                        (fs/create-dirs (str cont "/MacOS"))
+                        (fs/create-dirs (str cont "/Resources/game"))
+                        (fs/copy (str "target/" triple "/release/kami-clj-play")
+                                 (str cont "/MacOS/kami-clj-play") {:replace-existing true})
+                        (doseq [f ["logic.clj" "scene.edn"]]
+                          (fs/copy (str gdir "/" f) (str cont "/Resources/game/" f) {:replace-existing true}))
+                        (spit (str cont "/Info.plist")
+                              (str "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                                   "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
+                                   "<plist version=\"1.0\"><dict>\n"
+                                   "  <key>CFBundleName</key><string>" (str/capitalize game) "</string>\n"
+                                   "  <key>CFBundleExecutable</key><string>kami-clj-play</string>\n"
+                                   "  <key>CFBundleIdentifier</key><string>group.gftd.kami." game "</string>\n"
+                                   "  <key>CFBundlePackageType</key><string>APPL</string>\n"
+                                   "  <key>CFBundleVersion</key><string>0.1.0</string>\n"
+                                   "</dict></plist>\n"))
+                        (println "✓ packaged" app
+                                 (str "(host=" feature ", game data in Resources/game — relocatable)"))))}
+
   test       {:doc  "Golden-frame + suite under BOTH backends."
               :task (shell "scripts/test-script-backends.sh")}}}

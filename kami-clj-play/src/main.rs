@@ -782,9 +782,28 @@ impl ApplicationHandler for App {
     }
 }
 
+/// Resolve the game data directory. Relocatable for packaging:
+///   1. `$KAMI_GAME_DIR`                         — explicit override
+///   2. `<exe>/../Resources/game`                — inside a packaged .app bundle
+///   3. `$CARGO_MANIFEST_DIR/games/survivors`    — dev / `cargo run`
+fn game_dir() -> std::path::PathBuf {
+    if let Ok(d) = std::env::var("KAMI_GAME_DIR") {
+        return std::path::PathBuf::from(d);
+    }
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(dir) = exe.parent() {
+            let bundled = dir.join("../Resources/game");
+            if bundled.join("scene.edn").exists() {
+                return bundled;
+            }
+        }
+    }
+    std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("games/survivors")
+}
+
 fn main() {
     // The game is data: load CLJ logic + Datomic-shaped scene from files.
-    let base = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("games/survivors");
+    let base = game_dir();
     let logic = std::fs::read_to_string(base.join("logic.clj")).expect("read logic.clj");
     let scene_src = std::fs::read_to_string(base.join("scene.edn")).expect("read scene.edn");
     let scene = parse_scene(&scene_src);

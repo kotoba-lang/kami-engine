@@ -155,6 +155,13 @@ scene.edn), `bb compile survivors` runs `kamiclj` (logic.clj → game.wasm, veri
 `bb host <target>` reads the feature+triple from `kami spec <target>` (EDN — single source of
 truth, no re-encoding) and cross-builds, reporting "NDA console SDK" for PS5/Switch. `bb test`
 is the dual-backend gate. The per-platform decisions live only in `kami-script-runtime::platform`.
+✅ **`bb package mac` produces a relocatable `.app`** (`dist/<Game>.app`): release host binary in
+`Contents/MacOS/`, the game's `logic.clj` + `scene.edn` in `Contents/Resources/game/`, and an
+`Info.plist`. The player resolves its game dir relocatably (`$KAMI_GAME_DIR` → `<exe>/../Resources/game`
+→ dev `CARGO_MANIFEST_DIR`), so the bundle is self-contained — verified: the bundled binary loads the
+game from `Resources/game`, not the source tree. iOS/Android/console mirror this layout behind their
+native shells (Swift / NativeActivity / console SDK), which `bb package <target>` flags as the
+remaining native-shell step.
 
 ---
 
