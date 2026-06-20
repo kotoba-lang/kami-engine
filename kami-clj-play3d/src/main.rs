@@ -582,9 +582,9 @@ impl App {
         self.game.step(mv.x * sp, mv.y * sp);
 
         // --- gravity / jump (host owns height) ---
-        self.jump_v -= self.scene.gravity * dt;
-        self.height += self.jump_v * dt;
-        if self.height < 0.0 { self.height = 0.0; self.jump_v = 0.0; }
+        let (h, v) = integrate_jump(self.height, self.jump_v, self.scene.gravity, dt);
+        self.height = h;
+        self.jump_v = v;
 
         let (player, ents) = self.game.snapshot();
         let gs = self.scene.ground_scale;
@@ -777,6 +777,18 @@ impl ApplicationHandler for App {
     }
 }
 
+/// Fixed-step jump/gravity integration → (height, vertical velocity), clamped to
+/// the ground (height ≥ 0, velocity reset on landing). Pure, so it's unit-tested.
+fn integrate_jump(height: f32, vel: f32, gravity: f32, dt: f32) -> (f32, f32) {
+    let v = vel - gravity * dt;
+    let h = height + v * dt;
+    if h <= 0.0 {
+        (0.0, 0.0)
+    } else {
+        (h, v)
+    }
+}
+
 fn game_dir() -> std::path::PathBuf {
     if let Ok(d) = std::env::var("KAMI_GAME_DIR") {
         return std::path::PathBuf::from(d);
@@ -804,4 +816,31 @@ fn main() {
     event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
     let mut app = App::new(&logic, scene);
     event_loop.run_app(&mut app).expect("run");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::integrate_jump;
+
+    #[test]
+    fn at_rest_stays_grounded() {
+        assert_eq!(integrate_jump(0.0, 0.0, 26.0, 0.016), (0.0, 0.0));
+    }
+
+    #[test]
+    fn jump_rises_then_lands_and_resets() {
+        let (g, dt) = (26.0f32, 0.016f32);
+        let (mut h, mut v) = (0.0f32, 9.5f32); // jump impulse
+        let mut peak = 0.0f32;
+        for _ in 0..400 {
+            let (nh, nv) = integrate_jump(h, v, g, dt);
+            h = nh;
+            v = nv;
+            peak = peak.max(h);
+            assert!(h >= 0.0, "player never sinks below the ground");
+        }
+        assert!(peak > 1.0, "the jump reaches a real height (peak {peak})");
+        assert_eq!(h, 0.0, "and eventually lands");
+        assert_eq!(v, 0.0, "with vertical velocity reset on landing");
+    }
 }
