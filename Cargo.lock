@@ -1850,6 +1850,7 @@ dependencies = [
  "bytemuck",
  "hecs",
  "kami-core",
+ "kami-scene",
  "kami-script-runtime",
  "kotoba-edn",
  "pollster",
@@ -1865,6 +1866,7 @@ dependencies = [
  "glam",
  "hecs",
  "kami-core",
+ "kami-scene",
  "kami-script-runtime",
  "kotoba-edn",
  "pollster",
@@ -2465,6 +2467,13 @@ dependencies = [
  "kami-voxel",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "kami-scene"
+version = "0.1.0"
+dependencies = [
+ "kotoba-edn",
 ]
 
 [[package]]

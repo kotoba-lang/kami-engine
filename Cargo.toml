@@ -8,6 +8,7 @@ members = [
     "kami-script-runtime",
     "kami-clj-play",
     "kami-clj-play3d",
+    "kami-scene",
     "kami-core",
     "kami-knp",
     "kami-render",

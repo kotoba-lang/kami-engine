@@ -1,0 +1,8 @@
+[package]
+name = "kami-scene"
+version.workspace = true
+edition.workspace = true
+description = "kami-scene — EDN accessor helpers for reading the Datomic-shaped scene.edn a kami-clj game ships (ADR-0036). Shared by the native players; pure + unit-tested."
+
+[dependencies]
+kotoba-edn = { path = "../../kotoba/crates/kotoba-edn" }

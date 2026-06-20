@@ -17,6 +17,7 @@ path = "src/main.rs"
 kami-script-runtime = { path = "../kami-script-runtime", default-features = false }
 kami-core = { path = "../kami-core" }
 kotoba-edn = { path = "../../kotoba/crates/kotoba-edn" }     # parse the Datomic-shaped scene.edn
+kami-scene = { path = "../kami-scene" }
 hecs      = { workspace = true }
 wgpu      = "24"
 winit     = "0.30"

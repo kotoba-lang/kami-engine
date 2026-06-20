@@ -15,13 +15,13 @@
 //!
 //! Arrows move · survive the swarm · Esc quits.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 use kami_core::actor::components::Position;
 use kami_script_runtime::{KamiScriptRuntime, Tag, BACKEND};
-use kotoba_edn::EdnValue;
+use kami_scene::{kw_key, mget, num, vec3};
 use winit::application::ApplicationHandler;
 use winit::event::{ElementState, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, EventLoop};
@@ -50,26 +50,6 @@ struct Scene {
     burst_size: f32,
 }
 
-// --- tiny EDN helpers ---
-fn kw_key(k: &EdnValue) -> Option<String> {
-    k.as_keyword().map(|kw| match &kw.0.namespace {
-        Some(ns) => format!("{ns}/{}", kw.0.name),
-        None => kw.0.name.clone(),
-    })
-}
-fn mget<'a>(m: &'a BTreeMap<EdnValue, EdnValue>, key: &str) -> Option<&'a EdnValue> {
-    m.iter()
-        .find_map(|(k, v)| if kw_key(k).as_deref() == Some(key) { Some(v) } else { None })
-}
-fn num(v: Option<&EdnValue>) -> f32 {
-    v.and_then(|x| x.as_float().map(|f| f as f32).or_else(|| x.as_integer().map(|i| i as f32)))
-        .unwrap_or(0.0)
-}
-fn vec3(v: Option<&EdnValue>) -> [f32; 3] {
-    let s = v.and_then(|x| x.as_vector()).unwrap_or(&[]);
-    let g = |i: usize| s.get(i).map(|x| num(Some(x))).unwrap_or(0.0);
-    [g(0), g(1), g(2)]
-}
 
 fn parse_scene(src: &str) -> Scene {
     let forms = kotoba_edn::parse_all(src).expect("scene.edn must be valid EDN");
