@@ -1580,6 +1580,31 @@ mod tests {
     }
 
     #[test]
+    fn lang_integer_division() {
+        // `/` is integer division (truncating). Previously untested.
+        assert_eq!(eval_count("(/ 17 5)"), 3);
+        assert_eq!(eval_count("(/ 100 10)"), 10);
+        assert_eq!(eval_count("(* (/ 9 2) 3)"), 12); // (9/2=4)*3
+    }
+
+    #[test]
+    fn host_surfaces_guest_trap_as_err() {
+        // A guest divide-by-zero traps the wasm; the host must surface it as Err
+        // (not crash/abort), and stay usable afterward — a guest bug can't take
+        // the host down. Verified on whichever backend is compiled.
+        let w = world();
+        let mut rt = KamiScriptRuntime::new(w.clone()).unwrap();
+        rt.load_clj("bad", r#"(defn init [] (/ 5 0))"#).unwrap();
+        assert!(rt.call_init("bad").is_err(), "guest trap must be an Err, not a host crash");
+        // the runtime is not poisoned: a fresh module still loads and runs.
+        rt.load_clj("good", r#"(defn init [] (spawn-entity "ok"))"#).unwrap();
+        rt.call_init("good").unwrap();
+        let world = w.lock().unwrap();
+        let mut q = world.query::<&Tag>();
+        assert_eq!(q.iter().filter(|(_, t)| t.0 == "ok").count(), 1);
+    }
+
+    #[test]
     fn count_tagged_via_world() {
         // spawn tags entities so count/query can see them.
         let w = world();
