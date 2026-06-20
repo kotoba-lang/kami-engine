@@ -268,6 +268,10 @@ default for each, plus `host_feature()` (the cargo feature the host links). 5 te
 invariants — iOS/PS5/Switch are no-JIT⇒wasmi, only consoles need the seam, mobile/Switch get
 ASTC — so the per-platform decisions can't silently regress as the host crates land. The
 `bb kge host/package` tooling and CI consume this instead of re-encoding the matrix in prose.
+A `kge` CLI (`cargo run -p kami-script-runtime --bin kge -- targets | plan <target>`) makes
+it actionable: it prints the full matrix and, per target, the JIT/host/texfmt/render/input
+decision + rustc triple + the exact `cargo build` command for the host (or "NDA console SDK"
+for PS5/Switch). This is the seam `bb kge host/package` shells out to.
 
 ---
 

@@ -104,6 +104,21 @@ impl Target {
         Target::all().into_iter().find(|t| t.tag() == s)
     }
 
+    /// The rustc target triple the host crate cross-compiles to. `None` for PS5 /
+    /// Switch — their toolchains are NDA console SDKs, not public rustc targets.
+    pub fn triple(self) -> Option<&'static str> {
+        use Target::*;
+        match self {
+            Web => Some("wasm32-unknown-unknown"),
+            Mac => Some("aarch64-apple-darwin"),
+            Linux => Some("x86_64-unknown-linux-gnu"),
+            Windows => Some("x86_64-pc-windows-msvc"),
+            Ios => Some("aarch64-apple-ios"),
+            Android => Some("aarch64-linux-android"),
+            Ps5 | Switch => None,
+        }
+    }
+
     /// The packaging decision for this target — the ADR-0037 matrix, in code.
     pub fn spec(self) -> PlatformSpec {
         use InputDefault::*;
@@ -193,6 +208,15 @@ mod tests {
         assert_eq!(Target::Mac.spec().tex, TexFmt::Ktx2Bcn);
         assert_eq!(Target::Ps5.spec().tex, TexFmt::Ktx2Bcn);
         assert_eq!(Target::Web.spec().tex, TexFmt::Ktx2Auto);
+    }
+
+    #[test]
+    fn consoles_have_no_public_triple() {
+        assert!(Target::Ps5.triple().is_none());
+        assert!(Target::Switch.triple().is_none());
+        for t in [Target::Web, Target::Mac, Target::Ios, Target::Android] {
+            assert!(t.triple().is_some(), "{:?} needs a rustc triple", t);
+        }
     }
 
     #[test]
