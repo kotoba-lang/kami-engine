@@ -236,6 +236,31 @@ mod tests {
     }
 
     #[test]
+    fn rejects_bad_version() {
+        let mut b = FIXTURE.to_vec();
+        b[4] = 0xFF;
+        b[5] = 0xFF; // version u16 @ offset 4
+        assert!(matches!(decode(&b), Err(DecodeError::BadVersion(_))));
+    }
+
+    #[test]
+    fn rejects_truncated_mid_column_header() {
+        // 16-byte frame header present, but cut inside the 2 × 16-byte column
+        // headers (ncols=2 needs 48 bytes) → the per-column bounds check fires.
+        assert!(matches!(decode(&FIXTURE[..24]), Err(DecodeError::TooShort)));
+    }
+
+    #[test]
+    fn rejects_column_payload_out_of_bounds() {
+        // headers intact (48 bytes) but the payload they point at is gone → the
+        // slice guard fires instead of an out-of-bounds panic on untrusted bytes.
+        assert!(matches!(
+            decode(&FIXTURE[..48]),
+            Err(DecodeError::ColumnOutOfBounds { .. })
+        ));
+    }
+
+    #[test]
     fn every_payload_offset_is_16_byte_aligned() {
         // mirror of the clj-side invariant: columns DMA into GPU buffers without
         // realignment, so each payload offset must be 16-aligned.
