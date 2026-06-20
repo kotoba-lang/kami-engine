@@ -29,3 +29,5 @@ backend-wasmi    = ["dep:wasmi"]
 
 [dev-dependencies]
 hecs = { workspace = true }
+# Parse the EDN that `kami spec` emits, to round-trip-test the bb-pipeline contract.
+kami-scene = { path = "../kami-scene" }

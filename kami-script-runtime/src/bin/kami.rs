@@ -8,7 +8,7 @@
 //!   cargo run -p kami-script-runtime --bin kami -- targets
 //!   cargo run -p kami-script-runtime --bin kami -- plan ios
 
-use kami_script_runtime::{LogicHost, Target};
+use kami_script_runtime::Target;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -21,10 +21,10 @@ fn main() {
                     "{:<8} {:<6} {:<10} {:<8} {:<9} {:<8} {}",
                     t.tag(),
                     if s.jit_allowed { "yes" } else { "NO" },
-                    host_label(s.logic),
-                    tex_label(s.tex),
-                    render_label(s.render),
-                    input_label(s.input),
+                    s.logic.label(),
+                    s.tex.label(),
+                    s.render.label(),
+                    s.input.label(),
                     t.triple().unwrap_or("(NDA console SDK)"),
                 );
             }
@@ -53,30 +53,17 @@ fn main() {
 }
 
 fn print_spec(t: Target) {
-    let s = t.spec();
-    let q = |o: Option<&str>| o.map(|v| format!("\"{v}\"")).unwrap_or_else(|| "nil".into());
-    println!(
-        "{{:target \"{}\" :jit {} :host \"{}\" :feature {} :tex \"{}\" :render \"{}\" :input \"{}\" :triple {} :console-seam {}}}",
-        t.tag(),
-        s.jit_allowed,
-        host_label(s.logic),
-        q(s.host_feature()),
-        tex_label(s.tex),
-        render_label(s.render),
-        input_label(s.input),
-        q(t.triple()),
-        s.console_seam,
-    );
+    println!("{}", t.spec_edn()); // tested contract — see platform::tests
 }
 
 fn print_plan(t: Target) {
     let s = t.spec();
     println!("== kami plan: {} ==", t.tag());
     println!("  JIT allowed   : {}", s.jit_allowed);
-    println!("  logic host    : {}{}", host_label(s.logic), s.host_feature().map(|f| format!("  (feature: {f})")).unwrap_or_default());
-    println!("  texture       : {}", tex_label(s.tex));
-    println!("  render backend: {}{}", render_label(s.render), if s.console_seam { "  (NDA for_console_surface seam — out of repo)" } else { "" });
-    println!("  default input : {}", input_label(s.input));
+    println!("  logic host    : {}{}", s.logic.label(), s.host_feature().map(|f| format!("  (feature: {f})")).unwrap_or_default());
+    println!("  texture       : {}", s.tex.label());
+    println!("  render backend: {}{}", s.render.label(), if s.console_seam { "  (NDA for_console_surface seam — out of repo)" } else { "" });
+    println!("  default input : {}", s.input.label());
     println!();
     match (t.triple(), s.host_feature()) {
         (Some(triple), Some(feature)) => {
@@ -92,44 +79,11 @@ fn print_plan(t: Target) {
         }
         (None, _) => {
             println!("  build host: requires the {} console SDK toolchain (NDA, private repo).", t.tag());
-            println!("              logic = {} wasm; renderer = console seam.", host_label(s.logic));
+            println!("              logic = {} wasm; renderer = console seam.", s.logic.label());
         }
     }
 }
 
-fn host_label(h: LogicHost) -> &'static str {
-    match h {
-        LogicHost::BrowserWasm => "browser",
-        LogicHost::Wasmtime => "wasmtime",
-        LogicHost::Wasmi => "wasmi",
-    }
-}
-fn tex_label(t: kami_script_runtime::TexFmt) -> &'static str {
-    use kami_script_runtime::TexFmt::*;
-    match t {
-        Ktx2Auto => "ktx2-auto",
-        Ktx2Bcn => "ktx2-bcn",
-        Ktx2Astc => "ktx2-astc",
-    }
-}
-fn render_label(r: kami_script_runtime::RenderBackend) -> &'static str {
-    use kami_script_runtime::RenderBackend::*;
-    match r {
-        WebGpu => "webgpu",
-        Metal => "metal",
-        Vulkan => "vulkan",
-        Dx12 => "dx12",
-        Console => "console",
-    }
-}
-fn input_label(i: kami_script_runtime::InputDefault) -> &'static str {
-    use kami_script_runtime::InputDefault::*;
-    match i {
-        Keyboard => "keyboard",
-        Touch => "touch",
-        Gamepad => "gamepad",
-    }
-}
 fn tag_list() -> String {
     Target::all().iter().map(|t| t.tag()).collect::<Vec<_>>().join(" ")
 }

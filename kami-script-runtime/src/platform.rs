@@ -162,6 +162,69 @@ impl PlatformSpec {
     }
 }
 
+// Lowercase labels for CLI tables and the EDN spec — one definition (the `kami`
+// bin used to duplicate these).
+impl LogicHost {
+    pub fn label(self) -> &'static str {
+        match self {
+            LogicHost::BrowserWasm => "browser",
+            LogicHost::Wasmtime => "wasmtime",
+            LogicHost::Wasmi => "wasmi",
+        }
+    }
+}
+impl TexFmt {
+    pub fn label(self) -> &'static str {
+        match self {
+            TexFmt::Ktx2Auto => "ktx2-auto",
+            TexFmt::Ktx2Bcn => "ktx2-bcn",
+            TexFmt::Ktx2Astc => "ktx2-astc",
+        }
+    }
+}
+impl RenderBackend {
+    pub fn label(self) -> &'static str {
+        match self {
+            RenderBackend::WebGpu => "webgpu",
+            RenderBackend::Metal => "metal",
+            RenderBackend::Vulkan => "vulkan",
+            RenderBackend::Dx12 => "dx12",
+            RenderBackend::Console => "console",
+        }
+    }
+}
+impl InputDefault {
+    pub fn label(self) -> &'static str {
+        match self {
+            InputDefault::Keyboard => "keyboard",
+            InputDefault::Touch => "touch",
+            InputDefault::Gamepad => "gamepad",
+        }
+    }
+}
+
+impl Target {
+    /// The packaging decision as a machine-readable EDN map — the contract the
+    /// `bb kami` orchestration reads via `clojure.edn/read-string`. One source of
+    /// truth (not re-built by hand in the bin), and round-trip-tested below.
+    pub fn spec_edn(self) -> String {
+        let s = self.spec();
+        let q = |o: Option<&str>| o.map(|v| format!("\"{v}\"")).unwrap_or_else(|| "nil".into());
+        format!(
+            "{{:target \"{}\" :jit {} :host \"{}\" :feature {} :tex \"{}\" :render \"{}\" :input \"{}\" :triple {} :console-seam {}}}",
+            self.tag(),
+            s.jit_allowed,
+            s.logic.label(),
+            q(s.host_feature()),
+            s.tex.label(),
+            s.render.label(),
+            s.input.label(),
+            q(self.triple()),
+            s.console_seam,
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -225,5 +288,30 @@ mod tests {
             assert_eq!(Target::from_tag(t.tag()), Some(t));
         }
         assert_eq!(Target::from_tag("n64"), None);
+    }
+
+    #[test]
+    fn spec_edn_is_valid_and_matches_the_matrix() {
+        // The `bb kami` pipeline parses `kami spec <t>` as EDN; pin that contract:
+        // every target's spec_edn parses as a map whose fields equal the matrix.
+        for t in Target::all() {
+            let edn = t.spec_edn();
+            let m = kami_scene::root_map(&edn)
+                .unwrap_or_else(|| panic!("{} spec_edn is not a valid EDN map: {edn}", t.tag()));
+            let get = |k: &str| kami_scene::mget(&m, k);
+            let s = t.spec();
+            assert_eq!(get("target").and_then(|v| v.as_string()), Some(t.tag()));
+            assert_eq!(get("jit").and_then(|v| v.as_bool()), Some(s.jit_allowed));
+            assert_eq!(get("console-seam").and_then(|v| v.as_bool()), Some(s.console_seam));
+            assert_eq!(get("host").and_then(|v| v.as_string()), Some(s.logic.label()));
+            match s.host_feature() {
+                Some(f) => assert_eq!(get("feature").and_then(|v| v.as_string()), Some(f)),
+                None => assert!(get("feature").map_or(false, |v| v.is_nil()), "{} feature nil", t.tag()),
+            }
+            match t.triple() {
+                Some(tr) => assert_eq!(get("triple").and_then(|v| v.as_string()), Some(tr)),
+                None => assert!(get("triple").map_or(false, |v| v.is_nil()), "{} triple nil", t.tag()),
+            }
+        }
     }
 }
