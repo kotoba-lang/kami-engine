@@ -1556,6 +1556,30 @@ mod tests {
     }
 
     #[test]
+    fn lang_user_function_call_with_args() {
+        // User-defined fn calls (Expr::Call to a non-builtin) with multiple args +
+        // a return value — the core call ABI, exercised only indirectly before
+        // (the games' `(player)` is 0-arg). Verified on both backends.
+        assert_eq!(
+            run_init_count(
+                r#"(defn add3 [a b c] (+ a b c))
+                   (defn init [] (when (= (add3 2 3 5) 10) (spawn-entity "ok")))"#,
+                "ok",
+            ),
+            1
+        );
+        // a returned value composes into further arithmetic
+        assert_eq!(
+            run_init_count(
+                r#"(defn dbl [x] (* x 2))
+                   (defn init [] (when (= (dbl (dbl 3)) 12) (spawn-entity "ok")))"#,
+                "ok",
+            ),
+            1
+        );
+    }
+
+    #[test]
     fn count_tagged_via_world() {
         // spawn tags entities so count/query can see them.
         let w = world();
