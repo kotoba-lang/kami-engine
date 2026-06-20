@@ -1296,6 +1296,89 @@ mod tests {
         assert_eq!(eval_count("(let [m (map-make 4)] (map-put! m 1 1) (map-has? m 9))"), 0);
     }
 
+    /// Load + init a script and count entities tagged `tag`. Used by the host
+    /// robustness probes below — each spawns "ok" only if a host fn handled a
+    /// bad/edge input gracefully (returned the documented sentinel, no panic/trap).
+    fn run_init_count(src: &str, tag: &str) -> usize {
+        let w = world();
+        let mut rt = KamiScriptRuntime::new(w.clone()).unwrap();
+        rt.set_seed(7);
+        rt.load_clj("g", src).unwrap();
+        rt.call_init("g").unwrap();
+        let world = w.lock().unwrap();
+        let mut q = world.query::<&Tag>();
+        q.iter().filter(|(_, t)| t.0 == tag).count()
+    }
+
+    #[test]
+    fn host_despawn_then_read_is_zero() {
+        // get-x on a despawned entity returns 0.0 (no dangling-handle trap).
+        let n = run_init_count(
+            r#"(defn init []
+                  (let [e (spawn-entity "z")]
+                    (despawn-entity e)
+                    (when (= (get-x e) (f32 0.0)) (spawn-entity "ok"))))"#,
+            "ok",
+        );
+        assert_eq!(n, 1);
+    }
+
+    #[test]
+    fn host_unknown_entity_is_graceful() {
+        // get-x of a never-spawned id → 0.0; despawn of an unknown id → no-op.
+        let n = run_init_count(
+            r#"(defn init []
+                  (despawn-entity 999999)
+                  (when (= (get-x 999999) (f32 0.0)) (spawn-entity "ok")))"#,
+            "ok",
+        );
+        assert_eq!(n, 1, "unknown-entity reads/writes must not trap");
+    }
+
+    #[test]
+    fn host_move_toward_invalid_target_is_noop() {
+        // move-toward! with target -1 must not trap and must leave velocity at 0.
+        let w = world();
+        let mut rt = KamiScriptRuntime::new(w.clone()).unwrap();
+        let src = r#"(defn init []
+                       (let [e (spawn-entity "e")]
+                         (set-position! e (f32 5.0) (f32 0.0) (f32 0.0))
+                         (move-toward! e -1 (f32 50.0))))"#;
+        rt.load_clj("g", src).unwrap();
+        rt.call_init("g").unwrap(); // must not panic
+        let world = w.lock().unwrap();
+        let mut q = world.query::<(&Tag, &Velocity)>();
+        let (_, (_, v)) = q.iter().find(|(_, (t, _))| t.0 == "e").unwrap();
+        assert_eq!(v.0, [0.0, 0.0, 0.0], "invalid target → unchanged velocity");
+    }
+
+    #[test]
+    fn host_empty_queries_return_sentinels() {
+        // nearest of a tag with no entities → -1; count of an empty tag → 0.
+        let n = run_init_count(
+            r#"(defn init []
+                  (when (= (nearest-tagged "ghost" (f32 0.0) (f32 0.0) (f32 100.0)) -1)
+                    (spawn-entity "ok"))
+                  (when (= (count-tagged "none") 0) (spawn-entity "ok")))"#,
+            "ok",
+        );
+        assert_eq!(n, 2);
+    }
+
+    #[test]
+    fn host_rand_int_guards_nonpositive() {
+        // rand-int n returns 0 for n <= 0 (no divide-by-zero / modulo trap).
+        assert_eq!(
+            run_init_count(
+                r#"(defn init []
+                      (when (= (rand-int 0) 0) (spawn-entity "ok"))
+                      (when (= (rand-int -5) 0) (spawn-entity "ok")))"#,
+                "ok",
+            ),
+            2
+        );
+    }
+
     #[test]
     fn count_tagged_via_world() {
         // spawn tags entities so count/query can see them.
