@@ -51,9 +51,10 @@ struct Scene {
 }
 
 
-fn parse_scene(src: &str) -> Scene {
-    let forms = kotoba_edn::parse_all(src).expect("scene.edn must be valid EDN");
-    let root = forms.first().and_then(|f| f.as_map()).expect("scene.edn must be a map");
+/// Parse the scene; `None` (not a panic) if `src` isn't a valid EDN map.
+fn parse_scene(src: &str) -> Option<Scene> {
+    let parsed = kami_scene::root_map(src)?;
+    let root = &parsed;
 
     let world = mget(root, "world").and_then(|w| w.as_map());
     let wget = |k: &str| world.and_then(|w| mget(w, k));
@@ -78,7 +79,7 @@ fn parse_scene(src: &str) -> Scene {
     let burst = mget(root, "fx/burst").and_then(|b| b.as_map());
     let bget = |k: &str| burst.and_then(|b| mget(b, k));
 
-    Scene {
+    Some(Scene {
         title: mget(root, "game/title")
             .and_then(|t| t.as_string())
             .unwrap_or("kami-clj-play")
@@ -92,7 +93,15 @@ fn parse_scene(src: &str) -> Scene {
         burst_life: num(bget("life")),
         burst_color: vec3(bget("color")),
         burst_size: num(bget("size")),
-    }
+    })
+}
+
+/// Read a game file or exit with a clear message (no panic backtrace).
+fn read_or_exit(base: &std::path::Path, name: &str) -> String {
+    std::fs::read_to_string(base.join(name)).unwrap_or_else(|e| {
+        eprintln!("kami-clj-play: cannot read {}: {e}", base.join(name).display());
+        std::process::exit(1);
+    })
 }
 
 // ── Debug overlay: a 3×5 LED font drawn as little glowing discs ─────────────
@@ -784,9 +793,12 @@ fn game_dir() -> std::path::PathBuf {
 fn main() {
     // The game is data: load CLJ logic + Datomic-shaped scene from files.
     let base = game_dir();
-    let logic = std::fs::read_to_string(base.join("logic.clj")).expect("read logic.clj");
-    let scene_src = std::fs::read_to_string(base.join("scene.edn")).expect("read scene.edn");
-    let scene = parse_scene(&scene_src);
+    let logic = read_or_exit(&base, "logic.clj");
+    let scene_src = read_or_exit(&base, "scene.edn");
+    let scene = parse_scene(&scene_src).unwrap_or_else(|| {
+        eprintln!("kami-clj-play: {} is not a valid EDN scene map", base.join("scene.edn").display());
+        std::process::exit(2);
+    });
     println!(
         "kami-clj-play: loaded '{}' — logic.clj (CLJ→WASM, {BACKEND}) + scene.edn ({} render profiles).",
         scene.title,

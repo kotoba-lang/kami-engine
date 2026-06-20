@@ -64,9 +64,10 @@ struct Scene3 {
 }
 
 
-fn parse_scene(src: &str) -> Scene3 {
-    let forms = kotoba_edn::parse_all(src).expect("scene.edn must be valid EDN");
-    let root = forms.first().and_then(|f| f.as_map()).expect("scene.edn must be a map");
+/// Parse the scene; `None` (not a panic) if `src` isn't a valid EDN map.
+fn parse_scene(src: &str) -> Option<Scene3> {
+    let parsed = kami_scene::root_map(src)?;
+    let root = &parsed;
     let world = mget(root, "world").and_then(|w| w.as_map());
     let wget = |k: &str| world.and_then(|w| mget(w, k));
 
@@ -106,7 +107,7 @@ fn parse_scene(src: &str) -> Scene3 {
     let sky = mget(root, "render/sky").and_then(|s| s.as_map());
     let sget = |k: &str| sky.and_then(|s| mget(s, k));
 
-    Scene3 {
+    Some(Scene3 {
         title: mget(root, "game/title").and_then(|t| t.as_string()).unwrap_or("kami-clj-play3d").to_string(),
         player_speed: num(wget("player-speed")),
         camera_dist: num(wget("camera-dist")),
@@ -128,7 +129,15 @@ fn parse_scene(src: &str) -> Scene3 {
         sun_col: vec3(sget("sun")),
         fog: num(sget("fog")),
         ground_col: vec3(sget("ground")),
-    }
+    })
+}
+
+/// Read a game file or exit with a clear message (no panic backtrace).
+fn read_or_exit(base: &std::path::Path, name: &str) -> String {
+    std::fs::read_to_string(base.join(name)).unwrap_or_else(|e| {
+        eprintln!("kami-clj-play3d: cannot read {}: {e}", base.join(name).display());
+        std::process::exit(1);
+    })
 }
 
 // ── GPU types ───────────────────────────────────────────────────────────────
@@ -785,8 +794,11 @@ fn game_dir() -> std::path::PathBuf {
 
 fn main() {
     let base = game_dir();
-    let logic = std::fs::read_to_string(base.join("logic.clj")).expect("read logic.clj");
-    let scene = parse_scene(&std::fs::read_to_string(base.join("scene.edn")).expect("read scene.edn"));
+    let logic = read_or_exit(&base, "logic.clj");
+    let scene = parse_scene(&read_or_exit(&base, "scene.edn")).unwrap_or_else(|| {
+        eprintln!("kami-clj-play3d: {} is not a valid EDN scene map", base.join("scene.edn").display());
+        std::process::exit(2);
+    });
     println!("kami-clj-play3d: loaded '{}' (CLJ→WASM {BACKEND}, {} profiles).", scene.title, scene.profiles.len());
     let event_loop = EventLoop::new().expect("event loop");
     event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
