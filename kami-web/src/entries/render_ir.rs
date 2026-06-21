@@ -38,6 +38,8 @@ struct State {
     ibuf: wgpu::Buffer,
     idx: u32,
     gbuf: wgpu::Buffer,
+    inst_buf: wgpu::Buffer, // persistent, reused every frame (no per-frame alloc)
+    inst_cap: u32,
     bind: wgpu::BindGroup,
     w: u32,
     h: u32,
@@ -115,8 +117,10 @@ fn draw(st: &State, ir: &serde_json::Value) -> Result<(), JsValue> {
         sky: [sky_h[0], sky_h[1], sky_h[2], 1.0],
     };
     st.queue.write_buffer(&st.gbuf, 0, bytemuck::bytes_of(&globals));
-    let inst_buf = st.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("inst"), contents: bytemuck::cast_slice(&insts), usage: wgpu::BufferUsages::VERTEX });
+    // reuse the persistent instance buffer (cap-bounded) — no per-frame allocation
+    insts.truncate(st.inst_cap as usize);
+    st.queue.write_buffer(&st.inst_buf, 0, bytemuck::cast_slice(&insts));
+    let draw_n = insts.len() as u32;
 
     let frame = st.surface.get_current_texture().map_err(|e| JsValue::from_str(&format!("{e:?}")))?;
     let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
@@ -130,13 +134,13 @@ fn draw(st: &State, ir: &serde_json::Value) -> Result<(), JsValue> {
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                 view: &st.depth, depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Clear(1.0), store: wgpu::StoreOp::Store }), stencil_ops: None }),
             timestamp_writes: None, occlusion_query_set: None });
-        if !insts.is_empty() {
+        if draw_n > 0 {
             rp.set_pipeline(&st.pipeline);
             rp.set_bind_group(0, &st.bind, &[]);
             rp.set_vertex_buffer(0, st.vbuf.slice(..));
-            rp.set_vertex_buffer(1, inst_buf.slice(..));
+            rp.set_vertex_buffer(1, st.inst_buf.slice(..));
             rp.set_index_buffer(st.ibuf.slice(..), wgpu::IndexFormat::Uint16);
-            rp.draw_indexed(0..st.idx, 0, 0..insts.len() as u32);
+            rp.draw_indexed(0..st.idx, 0, 0..draw_n);
         }
     }
     st.queue.submit(Some(enc.finish()));
@@ -159,6 +163,10 @@ async fn ensure_init(canvas_id: &str) -> Result<(), JsValue> {
     let gbuf = device.create_buffer(&wgpu::BufferDescriptor {
         label: Some("g"), size: std::mem::size_of::<Globals>() as u64,
         usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST, mapped_at_creation: false });
+    let inst_cap = 16384u32;
+    let inst_buf = device.create_buffer(&wgpu::BufferDescriptor {
+        label: Some("inst"), size: (inst_cap as usize * std::mem::size_of::<Instance>()) as u64,
+        usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST, mapped_at_creation: false });
     let bgl = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
         label: None, entries: &[wgpu::BindGroupLayoutEntry {
             binding: 0, visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
@@ -192,18 +200,32 @@ async fn ensure_init(canvas_id: &str) -> Result<(), JsValue> {
         multisample: Default::default(), multiview: None, cache: None });
 
     STATE.with(|s| *s.borrow_mut() = Some(State {
-        device, queue, surface, format, depth, pipeline, vbuf, ibuf, idx: indices.len() as u32, gbuf, bind, w, h }));
+        device, queue, surface, format, depth, pipeline, vbuf, ibuf, idx: indices.len() as u32,
+        gbuf, inst_buf, inst_cap, bind, w, h }));
     Ok(())
 }
 
 /// Render-IR entry: init once, then draw the given frame. Call it every frame.
 #[wasm_bindgen]
 pub async fn run_with_render_ir(canvas_id: &str, ir_json: &str) -> Result<(), JsValue> {
-    ensure_init(canvas_id).await?;
+    render_ir_init(canvas_id).await?;
+    render_ir_draw(ir_json)
+}
+
+/// Set up wgpu once (async). Call before the per-frame draws.
+#[wasm_bindgen]
+pub async fn render_ir_init(canvas_id: &str) -> Result<(), JsValue> {
+    ensure_init(canvas_id).await
+}
+
+/// Draw one frame from a render-IR — **synchronous** (no async executor per frame, so
+/// a tight requestAnimationFrame loop can't re-enter the wasm allocator mid-flight).
+#[wasm_bindgen]
+pub fn render_ir_draw(ir_json: &str) -> Result<(), JsValue> {
     let ir: serde_json::Value = serde_json::from_str(ir_json).map_err(|e| JsValue::from_str(&e.to_string()))?;
     STATE.with(|s| {
         let b = s.borrow();
-        let st = b.as_ref().ok_or("renderer not initialised")?;
+        let st = b.as_ref().ok_or("renderer not initialised — call render_ir_init first")?;
         draw(st, &ir)
     })
 }
