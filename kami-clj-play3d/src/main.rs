@@ -153,6 +153,7 @@ struct Globals {
     ground_col: [f32; 4],
     params: [f32; 4],  // fog, time, res_w, res_h
     params2: [f32; 4], // storm_radius, _, _, _
+    light_vp: [[f32; 4]; 4],
 }
 
 #[repr(C)]
@@ -247,8 +248,40 @@ struct G {
   view_proj: mat4x4<f32>, cam_pos: vec4<f32>, sun_dir: vec4<f32>, sun_col: vec4<f32>,
   sky_zenith: vec4<f32>, sky_horizon: vec4<f32>, ground_col: vec4<f32>, params: vec4<f32>,
   params2: vec4<f32>,
+  light_vp: mat4x4<f32>,
 };
 @group(0) @binding(0) var<uniform> g: G;
+@group(1) @binding(0) var shadow_tex: texture_depth_2d;
+@group(1) @binding(1) var shadow_smp: sampler_comparison;
+
+// real cast shadow from the sun's depth map (3×3 PCF, slope bias).
+fn sun_shadow(wpos: vec3<f32>, ndl: f32) -> f32 {
+  let lp = g.light_vp * vec4<f32>(wpos, 1.0);
+  let proj = lp.xyz / lp.w;
+  let uv = vec2<f32>(proj.x * 0.5 + 0.5, proj.y * -0.5 + 0.5);
+  let bias = max(0.004 * (1.0 - ndl), 0.0010);
+  let texel = 1.0 / 2048.0;
+  var sh = 0.0;
+  for (var x = -1; x <= 1; x = x + 1) {
+    for (var y = -1; y <= 1; y = y + 1) {
+      let o = clamp(uv + vec2<f32>(f32(x), f32(y)) * texel, vec2<f32>(0.0), vec2<f32>(1.0));
+      sh = sh + textureSampleCompare(shadow_tex, shadow_smp, o, proj.z - bias);
+    }
+  }
+  let lit = mix(0.28, 1.0, sh / 9.0); // shadowed keeps ambient + a little fill
+  let inside = proj.z <= 1.0 && abs(proj.x) <= 1.0 && abs(proj.y) <= 1.0;
+  return select(1.0, lit, inside);
+}
+
+// depth-only pass from the light's POV (writes the shadow map).
+@vertex
+fn shadow_vs(@location(0) pos: vec3<f32>, @location(1) normal: vec3<f32>,
+             @location(2) m0: vec4<f32>, @location(3) m1: vec4<f32>,
+             @location(4) m2: vec4<f32>, @location(5) m3: vec4<f32>,
+             @location(6) color: vec4<f32>) -> @builtin(position) vec4<f32> {
+  let model = mat4x4<f32>(m0, m1, m2, m3);
+  return g.light_vp * model * vec4<f32>(pos, 1.0);
+}
 
 // ---- sky (fullscreen) ----
 @vertex
@@ -285,18 +318,39 @@ fn box_vs(@location(0) pos: vec3<f32>, @location(1) normal: vec3<f32>,
   o.color = color.rgb;
   return o;
 }
+const PI: f32 = 3.14159265;
+
+// Cook-Torrance PBR: GGX NDF + Smith G + Schlick Fresnel, sun + hemisphere ambient,
+// modulated by a real shadow-map term, then Reinhard tonemap + fog + storm.
 fn shade(wpos: vec3<f32>, n: vec3<f32>, base: vec3<f32>) -> vec3<f32> {
   let N = normalize(n);
   let L = normalize(-g.sun_dir.xyz);
   let V = normalize(g.cam_pos.xyz - wpos);
   let H = normalize(L + V);
-  let lambert = max(dot(N, L), 0.0);
-  let amb = mix(g.ground_col.rgb * 0.25, g.sky_zenith.rgb * 0.45, N.y * 0.5 + 0.5);
-  let spec = pow(max(dot(N, H), 0.0), 32.0) * 0.25 * lambert;
-  var col = base * (amb + lambert * g.sun_col.rgb * 0.85) + g.sun_col.rgb * spec;
+  let ndl = max(dot(N, L), 0.0);
+  let ndv = max(dot(N, V), 1e-3);
+  let ndh = max(dot(N, H), 0.0);
+  let vdh = max(dot(V, H), 0.0);
+  let rough = 0.55;
+  let metallic = 0.0;
+  let a = rough * rough;
+  let a2 = a * a;
+  let denom = ndh * ndh * (a2 - 1.0) + 1.0;
+  let ndf = a2 / (PI * denom * denom);
+  let k = (rough + 1.0) * (rough + 1.0) / 8.0;
+  let gg = (ndv / (ndv * (1.0 - k) + k)) * (ndl / (ndl * (1.0 - k) + k));
+  let f0 = mix(vec3<f32>(0.04), base, metallic);
+  let fr = f0 + (vec3<f32>(1.0) - f0) * pow(1.0 - vdh, 5.0);
+  let spec = (ndf * gg) * fr / max(4.0 * ndv * ndl, 1e-3);
+  let kd = (vec3<f32>(1.0) - fr) * (1.0 - metallic);
+  let shadow = sun_shadow(wpos, ndl);
+  let direct = (kd * base / PI + spec) * g.sun_col.rgb * 2.4 * ndl * shadow;
+  let amb = mix(g.ground_col.rgb * 0.3, g.sky_zenith.rgb * 0.6, N.y * 0.5 + 0.5) * base;
+  var col = amb + direct;
   let sd = length(wpos.xz);
   let storm = smoothstep(g.params2.x - 5.0, g.params2.x + 5.0, sd);
   col = mix(col, vec3<f32>(0.55, 0.25, 0.8), storm * 0.55);
+  col = col / (col + vec3<f32>(1.0)); // Reinhard tonemap (HDR → LDR)
   let dist = length(wpos - g.cam_pos.xyz);
   let fog = clamp(1.0 - exp(-dist * g.params.x), 0.0, 1.0);
   return mix(col, g.sky_horizon.rgb, fog);
@@ -337,6 +391,9 @@ struct Gpu {
     sky_pipeline: wgpu::RenderPipeline,
     ground_pipeline: wgpu::RenderPipeline,
     box_pipeline: wgpu::RenderPipeline,
+    shadow_pipeline: wgpu::RenderPipeline,
+    shadow_view: wgpu::TextureView,
+    shadow_bind: wgpu::BindGroup,
     globals_buf: wgpu::Buffer,
     bind: wgpu::BindGroup,
     vbuf: wgpu::Buffer,
@@ -537,6 +594,62 @@ impl App {
             bind_group_layouts: &[&bgl],
             push_constant_ranges: &[],
         });
+
+        // --- shadow map: sun depth texture + comparison sampler + bind group ---
+        let shadow_tex = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("shadow"),
+            size: wgpu::Extent3d { width: 2048, height: 2048, depth_or_array_layers: 1 },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Depth32Float,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::TEXTURE_BINDING,
+            view_formats: &[],
+        });
+        let shadow_view = shadow_tex.create_view(&wgpu::TextureViewDescriptor::default());
+        let shadow_smp = device.create_sampler(&wgpu::SamplerDescriptor {
+            label: Some("shadow-cmp"),
+            compare: Some(wgpu::CompareFunction::LessEqual),
+            mag_filter: wgpu::FilterMode::Linear,
+            min_filter: wgpu::FilterMode::Linear,
+            ..Default::default()
+        });
+        let shadow_bgl = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            label: Some("shadow-bgl"),
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        sample_type: wgpu::TextureSampleType::Depth,
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        multisampled: false,
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Comparison),
+                    count: None,
+                },
+            ],
+        });
+        let shadow_bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: Some("shadow-bind"),
+            layout: &shadow_bgl,
+            entries: &[
+                wgpu::BindGroupEntry { binding: 0, resource: wgpu::BindingResource::TextureView(&shadow_view) },
+                wgpu::BindGroupEntry { binding: 1, resource: wgpu::BindingResource::Sampler(&shadow_smp) },
+            ],
+        });
+        // box/ground sample the shadow map → they use a 2-group layout.
+        let pl_lit = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: Some("pl-lit"),
+            bind_group_layouts: &[&bgl, &shadow_bgl],
+            push_constant_ranges: &[],
+        });
+
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("kami3d"),
             source: wgpu::ShaderSource::Wgsl(SHADER.into()),
@@ -563,7 +676,7 @@ impl App {
         });
         let ground_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("ground"),
-            layout: Some(&pl),
+            layout: Some(&pl_lit),
             vertex: wgpu::VertexState { module: &shader, entry_point: Some("ground_vs"), buffers: &[], compilation_options: Default::default() },
             fragment: Some(wgpu::FragmentState { module: &shader, entry_point: Some("ground_fs"), targets: &[Some(config.format.into())], compilation_options: Default::default() }),
             primitive: wgpu::PrimitiveState::default(),
@@ -592,11 +705,24 @@ impl App {
                 wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 64, shader_location: 6 },
             ],
         };
+        let vbuffers = [vbl, ibl];
         let box_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("box"),
-            layout: Some(&pl),
-            vertex: wgpu::VertexState { module: &shader, entry_point: Some("box_vs"), buffers: &[vbl, ibl], compilation_options: Default::default() },
+            layout: Some(&pl_lit),
+            vertex: wgpu::VertexState { module: &shader, entry_point: Some("box_vs"), buffers: &vbuffers, compilation_options: Default::default() },
             fragment: Some(wgpu::FragmentState { module: &shader, entry_point: Some("box_fs"), targets: &[Some(config.format.into())], compilation_options: Default::default() }),
+            primitive: wgpu::PrimitiveState { cull_mode: Some(wgpu::Face::Back), ..Default::default() },
+            depth_stencil: Some(depth_state(true, wgpu::CompareFunction::LessEqual)),
+            multisample: wgpu::MultisampleState::default(),
+            multiview: None,
+            cache: None,
+        });
+        // depth-only pass writing the sun shadow map (reuses the cube + instances).
+        let shadow_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("shadow"),
+            layout: Some(&pl),
+            vertex: wgpu::VertexState { module: &shader, entry_point: Some("shadow_vs"), buffers: &vbuffers, compilation_options: Default::default() },
+            fragment: None,
             primitive: wgpu::PrimitiveState { cull_mode: Some(wgpu::Face::Back), ..Default::default() },
             depth_stencil: Some(depth_state(true, wgpu::CompareFunction::LessEqual)),
             multisample: wgpu::MultisampleState::default(),
@@ -618,6 +744,7 @@ impl App {
 
         self.gpu = Some(Gpu {
             device, queue, surface, config, depth, sky_pipeline, ground_pipeline, box_pipeline,
+            shadow_pipeline, shadow_view, shadow_bind,
             globals_buf, bind, vbuf, ibuf, index_count: indices.len() as u32, instance_buf, instance_cap,
         });
     }
@@ -751,6 +878,12 @@ impl App {
         let view = Mat4::look_at_rh(cam, target, Vec3::Y);
         let vp = proj * view;
 
+        // sun shadow frustum: orthographic, centred on the player's ground spot.
+        let sun = Vec3::new(self.scene.sun_dir[0], self.scene.sun_dir[1], self.scene.sun_dir[2]).normalize();
+        let s_center = Vec3::new(pw.x, 0.0, pw.z);
+        let light_vp = Mat4::orthographic_rh(-45.0, 45.0, -45.0, 45.0, 1.0, 200.0)
+            * Mat4::look_at_rh(s_center - sun * 80.0, s_center, Vec3::Y);
+
         // --- build instance list: static props + built walls + entities + particles ---
         let mut inst = self.props.clone();
         inst.extend(self.walls.iter().cloned());
@@ -791,6 +924,7 @@ impl App {
             ground_col: [sky.ground_col[0], sky.ground_col[1], sky.ground_col[2], 1.0],
             params: [sky.fog, self.time, gpu.config.width as f32, gpu.config.height as f32],
             params2: [self.storm_radius, 0.0, 0.0, 0.0],
+            light_vp: light_vp.to_cols_array_2d(),
         };
         gpu.queue.write_buffer(&gpu.globals_buf, 0, bytemuck::bytes_of(&globals));
         gpu.queue.write_buffer(&gpu.instance_buf, 0, bytemuck::cast_slice(&inst[..count as usize]));
@@ -804,6 +938,29 @@ impl App {
         };
         let v = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
         let mut enc = gpu.device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: Some("enc") });
+        // --- pass 1: render the scene depth from the sun into the shadow map ---
+        {
+            let mut sp = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("shadow"),
+                color_attachments: &[],
+                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                    view: &gpu.shadow_view,
+                    depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Clear(1.0), store: wgpu::StoreOp::Store }),
+                    stencil_ops: None,
+                }),
+                timestamp_writes: None,
+                occlusion_query_set: None,
+            });
+            if count > 0 {
+                sp.set_pipeline(&gpu.shadow_pipeline);
+                sp.set_bind_group(0, &gpu.bind, &[]);
+                sp.set_vertex_buffer(0, gpu.vbuf.slice(..));
+                sp.set_vertex_buffer(1, gpu.instance_buf.slice(..));
+                sp.set_index_buffer(gpu.ibuf.slice(..), wgpu::IndexFormat::Uint16);
+                sp.draw_indexed(0..gpu.index_count, 0, 0..count);
+            }
+        }
+        // --- pass 2: the lit scene, sampling the shadow map ---
         {
             let mut rp = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("scene"),
@@ -824,6 +981,7 @@ impl App {
             rp.set_pipeline(&gpu.sky_pipeline);
             rp.draw(0..3, 0..1);
             rp.set_pipeline(&gpu.ground_pipeline);
+            rp.set_bind_group(1, &gpu.shadow_bind, &[]); // shadow map (ground + box use it)
             rp.draw(0..6, 0..1);
             if count > 0 {
                 rp.set_pipeline(&gpu.box_pipeline);
