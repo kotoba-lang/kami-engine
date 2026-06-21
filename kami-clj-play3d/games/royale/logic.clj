@@ -10,6 +10,8 @@
 (def bot-speed   (f32 60.0))
 (def hunt-range  (f32 900.0))
 (def ring        (f32 700.0))
+(def fire-every   12)            ;; ticks between auto-fire shots
+(def weapon-range (f32 340.0))   ;; auto-fire reach (ground units)
 
 (defn player []
   (nearest-tagged "player" (f32 0.0) (f32 0.0) (f32 9000000.0)))
@@ -43,3 +45,13 @@
         (let [near (nearest-tagged "player" (get-x e) (get-y e) hunt-range)]
           (when (not= near -1)
             (move-toward! e near bot-speed)))))))
+
+;; auto-fire: on the fire cadence, cull the nearest bot within weapon range.
+;; The host renders the hit (particle burst) by watching for bots that vanish.
+(defsystem weapon [dt]
+  (let [p (player)]
+    (when (not= p -1)
+      (when (zero? (mod (tick-n) fire-every))
+        (let [hit (nearest-tagged "bot" (get-x p) (get-y p) weapon-range)]
+          (when (not= hit -1)
+            (despawn-entity hit)))))))

@@ -196,6 +196,23 @@ fn model_box(base: Vec3, w: f32, h: f32) -> [[f32; 4]; 4] {
         .to_cols_array_2d()
 }
 
+/// A thin wall panel (width `w`, height `h`, thin `depth`) yawed to face the
+/// builder, base on the ground at `base` — the Fortnite-style build piece.
+fn model_wall(base: Vec3, yaw: f32, w: f32, h: f32, depth: f32) -> [[f32; 4]; 4] {
+    (Mat4::from_translation(base + Vec3::new(0.0, h * 0.5, 0.0))
+        * Mat4::from_rotation_y(yaw)
+        * Mat4::from_scale(Vec3::new(w, h, depth)))
+    .to_cols_array_2d()
+}
+
+/// A short-lived hit/impact particle (host CPU), drawn as a small glowing cube.
+struct Particle3 {
+    pos: Vec3,
+    vel: Vec3,
+    age: f32,
+    life: f32,
+}
+
 const SHADER: &str = r#"
 struct G {
   view_proj: mat4x4<f32>, cam_pos: vec4<f32>, sun_dir: vec4<f32>, sun_col: vec4<f32>,
@@ -324,15 +341,15 @@ impl Game {
         self.rt.call_systems("game", 16).expect("systems");
         self.rt.integrate(16);
     }
-    fn snapshot(&self) -> ([f32; 2], Vec<(String, [f32; 2])>) {
+    fn snapshot(&self) -> ([f32; 2], Vec<(String, [f32; 2], u32)>) {
         let w = self.world.lock().unwrap();
         let mut player = [0.0, 0.0];
         let mut out = Vec::new();
-        for (_, (t, p)) in w.query::<(&Tag, &Position)>().iter() {
+        for (e, (t, p)) in w.query::<(&Tag, &Position)>().iter() {
             if t.0 == "player" {
                 player = [p.0[0], p.0[1]];
             }
-            out.push((t.0.clone(), [p.0[0], p.0[1]]));
+            out.push((t.0.clone(), [p.0[0], p.0[1]], e.id()));
         }
         (player, out)
     }
@@ -366,6 +383,12 @@ struct App {
     scene: Scene3,
     keys: Keys,
     props: Vec<Instance>, // static world dressing
+    walls: Vec<Instance>, // player-built wall pieces
+    particles: Vec<Particle3>,
+    prev_bots: HashMap<u32, Vec3>, // for hit-burst detection
+    score: u32,
+    build_pressed: bool,
+    rng: u32,
     cam_yaw: f32,
     cam_pitch: f32,
     jump_v: f32,
@@ -386,6 +409,12 @@ impl App {
             scene,
             keys: Keys::default(),
             props,
+            walls: Vec::new(),
+            particles: Vec::new(),
+            prev_bots: HashMap::new(),
+            score: 0,
+            build_pressed: false,
+            rng: 0x1357_2468,
             cam_yaw: 0.6,
             cam_pitch: 0.5,
             jump_v: 0.0,
@@ -551,6 +580,16 @@ impl App {
         });
     }
 
+    /// xorshift → [0,1) for hit-particle scatter.
+    fn rng_next(&mut self) -> f32 {
+        let mut x = self.rng;
+        x ^= x << 13;
+        x ^= x >> 17;
+        x ^= x << 5;
+        self.rng = x;
+        x as f32 / u32::MAX as f32
+    }
+
     fn frame(&mut self) {
         self.time += 0.016;
         let now = Instant::now();
@@ -590,6 +629,55 @@ impl App {
         let gs = self.scene.ground_scale;
         let pw = Vec3::new(player[0] * gs, self.height, player[1] * gs);
 
+        // --- shooting feedback: the CLJ weapon despawns bots; burst where one vanished ---
+        let cur_bots: HashMap<u32, Vec3> = ents
+            .iter()
+            .filter(|(t, _, _)| t == "bot")
+            .map(|(_, p, id)| (*id, Vec3::new(p[0] * gs, 0.0, p[1] * gs)))
+            .collect();
+        let kills: Vec<Vec3> = self
+            .prev_bots
+            .iter()
+            .filter(|(id, _)| !cur_bots.contains_key(id))
+            .map(|(_, p)| *p)
+            .collect();
+        for kpos in kills {
+            self.score += 1;
+            for _ in 0..14 {
+                let vx = (self.rng_next() * 2.0 - 1.0) * 4.0;
+                let vy = self.rng_next() * 5.0 + 1.0;
+                let vz = (self.rng_next() * 2.0 - 1.0) * 4.0;
+                let life = 0.5 + self.rng_next() * 0.4;
+                self.particles.push(Particle3 {
+                    pos: kpos + Vec3::new(0.0, 1.0, 0.0),
+                    vel: Vec3::new(vx, vy, vz),
+                    age: 0.0,
+                    life,
+                });
+            }
+        }
+        self.prev_bots = cur_bots;
+
+        // --- building: place a wall in front of the player on B ---
+        if self.build_pressed {
+            self.build_pressed = false;
+            let fwd = Vec3::new(-sy, 0.0, -cy); // camera-forward on the ground
+            let base = Vec3::new(player[0] * gs, 0.0, player[1] * gs) + fwd * 5.0;
+            self.walls.push(Instance {
+                model: model_wall(base, self.cam_yaw, 5.0, 4.0, 0.4),
+                color: [0.74, 0.62, 0.44, 1.0], // wood
+            });
+        }
+
+        // --- advance hit particles (gravity + fade) ---
+        let dt_p = 0.016;
+        for p in &mut self.particles {
+            p.age += dt_p;
+            p.vel.y -= 14.0 * dt_p;
+            p.pos += p.vel * dt_p;
+        }
+        self.particles.retain(|p| p.age < p.life);
+
         // --- camera follow ---
         let target = pw + Vec3::new(0.0, self.scene.camera_height * 0.5, 0.0);
         let (spi, cpi) = self.cam_pitch.sin_cos();
@@ -602,9 +690,10 @@ impl App {
         let view = Mat4::look_at_rh(cam, target, Vec3::Y);
         let vp = proj * view;
 
-        // --- build instance list: static props + entities ---
+        // --- build instance list: static props + built walls + entities + particles ---
         let mut inst = self.props.clone();
-        for (tag, pos) in &ents {
+        inst.extend(self.walls.iter().cloned());
+        for (tag, pos, _) in &ents {
             if let Some(p) = self.scene.profiles.get(tag) {
                 let h = if tag == "player" { self.height } else { 0.0 };
                 let base = Vec3::new(pos[0] * gs, h, pos[1] * gs);
@@ -613,6 +702,14 @@ impl App {
                 let head = Vec3::new(pos[0] * gs, h + p.h, pos[1] * gs);
                 inst.push(Instance { model: model_box(head, p.w * 0.6, p.w * 0.6), color: [p.color[0] * 1.1, p.color[1] * 1.1, p.color[2] * 1.1, 1.0] });
             }
+        }
+        // hit particles: small bright cubes that fade as they age
+        for p in &self.particles {
+            let f = 1.0 - p.age / p.life;
+            inst.push(Instance {
+                model: model_box(p.pos, 0.25 * f + 0.05, 0.25 * f + 0.05),
+                color: [1.0, 0.55 + 0.35 * f, 0.2, 1.0],
+            });
         }
         let count = inst.len().min(gpu.instance_cap as usize) as u32;
 
@@ -678,10 +775,14 @@ impl App {
 
         self.frames += 1;
         if self.frames % 120 == 0 {
-            println!("perf[{BACKEND}]: {:.0} fps · bots {}", self.fps, ents.iter().filter(|(t, _)| t == "bot").count());
+            println!("perf[{BACKEND}]: {:.0} fps · bots {} · kills {}", self.fps, ents.iter().filter(|(t, _, _)| t == "bot").count(), self.score);
         }
         if let Some(w) = self.window.as_ref() {
-            w.set_title(&format!("{} · {:.0} fps · {} bots", self.scene.title, self.fps, ents.iter().filter(|(t, _)| t == "bot").count()));
+            w.set_title(&format!(
+                "{} · {:.0} fps · kills {} · {} bots · [B] build",
+                self.scene.title, self.fps, self.score,
+                ents.iter().filter(|(t, _, _)| t == "bot").count()
+            ));
         }
     }
 }
@@ -755,6 +856,7 @@ impl ApplicationHandler for App {
                             self.jump_v = self.scene.jump;
                         }
                     }
+                    PhysicalKey::Code(KeyCode::KeyB) if down => self.build_pressed = true,
                     PhysicalKey::Code(KeyCode::KeyW) => self.keys.w = down,
                     PhysicalKey::Code(KeyCode::KeyA) => self.keys.a = down,
                     PhysicalKey::Code(KeyCode::KeyS) => self.keys.s = down,
