@@ -11,3 +11,5 @@
 //! `run_with_character`/`run_embed_vrm`) migrate here as they are touched.
 
 pub mod quarry_walk;
+
+pub mod render_ir;
