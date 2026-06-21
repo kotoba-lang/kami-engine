@@ -295,6 +295,25 @@ struct Item {
     kind: Loot,
 }
 
+/// Native synth audio (no asset files) — short decaying sine blips per event.
+struct Audio {
+    _stream: rodio::OutputStream,
+    handle: rodio::OutputStreamHandle,
+}
+impl Audio {
+    fn new() -> Option<Self> {
+        let (s, h) = rodio::OutputStream::try_default().ok()?;
+        Some(Audio { _stream: s, handle: h })
+    }
+    fn blip(&self, freq: f32, ms: u64, amp: f32) {
+        use rodio::Source;
+        let src = rodio::source::SineWave::new(freq)
+            .take_duration(std::time::Duration::from_millis(ms))
+            .amplify(amp);
+        let _ = self.handle.play_raw(src);
+    }
+}
+
 /// Append a blocky humanoid (legs/torso/arms/head/visor) to `inst`, standing on
 /// `ground`, facing `yaw`, with a walk cycle when `moving`. Stylized boxes — no
 /// skinned mesh, but reads as a character with motion.
@@ -701,6 +720,11 @@ struct App {
     reload_t: u32, // frames left in a reload (0 = ready)
     bot_hp: HashMap<u32, u32>,
     items: Vec<Item>, // building loot
+    gilrs: Option<gilrs::Gilrs>,
+    active_pad: Option<gilrs::GamepadId>,
+    pad_move: glam::Vec2,
+    pad_look: glam::Vec2,
+    audio: Option<Audio>,
     hp: f32,
     lives: u32,
     prev_bots: HashMap<u32, Vec3>, // for hit-burst detection
@@ -753,6 +777,11 @@ impl App {
             reload_t: 0,
             bot_hp: HashMap::new(),
             items,
+            gilrs: gilrs::Gilrs::new().ok(),
+            active_pad: None,
+            pad_move: glam::Vec2::ZERO,
+            pad_look: glam::Vec2::ZERO,
+            audio: Audio::new(),
             hp: 100.0,
             lives: 3,
             prev_bots: HashMap::new(),
@@ -1055,6 +1084,67 @@ impl App {
         self.weapon = w;
         self.ammo = w.ammo_spec().0;
         self.reload_t = 0;
+        self.sfx(660.0, 50, 0.15);
+    }
+
+    /// Play a synth blip if audio is available.
+    fn sfx(&self, freq: f32, ms: u64, amp: f32) {
+        if let Some(a) = &self.audio {
+            a.blip(freq, ms, amp);
+        }
+    }
+
+    /// Poll the gamepad: drain events (buttons), read sticks → pad_move/pad_look,
+    /// apply right-stick camera look. PS5/Xbox pads work via gilrs (HID/XInput).
+    fn poll_pad(&mut self, dt: f32) {
+        use gilrs::{Axis, Button, EventType};
+        let mut events = Vec::new();
+        if let Some(g) = self.gilrs.as_mut() {
+            while let Some(ev) = g.next_event() {
+                events.push(ev);
+            }
+        }
+        for ev in events {
+            self.active_pad = Some(ev.id);
+            if let EventType::ButtonPressed(btn, _) = ev.event {
+                match btn {
+                    Button::South => {
+                        if self.phase == Phase::Playing && self.height <= 0.0 {
+                            self.jump_v = self.scene.jump;
+                            self.sfx(160.0, 120, 0.18);
+                        }
+                    }
+                    Button::East => self.build_pressed = true,
+                    Button::West => {
+                        let (mag, rf) = self.weapon.ammo_spec();
+                        if self.reload_t == 0 && self.ammo < mag && self.reserve > 0 {
+                            self.reload_t = rf;
+                            self.sfx(330.0, 60, 0.15);
+                        }
+                    }
+                    Button::North => {
+                        let next = match self.weapon {
+                            Weapon::Pistol => Weapon::Rifle,
+                            Weapon::Rifle => Weapon::Shotgun,
+                            Weapon::Shotgun => Weapon::Pistol,
+                        };
+                        self.set_weapon(next);
+                    }
+                    _ => {}
+                }
+            }
+        }
+        let dz = |x: f32, y: f32| {
+            let v = glam::vec2(x, y);
+            if v.length() < 0.18 { glam::Vec2::ZERO } else { v }
+        };
+        if let (Some(g), Some(id)) = (self.gilrs.as_ref(), self.active_pad) {
+            let gp = g.gamepad(id);
+            self.pad_move = dz(gp.value(Axis::LeftStickX), gp.value(Axis::LeftStickY));
+            self.pad_look = dz(gp.value(Axis::RightStickX), gp.value(Axis::RightStickY));
+        }
+        self.cam_yaw += self.pad_look.x * 2.2 * dt;
+        self.cam_pitch = (self.cam_pitch - self.pad_look.y * 1.6 * dt).clamp(0.1, 1.3);
     }
 
     /// xorshift → [0,1) for hit-particle scatter.
@@ -1076,14 +1166,15 @@ impl App {
         }
         self.last = Some(now);
 
-        // --- camera orbit from arrows ---
+        // --- camera orbit from arrows + right stick ---
         let dt = 0.016;
         if self.keys.left { self.cam_yaw -= 1.6 * dt; }
         if self.keys.right { self.cam_yaw += 1.6 * dt; }
         if self.keys.up { self.cam_pitch = (self.cam_pitch + 1.2 * dt).min(1.3); }
         if self.keys.down { self.cam_pitch = (self.cam_pitch - 1.2 * dt).max(0.1); }
+        self.poll_pad(dt); // gamepad: sticks + buttons (also nudges cam_yaw/pitch)
 
-        // --- camera-relative ground movement → feed CLJ ---
+        // --- camera-relative ground movement → feed CLJ (keyboard + left stick) ---
         let (sy, cy) = self.cam_yaw.sin_cos();
         // forward = direction the camera looks, on the ground (toward target)
         let fwd = glam::Vec2::new(-sy, -cy);
@@ -1093,6 +1184,7 @@ impl App {
         if self.keys.s { mv -= fwd; }
         if self.keys.d { mv += right; }
         if self.keys.a { mv -= right; }
+        mv += fwd * self.pad_move.y + right * self.pad_move.x; // left stick
         if mv.length_squared() > 0.0 { mv = mv.normalize(); }
         let player_moving = mv.length_squared() > 0.0;
         if player_moving {
@@ -1111,6 +1203,7 @@ impl App {
                     self.height = 0.0;
                     self.jump_v = 0.0;
                     self.phase = Phase::Playing; // touchdown → fight
+                    self.sfx(140.0, 200, 0.22); // landing thud
                 }
             }
             Phase::Playing => {
@@ -1140,6 +1233,7 @@ impl App {
             .collect();
         for kpos in kills {
             self.score += 1;
+            self.sfx(880.0, 90, 0.18); // kill confirm
             for _ in 0..14 {
                 let vx = (self.rng_next() * 2.0 - 1.0) * 4.0;
                 let vy = self.rng_next() * 5.0 + 1.0;
@@ -1206,6 +1300,7 @@ impl App {
                 }
             } else if self.ammo == 0 && self.reserve > 0 {
                 self.reload_t = reload_frames; // auto-reload when the magazine runs dry
+                self.sfx(330.0, 60, 0.15);
             }
         }
         let can_fire = self.phase == Phase::Playing && self.reload_t == 0 && self.ammo > 0;
@@ -1232,6 +1327,8 @@ impl App {
                     self.bullets.push(Bullet { pos: chest, vel: dir * 48.0, life: 0.8 });
                 }
                 self.ammo -= 1; // one trigger pull = one round (shotgun pellets included)
+                let fhz = match self.weapon { Weapon::Pistol => 520.0, Weapon::Rifle => 700.0, Weapon::Shotgun => 300.0 };
+                self.sfx(fhz, 28, 0.09); // muzzle blip
             }
         }
         for b in &mut self.bullets {
@@ -1306,6 +1403,7 @@ impl App {
         }
         for &i in picked.iter().rev() {
             let it = self.items.remove(i);
+            self.sfx(988.0, 80, 0.18); // pickup
             match it.kind {
                 Loot::Health => self.hp = 100.0,
                 Loot::Rifle => {
