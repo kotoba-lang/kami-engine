@@ -326,10 +326,10 @@ fn make_building(c: Vec3, room: f32, h: f32, color: [f32; 3], inst: &mut Vec<Ins
          glam::vec2(cx + half - seg, cz - half - th * 0.5), glam::vec2(cx + half, cz - half + th * 0.5));
     // roof (no collision; player can't reach it)
     inst.push(Instance { model: model_box(Vec3::new(cx, h, cz), room, th), color: [color[0] * 0.85, color[1] * 0.85, color[2] * 0.85, 1.0] });
-    // window insets on the north + south facades (detail)
+    // lit window insets on the north + south facades (alpha 0.0 = emissive sentinel)
     let win = |cyx: f32, cyy: f32, cyz: f32, w: f32, hh: f32, d: f32| {
         let m = Mat4::from_translation(Vec3::new(cyx, cyy, cyz)) * Mat4::from_scale(Vec3::new(w, hh, d));
-        Instance { model: m.to_cols_array_2d(), color: [0.12, 0.15, 0.22, 1.0] }
+        Instance { model: m.to_cols_array_2d(), color: [1.0, 0.85, 0.5, 0.0] }
     };
     inst.push(win(cx, h * 0.55, cz + half + 0.07, room * 0.34, h * 0.34, 0.14));
     inst.push(win(cx, h * 0.55, cz - half - 0.07, room * 0.34, h * 0.34, 0.14));
@@ -416,7 +416,7 @@ struct VO {
   @builtin(position) clip: vec4<f32>,
   @location(0) wpos: vec3<f32>,
   @location(1) wnormal: vec3<f32>,
-  @location(2) color: vec3<f32>,
+  @location(2) color: vec4<f32>,
 };
 @vertex
 fn box_vs(@location(0) pos: vec3<f32>, @location(1) normal: vec3<f32>,
@@ -429,7 +429,7 @@ fn box_vs(@location(0) pos: vec3<f32>, @location(1) normal: vec3<f32>,
   o.clip = g.view_proj * world;
   o.wpos = world.xyz;
   o.wnormal = normalize((model * vec4<f32>(normal, 0.0)).xyz);
-  o.color = color.rgb;
+  o.color = color;
   return o;
 }
 const PI: f32 = 3.14159265;
@@ -471,7 +471,14 @@ fn shade(wpos: vec3<f32>, n: vec3<f32>, base: vec3<f32>) -> vec3<f32> {
 }
 @fragment
 fn box_fs(i: VO) -> @location(0) vec4<f32> {
-  return vec4<f32>(shade(i.wpos, i.wnormal, i.color), 1.0);
+  // subtle material grain so flat faces read as a surface, not plastic
+  let grain = (fract(sin(dot(floor(i.wpos.xz * 3.0 + i.wpos.y * 3.0), vec2<f32>(12.99, 78.23))) * 43758.5) - 0.5) * 0.06;
+  let lit = shade(i.wpos, i.wnormal, i.color.rgb * (1.0 + grain)); // always run → shadow sample stays uniform
+  // emissive sentinel (alpha < 0.5): lit windows / glowing elements
+  let dist = length(i.wpos - g.cam_pos.xyz);
+  let fog = clamp(1.0 - exp(-dist * g.params.x), 0.0, 1.0);
+  let emis = mix(i.color.rgb * 1.7, g.sky_horizon.rgb, fog);
+  return vec4<f32>(select(lit, emis, i.color.a < 0.5), 1.0);
 }
 
 // ---- ground (big quad with grid) ----
@@ -484,15 +491,49 @@ fn ground_vs(@builtin(vertex_index) vi: u32) -> VO {
   let world = vec3<f32>(q[vi].x * s, 0.0, q[vi].y * s);
   var o: VO;
   o.clip = g.view_proj * vec4<f32>(world, 1.0);
-  o.wpos = world; o.wnormal = vec3<f32>(0.0,1.0,0.0); o.color = g.ground_col.rgb;
+  o.wpos = world; o.wnormal = vec3<f32>(0.0,1.0,0.0); o.color = vec4<f32>(g.ground_col.rgb, 1.0);
   return o;
 }
 @fragment
 fn ground_fs(i: VO) -> @location(0) vec4<f32> {
   let gp = abs(fract(i.wpos.xz / 4.0) - 0.5);
   let line = smoothstep(0.47, 0.5, max(gp.x, gp.y));
-  let base = mix(i.color, i.color * 1.25, line);
+  let base = mix(i.color.rgb, i.color.rgb * 1.25, line);
   return vec4<f32>(shade(i.wpos, i.wnormal, base), 1.0);
+}
+
+// ---- water (animated lake) ----
+@vertex
+fn water_vs(@builtin(vertex_index) vi: u32) -> VO {
+  var q = array<vec2<f32>,6>(
+    vec2<f32>(-1.0,-1.0), vec2<f32>(1.0,-1.0), vec2<f32>(1.0,1.0),
+    vec2<f32>(-1.0,-1.0), vec2<f32>(1.0,1.0), vec2<f32>(-1.0,1.0));
+  let cx = -22.0; let cz = 14.0; let hf = 12.0; let lvl = 0.35;
+  var world = vec3<f32>(cx + q[vi].x * hf, lvl, cz + q[vi].y * hf);
+  let t = g.params.y;
+  world.y += sin(world.x * 0.5 + t * 1.6) * 0.18 + cos(world.z * 0.6 + t * 1.3) * 0.15;
+  var o: VO;
+  o.clip = g.view_proj * vec4<f32>(world, 1.0);
+  o.wpos = world; o.wnormal = vec3<f32>(0.0, 1.0, 0.0); o.color = vec4<f32>(0.05, 0.2, 0.3, 1.0);
+  return o;
+}
+@fragment
+fn water_fs(i: VO) -> @location(0) vec4<f32> {
+  let t = g.params.y;
+  let nx = cos(i.wpos.x * 0.5 + t * 1.6) * 0.25 + sin(i.wpos.x * 1.3 + t * 2.1) * 0.12;
+  let nz = -sin(i.wpos.z * 0.6 + t * 1.3) * 0.25 + cos(i.wpos.z * 1.1 + t * 1.7) * 0.12;
+  let N = normalize(vec3<f32>(-nx, 1.0, -nz));
+  let V = normalize(g.cam_pos.xyz - i.wpos);
+  let fres = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+  let deep = vec3<f32>(0.04, 0.16, 0.26);
+  let sky = mix(g.sky_horizon.rgb, g.sky_zenith.rgb, 0.5);
+  var col = mix(deep, sky, clamp(fres * 0.85 + 0.08, 0.0, 1.0));
+  let L = normalize(-g.sun_dir.xyz);
+  let H = normalize(L + V);
+  col += g.sun_col.rgb * pow(max(dot(N, H), 0.0), 120.0) * 1.6;
+  let dist = length(i.wpos - g.cam_pos.xyz);
+  let fog = clamp(1.0 - exp(-dist * g.params.x), 0.0, 1.0);
+  return vec4<f32>(mix(col, g.sky_horizon.rgb, fog), 1.0);
 }
 "#;
 
@@ -504,6 +545,7 @@ struct Gpu {
     depth: wgpu::TextureView,
     sky_pipeline: wgpu::RenderPipeline,
     ground_pipeline: wgpu::RenderPipeline,
+    water_pipeline: wgpu::RenderPipeline,
     box_pipeline: wgpu::RenderPipeline,
     shadow_pipeline: wgpu::RenderPipeline,
     shadow_view: wgpu::TextureView,
@@ -829,6 +871,18 @@ impl App {
             multiview: None,
             cache: None,
         });
+        // water reuses the globals-only layout (it doesn't sample the shadow map)
+        let water_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("water"),
+            layout: Some(&pl),
+            vertex: wgpu::VertexState { module: &shader, entry_point: Some("water_vs"), buffers: &[], compilation_options: Default::default() },
+            fragment: Some(wgpu::FragmentState { module: &shader, entry_point: Some("water_fs"), targets: &[Some(config.format.into())], compilation_options: Default::default() }),
+            primitive: wgpu::PrimitiveState::default(),
+            depth_stencil: Some(depth_state(true, wgpu::CompareFunction::LessEqual)),
+            multisample: wgpu::MultisampleState::default(),
+            multiview: None,
+            cache: None,
+        });
 
         let vbl = wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Vertex>() as u64,
@@ -887,7 +941,7 @@ impl App {
         let depth = make_depth(&device, config.width, config.height);
 
         self.gpu = Some(Gpu {
-            device, queue, surface, config, depth, sky_pipeline, ground_pipeline, box_pipeline,
+            device, queue, surface, config, depth, sky_pipeline, ground_pipeline, water_pipeline, box_pipeline,
             shadow_pipeline, shadow_view, shadow_bind,
             globals_buf, bind, vbuf, ibuf, index_count: indices.len() as u32, instance_buf, instance_cap,
         });
@@ -1124,8 +1178,9 @@ impl App {
             }
         }
 
-        // --- camera follow ---
-        let target = pw + Vec3::new(0.0, self.scene.camera_height * 0.5, 0.0);
+        // --- camera follow: Fortnite-style over-the-shoulder ---
+        let shoulder = Vec3::new(cy, 0.0, -sy) * 2.2; // lateral offset → player sits left of centre
+        let target = pw + Vec3::new(0.0, self.scene.camera_height * 0.5, 0.0) + shoulder;
         let (spi, cpi) = self.cam_pitch.sin_cos();
         let off = Vec3::new(sy * cpi, spi, cy * cpi) * self.scene.camera_dist;
         let cam = target + off + Vec3::new(0.0, self.scene.camera_height, 0.0);
@@ -1278,8 +1333,11 @@ impl App {
             rp.set_pipeline(&gpu.ground_pipeline);
             rp.set_bind_group(1, &gpu.shadow_bind, &[]); // shadow map (ground + box use it)
             rp.draw(0..6, 0..1);
+            rp.set_pipeline(&gpu.water_pipeline); // animated lake (group 0 only)
+            rp.draw(0..6, 0..1);
             if count > 0 {
                 rp.set_pipeline(&gpu.box_pipeline);
+                rp.set_bind_group(1, &gpu.shadow_bind, &[]); // re-bind (water pipeline cleared group 1)
                 rp.set_vertex_buffer(0, gpu.vbuf.slice(..));
                 rp.set_vertex_buffer(1, gpu.instance_buf.slice(..));
                 rp.set_index_buffer(gpu.ibuf.slice(..), wgpu::IndexFormat::Uint16);
