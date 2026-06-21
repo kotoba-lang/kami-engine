@@ -27,6 +27,12 @@ not the hot path).
 
 ### Crates
 
+**Single entry points (ADR-0039):** the compiler is **`kototama`**
+(`com-junkawasaki/kototama`, layering kotoba-clj core + kami-engine-clj game) — all
+hosts depend on kototama, not on kotoba-clj/kami-engine-clj directly. The renderer entry
+for **new web games is `kami-web::run_with_render_ir`** (data-driven EDN render-IR); the
+per-demo `run_with_*` entries are legacy.
+
 | Crate | Tier | Role |
 |---|---|---|
 | **kami-engine-clj** | language | Clojure/EDN-subset → **WASM compiler** (`wasm-encoder`, all-i64 ABI, f32, `defsystem`/`defentity`, vec/map prelude). WIT world `kami:engine/kami-game`. `--bin kamiclj` compiles `logic.clj` → `game.wasm`. |

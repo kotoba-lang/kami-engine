@@ -2,7 +2,7 @@
 name = "kami-script-runtime"
 version.workspace = true
 edition.workspace = true
-description = "kami-script-runtime — WASM host (wasmtime JIT or wasmi no-JIT) that binds kami:engine/* imports to live Rust game-engine state. Loads compiled kami-engine-clj WASM modules and drives init/tick/on-event lifecycle."
+description = "kami-script-runtime — WASM host (wasmtime JIT or wasmi no-JIT) that binds kami:engine/* imports to live Rust game-engine state. Loads kototama-compiled WASM modules (the single Clojure→WASM toolchain) and drives init/tick/on-event lifecycle."
 
 [dependencies]
 # Compiler comes through kototama (the one Clojure→WASM runtime), not directly from

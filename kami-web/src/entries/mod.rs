@@ -9,7 +9,15 @@
 //! Remaining entries (`run_with_scene`/`run_with_game`/`run_with_graph`/
 //! `run_with_sabiotoshi`/`run_embed_scad`/`run_embed_sdf*`/`run_embed_nerf`/
 //! `run_with_character`/`run_embed_vrm`) migrate here as they are touched.
+//!
+//! LEGACY (ADR-0039): the per-demo `run_with_*` *game* entries are deprecated in
+//! favour of the data-driven `render_ir` interpreter — **new games use
+//! `run_with_render_ir` (a CLJ-authored EDN render-IR), not a new `run_with_*`
+//! entry.** Existing ones stay only for live surfaces (app-aozora etc.) and shrink as
+//! demos move to render-IR. (`run_embed_*` VRM/SDF/SCAD/NeRF viewers are a separate
+//! surface, ADR-0031, unaffected.)
 
 pub mod quarry_walk;
 
+/// The single, data-driven renderer entry for new games (ADR-0039).
 pub mod render_ir;
