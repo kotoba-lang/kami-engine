@@ -222,6 +222,13 @@ struct Bullet {
     life: f32,
 }
 
+/// Match flow: drop in from the sky, then fight on the ground.
+#[derive(Clone, Copy, PartialEq)]
+enum Phase {
+    Skydive,
+    Playing,
+}
+
 #[derive(Clone, Copy, PartialEq)]
 enum Weapon {
     Pistol,
@@ -319,6 +326,13 @@ fn make_building(c: Vec3, room: f32, h: f32, color: [f32; 3], inst: &mut Vec<Ins
          glam::vec2(cx + half - seg, cz - half - th * 0.5), glam::vec2(cx + half, cz - half + th * 0.5));
     // roof (no collision; player can't reach it)
     inst.push(Instance { model: model_box(Vec3::new(cx, h, cz), room, th), color: [color[0] * 0.85, color[1] * 0.85, color[2] * 0.85, 1.0] });
+    // window insets on the north + south facades (detail)
+    let win = |cyx: f32, cyy: f32, cyz: f32, w: f32, hh: f32, d: f32| {
+        let m = Mat4::from_translation(Vec3::new(cyx, cyy, cyz)) * Mat4::from_scale(Vec3::new(w, hh, d));
+        Instance { model: m.to_cols_array_2d(), color: [0.12, 0.15, 0.22, 1.0] }
+    };
+    inst.push(win(cx, h * 0.55, cz + half + 0.07, room * 0.34, h * 0.34, 0.14));
+    inst.push(win(cx, h * 0.55, cz - half - 0.07, room * 0.34, h * 0.34, 0.14));
 }
 
 /// Push the player (world XZ) out of any wall AABB it has entered (with radius `r`).
@@ -585,6 +599,7 @@ struct App {
     walls: Vec<Instance>, // player-built wall pieces
     particles: Vec<Particle3>,
     bullets: Vec<Bullet>,
+    phase: Phase,
     weapon: Weapon,
     items: Vec<Item>, // building loot
     hp: f32,
@@ -632,6 +647,7 @@ impl App {
             walls: Vec::new(),
             particles: Vec::new(),
             bullets: Vec::new(),
+            phase: Phase::Skydive,
             weapon: Weapon::Pistol,
             items,
             hp: 100.0,
@@ -645,7 +661,7 @@ impl App {
             cam_yaw: 0.6,
             cam_pitch: 0.5,
             jump_v: 0.0,
-            height: 0.0,
+            height: 260.0, // start the match high in the sky (skydive)
             time: 0.0,
             frames: 0,
             last: None,
@@ -921,13 +937,26 @@ impl App {
         let sp = self.scene.player_speed;
         self.game.step(mv.x * sp, mv.y * sp);
 
-        // storm closes in over time (down to a small final circle).
-        self.storm_radius = (self.storm_radius - 6.0 * 0.016).max(90.0);
-
-        // --- gravity / jump (host owns height) ---
-        let (h, v) = integrate_jump(self.height, self.jump_v, self.scene.gravity, dt);
-        self.height = h;
-        self.jump_v = v;
+        // --- vertical: skydive descent until landing, then normal jump physics ---
+        match self.phase {
+            Phase::Skydive => {
+                let glider_alt = 45.0; // glider deploys here → descent slows
+                let fall = if self.height > glider_alt { 95.0 } else { 22.0 };
+                self.height -= fall * dt;
+                if self.height <= 0.0 {
+                    self.height = 0.0;
+                    self.jump_v = 0.0;
+                    self.phase = Phase::Playing; // touchdown → fight
+                }
+            }
+            Phase::Playing => {
+                let (h, v) = integrate_jump(self.height, self.jump_v, self.scene.gravity, dt);
+                self.height = h;
+                self.jump_v = v;
+                // storm only closes in once you're on the ground.
+                self.storm_radius = (self.storm_radius - 6.0 * 0.016).max(90.0);
+            }
+        }
 
         let (player, ents) = self.game.snapshot();
         let gs = self.scene.ground_scale;
@@ -997,7 +1026,7 @@ impl App {
         // --- real bullets: per-weapon fire at the nearest bot in range ---
         let chest = pw + Vec3::new(0.0, 1.4, 0.0);
         let (fire_period, range, pellets, spread, _) = self.weapon.params();
-        if self.frames % fire_period == 0 {
+        if self.phase == Phase::Playing && self.frames % fire_period == 0 {
             let mut best: Option<(Vec3, f32)> = None;
             for (t, p, _) in &ents {
                 if t == "bot" {
@@ -1058,7 +1087,7 @@ impl App {
 
         // --- storm: take damage outside the safe circle; respawn / new match on 0 lives ---
         let pdist = (player[0] * player[0] + player[1] * player[1]).sqrt();
-        if pdist > self.storm_radius {
+        if self.phase == Phase::Playing && pdist > self.storm_radius {
             self.hp -= 18.0 * dt_p;
             if self.hp <= 0.0 {
                 self.lives = self.lives.saturating_sub(1);
@@ -1131,6 +1160,17 @@ impl App {
                 push_shadow(&mut inst, Vec3::new(pos[0] * gs, 0.0, pos[1] * gs), p.w * 0.7);
                 push_character(&mut inst, ground, yaw, walk, moving, p.h / 1.9, p.color);
             }
+        }
+        // glider canopy above the player while skydiving
+        if self.phase == Phase::Skydive {
+            let canopy = pw + Vec3::new(0.0, 3.0, 0.0);
+            inst.push(Instance { model: model_box(canopy, 3.4, 0.2), color: [0.95, 0.45, 0.32, 1.0] });
+        }
+        // floating HP bar above the player (length + colour = health)
+        {
+            let frac = (self.hp / 100.0).clamp(0.06, 1.0);
+            let bar = pw + Vec3::new(0.0, 3.6, 0.0);
+            inst.push(Instance { model: model_wall(bar, self.cam_yaw, 2.2 * frac, 0.26, 0.08), color: [1.0 - frac, 0.15 + frac * 0.8, 0.18, 1.0] });
         }
         // storm wall: a ring of glowing pillars at the current safe radius
         let sr = self.storm_radius * gs;
@@ -1262,11 +1302,15 @@ impl App {
             println!("perf[{BACKEND}]: {:.0} fps · bots {} · kills {}", self.fps, ents.iter().filter(|(t, _, _)| t == "bot").count(), self.score);
         }
         if let Some(w) = self.window.as_ref() {
-            w.set_title(&format!(
-                "{} · {:.0} fps · {} · HP {:.0} · lives {} · kills {} · {} bots · [1/2/3] weapon [B] build",
-                self.scene.title, self.fps, self.weapon.name(), self.hp, self.lives, self.score,
-                ents.iter().filter(|(t, _, _)| t == "bot").count()
-            ));
+            if self.phase == Phase::Skydive {
+                w.set_title(&format!("{} · {:.0} fps · SKYDIVE — alt {:.0}m · WASD steer", self.scene.title, self.fps, self.height));
+            } else {
+                w.set_title(&format!(
+                    "{} · {:.0} fps · {} · HP {:.0} · lives {} · kills {} · {} bots · [1/2/3] weapon [B] build",
+                    self.scene.title, self.fps, self.weapon.name(), self.hp, self.lives, self.score,
+                    ents.iter().filter(|(t, _, _)| t == "bot").count()
+                ));
+            }
         }
     }
 }
@@ -1289,7 +1333,16 @@ fn scatter_props(s: &Scene3) -> (Vec<Instance>, Vec<Aabb>, Vec<Vec3>) {
             continue; // keep the spawn area clear (room-sized buffer)
         }
         let base = Vec3::new(x, 0.0, z);
-        if rnd() < s.tree_ratio {
+        let kind = rnd();
+        if kind < 0.18 {
+            // rock cluster (spatial detail, no collision)
+            out.push(Instance { model: model_box(base, 1.7, 0.9), color: [0.5, 0.5, 0.55, 1.0] });
+            out.push(Instance { model: model_box(base + Vec3::new(0.7, 0.0, 0.4), 1.0, 0.6), color: [0.44, 0.44, 0.5, 1.0] });
+        } else if kind < 0.30 {
+            // supply crate
+            out.push(Instance { model: model_box(base, 1.1, 1.0), color: [0.6, 0.45, 0.28, 1.0] });
+            out.push(Instance { model: model_box(base + Vec3::new(0.0, 1.0, 0.0), 0.7, 0.5), color: [0.52, 0.38, 0.22, 1.0] });
+        } else if rnd() < s.tree_ratio {
             // tree: trunk + canopy (solid decoration, no collision)
             out.push(Instance { model: model_box(base, s.tree_w * 0.3, s.tree_h * 0.5), color: [0.45, 0.32, 0.2, 1.0] });
             out.push(Instance { model: model_box(base + Vec3::new(0.0, s.tree_h * 0.5, 0.0), s.tree_w, s.tree_h * 0.6), color: [s.tree_color[0], s.tree_color[1], s.tree_color[2], 1.0] });
