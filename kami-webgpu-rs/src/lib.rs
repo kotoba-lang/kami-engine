@@ -120,9 +120,27 @@ fn model_mat(i: &Instance) -> Mat4 {
         * Mat4::from_scale(Vec3::new(w, h, w))
 }
 
+// Main shader — identical WGSL to the web kami.webgpu (shadow-map PCF included).
 const SHADER: &str = r#"
-struct G { vp: mat4x4<f32>, sun_dir: vec4<f32>, sun_col: vec4<f32>, sky: vec4<f32> };
+struct G { vp: mat4x4<f32>, sun_dir: vec4<f32>, sun_col: vec4<f32>, sky: vec4<f32>, light_vp: mat4x4<f32> };
 @group(0) @binding(0) var<uniform> g: G;
+@group(0) @binding(1) var shadowMap: texture_depth_2d;
+@group(0) @binding(2) var shadowSamp: sampler_comparison;
+fn shadow(wpos: vec3<f32>, ndl: f32) -> f32 {
+  let lc = g.light_vp * vec4<f32>(wpos, 1.0);
+  let ndc = lc.xyz / lc.w;
+  let uv = vec2<f32>(ndc.x*0.5+0.5, 0.5-ndc.y*0.5);
+  if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0 || ndc.z > 1.0) { return 1.0; }
+  let bias = max(0.0025*(1.0-ndl), 0.0006);
+  let texel = 1.0/2048.0;
+  var lit = 0.0;
+  for (var dx = -1; dx <= 1; dx++) {
+    for (var dy = -1; dy <= 1; dy++) {
+      lit += textureSampleCompareLevel(shadowMap, shadowSamp, uv + vec2<f32>(f32(dx),f32(dy))*texel, ndc.z - bias);
+    }
+  }
+  return lit/9.0;
+}
 struct VO { @builtin(position) clip: vec4<f32>, @location(0) n: vec3<f32>, @location(1) col: vec3<f32>, @location(2) wpos: vec3<f32>, @location(3) mat: vec3<f32> };
 @vertex
 fn vs(@location(0) pos: vec3<f32>, @location(1) normal: vec3<f32>,
@@ -150,11 +168,25 @@ fn fs(i: VO) -> @location(0) vec4<f32> {
   let spec = pow(max(dot(N, H), 0.0), shininess) * mix(0.25, 0.9, metallic);
   let specTint = mix(vec3<f32>(1.0), i.col, metallic);
   let rim = pow(1.0 - max(dot(N, V), 0.0), 3.0) * 0.25;
-  var c = i.col * (amb + ndl * g.sun_col.rgb * 0.9 * (1.0 - metallic*0.7))
-        + specTint * g.sun_col.rgb * spec + g.sky.rgb * rim + i.col * emissive;
+  let sh = shadow(i.wpos, ndl);
+  var c = i.col * (amb + ndl * g.sun_col.rgb * 0.9 * (1.0 - metallic*0.7) * sh)
+        + specTint * g.sun_col.rgb * spec * sh + g.sky.rgb * rim + i.col * emissive;
   c = c / (c + vec3<f32>(1.0));
   c = pow(c, vec3<f32>(1.0/2.2));
   return vec4<f32>(c, 1.0);
+}
+"#;
+
+// Depth-only shadow pass — renders instances from the sun's POV into the shadow map.
+const SHADOW_WGSL: &str = r#"
+struct G { vp: mat4x4<f32>, sun_dir: vec4<f32>, sun_col: vec4<f32>, sky: vec4<f32>, light_vp: mat4x4<f32> };
+@group(0) @binding(0) var<uniform> g: G;
+@vertex
+fn vs(@location(0) pos: vec3<f32>, @location(1) normal: vec3<f32>,
+      @location(2) m0: vec4<f32>, @location(3) m1: vec4<f32>, @location(4) m2: vec4<f32>, @location(5) m3: vec4<f32>,
+      @location(6) color: vec4<f32>, @location(7) material: vec4<f32>) -> @builtin(position) vec4<f32> {
+  let model = mat4x4<f32>(m0, m1, m2, m3);
+  return g.light_vp * model * vec4<f32>(pos, 1.0);
 }
 "#;
 
@@ -216,12 +248,20 @@ async fn render_async(g: &Globals, insts: &[Instance], w: u32, h: u32) -> Vec<u8
     let vp = Mat4::perspective_rh(60f32.to_radians(), w as f32 / h.max(1) as f32, 0.5, 4000.0)
         * Mat4::look_at_rh(Vec3::from(eye), Vec3::from(target), Vec3::Y);
 
-    // globals uniform: vp(16) + sun_dir(4,w=eye.x) + sun_col(4,w=eye.y) + sky(4,w=eye.z)
-    let mut gf = [0f32; 28];
+    // sun light view-proj: orthographic, centred on the camera target (the shadow camera)
+    let sd = Vec3::from(g.sun_dir).normalize_or_zero();
+    let ltgt = Vec3::new(cx, 0.0, cz);
+    let leye = ltgt - sd * 200.0;
+    let light_vp = Mat4::orthographic_rh(-130.0, 130.0, -130.0, 130.0, 1.0, 420.0)
+        * Mat4::look_at_rh(leye, ltgt, Vec3::Y);
+
+    // globals uniform: vp(16) + sun_dir(4,w=eye.x) + sun_col(4,w=eye.y) + sky(4,w=eye.z) + light_vp(16)
+    let mut gf = [0f32; 44];
     gf[0..16].copy_from_slice(&vp.to_cols_array());
     gf[16..20].copy_from_slice(&[g.sun_dir[0], g.sun_dir[1], g.sun_dir[2], eye[0]]);
     gf[20..24].copy_from_slice(&[g.sun[0], g.sun[1], g.sun[2], eye[1]]);
     gf[24..28].copy_from_slice(&[g.horizon[0], g.horizon[1], g.horizon[2], eye[2]]);
+    gf[28..44].copy_from_slice(&light_vp.to_cols_array());
     let gbuf = make_buf(&device, &queue, bytemuck::cast_slice(&gf), wgpu::BufferUsages::UNIFORM);
 
     // instance buffer: model(16) + color(4) + material(4) = 24 floats
@@ -237,58 +277,102 @@ async fn render_async(g: &Globals, insts: &[Instance], w: u32, h: u32) -> Vec<u8
         label: None,
         source: wgpu::ShaderSource::Wgsl(SHADER.into()),
     });
-    let va = |fmt, off, loc| wgpu::VertexAttribute { format: fmt, offset: off, shader_location: loc };
-    let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+    let shadow_module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
         label: None,
-        layout: None,
-        vertex: wgpu::VertexState {
-            module: &module,
-            entry_point: Some("vs"),
-            compilation_options: Default::default(),
-            buffers: &[
-                wgpu::VertexBufferLayout {
-                    array_stride: 24,
-                    step_mode: wgpu::VertexStepMode::Vertex,
-                    attributes: &[va(wgpu::VertexFormat::Float32x3, 0, 0), va(wgpu::VertexFormat::Float32x3, 12, 1)],
-                },
-                wgpu::VertexBufferLayout {
-                    array_stride: 96,
-                    step_mode: wgpu::VertexStepMode::Instance,
-                    attributes: &[
-                        va(wgpu::VertexFormat::Float32x4, 0, 2), va(wgpu::VertexFormat::Float32x4, 16, 3),
-                        va(wgpu::VertexFormat::Float32x4, 32, 4), va(wgpu::VertexFormat::Float32x4, 48, 5),
-                        va(wgpu::VertexFormat::Float32x4, 64, 6), va(wgpu::VertexFormat::Float32x4, 80, 7),
-                    ],
-                },
-            ],
-        },
+        source: wgpu::ShaderSource::Wgsl(SHADOW_WGSL.into()),
+    });
+    let va = |fmt, off, loc| wgpu::VertexAttribute { format: fmt, offset: off, shader_location: loc };
+    // vertex layout shared by the shadow + main pipelines
+    let cube_attrs = [va(wgpu::VertexFormat::Float32x3, 0, 0), va(wgpu::VertexFormat::Float32x3, 12, 1)];
+    let inst_attrs = [
+        va(wgpu::VertexFormat::Float32x4, 0, 2), va(wgpu::VertexFormat::Float32x4, 16, 3),
+        va(wgpu::VertexFormat::Float32x4, 32, 4), va(wgpu::VertexFormat::Float32x4, 48, 5),
+        va(wgpu::VertexFormat::Float32x4, 64, 6), va(wgpu::VertexFormat::Float32x4, 80, 7),
+    ];
+    let vlayout = [
+        wgpu::VertexBufferLayout { array_stride: 24, step_mode: wgpu::VertexStepMode::Vertex, attributes: &cube_attrs },
+        wgpu::VertexBufferLayout { array_stride: 96, step_mode: wgpu::VertexStepMode::Instance, attributes: &inst_attrs },
+    ];
+    // shadow map (depth) + comparison sampler
+    let shadow_tex = device.create_texture(&wgpu::TextureDescriptor {
+        label: None,
+        size: wgpu::Extent3d { width: 2048, height: 2048, depth_or_array_layers: 1 },
+        mip_level_count: 1, sample_count: 1, dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Depth32Float,
+        usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::TEXTURE_BINDING,
+        view_formats: &[],
+    });
+    let shadow_view = shadow_tex.create_view(&Default::default());
+    let shadow_samp = device.create_sampler(&wgpu::SamplerDescriptor {
+        compare: Some(wgpu::CompareFunction::LessEqual),
+        mag_filter: wgpu::FilterMode::Linear, min_filter: wgpu::FilterMode::Linear,
+        ..Default::default()
+    });
+    // PASS pipelines: shadow (depth-only) + main (samples the shadow map) — the web :passes, in Rust
+    let shadow_pipe = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        label: None, layout: None,
+        vertex: wgpu::VertexState { module: &shadow_module, entry_point: Some("vs"), compilation_options: Default::default(), buffers: &vlayout },
+        fragment: None,
+        primitive: wgpu::PrimitiveState { cull_mode: Some(wgpu::Face::Back), ..Default::default() },
+        depth_stencil: Some(wgpu::DepthStencilState {
+            format: wgpu::TextureFormat::Depth32Float, depth_write_enabled: true,
+            depth_compare: wgpu::CompareFunction::Less, stencil: Default::default(), bias: Default::default(),
+        }),
+        multisample: Default::default(), multiview: None, cache: None,
+    });
+    let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        label: None, layout: None,
+        vertex: wgpu::VertexState { module: &module, entry_point: Some("vs"), compilation_options: Default::default(), buffers: &vlayout },
         fragment: Some(wgpu::FragmentState {
-            module: &module,
-            entry_point: Some("fs"),
-            compilation_options: Default::default(),
+            module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
             targets: &[Some(wgpu::ColorTargetState { format: fmt, blend: None, write_mask: wgpu::ColorWrites::ALL })],
         }),
         primitive: wgpu::PrimitiveState { cull_mode: Some(wgpu::Face::Back), ..Default::default() },
         depth_stencil: Some(wgpu::DepthStencilState {
-            format: wgpu::TextureFormat::Depth24Plus,
-            depth_write_enabled: true,
-            depth_compare: wgpu::CompareFunction::LessEqual,
-            stencil: Default::default(),
-            bias: Default::default(),
+            format: wgpu::TextureFormat::Depth24Plus, depth_write_enabled: true,
+            depth_compare: wgpu::CompareFunction::LessEqual, stencil: Default::default(), bias: Default::default(),
         }),
-        multisample: Default::default(),
-        multiview: None,
-        cache: None,
+        multisample: Default::default(), multiview: None, cache: None,
+    });
+    let shadow_bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
+        label: None, layout: &shadow_pipe.get_bind_group_layout(0),
+        entries: &[wgpu::BindGroupEntry { binding: 0, resource: gbuf.as_entire_binding() }],
     });
     let bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
         label: None,
         layout: &pipeline.get_bind_group_layout(0),
-        entries: &[wgpu::BindGroupEntry { binding: 0, resource: gbuf.as_entire_binding() }],
+        entries: &[
+            wgpu::BindGroupEntry { binding: 0, resource: gbuf.as_entire_binding() },
+            wgpu::BindGroupEntry { binding: 1, resource: wgpu::BindingResource::TextureView(&shadow_view) },
+            wgpu::BindGroupEntry { binding: 2, resource: wgpu::BindingResource::Sampler(&shadow_samp) },
+        ],
     });
 
     let color_view = color.create_view(&Default::default());
     let depth_view = depth.create_view(&Default::default());
     let mut enc = device.create_command_encoder(&Default::default());
+    // PASS 1 — shadow map: depth from the sun's POV
+    {
+        let mut sp = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: None,
+            color_attachments: &[],
+            depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                view: &shadow_view,
+                depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Clear(1.0), store: wgpu::StoreOp::Store }),
+                stencil_ops: None,
+            }),
+            timestamp_writes: None, occlusion_query_set: None,
+        });
+        if !insts.is_empty() {
+            sp.set_pipeline(&shadow_pipe);
+            sp.set_bind_group(0, &shadow_bind, &[]);
+            sp.set_vertex_buffer(0, vbuf.slice(..));
+            sp.set_vertex_buffer(1, inst.slice(..));
+            sp.set_index_buffer(ibuf.slice(..), wgpu::IndexFormat::Uint16);
+            sp.draw_indexed(0..idx.len() as u32, 0, 0..insts.len() as u32);
+        }
+    }
+    // PASS 2 — main: lit, sampling the shadow map
     {
         let mut rp = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: None,
@@ -392,5 +476,23 @@ mod tests {
             && (b as i32 - sky.2 as i32).abs() < 12;
         assert!(!is_sky, "centre should be the lit building, not sky: got {r},{gc},{b}");
         assert!(r > gc && r > b, "building is reddish: got {r},{gc},{b}");
+    }
+
+    #[test]
+    fn caster_casts_a_shadow() {
+        // a ground plane filling the view; a tall caster should darken the ground (shadow map).
+        let cam = ":eye [0 50 22] :target [0 0 0]";
+        let sky = ":horizon [0.1 0.1 0.12] :sun-dir [-0.45 -0.8 -0.4] :sun [1 0.96 0.85]";
+        let ground = "{:pos [0 -0.5 0] :color [0.7 0.7 0.7] :size [200 1] :roughness 0.95}";
+        let caster = "{:pos [0 0 0] :color [0.5 0.5 0.5] :size [5 16] :roughness 0.95}";
+        let lit_only = format!("{{:globals {{:sky {{{sky}}} {cam}}} :instances [{ground}]}}");
+        let shadowed = format!("{{:globals {{:sky {{{sky}}} {cam}}} :instances [{ground} {caster}]}}");
+        // darkest luminance anywhere in the frame
+        let darkest = |px: &[u8]| px.chunks(4)
+            .map(|c| (c[0] as i32 * 30 + c[1] as i32 * 59 + c[2] as i32 * 11) / 100)
+            .min().unwrap_or(0);
+        let la = darkest(&render_to_pixels(&lit_only, 96, 96));
+        let lb = darkest(&render_to_pixels(&shadowed, 96, 96));
+        assert!(lb + 12 < la, "the caster should darken the ground via shadow: lit min={la}, shadowed min={lb}");
     }
 }
