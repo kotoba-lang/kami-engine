@@ -14,3 +14,4 @@ kotoba-edn  = { path = "../../kotoba/crates/kotoba-edn" }
 
 [dev-dependencies]
 image = { version = "0.25", default-features = false, features = ["png"] }
+winit = "0.30"

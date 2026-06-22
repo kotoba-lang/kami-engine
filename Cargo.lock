@@ -2928,6 +2928,7 @@ dependencies = [
  "kotoba-edn",
  "pollster",
  "wgpu",
+ "winit",
 ]
 
 [[package]]
