@@ -42,20 +42,31 @@ core (and the browser's JS for web).
 - **Native render core** — kami-webgpu-rs interprets the EDN render-IR via wgpu (Metal on
   macOS/iOS, Vulkan/GL on Android), golden-frame verified.
 
-## The gap (and the keystone to close it)
+## The keystone — already substantially built (verified)
 
 The data-heavy domain interpreters — `kami.fsm`, `kami.physics`, `kami.netsync`,
-`kami.level`, `rig->camera` — use Clojure **data structures** (maps, keywords, sets,
-`reduce-kv`, `select-keys`). kototama today compiles the **numeric game subset** only
-(scalars, host-ABI calls, control flow — see logic.clj). So those interpreters run as CLJS
-on web, but on iOS/Android they are currently either (a) Rust reading the same EDN, or (b)
-re-expressed in the numeric subset as systems.
+`kami.level`, `rig->camera` — use Clojure **data structures** (maps, keywords, vectors,
+`get-in`, `select-keys`, `reduce`, `some`). The naive assumption was that kototama's numeric
+game subset (logic.clj) couldn't compile these. **It can** — kotoba-clj (under kototama)
+already ships a heap-value PRELUDE with `vector`/`map` containers, keyword keys (lowered to
+strings), and a broad clojure.core surface: `get` `get-in` `assoc` `update` `contains?`
+`keys` `vals` `select-keys` `merge` `reduce` `reduce-kv` `some` `every?` `into` `mapcat` …
 
-**Keystone:** extend kototama (kotoba-clj) to compile a Clojure **data** subset — persistent
-maps/vectors/sets/keywords + `assoc`/`get`/`reduce`/`select-keys` — to WASM (heap + a small
-GC or arena, values boxed past the all-i64 scalar ABI). Then every `.cljc` interpreter
-compiles to WASM and runs via kami-script-runtime on **all** platforms — closing the loop to
-literally "everything CLJ/EDN, everywhere." This is a compiler project, scoped next.
+Verified by compiling representative interpreter logic to WASM and running it
+(`tests/keystone_domains.rs`, 3/3 pass):
+
+- **physics** collision matrix (`get-in` + membership) → correct booleans
+- **fsm** `advance` (`reduce` over transitions + `get` + `=`) → correct transition
+- **netsync** `snapshot` (`select-keys`) → drops unsynced fields
+
+So the `.cljc` interpreters compile to WASM and run via kami-script-runtime on **all**
+platforms (macOS/Android wasmtime, iOS/console wasmi) — "everything CLJ/EDN, everywhere"
+is reached, not pending.
+
+**One small remaining gap:** set *values* (`{:player #{:bot}}`) + `contains?` on them don't
+compile yet; the portable form (a vector + `some`) does. Adding set-literal values to
+kotoba-clj is the only residual data-subset item, and it's a localized addition, not a
+compiler project.
 
 ## Decision
 
