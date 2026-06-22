@@ -655,6 +655,27 @@ mod tests {
     }
 
     #[test]
+    fn scatter_rng_matches_the_web() {
+        // The native xorshift (seed 2654435769) must produce the same sequence as the web's
+        // CLJS scatter (game.cljs) so web + native render the same world from the same EDN.
+        // Expected values computed in JS (CLJS-faithful 32-bit xorshift):
+        //   node -e 'let s=2654435769>>>0; const r=()=>{s^=s<<13;s^=s>>>17;s^=s<<5;s>>>=0;
+        //            return (s&0x7fffffff)/2147483647}; ...'
+        let mut seed: u32 = 2654435769;
+        let mut rnd = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 17;
+            seed ^= seed << 5;
+            (seed & 0x7fffffff) as f32 / 2147483647.0
+        };
+        let expected = [0.633187f32, 0.751414, 0.9666, 0.01183, 0.798444];
+        for e in expected {
+            let g = rnd();
+            assert!((g - e).abs() < 1e-4, "native rng diverged from web: got {g}, web {e}");
+        }
+    }
+
+    #[test]
     fn renders_geometry_headless() {
         // a single building filling the view; centre must differ from the sky clear.
         let edn = "{:globals {:sky {:horizon [0.74 0.84 0.95] :sun-dir [-0.4 -0.85 -0.35] :sun [1.0 0.96 0.85]}
