@@ -63,10 +63,12 @@ So the `.cljc` interpreters compile to WASM and run via kami-script-runtime on *
 platforms (macOS/Android wasmtime, iOS/console wasmi) — "everything CLJ/EDN, everywhere"
 is reached, not pending.
 
-**One small remaining gap:** set *values* (`{:player #{:bot}}`) + `contains?` on them don't
-compile yet; the portable form (a vector + `some`) does. Adding set-literal values to
-kotoba-clj is the only residual data-subset item, and it's a localized addition, not a
-compiler project.
+**Residual gap — now closed.** Set *values* (`{:player #{:bot}}`) didn't compile; a
+one-arm `lower_expr` addition (set literal → growable vector; membership via `some`)
+fixed it. `keystone_domains` is 4/4 (incl. `set_literal_value_compiles`) and the full
+kotoba-clj suite stays green. The data subset
+(maps/keywords/vectors/sets/get-in/select-keys/reduce/some) is complete — every `.cljc`
+interpreter compiles to WASM and runs as CLJ on every platform. No residual gap.
 
 ## Decision
 
