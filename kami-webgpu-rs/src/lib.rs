@@ -549,6 +549,51 @@ mod tests {
     }
 
     #[test]
+    fn parse_ir_defaults_when_fields_missing() {
+        // missing globals → defaults; partial instance → roughness 0.65, metallic/emissive 0
+        let (g, insts) = parse_ir("{:instances [{:pos [1 0 2] :color [0.3 0.6 1.0] :size [1 2]}]}");
+        assert_eq!(g.sun_dir, [-0.4, -0.85, -0.35], "default sun");
+        assert!(g.eye.is_none(), "no camera → overview derived later");
+        assert_eq!(insts.len(), 1);
+        assert_eq!(insts[0].roughness, 0.65, "roughness defaults");
+        assert_eq!(insts[0].metallic, 0.0);
+        assert_eq!(insts[0].emissive, 0.0);
+    }
+
+    #[test]
+    fn parse_ir_empty_or_malformed() {
+        assert_eq!(parse_ir("not-a-map").1.len(), 0);
+        assert_eq!(parse_ir("{}").1.len(), 0);
+    }
+
+    #[test]
+    fn scene_to_ir_scatters_props_and_parses_sky() {
+        // the play3d bridge: a kami-clj scene.edn → ground + scattered prop instances
+        let scene = "{:render/sky {:horizon [0.74 0.84 0.95] :sun-dir [-0.4 -0.85 -0.35] :sun [1 0.96 0.85]}
+                      :render/props {:count 80 :spread 80.0
+                        :buildings [{:color [0.62 0.60 0.66] :min-h 2 :max-h 6 :w 2 :metallic 0.8 :roughness 0.25}]
+                        :trees {:color [0.28 0.55 0.30] :h 2.6 :w 1.1 :ratio 0.4 :roughness 0.95}}}";
+        let (g, insts) = scene_to_ir(scene);
+        assert_eq!(g.horizon, [0.74, 0.84, 0.95], "sky parsed");
+        assert_eq!(insts[0].size, [400.0, 1.0], "first instance is the ground plane");
+        assert!(insts.len() > 20, "ground + scattered props: {}", insts.len());
+    }
+
+    #[test]
+    fn scene_to_ir_applies_camera_rig() {
+        // :camera rig (distance/azimuth/height) → eye/target on the globals
+        let scene = "{:render/sky {:horizon [0.7 0.8 0.9] :sun-dir [-0.4 -0.85 -0.35] :sun [1 1 1]}
+                      :camera {:distance 70.0 :height 48.0 :azimuth 0.0 :look-height 1.0}
+                      :render/props {:count 4 :spread 40.0 :buildings [{:color [0.6 0.6 0.6] :min-h 2 :max-h 4 :w 2}]}}";
+        let (g, _) = scene_to_ir(scene);
+        let eye = g.eye.expect("camera rig sets eye");
+        // azimuth 0 → eye.x = distance*cos(0) = 70, eye.y = height = 48
+        assert!((eye[0] - 70.0).abs() < 0.01, "eye.x from distance/azimuth: {}", eye[0]);
+        assert_eq!(eye[1], 48.0, "eye.y = height");
+        assert_eq!(g.target.unwrap()[1], 1.0, "target.y = look-height");
+    }
+
+    #[test]
     fn renders_geometry_headless() {
         // a single building filling the view; centre must differ from the sky clear.
         let edn = "{:globals {:sky {:horizon [0.74 0.84 0.95] :sun-dir [-0.4 -0.85 -0.35] :sun [1.0 0.96 0.85]}
