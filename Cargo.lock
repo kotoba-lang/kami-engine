@@ -2918,6 +2918,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-webgpu-rs"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "glam",
+ "kami-scene",
+ "kotoba-edn",
+ "pollster",
+ "wgpu",
+]
+
+[[package]]
 name = "kami-yield"
 version = "0.1.0"
 dependencies = [
