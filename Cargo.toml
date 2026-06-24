@@ -36,6 +36,7 @@ members = [
     "kami-autodrive-scene",
     "kami-character-scene",
     "kami-game-scene",
+    "kami-input-scene",
     "kami-autodrive",
     "kami-tilemap",
     "kami-audio",
