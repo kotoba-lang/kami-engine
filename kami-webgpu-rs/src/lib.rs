@@ -537,6 +537,88 @@ fn make_buf(device: &wgpu::Device, queue: &wgpu::Queue, data: &[u8], usage: wgpu
 mod tests {
     use super::*;
 
+    // --- ports of kami.webgpu.geometry (sphere/cylinder) for cross-platform parity tests ----
+    fn push_v6(v: &mut Vec<f32>, p: [f64; 3], n: [f64; 3]) {
+        v.extend_from_slice(&[p[0] as f32, p[1] as f32, p[2] as f32, n[0] as f32, n[1] as f32, n[2] as f32]);
+    }
+    fn geo_sphere(r: f32, rings: usize, sectors: usize) -> (Vec<f32>, Vec<u16>) {
+        let pi = std::f64::consts::PI;
+        let mut v = Vec::new();
+        for i in 0..=rings {
+            for j in 0..=sectors {
+                let phi = pi * i as f64 / rings as f64;
+                let th = 2.0 * pi * j as f64 / sectors as f64;
+                let n = [phi.sin() * th.cos(), phi.cos(), phi.sin() * th.sin()];
+                push_v6(&mut v, [r as f64 * n[0], r as f64 * n[1], r as f64 * n[2]], n);
+            }
+        }
+        let stride = (sectors + 1) as u16;
+        let mut idx = Vec::new();
+        for i in 0..rings {
+            for j in 0..sectors {
+                let a = (i * (sectors + 1) + j) as u16;
+                idx.extend_from_slice(&[a, a + 1, a + stride + 1, a, a + stride + 1, a + stride]);
+            }
+        }
+        (v, idx)
+    }
+    fn cyl_ring(r: f32, sectors: usize, y: f64) -> Vec<[f64; 3]> {
+        let pi = std::f64::consts::PI;
+        (0..=sectors).map(|j| {
+            let th = 2.0 * pi * j as f64 / sectors as f64;
+            [r as f64 * th.cos(), y, r as f64 * th.sin()]
+        }).collect()
+    }
+    fn geo_cylinder(r: f32, h: f32, sectors: usize) -> (Vec<f32>, Vec<u16>) {
+        let hy = h as f64 / 2.0;
+        let (top, bot) = (cyl_ring(r, sectors, hy), cyl_ring(r, sectors, -hy));
+        let mut v = Vec::new();
+        for j in 0..top.len() {
+            let [x, _, z] = top[j];
+            let m = (x * x + z * z).sqrt().max(1e-6);
+            let n = [x / m, 0.0, z / m];
+            push_v6(&mut v, top[j], n);
+            push_v6(&mut v, bot[j], n);
+        }
+        let mut idx = Vec::new();
+        for j in 0..sectors {
+            let a = (2 * j) as u16;
+            idx.extend_from_slice(&[a, a + 1, a + 3, a, a + 3, a + 2]);
+        }
+        let mut cap = |v: &mut Vec<f32>, idx: &mut Vec<u16>, y: f64, ny: [f64; 3], dir: i32, base: u16| {
+            push_v6(v, [0.0, y, 0.0], ny);
+            for p in cyl_ring(r, sectors, y) { push_v6(v, p, ny); }
+            for j in 0..sectors as u16 {
+                if dir > 0 { idx.extend_from_slice(&[base, base + 1 + j, base + 2 + j]); }
+                else { idx.extend_from_slice(&[base, base + 2 + j, base + 1 + j]); }
+            }
+        };
+        let nv = (2 * top.len()) as u16;
+        cap(&mut v, &mut idx, hy, [0.0, 1.0, 0.0], 1, nv);
+        cap(&mut v, &mut idx, -hy, [0.0, -1.0, 0.0], -1, nv + (1 + top.len()) as u16);
+        (v, idx)
+    }
+    fn load_golden(name: &str) -> Option<(Vec<f32>, Vec<u16>)> {
+        let path = format!("{}/../../kami-webgpu/fixtures/{}-golden.json", env!("CARGO_MANIFEST_DIR"), name);
+        let json = std::fs::read_to_string(&path).ok()?;
+        let v: serde_json::Value = serde_json::from_str(&json).expect("valid golden json");
+        let gv = v["verts"].as_array().unwrap().iter().map(|x| x.as_f64().unwrap() as f32).collect();
+        let gi = v["indices"].as_array().unwrap().iter().map(|x| x.as_u64().unwrap() as u16).collect();
+        Some((gv, gi))
+    }
+    fn assert_parity(name: &str, got: (Vec<f32>, Vec<u16>)) {
+        let (gv, gi) = match load_golden(name) {
+            Some(g) => g,
+            None => { eprintln!("skip: {name} golden not found (kami-webgpu not co-located)"); return; }
+        };
+        assert_eq!(got.1, gi, "{name} indices must match the CLJC geometry golden exactly");
+        assert_eq!(got.0.len(), gv.len(), "{name} vertex count");
+        // verts go through f64 transcendentals → match to f32 precision (JVM/Rust libm may differ in ulps)
+        for (a, b) in got.0.iter().zip(gv.iter()) {
+            assert!((a - b).abs() < 1e-4, "{name} vertex parity within f32 precision: {a} vs {b}");
+        }
+    }
+
     #[test]
     fn parses_the_same_edn_render_ir() {
         let edn = "{:globals {:sky {:horizon [0.74 0.84 0.95] :sun-dir [-0.4 -0.85 -0.35] :sun [1.0 0.96 0.85]}}
@@ -624,6 +706,16 @@ mod tests {
         let (verts, idx) = cube();
         assert_eq!(verts, gv, "native cube vertices must match the CLJC geometry golden");
         assert_eq!(idx, gi, "native cube indices must match the CLJC geometry golden");
+    }
+
+    #[test]
+    fn sphere_matches_cljc_geometry_golden() {
+        assert_parity("sphere", geo_sphere(1.0, 4, 6));
+    }
+
+    #[test]
+    fn cylinder_matches_cljc_geometry_golden() {
+        assert_parity("cylinder", geo_cylinder(1.0, 2.0, 6));
     }
 
     #[test]
