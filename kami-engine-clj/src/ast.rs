@@ -36,6 +36,17 @@ fn gensym(prefix: &str) -> String {
 pub struct Program {
     pub defs:      Vec<Def>,
     pub functions: Vec<Function>,
+    /// Mutable per-instance state cells (`defatom`) — persist across tick calls.
+    pub atoms:     Vec<Atom>,
+}
+
+/// A `(defatom name init)` — a mutable i64 cell that lives for the instance's lifetime
+/// (a WASM mutable global), letting a game hold lives/score/state without the off-map
+/// marker-entity hack. `init` must be an integer constant.
+#[derive(Debug, Clone)]
+pub struct Atom {
+    pub name: String,
+    pub init: i64,
 }
 
 #[derive(Debug, Clone)]
@@ -513,6 +524,10 @@ pub enum Expr {
         name: String,
         args: Vec<Expr>,
     },
+    /// `(atom-val name)` — read a `defatom` cell (a WASM mutable global).
+    AtomGet(String),
+    /// `(set-atom! name value)` — write a `defatom` cell; evaluates to the new value.
+    AtomSet(String, Box<Expr>),
 }
 
 // ---------------------------------------------------------------------------
@@ -523,6 +538,7 @@ pub fn parse_program(src: &str) -> Result<Program, CljError> {
     let forms = kotoba_edn::parse_all(src).map_err(|e| CljError::Read(e.to_string()))?;
     let mut defs      = Vec::new();
     let mut functions = Vec::new();
+    let mut atoms     = Vec::new();
 
     for form in &forms {
         let items = match form {
@@ -540,14 +556,15 @@ pub fn parse_program(src: &str) -> Result<Program, CljError> {
             "defn"      => functions.push(lower_defn(items)?),
             "defsystem" => functions.push(lower_defsystem(items)?),
             "defentity" => functions.push(lower_defentity(items)?),
+            "defatom"   => atoms.push(lower_defatom(items)?),
             other       => {
                 return Err(CljError::Lower(format!(
-                    "unsupported top-level form `({other} …)` — expected def/defn/ns/defsystem/defentity"
+                    "unsupported top-level form `({other} …)` — expected def/defn/ns/defsystem/defentity/defatom"
                 )))
             }
         }
     }
-    Ok(Program { defs, functions })
+    Ok(Program { defs, functions, atoms })
 }
 
 // ---------------------------------------------------------------------------
@@ -571,6 +588,22 @@ fn lower_def(items: &[EdnValue]) -> Result<Def, CljError> {
         name:  sym_name(&items[1], "def name")?,
         value: lower_expr(&items[2])?,
     })
+}
+
+/// `(defatom name <int>)` — declare a mutable i64 state cell. The initial value must be an
+/// integer constant (the WASM global's init expression); a game increments/sets it at runtime.
+fn lower_defatom(items: &[EdnValue]) -> Result<Atom, CljError> {
+    if items.len() != 3 {
+        return Err(CljError::Lower("defatom takes exactly: (defatom name <int-literal>)".into()));
+    }
+    let name = sym_name(&items[1], "defatom name")?;
+    let init = match lower_expr(&items[2])? {
+        Expr::Int(v) => v,
+        _ => return Err(CljError::Lower(format!(
+            "defatom `{name}` initial value must be an integer literal"
+        ))),
+    };
+    Ok(Atom { name, init })
 }
 
 fn lower_defn(items: &[EdnValue]) -> Result<Function, CljError> {
@@ -684,6 +717,20 @@ fn lower_call(items: &[EdnValue]) -> Result<Expr, CljError> {
         "recur" => Ok(Expr::Recur(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
         "do"    => Ok(Expr::Do(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
         "doseq-entities" => lower_doseq_entities(args),
+        // `(atom-val name)` / `(set-atom! name value)` — read/write a defatom cell. The atom
+        // name is a bare symbol (resolved to a global at codegen), not an evaluated argument.
+        "atom-val" | "deref" => {
+            if args.len() != 1 {
+                return Err(CljError::Lower("(atom-val name) takes exactly one argument".into()));
+            }
+            Ok(Expr::AtomGet(sym_name(&args[0], "atom name")?))
+        }
+        "set-atom!" => {
+            if args.len() != 2 {
+                return Err(CljError::Lower("(set-atom! name value) takes exactly two arguments".into()));
+            }
+            Ok(Expr::AtomSet(sym_name(&args[0], "atom name")?, Box::new(lower_expr(&args[1])?)))
+        }
         // `(f32 1.5)` — explicit float literal form for disambiguation
         "f32" => {
             if args.len() != 1 {

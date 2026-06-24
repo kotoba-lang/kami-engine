@@ -117,6 +117,18 @@ pub fn compile(program: &Program) -> Result<Vec<u8>, CljError> {
     );
     const HEAP_GLOBAL: u32 = 0;
 
+    // defatom cells → mutable i64 globals (indices 1..), persisting across tick calls. The init
+    // value is the global's constant init expression, so no runtime `init` pass is needed (and a
+    // legitimate initial 0 is not confused with "uninitialised").
+    let mut atom_index: HashMap<String, u32> = HashMap::new();
+    for (k, atom) in program.atoms.iter().enumerate() {
+        globals.global(
+            GlobalType { val_type: ValType::I64, mutable: true, shared: false },
+            &ConstExpr::i64_const(atom.init),
+        );
+        atom_index.insert(atom.name.clone(), 1 + k as u32);
+    }
+
     // Pass 2: function bodies.
     let mut code = CodeSection::new();
     for f in &program.functions {
@@ -135,6 +147,7 @@ pub fn compile(program: &Program) -> Result<Vec<u8>, CljError> {
             loop_levels: Vec::new(),
             loop_var_locals: Vec::new(),
             heap_global: HEAP_GLOBAL,
+            atoms: &atom_index,
         };
         let instrs = cg.emit_body(&f.body)?;
         let mut func = Function::new(cg.local_decls());
@@ -402,6 +415,8 @@ struct FnCtx<'a> {
     /// `let` locals that happen to precede them.
     loop_var_locals: Vec<Vec<u32>>,
     heap_global:  u32,
+    /// defatom name → WASM global index (for `(atom-val …)` / `(set-atom! …)`).
+    atoms:        &'a HashMap<String, u32>,
 }
 
 impl<'a> FnCtx<'a> {
@@ -459,7 +474,30 @@ impl<'a> FnCtx<'a> {
             Expr::Recur(args)             => self.emit_recur(args),
             Expr::Builtin { op, args }    => self.emit_builtin(*op, args),
             Expr::Call { name, args }     => self.emit_call(name, args),
+            Expr::AtomGet(name)           => self.emit_atom_get(name),
+            Expr::AtomSet(name, val)      => self.emit_atom_set(name, val),
         }
+    }
+
+    fn emit_atom_get(&self, name: &str) -> Result<Vec<Instruction<'static>>, CljError> {
+        let idx = *self.atoms.get(name).ok_or_else(|| {
+            CljError::Codegen(format!("(atom-val {name}) — no such atom; declare it with defatom"))
+        })?;
+        Ok(vec![Instruction::GlobalGet(idx)])
+    }
+
+    /// `(set-atom! name v)` writes the global and evaluates to the new value: stash v in a temp,
+    /// store it, read the temp back — so it can be used in expression position.
+    fn emit_atom_set(&mut self, name: &str, val: &Expr) -> Result<Vec<Instruction<'static>>, CljError> {
+        let idx = *self.atoms.get(name).ok_or_else(|| {
+            CljError::Codegen(format!("(set-atom! {name} …) — no such atom; declare it with defatom"))
+        })?;
+        let mut out = self.emit(val)?;
+        let tmp = self.alloc_local();
+        out.push(Instruction::LocalTee(tmp));
+        out.push(Instruction::GlobalSet(idx));
+        out.push(Instruction::LocalGet(tmp));
+        Ok(out)
     }
 
     fn emit_var(&self, name: &str) -> Result<Vec<Instruction<'static>>, CljError> {

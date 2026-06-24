@@ -92,6 +92,41 @@ fn guest_f32_comparison_is_sign_correct() {
     assert_eq!(eval("(<f (f32 1.0) (f32 2.0) (f32 0.0))"), 0);
 }
 
+/// `defatom` gives the guest persistent mutable state (a WASM global), so a game holds
+/// lives/score directly instead of counting off-map marker entities. The cell must accumulate
+/// across separate tick calls — this drives 200 ticks and 2 hits and reads the values back.
+#[test]
+fn defatom_persists_state_across_ticks() {
+    use kami_engine_clj::compile_str;
+    let src = r#"
+        (defatom score 0)
+        (defatom lives 3)
+        (defn init [] 0)
+        (defn step [dt] (set-atom! score (+ (atom-val score) 1)))
+        (defn hit  [dt] (set-atom! lives (- (atom-val lives) 1)))
+        (defn getscore [] (atom-val score))
+        (defn getlives [] (atom-val lives))
+    "#;
+    let wasm = compile_str(src).expect("compile");
+    let engine = wasmtime::Engine::default();
+    let module = wasmtime::Module::new(&engine, &wasm).expect("module");
+    let mut store: wasmtime::Store<()> = wasmtime::Store::new(&engine, ());
+    let instance = wasmtime::Instance::new(&mut store, &module, &[]).expect("instantiate");
+
+    let step = instance.get_typed_func::<i64, i64>(&mut store, "step").unwrap();
+    for _ in 0..200 {
+        step.call(&mut store, 0).unwrap();
+    }
+    let hit = instance.get_typed_func::<i64, i64>(&mut store, "hit").unwrap();
+    hit.call(&mut store, 0).unwrap();
+    hit.call(&mut store, 0).unwrap();
+
+    let getscore = instance.get_typed_func::<(), i64>(&mut store, "getscore").unwrap();
+    let getlives = instance.get_typed_func::<(), i64>(&mut store, "getlives").unwrap();
+    assert_eq!(getscore.call(&mut store, ()).unwrap(), 200, "score must accumulate across 200 ticks");
+    assert_eq!(getlives.call(&mut store, ()).unwrap(), 1, "lives 3 - 2 hits = 1");
+}
+
 #[test]
 fn conditionals_pick_the_right_branch() {
     assert_eq!(eval("(if (< 1 2) 100 200)"), 100);
