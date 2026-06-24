@@ -1,0 +1,31 @@
+[package]
+name = "kami-character-scene"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# kami-character-scene — data-tier authoring surface for kami-character
+# HAIR-STYLE presets.
+#
+# ADR-0038: hot procedural geometry generation (strand / card / mesh) stays
+# native Rust (kami-character::hair_gen); only init-time CONFIG/DATA moves to
+# EDN. This sibling-of-kami-vehicle-scene / kami-postfx-scene / kami-autodrive-scene
+# crate turns canonical `:character/hair-styles` EDN (a table of named
+# `HairStyle` parameter maps) into the real `kami_character::HairStyle` engine
+# struct, re-using the tolerant `kami-scene` EDN accessors exactly the way games
+# parse `scene.edn` (missing keys fall back to defaults, namespaced keywords
+# match on `ns/name`, ints coerce to floats).
+#
+# kami-character stays untouched — the EDN dependency lives only here. The
+# compiled-in `HairStyle::{blonde_long,dark_short,red_wavy,brown_curly,afro}()`
+# preset builders remain the `builtin_hair_style()` fallback and parity oracle,
+# and are parity-tested against the shipped EDN.
+
+[dependencies]
+# Engine struct we build (HairStyle + HairType). Path dep, no new feature added
+# to kami-character — this is additive.
+kami-character = { path = "../kami-character" }
+# EDN preset-config authoring (clj/edn → HairStyleSpec). Re-uses the tolerant
+# scene.edn accessors so preset config parses the same way games do.
+kami-scene = { path = "../kami-scene" }
+thiserror = { workspace = true }
