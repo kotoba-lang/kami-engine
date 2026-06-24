@@ -12,6 +12,7 @@ crate-type = ["cdylib", "rlib"]
 kami-app = { path = "../kami-app" }
 kami-render = { path = "../kami-render", features = ["wgpu-backend"] }
 kami-vehicle = { path = "../kami-vehicle" }
+kami-vehicle-scene = { path = "../kami-vehicle-scene" }
 kami-atmosphere = { path = "../kami-atmosphere" }
 glam = { workspace = true }
 bytemuck = { workspace = true }
