@@ -53,6 +53,499 @@ fn vec2(v: Option<&EdnValue>) -> [f32; 2] {
 fn opt_vec3(v: Option<&EdnValue>) -> Option<[f32; 3]> {
     v.and_then(|x| x.as_vector()).map(|_| vec3(v))
 }
+/// Local keyword/string name (namespace dropped), if `v` is one.
+fn ident(v: Option<&EdnValue>) -> Option<String> {
+    v.and_then(|x| {
+        x.as_keyword()
+            .map(|k| k.0.name.clone())
+            .or_else(|| x.as_string().map(|s| s.to_string()))
+    })
+}
+/// Read a number with an explicit default (vs. `num`'s implicit 0.0).
+fn num_or(v: Option<&EdnValue>, default: f32) -> f32 {
+    v.map(|x| num(Some(x))).unwrap_or(default)
+}
+
+// ── EDN render-IR extensions (ADR-0044) ─────────────────────────────────────
+// Additive, optional render-IR vocabulary closing three.js/VRM gaps. `parse_ir`
+// (the v1 forward-pass path + golden tests) is untouched; `parse_render_ir`
+// reads the richer scene. The GPU executor adopts these incrementally.
+
+/// Light kind for `:lights` (closes the "directional-only" gap → multi-light).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LightKind {
+    Directional,
+    Point,
+    Spot,
+}
+
+impl LightKind {
+    pub fn by_name(name: &str) -> LightKind {
+        match name {
+            "point" => LightKind::Point,
+            "spot" => LightKind::Spot,
+            _ => LightKind::Directional,
+        }
+    }
+}
+
+/// One light source. `dir` is used by directional/spot; `pos`/`range` by
+/// point/spot; `spot_inner`/`spot_outer` (radians) shape the spot cone.
+#[derive(Clone, Debug)]
+pub struct Light {
+    pub kind: LightKind,
+    pub color: [f32; 3],
+    pub intensity: f32,
+    pub dir: [f32; 3],
+    pub pos: [f32; 3],
+    pub range: f32,
+    pub spot_inner: f32,
+    pub spot_outer: f32,
+    pub cast_shadow: bool,
+}
+
+/// Explicit camera (closes "no fov/near/far" — eye/target alone can't frame).
+#[derive(Clone, Debug)]
+pub struct Camera {
+    pub eye: [f32; 3],
+    pub target: [f32; 3],
+    /// Vertical FOV in radians.
+    pub fov_y: f32,
+    pub near: f32,
+    pub far: f32,
+}
+
+/// Environment / image-based lighting (closes "no IBL/env map"). `ibl_url` is a
+/// host-loaded equirect/cubemap reference; `ibl_intensity` scales it.
+#[derive(Clone, Debug)]
+pub struct Environment {
+    pub ambient: [f32; 3],
+    pub ground: [f32; 3],
+    pub ibl_intensity: f32,
+    pub ibl_url: Option<String>,
+}
+
+impl Default for Environment {
+    fn default() -> Self {
+        Environment {
+            ambient: [0.7, 0.8, 0.9],
+            ground: [0.34, 0.52, 0.30],
+            ibl_intensity: 0.0,
+            ibl_url: None,
+        }
+    }
+}
+
+/// Shading model for a `:materials` entry (closes "fixed PBR/MToon, not data").
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MaterialModel {
+    Pbr,
+    Mtoon,
+    Unlit,
+}
+
+impl MaterialModel {
+    pub fn by_name(name: &str) -> MaterialModel {
+        match name {
+            "mtoon" => MaterialModel::Mtoon,
+            "unlit" => MaterialModel::Unlit,
+            _ => MaterialModel::Pbr,
+        }
+    }
+}
+
+/// Transparency handling (closes the "no alpha-test / glTF MASK" gap).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AlphaMode {
+    Opaque,
+    /// Cutout: discard fragments below `alpha_cutoff` (hair / foliage / VRM).
+    Mask,
+    Blend,
+}
+
+impl AlphaMode {
+    pub fn by_name(name: &str) -> AlphaMode {
+        match name {
+            "mask" => AlphaMode::Mask,
+            "blend" => AlphaMode::Blend,
+            _ => AlphaMode::Opaque,
+        }
+    }
+}
+
+/// A named material a mesh/instance references by `id`. Covers PBR metallic-
+/// roughness, MToon toon params (shade/outline/rim/matcap), and alpha handling.
+#[derive(Clone, Debug)]
+pub struct Material {
+    pub id: String,
+    pub model: MaterialModel,
+    pub base: [f32; 3],
+    /// MToon shade (second) colour.
+    pub shade: [f32; 3],
+    pub metallic: f32,
+    pub roughness: f32,
+    pub emissive: f32,
+    pub alpha_mode: AlphaMode,
+    pub alpha_cutoff: f32,
+    /// MToon outline width (world units); 0 = no outline.
+    pub outline: f32,
+    /// MToon rim-light intensity.
+    pub rim: f32,
+    /// MToon matcap texture reference (host-loaded).
+    pub matcap: Option<String>,
+}
+
+/// One morph-target weight (VRM expression / glTF morph). `name` is the target
+/// (e.g. `happy`, `blink`, `aa`); `weight` in [0,1].
+#[derive(Clone, Debug)]
+pub struct MorphWeight {
+    pub name: String,
+    pub weight: f32,
+}
+
+/// A skinned / morphable mesh asset (closes "skinned + morph in IR → cuboids
+/// only"). The asset (`url`) is host-loaded via kami-vrm / kami-gltf; the IR
+/// declares the *binding* — transform, material, skin (joint palette source),
+/// per-frame morph weights, and optionally an inline joint palette so a fully
+/// data-driven host can draw a VRM avatar with no per-scene code (ADR-0043).
+#[derive(Clone, Debug)]
+pub struct Mesh {
+    pub id: String,
+    pub url: String,
+    pub pos: [f32; 3],
+    /// Rotation quaternion xyzw.
+    pub rot: [f32; 4],
+    pub scale: f32,
+    pub material: Option<String>,
+    /// Skin/skeleton id whose joint palette deforms this mesh.
+    pub skin: Option<String>,
+    /// Optional inline joint palette (column-major mat4 per joint). When empty,
+    /// the host supplies the palette from its skeleton evaluation.
+    pub joints: Vec<[[f32; 4]; 4]>,
+    pub morphs: Vec<MorphWeight>,
+    pub cast_shadow: bool,
+}
+
+/// The richer render-IR: v1 globals+instances plus the additive vocabulary.
+#[derive(Clone, Debug)]
+pub struct RenderIr {
+    pub globals: Globals,
+    pub instances: Vec<Instance>,
+    pub lights: Vec<Light>,
+    pub camera: Option<Camera>,
+    pub env: Environment,
+    pub materials: Vec<Material>,
+    pub meshes: Vec<Mesh>,
+}
+
+/// 16 flat floats → a column-major mat4; identity for missing components.
+fn mat4_from_flat(v: &[EdnValue]) -> [[f32; 4]; 4] {
+    let g = |i: usize| {
+        v.get(i)
+            .map(|x| num(Some(x)))
+            .unwrap_or(if i % 5 == 0 { 1.0 } else { 0.0 })
+    };
+    [
+        [g(0), g(1), g(2), g(3)],
+        [g(4), g(5), g(6), g(7)],
+        [g(8), g(9), g(10), g(11)],
+        [g(12), g(13), g(14), g(15)],
+    ]
+}
+
+fn parse_mesh(m: &std::collections::BTreeMap<EdnValue, EdnValue>) -> Mesh {
+    let rot = {
+        let s = mget(m, "rot").and_then(|x| x.as_vector()).unwrap_or(&[]);
+        let g = |i: usize| s.get(i).map(|x| num(Some(x))).unwrap_or(if i == 3 { 1.0 } else { 0.0 });
+        [g(0), g(1), g(2), g(3)]
+    };
+    let joints = mget(m, "joints")
+        .and_then(|x| x.as_vector())
+        .map(|js| {
+            js.iter()
+                .filter_map(|j| j.as_vector())
+                .map(mat4_from_flat)
+                .collect()
+        })
+        .unwrap_or_default();
+    let morphs = mget(m, "morphs")
+        .and_then(|x| x.as_map())
+        .map(|mm| {
+            mm.iter()
+                .filter_map(|(k, v)| {
+                    ident(Some(k)).map(|name| MorphWeight {
+                        name,
+                        weight: num(Some(v)),
+                    })
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    Mesh {
+        id: ident(mget(m, "id")).unwrap_or_default(),
+        url: mget(m, "url").and_then(|v| v.as_string()).unwrap_or("").to_string(),
+        pos: opt_vec3(mget(m, "pos")).unwrap_or([0.0, 0.0, 0.0]),
+        rot,
+        scale: num_or(mget(m, "scale"), 1.0),
+        material: ident(mget(m, "material")),
+        skin: ident(mget(m, "skin")),
+        joints,
+        morphs,
+        cast_shadow: mget(m, "cast-shadow").and_then(|v| v.as_bool()).unwrap_or(true),
+    }
+}
+
+fn parse_material(m: &std::collections::BTreeMap<EdnValue, EdnValue>) -> Material {
+    Material {
+        id: ident(mget(m, "id")).unwrap_or_default(),
+        model: ident(mget(m, "model"))
+            .map(|n| MaterialModel::by_name(&n))
+            .unwrap_or(MaterialModel::Pbr),
+        base: opt_vec3(mget(m, "base")).unwrap_or([1.0, 1.0, 1.0]),
+        shade: opt_vec3(mget(m, "shade")).unwrap_or([0.5, 0.5, 0.5]),
+        metallic: num_or(mget(m, "metallic"), 0.0),
+        roughness: num_or(mget(m, "roughness"), 0.65),
+        emissive: num_or(mget(m, "emissive"), 0.0),
+        alpha_mode: ident(mget(m, "alpha-mode"))
+            .map(|n| AlphaMode::by_name(&n))
+            .unwrap_or(AlphaMode::Opaque),
+        alpha_cutoff: num_or(mget(m, "alpha-cutoff"), 0.5),
+        outline: num_or(mget(m, "outline"), 0.0),
+        rim: num_or(mget(m, "rim"), 0.0),
+        matcap: mget(m, "matcap").and_then(|v| v.as_string()).map(|s| s.to_string()),
+    }
+}
+
+fn parse_light(m: &std::collections::BTreeMap<EdnValue, EdnValue>) -> Light {
+    let kind = ident(mget(m, "kind"))
+        .map(|n| LightKind::by_name(&n))
+        .unwrap_or(LightKind::Directional);
+    Light {
+        kind,
+        color: opt_vec3(mget(m, "color")).unwrap_or([1.0, 1.0, 1.0]),
+        intensity: num_or(mget(m, "intensity"), 1.0),
+        dir: opt_vec3(mget(m, "dir")).unwrap_or([-0.4, -0.85, -0.35]),
+        pos: opt_vec3(mget(m, "pos")).unwrap_or([0.0, 0.0, 0.0]),
+        range: num_or(mget(m, "range"), 0.0),
+        spot_inner: num_or(mget(m, "inner"), 0.0),
+        spot_outer: num_or(mget(m, "outer"), 0.0),
+        cast_shadow: mget(m, "cast-shadow").and_then(|v| v.as_bool()).unwrap_or(false),
+    }
+}
+
+/// Parse the richer EDN render-IR. Backward compatible: a v1 scene (just
+/// `:globals` + `:instances`) parses with empty `lights`, no `camera`, default
+/// `env`. New keys: `:lights [...]`, `:camera {...}`, `:env {...}`.
+pub fn parse_render_ir(edn: &str) -> RenderIr {
+    let (globals, instances) = parse_ir(edn);
+    let mut lights = Vec::new();
+    let mut camera = None;
+    let mut env = Environment::default();
+    let mut materials = Vec::new();
+    let mut meshes = Vec::new();
+    env.ambient = globals.horizon;
+
+    if let Some(root) = root_map(edn) {
+        if let Some(ls) = mget(&root, "lights").and_then(|x| x.as_vector()) {
+            lights = ls.iter().filter_map(|l| l.as_map()).map(parse_light).collect();
+        }
+        if let Some(ms) = mget(&root, "materials").and_then(|x| x.as_vector()) {
+            materials = ms.iter().filter_map(|m| m.as_map()).map(parse_material).collect();
+        }
+        if let Some(ms) = mget(&root, "meshes").and_then(|x| x.as_vector()) {
+            meshes = ms.iter().filter_map(|m| m.as_map()).map(parse_mesh).collect();
+        }
+        if let Some(cam) = mget(&root, "camera").and_then(|x| x.as_map().cloned()) {
+            camera = Some(Camera {
+                eye: opt_vec3(mget(&cam, "eye")).or(globals.eye).unwrap_or([5.0, 3.0, 8.0]),
+                target: opt_vec3(mget(&cam, "target")).or(globals.target).unwrap_or([0.0, 1.0, 0.0]),
+                fov_y: num_or(mget(&cam, "fov"), 0.9),
+                near: num_or(mget(&cam, "near"), 0.1),
+                far: num_or(mget(&cam, "far"), 1000.0),
+            });
+        }
+        if let Some(e) = mget(&root, "env").and_then(|x| x.as_map().cloned()) {
+            if mget(&e, "ambient").is_some() {
+                env.ambient = vec3(mget(&e, "ambient"));
+            }
+            if mget(&e, "ground").is_some() {
+                env.ground = vec3(mget(&e, "ground"));
+            }
+            if let Some(ibl) = mget(&e, "ibl").and_then(|x| x.as_map().cloned()) {
+                env.ibl_intensity = num_or(mget(&ibl, "intensity"), 1.0);
+                env.ibl_url = mget(&ibl, "url").and_then(|v| v.as_string()).map(|s| s.to_string());
+            }
+        }
+    }
+    RenderIr { globals, instances, lights, camera, env, materials, meshes }
+}
+
+impl RenderIr {
+    /// Look up a material by `id`.
+    pub fn material(&self, id: &str) -> Option<&Material> {
+        self.materials.iter().find(|m| m.id == id)
+    }
+    /// Look up a mesh by `id`.
+    pub fn mesh(&self, id: &str) -> Option<&Mesh> {
+        self.meshes.iter().find(|m| m.id == id)
+    }
+}
+
+impl Mesh {
+    /// Resolve a morph weight by target name (0.0 when absent).
+    pub fn morph(&self, name: &str) -> f32 {
+        self.morphs.iter().find(|w| w.name == name).map(|w| w.weight).unwrap_or(0.0)
+    }
+}
+
+#[cfg(test)]
+mod render_ir_ext_tests {
+    use super::*;
+
+    #[test]
+    fn v1_scene_stays_backward_compatible() {
+        // A pre-ADR-0044 scene parses unchanged: no lights, no camera, default env.
+        let ir = parse_render_ir(
+            "{:globals {:sky {:horizon [0.7 0.8 0.9]}} :instances [{:pos [0 1 0] :color [1 0 0]}]}",
+        );
+        assert_eq!(ir.instances.len(), 1);
+        assert!(ir.lights.is_empty());
+        assert!(ir.camera.is_none());
+        assert_eq!(ir.env.ambient, [0.7, 0.8, 0.9], "env ambient inherits sky horizon");
+        assert_eq!(ir.env.ibl_intensity, 0.0);
+    }
+
+    #[test]
+    fn parses_multi_light_rig() {
+        let ir = parse_render_ir(
+            r#"{:instances []
+                :lights [{:kind :directional :color [1 0.96 0.85] :intensity 1.2 :dir [-0.4 -0.85 -0.35] :cast-shadow true}
+                         {:kind :point :color [1 0.5 0.2] :intensity 3.0 :pos [2 3 0] :range 12.0}
+                         {:kind :spot :color [0.6 0.8 1] :pos [0 5 0] :dir [0 -1 0] :range 20.0 :inner 0.3 :outer 0.6}]}"#,
+        );
+        assert_eq!(ir.lights.len(), 3);
+        assert_eq!(ir.lights[0].kind, LightKind::Directional);
+        assert!(ir.lights[0].cast_shadow);
+        assert_eq!(ir.lights[1].kind, LightKind::Point);
+        assert_eq!(ir.lights[1].pos, [2.0, 3.0, 0.0]);
+        assert_eq!(ir.lights[1].range, 12.0);
+        assert_eq!(ir.lights[2].kind, LightKind::Spot);
+        assert!((ir.lights[2].spot_outer - 0.6).abs() < 1e-6);
+    }
+
+    #[test]
+    fn parses_camera_and_ibl_environment() {
+        let ir = parse_render_ir(
+            r#"{:instances []
+                :camera {:eye [0 2 6] :target [0 1 0] :fov 1.05 :near 0.1 :far 500.0}
+                :env {:ambient [0.2 0.2 0.25] :ground [0.1 0.1 0.1]
+                      :ibl {:intensity 0.8 :url "studio.hdr"}}}"#,
+        );
+        let cam = ir.camera.expect("camera");
+        assert_eq!(cam.eye, [0.0, 2.0, 6.0]);
+        assert!((cam.fov_y - 1.05).abs() < 1e-6);
+        assert!((cam.far - 500.0).abs() < 1e-6);
+        assert_eq!(ir.env.ambient, [0.2, 0.2, 0.25]);
+        assert!((ir.env.ibl_intensity - 0.8).abs() < 1e-6);
+        assert_eq!(ir.env.ibl_url.as_deref(), Some("studio.hdr"));
+    }
+
+    #[test]
+    fn unknown_light_kind_defaults_to_directional() {
+        let ir = parse_render_ir("{:instances [] :lights [{:kind :laser-disco :color [1 1 1]}]}");
+        assert_eq!(ir.lights[0].kind, LightKind::Directional);
+    }
+
+    #[test]
+    fn parses_material_table_with_mtoon_and_alpha() {
+        let ir = parse_render_ir(
+            r#"{:instances []
+                :materials [{:id :skin :model :mtoon :base [1 0.8 0.7] :shade [0.6 0.4 0.4]
+                             :alpha-mode :mask :alpha-cutoff 0.5 :outline 0.02 :rim 0.3 :matcap "m.png"}
+                            {:id :glass :model :pbr :base [0.8 0.9 1] :metallic 0.0 :roughness 0.05
+                             :alpha-mode :blend}]}"#,
+        );
+        assert_eq!(ir.materials.len(), 2);
+        let skin = ir.material("skin").expect("skin material");
+        assert_eq!(skin.model, MaterialModel::Mtoon);
+        assert_eq!(skin.alpha_mode, AlphaMode::Mask);
+        assert!((skin.alpha_cutoff - 0.5).abs() < 1e-6);
+        assert!((skin.outline - 0.02).abs() < 1e-6);
+        assert_eq!(skin.matcap.as_deref(), Some("m.png"));
+        let glass = ir.material("glass").expect("glass material");
+        assert_eq!(glass.model, MaterialModel::Pbr);
+        assert_eq!(glass.alpha_mode, AlphaMode::Blend);
+        assert_eq!(glass.alpha_cutoff, 0.5, "default cutoff when unspecified");
+    }
+
+    #[test]
+    fn material_defaults_and_unknown_lookup() {
+        let ir = parse_render_ir("{:instances [] :materials [{:id :plain}]}");
+        let p = ir.material("plain").unwrap();
+        assert_eq!(p.model, MaterialModel::Pbr, "default model");
+        assert_eq!(p.alpha_mode, AlphaMode::Opaque, "default alpha");
+        assert_eq!(p.base, [1.0, 1.0, 1.0]);
+        assert!(ir.material("nope").is_none());
+    }
+
+    #[test]
+    fn v1_scene_has_empty_material_table() {
+        let ir = parse_render_ir("{:instances [{:pos [0 0 0] :color [1 0 0]}]}");
+        assert!(ir.materials.is_empty(), "no :materials → empty table, backward compatible");
+        assert!(ir.meshes.is_empty(), "no :meshes → empty, backward compatible");
+    }
+
+    #[test]
+    fn parses_skinned_morph_vrm_mesh() {
+        // A VRM avatar declared purely as data: transform + material + skin +
+        // morph weights — the gating piece for the dance scene (ADR-0043).
+        let ir = parse_render_ir(
+            r#"{:instances []
+                :materials [{:id :skin :model :mtoon}]
+                :meshes [{:id :avatar :url "mitama.vrm" :pos [0 1 0] :rot [0 0 0 1] :scale 1.1
+                          :material :skin :skin :rig
+                          :morphs {:happy 0.8 :blink 1.0}
+                          :cast-shadow true}]}"#,
+        );
+        assert_eq!(ir.meshes.len(), 1);
+        let a = ir.mesh("avatar").expect("avatar mesh");
+        assert_eq!(a.url, "mitama.vrm");
+        assert_eq!(a.pos, [0.0, 1.0, 0.0]);
+        assert_eq!(a.rot, [0.0, 0.0, 0.0, 1.0]);
+        assert!((a.scale - 1.1).abs() < 1e-6);
+        assert_eq!(a.material.as_deref(), Some("skin"));
+        assert_eq!(a.skin.as_deref(), Some("rig"));
+        assert!((a.morph("happy") - 0.8).abs() < 1e-6);
+        assert!((a.morph("blink") - 1.0).abs() < 1e-6);
+        assert_eq!(a.morph("angry"), 0.0, "absent morph → 0");
+        // the mesh resolves its material in the table.
+        assert_eq!(ir.material(a.material.as_deref().unwrap()).unwrap().model, MaterialModel::Mtoon);
+    }
+
+    #[test]
+    fn parses_inline_joint_palette() {
+        // a host can ship the evaluated skeleton palette inline (column-major mat4s).
+        let ir = parse_render_ir(
+            r#"{:instances []
+                :meshes [{:id :rigged :url "m.vrm"
+                          :joints [[1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 1]
+                                   [1 0 0 0  0 1 0 0  0 0 1 0  2 3 4 1]]}]}"#,
+        );
+        let m = ir.mesh("rigged").unwrap();
+        assert_eq!(m.joints.len(), 2);
+        assert_eq!(m.joints[0], [[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,1.0,0.0],[0.0,0.0,0.0,1.0]]);
+        assert_eq!(m.joints[1][3], [2.0, 3.0, 4.0, 1.0], "translation row");
+    }
+
+    #[test]
+    fn mesh_rot_and_scale_defaults() {
+        let ir = parse_render_ir(r#"{:instances [] :meshes [{:id :m :url "x.glb"}]}"#);
+        let m = ir.mesh("m").unwrap();
+        assert_eq!(m.rot, [0.0, 0.0, 0.0, 1.0], "identity quaternion default");
+        assert_eq!(m.scale, 1.0);
+        assert!(m.cast_shadow, "meshes cast shadow by default");
+    }
+}
 
 /// Parse the EDN render-IR — the same data the CLJS executor consumes.
 pub fn parse_ir(edn: &str) -> (Globals, Vec<Instance>) {
@@ -176,75 +669,13 @@ fn model_mat(i: &Instance) -> Mat4 {
         * Mat4::from_scale(Vec3::new(w, h, w))
 }
 
-// Main shader — identical WGSL to the web kami.webgpu (shadow-map PCF included).
-const SHADER: &str = r#"
-struct G { vp: mat4x4<f32>, sun_dir: vec4<f32>, sun_col: vec4<f32>, sky: vec4<f32>, light_vp: mat4x4<f32> };
-@group(0) @binding(0) var<uniform> g: G;
-@group(0) @binding(1) var shadowMap: texture_depth_2d;
-@group(0) @binding(2) var shadowSamp: sampler_comparison;
-fn shadow(wpos: vec3<f32>, ndl: f32) -> f32 {
-  let lc = g.light_vp * vec4<f32>(wpos, 1.0);
-  let ndc = lc.xyz / lc.w;
-  let uv = vec2<f32>(ndc.x*0.5+0.5, 0.5-ndc.y*0.5);
-  if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0 || ndc.z > 1.0) { return 1.0; }
-  let bias = max(0.0025*(1.0-ndl), 0.0006);
-  let texel = 1.0/2048.0;
-  var lit = 0.0;
-  for (var dx = -1; dx <= 1; dx++) {
-    for (var dy = -1; dy <= 1; dy++) {
-      lit += textureSampleCompareLevel(shadowMap, shadowSamp, uv + vec2<f32>(f32(dx),f32(dy))*texel, ndc.z - bias);
-    }
-  }
-  return lit/9.0;
-}
-struct VO { @builtin(position) clip: vec4<f32>, @location(0) n: vec3<f32>, @location(1) col: vec3<f32>, @location(2) wpos: vec3<f32>, @location(3) mat: vec3<f32> };
-@vertex
-fn vs(@location(0) pos: vec3<f32>, @location(1) normal: vec3<f32>,
-      @location(2) m0: vec4<f32>, @location(3) m1: vec4<f32>, @location(4) m2: vec4<f32>, @location(5) m3: vec4<f32>,
-      @location(6) color: vec4<f32>, @location(7) material: vec4<f32>) -> VO {
-  let model = mat4x4<f32>(m0, m1, m2, m3);
-  let world = model * vec4<f32>(pos, 1.0);
-  var o: VO; o.clip = g.vp * world;
-  o.n = normalize((model * vec4<f32>(normal, 0.0)).xyz); o.col = color.rgb; o.wpos = world.xyz;
-  o.mat = material.xyz; return o;
-}
-@fragment
-fn fs(i: VO) -> @location(0) vec4<f32> {
-  let N = normalize(i.n);
-  let L = normalize(-g.sun_dir.xyz);
-  let eye = vec3<f32>(g.sun_dir.w, g.sun_col.w, g.sky.w);
-  let V = normalize(eye - i.wpos);
-  let H = normalize(L + V);
-  let ndl = max(dot(N, L), 0.0);
-  let metallic = clamp(i.mat.x, 0.0, 1.0);
-  let rough = clamp(i.mat.y, 0.04, 1.0);
-  let emissive = i.mat.z;
-  let amb = mix(vec3<f32>(0.20,0.22,0.26), g.sky.rgb*0.65, N.y*0.5+0.5);
-  let shininess = mix(4.0, 256.0, 1.0 - rough);
-  let spec = pow(max(dot(N, H), 0.0), shininess) * mix(0.25, 0.9, metallic);
-  let specTint = mix(vec3<f32>(1.0), i.col, metallic);
-  let rim = pow(1.0 - max(dot(N, V), 0.0), 3.0) * 0.25;
-  let sh = shadow(i.wpos, ndl);
-  var c = i.col * (amb + ndl * g.sun_col.rgb * 0.9 * (1.0 - metallic*0.7) * sh)
-        + specTint * g.sun_col.rgb * spec * sh + g.sky.rgb * rim + i.col * emissive;
-  c = c / (c + vec3<f32>(1.0));
-  c = pow(c, vec3<f32>(1.0/2.2));
-  return vec4<f32>(c, 1.0);
-}
-"#;
+// Main + shadow shaders are GENERATED from kami.shaders/lit-shader (the EDN AST via kami.wgsl) and
+// committed here by `bb gen-wgsl`; the web (kami.webgpu) renders the same source. `bb wgsl-parity`
+// gates that these files stay token-equivalent to kami.shaders, so web↔native can't silently drift.
+const SHADER: &str = include_str!("lit_shader.wgsl");
 
 // Depth-only shadow pass — renders instances from the sun's POV into the shadow map.
-const SHADOW_WGSL: &str = r#"
-struct G { vp: mat4x4<f32>, sun_dir: vec4<f32>, sun_col: vec4<f32>, sky: vec4<f32>, light_vp: mat4x4<f32> };
-@group(0) @binding(0) var<uniform> g: G;
-@vertex
-fn vs(@location(0) pos: vec3<f32>, @location(1) normal: vec3<f32>,
-      @location(2) m0: vec4<f32>, @location(3) m1: vec4<f32>, @location(4) m2: vec4<f32>, @location(5) m3: vec4<f32>,
-      @location(6) color: vec4<f32>, @location(7) material: vec4<f32>) -> @builtin(position) vec4<f32> {
-  let model = mat4x4<f32>(m0, m1, m2, m3);
-  return g.light_vp * model * vec4<f32>(pos, 1.0);
-}
-"#;
+const SHADOW_WGSL: &str = include_str!("shadow_shader.wgsl");
 
 const MAX_INST: u32 = 16384;
 
@@ -344,7 +775,7 @@ impl Renderer {
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST, mapped_at_creation: false,
         });
         let gbuf = device.create_buffer(&wgpu::BufferDescriptor {
-            label: None, size: 176, usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST, mapped_at_creation: false,
+            label: None, size: 240, usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST, mapped_at_creation: false,
         });
 
         let module = device.create_shader_module(wgpu::ShaderModuleDescriptor { label: None, source: wgpu::ShaderSource::Wgsl(SHADER.into()) });
@@ -418,12 +849,18 @@ impl Renderer {
         let leye = ltgt - sd * 200.0;
         let light_vp = Mat4::orthographic_rh(-130.0, 130.0, -130.0, 130.0, 1.0, 420.0) * Mat4::look_at_rh(leye, ltgt, Vec3::Y);
 
-        let mut gf = [0f32; 44];
+        let mut gf = [0f32; 60];
         gf[0..16].copy_from_slice(&vp.to_cols_array());
         gf[16..20].copy_from_slice(&[g.sun_dir[0], g.sun_dir[1], g.sun_dir[2], eye[0]]);
         gf[20..24].copy_from_slice(&[g.sun[0], g.sun[1], g.sun[2], eye[1]]);
         gf[24..28].copy_from_slice(&[g.horizon[0], g.horizon[1], g.horizon[2], eye[2]]);
         gf[28..44].copy_from_slice(&light_vp.to_cols_array());
+        // tunable lighting — recovered from the previously-hardcoded fragment, now fed as data so the
+        // generated shader (g.light_a..d) renders identically. Matches the web kami.webgpu defaults.
+        gf[44..48].copy_from_slice(&[0.20, 0.22, 0.26, 0.65]);          // light_a: ambient rgb, sky-mix weight
+        gf[48..52].copy_from_slice(&[0.25, 0.9, 0.25, 3.0]);           // light_b: specStr lo/hi, rim scale/pow
+        gf[52..56].copy_from_slice(&[4.0, 256.0, 0.9, 0.7]);          // light_c: shininess lo/hi, sun scale, metal factor
+        gf[56..60].copy_from_slice(&[2.2, 0.0025, 0.0006, 1.0 / 2048.0]); // light_d: gamma, shadow bias factor/min, texel
         self.queue.write_buffer(&self.gbuf, 0, bytemuck::cast_slice(&gf));
 
         let n_inst = insts.len().min(MAX_INST as usize);
@@ -598,6 +1035,25 @@ mod tests {
         cap(&mut v, &mut idx, -hy, [0.0, -1.0, 0.0], -1, nv + (1 + top.len()) as u16);
         (v, idx)
     }
+    // The shaders are generated from kami.shaders/lit-shader (bb gen-wgsl). Assert the include_str'd
+    // WGSL matches the cljc canonical fixture token-for-token, so native can't drift from the web
+    // shader. Skips if kami-webgpu isn't co-located (same policy as the geometry goldens).
+    fn shader_canon(s: &str) -> String {
+        s.chars().filter(|c| !c.is_whitespace() && *c != '(' && *c != ')').collect()
+    }
+    fn assert_shader_parity(fixture: &str, native: &str) {
+        let path = format!("{}/../../kami-webgpu/fixtures/{}", env!("CARGO_MANIFEST_DIR"), fixture);
+        let Ok(golden) = std::fs::read_to_string(&path) else {
+            eprintln!("skip: {fixture} not found (kami-webgpu not co-located)"); return;
+        };
+        assert_eq!(shader_canon(native), shader_canon(&golden),
+                   "native shader must be token-equivalent to the kami.shaders canonical (run bb gen-wgsl)");
+    }
+    #[test]
+    fn lit_shader_matches_cljc_canonical() { assert_shader_parity("lit-shader.wgsl", SHADER); }
+    #[test]
+    fn shadow_shader_matches_cljc_canonical() { assert_shader_parity("shadow-shader.wgsl", SHADOW_WGSL); }
+
     fn load_golden(name: &str) -> Option<(Vec<f32>, Vec<u16>)> {
         let path = format!("{}/../../kami-webgpu/fixtures/{}-golden.json", env!("CARGO_MANIFEST_DIR"), name);
         let json = std::fs::read_to_string(&path).ok()?;
