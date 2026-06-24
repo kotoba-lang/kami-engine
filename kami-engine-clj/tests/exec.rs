@@ -127,6 +127,22 @@ fn defatom_persists_state_across_ticks() {
     assert_eq!(getlives.call(&mut store, ()).unwrap(), 1, "lives 3 - 2 hits = 1");
 }
 
+/// defatom cells are exported as WASM globals so the HOST can read game state directly (the
+/// bridge that replaces marker-entity counting for the HUD). Reads the initial values back.
+#[test]
+fn defatom_globals_are_exported_for_the_host() {
+    use kami_engine_clj::compile_str;
+    let wasm = compile_str("(defatom lives 3) (defatom score 0) (defn init [] 0)").expect("compile");
+    let engine = wasmtime::Engine::default();
+    let module = wasmtime::Module::new(&engine, &wasm).expect("module");
+    let mut store: wasmtime::Store<()> = wasmtime::Store::new(&engine, ());
+    let instance = wasmtime::Instance::new(&mut store, &module, &[]).expect("instantiate");
+    let lives = instance.get_global(&mut store, "lives").expect("lives global must be exported");
+    let score = instance.get_global(&mut store, "score").expect("score global must be exported");
+    assert_eq!(lives.get(&mut store).i64(), Some(3));
+    assert_eq!(score.get(&mut store).i64(), Some(0));
+}
+
 #[test]
 fn conditionals_pick_the_right_branch() {
     assert_eq!(eval("(if (< 1 2) 100 200)"), 100);

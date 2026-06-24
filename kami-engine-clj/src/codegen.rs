@@ -122,11 +122,15 @@ pub fn compile(program: &Program) -> Result<Vec<u8>, CljError> {
     // legitimate initial 0 is not confused with "uninitialised").
     let mut atom_index: HashMap<String, u32> = HashMap::new();
     for (k, atom) in program.atoms.iter().enumerate() {
+        let gidx = 1 + k as u32;
         globals.global(
             GlobalType { val_type: ValType::I64, mutable: true, shared: false },
             &ConstExpr::i64_const(atom.init),
         );
-        atom_index.insert(atom.name.clone(), 1 + k as u32);
+        atom_index.insert(atom.name.clone(), gidx);
+        // export the cell so the host can read game state (lives/score) directly — the bridge
+        // that lets a game use defatom instead of off-map marker entities for the HUD.
+        exports.export(&atom.name, ExportKind::Global, gidx);
     }
 
     // Pass 2: function bodies.
