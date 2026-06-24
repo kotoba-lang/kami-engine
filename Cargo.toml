@@ -35,6 +35,7 @@ members = [
     "kami-postfx-scene",
     "kami-autodrive-scene",
     "kami-character-scene",
+    "kami-game-scene",
     "kami-autodrive",
     "kami-tilemap",
     "kami-audio",
