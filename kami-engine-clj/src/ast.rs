@@ -60,9 +60,14 @@ pub enum Builtin {
     // ---- arithmetic ---------------------------------------------------------
     Add, Sub, Mul, Div, Mod,
     Inc, Dec, Abs,
+    // ---- f32 arithmetic (real float math on the i64-boxed bit-patterns) ------
+    // `+f -f *f /f` unbox each operand (i64 bits → f32), do the float op, rebox.
+    FAdd, FSub, FMul, FDiv,
     // ---- comparison ---------------------------------------------------------
     Eq, NotEq, Lt, Gt, Le, Ge,
     Zero, Pos, Neg,
+    // ---- f32 comparison (sign-correct, unlike I64LtS on f32 bits) -----------
+    FLt, FGt, FLe, FGe, FEq,
     // ---- logic --------------------------------------------------------------
     And, Or, Not,
     // ---- string / bytes (kotoba-clj core) -----------------------------------
@@ -220,6 +225,17 @@ impl Builtin {
             "inc"        => Inc,
             "dec"        => Dec,
             "abs"        => Abs,
+            // f32 arithmetic (real float math on i64-boxed bit-patterns)
+            "+f"         => FAdd,
+            "-f"         => FSub,
+            "*f"         => FMul,
+            "/f"         => FDiv,
+            // f32 comparison (sign-correct)
+            "<f"         => FLt,
+            ">f"         => FGt,
+            "<=f"        => FLe,
+            ">=f"        => FGe,
+            "=f"         => FEq,
             // comparison
             "="          => Eq,
             "!=" | "not="=> NotEq,
@@ -881,6 +897,10 @@ fn check_builtin_arity(op: Builtin, n: usize) -> Result<(), CljError> {
         Add | Mul | And | Or => n >= 1,
         Div | Mod => n == 2,
         Eq | NotEq | Lt | Gt | Le | Ge => n >= 1,
+        // f32 arithmetic: `+f`/`*f` fold from one operand; `-f`/`/f` need two.
+        FAdd | FMul => n >= 1,
+        FSub | FDiv => n >= 2,
+        FLt | FGt | FLe | FGe | FEq => n >= 1,
     };
     if ok {
         Ok(())

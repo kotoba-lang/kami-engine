@@ -53,3 +53,9 @@ pub fn eval_i64(expr: &str) -> Result<i64, CljError> {
         ref other => Err(CljError::Run(format!("expected i64 result, got {other:?}"))),
     }
 }
+
+/// Like [`eval_i64`], but decode the result as the f32 bit-pattern it boxes — for asserting
+/// the value of guest float expressions (`+f`/`-f`/`*f`/`/f`).
+pub fn eval_f32(expr: &str) -> Result<f32, CljError> {
+    Ok(f32::from_bits(eval_i64(expr)? as u32))
+}

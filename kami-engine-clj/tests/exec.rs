@@ -5,10 +5,14 @@
 //! only kind of test that catches silent codegen bugs. Requires `--features run`.
 #![cfg(feature = "run")]
 
-use kami_engine_clj::run::eval_i64;
+use kami_engine_clj::run::{eval_f32, eval_i64};
 
 fn eval(expr: &str) -> i64 {
     eval_i64(expr).unwrap_or_else(|e| panic!("eval `{expr}` failed: {e:?}"))
+}
+
+fn evalf(expr: &str) -> f32 {
+    eval_f32(expr).unwrap_or_else(|e| panic!("evalf `{expr}` failed: {e:?}"))
 }
 
 #[test]
@@ -60,6 +64,32 @@ fn multi_arg_ordering_checks_every_pair() {
     assert_eq!(eval("(<= 1 1 2)"), 1);
     assert_eq!(eval("(<= 1 2 2 1)"), 0);
     assert_eq!(eval("(>= 5 5 1)"), 1);
+}
+
+/// Guest f32 arithmetic computes REAL floats (unbox bits → float op → rebox), so games can
+/// finally do `(set-velocity! p (*f (axis "MoveX") speed) …)` in CLJ instead of the host.
+#[test]
+fn guest_f32_arithmetic_computes_real_floats() {
+    assert!((evalf("(+f (f32 1.5) (f32 2.25))") - 3.75).abs() < 1e-6);
+    assert!((evalf("(-f (f32 5.0) (f32 1.5))") - 3.5).abs() < 1e-6);
+    assert!((evalf("(*f (f32 3.0) (f32 2.5))") - 7.5).abs() < 1e-6);
+    assert!((evalf("(/f (f32 7.0) (f32 2.0))") - 3.5).abs() < 1e-6);
+    assert!((evalf("(+f (f32 1.0) (f32 2.0) (f32 3.0))") - 6.0).abs() < 1e-6); // variadic
+    assert!((evalf("(*f (f32 -2.0) (f32 4.0))") - -8.0).abs() < 1e-6); // negative
+}
+
+/// The reason f32 comparison is a distinct op: it is SIGN-CORRECT. A signed integer compare of
+/// the bit-patterns says -1.0 > 1.0 (its bit-pattern is numerically larger); the f32 compare is
+/// right. This is the unsoundness the f32-reject was guarding against, now fixed by `<f`.
+#[test]
+fn guest_f32_comparison_is_sign_correct() {
+    assert_eq!(eval("(<f (f32 -1.0) (f32 1.0))"), 1); // would be 0 with I64LtS on bits
+    assert_eq!(eval("(<f (f32 1.0) (f32 -1.0))"), 0);
+    assert_eq!(eval("(>f (f32 2.5) (f32 2.0))"), 1);
+    assert_eq!(eval("(<=f (f32 2.0) (f32 2.0))"), 1);
+    assert_eq!(eval("(=f (f32 3.5) (f32 3.5))"), 1);
+    assert_eq!(eval("(<f (f32 1.0) (f32 2.0) (f32 3.0))"), 1); // chain
+    assert_eq!(eval("(<f (f32 1.0) (f32 2.0) (f32 0.0))"), 0);
 }
 
 #[test]

@@ -609,6 +609,24 @@ impl<'a> FnCtx<'a> {
 
     // ---- builtins -----------------------------------------------------------
 
+    /// Does this expression yield an f32 bit-pattern rather than a real integer?
+    /// Conservative: true only for f32 literals and the host primitives documented to return
+    /// f32 bits (positions/velocities/rotations/axis/pointer). We deliberately do NOT track
+    /// f32 through `let`/`if`/calls — this guards the obvious unsound path, not a type system.
+    fn returns_f32(expr: &Expr) -> bool {
+        use Builtin::*;
+        match expr {
+            Expr::Float(_) => true,
+            Expr::Builtin { op, .. } => matches!(
+                op,
+                FAdd | FSub | FMul | FDiv
+                    | BitsF32 | GetX | GetY | GetZ | GetVx | GetVy | GetVz
+                    | GetRx | GetRy | GetRz | GetRw | Axis | PointerX | PointerY
+            ),
+            _ => false,
+        }
+    }
+
     /// Emit a variadic comparison as a pairwise AND-chain:
     /// `(op a b c …)` ≡ `(a op b) and (b op c) and …`.
     /// Each argument is evaluated exactly once into a local (so a side-effecting operand
@@ -642,6 +660,41 @@ impl<'a> FnCtx<'a> {
         Ok(out)
     }
 
+    /// Like `cmp_chain`, but each operand is an f32 bit-pattern: unbox it (low 32 bits → f32)
+    /// before the (sign-correct) f32 comparison. `(op a b c)` = `(a op b) and (b op c)`.
+    fn fcmp_chain(
+        &mut self,
+        cmp:  Instruction<'static>,
+        args: &[Expr],
+    ) -> Result<Vec<Instruction<'static>>, CljError> {
+        if args.len() < 2 {
+            return Ok(vec![Instruction::I64Const(1)]);
+        }
+        let mut out = Vec::new();
+        let locals: Vec<u32> = (0..args.len()).map(|_| self.alloc_local()).collect();
+        for (i, a) in args.iter().enumerate() {
+            out.extend(self.emit(a)?);
+            out.push(Instruction::LocalSet(locals[i]));
+        }
+        let unbox = |out: &mut Vec<Instruction<'static>>, l: u32| {
+            out.push(Instruction::LocalGet(l));
+            out.push(Instruction::I32WrapI64);
+            out.push(Instruction::F32ReinterpretI32);
+        };
+        unbox(&mut out, locals[0]);
+        unbox(&mut out, locals[1]);
+        out.push(cmp.clone());
+        out.push(Instruction::I64ExtendI32U);
+        for w in 2..args.len() {
+            unbox(&mut out, locals[w - 1]);
+            unbox(&mut out, locals[w]);
+            out.push(cmp.clone());
+            out.push(Instruction::I64ExtendI32U);
+            out.push(Instruction::I64And);
+        }
+        Ok(out)
+    }
+
     fn emit_builtin(
         &mut self,
         op:   Builtin,
@@ -652,6 +705,20 @@ impl<'a> FnCtx<'a> {
         // Host imports are handled by a separate path.
         if let Some(imp) = op.host_import() {
             return self.emit_host_call(imp, args);
+        }
+
+        // Reject unsound integer math / signed ordering on f32 bit-patterns. The all-i64 ABI
+        // stores an f32 as opaque bits, so `(+ (get-x e) v)` integer-adds bit-patterns and
+        // `(< fa fb)` signed-compares them — both silent garbage. Guest float arithmetic isn't
+        // supported yet, so turn the silent-garbage path into a caught error at the form.
+        if matches!(op, Add | Sub | Mul | Div | Mod | Inc | Dec | Lt | Gt | Le | Ge)
+            && args.iter().any(Self::returns_f32)
+        {
+            return Err(CljError::Codegen(format!(
+                "`({op:?} …)` operates on an f32 value, which is unsound: the i64 holds float \
+                 bits, not an integer. Use the f32 ops instead — `+f -f *f /f` for arithmetic, \
+                 `<f >f <=f >=f =f` for comparison — or pass f32 straight to a host primitive."
+            )));
         }
 
         let mut out = Vec::new();
@@ -732,6 +799,38 @@ impl<'a> FnCtx<'a> {
                 out.extend(self.emit(&args[1])?);
                 out.push(Instruction::I64Ne);
                 out.push(Instruction::I64ExtendI32U);
+            }
+            // Real f32 arithmetic: unbox each operand (low 32 bits of the i64 → f32), fold with
+            // the float op, then rebox the f32 result back to i64 bits. Variadic like the int ops.
+            FAdd | FSub | FMul | FDiv => {
+                let fop = match op {
+                    FAdd => Instruction::F32Add,
+                    FSub => Instruction::F32Sub,
+                    FMul => Instruction::F32Mul,
+                    _ => Instruction::F32Div,
+                };
+                out.extend(self.emit(&args[0])?);
+                out.push(Instruction::I32WrapI64);
+                out.push(Instruction::F32ReinterpretI32);
+                for a in &args[1..] {
+                    out.extend(self.emit(a)?);
+                    out.push(Instruction::I32WrapI64);
+                    out.push(Instruction::F32ReinterpretI32);
+                    out.push(fop.clone());
+                }
+                out.push(Instruction::I32ReinterpretF32);
+                out.push(Instruction::I64ExtendI32U);
+            }
+            // f32 comparison — sign-correct (an I64LtS on f32 bits is wrong for negatives).
+            FLt | FGt | FLe | FGe | FEq => {
+                let fcmp = match op {
+                    FLt => Instruction::F32Lt,
+                    FGt => Instruction::F32Gt,
+                    FLe => Instruction::F32Le,
+                    FGe => Instruction::F32Ge,
+                    _ => Instruction::F32Eq,
+                };
+                out.extend(self.fcmp_chain(fcmp, args)?);
             }
             Zero => {
                 out.extend(self.emit(&args[0])?);
