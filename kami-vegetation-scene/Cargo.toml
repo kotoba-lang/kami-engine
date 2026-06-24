@@ -1,0 +1,30 @@
+[package]
+name = "kami-vegetation-scene"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# kami-vegetation-scene — data-tier authoring surface for kami-vegetation
+# TAXONOMIC PROFILE presets.
+#
+# ADR-0038: hot mesh generation / placement / cull stays native Rust
+# (kami-vegetation); only init-time CONFIG/DATA moves to EDN. This
+# sibling-of-kami-vehicle-scene / kami-atmosphere-scene / kami-terrain-scene crate
+# turns canonical `:vegetation/profiles` EDN (the per-species TaxonomicProfile —
+# canopy shape + stem radii + leaf count/size + colours + taxonomy enums) into the
+# real `kami_vegetation::taxonomy::TaxonomicProfile` engine struct, re-using the
+# tolerant `kami-scene` EDN accessors exactly the way games parse `scene.edn`.
+#
+# kami-vegetation stays untouched — the EDN dependency lives only here. The
+# compiled-in `grass()` / `fern()` / `palm()` / `conifer()` / `bush()` / `cactus()`
+# / `moss()` profile builders remain the `builtin_profile()` fallback and parity
+# oracle, and are parity-tested against the shipped EDN.
+
+[dependencies]
+# Engine struct we build (TaxonomicProfile + CanopyShape etc.). Path dep, no new
+# feature added to kami-vegetation — this is additive.
+kami-vegetation = { path = "../kami-vegetation" }
+# EDN profile-config authoring (clj/edn → ProfileSpec). Re-uses the tolerant
+# scene.edn accessors so profile config parses the same way games do.
+kami-scene = { path = "../kami-scene" }
+thiserror = { workspace = true }

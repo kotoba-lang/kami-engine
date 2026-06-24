@@ -31,6 +31,7 @@ members = [
     "kami-vehicle-scene",
     "kami-atmosphere-scene",
     "kami-terrain-scene",
+    "kami-vegetation-scene",
     "kami-autodrive",
     "kami-tilemap",
     "kami-audio",
