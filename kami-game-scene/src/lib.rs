@@ -61,6 +61,9 @@ pub mod item_catalog;
 /// Battle-royale storm phases + consumable pool as EDN.
 pub mod battle_royale;
 
+/// Pokoa species dex (`pokoa::pokoa_dex()`) as EDN (owned spec; engine struct is `&'static`).
+pub mod pokoa;
+
 use std::collections::BTreeMap;
 
 use kami_game::animation::{AnimationClip, AnimationState, HeadBobPhase};
