@@ -52,6 +52,9 @@ pub mod catalog;
 /// Brainrot evolution chains (`island_gen::brainrot_evolution_chains()`) as EDN.
 pub mod brainrot;
 
+/// Brainrot character definitions (`island_gen::brainrot_characters()`) as EDN.
+pub mod character;
+
 use std::collections::BTreeMap;
 
 use kami_game::animation::{AnimationClip, AnimationState, HeadBobPhase};
