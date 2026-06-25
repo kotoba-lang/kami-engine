@@ -22,7 +22,7 @@ struct SkinParams { base_color: vec3<f32>, roughness: f32, epidermis_thickness: 
 // Morph target deltas (position + normal per target, flattened)
 @group(2) @binding(1) var<storage, read> morph_deltas: array<vec4<f32>>;
 
-struct MorphWeights { weights: array<f32, 64>, active_count: u32, _pad: array<f32, 3> };
+struct MorphWeights { weights: array<vec4<f32>, 16>, active_count: u32, _pad0: f32, _pad1: f32, _pad2: f32 };
 @group(2) @binding(2) var<uniform> morph_weights: MorphWeights;
 
 // --- Bind Group 3: Textures ---
