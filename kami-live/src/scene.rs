@@ -967,6 +967,11 @@ impl DanceScene {
                 EdnValue::vector(self.post.clone()),
             ));
         }
+        // `:sounds` (kami.audio EDN recipes) ride along in the render-IR so the
+        // web CLJS executor (kami.audio) plays them with the visual frame.
+        if !sounds.is_empty() {
+            extra.push((EdnValue::kw_bare("sounds"), EdnValue::vector(sounds.clone())));
+        }
         // (`:animations` is already projected by `show_to_render_ir` from the
         // avatar `:clip` — no duplicate injection here.)
         if let Some(shot) = &self.active_camera {
