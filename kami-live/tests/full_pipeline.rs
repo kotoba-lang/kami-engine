@@ -23,6 +23,19 @@ fn dance_scene_realises_render_ir() {
 }
 
 #[test]
+fn avatar_clip_emits_animations_layer() {
+    // The avatar's `:clip` projects into a render-IR `:animations` layer driven by
+    // show time (ADR-0044 §4), so a host (native or web CLJS) can evaluate the
+    // authored `:dance/clips` clip without any per-frame animation authoring.
+    let mut scene = DanceScene::from_edn(SCENE).expect("scene");
+    scene.show.start();
+    let _ = scene.frame(1.0 / 30.0);
+    let edn = scene.frame(1.0 / 30.0).render_ir_edn();
+    assert!(edn.contains(":animations"), "avatar :clip → render-IR :animations layer");
+    assert!(edn.contains("idle"), "the named clip ('idle') is referenced");
+}
+
+#[test]
 fn dance_post_chain_realises_into_effects() {
     // `:dance/post` is authored as EDN and realised into kami-postfx structs via
     // the kami-postfx-scene authoring tier (the `:effect` ids match across crates).

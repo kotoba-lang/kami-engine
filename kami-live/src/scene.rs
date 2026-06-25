@@ -659,6 +659,17 @@ impl DanceScene {
         if !self.post.is_empty() {
             extra.push((EdnValue::kw_bare("post"), EdnValue::vector(self.post.clone())));
         }
+        // Avatar `:clip` → `:animations` layer driven by show time (ADR-0044 §4):
+        // the host evaluates the named `:dance/clips` clip at this time (looping
+        // per the clip's own `:loop`/`:duration` when realised).
+        if let Some(clip) = &self.avatar.clip {
+            let anim = EdnValue::map(vec![
+                (EdnValue::kw_bare("clip"), EdnValue::string(clip.clone())),
+                (EdnValue::kw_bare("time"), EdnValue::float(snap.phase.time as f64)),
+                (EdnValue::kw_bare("weight"), EdnValue::float(1.0)),
+            ]);
+            extra.push((EdnValue::kw_bare("animations"), EdnValue::vector(vec![anim])));
+        }
         if let Some(shot) = &self.active_camera {
             extra.push((EdnValue::kw_bare("camera-shot"), EdnValue::kw_bare(shot.clone())));
         }
