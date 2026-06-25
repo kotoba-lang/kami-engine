@@ -150,3 +150,21 @@ fn conditionals_pick_the_right_branch() {
     assert_eq!(eval("(if (= 3 3 3) 1 0)"), 1);
     assert_eq!(eval("(let [a 10 b 20] (+ a b))"), 30);
 }
+
+#[test]
+fn desugar_forms_compute() {
+    // -> thread-first: (5+3)*2 = 16  (acc threads in as first arg)
+    assert_eq!(eval("(-> 5 (+ 3) (* 2))"), 16);
+    // ->> thread-last: (- 100 (- 20 5)) = 100 - 15 = 85  (acc threads in as last arg)
+    assert_eq!(eval("(->> 5 (- 20) (- 100))"), 85);
+    // if-not swaps the branches
+    assert_eq!(eval("(if-not (< 2 1) 7 9)"), 7); // 2<1 false → then
+    assert_eq!(eval("(if-not (< 1 2) 7 9)"), 9); // 1<2 true  → else
+    // when-not runs the body only when the test is false
+    assert_eq!(eval("(when-not (< 1 2) 5)"), 0); // cond true  → 0
+    assert_eq!(eval("(when-not (< 2 1) 5)"), 5); // cond false → 5
+    // case = nested (= expr v) dispatch, with optional default
+    assert_eq!(eval("(case 2 1 10 2 20 3 30 99)"), 20); // matches 2
+    assert_eq!(eval("(case 7 1 10 2 20 99)"), 99);      // default
+    assert_eq!(eval("(case 7 1 10 2 20)"), 0);          // no match, no default → 0
+}

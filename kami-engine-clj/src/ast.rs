@@ -730,6 +730,11 @@ fn lower_call(items: &[EdnValue]) -> Result<Expr, CljError> {
         "loop"  => lower_loop(args),
         "recur" => Ok(Expr::Recur(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
         "do"    => Ok(Expr::Do(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
+        "if-not"   => lower_if_not(args),
+        "when-not" => lower_when_not(args),
+        "case"     => lower_case(args),
+        "->"       => lower_thread(args, true),
+        "->>"      => lower_thread(args, false),
         "doseq-entities" => lower_doseq_entities(args),
         // `(atom-val name)` / `(set-atom! name value)` — read/write a defatom cell. The atom
         // name is a bare symbol (resolved to a global at codegen), not an evaluated argument.
@@ -768,6 +773,99 @@ fn lower_call(items: &[EdnValue]) -> Result<Expr, CljError> {
             }
         }
     }
+}
+
+fn lower_if_not(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.len() != 3 {
+        return Err(CljError::Lower("if-not takes: (if-not cond then else)".into()));
+    }
+    // (if-not c then else) ≡ (if c else then) — no `not` needed, just swap the branches.
+    Ok(Expr::If {
+        cond: Box::new(lower_expr(&args[0])?),
+        then: Box::new(lower_expr(&args[2])?),
+        els:  Box::new(lower_expr(&args[1])?),
+    })
+}
+
+fn lower_when_not(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.is_empty() {
+        return Err(CljError::Lower("when-not takes: (when-not cond body…)".into()));
+    }
+    let body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    // (when-not c body…) ≡ (if c 0 (do body…))
+    Ok(Expr::If {
+        cond: Box::new(lower_expr(&args[0])?),
+        then: Box::new(Expr::Int(0)),
+        els:  Box::new(Expr::Do(body)),
+    })
+}
+
+fn lower_case(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.is_empty() {
+        return Err(CljError::Lower("case takes: (case expr v1 e1 … [default])".into()));
+    }
+    let rest = &args[1..];
+    let has_default = rest.len() % 2 == 1;
+    let mut acc = if has_default {
+        lower_expr(rest.last().unwrap())?
+    } else {
+        Expr::Int(0)
+    };
+    let pairs = if has_default { &rest[..rest.len() - 1] } else { rest };
+    // fold the test/result pairs into nested (if (= expr v) result …); right-to-left so order holds.
+    for pair in pairs.chunks_exact(2).rev() {
+        let test = Expr::Builtin {
+            op: Builtin::Eq,
+            args: vec![lower_expr(&args[0])?, lower_expr(&pair[0])?],
+        };
+        acc = Expr::If {
+            cond: Box::new(test),
+            then: Box::new(lower_expr(&pair[1])?),
+            els:  Box::new(acc),
+        };
+    }
+    Ok(acc)
+}
+
+fn thread_into(step: &EdnValue, acc: Expr, first: bool) -> Result<Expr, CljError> {
+    match step {
+        // a call step (f a b): thread acc in as the first (->) or last (->>) argument.
+        EdnValue::List(items) => {
+            let head = list_head_symbol(items)?;
+            let mut largs: Vec<Expr> =
+                items[1..].iter().map(lower_expr).collect::<Result<_, _>>()?;
+            if first { largs.insert(0, acc); } else { largs.push(acc); }
+            if let Some(op) = Builtin::from_name(head.name.as_str()) {
+                check_builtin_arity(op, largs.len())?;
+                Ok(Expr::Builtin { op, args: largs })
+            } else {
+                Ok(Expr::Call { name: head.to_qualified(), args: largs })
+            }
+        }
+        // a bare symbol step f: (-> x f) ≡ (f x)
+        EdnValue::Symbol(s) => {
+            if let Some(op) = Builtin::from_name(s.name.as_str()) {
+                check_builtin_arity(op, 1)?;
+                Ok(Expr::Builtin { op, args: vec![acc] })
+            } else {
+                Ok(Expr::Call { name: s.to_qualified(), args: vec![acc] })
+            }
+        }
+        other => Err(CljError::Lower(format!(
+            "-> / ->> step must be a call or symbol, found {other:?}"
+        ))),
+    }
+}
+
+fn lower_thread(args: &[EdnValue], first: bool) -> Result<Expr, CljError> {
+    if args.is_empty() {
+        return Err(CljError::Lower("-> / ->> takes: (-> x step…)".into()));
+    }
+    let mut acc = lower_expr(&args[0])?;
+    for step in &args[1..] {
+        acc = thread_into(step, acc, first)?;
+    }
+    Ok(acc)
 }
 
 fn lower_if(args: &[EdnValue]) -> Result<Expr, CljError> {
