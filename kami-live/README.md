@@ -56,3 +56,35 @@ the latest `:camera` trigger.
 
 Reference scene: `kami-clj-play3d/games/dance/` — exercises the whole stack,
 asserted by `scene::tests::reference_scene_exercises_full_stack`.
+
+## Real-VRM offscreen render (examples) — ADR-0047
+
+The `:dance/*` data layer is GPU-less, but the repo ships a **reference offscreen
+renderer** that takes a real `.vrm` all the way to pixels, proving the render-IR /
+`:dance/avatar` data actually drives a three.js-parity VRM. It is a self-contained
+wgpu example (engine-owner-gated `run_embed_vrm` stays the production surface,
+ADR-0031); the example is the headless proof + algorithm reference.
+
+`examples/common/vrm.rs` is the reusable core (no per-example duplication):
+
+| API | Role |
+|---|---|
+| `VrmDance::load(&[u8])` | parse a real VRM → rest geometry + `JOINTS_0`/`WEIGHTS_0` + textures + morph targets + skeleton (parent/order/inverse-bind) + `SpringSimulator` |
+| `VrmDance::frame(pose, happy, aa, blink, spring)` | one frame, CPU: expression **morph** (via `kami_vrm::ExpressionManager`) → humanoid **FK** from `DancePose` → **spring bones** → joint **palette** |
+| `GpuRenderer::new(&model, w, h)` | offscreen wgpu pipeline: GPU **skinning** (storage-buffer palette) + **MToon** toon-shade + rim + **multi-light** + **textures** |
+| `GpuRenderer::render(morphed, palette, globals)` | draw one frame → RGBA |
+
+three.js / three-vrm parity covered: real geometry · GPU `SkinnedMesh` · baseColor
+textures (UV + alpha-cutout) · MToon toon-shading · render-IR `:lights` (beat-synced
+multi-light) · expression morph (blink/aa/happy) · `VRMC_springBone` (hair/gear jiggle).
+
+**clj/edn drives it**: the canonical `examples/vrm_edn.rs` reads `:dance/avatar`
+(`:vrm` path · `:spring-bones` on/off · `:scale`) from `scene.edn` and the per-frame
+`:lights`/`:env` from the render-IR — change the EDN, change the render.
+
+Example progression (all `cargo run -p kami-live --example <name> --target aarch64-apple-darwin`):
+`dance_png` (render-IR → cuboid performer) → `vrm_mesh` (procedural skinned mesh,
+no asset) → `vrm_real` (real VRM geometry, static) → **`vrm_edn`** (clj/edn-driven
+full VRM dance via `common/vrm.rs`). A `.vrm` asset is required for the real-VRM
+examples — e.g. the VRM Consortium sample `Seed-san.vrm` (VRM Public License 1.0)
+at `assets/Seed-san.vrm`, or set `:dance/avatar :vrm` to your own.
