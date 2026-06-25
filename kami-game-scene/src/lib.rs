@@ -55,6 +55,9 @@ pub mod brainrot;
 /// Brainrot character definitions (`island_gen::brainrot_characters()`) as EDN.
 pub mod character;
 
+/// Sabiotoshi item catalog (`sabiotoshi::default_item_catalog()`) as EDN.
+pub mod item_catalog;
+
 use std::collections::BTreeMap;
 
 use kami_game::animation::{AnimationClip, AnimationState, HeadBobPhase};
