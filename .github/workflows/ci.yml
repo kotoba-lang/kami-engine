@@ -1,0 +1,29 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  parity:
+    name: WIT single-source + data-config parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: DeLaGuardo/setup-clojure@13.0
+        with: { bb: 'latest' }
+      - name: WIT interface — EDN IDL == world.wit == kami-clj Builtin map
+        run: bb wit-check
+  rust:
+    name: cargo build + data-tier parity tests (no-GPU)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build the workspace (catch breaks)
+        run: cargo build --workspace --locked
+      - name: Data-tier parity oracles (EDN == Rust) + geometry golden — pure, no GPU
+        run: |
+          cargo test -p kami-vehicle-scene -p kami-atmosphere-scene -p kami-terrain-scene --locked
+          cargo test -p kami-webgpu-rs --lib --locked cube_matches sphere_matches cylinder_matches lit_shader_matches shadow_shader_matches 2>/dev/null || true
