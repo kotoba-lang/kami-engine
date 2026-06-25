@@ -33,6 +33,14 @@ jobs:
           repository: com-junkawasaki/kotoba
           path: kotoba
           token: ${{ secrets.KOTOBA_TOKEN || github.token }}
+      # kami-script-runtime path-depends on the sibling com-junkawasaki/kototama
+      # (the Clojure→WASM compiler). Public; falls back to github.token.
+      - name: Checkout kototama (sibling compiler path dep)
+        uses: actions/checkout@v4
+        with:
+          repository: com-junkawasaki/kototama
+          path: kototama
+          token: ${{ secrets.KOTOTAMA_TOKEN || github.token }}
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
