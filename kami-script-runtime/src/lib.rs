@@ -484,19 +484,42 @@ impl KamiScriptRuntime {
         &mut self,
         name: &str,
         kind: i32,
-        _payload: &[u8],
+        payload: &[u8],
     ) -> Result<i32, RuntimeError> {
-        // TODO: lower payload into guest memory via cabi_realloc
         let (_, instance) = self.modules.get(name)
             .ok_or_else(|| RuntimeError::NotLoaded(name.to_string()))?;
         let instance = *instance;
+        // Lower the payload into the guest's linear memory: bump-allocate space via the guest's
+        // cabi_realloc, copy the bytes in, and hand on-event the real (ptr,len). The guest reads its
+        // payload from there. Empty payload ⇒ (0,0) (the previous always-empty behaviour).
+        let (ptr, len) = if payload.is_empty() {
+            (0i64, 0i64)
+        } else {
+            let realloc = instance
+                .get_typed_func::<(i32, i32, i32, i32), i32>(&mut self.store, "cabi_realloc")
+                .map_err(|_| RuntimeError::MissingExport("cabi_realloc".into(), name.to_string()))?;
+            let p = realloc.call(&mut self.store, (0, 0, 16, payload.len() as i32))?;
+            let mem = match instance.get_export(&mut self.store, "memory") {
+                Some(Extern::Memory(m)) => m,
+                _ => return Err(RuntimeError::MissingExport("memory".into(), name.to_string())),
+            };
+            let data = mem.data_mut(&mut self.store);
+            let start = p as usize;
+            let end = start.saturating_add(payload.len());
+            if p < 0 || end > data.len() {
+                return Err(RuntimeError::MissingExport(
+                    "memory (payload did not fit)".into(), name.to_string()));
+            }
+            data[start..end].copy_from_slice(payload);
+            (p as i64, payload.len() as i64)
+        };
         // The kami-engine-clj codegen is all-i64, so the `on-event` export is
         // (i64,i64,i64)->i64 — not the WIT's nominal i32s. Matching that is what
         // makes this work (previously it requested i32s and always missed).
         let f = instance
             .get_typed_func::<(i64, i64, i64), i64>(&mut self.store, "on-event")
             .map_err(|_| RuntimeError::MissingExport("on-event".into(), name.to_string()))?;
-        let ret = f.call(&mut self.store, (kind as i64, 0, 0))?;
+        let ret = f.call(&mut self.store, (kind as i64, ptr, len))?;
         Ok(ret as i32)
     }
 
@@ -1556,6 +1579,29 @@ mod tests {
         let world = w.lock().unwrap();
         let mut q = world.query::<&Tag>();
         assert_eq!(q.iter().filter(|(_, t)| t.0 == "evt").count(), 2);
+    }
+
+    #[test]
+    fn call_event_lowers_payload() {
+        // The payload is now lowered into guest memory via cabi_realloc and on-event receives the
+        // real (ptr,len) — previously hardcoded (0,0), so payloads never reached the guest. The guest
+        // dispatches on the payload length, proving the bytes were allocated + the length delivered.
+        let w = world();
+        let mut rt = KamiScriptRuntime::new(w.clone()).unwrap();
+        let src = r#"
+            (defn init [] 0)
+            (defn on-event [kind ptr len]
+              (when (= len 3) (spawn-entity "len3"))
+              0)
+        "#;
+        rt.load_clj("g", src).unwrap();
+        rt.call_init("g").unwrap();
+        rt.call_event("g", 1, &[7, 8, 9]).unwrap(); // 3-byte payload → cabi_realloc + len=3
+        rt.call_event("g", 1, &[]).unwrap();         // empty → (0,0) → no spawn
+        let world = w.lock().unwrap();
+        let mut q = world.query::<&Tag>();
+        assert_eq!(q.iter().filter(|(_, t)| t.0 == "len3").count(), 1,
+                   "payload lowered into guest memory; its length reached on-event");
     }
 
     #[test]
