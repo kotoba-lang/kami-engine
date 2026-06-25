@@ -44,6 +44,8 @@ pub struct Lint {
 
 const STAGES: &[&str] = &["club", "hall", "festival"];
 const EXPR_SOURCES: &[&str] = &["cheer", "beat", "blink"];
+const WAVES: &[&str] = &["sine", "square", "triangle", "sawtooth"];
+const VOWELS: &[&str] = &["a", "i", "u", "e", "o", "aa", "ih", "ou", "ee", "oh"];
 const DANCES: &[&str] = &[
     "idle",
     "four-on-floor",
@@ -426,6 +428,23 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
                 }
             }
         }
+        // voice lip-sync: each phoneme `:vowel` must be a/i/u/e/o (or aa/ih/ou/ee/oh).
+        if let Some(phs) = mget(av, "voice")
+            .and_then(|v| v.as_map())
+            .and_then(|vm| mget(vm, "phonemes").and_then(|v| v.as_vector()))
+        {
+            for (i, p) in phs.iter().enumerate() {
+                if let Some(vw) = p.as_map().and_then(|pm| name(mget(pm, "vowel"))) {
+                    if !VOWELS.contains(&vw.as_str()) {
+                        warn(
+                            &mut out,
+                            &format!("dance/avatar.voice.phonemes[{i}].vowel"),
+                            format!("unknown vowel `{vw}` — phoneme skipped; expected a/i/u/e/o"),
+                        );
+                    }
+                }
+            }
+        }
     }
 
     // ── :dance/camera ───────────────────────────────────────────────────────
@@ -436,6 +455,29 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
                 "dance/camera.fov",
                 "fov must be in (0, π] radians — defaults to 0.9".into(),
             );
+        }
+    }
+
+    // ── :dance/audio :bank (kami.audio sound recipes) ───────────────────────
+    if let Some(bank) = mget(&root, "dance/audio")
+        .and_then(|v| v.as_map())
+        .and_then(|am| mget(am, "bank").and_then(|v| v.as_map()))
+    {
+        for (k, v) in bank {
+            let nm = k
+                .as_keyword()
+                .map(|kw| kw.0.name.clone())
+                .or_else(|| k.as_string().map(|s| s.to_string()))
+                .unwrap_or_default();
+            if let Some(wave) = v.as_map().and_then(|cm| mget(cm, "wave")).and_then(|w| w.as_string()) {
+                if !WAVES.contains(&wave) {
+                    warn(
+                        &mut out,
+                        &format!("dance/audio.bank.{nm}.wave"),
+                        format!("unknown wave `{wave}` — defaults to sine; expected one of {WAVES:?}"),
+                    );
+                }
+            }
         }
     }
 
@@ -497,6 +539,20 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn flags_unknown_wave_and_vowel() {
+        let src = r#"
+        {:dance/audio  {:bank {:kick {:wave "sino" :freq 100}}}
+         :dance/avatar {:vrm "a.vrm" :voice {:phonemes [{:at-beat 0 :vowel :x :dur 0.5}]}}
+         :dance/setlist [{:title "A" :bars 8 :dance :wota :cues [{:beat 1 :kind :drop}]}]}
+        "#;
+        let lints = lint_scene(src);
+        assert!(lints.iter().any(|l| l.path == "dance/audio.bank.kick.wave"),
+            "bad :wave flagged: {lints:?}");
+        assert!(lints.iter().any(|l| l.path == "dance/avatar.voice.phonemes[0].vowel"),
+            "bad :vowel flagged: {lints:?}");
+    }
 
     #[test]
     fn flags_unknown_expression_source_and_bad_fov() {
