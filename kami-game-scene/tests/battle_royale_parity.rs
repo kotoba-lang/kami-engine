@@ -7,8 +7,8 @@
 //! so each side is compared structurally via `serde_json`.
 
 use kami_game_scene::battle_royale::{
-    builtin_consumables, builtin_storm_phases, consumables_from_edn, storm_phases_from_edn,
-    CONSUMABLES_EDN, STORM_PHASES_EDN,
+    builtin_consumables, builtin_storm_phases, builtin_weapons, consumables_from_edn,
+    storm_phases_from_edn, weapons_from_edn, CONSUMABLES_EDN, STORM_PHASES_EDN, WEAPONS_EDN,
 };
 
 #[test]
@@ -49,5 +49,27 @@ fn consumables_edn_matches_builtin() {
         serde_json::to_value(&loaded).unwrap(),
         serde_json::to_value(&builtin).unwrap(),
         "full consumable parity (ordered)"
+    );
+}
+
+#[test]
+fn weapons_edn_matches_builtin() {
+    let loaded = weapons_from_edn(WEAPONS_EDN).expect("weapons edn parses");
+    let builtin = builtin_weapons();
+    assert_eq!(loaded.len(), builtin.len(), "weapon count");
+    assert_eq!(loaded.len(), 25, "all 25 weapons present");
+    for (i, (g, w)) in loaded.iter().zip(builtin.iter()).enumerate() {
+        assert_eq!(
+            serde_json::to_value(g).unwrap(),
+            serde_json::to_value(w).unwrap(),
+            "weapon[{i}] ({} {})",
+            w.name,
+            serde_json::to_value(&w.rarity).unwrap()
+        );
+    }
+    assert_eq!(
+        serde_json::to_value(&loaded).unwrap(),
+        serde_json::to_value(&builtin).unwrap(),
+        "full weapon-pool parity (ordered)"
     );
 }
