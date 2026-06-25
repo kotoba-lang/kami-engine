@@ -118,6 +118,20 @@ pub struct CameraShot {
     pub look: Vec3,
 }
 
+/// A static stage set piece (`:dance/stage :props`) — LED wall / riser / truss /
+/// speaker / screen — realised into a render-IR instance so the venue is dressed
+/// from data. `kind` is a free-form label; the geometry is the box `pos`+`size`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct StageProp {
+    pub kind: String,
+    pub pos: Vec3,
+    /// Footprint (width, height) of the box, like a render-IR instance `:size`.
+    pub size: [f32; 2],
+    pub color: [f32; 3],
+    /// Self-illumination (LED walls / screens glow); 0 = unlit prop.
+    pub emissive: f32,
+}
+
 /// Camera rig framing the performer (`:dance/camera`). The eye sits at the live
 /// performer position + `offset`; the look target at performer + `look`. So the
 /// camera follows the dancer, but the rig (distance, height, fov) is authored as
@@ -264,6 +278,9 @@ pub struct DanceScene {
     pub active_camera: Option<String>,
     /// Camera rig (`:dance/camera`) framing the performer — authored as data.
     pub camera: CameraRig,
+    /// Static stage set pieces (`:dance/stage :props`) dressed into the render-IR
+    /// `:instances` each frame (LED wall / risers / truss / speakers).
+    pub stage: Vec<StageProp>,
 }
 
 impl DanceScene {
@@ -721,7 +738,7 @@ impl DanceScene {
             self.active_camera = Some(shot);
         }
         let snap = self.show.snapshot();
-        let render_ir = crate::render::show_to_render_ir(&snap, &self.avatar, &self.camera);
+        let render_ir = crate::render::show_to_render_ir(&snap, &self.avatar, &self.camera, &self.stage);
         // inject scene-level keys (post-fx chain, active camera shot) into the
         // per-frame render-IR.
         let mut extra: Vec<(EdnValue, EdnValue)> = Vec::new();
@@ -900,6 +917,31 @@ impl DanceScene {
             })
             .unwrap_or_default();
 
+        // ── :dance/stage → static set pieces dressed into the render-IR ─────
+        let stage = mget(root, "dance/stage")
+            .and_then(|v| v.as_map())
+            .and_then(|sm| mget(sm, "props").and_then(|v| v.as_vector()))
+            .map(|props| {
+                props
+                    .iter()
+                    .filter_map(|p| p.as_map())
+                    .map(|pm| StageProp {
+                        kind: ident(mget(pm, "kind")).unwrap_or_else(|| "prop".into()),
+                        pos: opt_vec3(mget(pm, "pos")).unwrap_or(Vec3::ZERO),
+                        size: {
+                            let s = vec3(mget(pm, "size"));
+                            [if s[0] > 0.0 { s[0] } else { 1.0 }, if s[1] > 0.0 { s[1] } else { 1.0 }]
+                        },
+                        color: {
+                            let c = vec3(mget(pm, "color"));
+                            if c == [0.0, 0.0, 0.0] && mget(pm, "color").is_none() { [0.15, 0.15, 0.18] } else { c }
+                        },
+                        emissive: mget(pm, "emissive").map(|v| num(Some(v))).unwrap_or(0.0),
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
+
         DanceScene {
             title,
             avatar,
@@ -910,6 +952,7 @@ impl DanceScene {
             post,
             active_camera: None,
             camera,
+            stage,
         }
     }
 }

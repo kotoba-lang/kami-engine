@@ -53,6 +53,16 @@ fn dance_clip_realises_onto_skeleton() {
 }
 
 #[test]
+fn dance_stage_props_dressed_into_instances() {
+    // :dance/stage props (LED wall / risers / truss / speakers) become render-IR
+    // :instances alongside the performer + crowd — the venue is dressed from data.
+    let scene = DanceScene::from_edn(SCENE).expect("scene");
+    assert!(scene.stage.len() >= 6, "stage props parsed: {}", scene.stage.len());
+    assert!(scene.stage.iter().any(|p| p.kind == "led-wall" && p.emissive > 0.0),
+        "the LED wall is a self-lit prop");
+}
+
+#[test]
 fn dance_post_chain_realises_into_effects() {
     // `:dance/post` is authored as EDN and realised into kami-postfx structs via
     // the kami-postfx-scene authoring tier (the `:effect` ids match across crates).
