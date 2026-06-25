@@ -211,3 +211,13 @@ fn numeric_gameplay_forms_compute() {
     assert_eq!(eval("(clamp 15 0 10)"), 10); // above
     assert_eq!(eval("(clamp (- 0 3) 0 10)"), 0); // below
 }
+
+#[test]
+fn threading_with_special_form_steps() {
+    // regression: special-form steps (clamp/min/max/case) thread at the EDN level and desugar — they
+    // were previously mis-lowered to an undefined call. This is what real gameplay (-> tuning) needs.
+    assert_eq!(eval("(-> 15 (clamp 0 10))"), 10);          // clamp as a -> step
+    assert_eq!(eval("(-> 3 (max 7) (min 5))"), 5);         // max then min: max(3,7)=7, min(7,5)=5
+    assert_eq!(eval("(-> 2 (case 1 10 2 20 99))"), 20);    // case subject threaded in
+    assert_eq!(eval("(cond-> 15 (< 1 2) (clamp 0 10))"), 10); // cond-> with a special-form step
+}
