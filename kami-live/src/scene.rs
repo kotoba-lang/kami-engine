@@ -89,6 +89,10 @@ pub struct AvatarBinding {
     /// Optional vocal lip-sync (`:dance/avatar :voice`): a vowel timeline driving
     /// the VRM mouth (aa/ih/ou/ee/oh). When set it overrides the beat-driven `:aa`.
     pub voice: Option<VoiceLine>,
+    /// Optional MMD `.vmd` motion path (`:dance/avatar :vmd`). The host loads it
+    /// via `kami_skeleton_scene::vmd_to_clip` (MMD bone names → VRM humanoid) and
+    /// plays it as the base motion instead of (or layered over) `:clip`.
+    pub vmd: Option<String>,
 }
 
 /// Where a VRM performer's gaze points (VRM look-at).
@@ -352,6 +356,7 @@ impl Default for AvatarBinding {
             look_at_target: None,
             expressions: AvatarBinding::default_expressions(),
             voice: None,
+            vmd: None,
         }
     }
 }
@@ -1142,6 +1147,7 @@ fn parse_avatar(m: &BTreeMap<EdnValue, EdnValue>) -> AvatarBinding {
             .map(parse_expression_drives)
             .filter(|v| !v.is_empty())
             .unwrap_or_else(AvatarBinding::default_expressions),
+        vmd: mget(m, "vmd").and_then(|v| v.as_string()).map(|s| s.to_string()),
         voice: mget(m, "voice")
             .and_then(|v| v.as_map())
             .and_then(|vm| mget(vm, "phonemes").and_then(|v| v.as_vector()))

@@ -2076,6 +2076,7 @@ version = "0.1.0"
 dependencies = [
  "kami-character",
  "kami-scene",
+ "serde_json",
  "thiserror 2.0.18",
 ]
 
@@ -2336,8 +2337,10 @@ dependencies = [
 name = "kami-game-scene"
 version = "0.1.0"
 dependencies = [
+ "glam",
  "kami-game",
  "kami-scene",
+ "serde_json",
  "thiserror 2.0.18",
 ]
 
@@ -2877,6 +2880,7 @@ dependencies = [
 name = "kami-skeleton-scene"
 version = "0.1.0"
 dependencies = [
+ "encoding_rs",
  "glam",
  "kami-scene",
  "kami-skeleton",

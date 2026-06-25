@@ -43,12 +43,16 @@
 //! joint-name is a string that round-trips exactly (`"leftUpperArm"`); the limits
 //! are `:min-deg` / `:max-deg`, each a `[x y z]` 3-vector of degrees.
 
-use kami_scene::{mget, root_map, vec3, EdnValue};
-use kami_skeleton::{default_humanoid_constraints, JointConstraint};
+use kami_scene::{EdnValue, mget, root_map, vec3};
+use kami_skeleton::{JointConstraint, default_humanoid_constraints};
 
 /// EDN-authored animation clips (`:dance/clips` → [`kami_skeleton::AnimationClip`]).
 pub mod clip;
 pub use clip::clip_from_edn;
+
+/// MMD `.vmd` motion import (`→ kami_skeleton::AnimationClip`).
+pub mod vmd;
+pub use vmd::{mmd_bone_to_humanoid, vmd_to_clip};
 
 /// The canonical default humanoid joint-constraint table shipped with this crate.
 /// This is the source of truth; the compiled-in `default_humanoid_constraints()`
@@ -105,7 +109,9 @@ fn deg_vec3_to_rad(v: Option<&EdnValue>) -> [f32; 3] {
 /// Build one real [`JointConstraint`] from its EDN map (`{:min-deg [..] :max-deg
 /// [..]}`). Degrees are read and converted to radians with the same `f32`
 /// multiply the Rust source uses, so the `[f32;3]` limits are bit-for-bit equal.
-pub fn constraint_from_map(map: &std::collections::BTreeMap<EdnValue, EdnValue>) -> JointConstraint {
+pub fn constraint_from_map(
+    map: &std::collections::BTreeMap<EdnValue, EdnValue>,
+) -> JointConstraint {
     JointConstraint {
         min: deg_vec3_to_rad(mget(map, "min-deg")),
         max: deg_vec3_to_rad(mget(map, "max-deg")),
@@ -136,12 +142,18 @@ pub fn humanoid_constraints_from_edn(src: &str) -> Result<Vec<(String, JointCons
     let mut out = Vec::with_capacity(table.len());
     for pair in table {
         // Each entry is a [joint-name {limits}] 2-vector.
-        let Some(slots) = pair.as_vector() else { continue };
+        let Some(slots) = pair.as_vector() else {
+            continue;
+        };
         let (Some(name_v), Some(limits_v)) = (slots.first(), slots.get(1)) else {
             continue;
         };
-        let Some(name) = name_v.as_string() else { continue };
-        let Some(limits) = limits_v.as_map() else { continue };
+        let Some(name) = name_v.as_string() else {
+            continue;
+        };
+        let Some(limits) = limits_v.as_map() else {
+            continue;
+        };
         out.push((name.to_string(), constraint_from_map(limits)));
     }
     Ok(out)

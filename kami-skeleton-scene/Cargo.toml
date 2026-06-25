@@ -31,3 +31,5 @@ kami-scene = { path = "../kami-scene" }
 thiserror = { workspace = true }
 # EDN-authored animation clips (clip.rs) build glam Quat/Vec3 keyframes.
 glam.workspace = true
+# MMD .vmd motion import (vmd.rs): bone names are Shift-JIS.
+encoding_rs = "0.8"
