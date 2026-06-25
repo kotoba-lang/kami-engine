@@ -45,6 +45,10 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: kami-engine
+      # Linux system libs the workspace links at build time: ALSA (alsa-sys, via
+      # kami-audio) and udev (gamepad input). Headless runners ship neither.
+      - name: System libraries (ALSA + udev)
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev
       - name: Build the workspace (catch breaks)
         working-directory: kami-engine
         run: cargo build --workspace
