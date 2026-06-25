@@ -16,9 +16,21 @@ const MAX_JOINTS: usize = 8;
 #[derive(Clone, Copy, Pod, Zeroable)]
 struct Vertex { pos: [f32; 3], normal: [f32; 3], joints: [u32; 4], weights: [f32; 4] }
 
+const MAX_LIGHTS: usize = 8;
 #[repr(C)]
 #[derive(Clone, Copy, Pod, Zeroable)]
-struct Globals { view_proj: [[f32; 4]; 4], light: [f32; 4], eye: [f32; 4] }
+struct GpuLight { dir: [f32; 4], color: [f32; 4] }
+#[repr(C)]
+#[derive(Clone, Copy, Pod, Zeroable)]
+struct Globals {
+    view_proj: [[f32; 4]; 4],
+    base: [f32; 4],
+    shade: [f32; 4],
+    ambient: [f32; 4],
+    n_lights: u32,
+    _pad: [u32; 3],
+    lights: [GpuLight; MAX_LIGHTS],
+}
 
 #[repr(C)]
 #[derive(Clone, Copy, Pod, Zeroable)]
@@ -121,7 +133,8 @@ async fn run() {
     let pl = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor { label: None, bind_group_layouts: &[&bgl], push_constant_ranges: &[] });
 
     let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor { label: None, source: wgpu::ShaderSource::Wgsl(format!(r#"
-        struct G {{ vp: mat4x4<f32>, light: vec4<f32>, eye: vec4<f32> }};
+        struct L {{ dir: vec4<f32>, color: vec4<f32> }};
+        struct G {{ vp: mat4x4<f32>, base: vec4<f32>, shade: vec4<f32>, ambient: vec4<f32>, n: vec4<u32>, lights: array<L, {MAX_LIGHTS}u> }};
         struct P {{ joints: array<mat4x4<f32>, {MAX_JOINTS}u> }};
         @group(0) @binding(0) var<uniform> g: G;
         @group(0) @binding(1) var<uniform> p: P;
@@ -132,10 +145,19 @@ async fn run() {
           var o: VO; o.clip = g.vp * wp; o.n = normalize((skin * vec4<f32>(nor, 0.0)).xyz); return o;
         }}
         @fragment fn fs(i: VO) -> @location(0) vec4<f32> {{
-          let l = normalize(g.light.xyz);
-          let d = max(dot(normalize(i.n), -l), 0.0);
-          let col = vec3<f32>(0.85, 0.78, 0.92) * (0.35 + 0.75 * d);
-          return vec4<f32>(pow(col, vec3<f32>(1.0/2.2)), 1.0);
+          let nn = normalize(i.n);
+          var lit = g.ambient.xyz * g.base.xyz;
+          let count = min(g.n.x, {MAX_LIGHTS}u);
+          for (var k: u32 = 0u; k < count; k = k + 1u) {{
+            let ndl = dot(nn, -normalize(g.lights[k].dir.xyz));
+            // MToon two-tone: hard-ish step between shade and base.
+            let t = smoothstep(-0.05, 0.15, ndl);
+            let toon = mix(g.shade.xyz, g.base.xyz, t);
+            lit = lit + toon * g.lights[k].color.xyz * g.lights[k].color.w;
+          }}
+          let exposure = g.ambient.w;
+          let mapped = lit * exposure / (lit * exposure + vec3<f32>(1.0));
+          return vec4<f32>(pow(mapped, vec3<f32>(1.0/2.2)), 1.0);
         }}
     "#).into()) });
 
@@ -159,7 +181,6 @@ async fn run() {
     let eye = Vec3::new(0.0, 1.1, 3.0);
     let target = Vec3::new(0.0, 1.0, 0.0);
     let vp = Mat4::perspective_rh(0.9, w as f32 / h as f32, 0.1, 100.0) * Mat4::look_at_rh(eye, target, Vec3::Y);
-    queue.write_buffer(&gbuf, 0, bytemuck::bytes_of(&Globals { view_proj: vp.to_cols_array_2d(), light: [-0.4, -0.8, -0.4, 0.0], eye: [eye.x, eye.y, eye.z, 0.0] }));
 
     let mut scene = DanceScene::from_edn(SCENE).expect("scene");
     scene.show.start();
@@ -169,7 +190,30 @@ async fn run() {
     let rbuf = device.create_buffer(&wgpu::BufferDescriptor { label: None, size: (bpr * h) as u64, usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ, mapped_at_creation: false });
     let mut gif = Vec::new();
     for frame in 0..32 {
-        for _ in 0..3 { scene.frame(1.0 / 60.0); }
+        for _ in 0..2 { scene.frame(1.0 / 60.0); }
+        let frame_out = scene.frame(1.0 / 60.0);
+        let ir = kami_webgpu_rs::parse_render_ir(&frame_out.render_ir_edn());
+        // material + env + beat-synced lights come from the clj/edn render-IR.
+        let mat = ir.material("performer");
+        let base = mat.map(|m| m.base).unwrap_or([1.0, 0.82, 0.72]);
+        let shade = mat.map(|m| m.shade).unwrap_or([0.7, 0.55, 0.5]);
+        let amb = ir.env.ambient;
+        let mut lights = [GpuLight { dir: [0.0; 4], color: [0.0; 4] }; MAX_LIGHTS];
+        let nl = ir.lights.len().min(MAX_LIGHTS);
+        for (k, l) in ir.lights.iter().take(MAX_LIGHTS).enumerate() {
+            lights[k] = GpuLight { dir: [l.dir[0], l.dir[1], l.dir[2], 0.0], color: [l.color[0], l.color[1], l.color[2], l.intensity] };
+        }
+        // a fallback key light if the rig is empty.
+        let n_lights = if nl == 0 { lights[0] = GpuLight { dir: [-0.4, -0.8, -0.4, 0.0], color: [1.0, 0.96, 0.85, 1.0] }; 1 } else { nl };
+        queue.write_buffer(&gbuf, 0, bytemuck::bytes_of(&Globals {
+            view_proj: vp.to_cols_array_2d(),
+            base: [base[0], base[1], base[2], 1.0],
+            shade: [shade[0], shade[1], shade[2], 1.0],
+            ambient: [amb[0] * 0.5, amb[1] * 0.5, amb[2] * 0.5, ir.env.exposure.max(0.5)],
+            n_lights: n_lights as u32,
+            _pad: [0; 3],
+            lights,
+        }));
         let pose = scene.show.snapshot().performer_pose;
         queue.write_buffer(&pbuf, 0, bytemuck::bytes_of(&palette(&pose)));
         let mut enc = device.create_command_encoder(&Default::default());
