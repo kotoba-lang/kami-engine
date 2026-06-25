@@ -1,11 +1,11 @@
 //! Render the reference dance scene to a PNG sequence with the native executor.
 //! `cargo run -p kami-live --example dance_png --target aarch64-apple-darwin`
 //!
-//! Each frame's `:dance/*` EDN → render-IR → `kami_webgpu_rs::render` (offscreen,
-//! PBR + shadows, no window). The performer is a lit placeholder cuboid bobbing
-//! the choreography, the crowd are lit boxes, the camera tracks the dancer — the
-//! data path made visible. The skinned VRM mesh replaces the box on the GPU VRM
-//! surface (run_embed_vrm, ADR-0031) once that pipeline consumes `:meshes`.
+//! Advances into the **shuffle** track (visible side-step) and renders a close
+//! sequence over one bar, so the performer slides left↔right — the choreography
+//! made visible. Each frame: `:dance/*` EDN → render-IR → `kami_webgpu_rs::render`
+//! (offscreen PBR + shadows). The performer is a lit placeholder cuboid; the
+//! skinned VRM mesh replaces it once the GPU executor consumes `:meshes`.
 
 use kami_live::scene::DanceScene;
 
@@ -15,19 +15,24 @@ fn main() {
     let mut scene = DanceScene::from_edn(SCENE).expect("reference scene loads");
     scene.show.start();
     let (w, h) = (640u32, 400u32);
-    let fps = 30.0;
-    let mut saved = 0;
-    for step in 0..300 {
-        let f = scene.frame(1.0 / fps);
-        if step % 30 == 0 {
-            let edn = f.render_ir_edn();
-            let (g, insts) = kami_webgpu_rs::parse_ir(&edn);
-            let px = kami_webgpu_rs::render(&g, &insts, w, h);
-            let name = format!("dance_{saved:02}.png");
-            image::save_buffer(&name, &px, w, h, image::ExtendedColorType::Rgba8).unwrap();
-            println!("wrote {name} — {} instances @ beat {}", insts.len(), scene.show.grid().phase().beat);
-            saved += 1;
-        }
+    let dt = 1.0 / 60.0;
+
+    // Advance ~31s to the Verse (shuffle): the performer side-steps ±0.4 units.
+    for _ in 0..(31.0 / dt) as i32 {
+        scene.frame(dt);
     }
-    println!("done: {saved} frames of the dance rendered");
+    // Render 12 frames across ~1.4s (one 128-bpm bar) of the side-step.
+    for i in 0..12 {
+        for _ in 0..7 {
+            scene.frame(dt);
+        }
+        let f = scene.frame(dt);
+        let (g, insts) = kami_webgpu_rs::parse_ir(&f.render_ir_edn());
+        let px = kami_webgpu_rs::render(&g, &insts, w, h);
+        let name = format!("dance_{i:02}.png");
+        image::save_buffer(&name, &px, w, h, image::ExtendedColorType::Rgba8).unwrap();
+        let ph = scene.show.grid().phase();
+        println!("wrote {name} — beat {} bar-frac {:.2}", ph.beat, ph.bar_frac);
+    }
+    println!("done — the performer slides left↔right across the bar");
 }
