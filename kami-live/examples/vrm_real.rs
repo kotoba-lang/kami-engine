@@ -64,7 +64,7 @@ async fn run() {
         }
         @fragment fn fs(i: VO) -> @location(0) vec4<f32> {
           let d = max(dot(normalize(i.n), -normalize(g.light.xyz)), 0.0);
-          let c = vec3<f32>(0.92, 0.86, 0.84) * (0.35 + 0.7 * d);
+          let c = vec3<f32>(0.78, 0.68, 0.64) * (0.28 + 0.62 * d);
           return vec4<f32>(pow(c, vec3<f32>(1.0/2.2)), 1.0);
         }
     "#.into()) });
@@ -84,9 +84,9 @@ async fn run() {
 
     // front view (VRM faces -Z): camera on -Z looking at the model centre.
     let dist = height * 1.6;
-    let eye = center + Vec3::new(0.0, height * 0.05, -dist);
+    let eye = center + Vec3::new(0.0, height * 0.05, dist);
     let vp = Mat4::perspective_rh(0.7, w as f32 / h as f32, 0.05, 100.0) * Mat4::look_at_rh(eye, center, Vec3::Y);
-    queue.write_buffer(&gbuf, 0, bytemuck::bytes_of(&G { vp: vp.to_cols_array_2d(), light: [-0.3, -0.6, 0.7, 0.0] }));
+    queue.write_buffer(&gbuf, 0, bytemuck::bytes_of(&G { vp: vp.to_cols_array_2d(), light: [-0.3, -0.5, -0.75, 0.0] }));
 
     let mut enc = device.create_command_encoder(&Default::default());
     {
