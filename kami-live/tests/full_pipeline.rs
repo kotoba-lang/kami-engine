@@ -36,6 +36,23 @@ fn avatar_clip_emits_animations_layer() {
 }
 
 #[test]
+fn dance_clip_realises_onto_skeleton() {
+    // `:dance/clips` is authored as EDN and realised into a kami-skeleton
+    // AnimationClip via the kami-skeleton-scene tier (bone names → indices),
+    // so one authored clip retargets onto any skeleton (ADR-0044 §4).
+    let scene = DanceScene::from_edn(SCENE).expect("scene");
+    let clip_edn = kotoba_edn::to_string(&scene.clips[0]);
+    let bone_index = |n: &str| match n {
+        "hips" => Some(0usize),
+        "spine" => Some(1),
+        _ => None,
+    };
+    let clip = kami_skeleton_scene::clip_from_edn(&clip_edn, bone_index).expect("clip realises");
+    assert_eq!(clip.name, "idle");
+    assert_eq!(clip.tracks.len(), 2, "spine + hips tracks resolve to bone indices");
+}
+
+#[test]
 fn dance_post_chain_realises_into_effects() {
     // `:dance/post` is authored as EDN and realised into kami-postfx structs via
     // the kami-postfx-scene authoring tier (the `:effect` ids match across crates).

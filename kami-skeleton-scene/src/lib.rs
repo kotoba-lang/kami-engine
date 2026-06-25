@@ -46,6 +46,10 @@
 use kami_scene::{mget, root_map, vec3, EdnValue};
 use kami_skeleton::{default_humanoid_constraints, JointConstraint};
 
+/// EDN-authored animation clips (`:dance/clips` → [`kami_skeleton::AnimationClip`]).
+pub mod clip;
+pub use clip::clip_from_edn;
+
 /// The canonical default humanoid joint-constraint table shipped with this crate.
 /// This is the source of truth; the compiled-in `default_humanoid_constraints()`
 /// table is the parity-tested mirror.

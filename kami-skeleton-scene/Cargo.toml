@@ -29,3 +29,5 @@ kami-skeleton = { path = "../kami-skeleton" }
 # scene.edn accessors so constraint config parses the same way games do.
 kami-scene = { path = "../kami-scene" }
 thiserror = { workspace = true }
+# EDN-authored animation clips (clip.rs) build glam Quat/Vec3 keyframes.
+glam.workspace = true

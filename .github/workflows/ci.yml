@@ -18,12 +18,30 @@ jobs:
     name: cargo build + data-tier parity tests (no-GPU)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout kami-engine
+        uses: actions/checkout@v4
+        with:
+          path: kami-engine
+      # kami-engine-clj / kami-live / kami-scene / kami-webgpu-rs path-depend on the
+      # sibling `../../kotoba/crates/kotoba-edn`, so the workspace build needs kotoba
+      # checked out alongside (at <workspace>/kotoba, sibling of kami-engine/).
+      # Needs a KOTOBA_TOKEN secret with read access to the private
+      # com-junkawasaki/kotoba; falls back to github.token (works only if public).
+      - name: Checkout kotoba (sibling kotoba-edn path dep)
+        uses: actions/checkout@v4
+        with:
+          repository: com-junkawasaki/kotoba
+          path: kotoba
+          token: ${{ secrets.KOTOBA_TOKEN || github.token }}
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: kami-engine
       - name: Build the workspace (catch breaks)
+        working-directory: kami-engine
         run: cargo build --workspace --locked
       - name: Data-tier parity oracles (EDN == Rust) + geometry golden — pure, no GPU
+        working-directory: kami-engine
         run: |
           cargo test -p kami-vehicle-scene -p kami-atmosphere-scene -p kami-terrain-scene --locked
           cargo test -p kami-webgpu-rs --lib --locked cube_matches sphere_matches cylinder_matches lit_shader_matches shadow_shader_matches 2>/dev/null || true

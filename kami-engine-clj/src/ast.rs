@@ -730,6 +730,17 @@ fn lower_call(items: &[EdnValue]) -> Result<Expr, CljError> {
         "loop"  => lower_loop(args),
         "recur" => Ok(Expr::Recur(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
         "do"    => Ok(Expr::Do(args.iter().map(lower_expr).collect::<Result<_, _>>()?)),
+        "if-not"   => lower_if_not(args),
+        "when-not" => lower_when_not(args),
+        "case"     => lower_case(args),
+        "->"       => lower_thread(args, true),
+        "->>"      => lower_thread(args, false),
+        "if-let"   => lower_if_let(args),
+        "when-let" => lower_when_let(args),
+        "dotimes"  => lower_dotimes(args),
+        "as->"     => lower_as_thread(args),
+        "cond->"   => lower_cond_thread(args, true),
+        "cond->>"  => lower_cond_thread(args, false),
         "doseq-entities" => lower_doseq_entities(args),
         // `(atom-val name)` / `(set-atom! name value)` — read/write a defatom cell. The atom
         // name is a bare symbol (resolved to a global at codegen), not an evaluated argument.
@@ -768,6 +779,209 @@ fn lower_call(items: &[EdnValue]) -> Result<Expr, CljError> {
             }
         }
     }
+}
+
+fn lower_if_not(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.len() != 3 {
+        return Err(CljError::Lower("if-not takes: (if-not cond then else)".into()));
+    }
+    // (if-not c then else) ≡ (if c else then) — no `not` needed, just swap the branches.
+    Ok(Expr::If {
+        cond: Box::new(lower_expr(&args[0])?),
+        then: Box::new(lower_expr(&args[2])?),
+        els:  Box::new(lower_expr(&args[1])?),
+    })
+}
+
+fn lower_when_not(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.is_empty() {
+        return Err(CljError::Lower("when-not takes: (when-not cond body…)".into()));
+    }
+    let body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    // (when-not c body…) ≡ (if c 0 (do body…))
+    Ok(Expr::If {
+        cond: Box::new(lower_expr(&args[0])?),
+        then: Box::new(Expr::Int(0)),
+        els:  Box::new(Expr::Do(body)),
+    })
+}
+
+fn lower_case(args: &[EdnValue]) -> Result<Expr, CljError> {
+    if args.is_empty() {
+        return Err(CljError::Lower("case takes: (case expr v1 e1 … [default])".into()));
+    }
+    let rest = &args[1..];
+    let has_default = rest.len() % 2 == 1;
+    let mut acc = if has_default {
+        lower_expr(rest.last().unwrap())?
+    } else {
+        Expr::Int(0)
+    };
+    let pairs = if has_default { &rest[..rest.len() - 1] } else { rest };
+    // fold the test/result pairs into nested (if (= expr v) result …); right-to-left so order holds.
+    for pair in pairs.chunks_exact(2).rev() {
+        let test = Expr::Builtin {
+            op: Builtin::Eq,
+            args: vec![lower_expr(&args[0])?, lower_expr(&pair[0])?],
+        };
+        acc = Expr::If {
+            cond: Box::new(test),
+            then: Box::new(lower_expr(&pair[1])?),
+            els:  Box::new(acc),
+        };
+    }
+    Ok(acc)
+}
+
+fn thread_into(step: &EdnValue, acc: Expr, first: bool) -> Result<Expr, CljError> {
+    match step {
+        // a call step (f a b): thread acc in as the first (->) or last (->>) argument.
+        EdnValue::List(items) => {
+            let head = list_head_symbol(items)?;
+            let mut largs: Vec<Expr> =
+                items[1..].iter().map(lower_expr).collect::<Result<_, _>>()?;
+            if first { largs.insert(0, acc); } else { largs.push(acc); }
+            if let Some(op) = Builtin::from_name(head.name.as_str()) {
+                check_builtin_arity(op, largs.len())?;
+                Ok(Expr::Builtin { op, args: largs })
+            } else {
+                Ok(Expr::Call { name: head.to_qualified(), args: largs })
+            }
+        }
+        // a bare symbol step f: (-> x f) ≡ (f x)
+        EdnValue::Symbol(s) => {
+            if let Some(op) = Builtin::from_name(s.name.as_str()) {
+                check_builtin_arity(op, 1)?;
+                Ok(Expr::Builtin { op, args: vec![acc] })
+            } else {
+                Ok(Expr::Call { name: s.to_qualified(), args: vec![acc] })
+            }
+        }
+        other => Err(CljError::Lower(format!(
+            "-> / ->> step must be a call or symbol, found {other:?}"
+        ))),
+    }
+}
+
+fn lower_thread(args: &[EdnValue], first: bool) -> Result<Expr, CljError> {
+    if args.is_empty() {
+        return Err(CljError::Lower("-> / ->> takes: (-> x step…)".into()));
+    }
+    let mut acc = lower_expr(&args[0])?;
+    for step in &args[1..] {
+        acc = thread_into(step, acc, first)?;
+    }
+    Ok(acc)
+}
+
+fn binding_pair<'a>(args: &'a [EdnValue], form: &str) -> Result<(&'a EdnValue, &'a EdnValue), CljError> {
+    match args.first() {
+        Some(EdnValue::Vector(v)) if v.len() == 2 => Ok((&v[0], &v[1])),
+        _ => Err(CljError::Lower(format!("{form} requires a [name expr] binding vector"))),
+    }
+}
+
+fn lower_if_let(args: &[EdnValue]) -> Result<Expr, CljError> {
+    // (if-let [name expr] then else?) ≡ (let [name expr] (if name then else))
+    let (name_v, expr_v) = binding_pair(args, "if-let")?;
+    let name = sym_name(name_v, "if-let binding name")?;
+    let val = lower_expr(expr_v)?;
+    let then = lower_expr(args.get(1)
+        .ok_or_else(|| CljError::Lower("if-let needs a then branch".into()))?)?;
+    let els = match args.get(2) { Some(e) => lower_expr(e)?, None => Expr::Int(0) };
+    Ok(Expr::Let {
+        bindings: vec![(name.clone(), val)],
+        body: vec![Expr::If {
+            cond: Box::new(Expr::Var(name)),
+            then: Box::new(then),
+            els:  Box::new(els),
+        }],
+    })
+}
+
+fn lower_when_let(args: &[EdnValue]) -> Result<Expr, CljError> {
+    // (when-let [name expr] body…) ≡ (let [name expr] (if name (do body…) 0))
+    let (name_v, expr_v) = binding_pair(args, "when-let")?;
+    let name = sym_name(name_v, "when-let binding name")?;
+    let val = lower_expr(expr_v)?;
+    let body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    Ok(Expr::Let {
+        bindings: vec![(name.clone(), val)],
+        body: vec![Expr::If {
+            cond: Box::new(Expr::Var(name)),
+            then: Box::new(Expr::Do(body)),
+            els:  Box::new(Expr::Int(0)),
+        }],
+    })
+}
+
+fn lower_dotimes(args: &[EdnValue]) -> Result<Expr, CljError> {
+    // (dotimes [i n] body…) — run body n times with i = 0..n-1.
+    // ≡ (let [n* n] (loop [i 0] (if (< i n*) (do body… (recur (inc i))) 0)))
+    let (i_v, n_v) = binding_pair(args, "dotimes")?;
+    let i = sym_name(i_v, "dotimes binding name")?;
+    let n = lower_expr(n_v)?;
+    let nsym = gensym("n");
+    let mut body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    body.push(Expr::Recur(vec![Expr::Builtin { op: Builtin::Inc, args: vec![Expr::Var(i.clone())] }]));
+    Ok(Expr::Let {
+        bindings: vec![(nsym.clone(), n)],
+        body: vec![Expr::Loop {
+            bindings: vec![(i.clone(), Expr::Int(0))],
+            body: vec![Expr::If {
+                cond: Box::new(Expr::Builtin { op: Builtin::Lt, args: vec![Expr::Var(i.clone()), Expr::Var(nsym)] }),
+                then: Box::new(Expr::Do(body)),
+                els:  Box::new(Expr::Int(0)),
+            }],
+        }],
+    })
+}
+
+/// Fold a sequence of (name, value) rebindings into NESTED single-binding lets, so each value sees
+/// the previous binding of the same name (guaranteed-sequential shadowing) — the substrate for as->
+/// and cond->.
+fn nest_lets(bindings: Vec<(String, Expr)>, body: Expr) -> Expr {
+    let mut acc = body;
+    for (name, val) in bindings.into_iter().rev() {
+        acc = Expr::Let { bindings: vec![(name, val)], body: vec![acc] };
+    }
+    acc
+}
+
+fn lower_as_thread(args: &[EdnValue]) -> Result<Expr, CljError> {
+    // (as-> expr name form…) — rebind `name` through each form, returning the last value.
+    if args.len() < 2 {
+        return Err(CljError::Lower("as-> takes: (as-> expr name form…)".into()));
+    }
+    let name = sym_name(&args[1], "as-> binding name")?;
+    let mut bindings = vec![(name.clone(), lower_expr(&args[0])?)];
+    for form in &args[2..] {
+        bindings.push((name.clone(), lower_expr(form)?));
+    }
+    Ok(nest_lets(bindings, Expr::Var(name)))
+}
+
+fn lower_cond_thread(args: &[EdnValue], first: bool) -> Result<Expr, CljError> {
+    // (cond-> expr t1 f1 …) — thread expr through f_i only when t_i is truthy (cond->> = thread-last).
+    if args.is_empty() {
+        return Err(CljError::Lower("cond-> takes: (cond-> expr test form…)".into()));
+    }
+    let rest = &args[1..];
+    if rest.len() % 2 != 0 {
+        return Err(CljError::Lower("cond-> requires test/form pairs".into()));
+    }
+    let name = gensym("ct");
+    let mut bindings = vec![(name.clone(), lower_expr(&args[0])?)];
+    for pair in rest.chunks_exact(2) {
+        let test = lower_expr(&pair[0])?;
+        let threaded = thread_into(&pair[1], Expr::Var(name.clone()), first)?;
+        bindings.push((name.clone(), Expr::If {
+            cond: Box::new(test),
+            then: Box::new(threaded),
+            els:  Box::new(Expr::Var(name.clone())),
+        }));
+    }
+    Ok(nest_lets(bindings, Expr::Var(name)))
 }
 
 fn lower_if(args: &[EdnValue]) -> Result<Expr, CljError> {
