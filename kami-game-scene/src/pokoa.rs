@@ -11,11 +11,15 @@
 
 use std::collections::BTreeMap;
 
-use kami_game::pokoa::{pokoa_dex, EvolutionTrigger, PokoaType, SpeciesDef};
+use kami_game::pokoa::{
+    pokoa_dex, pokoa_items, EvolutionTrigger, ItemDef, ItemType, PokoaType, SpeciesDef,
+};
 use kami_scene::{kw_key, mget, root_map, EdnValue};
 
 /// The canonical Pokoa-dex CONFIG shipped with this crate (generated from the oracle).
 pub const POKOA_DEX_EDN: &str = include_str!("../data/pokoa_dex.edn");
+/// The canonical Pokoa item-shop CONFIG shipped with this crate (generated from the oracle).
+pub const POKOA_ITEMS_EDN: &str = include_str!("../data/pokoa_items.edn");
 
 /// Errors raised while loading the Pokoa dex from EDN.
 #[derive(Debug, thiserror::Error)]
@@ -23,9 +27,9 @@ pub enum PokoaError {
     /// The EDN source did not parse to a top-level map.
     #[error("pokoa-dex EDN root is not a map")]
     NotAMap,
-    /// The `:game/pokoa-dex` table was missing or not a vector.
-    #[error("`:game/pokoa-dex` missing or not a vector")]
-    NoTable,
+    /// The expected table key was missing or not a vector.
+    #[error("`{0}` missing or not a vector")]
+    NoTable(&'static str),
 }
 
 type Map = BTreeMap<EdnValue, EdnValue>;
@@ -205,7 +209,7 @@ pub fn dex_specs_from_edn(src: &str) -> Result<Vec<SpeciesDefSpec>, PokoaError> 
     let root = root_map(src).ok_or(PokoaError::NotAMap)?;
     let dex = mget(&root, "game/pokoa-dex")
         .and_then(|v| v.as_vector())
-        .ok_or(PokoaError::NoTable)?;
+        .ok_or(PokoaError::NoTable("game/pokoa-dex"))?;
     Ok(dex
         .iter()
         .filter_map(|e| e.as_map().map(SpeciesDefSpec::from_map))
@@ -220,6 +224,101 @@ pub fn builtin_dex_specs() -> Vec<SpeciesDefSpec> {
 /// Convenience: the dex from the crate-shipped [`POKOA_DEX_EDN`].
 pub fn shipped_dex_specs() -> Result<Vec<SpeciesDefSpec>, PokoaError> {
     dex_specs_from_edn(POKOA_DEX_EDN)
+}
+
+// ── item shop ────────────────────────────────────────────────────────────────────────
+
+fn u32_at(m: &Map, key: &str) -> u32 {
+    mget(m, key).and_then(|v| v.as_integer()).unwrap_or(0).clamp(0, u32::MAX as i64) as u32
+}
+
+/// PartialEq mirror of [`kami_game::pokoa::ItemType`] (owned; `&'static str` → `String`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ItemTypeSpec {
+    Pokeball { catch_modifier: u8 },
+    Potion { heal_amount: u16 },
+    Revive { hp_pct: u8 },
+    EvolutionItem { item_id: String },
+    KeyItem { name: String },
+    /// Fallback for an unknown `:kind` (never produced from the oracle).
+    Unknown,
+}
+
+impl ItemTypeSpec {
+    fn from_item_type(t: &ItemType) -> Self {
+        match t {
+            ItemType::Pokeball { catch_modifier } => Self::Pokeball { catch_modifier: *catch_modifier },
+            ItemType::Potion { heal_amount } => Self::Potion { heal_amount: *heal_amount },
+            ItemType::Revive { hp_pct } => Self::Revive { hp_pct: *hp_pct },
+            ItemType::EvolutionItem { item_id } => Self::EvolutionItem { item_id: item_id.to_string() },
+            ItemType::KeyItem { name } => Self::KeyItem { name: name.to_string() },
+        }
+    }
+    fn from_map(m: &Map) -> Self {
+        match mget(m, "kind").and_then(kw_key).as_deref() {
+            Some("pokeball") => Self::Pokeball { catch_modifier: u8_at(m, "catch-modifier") },
+            Some("potion") => Self::Potion { heal_amount: u16_at(m, "heal-amount") },
+            Some("revive") => Self::Revive { hp_pct: u8_at(m, "hp-pct") },
+            Some("evolution-item") => Self::EvolutionItem { item_id: str_at(m, "item-id") },
+            Some("key-item") => Self::KeyItem { name: str_at(m, "name") },
+            _ => Self::Unknown,
+        }
+    }
+}
+
+/// PartialEq mirror of [`kami_game::pokoa::ItemDef`] (owned).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ItemDefSpec {
+    pub id: String,
+    pub name: String,
+    pub item_type: ItemTypeSpec,
+    pub price: u32,
+}
+
+impl ItemDefSpec {
+    /// Read the spec straight off the real engine item (the parity oracle source).
+    pub fn from_item(it: &ItemDef) -> Self {
+        Self {
+            id: it.id.to_string(),
+            name: it.name.to_string(),
+            item_type: ItemTypeSpec::from_item_type(&it.item_type),
+            price: it.price,
+        }
+    }
+    /// Build a spec from one item's EDN map.
+    pub fn from_map(m: &Map) -> Self {
+        Self {
+            id: str_at(m, "id"),
+            name: str_at(m, "name"),
+            item_type: mget(m, "type")
+                .and_then(|v| v.as_map())
+                .map(ItemTypeSpec::from_map)
+                .unwrap_or(ItemTypeSpec::Unknown),
+            price: u32_at(m, "price"),
+        }
+    }
+}
+
+/// Parse the `:game/pokoa-items` table from EDN `src` into ordered [`ItemDefSpec`]s.
+pub fn item_specs_from_edn(src: &str) -> Result<Vec<ItemDefSpec>, PokoaError> {
+    let root = root_map(src).ok_or(PokoaError::NotAMap)?;
+    let items = mget(&root, "game/pokoa-items")
+        .and_then(|v| v.as_vector())
+        .ok_or(PokoaError::NoTable("game/pokoa-items"))?;
+    Ok(items
+        .iter()
+        .filter_map(|e| e.as_map().map(ItemDefSpec::from_map))
+        .collect())
+}
+
+/// The compiled-in oracle: `pokoa_items()` projected into specs.
+pub fn builtin_item_specs() -> Vec<ItemDefSpec> {
+    pokoa_items().iter().map(ItemDefSpec::from_item).collect()
+}
+
+/// Convenience: the item shop from the crate-shipped [`POKOA_ITEMS_EDN`].
+pub fn shipped_item_specs() -> Result<Vec<ItemDefSpec>, PokoaError> {
+    item_specs_from_edn(POKOA_ITEMS_EDN)
 }
 
 #[cfg(test)]
@@ -254,6 +353,15 @@ mod tests {
 
     #[test]
     fn missing_table_is_an_error() {
-        assert!(matches!(dex_specs_from_edn("{:x 1}"), Err(PokoaError::NoTable)));
+        assert!(matches!(dex_specs_from_edn("{:x 1}"), Err(PokoaError::NoTable(_))));
+        assert!(matches!(item_specs_from_edn("{:x 1}"), Err(PokoaError::NoTable(_))));
+    }
+
+    #[test]
+    fn shipped_has_ten_items() {
+        let specs = item_specs_from_edn(POKOA_ITEMS_EDN).expect("pokoa_items.edn parses");
+        assert_eq!(specs.len(), 10);
+        assert_eq!(specs.len(), builtin_item_specs().len());
+        assert_eq!(specs[0].id, "pokoa-ball");
     }
 }

@@ -5,7 +5,10 @@
 //! `&'static str` and derives no `PartialEq`, so both sides are projected into the
 //! owned `PartialEq` `SpeciesDefSpec` mirror and compared as ordered vectors.
 
-use kami_game_scene::pokoa::{builtin_dex_specs, dex_specs_from_edn, POKOA_DEX_EDN};
+use kami_game_scene::pokoa::{
+    builtin_dex_specs, builtin_item_specs, dex_specs_from_edn, item_specs_from_edn, POKOA_DEX_EDN,
+    POKOA_ITEMS_EDN,
+};
 
 #[test]
 fn pokoa_dex_edn_matches_builtin() {
@@ -25,4 +28,20 @@ fn pokoa_dex_edn_matches_builtin() {
     }
 
     assert_eq!(loaded, builtin, "full pokoa-dex parity (ordered)");
+}
+
+#[test]
+fn pokoa_items_edn_matches_builtin() {
+    let loaded = item_specs_from_edn(POKOA_ITEMS_EDN).expect("pokoa_items.edn parses");
+    let builtin = builtin_item_specs();
+
+    assert_eq!(loaded.len(), builtin.len(), "item count");
+    assert_eq!(loaded.len(), 10, "all 10 items present");
+
+    for (i, (g, w)) in loaded.iter().zip(builtin.iter()).enumerate() {
+        assert_eq!(g.item_type, w.item_type, "item[{i}] ({}) type", w.name);
+        assert_eq!(g, w, "item[{i}] ({}) full parity", w.name);
+    }
+
+    assert_eq!(loaded, builtin, "full pokoa-items parity (ordered)");
 }
