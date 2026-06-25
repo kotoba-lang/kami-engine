@@ -1,0 +1,24 @@
+[package]
+name = "kami-articulated-scene"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# kami-articulated-scene — data-tier authoring surface for kami-articulated.
+#
+# ADR-0040/0042/0046 (clj/edn が主): a 6-DOF arm articulation is authored as
+# canonical `:arm/*` EDN and turned into the real `kami_articulated::ArticulatedSystem`
+# via `from_edn`, re-using the tolerant `kami-scene` EDN accessors the same way
+# games parse `scene.edn`. The shipped `giemon_arm6.urdf` stays as the
+# parity-tested oracle: `from_edn(EDN) ≈ parse_urdf(URDF)` (see tests).
+#
+# kami-articulated stays "pure Rust + glam + roxmltree, no edn dep" — the EDN
+# dependency lives only here (sibling-of-kami-vehicle-scene / kami-live).
+
+[dependencies]
+# Engine structs we build (ArticulatedSystem / Link / Joint / Inertia / Pose).
+kami-articulated = { path = "../kami-articulated" }
+# Tolerant EDN accessors (root_map / mget / num / vec3 / kw_key + EdnValue).
+kami-scene = { path = "../kami-scene" }
+glam = { workspace = true }
+thiserror = { workspace = true }

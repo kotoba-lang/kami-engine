@@ -1900,6 +1900,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-articulated-scene"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "kami-articulated",
+ "kami-scene",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "kami-atmosphere"
 version = "0.1.0"
 dependencies = [
@@ -2023,6 +2033,15 @@ dependencies = [
  "log",
  "serde",
  "serde_json",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "kami-cam-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-cam",
+ "kami-scene",
  "thiserror 2.0.18",
 ]
 

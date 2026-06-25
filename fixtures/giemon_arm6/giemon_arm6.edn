@@ -1,0 +1,104 @@
+;; giemon_arm6 — canonical 6-DOF manipulator articulation, as EDN.
+;;
+;; clj/edn が主(ADR-0040/0042/0046): 本 EDN が正本。giemon_arm6.urdf は
+;; builtin()/parity-oracle として残し、`from_edn(edn) == parse_urdf(urdf)` で検証する。
+;; `from_edn` で kami-genesis World へ流す(kami-articulated は kami-scene-free を維持し、
+;; ローダ/データは kami-articulated-scene 側に置く想定)。
+;;
+;; Units: metres / kg / kg·m². Links stack along +z; wrist (z,y,y,z,y,z).
+{:arm/name "giemon_arm6"
+ :arm/dof 6
+ :arm/units {:length :m :mass :kg :inertia :kg-m2}
+ :arm/convention "links stack along +z; a typical 6-DOF wrist (z,y,y,z,y,z)"
+ :arm/solver "kami-genesis 3-D reduced-coordinate spatial solver (RNEA + CRBA) + contact"
+
+ :arm/base
+ {:link/name "base_link"
+  :link/inertial {:origin [0 0 0.04] :mass 2.0
+                  :inertia {:ixx 0.004 :iyy 0.004 :izz 0.004 :ixy 0 :ixz 0 :iyz 0}}}
+
+ ;; 各エントリ = URDF の joint とその child link を1組に束ねたもの(親→子で連鎖)
+ :arm/chain
+ [{:joint/name "j1" :joint/type :revolute :joint/parent "base_link" :joint/child "link1"
+   :joint/origin [0 0 0.08] :joint/axis [0 0 1]
+   :joint/limit {:lower -3.0 :upper 3.0 :effort 40 :velocity 3} :joint/damping 0.06
+   :child/link {:link/name "link1"
+                :link/inertial {:origin [0 0 0.03] :mass 0.6
+                                :inertia {:ixx 0.0012 :iyy 0.0012 :izz 0.0008}}}}
+
+  {:joint/name "j2" :joint/type :revolute :joint/parent "link1" :joint/child "link2"
+   :joint/origin [0 0 0.06] :joint/axis [0 1 0]
+   :joint/limit {:lower -2.2 :upper 2.2 :effort 40 :velocity 3} :joint/damping 0.08
+   :child/link {:link/name "link2"
+                :link/inertial {:origin [0 0 0.09] :mass 0.5
+                                :inertia {:ixx 0.0030 :iyy 0.0030 :izz 0.0006}}}}
+
+  {:joint/name "j3" :joint/type :revolute :joint/parent "link2" :joint/child "link3"
+   :joint/origin [0 0 0.18] :joint/axis [0 1 0]
+   :joint/limit {:lower -2.5 :upper 2.5 :effort 30 :velocity 3} :joint/damping 0.06
+   :child/link {:link/name "link3"
+                :link/inertial {:origin [0 0 0.07] :mass 0.35
+                                :inertia {:ixx 0.0016 :iyy 0.0016 :izz 0.0004}}}}
+
+  {:joint/name "j4" :joint/type :revolute :joint/parent "link3" :joint/child "link4"
+   :joint/origin [0 0 0.14] :joint/axis [0 0 1]
+   :joint/limit {:lower -3.0 :upper 3.0 :effort 14 :velocity 4} :joint/damping 0.04
+   :child/link {:link/name "link4"
+                :link/inertial {:origin [0 0 0.04] :mass 0.22
+                                :inertia {:ixx 0.0006 :iyy 0.0006 :izz 0.0003}}}}
+
+  {:joint/name "j5" :joint/type :revolute :joint/parent "link4" :joint/child "link5"
+   :joint/origin [0 0 0.10] :joint/axis [0 1 0]
+   :joint/limit {:lower -2.0 :upper 2.0 :effort 10 :velocity 4} :joint/damping 0.03
+   :child/link {:link/name "link5"
+                :link/inertial {:origin [0 0 0.03] :mass 0.16
+                                :inertia {:ixx 0.0003 :iyy 0.0003 :izz 0.0002}}}}
+
+  {:joint/name "j6" :joint/type :revolute :joint/parent "link5" :joint/child "link6"
+   :joint/origin [0 0 0.06] :joint/axis [0 0 1]
+   :joint/limit {:lower -3.0 :upper 3.0 :effort 6 :velocity 5} :joint/damping 0.02
+   :child/link {:link/name "link6"
+                :link/inertial {:origin [0 0 0.025] :mass 0.12
+                                :inertia {:ixx 0.0002 :iyy 0.0002 :izz 0.0001}}}}]
+
+ ;; --- 実機マッピング層 (Gate-0 deep-research 2026-06-25 で確定)。
+ ;;     parity-oracle(URDF)には無いフィールド = EDN を正本にする動機そのもの。
+ ;;     sim(:arm/chain の effort)と実機BOMを1つのEDNで束ねる。
+ :arm/realization
+ {:status :gate0-resolved
+  ;; 確定(default): 梱包用途は予算/安全/背面駆動性を優先し all-qdd を正本採用。
+  ;; 現行 :arm/chain の effort(肩40/肘30)と整合し可搬~1.5-2kg。3kg厳守なら :harmonic-shoulder へ。
+  :default :all-qdd
+  :torque-rule "連続(定格)トルク = ピークの 1/2〜1/3。関節選定は必ず連続値で評価する。"
+  :key-finding "QDDの連続トルク上限は約40N·m(RobStride04/DM-J10010)。肘(40-50)・ベース(40-60)は
+                満たすが、肩(60-80連続)を単機で満たすQDDは無い。真3kgの肩は波動歯車が必要。"
+  :payload-fork
+  {:in-budget {:variant :all-qdd :payload-kg "~1.5-2.0" :total-jpy "~29-35万"
+               :note "肩を連続40N·m級QDDで構成。背面駆動性◎・予算内。3kg荷物は余裕不足"
+               :maps-to "現行 :arm/chain の effort(肩/肘=40/30)とほぼ整合"}
+   :true-3kg  {:variant :harmonic-shoulder :payload-kg 3 :total-jpy ">55-65万(予算超)"
+               :note "肩のみ波動歯車FHA-25C-H(連続72N·m)。高精度だが高価・低バックドライブ"}}
+
+  ;; 推奨(予算内・背面駆動性重視・実用~1.5-2kg)。価格は概算 $≒150円/EUR≒165円・税送料別。
+  :bom/all-qdd
+  [{:joint "j1" :role :base     :actuator {:model "RobStride 04" :cont-nm 40 :peak-nm 120 :ratio "9:1"  :mass-kg 1.42 :comm :can :enc :abs-single-turn :price-jpy 42000 :buy "OpenELAB(EU)/Taobao"}}
+   {:joint "j2" :role :shoulder :actuator {:model "RobStride 04" :cont-nm 40 :peak-nm 120 :ratio "9:1"  :mass-kg 1.42 :comm :can :enc :abs-single-turn :price-jpy 42000 :buy "OpenELAB(EU)/Taobao"} :limits-payload true}
+   {:joint "j3" :role :elbow    :actuator {:model "Damiao DM-J10010-2EC" :cont-nm 40 :peak-nm 150 :ratio "10:1" :comm :can :enc :abs-single-turn :price-jpy 54000 :buy "Foxtech(在庫あり) $357"}}
+   {:joint "j4" :role :wrist    :actuator {:model "Damiao DM-J8009-2EC"  :cont-nm 20 :peak-nm 40  :ratio "9:1"  :mass-kg 0.896 :comm :can :enc :dual :price-jpy 33000 :note "J4(10-20連続)の上限を満たす中型機・やや重い"}}
+   {:joint "j5" :role :wrist    :actuator {:model "CubeMars AK70-10 KV100 / Unitree GO-M8010-6" :cont-nm 8.3 :peak-nm 24.8 :mass-kg 0.521 :price-jpy 60000 :note "AK70-10は公式品切れ表示・GO-M8010-6はtechshare国内入手"}}
+   {:joint "j6" :role :wrist    :actuator {:model "CubeMars AK70-10 / Unitree GO-M8010-6" :cont-nm 8.3 :peak-nm 24.8 :mass-kg 0.521 :price-jpy 60000}}]
+  :bom/all-qdd-total-jpy "~29-33万"
+
+  ;; 真3kg化の差分: 肩だけ波動歯車へ差し替え(=予算超のトレードオフ)
+  :bom/harmonic-shoulder-delta
+  {:swap "j2 → Harmonic Drive FHA-25C-H(比100)" :cont-nm 72 :peak-nm 233 :mass-kg 4.6 :enc :abs
+   :comm #{:canopen :ethercat} :price-jpy ">=250000"
+   :effect "肩を3kg対応に。total >55-65万・予算超・低バックドライブ・要ヒートシンク"}
+
+  :encoder-comms-ok "MyActuator RMD-X V4系=EtherCAT&CAN+出力側絶対値。Damiao/RobStride=CAN+出力軸
+                     シングルターン絶対値(電源断保持)。Harmonic SHA/FHA=絶対値+CANopen/EtherCAT。"
+  :unresolved
+  ["肩を単機で満たす安価QDDは証拠集合内に無し(QDD連続上限~40N·m)。2段減速の自作も選択肢"
+   "MyActuator RMD-X V4系の連続トルク実数値・国内価格は未確証"
+   "AK70-10は品切れ・J4は連続トルクやや不足→AK80-9等の上位も要検討"
+   "全機 日本正規代理店少(OpenELAB/Foxtech/Taobao中心)。為替/送料/保守/安全認証に留意"]}}

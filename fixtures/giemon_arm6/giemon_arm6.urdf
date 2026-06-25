@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<!-- GIEMON 6-DOF manipulator — canonical articulation spec.
+<!-- GIEMON 6-DOF manipulator — articulation spec (PARITY ORACLE).
+     clj/edn が主 (ADR-0040/0042/0046): 正本は giemon_arm6.edn。この URDF は
+     互換ローダの parity oracle として残し、from_edn(edn) == parse_urdf(urdf) を検証する。
      Parsed at runtime by kami_articulated::parse_urdf and driven by the
      kami-genesis 3-D reduced-coordinate spatial solver (RNEA + CRBA) with the
      contact/collision solver. Links stack along +z; a typical 6-DOF wrist

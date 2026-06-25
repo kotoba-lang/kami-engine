@@ -96,6 +96,7 @@ members = [
     "kami-usd",
     "kami-genesis",
     "kami-articulated",
+    "kami-articulated-scene",
     "kami-sensor-sim",
     "kami-replicator",
     "kami-app-amenominaka",
