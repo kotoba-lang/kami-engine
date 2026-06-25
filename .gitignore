@@ -19,3 +19,5 @@ node_modules
 /seed_*.png
 /seed_textured.gif
 /seedtex_*.png
+/seed_full.gif
+/seedfull_*.png
