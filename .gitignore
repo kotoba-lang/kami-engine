@@ -21,3 +21,5 @@ node_modules
 /seedtex_*.png
 /seed_full.gif
 /seedfull_*.png
+/seed_morph.gif
+/seedmorph_*.png
