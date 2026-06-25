@@ -39,7 +39,7 @@ kami-postfx-scene = { path = "../kami-postfx-scene" }
 kami-postfx = { path = "../kami-postfx" }
 kami-vrm = { path = "../kami-vrm" }
 # Offscreen PNG rendering of the dance scene (see the choreography rendered).
-image = { version = "0.25", default-features = false, features = ["png", "gif"] }
+image = { version = "0.25", default-features = false, features = ["png", "gif", "jpeg"] }
 wgpu = "24"
 pollster = "0.4"
 bytemuck = { workspace = true }
