@@ -144,16 +144,18 @@ pub fn show_to_render_ir(snap: &ShowSnapshot, avatar: &AvatarBinding) -> EdnValu
     ])];
     let mut meshes: Vec<EdnValue> = Vec::new();
     if !avatar.vrm.is_empty() {
-        // VRM expressions driven by the same show (mirrors the Live2D param
-        // driver): cheer → happy, beat front → mouth (aa), periodic blink.
-        let happy = (snap.cheer_loudness / 40.0).clamp(0.0, 1.0);
-        let aa = ((1.0 - (snap.phase.beat_frac * std::f32::consts::TAU).cos()) * 0.5).clamp(0.0, 1.0);
-        let blink = blink_expr(snap.phase.time);
-        let expressions = EdnValue::map([
-            (kw("happy"), f(happy)),
-            (kw("aa"), f(aa)),
-            (kw("blink"), f(blink)),
-        ]);
+        // VRM expressions driven by the show, but authored in clj/edn: the
+        // `:dance/avatar :expressions` drives (smile-on-cheer / lip-sync-on-beat /
+        // blink) are resolved here so the render-IR carries EDN-configured weights.
+        let weights = avatar.expression_weights(snap.cheer_loudness, snap.phase.beat_frac, snap.phase.time);
+        // Emit every *declared* expression (stable keys) with its current weight
+        // (0 when inactive) — names come from the EDN `:expressions` drives.
+        let expr_entries: Vec<(EdnValue, EdnValue)> = avatar
+            .expressions
+            .iter()
+            .map(|d| (kw(&d.name), f(*weights.get(&d.name).unwrap_or(&0.0))))
+            .collect();
+        let expressions = EdnValue::map(expr_entries);
         meshes.push(EdnValue::map([
             (kw("id"), kw("performer")),
             (kw("url"), EdnValue::string(avatar.vrm.clone())),
@@ -192,16 +194,6 @@ pub fn show_to_render_ir(snap: &ShowSnapshot, avatar: &AvatarBinding) -> EdnValu
     ])
 }
 
-/// VRM `blink` expression weight: ~0 (eyes open) most of the time, spiking to 1
-/// (closed) for a quick blink every ~3 s. Deterministic on show time.
-fn blink_expr(t: f32) -> f32 {
-    let m = t - 3.0 * (t / 3.0).floor(); // t mod 3
-    if m < 0.12 {
-        1.0 - (m / 0.06 - 1.0).abs().min(1.0)
-    } else {
-        0.0
-    }
-}
 
 /// Map a lighting fixture to a render-IR light kind: moving heads (spot) project
 /// a cone; everything else washes as a directional.
