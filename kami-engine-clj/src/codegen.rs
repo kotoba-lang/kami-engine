@@ -753,7 +753,8 @@ impl<'a> FnCtx<'a> {
         // stores an f32 as opaque bits, so `(+ (get-x e) v)` integer-adds bit-patterns and
         // `(< fa fb)` signed-compares them — both silent garbage. Guest float arithmetic isn't
         // supported yet, so turn the silent-garbage path into a caught error at the form.
-        if matches!(op, Add | Sub | Mul | Div | Mod | Inc | Dec | Lt | Gt | Le | Ge)
+        if matches!(op, Add | Sub | Mul | Div | Mod | Inc | Dec | Lt | Gt | Le | Ge
+                      | BitAnd | BitOr | BitXor | Shl | ShrS)
             && args.iter().any(Self::returns_f32)
         {
             return Err(CljError::Codegen(format!(
@@ -800,6 +801,28 @@ impl<'a> FnCtx<'a> {
                 out.extend(self.emit(&args[0])?);
                 out.extend(self.emit(&args[1])?);
                 out.push(Instruction::I64RemS);
+            }
+            BitAnd => {
+                out.extend(self.emit(&args[0])?);
+                for a in &args[1..] { out.extend(self.emit(a)?); out.push(Instruction::I64And); }
+            }
+            BitOr => {
+                out.extend(self.emit(&args[0])?);
+                for a in &args[1..] { out.extend(self.emit(a)?); out.push(Instruction::I64Or); }
+            }
+            BitXor => {
+                out.extend(self.emit(&args[0])?);
+                for a in &args[1..] { out.extend(self.emit(a)?); out.push(Instruction::I64Xor); }
+            }
+            Shl => {
+                out.extend(self.emit(&args[0])?);
+                out.extend(self.emit(&args[1])?);
+                out.push(Instruction::I64Shl);
+            }
+            ShrS => {
+                out.extend(self.emit(&args[0])?);
+                out.extend(self.emit(&args[1])?);
+                out.push(Instruction::I64ShrS);
             }
             Inc => {
                 out.extend(self.emit(&args[0])?);

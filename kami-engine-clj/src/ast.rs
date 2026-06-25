@@ -81,6 +81,10 @@ pub enum Builtin {
     FLt, FGt, FLe, FGe, FEq,
     // ---- logic --------------------------------------------------------------
     And, Or, Not,
+    // ---- bitwise (i64 — flags / masks / packing booleans into one cell) ------
+    /// `(bit-and a b…)` / `(bit-or …)` / `(bit-xor …)` / `(bit-shift-left a n)` /
+    /// `(bit-shift-right a n)` — integer bit ops on the i64 value model.
+    BitAnd, BitOr, BitXor, Shl, ShrS,
     // ---- string / bytes (kotoba-clj core) -----------------------------------
     StrLen, ByteAt,
     BytesAlloc, ByteAppend, BytesLen, BytesFinish,
@@ -268,6 +272,11 @@ impl Builtin {
             // logic
             "and"        => And,
             "or"         => Or,
+            "bit-and"         => BitAnd,
+            "bit-or"          => BitOr,
+            "bit-xor"         => BitXor,
+            "bit-shift-left"  => Shl,
+            "bit-shift-right" => ShrS,
             "not"        => Not,
             // strings / bytes
             "str-len"    => StrLen,
@@ -1220,6 +1229,8 @@ fn check_builtin_arity(op: Builtin, n: usize) -> Result<(), CljError> {
 
         Sub => n >= 1,
         Add | Mul | And | Or => n >= 1,
+        BitAnd | BitOr | BitXor => n >= 1,
+        Shl | ShrS => n == 2,
         Div | Mod => n == 2,
         Eq | NotEq | Lt | Gt | Le | Ge => n >= 1,
         // f32 arithmetic: `+f`/`*f` fold from one operand; `-f`/`/f` need two.

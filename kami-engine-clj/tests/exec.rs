@@ -221,3 +221,15 @@ fn threading_with_special_form_steps() {
     assert_eq!(eval("(-> 2 (case 1 10 2 20 99))"), 20);    // case subject threaded in
     assert_eq!(eval("(cond-> 15 (< 1 2) (clamp 0 10))"), 10); // cond-> with a special-form step
 }
+
+#[test]
+fn bitwise_ops_compute() {
+    assert_eq!(eval("(bit-and 12 10)"), 8);          // 1100 & 1010 = 1000
+    assert_eq!(eval("(bit-or 12 10)"), 14);          // 1100 | 1010 = 1110
+    assert_eq!(eval("(bit-xor 12 10)"), 6);          // 1100 ^ 1010 = 0110
+    assert_eq!(eval("(bit-shift-left 1 4)"), 16);    // 1 << 4
+    assert_eq!(eval("(bit-shift-right 64 2)"), 16);  // 64 >> 2
+    assert_eq!(eval("(bit-or 1 2 4)"), 7);           // variadic
+    // a flags bitset: set bit0 + bit2, then test bit2 → 4
+    assert_eq!(eval("(bit-and (bit-or (bit-shift-left 1 0) (bit-shift-left 1 2)) (bit-shift-left 1 2))"), 4);
+}
