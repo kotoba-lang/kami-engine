@@ -8,6 +8,71 @@
 use bytemuck::{Pod, Zeroable};
 use wgpu::util::DeviceExt;
 
+// ── EDN pipeline specs → wgpu (the single-source cull/depth fields) ──
+// The generated `pipeline_specs::PIPELINE_SPECS` (from kami.pipelines EDN) is the authoritative
+// source for each pipeline's cull / depth-write / depth-compare. These map a spec to the wgpu
+// values the pipelines below build with; `specs_map_to_the_renderer_values` locks every pipeline's
+// mapped value to what the hand-written descriptors use, so the EDN and the renderer can't diverge.
+use crate::pipeline_specs::{PIPELINE_SPECS, PipelineSpec, Cull};
+
+/// Look up a generated pipeline spec by name.
+pub fn spec(name: &str) -> &'static PipelineSpec {
+    PIPELINE_SPECS.iter().find(|s| s.name == name)
+        .unwrap_or_else(|| panic!("no pipeline spec for {name}"))
+}
+
+/// Map a spec `Cull` to wgpu's optional face cull (`None` = no culling).
+pub fn wgpu_cull(c: Cull) -> Option<wgpu::Face> {
+    match c {
+        Cull::Back => Some(wgpu::Face::Back),
+        Cull::Front => Some(wgpu::Face::Front),
+        Cull::None => None,
+    }
+}
+
+/// Map a spec depth-compare string to wgpu's `CompareFunction`.
+pub fn wgpu_compare(s: &str) -> wgpu::CompareFunction {
+    match s {
+        "less"          => wgpu::CompareFunction::Less,
+        "less-equal"    => wgpu::CompareFunction::LessEqual,
+        "greater"       => wgpu::CompareFunction::Greater,
+        "greater-equal" => wgpu::CompareFunction::GreaterEqual,
+        "equal"         => wgpu::CompareFunction::Equal,
+        "always"        => wgpu::CompareFunction::Always,
+        "never"         => wgpu::CompareFunction::Never,
+        _               => wgpu::CompareFunction::Less,
+    }
+}
+
+#[cfg(test)]
+mod spec_consumption_tests {
+    use super::{spec, wgpu_cull, wgpu_compare};
+
+    #[test]
+    fn specs_map_to_the_renderer_values() {
+        // (name, cull, depth_write, depth_compare) the hand-written pipelines use — the EDN spec,
+        // mapped through the helpers, must reproduce each one exactly (a Rust-side oracle complementing
+        // the bb parse-rust parity gate). Wiring the descriptors to read these is then provably safe.
+        use wgpu::{Face, CompareFunction as CF};
+        let expect: &[(&str, Option<Face>, bool, CF)] = &[
+            ("terrain",    Some(Face::Back), true,  CF::Less),
+            ("sky",        None,             false, CF::LessEqual),
+            ("vegetation", None,             true,  CF::Less),
+            ("character",  Some(Face::Back), true,  CF::Less),
+            ("water",      None,             false, CF::Less),
+            ("voxel",      Some(Face::Back), true,  CF::Less),
+            ("particle",   None,             false, CF::Less),
+            ("atlas",      None,             false, CF::Less),
+        ];
+        for &(name, cull, dw, cmp) in expect {
+            let s = spec(name);
+            assert_eq!(wgpu_cull(s.cull), cull, "{name} cull");
+            assert_eq!(s.depth_write, dw, "{name} depth_write");
+            assert_eq!(wgpu_compare(s.depth_compare), cmp, "{name} depth_compare");
+        }
+    }
+}
+
 // ── Uniform layouts (match WGSL structs byte-for-byte) ──
 
 #[repr(C, align(16))]
