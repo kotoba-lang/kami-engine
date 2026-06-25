@@ -54,12 +54,20 @@ pub const ANIMATIONS_EDN: &str = include_str!("../data/animations.edn");
 /// Names of the presets shipped as the compiled-in oracle (iteration source for
 /// `builtin`/parity). Keeping this list here (not in `kami-game`) keeps the engine crate
 /// untouched. Order mirrors the preset-factory declaration order in `animation.rs`.
-pub const ALL_ANIMATION_NAMES: [&str; 5] = [
+pub const ALL_ANIMATION_NAMES: [&str; 13] = [
     "skibidi-idle",
     "grimace-wobble",
     "item-pickup",
     "sigma-idle",
     "ohio-glitch",
+    "pop-spawn",
+    "emote-wave",
+    "emote-dance",
+    "emote-taunt",
+    "emote-celebrate",
+    "emote-sad",
+    "emote-rage",
+    "nintendo-bounce",
 ];
 
 /// Errors raised while loading animation-preset CONFIG from EDN.
@@ -440,6 +448,14 @@ pub fn builtin_animation(name: &str) -> Option<AnimationState> {
         "item-pickup" => AnimationState::item_pickup(),
         "sigma-idle" => AnimationState::sigma_idle(),
         "ohio-glitch" => AnimationState::ohio_glitch(),
+        "pop-spawn" => AnimationState::pop_spawn(),
+        "emote-wave" => AnimationState::emote_wave(),
+        "emote-dance" => AnimationState::emote_dance(),
+        "emote-taunt" => AnimationState::emote_taunt(),
+        "emote-celebrate" => AnimationState::emote_celebrate(),
+        "emote-sad" => AnimationState::emote_sad(),
+        "emote-rage" => AnimationState::emote_rage(),
+        "nintendo-bounce" => AnimationState::nintendo_bounce(),
         _ => return None,
     })
 }
@@ -506,7 +522,7 @@ mod tests {
     #[test]
     fn shipped_has_all_animations() {
         let a = shipped_animations().expect("animations.edn parse");
-        assert_eq!(a.len(), 5);
+        assert_eq!(a.len(), ALL_ANIMATION_NAMES.len());
         for name in ALL_ANIMATION_NAMES {
             assert!(a.contains_key(name), "{name} present in EDN");
         }

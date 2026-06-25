@@ -32,6 +32,14 @@ fn oracle(name: &str) -> AnimationState {
         "item-pickup" => AnimationState::item_pickup(),
         "sigma-idle" => AnimationState::sigma_idle(),
         "ohio-glitch" => AnimationState::ohio_glitch(),
+        "pop-spawn" => AnimationState::pop_spawn(),
+        "emote-wave" => AnimationState::emote_wave(),
+        "emote-dance" => AnimationState::emote_dance(),
+        "emote-taunt" => AnimationState::emote_taunt(),
+        "emote-celebrate" => AnimationState::emote_celebrate(),
+        "emote-sad" => AnimationState::emote_sad(),
+        "emote-rage" => AnimationState::emote_rage(),
+        "nintendo-bounce" => AnimationState::nintendo_bounce(),
         other => panic!("unknown preset {other}"),
     }
 }
@@ -61,7 +69,7 @@ fn assert_animation_eq(name: &str, loaded: &AnimationState) {
 #[test]
 fn animations_edn_matches_builtin() {
     let loaded = animations_from_edn(ANIMATIONS_EDN).expect("animations.edn parse");
-    assert_eq!(loaded.len(), 5, "all presets present in EDN");
+    assert_eq!(loaded.len(), 13, "all presets present in EDN");
 
     for name in ALL_ANIMATION_NAMES {
         assert_animation_eq(name, &loaded[name]);
