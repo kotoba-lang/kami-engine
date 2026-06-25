@@ -85,8 +85,8 @@
    {:joint "j2" :role :shoulder :actuator {:model "RobStride 04" :cont-nm 40 :peak-nm 120 :ratio "9:1"  :mass-kg 1.42 :comm :can :enc :abs-single-turn :price-jpy 42000 :buy "OpenELAB(EU)/Taobao"} :limits-payload true}
    {:joint "j3" :role :elbow    :actuator {:model "Damiao DM-J10010-2EC" :cont-nm 40 :peak-nm 150 :ratio "10:1" :comm :can :enc :abs-single-turn :price-jpy 54000 :buy "Foxtech(在庫あり) $357"}}
    {:joint "j4" :role :wrist    :actuator {:model "Damiao DM-J8009-2EC"  :cont-nm 20 :peak-nm 40  :ratio "9:1"  :mass-kg 0.896 :comm :can :enc :dual :price-jpy 33000 :note "J4(10-20連続)の上限を満たす中型機・やや重い"}}
-   {:joint "j5" :role :wrist    :actuator {:model "CubeMars AK70-10 KV100 / Unitree GO-M8010-6" :cont-nm 8.3 :peak-nm 24.8 :mass-kg 0.521 :price-jpy 60000 :note "AK70-10は公式品切れ表示・GO-M8010-6はtechshare国内入手"}}
-   {:joint "j6" :role :wrist    :actuator {:model "CubeMars AK70-10 / Unitree GO-M8010-6" :cont-nm 8.3 :peak-nm 24.8 :mass-kg 0.521 :price-jpy 60000}}]
+   {:joint "j5" :role :wrist    :actuator {:model "Unitree GO-M8010-6" :cont-nm 10 :peak-nm 23.7 :mass-kg 0.53 :price-jpy 60000 :note "j5 effort=10 を満たす連続~10N·m。余裕僅少(production は一段上推奨)。AK70-10(連続8.3)では不足のため除外"}}
+   {:joint "j6" :role :wrist    :actuator {:model "CubeMars AK70-10 / Unitree GO-M8010-6" :cont-nm 8.3 :peak-nm 24.8 :mass-kg 0.521 :price-jpy 60000 :note "j6 effort=6 に対し連続8.3で可"}}]
   :bom/all-qdd-total-jpy "~29-33万"
 
   ;; 真3kg化の差分: 肩だけ波動歯車へ差し替え(=予算超のトレードオフ)

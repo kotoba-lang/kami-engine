@@ -60,6 +60,15 @@ pub enum Error {
     /// A chain joint was missing its `:joint/name`.
     #[error("chain joint {0} missing `:joint/name`")]
     NoJointName(usize),
+    /// `:arm/realization` was missing or not a map.
+    #[error("`:arm/realization` missing or not a map")]
+    NoRealization,
+    /// The requested `:bom/<variant>` was missing or not a vector.
+    #[error("`:bom/{0}` missing or not a vector under `:arm/realization`")]
+    NoBom(String),
+    /// `:arm/realization :default` (the default BOM variant) was missing.
+    #[error("`:arm/realization :default` (default BOM variant) missing")]
+    NoDefaultBom,
 }
 
 fn str_of(v: Option<&EdnValue>) -> Option<String> {
@@ -164,6 +173,90 @@ pub fn giemon_arm6() -> Result<ArticulatedSystem, Error> {
     from_edn(GIEMON_ARM6_EDN)
 }
 
+// ── Realization layer (`:arm/realization`) — actuator BOM ↔ sim integrity ──
+
+/// One actuator assignment from `:arm/realization :bom/<variant>`.
+#[derive(Debug, Clone)]
+pub struct ActuatorChoice {
+    /// Joint name this actuator drives (matches a `:arm/chain` `:joint/name`).
+    pub joint: String,
+    /// Actuator model string (`:actuator :model`).
+    pub model: String,
+    /// Rated **continuous** torque in N·m (`:actuator :cont-nm`).
+    pub cont_nm: f32,
+    /// Peak torque in N·m (`:actuator :peak-nm`).
+    pub peak_nm: f32,
+}
+
+/// A joint whose design continuous-torque requirement (`:joint/limit :effort`)
+/// exceeds the rated continuous torque of its assigned actuator.
+#[derive(Debug, Clone)]
+pub struct TorqueViolation {
+    /// Joint name.
+    pub joint: String,
+    /// Assigned actuator model.
+    pub model: String,
+    /// Required continuous torque (the chain joint's `effort`), N·m.
+    pub required_nm: f32,
+    /// Actuator rated continuous torque, N·m.
+    pub cont_nm: f32,
+}
+
+/// Read the actuator BOM for a named variant (e.g. `"all-qdd"`) from
+/// `:arm/realization :bom/<variant>`.
+pub fn bom_from_edn(src: &str, variant: &str) -> Result<Vec<ActuatorChoice>, Error> {
+    let root = root_map(src).ok_or(Error::NotAMap)?;
+    let real = mget(&root, "arm/realization").and_then(|v| v.as_map()).ok_or(Error::NoRealization)?;
+    let list = mget(real, &format!("bom/{variant}"))
+        .and_then(|v| v.as_vector())
+        .ok_or_else(|| Error::NoBom(variant.to_string()))?;
+
+    let mut out = Vec::new();
+    for entry in list {
+        let Some(e) = entry.as_map() else { continue };
+        let Some(joint) = str_of(mget(e, "joint")) else { continue };
+        let act = mget(e, "actuator").and_then(|v| v.as_map());
+        out.push(ActuatorChoice {
+            joint,
+            model: act.and_then(|a| str_of(mget(a, "model"))).unwrap_or_default(),
+            cont_nm: act.map(|a| num(mget(a, "cont-nm"))).unwrap_or(0.0),
+            peak_nm: act.map(|a| num(mget(a, "peak-nm"))).unwrap_or(0.0),
+        });
+    }
+    Ok(out)
+}
+
+/// Read the BOM variant named by `:arm/realization :default`.
+pub fn default_bom_from_edn(src: &str) -> Result<Vec<ActuatorChoice>, Error> {
+    let root = root_map(src).ok_or(Error::NotAMap)?;
+    let real = mget(&root, "arm/realization").and_then(|v| v.as_map()).ok_or(Error::NoRealization)?;
+    let variant = kw_name(mget(real, "default")).ok_or(Error::NoDefaultBom)?;
+    bom_from_edn(src, &variant)
+}
+
+/// Check each chain joint's continuous-torque requirement (`:joint/limit
+/// :effort`) against its assigned actuator's rated continuous torque. Returns
+/// the under-spec'd joints (empty ⇒ the BOM can hold the sim spec continuously).
+///
+/// Joints with no actuator in `bom` are skipped (use a presence check for that).
+pub fn validate_torque(sys: &ArticulatedSystem, bom: &[ActuatorChoice]) -> Vec<TorqueViolation> {
+    let mut out = Vec::new();
+    for j in &sys.joints {
+        if let Some(a) = bom.iter().find(|a| a.joint == j.name) {
+            // Tiny epsilon so a spec that exactly meets the rating passes.
+            if j.effort > a.cont_nm + 1e-4 {
+                out.push(TorqueViolation {
+                    joint: j.name.clone(),
+                    model: a.model.clone(),
+                    required_nm: j.effort,
+                    cont_nm: a.cont_nm,
+                });
+            }
+        }
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -242,5 +335,46 @@ mod tests {
                 "{} axis {:?} vs {:?}", uj.name, ej.axis, uj.axis
             );
         }
+    }
+
+    /// Design ↔ hardware integrity: the default actuator BOM must (a) cover every
+    /// chain joint and (b) supply each joint's continuous-torque requirement
+    /// (`:joint/limit :effort`) within the actuator's rated continuous torque.
+    #[test]
+    fn default_bom_meets_chain_torque() {
+        let sys = giemon_arm6().expect("edn");
+        let bom = default_bom_from_edn(GIEMON_ARM6_EDN).expect("default bom");
+
+        for j in &sys.joints {
+            assert!(
+                bom.iter().any(|a| a.joint == j.name),
+                "joint `{}` has no actuator in the default BOM",
+                j.name
+            );
+        }
+
+        let violations = validate_torque(&sys, &bom);
+        assert!(
+            violations.is_empty(),
+            "under-spec'd joints (design effort > actuator continuous): {:?}",
+            violations
+                .iter()
+                .map(|v| format!(
+                    "{}: need {}N·m > {}N·m [{}]",
+                    v.joint, v.required_nm, v.cont_nm, v.model
+                ))
+                .collect::<Vec<_>>()
+        );
+    }
+
+    /// The `:harmonic-shoulder` story is a *delta* over all-qdd, not a full BOM —
+    /// so it is not parsed as a standalone variant. Guard the variant lookup
+    /// error path instead.
+    #[test]
+    fn unknown_bom_variant_errors() {
+        assert!(matches!(
+            bom_from_edn(GIEMON_ARM6_EDN, "no-such-variant"),
+            Err(Error::NoBom(_))
+        ));
     }
 }
