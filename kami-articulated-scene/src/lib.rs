@@ -63,8 +63,9 @@ pub enum Error {
     /// `:arm/realization` was missing or not a map.
     #[error("`:arm/realization` missing or not a map")]
     NoRealization,
-    /// The requested `:bom/<variant>` was missing or not a vector.
-    #[error("`:bom/{0}` missing or not a vector under `:arm/realization`")]
+    /// The requested BOM variant was neither the `:default` nor present under
+    /// `:arm/realization :variants`.
+    #[error("BOM variant `{0}` not found under `:arm/realization :variants`")]
     NoBom(String),
     /// `:arm/realization :default` (the default BOM variant) was missing.
     #[error("`:arm/realization :default` (default BOM variant) missing")]
@@ -202,36 +203,70 @@ pub struct TorqueViolation {
     pub cont_nm: f32,
 }
 
-/// Read the actuator BOM for a named variant (e.g. `"all-qdd"`) from
-/// `:arm/realization :bom/<variant>`.
-pub fn bom_from_edn(src: &str, variant: &str) -> Result<Vec<ActuatorChoice>, Error> {
-    let root = root_map(src).ok_or(Error::NotAMap)?;
-    let real = mget(&root, "arm/realization").and_then(|v| v.as_map()).ok_or(Error::NoRealization)?;
-    let list = mget(real, &format!("bom/{variant}"))
-        .and_then(|v| v.as_vector())
-        .ok_or_else(|| Error::NoBom(variant.to_string()))?;
+fn actuator_of(joint: &str, a: &BTreeMap<EdnValue, EdnValue>) -> ActuatorChoice {
+    ActuatorChoice {
+        joint: joint.to_string(),
+        model: str_of(mget(a, "model")).unwrap_or_default(),
+        cont_nm: num(mget(a, "cont-nm")),
+        peak_nm: num(mget(a, "peak-nm")),
+    }
+}
 
+/// Read the per-joint actuators inlined on `:arm/chain` (`:joint/actuator`).
+/// This *is* the default (`:all-qdd`) BOM — there is no separate `:bom` list.
+pub fn chain_actuators_from_edn(src: &str) -> Result<Vec<ActuatorChoice>, Error> {
+    let root = root_map(src).ok_or(Error::NotAMap)?;
+    let chain = mget(&root, "arm/chain").and_then(|v| v.as_vector()).ok_or(Error::NoChain)?;
     let mut out = Vec::new();
-    for entry in list {
+    for entry in chain {
         let Some(e) = entry.as_map() else { continue };
-        let Some(joint) = str_of(mget(e, "joint")) else { continue };
-        let act = mget(e, "actuator").and_then(|v| v.as_map());
-        out.push(ActuatorChoice {
-            joint,
-            model: act.and_then(|a| str_of(mget(a, "model"))).unwrap_or_default(),
-            cont_nm: act.map(|a| num(mget(a, "cont-nm"))).unwrap_or(0.0),
-            peak_nm: act.map(|a| num(mget(a, "peak-nm"))).unwrap_or(0.0),
-        });
+        let Some(joint) = str_of(mget(e, "joint/name")) else { continue };
+        if let Some(a) = mget(e, "joint/actuator").and_then(|v| v.as_map()) {
+            out.push(actuator_of(&joint, a));
+        }
     }
     Ok(out)
 }
 
-/// Read the BOM variant named by `:arm/realization :default`.
+/// The default BOM is the inline chain actuators (single source of truth).
 pub fn default_bom_from_edn(src: &str) -> Result<Vec<ActuatorChoice>, Error> {
+    chain_actuators_from_edn(src)
+}
+
+/// BOM for a named variant. The base is the inline chain actuators; the
+/// `:default` variant returns them unchanged, any other variant applies
+/// `:arm/realization :variants <variant> :override` (a `{joint actuator}` map)
+/// on top. Unknown variants error with [`Error::NoBom`].
+pub fn bom_from_edn(src: &str, variant: &str) -> Result<Vec<ActuatorChoice>, Error> {
+    let mut base = chain_actuators_from_edn(src)?;
     let root = root_map(src).ok_or(Error::NotAMap)?;
     let real = mget(&root, "arm/realization").and_then(|v| v.as_map()).ok_or(Error::NoRealization)?;
-    let variant = kw_name(mget(real, "default")).ok_or(Error::NoDefaultBom)?;
-    bom_from_edn(src, &variant)
+
+    let default_v = kw_name(mget(real, "default")).ok_or(Error::NoDefaultBom)?;
+    if variant == default_v {
+        return Ok(base);
+    }
+
+    // Non-default variant: must exist under :variants.
+    let vmap = mget(real, "variants")
+        .and_then(|v| v.as_map())
+        .and_then(|vs| mget(vs, variant))
+        .and_then(|v| v.as_map())
+        .ok_or_else(|| Error::NoBom(variant.to_string()))?;
+
+    if let Some(over) = mget(vmap, "override").and_then(|v| v.as_map()) {
+        for (k, av) in over.iter() {
+            // override keys are plain strings ("j2"), not keywords.
+            let Some(jname) = k.as_string() else { continue };
+            let Some(am) = av.as_map() else { continue };
+            let choice = actuator_of(jname, am);
+            match base.iter_mut().find(|c| c.joint == jname) {
+                Some(slot) => *slot = choice,
+                None => base.push(choice),
+            }
+        }
+    }
+    Ok(base)
 }
 
 /// Check each chain joint's continuous-torque requirement (`:joint/limit
@@ -367,9 +402,25 @@ mod tests {
         );
     }
 
-    /// The `:harmonic-shoulder` story is a *delta* over all-qdd, not a full BOM —
-    /// so it is not parsed as a standalone variant. Guard the variant lookup
-    /// error path instead.
+    /// The `:harmonic-shoulder` variant overrides only j2, lifting its continuous
+    /// rating to the FHA-25C-H (72 N·m) while leaving every other joint as the
+    /// inline all-qdd actuator.
+    #[test]
+    fn harmonic_shoulder_override_lifts_j2() {
+        let base = default_bom_from_edn(GIEMON_ARM6_EDN).expect("default");
+        let h = bom_from_edn(GIEMON_ARM6_EDN, "harmonic-shoulder").expect("harmonic variant");
+
+        let j2_base = base.iter().find(|a| a.joint == "j2").unwrap();
+        let j2_h = h.iter().find(|a| a.joint == "j2").unwrap();
+        assert!(j2_h.cont_nm >= 72.0, "FHA-25C-H continuous ≥ 72N·m, got {}", j2_h.cont_nm);
+        assert!(j2_h.cont_nm > j2_base.cont_nm, "override lifts j2 {} > {}", j2_h.cont_nm, j2_base.cont_nm);
+        // only j2 changes — j3 stays the inline elbow actuator.
+        let j3_base = base.iter().find(|a| a.joint == "j3").unwrap();
+        let j3_h = h.iter().find(|a| a.joint == "j3").unwrap();
+        assert_eq!(j3_h.model, j3_base.model, "non-overridden joints unchanged");
+        assert_eq!(h.len(), base.len(), "override replaces, not appends");
+    }
+
     #[test]
     fn unknown_bom_variant_errors() {
         assert!(matches!(
