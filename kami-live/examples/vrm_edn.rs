@@ -9,7 +9,7 @@ mod vrm;
 
 use glam::{Mat4, Vec3};
 use kami_live::scene::DanceScene;
-use vrm::{blink_expr, Globals, GpuLight, GpuRenderer, VrmDance, MAX_LIGHTS};
+use vrm::{Globals, GpuLight, GpuRenderer, VrmDance, MAX_LIGHTS};
 
 const SCENE: &str = include_str!("../../kami-clj-play3d/games/dance/scene.edn");
 
@@ -54,10 +54,9 @@ async fn run() {
         let amb = ir.env.ambient;
         let snap = scene.show.snapshot();
         let pose = snap.performer_pose;
-        let happy = (snap.cheer_loudness / 40.0).clamp(0.0, 1.0);
-        let aa = ((1.0 - (snap.phase.beat_frac * std::f32::consts::TAU).cos()) * 0.5).clamp(0.0, 1.0);
-        let blink = blink_expr(snap.phase.time);
-        let (mv, palette) = model.frame(&pose, happy, aa, blink, spring_enabled);
+        // expression weights are authored in clj/edn (:dance/avatar :expressions).
+        let expr = cfg.avatar.expression_weights(snap.cheer_loudness, snap.phase.beat_frac, snap.phase.time);
+        let (mv, palette) = model.frame(&pose, &expr, spring_enabled);
         let g = Globals { vp, ambient: [amb[0]*0.45, amb[1]*0.45, amb[2]*0.5, 1.0], n_lights: [n_used as u32,0,0,0], lights };
         let px = r.render(&mv, &palette, g);
         if frame % 8 == 0 { image::save_buffer(format!("seededn_{frame:02}.png"), &px, w, h, image::ExtendedColorType::Rgba8).unwrap(); }

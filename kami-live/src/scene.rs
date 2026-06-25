@@ -80,6 +80,12 @@ pub struct AvatarBinding {
     /// What the VRM look-at gaze tracks when `look_at` is on. `None` (the default)
     /// tracks the camera; a `:look-at {:target [x y z]}` map fixes it on a point.
     pub look_at_target: Option<LookTarget>,
+    /// Show→expression drives (`:dance/avatar :expressions`). Maps VRM expression
+    /// names to a live-show signal so the face animates from the beat/crowd
+    /// (blink / lip-sync / smile-on-cheer) with no per-frame authoring. Defaults
+    /// to `happy←cheer, aa←beat, blink←blink` when omitted. Resolved per frame by
+    /// [`AvatarBinding::expression_weights`] → fed to `kami_vrm::ExpressionManager`.
+    pub expressions: Vec<ExpressionDrive>,
 }
 
 /// Where a VRM performer's gaze points (VRM look-at).
@@ -103,6 +109,61 @@ pub struct SpringTuning {
     pub gravity: f32,
 }
 
+/// Which live-show signal drives a VRM expression's weight each frame
+/// (`:dance/avatar :expressions {<name> {:from <source> :gain <f>}}`).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ExprSource {
+    /// Crowd cheer loudness × gain, clamped to [0,1] — e.g. a smile on cheers.
+    Cheer,
+    /// Mouth-open on the beat: (1 − cos 2π·beat_frac)/2 × gain — lip-sync "aa".
+    Beat,
+    /// Periodic eye blink (a short pulse every ~3 s); ignores gain.
+    Blink,
+}
+
+/// One show→expression drive: which VRM expression, driven by which signal.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExpressionDrive {
+    /// VRM expression name (`happy` / `aa` / `blink` / …), resolved host-side by
+    /// `kami_vrm::ExpressionManager`.
+    pub name: String,
+    pub source: ExprSource,
+    /// Multiplier on the source signal (ignored by `Blink`).
+    pub gain: f32,
+}
+
+impl AvatarBinding {
+    /// The default face animation when `:expressions` is omitted: smile on cheers,
+    /// lip-sync on the beat, periodic blink.
+    pub fn default_expressions() -> Vec<ExpressionDrive> {
+        vec![
+            ExpressionDrive { name: "happy".into(), source: ExprSource::Cheer, gain: 0.025 },
+            ExpressionDrive { name: "aa".into(), source: ExprSource::Beat, gain: 1.0 },
+            ExpressionDrive { name: "blink".into(), source: ExprSource::Blink, gain: 1.0 },
+        ]
+    }
+
+    /// Resolve every drive against this frame's show signals → `name → weight`
+    /// in [0,1]. Deterministic given the inputs; the host feeds the result to
+    /// `kami_vrm::ExpressionManager::resolve`. Zero-weight entries are omitted.
+    pub fn expression_weights(&self, cheer_loudness: f32, beat_frac: f32, time: f32) -> BTreeMap<String, f32> {
+        use std::f32::consts::TAU;
+        let mut out = BTreeMap::new();
+        for d in &self.expressions {
+            let w = match d.source {
+                ExprSource::Cheer => (cheer_loudness * d.gain).clamp(0.0, 1.0),
+                ExprSource::Beat => (((1.0 - (beat_frac * TAU).cos()) * 0.5) * d.gain).clamp(0.0, 1.0),
+                ExprSource::Blink => {
+                    let m = time - 3.0 * (time / 3.0).floor();
+                    if m < 0.12 { (1.0 - (m / 0.06 - 1.0).abs().min(1.0)).clamp(0.0, 1.0) } else { 0.0 }
+                }
+            };
+            if w > 0.0 { out.insert(d.name.clone(), w); }
+        }
+        out
+    }
+}
+
 impl Default for AvatarBinding {
     fn default() -> Self {
         Self {
@@ -114,6 +175,7 @@ impl Default for AvatarBinding {
             clip: None,
             spring: None,
             look_at_target: None,
+            expressions: AvatarBinding::default_expressions(),
         }
     }
 }
@@ -776,7 +838,38 @@ fn parse_avatar(m: &BTreeMap<EdnValue, EdnValue>) -> AvatarBinding {
                 None => LookTarget::Camera,
             }
         }),
+        expressions: mget(m, "expressions")
+            .and_then(|v| v.as_map())
+            .map(parse_expression_drives)
+            .filter(|v| !v.is_empty())
+            .unwrap_or_else(AvatarBinding::default_expressions),
     }
+}
+
+/// Parse `:dance/avatar :expressions {<name> {:from :cheer|:beat|:blink :gain f}}`.
+fn parse_expression_drives(m: &BTreeMap<EdnValue, EdnValue>) -> Vec<ExpressionDrive> {
+    let mut out = Vec::new();
+    for (k, v) in m {
+        let Some(name) = k
+            .as_keyword()
+            .map(|kw| kw.0.name.clone())
+            .or_else(|| k.as_string().map(|s| s.to_string()))
+        else {
+            continue;
+        };
+        let dm = v.as_map();
+        let source = match dm.and_then(|d| ident(mget(d, "from"))).as_deref() {
+            Some("cheer") => ExprSource::Cheer,
+            Some("blink") => ExprSource::Blink,
+            _ => ExprSource::Beat, // `:beat` or unspecified
+        };
+        let gain = dm
+            .and_then(|d| mget(d, "gain"))
+            .map(|v| num(Some(v)))
+            .unwrap_or(1.0);
+        out.push(ExpressionDrive { name, source, gain });
+    }
+    out
 }
 
 fn parse_crowd(m: &BTreeMap<EdnValue, EdnValue>) -> CrowdConfig {

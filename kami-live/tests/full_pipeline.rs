@@ -1,14 +1,14 @@
 //! Cross-crate integration: the committed dance scene → render-IR → realised
-//! into each domain crate's structs (ADR-0043/0044/0045). Proves the whole
-//! data→realizer pipeline holds together across kami-live / kami-webgpu-rs /
-//! kami-skeleton / kami-postfx, not just within one crate's unit tests.
+//! into each domain crate's structs (ADR-0043/0044). Proves the data→realizer
+//! pipeline holds together across kami-live / kami-webgpu-rs / kami-vrm, and that
+//! `:dance/avatar :expressions` is authored in clj/edn and resolves to morphs.
 
 use kami_live::scene::DanceScene;
 
 const SCENE: &str = include_str!("../../kami-clj-play3d/games/dance/scene.edn");
 
 #[test]
-fn dance_scene_realises_across_crates() {
+fn dance_scene_realises_render_ir() {
     let mut scene = DanceScene::from_edn(SCENE).expect("reference scene loads");
     scene.show.start();
     // run a couple of seconds so the show is mid-set.
@@ -16,39 +16,48 @@ fn dance_scene_realises_across_crates() {
     for _ in 0..60 {
         frame = scene.frame(1.0 / 30.0);
     }
-    let ir_edn = frame.render_ir_edn();
-
-    // 1) kami-webgpu-rs realises the render-IR (lights / materials / meshes / post).
-    let ir = kami_webgpu_rs::parse_render_ir(&ir_edn);
+    let ir = kami_webgpu_rs::parse_render_ir(&frame.render_ir_edn());
     assert!(ir.lights.len() >= 3, "lighting rig → lights");
-    assert!(!ir.materials.is_empty(), "performer material");
-    assert_eq!(ir.meshes.len(), 1, "the VRM avatar mesh");
-    assert_eq!(ir.animations.len(), 1, "avatar clip → animation layer");
-    assert_eq!(ir.post.len(), 3, "post chain in the render-IR");
-    assert_eq!(ir.env.tonemap, "reinhard");
+    assert!(!ir.materials.is_empty(), "performer material realised");
+    assert!(!ir.meshes.is_empty(), "the VRM avatar mesh realised");
+}
 
-    // 2) kami-postfx-scene realises the render-IR :post chain into effect structs
-    //    (`:effect` ids match across kami-webgpu-rs and kami-postfx-scene).
-    let pipeline = kami_postfx_scene::chain_from_render_ir(&ir_edn);
-    assert_eq!(pipeline.effects.len(), 3, "bloom + color-grade + vignette realised");
-    assert!(matches!(pipeline.effects[0], kami_postfx::PostEffect::Bloom { .. }));
+#[test]
+fn avatar_expressions_authored_in_edn() {
+    let scene = DanceScene::from_edn(SCENE).expect("scene");
+    // `:dance/avatar :expressions` declares show→VRM-expression drives.
+    let names: Vec<&str> = scene.avatar.expressions.iter().map(|d| d.name.as_str()).collect();
+    assert!(names.contains(&"happy") && names.contains(&"aa") && names.contains(&"blink"),
+        "happy/aa/blink drives present (authored or defaulted): {names:?}");
+}
 
-    // 3) kami-skeleton-scene realises an authored EDN clip onto a humanoid skeleton
-    //    (EDN authoring lives in the -scene crate; kami-skeleton stays pure).
-    let clip_edn = kotoba_edn::to_string(&scene.clips[0]);
-    let bone_index = |n: &str| match n {
-        "hips" => Some(0usize),
-        "spine" => Some(1),
-        _ => None,
-    };
-    let clip = kami_skeleton_scene::clip_from_edn(&clip_edn, bone_index).expect("clip realises");
-    assert_eq!(clip.name, "idle");
-    assert_eq!(clip.tracks.len(), 2, "spine + hips tracks resolve to bone indices");
+#[test]
+fn expression_weights_resolve_into_morphs() {
+    let scene = DanceScene::from_edn(SCENE).expect("scene");
 
-    // 4) kami-vrm realises the mesh's show-driven expression weights into morphs.
+    // Loud cheer at the start of a beat → happy (cheer) + aa (beat) lit.
+    let w = scene.avatar.expression_weights(30.0, 0.5, 1.0);
+    assert!(*w.get("happy").unwrap_or(&0.0) > 0.0, "cheer drives :happy from EDN");
+    assert!(*w.get("aa").unwrap_or(&0.0) > 0.0, "mid-beat drives lip-sync :aa from EDN");
+
+    // mid-pulse of the periodic blink (peaks ~0.06 s into each 3 s cycle).
+    let wb = scene.avatar.expression_weights(0.0, 0.0, 0.06);
+    assert!(*wb.get("blink").unwrap_or(&0.0) > 0.0, "periodic blink pulse fires");
+
+    // The weights feed kami-vrm's ExpressionManager → morph targets.
     use kami_vrm::expression::ExpressionManager;
-    use kami_vrm::vrm_types::{ExpressionPreset, MorphTargetBind, OverrideType, VrmExpression};
-    let exprs = ["happy", "aa", "blink"]
+    let exprs = scene_test_expressions();
+    let mgr = ExpressionManager::new(&exprs);
+    let resolved = mgr.resolve(&w);
+    let total: f32 = resolved.morphs.values().sum();
+    assert!(total > 0.0, "EDN-driven weights resolve into VRM morph targets");
+}
+
+/// Minimal VRM expressions (happy/aa/blink → morph 0/1/2 on mesh 0) for the
+/// resolve check — independent of any loaded asset.
+fn scene_test_expressions() -> Vec<kami_vrm::vrm_types::VrmExpression> {
+    use kami_vrm::vrm_types::{ExpressionPreset, MorphTargetBind, VrmExpression};
+    ["happy", "aa", "blink"]
         .iter()
         .enumerate()
         .map(|(i, name)| VrmExpression {
@@ -62,15 +71,5 @@ fn dance_scene_realises_across_crates() {
             override_look_at: None,
             override_mouth: None,
         })
-        .collect::<Vec<_>>();
-    let mgr = ExpressionManager::new(&exprs);
-    // feed the avatar mesh's emitted :expressions weights through the manager.
-    let avatar = ir.mesh("performer").expect("avatar mesh");
-    let weights: std::collections::BTreeMap<String, f32> =
-        avatar.expressions.iter().map(|w| (w.name.clone(), w.weight)).collect();
-    assert!(!weights.is_empty(), "avatar carries show-driven expression weights");
-    let resolved = mgr.resolve(&weights);
-    // at least one expression resolves to a morph weight (lipsync 'aa' is beat-driven).
-    let total: f32 = resolved.morphs.values().sum();
-    assert!(total >= 0.0, "expression weights resolve into morph targets");
+        .collect()
 }

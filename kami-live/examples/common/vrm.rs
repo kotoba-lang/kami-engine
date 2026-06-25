@@ -31,10 +31,6 @@ fn node_local(n: &kami_vrm::gltf_types::Node) -> Mat4 {
         n.rotation.map(Quat::from_array).unwrap_or(Quat::IDENTITY),
         n.translation.map(Vec3::from).unwrap_or(Vec3::ZERO))
 }
-pub fn blink_expr(t: f32) -> f32 {
-    let m = t - 3.0 * (t / 3.0).floor();
-    if m < 0.12 { 1.0 - (m / 0.06 - 1.0).abs().min(1.0) } else { 0.0 }
-}
 
 /// A loaded VRM ready to be posed: rest geometry + skeleton + morph + spring.
 pub struct VrmDance {
@@ -133,19 +129,20 @@ impl VrmDance {
     }
 
     /// Pose for one frame: returns (morphed rest verts, joint palette). Drives
-    /// humanoid bones from `pose`, expression morph from (happy/aa/blink), and
-    /// (when `spring_enabled`) VRM spring bones.
-    pub fn frame(&mut self, pose: &kami_live::DancePose, happy: f32, aa: f32, blink: f32, spring_enabled: bool) -> (Vec<V>, Vec<[[f32; 4]; 4]>) {
+    /// humanoid bones from `pose`, expression morph from `expr_weights`
+    /// (VRM-expression-name → intensity, e.g. from `AvatarBinding::expression_weights`),
+    /// and (when `spring_enabled`) VRM spring bones.
+    pub fn frame(&mut self, pose: &kami_live::DancePose, expr_weights: &std::collections::BTreeMap<String, f32>, spring_enabled: bool) -> (Vec<V>, Vec<[[f32; 4]; 4]>) {
         let nn = self.nn;
-        // expression morph
+        // expression morph — resolve the EDN-driven weights against the VRM's own
+        // expression names (case-insensitive, so "Happy"/"happy"/"A"/"aa" match).
         let mgr = kami_vrm::ExpressionManager::new(&self.doc.expressions);
         let mut ew = std::collections::BTreeMap::new();
         for e in &self.doc.expressions {
             let ln = e.name.to_lowercase();
-            let w = if ln.contains("blink") && !ln.contains("left") && !ln.contains("right") { blink }
-                else if ln == "aa" || ln == "a" { aa }
-                else if ln.contains("happy") || ln.contains("joy") || ln.contains("smile") { happy } else { 0.0 };
-            if w > 0.0 { ew.insert(e.name.clone(), w); }
+            if let Some(&w) = expr_weights.get(&ln).or_else(|| expr_weights.iter().find(|(k, _)| k.to_lowercase() == ln).map(|(_, v)| v)) {
+                if w > 0.0 { ew.insert(e.name.clone(), w); }
+            }
         }
         let resolved = mgr.resolve(&ew);
         let mut mv = self.verts.clone();

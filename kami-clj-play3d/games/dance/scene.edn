@@ -26,7 +26,13 @@
   :scale        1.0
   :look-at      true      ;; eyes/head track the camera
   :spring-bones true      ;; VRMC_springBone hair/skirt secondary motion
-  :clip         "idle"}   ;; base animation clip (defined in :dance/clips)
+  :clip         "idle"    ;; base animation clip (defined in :dance/clips)
+  ;; show→VRM-expression drives: the face animates from the live show with no
+  ;; per-frame authoring (smile on cheers, lip-sync on the beat, periodic blink).
+  ;; Resolved per frame by AvatarBinding::expression_weights → ExpressionManager.
+  :expressions  {:happy {:from :cheer :gain 0.03}
+                 :aa    {:from :beat}
+                 :blink {:from :blink}}}
 
  ;; EDN-authored animation clips (no binary .vrma needed). The host loads each
  ;; via kami_skeleton::clip_from_edn and blends per the render-IR :animations.
