@@ -735,6 +735,9 @@ fn lower_call(items: &[EdnValue]) -> Result<Expr, CljError> {
         "case"     => lower_case(args),
         "->"       => lower_thread(args, true),
         "->>"      => lower_thread(args, false),
+        "if-let"   => lower_if_let(args),
+        "when-let" => lower_when_let(args),
+        "dotimes"  => lower_dotimes(args),
         "doseq-entities" => lower_doseq_entities(args),
         // `(atom-val name)` / `(set-atom! name value)` — read/write a defatom cell. The atom
         // name is a bare symbol (resolved to a global at codegen), not an evaluated argument.
@@ -866,6 +869,69 @@ fn lower_thread(args: &[EdnValue], first: bool) -> Result<Expr, CljError> {
         acc = thread_into(step, acc, first)?;
     }
     Ok(acc)
+}
+
+fn binding_pair<'a>(args: &'a [EdnValue], form: &str) -> Result<(&'a EdnValue, &'a EdnValue), CljError> {
+    match args.first() {
+        Some(EdnValue::Vector(v)) if v.len() == 2 => Ok((&v[0], &v[1])),
+        _ => Err(CljError::Lower(format!("{form} requires a [name expr] binding vector"))),
+    }
+}
+
+fn lower_if_let(args: &[EdnValue]) -> Result<Expr, CljError> {
+    // (if-let [name expr] then else?) ≡ (let [name expr] (if name then else))
+    let (name_v, expr_v) = binding_pair(args, "if-let")?;
+    let name = sym_name(name_v, "if-let binding name")?;
+    let val = lower_expr(expr_v)?;
+    let then = lower_expr(args.get(1)
+        .ok_or_else(|| CljError::Lower("if-let needs a then branch".into()))?)?;
+    let els = match args.get(2) { Some(e) => lower_expr(e)?, None => Expr::Int(0) };
+    Ok(Expr::Let {
+        bindings: vec![(name.clone(), val)],
+        body: vec![Expr::If {
+            cond: Box::new(Expr::Var(name)),
+            then: Box::new(then),
+            els:  Box::new(els),
+        }],
+    })
+}
+
+fn lower_when_let(args: &[EdnValue]) -> Result<Expr, CljError> {
+    // (when-let [name expr] body…) ≡ (let [name expr] (if name (do body…) 0))
+    let (name_v, expr_v) = binding_pair(args, "when-let")?;
+    let name = sym_name(name_v, "when-let binding name")?;
+    let val = lower_expr(expr_v)?;
+    let body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    Ok(Expr::Let {
+        bindings: vec![(name.clone(), val)],
+        body: vec![Expr::If {
+            cond: Box::new(Expr::Var(name)),
+            then: Box::new(Expr::Do(body)),
+            els:  Box::new(Expr::Int(0)),
+        }],
+    })
+}
+
+fn lower_dotimes(args: &[EdnValue]) -> Result<Expr, CljError> {
+    // (dotimes [i n] body…) — run body n times with i = 0..n-1.
+    // ≡ (let [n* n] (loop [i 0] (if (< i n*) (do body… (recur (inc i))) 0)))
+    let (i_v, n_v) = binding_pair(args, "dotimes")?;
+    let i = sym_name(i_v, "dotimes binding name")?;
+    let n = lower_expr(n_v)?;
+    let nsym = gensym("n");
+    let mut body = args[1..].iter().map(lower_expr).collect::<Result<Vec<_>, _>>()?;
+    body.push(Expr::Recur(vec![Expr::Builtin { op: Builtin::Inc, args: vec![Expr::Var(i.clone())] }]));
+    Ok(Expr::Let {
+        bindings: vec![(nsym.clone(), n)],
+        body: vec![Expr::Loop {
+            bindings: vec![(i.clone(), Expr::Int(0))],
+            body: vec![Expr::If {
+                cond: Box::new(Expr::Builtin { op: Builtin::Lt, args: vec![Expr::Var(i.clone()), Expr::Var(nsym)] }),
+                then: Box::new(Expr::Do(body)),
+                els:  Box::new(Expr::Int(0)),
+            }],
+        }],
+    })
 }
 
 fn lower_if(args: &[EdnValue]) -> Result<Expr, CljError> {

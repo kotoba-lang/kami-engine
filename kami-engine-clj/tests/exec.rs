@@ -168,3 +168,17 @@ fn desugar_forms_compute() {
     assert_eq!(eval("(case 7 1 10 2 20 99)"), 99);      // default
     assert_eq!(eval("(case 7 1 10 2 20)"), 0);          // no match, no default → 0
 }
+
+#[test]
+fn binding_and_loop_forms_compute() {
+    // if-let binds, then branches on the bound value's truthiness (0 = falsy)
+    assert_eq!(eval("(if-let [x (+ 2 3)] x 99)"), 5);  // x=5 truthy → x
+    assert_eq!(eval("(if-let [x (- 5 5)] x 99)"), 99); // x=0 falsy  → else
+    assert_eq!(eval("(if-let [x 0] 1)"), 0);           // no else    → 0
+    // when-let runs the body only when the binding is truthy
+    assert_eq!(eval("(when-let [x 7] (+ x 1))"), 8);
+    assert_eq!(eval("(when-let [x 0] (+ x 1))"), 0);
+    // dotimes compiles, terminates, and returns 0 — exercises the loop/recur/inc/< construction
+    assert_eq!(eval("(dotimes [i 5] (+ i 1))"), 0);
+    assert_eq!(eval("(dotimes [i 0] 1)"), 0);
+}
