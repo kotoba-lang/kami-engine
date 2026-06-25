@@ -61,6 +61,10 @@
   {:effect :color-grade :lift [0.0 0.0 0.03] :gamma [1.0 1.0 1.0] :gain [1.05 1.0 0.95]}
   {:effect :vignette :intensity 0.35}]
 
+ ;; camera rig framing the performer — authored as data (not hardcoded). The eye
+ ;; sits at the live performer position + :offset; the look target at + :look.
+ :dance/camera {:offset [0.0 3.0 8.0] :look [0.0 1.0 0.0] :fov 0.9}
+
  ;; audience density (deterministic placement from :seed)
  :dance/crowd
  {:fans 240 :cap 4096 :pit-bias 0.7 :seed 1}

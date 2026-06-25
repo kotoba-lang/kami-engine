@@ -51,6 +51,18 @@ fn dance_post_chain_realises_into_effects() {
 }
 
 #[test]
+fn camera_rig_authored_in_edn() {
+    // `:dance/camera` authors the eye/look offset + fov framing the performer,
+    // and the rig flows into the render-IR `:camera` (eye follows the dancer).
+    let mut scene = DanceScene::from_edn(SCENE).expect("scene");
+    assert!((scene.camera.offset.z - 8.0).abs() < 1e-6, ":dance/camera :offset parsed");
+    assert!((scene.camera.fov - 0.9).abs() < 1e-6, ":dance/camera :fov parsed");
+    scene.show.start();
+    let edn = scene.frame(1.0 / 30.0).render_ir_edn();
+    assert!(edn.contains(":camera"), "render-IR carries the :camera rig");
+}
+
+#[test]
 fn avatar_expressions_authored_in_edn() {
     let scene = DanceScene::from_edn(SCENE).expect("scene");
     // `:dance/avatar :expressions` declares show→VRM-expression drives.

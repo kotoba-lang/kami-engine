@@ -109,6 +109,23 @@ pub struct SpringTuning {
     pub gravity: f32,
 }
 
+/// Camera rig framing the performer (`:dance/camera`). The eye sits at the live
+/// performer position + `offset`; the look target at performer + `look`. So the
+/// camera follows the dancer, but the rig (over-the-shoulder distance, height,
+/// fov) is authored as data instead of hardcoded.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CameraRig {
+    pub offset: Vec3,
+    pub look: Vec3,
+    pub fov: f32,
+}
+
+impl Default for CameraRig {
+    fn default() -> Self {
+        Self { offset: Vec3::new(0.0, 3.0, 8.0), look: Vec3::new(0.0, 1.0, 0.0), fov: 0.9 }
+    }
+}
+
 /// Which live-show signal drives a VRM expression's weight each frame
 /// (`:dance/avatar :expressions {<name> {:from <source> :gain <f>}}`).
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -208,6 +225,8 @@ pub struct DanceScene {
     /// (e.g. `:closeup` / `:wide` / `:punch`); emitted as `:camera-shot` so the
     /// host adjusts framing. Persists until another `:camera` action fires.
     pub active_camera: Option<String>,
+    /// Camera rig (`:dance/camera`) framing the performer — authored as data.
+    pub camera: CameraRig,
 }
 
 impl DanceScene {
@@ -652,7 +671,7 @@ impl DanceScene {
             self.active_camera = Some(shot);
         }
         let snap = self.show.snapshot();
-        let render_ir = crate::render::show_to_render_ir(&snap, &self.avatar);
+        let render_ir = crate::render::show_to_render_ir(&snap, &self.avatar, &self.camera);
         // inject scene-level keys (post-fx chain, active camera shot) into the
         // per-frame render-IR.
         let mut extra: Vec<(EdnValue, EdnValue)> = Vec::new();
@@ -801,6 +820,19 @@ impl DanceScene {
             .map(|ps| ps.iter().filter(|p| p.as_map().is_some()).cloned().collect())
             .unwrap_or_default();
 
+        // ── :dance/camera → camera rig (offset / look / fov), data-authored ──
+        let camera = mget(root, "dance/camera")
+            .and_then(|v| v.as_map())
+            .map(|cm| {
+                let d = CameraRig::default();
+                CameraRig {
+                    offset: opt_vec3(mget(cm, "offset")).unwrap_or(d.offset),
+                    look: opt_vec3(mget(cm, "look")).unwrap_or(d.look),
+                    fov: mget(cm, "fov").map(|v| num(Some(v))).filter(|f| *f > 0.0).unwrap_or(d.fov),
+                }
+            })
+            .unwrap_or_default();
+
         DanceScene {
             title,
             avatar,
@@ -810,6 +842,7 @@ impl DanceScene {
             clips,
             post,
             active_camera: None,
+            camera,
         }
     }
 }
