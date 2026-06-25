@@ -1821,6 +1821,7 @@ dependencies = [
  "kami-atmosphere",
  "kami-render",
  "kami-vehicle",
+ "kami-vehicle-scene",
  "log",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -1889,6 +1890,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-atmosphere-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-atmosphere",
+ "kami-scene",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "kami-audio"
 version = "0.1.0"
 dependencies = [
@@ -1904,6 +1914,15 @@ dependencies = [
  "kami-pathfind",
  "kami-sensor-sim",
  "kami-vehicle",
+]
+
+[[package]]
+name = "kami-autodrive-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-autodrive",
+ "kami-scene",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -2012,6 +2031,15 @@ dependencies = [
  "kami-skeleton",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "kami-character-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-character",
+ "kami-scene",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -2268,6 +2296,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-game-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-game",
+ "kami-scene",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "kami-genesis"
 version = "0.1.0"
 dependencies = [
@@ -2330,6 +2367,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-input-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-input",
+ "kami-scene",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "kami-ip"
 version = "0.1.0"
 dependencies = [
@@ -2361,6 +2407,13 @@ name = "kami-live"
 version = "0.1.0"
 dependencies = [
  "glam",
+ "kami-postfx",
+ "kami-postfx-scene",
+ "kami-scene",
+ "kami-skeleton-scene",
+ "kami-vrm",
+ "kami-webgpu-rs",
+ "kotoba-edn",
  "log",
  "serde",
  "serde_json",
@@ -2572,6 +2625,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-postfx-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-postfx",
+ "kami-scene",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "kami-power"
 version = "0.1.0"
 dependencies = [
@@ -2594,7 +2656,9 @@ dependencies = [
  "gpu-allocator",
  "image",
  "kami-core",
+ "kami-rt",
  "log",
+ "pollster",
  "serde_json",
  "thiserror 2.0.18",
  "wgpu",
@@ -2614,6 +2678,8 @@ dependencies = [
 name = "kami-rt"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
+ "glam",
  "log",
  "thiserror 2.0.18",
 ]
@@ -2690,16 +2756,22 @@ dependencies = [
 name = "kami-script-runtime"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
+ "glam",
  "hecs",
  "kami-audio",
  "kami-core",
  "kami-input",
+ "kami-render",
+ "kami-rt",
  "kami-scene",
  "kototama",
  "log",
+ "pollster",
  "thiserror 2.0.18",
  "wasmi",
  "wasmtime",
+ "wgpu",
 ]
 
 [[package]]
@@ -2761,6 +2833,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-skeleton-scene"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "kami-scene",
+ "kami-skeleton",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "kami-spice"
 version = "0.1.0"
 dependencies = [
@@ -2778,6 +2860,15 @@ dependencies = [
  "bytemuck",
  "glam",
  "serde",
+]
+
+[[package]]
+name = "kami-terrain-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-scene",
+ "kami-terrain",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -2843,12 +2934,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "kami-vegetation-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-scene",
+ "kami-vegetation",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "kami-vehicle"
 version = "0.1.0"
 dependencies = [
  "glam",
  "serde",
  "serde_json",
+ "thiserror 2.0.18",
+]
+
+[[package]]
+name = "kami-vehicle-scene"
+version = "0.1.0"
+dependencies = [
+ "kami-scene",
+ "kami-vehicle",
  "thiserror 2.0.18",
 ]
 

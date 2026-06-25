@@ -1,0 +1,35 @@
+[package]
+name = "kami-game-scene"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# kami-game-scene — data-tier authoring surface for kami-game ANIMATION-STATE
+# presets (Nintendo-style juicy motion).
+#
+# ADR-0038/0046: the hot per-frame `AnimationClip::tick` integrator stays native
+# Rust (kami-game::animation); only the init-time CONFIG/DATA — which clips, in
+# which order, with which params + initial runtime state — moves to EDN. This
+# sibling-of-kami-postfx-scene / kami-character-scene crate turns canonical
+# `:game/animations` EDN (an ordered vector of `:clip`-tagged clip maps per
+# preset) into the real `kami_game::animation::AnimationState` engine struct
+# (rebuilt via `AnimationState::new()` + `.with(clip)` in order, the same way the
+# hardcoded preset factories assemble it), re-using the tolerant `kami-scene` EDN
+# accessors exactly the way games parse `scene.edn` (missing keys fall back to
+# defaults, namespaced keywords match on `ns/name`, ints coerce to floats).
+#
+# kami-game stays untouched — the EDN dependency lives only here. The compiled-in
+# `AnimationState::{skibidi_idle,grimace_wobble,item_pickup,sigma_idle,ohio_glitch}()`
+# preset factories remain the `builtin_animation()` fallback and parity oracle,
+# and are parity-tested against the shipped EDN.
+
+[dependencies]
+# Engine struct we build (AnimationState + AnimationClip + HeadBobPhase). Path
+# dep, no new feature added to kami-game — this is additive. The items are reached
+# via the fully-qualified `kami_game::animation::*` path (the module is `pub mod
+# animation`, not re-exported at the crate root).
+kami-game = { path = "../kami-game" }
+# EDN preset-config authoring (clj/edn → ClipSpec). Re-uses the tolerant scene.edn
+# accessors so preset config parses the same way games do.
+kami-scene = { path = "../kami-scene" }
+thiserror = { workspace = true }

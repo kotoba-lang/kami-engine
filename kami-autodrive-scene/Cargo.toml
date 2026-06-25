@@ -1,0 +1,30 @@
+[package]
+name = "kami-autodrive-scene"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# kami-autodrive-scene — data-tier authoring surface for kami-autodrive
+# PER-VEHICLE-CLASS PRESETS (the drive.gftd.ai autonomy stack's per-class config).
+#
+# ADR-0038: hot GNC loop (perception / planning / control) stays native Rust
+# (kami-autodrive); only init-time CONFIG/DATA moves to EDN. This
+# sibling-of-kami-vehicle-scene / kami-atmosphere-scene / kami-terrain-scene /
+# kami-vegetation-scene / kami-postfx-scene crate turns canonical
+# `:autodrive/limits` (per-class kinematic envelopes) + `:autodrive/autopilot`
+# (per-class autopilot tuning) EDN into the real `kami_autodrive::VehicleLimits`
+# / `AutopilotConfig` engine structs via `from_edn` loaders, re-using the
+# tolerant `kami-scene` EDN accessors exactly the way games parse `scene.edn`.
+#
+# kami-autodrive stays untouched — the EDN dependency lives only here. The
+# compiled-in `VehicleClass::limits()` / `AutopilotConfig::for_class()` remain
+# the `builtin_*()` fallback and parity oracle, asserted `==` the shipped EDN.
+
+[dependencies]
+# Engine structs we build (VehicleLimits + AutopilotConfig + VehicleClass).
+# Path dep, no new feature added to kami-autodrive — this is additive.
+kami-autodrive = { path = "../kami-autodrive" }
+# EDN preset-config authoring (clj/edn → spec). Re-uses the tolerant scene.edn
+# accessors so preset config parses the same way games do.
+kami-scene = { path = "../kami-scene" }
+thiserror = { workspace = true }

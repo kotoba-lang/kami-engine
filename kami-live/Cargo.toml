@@ -23,3 +23,18 @@ glam = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 log = { workspace = true }
+# EDN dance-scene authoring (clj/edn → LiveShow). Re-uses the tolerant
+# scene.edn accessors so the dance scene parses the same way games do.
+kami-scene = { path = "../kami-scene" }
+# EDN writer: project a ShowSnapshot → the render-IR EDN the native
+# (kami-webgpu-rs) + web (CLJS) renderers already consume (ADR-0041).
+kotoba-edn = { path = "../../kotoba/crates/kotoba-edn" }
+
+[dev-dependencies]
+# Cross-crate integration test: realise the EDN render-IR into the domain
+# structs each crate owns (ADR-0044/0045) — proves the data→realizer pipeline.
+kami-webgpu-rs = { path = "../kami-webgpu-rs" }
+kami-skeleton-scene = { path = "../kami-skeleton-scene" }
+kami-postfx-scene = { path = "../kami-postfx-scene" }
+kami-postfx = { path = "../kami-postfx" }
+kami-vrm = { path = "../kami-vrm" }

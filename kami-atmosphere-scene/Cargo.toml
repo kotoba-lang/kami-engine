@@ -1,0 +1,26 @@
+[package]
+name = "kami-atmosphere-scene"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# kami-atmosphere-scene — data-tier authoring surface for kami-atmosphere WEATHER CONFIG.
+#
+# ADR-0038: hot rendering/wind/cloud simulation stays native Rust (kami-atmosphere);
+# only init-time CONFIG/DATA moves to EDN. This sibling-of-kami-vehicle-scene crate
+# turns canonical `:weather/presets` EDN into real `kami_atmosphere::Weather`
+# instances, re-using the tolerant `kami-scene` EDN accessors exactly the way games
+# parse `scene.edn`.
+#
+# kami-atmosphere stays "pure Rust + glam + bytemuck, no edn dep" — the EDN dependency
+# lives only here. The compiled-in `Weather::overcast()` / `Weather::clear()` presets
+# remain the `builtin_preset()` fallback and are parity-tested against the shipped EDN.
+
+[dependencies]
+# Engine structs we build (Weather / CloudSystem / WindSystem / DayNightCycle). Path
+# dep, no new feature added to kami-atmosphere — this is additive.
+kami-atmosphere = { path = "../kami-atmosphere" }
+# EDN weather-config authoring (clj/edn → WeatherPreset). Re-uses the tolerant
+# scene.edn accessors so weather config parses the same way games do.
+kami-scene = { path = "../kami-scene" }
+thiserror = { workspace = true }

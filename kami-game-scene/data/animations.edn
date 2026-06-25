@@ -1,0 +1,19 @@
+{:game/animations
+ {:skibidi-idle
+  [{:clip :head-bob :rise-height 2.0 :rise-time 1.0 :hold-time 0.5 :drop-time 0.5 :wait-time 2.0 :timer 0.0 :phase :wait}
+   {:clip :spinning :speed 3.0 :angle 0.0}]
+
+  :grimace-wobble
+  [{:clip :wobble :intensity 0.05 :speed 2.0 :phase 0.0}
+   {:clip :bobbing :amplitude 0.2 :frequency 0.5 :phase 0.0}]
+
+  :item-pickup
+  [{:clip :bobbing :amplitude 0.3 :frequency 1.5 :phase 0.0}
+   {:clip :spinning :speed 2.0 :angle 0.0}
+   {:clip :pulse-glow :min-scale 0.9 :max-scale 1.1 :speed 2.0 :phase 0.0}]
+
+  :sigma-idle
+  []
+
+  :ohio-glitch
+  [{:clip :glitch :interval 0.1 :timer 0.0 :intensity 0.15 :seed 42}]}}

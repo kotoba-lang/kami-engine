@@ -978,7 +978,14 @@ pub async fn run_car_sim(canvas_id: &str) -> Result<(), JsValue> {
         parse_color_hex(&paint_hex)
     };
     log::info!("[car-sim] kind={} paint={:?}", kind.id(), paint);
-    let mut car = build(kind);
+    // The VEHICLE is now DATA: build it from kami-vehicle-scene's garage.edn (the
+    // canonical, parity-tested source of truth — behaviourally identical to
+    // build_vehicle(kind)). Fall back to the compiled-in builder only if the
+    // shipped EDN ever fails to parse / resolve.
+    let mut car = kami_vehicle_scene::build_from_edn(kind.id()).unwrap_or_else(|e| {
+        log::warn!("[car-sim] garage.edn build failed ({e}); using builtin build({})", kind.id());
+        build(kind)
+    });
     // Force XPBD — Implicit mode is still being stabilised (its
     // stiffness-matrix sign needs more work; in the meantime the
     // XPBD + rigid-chassis combo is the better-behaved default).
@@ -1004,7 +1011,13 @@ pub async fn run_car_sim(canvas_id: &str) -> Result<(), JsValue> {
         })
         .with_input(InputMode::OrbitMouse);
 
-    let map = MapGround::demo_circuit();
+    // The circuit is now DATA: load the demo-circuit zones from kami-vehicle-scene's
+    // ground.edn (the canonical, parity-tested source of truth). Fall back to the
+    // compiled-in builder only if the shipped EDN ever fails to parse.
+    let map = kami_vehicle_scene::shipped_demo_circuit().unwrap_or_else(|e| {
+        log::warn!("[car-sim] ground.edn load failed ({e}); using builtin demo_circuit");
+        MapGround::demo_circuit()
+    });
     let pipeline = CarSimPipeline::new(app.render_context(), vehicle.clone(), paint, map.clone());
 
     let vh = vehicle.clone();

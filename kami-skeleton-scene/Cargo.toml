@@ -1,0 +1,33 @@
+[package]
+name = "kami-skeleton-scene"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# kami-skeleton-scene — data-tier authoring surface for kami-skeleton's default
+# humanoid joint-constraint table (ADR-0040 "animation: constraints / retarget
+# maps as EDN").
+#
+# ADR-0038: hot skeletal evaluation stays native Rust (kami-skeleton); only the
+# init-time CONFIG — the anatomical joint-rotation limit table — moves to EDN.
+# This sibling-of-kami-vehicle-scene / kami-input-scene crate turns canonical
+# `:skeleton/humanoid-constraints` EDN (an ordered table of
+# `[joint-name {:min-deg [..] :max-deg [..]}]` pairs, authored in DEGREES) into
+# the real `kami_skeleton::JointConstraint` engine struct (radians), re-using the
+# tolerant `kami-scene` EDN accessors exactly the way games parse `scene.edn`.
+#
+# kami-skeleton stays untouched — the EDN dependency lives only here. The
+# compiled-in `default_humanoid_constraints()` table remains the
+# `builtin_humanoid_constraints()` fallback and parity oracle, and is
+# parity-tested (bit-for-bit f32) against the shipped EDN.
+
+[dependencies]
+# Engine struct we build (JointConstraint). Path dep, no new feature added to
+# kami-skeleton — this is additive.
+kami-skeleton = { path = "../kami-skeleton" }
+# EDN preset-config authoring (clj/edn → JointConstraint). Re-uses the tolerant
+# scene.edn accessors so constraint config parses the same way games do.
+kami-scene = { path = "../kami-scene" }
+thiserror = { workspace = true }
+# Keyframe position/rotation types (Vec3/Quat) for EDN-authored clips.
+glam = { workspace = true }

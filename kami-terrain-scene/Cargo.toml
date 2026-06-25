@@ -1,0 +1,29 @@
+[package]
+name = "kami-terrain-scene"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# kami-terrain-scene — data-tier authoring surface for kami-terrain BIOME CONFIG.
+#
+# ADR-0038: hot heightmap / splatmap / mesh generation stays native Rust
+# (kami-terrain); only init-time CONFIG/DATA moves to EDN. This
+# sibling-of-kami-vehicle-scene / kami-atmosphere-scene crate turns canonical
+# `:terrain/biomes` EDN (the FBM heightmap params + splatmap thresholds +
+# material colour palette per biome) into the real `kami_terrain` engine structs,
+# re-using the tolerant `kami-scene` EDN accessors exactly the way games parse
+# `scene.edn`.
+#
+# kami-terrain stays "pure Rust + serde, no edn dep" — the EDN dependency lives
+# only here. The compiled-in `BiomePreset` enum + its `heightmap()` /
+# `splat_thresholds()` / `palette()` methods remain the `builtin_biome()`
+# fallback and parity oracle, and are parity-tested against the shipped EDN.
+
+[dependencies]
+# Engine structs we build (HeightmapConfig / SplatThresholds / MaterialPalette).
+# Path dep, no new feature added to kami-terrain — this is additive.
+kami-terrain = { path = "../kami-terrain" }
+# EDN biome-config authoring (clj/edn → BiomeSpec). Re-uses the tolerant
+# scene.edn accessors so biome config parses the same way games do.
+kami-scene = { path = "../kami-scene" }
+thiserror = { workspace = true }

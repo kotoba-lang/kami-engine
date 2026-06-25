@@ -25,3 +25,6 @@ component = ["dep:wit-component", "dep:wit-parser", "run"]
 
 [dev-dependencies]
 wat = "1"
+# Second WASM backend (no-JIT — the console/iOS path). Used by tests/parity.rs to prove the
+# SAME compiled module runs bit-identically under wasmtime (JIT) and wasmi (interpreter).
+wasmi = "1.1"

@@ -337,6 +337,9 @@ pub struct LiveShowBuilder {
     crowd_cfg: CrowdConfig,
     performer_name: String,
     program: Option<VJDeck>,
+    swing: f32,
+    beats_per_bar: u32,
+    bars_per_phrase: u32,
 }
 
 impl Default for LiveShowBuilder {
@@ -347,6 +350,9 @@ impl Default for LiveShowBuilder {
             crowd_cfg: CrowdConfig::default(),
             performer_name: "Mitama".into(),
             program: None,
+            swing: 0.0,
+            beats_per_bar: 4,
+            bars_per_phrase: 8,
         }
     }
 }
@@ -372,6 +378,17 @@ impl LiveShowBuilder {
         self.program = Some(deck);
         self
     }
+    /// Swing factor in [-0.5, 0.5] for the master grid (groove on off-beat 8ths).
+    pub fn swing(mut self, swing: f32) -> Self {
+        self.swing = swing;
+        self
+    }
+    /// Time signature: `beats_per_bar` (e.g. 4) and `bars_per_phrase` (e.g. 8).
+    pub fn meter(mut self, beats_per_bar: u32, bars_per_phrase: u32) -> Self {
+        self.beats_per_bar = beats_per_bar.max(1);
+        self.bars_per_phrase = bars_per_phrase.max(1);
+        self
+    }
     pub fn build(self) -> LiveShow {
         let stage = self.stage_preset.build();
         let perf_home = stage
@@ -382,7 +399,9 @@ impl LiveShowBuilder {
         let crowd = Crowd::new(self.crowd_cfg, &stage);
         let vj = self.program.unwrap_or_else(VJDeck::default_program);
         LiveShow {
-            grid: BeatGrid::new(self.bpm),
+            grid: BeatGrid::new(self.bpm)
+                .with_meter(self.beats_per_bar, self.bars_per_phrase)
+                .with_swing(self.swing),
             setlist: Setlist::new(),
             stage,
             performer,

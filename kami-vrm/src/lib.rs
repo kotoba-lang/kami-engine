@@ -41,9 +41,13 @@ pub mod export;
 pub mod convert;
 pub mod spring;
 pub mod constraint;
+pub mod expression;
+pub mod firstperson;
 
 // Re-exports for convenience.
 pub use compose::{ComposeConfig, PartSource};
+pub use expression::{ColorOverride, ExpressionManager, ResolvedExpression, UvOverride};
+pub use firstperson::{node_visible, FirstPersonResolver, FirstPersonView};
 pub use part::{decompose, PartCategory, VrmPart};
 pub use parse::parse_vrm;
 pub use export::export_glb;

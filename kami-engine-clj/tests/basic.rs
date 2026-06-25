@@ -36,6 +36,36 @@ fn compiler_rejects_malformed_input() {
     }
 }
 
+/// Integer math / signed ordering on an f32 bit-pattern is unsound under the all-i64 ABI
+/// (the i64 holds float bits). The compiler must REJECT it with a clear error rather than
+/// emit silent garbage — guest float arithmetic isn't supported.
+#[test]
+fn f32_arithmetic_is_rejected() {
+    let bad = [
+        "(defn f [e] (+ (get-x e) 1))",         // integer-add of a position's bits
+        "(defn f [e] (- (get-y e) (get-x e)))", // subtract two f32 positions
+        "(defn f [e] (* (get-vx e) 2))",        // scale a velocity in-guest
+        "(defn f [] (< (get-x 0) (get-y 0)))",  // signed-compare f32 bits (wrong for negatives)
+        "(defn f [] (inc (get-x 0)))",          // inc an f32
+        "(defn f [] (+ (f32 1.0) (f32 2.0)))",  // add two float literals
+        "(defn f [] (* (axis \"MoveX\") 3))",   // scale an axis reading
+    ];
+    for src in bad {
+        assert!(
+            compile_str(src).is_err(),
+            "compiler must reject unsound f32 arithmetic, not accept `{src}`",
+        );
+    }
+}
+
+/// The flip side: passing f32 values straight to host primitives (the supported pattern)
+/// must still compile — the reject is for *arithmetic*, not for using f32 at all.
+#[test]
+fn f32_passthrough_to_host_still_compiles() {
+    let ok = "(defn move [e] (set-position! e (get-x e) (get-y e) (f32 0.0)))";
+    assert!(compile_str(ok).is_ok(), "passing f32 to a host primitive must compile");
+}
+
 #[test]
 fn float_literal_compiles() {
     let src = "(defn get-speed [] (f32 5.0))";
