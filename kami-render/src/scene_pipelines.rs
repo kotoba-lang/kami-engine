@@ -199,13 +199,13 @@ impl TerrainPipeline {
             }),
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
-                cull_mode: Some(wgpu::Face::Back),
+                cull_mode: wgpu_cull(spec("terrain").cull),
                 ..Default::default()
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: true,
-                depth_compare: wgpu::CompareFunction::Less,
+                depth_write_enabled: spec("terrain").depth_write,
+                depth_compare: wgpu_compare(spec("terrain").depth_compare),
                 stencil: Default::default(), bias: Default::default(),
             }),
             multisample: Default::default(), multiview: None, cache: None,
@@ -249,8 +249,8 @@ impl SkyPipeline {
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: false,
-                depth_compare: wgpu::CompareFunction::LessEqual,
+                depth_write_enabled: spec("sky").depth_write,
+                depth_compare: wgpu_compare(spec("sky").depth_compare),
                 stencil: Default::default(), bias: Default::default(),
             }),
             multisample: Default::default(), multiview: None, cache: None,
@@ -379,11 +379,11 @@ impl VegetationPipeline {
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
             }),
-            primitive: wgpu::PrimitiveState { topology: wgpu::PrimitiveTopology::TriangleList, cull_mode: None, ..Default::default() },
+            primitive: wgpu::PrimitiveState { topology: wgpu::PrimitiveTopology::TriangleList, cull_mode: wgpu_cull(spec("vegetation").cull), ..Default::default() },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: true,
-                depth_compare: wgpu::CompareFunction::Less,
+                depth_write_enabled: spec("vegetation").depth_write,
+                depth_compare: wgpu_compare(spec("vegetation").depth_compare),
                 stencil: Default::default(), bias: Default::default(),
             }),
             multisample: Default::default(), multiview: None, cache: None,
@@ -431,11 +431,11 @@ impl CharacterPipeline {
                 module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState { format: color_format, blend: None, write_mask: wgpu::ColorWrites::ALL })],
             }),
-            primitive: wgpu::PrimitiveState { topology: wgpu::PrimitiveTopology::TriangleList, cull_mode: Some(wgpu::Face::Back), ..Default::default() },
+            primitive: wgpu::PrimitiveState { topology: wgpu::PrimitiveTopology::TriangleList, cull_mode: wgpu_cull(spec("character").cull), ..Default::default() },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: true,
-                depth_compare: wgpu::CompareFunction::Less,
+                depth_write_enabled: spec("character").depth_write,
+                depth_compare: wgpu_compare(spec("character").depth_compare),
                 stencil: Default::default(), bias: Default::default(),
             }),
             multisample: Default::default(), multiview: None, cache: None,
@@ -503,13 +503,13 @@ impl WaterPipeline {
             }),
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
-                cull_mode: None,
+                cull_mode: wgpu_cull(spec("water").cull),
                 ..Default::default()
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: false,  // alpha blend — let terrain show through
-                depth_compare: wgpu::CompareFunction::Less,
+                depth_write_enabled: spec("water").depth_write,  // alpha blend — let terrain show through
+                depth_compare: wgpu_compare(spec("water").depth_compare),
                 stencil: Default::default(), bias: Default::default(),
             }),
             multisample: Default::default(), multiview: None, cache: None,
@@ -577,13 +577,13 @@ impl VoxelPipeline {
             }),
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
-                cull_mode: Some(wgpu::Face::Back),
+                cull_mode: wgpu_cull(spec("voxel").cull),
                 ..Default::default()
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: true,
-                depth_compare: wgpu::CompareFunction::Less,
+                depth_write_enabled: spec("voxel").depth_write,
+                depth_compare: wgpu_compare(spec("voxel").depth_compare),
                 stencil: Default::default(), bias: Default::default(),
             }),
             multisample: Default::default(), multiview: None, cache: None,
@@ -672,13 +672,13 @@ impl ParticlePipeline {
             }),
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
-                cull_mode: None,
+                cull_mode: wgpu_cull(spec("particle").cull),
                 ..Default::default()
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: false,  // alpha blend — let scene show through
-                depth_compare: wgpu::CompareFunction::Less,
+                depth_write_enabled: spec("particle").depth_write,  // alpha blend — let scene show through
+                depth_compare: wgpu_compare(spec("particle").depth_compare),
                 stencil: Default::default(), bias: Default::default(),
             }),
             multisample: Default::default(), multiview: None, cache: None,
@@ -775,13 +775,13 @@ impl AtlasPipeline {
             }),
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
-                cull_mode: None,
+                cull_mode: wgpu_cull(spec("atlas").cull),
                 ..Default::default()
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: false,
-                depth_compare: wgpu::CompareFunction::Less,
+                depth_write_enabled: spec("atlas").depth_write,
+                depth_compare: wgpu_compare(spec("atlas").depth_compare),
                 stencil: Default::default(), bias: Default::default(),
             }),
             multisample: Default::default(), multiview: None, cache: None,
