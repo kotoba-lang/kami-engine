@@ -129,7 +129,7 @@
   {:title "Chorus"  :bpm 128.0 :bars 16 :dance :wota :audio :opener
    :cues [{:beat 1 :kind :drop :tag "hook"}
           {:beat 32 :kind :drop :tag "hook-2"}]}
-  {:title "Bridge"  :bpm 128.0 :bars 8  :dance :hold :audio :ballad
+  {:title "Bridge"  :bpm 128.0 :bars 8  :dance :sway :audio :ballad
    :cues [{:beat 1 :kind :breakdown :tag "bridge"}]}
   {:title "Final"   :bpm 132.0 :bars 16 :dance :kpop-point :audio :encore
    :cues [{:beat 1 :kind :drop :tag "last-chorus"}]}]}

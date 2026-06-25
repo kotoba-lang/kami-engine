@@ -13,7 +13,7 @@
 //! }
 //! ```
 
-use kami_scene::{mget, root_map, EdnValue};
+use kami_scene::{EdnValue, mget, root_map};
 use std::collections::BTreeSet;
 
 /// How serious a finding is. `Error` = the scene won't load as authored;
@@ -44,20 +44,60 @@ pub struct Lint {
 
 const STAGES: &[&str] = &["club", "hall", "festival"];
 const EXPR_SOURCES: &[&str] = &["cheer", "beat", "blink"];
-const DANCES: &[&str] = &["idle", "four-on-floor", "wota", "kpop-point", "shuffle", "hold"];
+const DANCES: &[&str] = &[
+    "idle",
+    "four-on-floor",
+    "wota",
+    "kpop-point",
+    "shuffle",
+    "hold",
+    "bounce",
+    "sway",
+    "spin",
+    "headbang",
+    "clap",
+];
 const CUE_KINDS: &[&str] = &["drop", "breakdown", "callout", "custom"];
 const TRIGGER_ON: &[&str] = &[
-    "drop", "breakdown", "callout", "custom", "beat", "bar", "phrase", "track",
+    "drop",
+    "breakdown",
+    "callout",
+    "custom",
+    "beat",
+    "bar",
+    "phrase",
+    "track",
 ];
-const FIXTURES: &[&str] = &["front-par", "back-par", "spot", "blinder", "laser", "strobe"];
+const FIXTURES: &[&str] = &[
+    "front-par",
+    "back-par",
+    "spot",
+    "blinder",
+    "laser",
+    "strobe",
+];
 const ENVELOPES: &[&str] = &["hold", "breathe", "ramp", "pulse", "strobe"];
 const VJ_PATTERNS: &[&str] = &["solid", "stripes", "pulse", "rings", "scope", "noise"];
 const PALETTES: &[&str] = &["neon-pink", "cool-wave", "sunset", "monochrome"];
 // Canonical effect ids (kami-postfx-scene) + tolerated short aliases + fxaa.
 const POST_FX: &[&str] = &[
-    "bloom", "outline", "vignette", "crt", "color-grade", "pixelate", "ssao",
-    "depth-of-field", "dof", "ssr", "aces-tonemap", "aces", "film-grain",
-    "chromatic-aberration", "chromatic", "god-rays", "fxaa",
+    "bloom",
+    "outline",
+    "vignette",
+    "crt",
+    "color-grade",
+    "pixelate",
+    "ssao",
+    "depth-of-field",
+    "dof",
+    "ssr",
+    "aces-tonemap",
+    "aces",
+    "film-grain",
+    "chromatic-aberration",
+    "chromatic",
+    "god-rays",
+    "fxaa",
 ];
 
 /// Local keyword/string name (namespace dropped), if `v` is one.
@@ -69,7 +109,11 @@ fn name(v: Option<&EdnValue>) -> Option<String> {
 }
 
 fn num(v: Option<&EdnValue>) -> Option<f32> {
-    v.and_then(|x| x.as_float().map(|f| f as f32).or_else(|| x.as_integer().map(|i| i as f32)))
+    v.and_then(|x| {
+        x.as_float()
+            .map(|f| f as f32)
+            .or_else(|| x.as_integer().map(|i| i as f32))
+    })
 }
 
 /// Validate a dance scene's EDN. Returns findings in document order; an empty
@@ -89,34 +133,58 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
     };
 
     let warn = |out: &mut Vec<Lint>, path: &str, msg: String| {
-        out.push(Lint { severity: Severity::Warn, path: path.into(), message: msg });
+        out.push(Lint {
+            severity: Severity::Warn,
+            path: path.into(),
+            message: msg,
+        });
     };
-    let enum_check =
-        |out: &mut Vec<Lint>, path: &str, val: Option<&EdnValue>, known: &[&str], what: &str| {
-            if let Some(n) = name(val) {
-                if !known.contains(&n.as_str()) {
+    let enum_check = |out: &mut Vec<Lint>,
+                      path: &str,
+                      val: Option<&EdnValue>,
+                      known: &[&str],
+                      what: &str| {
+        if let Some(n) = name(val) {
+            if !known.contains(&n.as_str()) {
+                warn(
+                    out,
+                    path,
+                    format!(
+                        "unknown {what} `{n}` — falls back to a default; expected one of {known:?}"
+                    ),
+                );
+            }
+        }
+    };
+    let range_check =
+        |out: &mut Vec<Lint>, path: &str, val: Option<&EdnValue>, lo: f32, hi: f32| {
+            if let Some(x) = num(val) {
+                if x < lo || x > hi {
                     warn(
                         out,
                         path,
-                        format!("unknown {what} `{n}` — falls back to a default; expected one of {known:?}"),
+                        format!("value {x} out of range [{lo}, {hi}] — clamped"),
                     );
                 }
             }
         };
-    let range_check = |out: &mut Vec<Lint>, path: &str, val: Option<&EdnValue>, lo: f32, hi: f32| {
-        if let Some(x) = num(val) {
-            if x < lo || x > hi {
-                warn(out, path, format!("value {x} out of range [{lo}, {hi}] — clamped"));
-            }
-        }
-    };
 
     // ── :dance/show ─────────────────────────────────────────────────────────
     if let Some(show) = mget(&root, "dance/show").and_then(|v| v.as_map()) {
-        enum_check(&mut out, "dance/show.stage", mget(show, "stage"), STAGES, "stage");
+        enum_check(
+            &mut out,
+            "dance/show.stage",
+            mget(show, "stage"),
+            STAGES,
+            "stage",
+        );
         if let Some(b) = num(mget(show, "bpm")) {
             if b <= 0.0 {
-                warn(&mut out, "dance/show.bpm", format!("bpm {b} must be > 0 — defaults to 128"));
+                warn(
+                    &mut out,
+                    "dance/show.bpm",
+                    format!("bpm {b} must be > 0 — defaults to 128"),
+                );
             }
         }
         range_check(&mut out, "dance/show.swing", mget(show, "swing"), -0.5, 0.5);
@@ -135,7 +203,13 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
             for (i, t) in ts.iter().enumerate() {
                 let Some(tm) = t.as_map() else { continue };
                 let p = format!("dance/setlist[{i}]");
-                enum_check(&mut out, &format!("{p}.dance"), mget(tm, "dance"), DANCES, "dance preset");
+                enum_check(
+                    &mut out,
+                    &format!("{p}.dance"),
+                    mget(tm, "dance"),
+                    DANCES,
+                    "dance preset",
+                );
                 if let Some(cues) = mget(tm, "cues").and_then(|v| v.as_vector()) {
                     for (j, c) in cues.iter().enumerate() {
                         let Some(cm) = c.as_map() else { continue };
@@ -170,12 +244,28 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
         for (i, c) in cues.iter().enumerate() {
             let Some(cm) = c.as_map() else { continue };
             let p = format!("dance/lighting[{i}]");
-            enum_check(&mut out, &format!("{p}.fixture"), mget(cm, "fixture"), FIXTURES, "fixture");
-            range_check(&mut out, &format!("{p}.intensity"), mget(cm, "intensity"), 0.0, 1.0);
+            enum_check(
+                &mut out,
+                &format!("{p}.fixture"),
+                mget(cm, "fixture"),
+                FIXTURES,
+                "fixture",
+            );
+            range_check(
+                &mut out,
+                &format!("{p}.intensity"),
+                mget(cm, "intensity"),
+                0.0,
+                1.0,
+            );
             // envelope may be a bare keyword; map forms ({:pulse d}) are fine.
             if let Some(n) = name(mget(cm, "envelope")) {
                 if !ENVELOPES.contains(&n.as_str()) {
-                    warn(&mut out, &format!("{p}.envelope"), format!("unknown envelope `{n}` — defaults to :hold"));
+                    warn(
+                        &mut out,
+                        &format!("{p}.envelope"),
+                        format!("unknown envelope `{n}` — defaults to :hold"),
+                    );
                 }
             }
         }
@@ -186,11 +276,21 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
         for (i, s) in steps.iter().enumerate() {
             let Some(sm) = s.as_map() else { continue };
             let p = format!("dance/vj[{i}]");
-            enum_check(&mut out, &format!("{p}.pattern"), mget(sm, "pattern"), VJ_PATTERNS, "pattern");
+            enum_check(
+                &mut out,
+                &format!("{p}.pattern"),
+                mget(sm, "pattern"),
+                VJ_PATTERNS,
+                "pattern",
+            );
             // palette: named const is checked; an inline map is fine.
             if let Some(n) = name(mget(sm, "palette")) {
                 if !PALETTES.contains(&n.as_str()) {
-                    warn(&mut out, &format!("{p}.palette"), format!("unknown palette `{n}` — defaults to :cool-wave"));
+                    warn(
+                        &mut out,
+                        &format!("{p}.palette"),
+                        format!("unknown palette `{n}` — defaults to :cool-wave"),
+                    );
                 }
             }
         }
@@ -202,11 +302,17 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
             let Some(tm) = t.as_map() else { continue };
             let p = format!("dance/triggers[{i}]");
             match name(mget(tm, "on")) {
-                None => warn(&mut out, &format!("{p}.on"), "trigger missing `:on` — it will never fire".into()),
+                None => warn(
+                    &mut out,
+                    &format!("{p}.on"),
+                    "trigger missing `:on` — it will never fire".into(),
+                ),
                 Some(n) if !TRIGGER_ON.contains(&n.as_str()) => warn(
                     &mut out,
                     &format!("{p}.on"),
-                    format!("unknown trigger `:on {n}` — it will never fire; expected one of {TRIGGER_ON:?}"),
+                    format!(
+                        "unknown trigger `:on {n}` — it will never fire; expected one of {TRIGGER_ON:?}"
+                    ),
                 ),
                 _ => {}
             }
@@ -215,7 +321,9 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
                     warn(
                         &mut out,
                         &format!("{p}.tag"),
-                        format!("dangling `:tag {tag:?}` — no cue in the setlist carries it, so this trigger never fires"),
+                        format!(
+                            "dangling `:tag {tag:?}` — no cue in the setlist carries it, so this trigger never fires"
+                        ),
                     );
                 }
             }
@@ -231,10 +339,21 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
                 Some(n) if !n.is_empty() => {
                     clip_names.insert(n.to_string());
                 }
-                _ => warn(&mut out, &format!("dance/clips[{i}].name"), "clip has no `:name`".into()),
+                _ => warn(
+                    &mut out,
+                    &format!("dance/clips[{i}].name"),
+                    "clip has no `:name`".into(),
+                ),
             }
-            if mget(cm, "tracks").and_then(|v| v.as_vector()).map_or(true, |t| t.is_empty()) {
-                warn(&mut out, &format!("dance/clips[{i}].tracks"), "clip has no `:tracks` — nothing to play".into());
+            if mget(cm, "tracks")
+                .and_then(|v| v.as_vector())
+                .map_or(true, |t| t.is_empty())
+            {
+                warn(
+                    &mut out,
+                    &format!("dance/clips[{i}].tracks"),
+                    "clip has no `:tracks` — nothing to play".into(),
+                );
             }
         }
     }
@@ -245,7 +364,11 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
             let Some(em) = e.as_map() else { continue };
             // tag is `:effect` (canonical, kami-postfx-scene) or `:fx` (alias).
             match name(mget(em, "effect")).or_else(|| name(mget(em, "fx"))) {
-                None => warn(&mut out, &format!("dance/post[{i}].effect"), "post effect missing `:effect`".into()),
+                None => warn(
+                    &mut out,
+                    &format!("dance/post[{i}].effect"),
+                    "post effect missing `:effect`".into(),
+                ),
                 Some(n) if !POST_FX.contains(&n.as_str()) => warn(
                     &mut out,
                     &format!("dance/post[{i}].effect"),
@@ -258,8 +381,16 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
 
     // ── :dance/avatar (VRM) ─────────────────────────────────────────────────
     if let Some(av) = mget(&root, "dance/avatar").and_then(|v| v.as_map()) {
-        if mget(av, "vrm").and_then(|v| v.as_string()).unwrap_or("").is_empty() {
-            warn(&mut out, "dance/avatar.vrm", "no `:vrm` model bound — the avatar won't load".into());
+        if mget(av, "vrm")
+            .and_then(|v| v.as_string())
+            .unwrap_or("")
+            .is_empty()
+        {
+            warn(
+                &mut out,
+                "dance/avatar.vrm",
+                "no `:vrm` model bound — the avatar won't load".into(),
+            );
         }
         if num(mget(av, "scale")).map_or(false, |s| s <= 0.0) {
             warn(&mut out, "dance/avatar.scale", "scale must be > 0".into());
@@ -287,7 +418,9 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
                         warn(
                             &mut out,
                             &format!("dance/avatar.expressions.{nm}"),
-                            format!("unknown expression source `:from {src}` — defaults to :beat; expected one of {EXPR_SOURCES:?}"),
+                            format!(
+                                "unknown expression source `:from {src}` — defaults to :beat; expected one of {EXPR_SOURCES:?}"
+                            ),
                         );
                     }
                 }
@@ -298,14 +431,26 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
     // ── :dance/camera ───────────────────────────────────────────────────────
     if let Some(cam) = mget(&root, "dance/camera").and_then(|v| v.as_map()) {
         if num(mget(cam, "fov")).map_or(false, |fv| fv <= 0.0 || fv > std::f32::consts::PI) {
-            warn(&mut out, "dance/camera.fov", "fov must be in (0, π] radians — defaults to 0.9".into());
+            warn(
+                &mut out,
+                "dance/camera.fov",
+                "fov must be in (0, π] radians — defaults to 0.9".into(),
+            );
         }
     }
 
     // ── :dance/live2d ───────────────────────────────────────────────────────
     if let Some(l2) = mget(&root, "dance/live2d").and_then(|v| v.as_map()) {
-        if mget(l2, "model").and_then(|v| v.as_string()).unwrap_or("").is_empty() {
-            warn(&mut out, "dance/live2d.model", "no `:model` bound — the Live2D avatar won't load".into());
+        if mget(l2, "model")
+            .and_then(|v| v.as_string())
+            .unwrap_or("")
+            .is_empty()
+        {
+            warn(
+                &mut out,
+                "dance/live2d.model",
+                "no `:model` bound — the Live2D avatar won't load".into(),
+            );
         }
         if num(mget(l2, "scale")).map_or(false, |s| s <= 0.0) {
             warn(&mut out, "dance/live2d.scale", "scale must be > 0".into());
@@ -318,8 +463,13 @@ pub fn lint_scene(src: &str) -> Vec<Lint> {
                     motion_names.insert(n.to_string());
                 }
                 // a motion needs either a :file or inline :keys to play.
-                let has_file = !mget(mm, "file").and_then(|v| v.as_string()).unwrap_or("").is_empty();
-                let has_keys = mget(mm, "keys").and_then(|v| v.as_vector()).map_or(false, |k| !k.is_empty());
+                let has_file = !mget(mm, "file")
+                    .and_then(|v| v.as_string())
+                    .unwrap_or("")
+                    .is_empty();
+                let has_keys = mget(mm, "keys")
+                    .and_then(|v| v.as_vector())
+                    .map_or(false, |k| !k.is_empty());
                 if !has_file && !has_keys {
                     warn(
                         &mut out,
@@ -356,10 +506,16 @@ mod tests {
          :dance/setlist [{:title "A" :bars 8 :dance :wota :cues [{:beat 1 :kind :drop}]}]}
         "#;
         let lints = lint_scene(src);
-        assert!(lints.iter().any(|l| l.path == "dance/avatar.expressions.happy"),
-            "unknown :from flagged: {lints:?}");
-        assert!(lints.iter().any(|l| l.path == "dance/camera.fov"),
-            "out-of-range fov flagged: {lints:?}");
+        assert!(
+            lints
+                .iter()
+                .any(|l| l.path == "dance/avatar.expressions.happy"),
+            "unknown :from flagged: {lints:?}"
+        );
+        assert!(
+            lints.iter().any(|l| l.path == "dance/camera.fov"),
+            "out-of-range fov flagged: {lints:?}"
+        );
     }
 
     #[test]
@@ -399,7 +555,11 @@ mod tests {
         let lints = lint_scene(src);
         assert!(lints.iter().any(|l| l.path == "dance/show.bpm"));
         assert!(lints.iter().any(|l| l.path == "dance/show.swing"));
-        assert!(lints.iter().any(|l| l.path == "dance/lighting[0].intensity"));
+        assert!(
+            lints
+                .iter()
+                .any(|l| l.path == "dance/lighting[0].intensity")
+        );
         assert!(lints.iter().any(|l| l.path == "dance/setlist"));
     }
 
@@ -413,8 +573,14 @@ mod tests {
                            :cues [{:beat 0 :kind :drop :tag "real"}]}]}
         "#;
         let lints = lint_scene(src);
-        assert!(lints.iter().any(|l| l.path == "dance/triggers[0].tag"), "dangling tag");
-        assert!(lints.iter().any(|l| l.path == "dance/triggers[1].on"), "unknown :on");
+        assert!(
+            lints.iter().any(|l| l.path == "dance/triggers[0].tag"),
+            "dangling tag"
+        );
+        assert!(
+            lints.iter().any(|l| l.path == "dance/triggers[1].on"),
+            "unknown :on"
+        );
     }
 
     #[test]
@@ -426,8 +592,14 @@ mod tests {
                           :cues [{:beat 1 :kind :drop :tag "hook"}]}]}
         "#;
         let lints = lint_scene(src);
-        assert!(lints.iter().any(|l| l.path == "dance/post[1].effect"), "unknown fx: {lints:?}");
-        assert!(lints.iter().any(|l| l.path == "dance/post[2].effect"), "missing fx");
+        assert!(
+            lints.iter().any(|l| l.path == "dance/post[1].effect"),
+            "unknown fx: {lints:?}"
+        );
+        assert!(
+            lints.iter().any(|l| l.path == "dance/post[2].effect"),
+            "missing fx"
+        );
         // the valid bloom entry produces no lint.
         assert!(!lints.iter().any(|l| l.path == "dance/post[0].effect"));
     }
@@ -441,7 +613,9 @@ mod tests {
         "#;
         let lints = lint_scene(src);
         assert!(
-            lints.iter().any(|l| l.path == "dance/setlist[0].cues[0].beat"),
+            lints
+                .iter()
+                .any(|l| l.path == "dance/setlist[0].cues[0].beat"),
             "beat-0 cue flagged: {lints:?}"
         );
     }
@@ -458,10 +632,16 @@ mod tests {
         "#;
         let lints = lint_scene(src);
         let paths: Vec<&str> = lints.iter().map(|l| l.path.as_str()).collect();
-        assert!(paths.contains(&"dance/avatar.vrm"), "missing vrm: {lints:?}");
+        assert!(
+            paths.contains(&"dance/avatar.vrm"),
+            "missing vrm: {lints:?}"
+        );
         assert!(paths.contains(&"dance/avatar.scale"), "bad scale");
         assert!(paths.contains(&"dance/live2d.model"), "missing model");
-        assert!(paths.contains(&"dance/live2d.motions[0]"), "motion without file or keys");
+        assert!(
+            paths.contains(&"dance/live2d.motions[0]"),
+            "motion without file or keys"
+        );
     }
 
     #[test]
@@ -473,7 +653,12 @@ mod tests {
          :dance/setlist [{:title "A" :bars 8 :dance :wota
                           :cues [{:beat 1 :kind :drop :tag "hook"}]}]}
         "#;
-        assert!(lint_scene(src).iter().any(|l| l.path == "dance/live2d.motion"), "dangling motion ref");
+        assert!(
+            lint_scene(src)
+                .iter()
+                .any(|l| l.path == "dance/live2d.motion"),
+            "dangling motion ref"
+        );
     }
 
     #[test]
@@ -488,8 +673,14 @@ mod tests {
         "#;
         let lints = lint_scene(src);
         let paths: Vec<&str> = lints.iter().map(|l| l.path.as_str()).collect();
-        assert!(paths.contains(&"dance/clips[1].name"), "clip without name: {lints:?}");
-        assert!(paths.contains(&"dance/clips[1].tracks"), "clip without tracks");
+        assert!(
+            paths.contains(&"dance/clips[1].name"),
+            "clip without name: {lints:?}"
+        );
+        assert!(
+            paths.contains(&"dance/clips[1].tracks"),
+            "clip without tracks"
+        );
         assert!(paths.contains(&"dance/avatar.clip"), "dangling clip ref");
     }
 

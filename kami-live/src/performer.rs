@@ -54,6 +54,16 @@ pub enum DanceMove {
     Shuffle,
     /// Hold pose (used during ballad / breakdown).
     Hold,
+    /// Springy two-feet bounce on every beat.
+    Bounce,
+    /// Side-to-side body sway (ballad groove).
+    Sway,
+    /// Continuous turn — one full rotation per bar.
+    Spin,
+    /// Sharp downward nod on each beat (rock head-bang).
+    Headbang,
+    /// Rhythmic arms-up clap on the off-beats.
+    Clap,
 }
 
 impl DanceMove {
@@ -65,6 +75,11 @@ impl DanceMove {
             "kpop-point" => DanceMove::KpopPoint,
             "shuffle" => DanceMove::Shuffle,
             "hold" => DanceMove::Hold,
+            "bounce" => DanceMove::Bounce,
+            "sway" => DanceMove::Sway,
+            "spin" => DanceMove::Spin,
+            "headbang" => DanceMove::Headbang,
+            "clap" => DanceMove::Clap,
             _ => DanceMove::Idle,
         }
     }
@@ -111,6 +126,36 @@ impl DanceMove {
                 ..DancePose::rest()
             },
             DanceMove::Hold => DancePose::rest(),
+            DanceMove::Bounce => DancePose {
+                // crouch-and-spring: dips down then pops up each beat.
+                vertical_bob: -0.12 * (bf * std::f32::consts::PI).sin().abs(),
+                arms_up: 0.3,
+                ..DancePose::rest()
+            },
+            DanceMove::Sway => DancePose {
+                root_translation: Vec3::new(0.22 * (bar_frac * std::f32::consts::TAU).sin(), 0.0, 0.0),
+                spine_sway: 0.16 * (bar_frac * std::f32::consts::TAU).sin(),
+                vertical_bob: 0.03 * (bf * std::f32::consts::TAU).sin(),
+                ..DancePose::rest()
+            },
+            DanceMove::Spin => DancePose {
+                root_yaw: bar_frac * std::f32::consts::TAU, // one full turn per bar
+                arms_up: 0.5,
+                vertical_bob: 0.04 * (bf * std::f32::consts::TAU).sin(),
+                ..DancePose::rest()
+            },
+            DanceMove::Headbang => DancePose {
+                // sharp downward attack on the beat, recovering through it.
+                vertical_bob: -0.16 * (1.0 - (1.0 - bf).powi(3)),
+                spine_sway: 0.0,
+                arms_up: 0.15,
+                ..DancePose::rest()
+            },
+            DanceMove::Clap => DancePose {
+                arms_up: 0.5 + 0.45 * (bf * std::f32::consts::TAU * 2.0).sin().abs(),
+                vertical_bob: 0.03 * (bf * std::f32::consts::TAU).sin(),
+                ..DancePose::rest()
+            },
         }
     }
 }
@@ -155,6 +200,20 @@ mod tests {
         let p = DancePose::rest();
         assert!(p.root_translation.length() < 1e-6);
         assert_eq!(p.arms_up, 0.0);
+    }
+
+    #[test]
+    fn new_presets_resolve_and_pose() {
+        // the added moves resolve by name and produce non-rest, distinct poses.
+        for name in ["bounce", "sway", "spin", "headbang", "clap"] {
+            let m = DanceMove::by_name(name);
+            assert!(!matches!(m, DanceMove::Idle), "{name} resolves to its own move");
+        }
+        // spin turns through the bar; sway translates sideways; they differ.
+        let spin = DanceMove::Spin.pose_at(0.5, 0.5);
+        let sway = DanceMove::Sway.pose_at(0.5, 0.25);
+        assert!(spin.root_yaw.abs() > 0.1, "spin yaws");
+        assert!(sway.root_translation.x.abs() > 0.05, "sway steps sideways");
     }
 
     #[test]
