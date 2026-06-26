@@ -67,7 +67,13 @@ fork, and `as-of` — the ADR-0040 substrate, now covering preset config too.
 | `kami-vegetation-scene` | kami-vegetation | vegetation.edn | 7 taxonomic species |
 | `kami-postfx-scene` | kami-postfx | postfx.edn | 4 post-FX presets (ordered effect lists) |
 | `kami-autodrive-scene` | kami-autodrive | classes.edn | per-class `VehicleLimits` + `AutopilotConfig` (the drive.gftd.ai autonomy stack) |
-| `kami-character-scene` | kami-character | hair.edn | 5 hair styles |
+| `kami-character-scene` | kami-character | hair.edn | 5 hair styles + anim-blueprint + face-rig |
+| `kami-cam-scene` | kami-cam | materials.edn | camera post-process materials |
+| `kami-input-scene` | kami-input | input.edn | fps / graph key-binding maps |
+| `kami-skeleton-scene` | kami-skeleton | humanoid.edn | 13-joint humanoid IK constraints; **also** MMD `.vmd`/`.pmx` import + EDN `:dance/clips` (`clip_from_edn`) |
+| `kami-game-scene` | kami-game | 11 EDN files | catalog / animations / items / pokoa / brainrot / battle-royale / npc |
+
+14 data crates (11 active + shells), 25 EDN files, 24 parity tests as of 2026-06-26.
 
 ## Consequences
 
@@ -83,3 +89,45 @@ fork, and `as-of` — the ADR-0040 substrate, now covering preset config too.
   `kami-cam` stock, `kami-character` rig/anim-blueprint, `kami-game` npc). Add a `*-scene`
   crate by the recipe above. The cross-platform *executor* adopting the EDN at the GPU/native
   edge (vs. reading the builtin) proceeds per subsystem, additively (ADR-0044 pattern).
+
+## Amendment (2026-06-26) — single-source boundary & the clj/edn ceiling
+
+A natural follow-up was raised: *the migrated Rust is now duplicated by EDN — can it be
+removed so EDN is the **sole** source?* Investigating the actual wiring clarified the limit
+of this pattern, and is recorded here so it is not re-litigated.
+
+**The `builtin*()` is the engine's real runtime default, not dead code.** In every `*-scene`
+crate the parity oracle resolves to the *engine crate's own* default builder —
+`InputMap::default_fps()`, `kami_skeleton::default_humanoid_constraints()`,
+`SurfaceKind::coefficients()`, … These are **load-bearing**: they are the runtime default an
+app gets when it does not load EDN, and (per ADR-0038) the hot/engine crate deliberately
+stays EDN-free. The `*-scene` EDN is the **additive authoring surface**, not a replacement.
+
+Therefore:
+
+- **Keep the builtins + parity tests.** They are the fallback *and* the proof that EDN ==
+  Rust. Removing them is not a cleanup — it either (a) just deletes the verification (EDN and
+  Rust still both exist, now unverified — a downgrade), or (b) requires gutting the engine
+  defaults and rewiring every consumer to load EDN, which **reverses ADR-0038** ("hot crates
+  stay EDN-free"). Neither is adopted. There is no dead code to remove here.
+- **True single-source applies only when the default lives in a *data* crate, not the engine.**
+  Worked example: `kami-live`'s default `kami.audio` sound bank lived in the data crate
+  (`audio::default_sound_bank()`), so it was moved wholesale to `kami-live/data/audio.edn` and
+  the Rust mirror **was** deleted — EDN is now its sole source, behaviour byte-identical. That
+  is the only shape where "remove the migrated Rust" is clean; engine-crate defaults are not.
+
+**The clj/edn ceiling** (the boundary this and sibling ADRs draw):
+
+1. **Data / config / content / scene / show → EDN.** This ADR + ADR-0040/0043. Effectively at
+   its ceiling: every preset table + the whole `:dance/*` show + MMD import are data.
+2. **Gameplay *behaviour* → CLJ, compiled to WASM.** ADR-0035/0038 Model B (`kami-engine-clj`
+   → `kototama` → `kami-script-runtime`). A whole game's systems/entities can be CLJ; this is
+   the clj-ification frontier still worth pushing (e.g. a Model-B `logic.clj` dance).
+3. **Per-frame / per-sample hot compute → native Rust, by design.** Render (wgpu/WGSL),
+   physics integration, audio synthesis, skeletal evaluate/skinning, and the motion/shader
+   *algorithms* themselves. This is the deliberate floor; "more clj" never means lowering it.
+
+So "how far can it be clj?" → **all data and all gameplay logic; only the hot per-frame math
+stays native.** Pushing further means item 2 (logic as CLJ) and authoring *more content* as
+EDN (e.g. choreography as `:dance/clips` keyframes instead of Rust presets) — **not** removing
+the parity oracles, which do not advance clj-ification.
