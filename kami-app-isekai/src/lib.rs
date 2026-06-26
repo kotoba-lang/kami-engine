@@ -117,13 +117,7 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
     // view_radius=2 → 5×5 = 25 chunks loaded = 640m visibility window
     // around camera. Heightmap + mesh + splat gen = ~5-15 ms/chunk, so
     // 1/frame budget is safe at 60 FPS.
-    let terrain = pipelines::TerrainAdapter::streaming(
-        app.render_context(),
-        kami_terrain::BiomePreset::Plains,
-        42.0,
-        128,
-        2,
-    );
+    let terrain = plains_terrain(app.render_context());
     // Water plane at y=14 (just below Plains sand_line=15). Covers the
     // streaming view radius (5 × 128m = 640m) + margin.
     let water = kami_pipelines::WaterAdapter::new(app.render_context(), 1024.0, 14.0);
@@ -151,8 +145,7 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
     // them differ. This is the compositional payoff of v3 — adding a
     // second physical field is ~20 LoC, not a new rule pipeline.
     let heat_field = std::rc::Rc::new(std::cell::RefCell::new(kami_dec::ScalarField::new()));
-    let moisture_field =
-        std::rc::Rc::new(std::cell::RefCell::new(kami_dec::ScalarField::new()));
+    let moisture_field = std::rc::Rc::new(std::cell::RefCell::new(kami_dec::ScalarField::new()));
     let heat_for_tick = heat_field.clone();
     let moisture_for_tick = moisture_field.clone();
 
@@ -178,8 +171,7 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
     // billboard sprites at each non-zero cell. Instance count capped
     // at 2048; enough for the demo (~5-30 active heat cells, ~5-30
     // moisture cells).
-    let mut field_vis =
-        kami_pipelines::FieldVisAdapter::new(app.render_context(), 2048);
+    let mut field_vis = kami_pipelines::FieldVisAdapter::new(app.render_context(), 2048);
     // Billboards scaled up for the v3-demos eye-level view: fire /
     // moisture sprites need to be big enough to read from 10 m away
     // inside the demo house. Lower max_value saturates sooner so
@@ -207,8 +199,7 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
 
     // Scene 5 EM demo: visualise |E| directly on edges. Colour hot →
     // cool by amplitude; smaller sprites so you can see wave fronts.
-    let mut em_vis =
-        kami_pipelines::EdgeVisAdapter::new(app.render_context(), em_e.clone(), 8192);
+    let mut em_vis = kami_pipelines::EdgeVisAdapter::new(app.render_context(), em_e.clone(), 8192);
     em_vis.max_mag = 0.6;
     em_vis.min_mag = 0.01;
     em_vis.arrow_length = 0.8;
@@ -217,8 +208,7 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
 
     // Maxwell B-field visualiser. Green billboards to contrast with
     // E's blue→red arrows; offset slightly so overlap is legible.
-    let em_b_vis =
-        kami_pipelines::FaceVisAdapter::new(app.render_context(), em_b.clone(), 8192);
+    let em_b_vis = kami_pipelines::FaceVisAdapter::new(app.render_context(), em_b.clone(), 8192);
 
     // Nintendo-style procedural sprite atlas (N1). Holds flames /
     // sparkles / splashes / shock waves / etc. Callers emit via
@@ -323,18 +313,16 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
             //   3 — Helmholtz projection (divergence-free flow)
             //   4 — walls + vorticity confinement
             //   5 — Maxwell EM only (no heat / moisture / wind)
-            let fire_positions: [(i32, i32, i32); 2] = [
-                (-16 + 4, 32 + 1, 16 + 2),
-                (-16 + 4, 32 + 2, 16 + 2),
-            ];
-            let water_positions: [(i32, i32, i32); 2] = [
-                (-16 + 8, 32 + 2, 16 + 2),
-                (-16 + 9, 32 + 2, 16 + 2),
-            ];
+            let fire_positions: [(i32, i32, i32); 2] =
+                [(-16 + 4, 32 + 1, 16 + 2), (-16 + 4, 32 + 2, 16 + 2)];
+            let water_positions: [(i32, i32, i32); 2] =
+                [(-16 + 8, 32 + 2, 16 + 2), (-16 + 9, 32 + 2, 16 + 2)];
             let emit_fire = |heat: &mut kami_dec::ScalarField| {
                 for &(x, y, z) in &fire_positions {
                     if voxels_for_heat.is_solid(glam::Vec3::new(
-                        x as f32 + 0.5, y as f32 + 0.5, z as f32 + 0.5,
+                        x as f32 + 0.5,
+                        y as f32 + 0.5,
+                        z as f32 + 0.5,
                     )) {
                         heat.add(x, y, z, 180.0 * dt);
                     }
@@ -343,7 +331,9 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
             let emit_water = |moist: &mut kami_dec::ScalarField| {
                 for &(x, y, z) in &water_positions {
                     if voxels_for_heat.is_solid(glam::Vec3::new(
-                        x as f32 + 0.5, y as f32 + 0.5, z as f32 + 0.5,
+                        x as f32 + 0.5,
+                        y as f32 + 0.5,
+                        z as f32 + 0.5,
                     )) {
                         moist.add(x, y, z, 80.0 * dt);
                     }
@@ -389,7 +379,9 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                     let vox = voxels_for_heat.clone();
                     wind.mask_solid(|x, y, z| {
                         vox.is_solid(glam::Vec3::new(
-                            x as f32 + 0.5, y as f32 + 0.5, z as f32 + 0.5,
+                            x as f32 + 0.5,
+                            y as f32 + 0.5,
+                            z as f32 + 0.5,
                         ))
                     });
                     kami_dec::project_divergence_free_mg(&mut *wind);
@@ -445,7 +437,9 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                     let vox = voxels_for_heat.clone();
                     wind.mask_solid(|x, y, z| {
                         vox.is_solid(glam::Vec3::new(
-                            x as f32 + 0.5, y as f32 + 0.5, z as f32 + 0.5,
+                            x as f32 + 0.5,
+                            y as f32 + 0.5,
+                            z as f32 + 0.5,
                         ))
                     });
                     kami_dec::project_divergence_free_mg(&mut *wind);
@@ -479,7 +473,9 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                     let vox = voxels_for_heat.clone();
                     wind.mask_solid(|x, y, z| {
                         vox.is_solid(glam::Vec3::new(
-                            x as f32 + 0.5, y as f32 + 0.5, z as f32 + 0.5,
+                            x as f32 + 0.5,
+                            y as f32 + 0.5,
+                            z as f32 + 0.5,
                         ))
                     });
                     kami_dec::project_divergence_free_mg(&mut *wind);
@@ -541,12 +537,19 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                         let phase = (tick_count as f32) * 0.35;
                         if icon.bobbing {
                             atlas_for_heat.emit_bobbing(
-                                core, icon.slot, icon.tint, icon.size * 1.4,
-                                icon.life, phase,
+                                core,
+                                icon.slot,
+                                icon.tint,
+                                icon.size * 1.4,
+                                icon.life,
+                                phase,
                             );
                         } else {
                             atlas_for_heat.emit_static(
-                                core, icon.slot, icon.tint, icon.size * 1.4,
+                                core,
+                                icon.slot,
+                                icon.tint,
+                                icon.size * 1.4,
                                 icon.life,
                             );
                         }
@@ -565,8 +568,17 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                             slot: slot::SMOKE_THIN,
                             rot: rnd() * std::f32::consts::TAU,
                             rot_vel: 0.3,
-                            age: 0.0, life: 1.4, gravity: false,
-                            bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0, pulse_amp: 0.0, pulse_w: 0.0, wiggle_amp: 0.0, wiggle_w: 0.0, pop_ease_t: 0.0,
+                            age: 0.0,
+                            life: 1.4,
+                            gravity: false,
+                            bob_amp: 0.0,
+                            bob_w: 0.0,
+                            bob_phase: 0.0,
+                            pulse_amp: 0.0,
+                            pulse_w: 0.0,
+                            wiggle_amp: 0.0,
+                            wiggle_w: 0.0,
+                            pop_ease_t: 0.0,
                         });
                     }
                 }
@@ -576,7 +588,11 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                     use kami_pipelines::atlas_slot as slot;
                     let core = glam::Vec3::new(-7.5, 34.6, 18.5);
                     atlas_for_heat.emit_bobbing(
-                        core, slot::WATER_DROP, [0.45, 0.75, 1.0], 1.2, 0.35,
+                        core,
+                        slot::WATER_DROP,
+                        [0.45, 0.75, 1.0],
+                        1.2,
+                        0.35,
                         tick_count as f32 * 0.28,
                     );
                     if tick_count % 3 == 0 {
@@ -587,15 +603,23 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                         );
                         atlas_for_heat.emit(kami_pipelines::AtlasSprite {
                             pos: p,
-                            vel: glam::Vec3::new(
-                                (rnd() - 0.5) * 0.3,
-                                0.35 + rnd() * 0.25, 0.0,
-                            ),
+                            vel: glam::Vec3::new((rnd() - 0.5) * 0.3, 0.35 + rnd() * 0.25, 0.0),
                             tint: [0.85, 0.92, 1.0],
-                            size: 1.1, slot: slot::STEAM_PUFF,
-                            rot: rnd() * 1.0, rot_vel: 0.5,
-                            age: 0.0, life: 1.8, gravity: false,
-                            bob_amp: 0.05, bob_w: 2.0, bob_phase: rnd() * 6.28, pulse_amp: 0.0, pulse_w: 0.0, wiggle_amp: 0.0, wiggle_w: 0.0, pop_ease_t: 0.0,
+                            size: 1.1,
+                            slot: slot::STEAM_PUFF,
+                            rot: rnd() * 1.0,
+                            rot_vel: 0.5,
+                            age: 0.0,
+                            life: 1.8,
+                            gravity: false,
+                            bob_amp: 0.05,
+                            bob_w: 2.0,
+                            bob_phase: rnd() * 6.28,
+                            pulse_amp: 0.0,
+                            pulse_w: 0.0,
+                            wiggle_amp: 0.0,
+                            wiggle_w: 0.0,
+                            pop_ease_t: 0.0,
                         });
                     }
                 }
@@ -607,8 +631,11 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                     use kami_pipelines::atlas_slot as slot;
                     let flame_core = glam::Vec3::new(-11.5, 33.8, 18.5);
                     atlas_for_heat.emit_bobbing(
-                        flame_core, slot::FLAME_MEDIUM,
-                        [1.0, 0.55, 0.15], 1.6, 0.35,
+                        flame_core,
+                        slot::FLAME_MEDIUM,
+                        [1.0, 0.55, 0.15],
+                        1.6,
+                        0.35,
                         tick_count as f32 * 0.35,
                     );
                     let wind = wind_for_tick.borrow();
@@ -620,14 +647,20 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                         let mut prev = p;
                         for step in 0..12 {
                             let v = wind.vec_at(
-                                p.x.floor() as i32, p.y.floor() as i32, p.z.floor() as i32,
+                                p.x.floor() as i32,
+                                p.y.floor() as i32,
+                                p.z.floor() as i32,
                             );
                             let vlen = v.length();
                             if vlen < 0.02 {
                                 if scene_id == 4 && step > 3 {
                                     atlas_for_heat.emit_pop(
-                                        prev, slot::WIND_SWIRL,
-                                        [0.45, 0.85, 0.95], 0.8, 0.6, 0.18,
+                                        prev,
+                                        slot::WIND_SWIRL,
+                                        [0.45, 0.85, 0.95],
+                                        0.8,
+                                        0.6,
+                                        0.18,
                                     );
                                     sfx("whoosh");
                                 }
@@ -644,14 +677,28 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                                 0.1 * warmth + 0.9 * (1.0 - warmth),
                             ];
                             atlas_for_heat.emit(kami_pipelines::AtlasSprite {
-                                pos: p, vel: glam::Vec3::ZERO, tint: col,
+                                pos: p,
+                                vel: glam::Vec3::ZERO,
+                                tint: col,
                                 size: 0.55 + 0.3 * warmth,
-                                slot: slot::ARROW_TRAIL, rot, rot_vel: 0.0,
-                                age: 0.0, life: 0.55, gravity: false,
-                                bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0, pulse_amp: 0.0, pulse_w: 0.0, wiggle_amp: 0.0, wiggle_w: 0.0, pop_ease_t: 0.0,
+                                slot: slot::ARROW_TRAIL,
+                                rot,
+                                rot_vel: 0.0,
+                                age: 0.0,
+                                life: 0.55,
+                                gravity: false,
+                                bob_amp: 0.0,
+                                bob_w: 0.0,
+                                bob_phase: 0.0,
+                                pulse_amp: 0.0,
+                                pulse_w: 0.0,
+                                wiggle_amp: 0.0,
+                                wiggle_w: 0.0,
+                                pop_ease_t: 0.0,
                             });
                             prev = p;
-                            let _ = seed_i; let _ = step;
+                            let _ = seed_i;
+                            let _ = step;
                         }
                     }
                 }
@@ -661,32 +708,52 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                     // (representing B field) between them.
                     use kami_pipelines::atlas_slot as slot;
                     let p = glam::Vec3::new(-11.5, 36.5, 20.5);
-                    if tick_count % 30 == 0 { sfx("tick"); }
+                    if tick_count % 30 == 0 {
+                        sfx("tick");
+                    }
                     if tick_count % 2 == 0 {
                         // E wave: pop-in ring that grows via pulse.
                         atlas_for_heat.emit(kami_pipelines::AtlasSprite {
-                            pos: p, vel: glam::Vec3::ZERO,
+                            pos: p,
+                            vel: glam::Vec3::ZERO,
                             tint: [1.0, 0.95, 0.5],
-                            size: 2.0, slot: slot::SHOCK_WAVE,
-                            rot: 0.0, rot_vel: 0.8,
-                            age: 0.0, life: 1.6, gravity: false,
-                            bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0,
-                            pulse_amp: 0.4, pulse_w: 2.0,
-                            wiggle_amp: 0.0, wiggle_w: 0.0,
+                            size: 2.0,
+                            slot: slot::SHOCK_WAVE,
+                            rot: 0.0,
+                            rot_vel: 0.8,
+                            age: 0.0,
+                            life: 1.6,
+                            gravity: false,
+                            bob_amp: 0.0,
+                            bob_w: 0.0,
+                            bob_phase: 0.0,
+                            pulse_amp: 0.4,
+                            pulse_w: 2.0,
+                            wiggle_amp: 0.0,
+                            wiggle_w: 0.0,
                             pop_ease_t: 0.3,
                         });
                     }
                     if tick_count % 2 == 1 {
                         // B wave: rotating swirl with pop-in.
                         atlas_for_heat.emit(kami_pipelines::AtlasSprite {
-                            pos: p, vel: glam::Vec3::ZERO,
+                            pos: p,
+                            vel: glam::Vec3::ZERO,
                             tint: [0.4, 0.95, 0.55],
-                            size: 1.5, slot: slot::WIND_SWIRL,
-                            rot: 0.0, rot_vel: 2.5,
-                            age: 0.0, life: 1.5, gravity: false,
-                            bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0,
-                            pulse_amp: 0.3, pulse_w: 2.5,
-                            wiggle_amp: 0.0, wiggle_w: 0.0,
+                            size: 1.5,
+                            slot: slot::WIND_SWIRL,
+                            rot: 0.0,
+                            rot_vel: 2.5,
+                            age: 0.0,
+                            life: 1.5,
+                            gravity: false,
+                            bob_amp: 0.0,
+                            bob_w: 0.0,
+                            bob_phase: 0.0,
+                            pulse_amp: 0.3,
+                            pulse_w: 2.5,
+                            wiggle_amp: 0.0,
+                            wiggle_w: 0.0,
                             pop_ease_t: 0.25,
                         });
                     }
@@ -701,20 +768,21 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                                 32.0 + y as f32 + 0.5,
                                 16.0 + 2.5,
                             );
-                            if !voxels_for_heat.is_solid(w) { continue; }
+                            if !voxels_for_heat.is_solid(w) {
+                                continue;
+                            }
                             let h = heat.get(lx as i32 - 16, y as i32 + 32, 18);
-                            let Some(icon) = icon_map.pick(h, 0.0) else { continue; };
-                            let phase = (lx as f32 + y as f32) * 1.3
-                                + tick_count as f32 * 0.3;
+                            let Some(icon) = icon_map.pick(h, 0.0) else {
+                                continue;
+                            };
+                            let phase = (lx as f32 + y as f32) * 1.3 + tick_count as f32 * 0.3;
                             if icon.bobbing {
                                 atlas_for_heat.emit_bobbing(
-                                    w, icon.slot, icon.tint, icon.size,
-                                    icon.life, phase,
+                                    w, icon.slot, icon.tint, icon.size, icon.life, phase,
                                 );
                             } else {
-                                atlas_for_heat.emit_static(
-                                    w, icon.slot, icon.tint, icon.size, icon.life,
-                                );
+                                atlas_for_heat
+                                    .emit_static(w, icon.slot, icon.tint, icon.size, icon.life);
                             }
                         }
                     }
@@ -729,31 +797,47 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                         let w = glam::Vec3::new(wx, 33.5, 18.5);
                         let h = heat.get(lx as i32 - 16, 33, 18);
                         let m = moist.get(lx as i32 - 16, 33, 18);
-                        let Some(icon) = icon_map.pick(h, m) else { continue; };
+                        let Some(icon) = icon_map.pick(h, m) else {
+                            continue;
+                        };
                         // Steam puffs drift up; everything else stays put.
                         if icon.slot == kami_pipelines::atlas_slot::STEAM_PUFF {
                             atlas_for_heat.emit(kami_pipelines::AtlasSprite {
                                 pos: w + glam::Vec3::new(
-                                    (rnd() - 0.5) * 0.3, 0.3 + rnd() * 0.2, 0.0,
+                                    (rnd() - 0.5) * 0.3,
+                                    0.3 + rnd() * 0.2,
+                                    0.0,
                                 ),
                                 vel: glam::Vec3::new(0.0, 0.7, 0.0),
-                                tint: icon.tint, size: icon.size,
+                                tint: icon.tint,
+                                size: icon.size,
                                 slot: icon.slot,
-                                rot: rnd() * 6.28, rot_vel: 0.3,
-                                age: 0.0, life: icon.life, gravity: false,
-                                bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0,
-                                pulse_amp: 0.0, pulse_w: 0.0,
-                                wiggle_amp: 0.0, wiggle_w: 0.0, pop_ease_t: 0.0,
+                                rot: rnd() * 6.28,
+                                rot_vel: 0.3,
+                                age: 0.0,
+                                life: icon.life,
+                                gravity: false,
+                                bob_amp: 0.0,
+                                bob_w: 0.0,
+                                bob_phase: 0.0,
+                                pulse_amp: 0.0,
+                                pulse_w: 0.0,
+                                wiggle_amp: 0.0,
+                                wiggle_w: 0.0,
+                                pop_ease_t: 0.0,
                             });
                         } else if icon.bobbing {
                             atlas_for_heat.emit_bobbing(
-                                w, icon.slot, icon.tint, icon.size, icon.life,
+                                w,
+                                icon.slot,
+                                icon.tint,
+                                icon.size,
+                                icon.life,
                                 lx as f32 * 1.3 + tick_count as f32 * 0.3,
                             );
                         } else {
-                            atlas_for_heat.emit_static(
-                                w, icon.slot, icon.tint, icon.size, icon.life,
-                            );
+                            atlas_for_heat
+                                .emit_static(w, icon.slot, icon.tint, icon.size, icon.life);
                         }
                     }
                 }
@@ -767,25 +851,43 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                         let z = 16.0 + rnd() * 14.0;
                         let p = glam::Vec3::new(x, 44.0 + rnd() * 2.0, z);
                         atlas_for_heat.emit(kami_pipelines::AtlasSprite {
-                            pos: p, vel: glam::Vec3::new(0.0, -5.0, 0.0),
-                            tint: [0.55, 0.75, 1.0], size: 0.7,
+                            pos: p,
+                            vel: glam::Vec3::new(0.0, -5.0, 0.0),
+                            tint: [0.55, 0.75, 1.0],
+                            size: 0.7,
                             slot: slot::WATER_DROP,
-                            rot: 0.0, rot_vel: 0.0,
-                            age: 0.0, life: 2.2, gravity: false,
-                            bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0, pulse_amp: 0.0, pulse_w: 0.0, wiggle_amp: 0.0, wiggle_w: 0.0, pop_ease_t: 0.0,
+                            rot: 0.0,
+                            rot_vel: 0.0,
+                            age: 0.0,
+                            life: 2.2,
+                            gravity: false,
+                            bob_amp: 0.0,
+                            bob_w: 0.0,
+                            bob_phase: 0.0,
+                            pulse_amp: 0.0,
+                            pulse_w: 0.0,
+                            wiggle_amp: 0.0,
+                            wiggle_w: 0.0,
+                            pop_ease_t: 0.0,
                         });
                     }
                     // Splash rings on ground level (y=32) at random
                     // cells so the landing event reads too.
                     if tick_count % 2 == 0 {
-                        if tick_count % 12 == 0 { sfx("pop"); }
+                        if tick_count % 12 == 0 {
+                            sfx("pop");
+                        }
                         for _ in 0..2 {
                             let x = -16.0 + rnd() * 14.0;
                             let z = 16.0 + rnd() * 14.0;
                             let p = glam::Vec3::new(x, 33.0, z);
                             atlas_for_heat.emit_pop(
-                                p, slot::WATER_SPLASH,
-                                [0.7, 0.85, 1.0], 1.0, 0.45, 0.15,
+                                p,
+                                slot::WATER_SPLASH,
+                                [0.7, 0.85, 1.0],
+                                1.0,
+                                0.45,
+                                0.15,
                             );
                         }
                     }
@@ -805,48 +907,67 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                             let wz = 18.5;
                             let h = heat.get(lx as i32 - 16, ly + 32, 18);
                             let m = moist.get(lx as i32 - 16, ly + 32, 18);
-                            let Some(icon) = icon_map.pick(h, m) else { continue; };
-                            if rnd() > 0.35 { continue; } // sub-sample density
+                            let Some(icon) = icon_map.pick(h, m) else {
+                                continue;
+                            };
+                            if rnd() > 0.35 {
+                                continue;
+                            } // sub-sample density
                             let pos_base = glam::Vec3::new(wx, wy, wz);
-                            let phase = lx as f32 * 1.1 + ly as f32 * 0.7
-                                + tick_count as f32 * 0.3;
+                            let phase = lx as f32 * 1.1 + ly as f32 * 0.7 + tick_count as f32 * 0.3;
                             match icon.slot {
                                 s if s == slot::STEAM_PUFF => {
                                     atlas_for_heat.emit(kami_pipelines::AtlasSprite {
                                         pos: pos_base + glam::Vec3::new(0.0, 0.3, 0.0),
                                         vel: glam::Vec3::new(0.0, 0.7, 0.0),
-                                        tint: icon.tint, size: icon.size,
+                                        tint: icon.tint,
+                                        size: icon.size,
                                         slot: icon.slot,
-                                        rot: rnd() * 6.28, rot_vel: 0.4,
-                                        age: 0.0, life: icon.life, gravity: false,
-                                        bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0,
-                                        pulse_amp: 0.0, pulse_w: 0.0,
-                                        wiggle_amp: 0.0, wiggle_w: 0.0, pop_ease_t: 0.0,
+                                        rot: rnd() * 6.28,
+                                        rot_vel: 0.4,
+                                        age: 0.0,
+                                        life: icon.life,
+                                        gravity: false,
+                                        bob_amp: 0.0,
+                                        bob_w: 0.0,
+                                        bob_phase: 0.0,
+                                        pulse_amp: 0.0,
+                                        pulse_w: 0.0,
+                                        wiggle_amp: 0.0,
+                                        wiggle_w: 0.0,
+                                        pop_ease_t: 0.0,
                                     });
                                 }
                                 s if s == slot::WATER_DROP => {
                                     atlas_for_heat.emit(kami_pipelines::AtlasSprite {
                                         pos: pos_base,
                                         vel: glam::Vec3::new(0.0, -1.8, 0.0),
-                                        tint: icon.tint, size: icon.size,
+                                        tint: icon.tint,
+                                        size: icon.size,
                                         slot: icon.slot,
-                                        rot: 0.0, rot_vel: 0.0,
-                                        age: 0.0, life: icon.life, gravity: false,
-                                        bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0,
-                                        pulse_amp: 0.0, pulse_w: 0.0,
-                                        wiggle_amp: 0.0, wiggle_w: 0.0, pop_ease_t: 0.0,
+                                        rot: 0.0,
+                                        rot_vel: 0.0,
+                                        age: 0.0,
+                                        life: icon.life,
+                                        gravity: false,
+                                        bob_amp: 0.0,
+                                        bob_w: 0.0,
+                                        bob_phase: 0.0,
+                                        pulse_amp: 0.0,
+                                        pulse_w: 0.0,
+                                        wiggle_amp: 0.0,
+                                        wiggle_w: 0.0,
+                                        pop_ease_t: 0.0,
                                     });
                                 }
                                 _ if icon.bobbing => {
                                     atlas_for_heat.emit_bobbing(
-                                        pos_base, icon.slot, icon.tint,
-                                        icon.size, icon.life, phase,
+                                        pos_base, icon.slot, icon.tint, icon.size, icon.life, phase,
                                     );
                                 }
                                 _ => {
                                     atlas_for_heat.emit_static(
-                                        pos_base, icon.slot, icon.tint,
-                                        icon.size, icon.life,
+                                        pos_base, icon.slot, icon.tint, icon.size, icon.life,
                                     );
                                 }
                             }
@@ -855,25 +976,42 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                     // Wind streamlines via arrow_trail.
                     for _ in 0..2 {
                         let mut p = glam::Vec3::new(
-                            -11.5 + (rnd() - 0.5) * 0.6, 33.5,
+                            -11.5 + (rnd() - 0.5) * 0.6,
+                            33.5,
                             18.5 + (rnd() - 0.5) * 0.6,
                         );
                         for _ in 0..10 {
                             let v = wind.vec_at(
-                                p.x.floor() as i32, p.y.floor() as i32, p.z.floor() as i32,
+                                p.x.floor() as i32,
+                                p.y.floor() as i32,
+                                p.z.floor() as i32,
                             );
                             let vlen = v.length();
-                            if vlen < 0.02 { break; }
+                            if vlen < 0.02 {
+                                break;
+                            }
                             let dir = v / vlen;
                             p += dir * 0.4;
                             let rot = dir.z.atan2(dir.x);
                             atlas_for_heat.emit(kami_pipelines::AtlasSprite {
-                                pos: p, vel: glam::Vec3::ZERO,
+                                pos: p,
+                                vel: glam::Vec3::ZERO,
                                 tint: [1.0, 0.82, 0.45],
-                                size: 0.45, slot: slot::ARROW_TRAIL,
-                                rot, rot_vel: 0.0,
-                                age: 0.0, life: 0.5, gravity: false,
-                                bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0, pulse_amp: 0.0, pulse_w: 0.0, wiggle_amp: 0.0, wiggle_w: 0.0, pop_ease_t: 0.0,
+                                size: 0.45,
+                                slot: slot::ARROW_TRAIL,
+                                rot,
+                                rot_vel: 0.0,
+                                age: 0.0,
+                                life: 0.5,
+                                gravity: false,
+                                bob_amp: 0.0,
+                                bob_w: 0.0,
+                                bob_phase: 0.0,
+                                pulse_amp: 0.0,
+                                pulse_w: 0.0,
+                                wiggle_amp: 0.0,
+                                wiggle_w: 0.0,
+                                pop_ease_t: 0.0,
                             });
                         }
                     }
@@ -890,20 +1028,36 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                         let mut p = glam::Vec3::new(x, y, z);
                         for _ in 0..10 {
                             let v = wind.vec_at(
-                                p.x.floor() as i32, p.y.floor() as i32, p.z.floor() as i32,
+                                p.x.floor() as i32,
+                                p.y.floor() as i32,
+                                p.z.floor() as i32,
                             );
                             let vlen = v.length();
-                            if vlen < 0.01 { break; }
+                            if vlen < 0.01 {
+                                break;
+                            }
                             let dir = v / vlen;
                             p += dir * 0.4;
                             let rot = dir.z.atan2(dir.x);
                             atlas_for_heat.emit(kami_pipelines::AtlasSprite {
-                                pos: p, vel: glam::Vec3::ZERO,
+                                pos: p,
+                                vel: glam::Vec3::ZERO,
                                 tint: [0.95, 0.78, 0.45],
-                                size: 0.55, slot: slot::ARROW_TRAIL,
-                                rot, rot_vel: 0.0,
-                                age: 0.0, life: 0.9, gravity: false,
-                                bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0, pulse_amp: 0.0, pulse_w: 0.0, wiggle_amp: 0.0, wiggle_w: 0.0, pop_ease_t: 0.0,
+                                size: 0.55,
+                                slot: slot::ARROW_TRAIL,
+                                rot,
+                                rot_vel: 0.0,
+                                age: 0.0,
+                                life: 0.9,
+                                gravity: false,
+                                bob_amp: 0.0,
+                                bob_w: 0.0,
+                                bob_phase: 0.0,
+                                pulse_amp: 0.0,
+                                pulse_w: 0.0,
+                                wiggle_amp: 0.0,
+                                wiggle_w: 0.0,
+                                pop_ease_t: 0.0,
                             });
                         }
                     }
@@ -929,9 +1083,15 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
             // paper survives). Scenes 1/5/8/9 have no ignition loop.
             let allow_ignition = matches!(scene_id, 0 | 2 | 3 | 4 | 6 | 7 | 10);
             for &(x, y, z) in &paper_positions {
-                if !allow_ignition { break; }
+                if !allow_ignition {
+                    break;
+                }
                 let t = heat.get(x, y, z);
-                let m = if matches!(scene_id, 7 | 10) { moist.get(x, y, z) } else { 0.0 };
+                let m = if matches!(scene_id, 7 | 10) {
+                    moist.get(x, y, z)
+                } else {
+                    0.0
+                };
                 let sample = glam::Vec3::new(x as f32 + 0.5, y as f32 + 0.5, z as f32 + 0.5);
                 if !voxels_for_heat.is_solid(sample) {
                     continue;
@@ -945,28 +1105,31 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                     _ => 40.0,
                 };
                 if t > threshold {
-                    voxels_for_heat.set_voxel(
-                        glam::IVec3::new(x, y, z),
-                        PALETTE_FIRE,
-                    );
+                    voxels_for_heat.set_voxel(glam::IVec3::new(x, y, z), PALETTE_FIRE);
                     particles_for_heat.burst(sample, 10, [1.0, 0.6, 0.2]);
-                    sfx("coin");  // Mario coin on new ignition
+                    sfx("coin"); // Mario coin on new ignition
                     // Nintendo Zelda-style "item get" sparkle on new
                     // ignition (scenes 6/7/10). Three stars pop-in
                     // at 120° with easeOutBack overshoot.
                     for k in 0..3 {
                         let offs = (k as f32) * 2.094; // 120°
                         atlas_for_heat.emit_pop(
-                            sample + glam::Vec3::new(
-                                offs.cos() * 0.5, 0.6, offs.sin() * 0.5,
-                            ),
+                            sample + glam::Vec3::new(offs.cos() * 0.5, 0.6, offs.sin() * 0.5),
                             kami_pipelines::atlas_slot::SPARKLE_STAR,
-                            [1.0, 0.95, 0.6], 1.2, 0.7, 0.25,
+                            [1.0, 0.95, 0.6],
+                            1.2,
+                            0.7,
+                            0.25,
                         );
                     }
                     log::info!(
                         "[isekai-v2-dec] ignited paper ({},{},{}) T={:.1} M={:.2} thresh={:.1}",
-                        x, y, z, t, m, threshold
+                        x,
+                        y,
+                        z,
+                        t,
+                        m,
+                        threshold
                     );
                 }
             }
@@ -983,7 +1146,9 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
             const ACTIVE_RADIUS: i32 = 1;
             heat.prune_outside(ACTIVE_CENTER, ACTIVE_RADIUS);
             moist.prune_outside(ACTIVE_CENTER, ACTIVE_RADIUS);
-            wind_for_tick.borrow_mut().prune_outside(ACTIVE_CENTER, ACTIVE_RADIUS);
+            wind_for_tick
+                .borrow_mut()
+                .prune_outside(ACTIVE_CENTER, ACTIVE_RADIUS);
 
             if tick_count % 120 == 0 {
                 log::info!(
@@ -1006,7 +1171,9 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                 {
                     log::info!(
                         "[isekai-v2] mine block=({},{},{})",
-                        block.x, block.y, block.z
+                        block.x,
+                        block.y,
+                        block.z
                     );
                     // Debris burst matching the mined block's color
                     // (palette lookup would require keeping the broken
@@ -1042,7 +1209,9 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
                     if place != head && place != feet {
                         log::info!(
                             "[isekai-v2] place block=({},{},{})",
-                            place.x, place.y, place.z
+                            place.x,
+                            place.y,
+                            place.z
                         );
                         voxels_for_mining.set_voxel(place, PALETTE_BRICK);
                         // Small white sparkle on placement.
@@ -1058,7 +1227,9 @@ pub async fn run_isekai_v2_scene(canvas_id: &str, scene: u32) -> Result<(), JsVa
         });
 
     log::info!("[isekai-v2] backend={:?}", app.backend());
-    app.run().await.map_err(|e| JsValue::from_str(&e.to_string()))
+    app.run()
+        .await
+        .map_err(|e| JsValue::from_str(&e.to_string()))
 }
 
 /// Native test entry — drives a single frame via `from_context` for
@@ -1071,8 +1242,8 @@ mod tests {
         // Actual GPU work needs a winit + surface, which is out of scope
         // for unit tests.
         fn _assert_shape() {
-            use kami_app::{CameraMode, InputMode};
             use glam::Vec3;
+            use kami_app::{CameraMode, InputMode};
             let _ = CameraMode::FirstPerson {
                 spawn: Vec3::ZERO,
                 yaw: 0.0,
@@ -1097,17 +1268,17 @@ const PALETTE_WATER: u8 = 10;
 
 fn isekai_palette() -> kami_pipelines::VoxelPalette {
     vec![
-        [0.0, 0.0, 0.0],   // 0 air (unused)
-        [0.55, 0.35, 0.2], // 1 wood
-        [0.2, 0.7, 0.25],  // 2 grass
-        [0.5, 0.5, 0.55],  // 3 stone
-        [0.9, 0.88, 0.8],  // 4 sand
-        [0.82, 0.25, 0.2], // 5 brick
-        [0.4, 0.8, 0.9],   // 6 glass
-        [1.0, 0.45, 0.1],  // 7 fire (vivid orange, emits heat)
-        [0.96, 0.94, 0.88],// 8 paper (ivory)
-        [0.25, 0.22, 0.2], // 9 ash
-        [0.12, 0.36, 0.65],// 10 water (emits moisture)
+        [0.0, 0.0, 0.0],    // 0 air (unused)
+        [0.55, 0.35, 0.2],  // 1 wood
+        [0.2, 0.7, 0.25],   // 2 grass
+        [0.5, 0.5, 0.55],   // 3 stone
+        [0.9, 0.88, 0.8],   // 4 sand
+        [0.82, 0.25, 0.2],  // 5 brick
+        [0.4, 0.8, 0.9],    // 6 glass
+        [1.0, 0.45, 0.1],   // 7 fire (vivid orange, emits heat)
+        [0.96, 0.94, 0.88], // 8 paper (ivory)
+        [0.25, 0.22, 0.2],  // 9 ash
+        [0.12, 0.36, 0.65], // 10 water (emits moisture)
     ]
 }
 
@@ -1148,11 +1319,7 @@ pub(crate) fn build_voxel_world(
                 }
             }
         }
-        if has_solid {
-            Some(chunk)
-        } else {
-            None
-        }
+        if has_solid { Some(chunk) } else { None }
     })
 }
 
@@ -1237,4 +1404,31 @@ pub(crate) fn build_demo_house(
     chunk.set(9, 2, 2, PALETTE_WATER);
 
     voxels.insert_chunk(ctx, chunk);
+}
+
+/// Build the Plains terrain adapter from kami-terrain-scene's `biomes.edn` (executor edge,
+/// ADR-0044/0046): the heightmap/splat/palette are data, parity-tested in the scene crate,
+/// with the compiled-in `BiomePreset::Plains` only as fallback. Shared by the main entry
+/// and the omniverse scene.
+pub(crate) fn plains_terrain(ctx: &kami_render::RenderContext) -> kami_pipelines::TerrainAdapter {
+    match kami_terrain_scene::resolve_biome("plains") {
+        Some(b) => kami_pipelines::TerrainAdapter::streaming_with_config(
+            ctx,
+            b.to_heightmap_config(42.0),
+            b.to_splat_thresholds(),
+            b.to_material_palette(),
+            128,
+            2,
+        ),
+        None => {
+            log::warn!("[isekai] biomes.edn 'plains' unavailable; using builtin BiomePreset");
+            kami_pipelines::TerrainAdapter::streaming(
+                ctx,
+                kami_terrain::BiomePreset::Plains,
+                42.0,
+                128,
+                2,
+            )
+        }
+    }
 }

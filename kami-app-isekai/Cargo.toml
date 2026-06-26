@@ -13,6 +13,8 @@ kami-pipelines = { path = "../kami-pipelines" }
 kami-dec = { path = "../kami-dec" }
 kami-render = { path = "../kami-render" }
 kami-terrain = { path = "../kami-terrain" }
+# Executor edge (ADR-0044/0046): Plains biome loads from kami-terrain-scene's biomes.edn.
+kami-terrain-scene = { path = "../kami-terrain-scene" }
 # Omniverse / PhysX / OpenUSD nv-compat facade (ADR-2605261800 §D10.3).
 kami-usd = { path = "../kami-usd" }
 kami-genesis = { path = "../kami-genesis" }

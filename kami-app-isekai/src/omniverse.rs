@@ -34,9 +34,7 @@ use wasm_bindgen::prelude::*;
 
 // Bundled URDF — same physical cartpole used by `kami-cartpole-wasm` so
 // trained policies trained against either entry remain valid.
-const BUNDLED_CARTPOLE_URDF: &str = include_str!(
-    "../../fixtures/cartpole/cartpole.urdf"
-);
+const BUNDLED_CARTPOLE_URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
 
 /// Built-in USDA used when the JS side does not supply a custom one.
 /// One PhysicsScene + a ground plane + one Cartpole articulation that
@@ -282,10 +280,7 @@ struct Prop {
 ///                `DEFAULT_ISEKAI_USDA`.
 #[cfg(target_family = "wasm")]
 #[wasm_bindgen(js_name = runIsekaiOmniverse)]
-pub async fn run_isekai_omniverse(
-    canvas_id: &str,
-    usda_src: &str,
-) -> Result<(), JsValue> {
+pub async fn run_isekai_omniverse(canvas_id: &str, usda_src: &str) -> Result<(), JsValue> {
     use crate::pipelines;
     console_error_panic_hook::set_once();
     let _ = console_log::init_with_level(Level::Info);
@@ -343,13 +338,8 @@ pub async fn run_isekai_omniverse(
     // adapters the v3-demos scene already validates. Voxel world gives
     // the cartpole something to land on.
     let sky = pipelines::SkyAdapter::new(app.render_context());
-    let terrain = pipelines::TerrainAdapter::streaming(
-        app.render_context(),
-        kami_terrain::BiomePreset::Plains,
-        42.0,
-        128,
-        2,
-    );
+    // Executor edge (ADR-0044/0046): Plains terrain from kami-terrain-scene's biomes.edn.
+    let terrain = crate::plains_terrain(app.render_context());
     let voxels = crate::build_voxel_world(app.render_context());
     let voxels_for_probe = voxels.clone();
     let voxels_for_wall = voxels.clone();
@@ -455,12 +445,15 @@ pub async fn run_isekai_omniverse(
                 let cart_x_off = state.map(|s| s.x).unwrap_or(0.0);
                 let pole_theta = state.map(|s| s.theta).unwrap_or(0.0);
 
-                let cart_pos =
-                    glam::Vec3::new(origin[0] + cart_x_off, origin[1] + 0.5, origin[2]);
+                let cart_pos = glam::Vec3::new(origin[0] + cart_x_off, origin[1] + 0.5, origin[2]);
                 // Pole pivots about +y; theta=0 ⇒ straight up. Length ~1 m.
                 let pole_len = 1.0_f32;
                 let pole_tip = cart_pos
-                    + glam::Vec3::new(pole_theta.sin() * pole_len, pole_theta.cos() * pole_len, 0.0);
+                    + glam::Vec3::new(
+                        pole_theta.sin() * pole_len,
+                        pole_theta.cos() * pole_len,
+                        0.0,
+                    );
 
                 atlas_for_tick.emit_static(
                     cart_pos,
@@ -512,7 +505,9 @@ pub async fn run_isekai_omniverse(
             kami_genesis::PHASE
         )
     );
-    app.run().await.map_err(|e| JsValue::from_str(&e.to_string()))
+    app.run()
+        .await
+        .map_err(|e| JsValue::from_str(&e.to_string()))
 }
 
 fn parse_or_default(usda_src: &str) -> Stage {
