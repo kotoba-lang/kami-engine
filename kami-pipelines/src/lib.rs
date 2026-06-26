@@ -15,7 +15,7 @@ pub mod water;
 pub use water::WaterAdapter;
 
 pub mod voxel;
-pub use voxel::{VoxelChunk, VoxelChunkAdapter, VoxelPalette, CHUNK_SIZE};
+pub use voxel::{CHUNK_SIZE, VoxelChunk, VoxelChunkAdapter, VoxelPalette};
 
 pub mod particle;
 pub use particle::ParticleAdapter;
@@ -30,7 +30,7 @@ pub mod face_vis;
 pub use face_vis::FaceVisAdapter;
 
 pub mod atlas_vis;
-pub use atlas_vis::{atlas_slot, AtlasSprite, AtlasVisAdapter};
+pub use atlas_vis::{AtlasSprite, AtlasVisAdapter, atlas_slot};
 
 pub mod field_icon;
 pub use field_icon::{FieldIcon, FieldIconMap, FieldIconRule};
@@ -50,8 +50,8 @@ pub use gsplat::{GsplatAdapter, GsplatError, GsplatFormat, MAX_SPLATS_PER_CLOUD}
 use glam::{Mat4, Vec3};
 use hecs::World;
 use kami_app::{Camera, RenderPipeline};
-use kami_render::scene_pipelines::{SkyPipeline, SkyUniform};
 use kami_render::RenderContext;
+use kami_render::scene_pipelines::{SkyPipeline, SkyUniform};
 
 /// Day/night sun direction from `camera.time`. Period = 180 s
 /// (3 minutes for a full cycle — fast enough to observe during testing).
@@ -87,7 +87,6 @@ pub fn fog_from_sun(sun_dir: Vec3) -> Vec3 {
         dusk * (1.0 - t) + night * t
     }
 }
-
 
 /// `SkyPipeline` adapter — wraps `kami_render::scene_pipelines::SkyPipeline`
 /// into the `RenderPipeline` trait.
@@ -235,6 +234,30 @@ impl TerrainAdapter {
         chunk_extent: u32,
         view_radius: i32,
     ) -> Self {
+        Self::streaming_with_config(
+            ctx,
+            biome.heightmap(seed),
+            biome.splat_thresholds(),
+            biome.palette(),
+            chunk_extent,
+            view_radius,
+        )
+    }
+
+    /// Like [`streaming`](Self::streaming) but seeded from explicit terrain config structs
+    /// instead of a hardcoded [`kami_terrain::BiomePreset`] — the **executor edge** a
+    /// consumer uses to drive terrain from `kami-terrain-scene`'s biome EDN (ADR-0044/0046):
+    /// `resolve_biome(name)` →
+    /// `BiomeSpec::{to_heightmap_config,to_splat_thresholds,to_material_palette}` → here.
+    /// Behaviourally identical to `streaming` when given the same biome's configs.
+    pub fn streaming_with_config(
+        ctx: &RenderContext,
+        hm_cfg: kami_terrain::HeightmapConfig,
+        splat_thresholds: kami_terrain::SplatThresholds,
+        palette: kami_terrain::MaterialPalette,
+        chunk_extent: u32,
+        view_radius: i32,
+    ) -> Self {
         let pipeline = kami_render::scene_pipelines::TerrainPipeline::new(&ctx.device, ctx.format);
         // Vegetation pipeline with an unused instance_vb (capacity=1 dummy);
         // each chunk owns its own instance_vb that we bind at draw time.
@@ -252,9 +275,9 @@ impl TerrainAdapter {
             veg_pipeline,
             chunks: std::collections::HashMap::new(),
             pending: std::collections::VecDeque::new(),
-            hm_cfg: biome.heightmap(seed),
-            splat_thresholds: biome.splat_thresholds(),
-            palette: biome.palette(),
+            hm_cfg,
+            splat_thresholds,
+            palette,
             chunk_extent,
             view_radius,
         }
@@ -279,16 +302,20 @@ impl TerrainAdapter {
         // per cell. Using scale != 1.0 stretches the mesh horizontally
         // without re-sampling the heights → visible seams.
         let mesh = kami_terrain::generate_chunk_mesh(&hm, &splat, ox, oz, 1, 1.0, 0);
-        let vb = ctx.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("isekai-v2.terrain.vb"),
-            contents: bytemuck::cast_slice(&mesh.vertices),
-            usage: wgpu::BufferUsages::VERTEX,
-        });
-        let ib = ctx.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("isekai-v2.terrain.ib"),
-            contents: bytemuck::cast_slice(&mesh.indices),
-            usage: wgpu::BufferUsages::INDEX,
-        });
+        let vb = ctx
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("isekai-v2.terrain.vb"),
+                contents: bytemuck::cast_slice(&mesh.vertices),
+                usage: wgpu::BufferUsages::VERTEX,
+            });
+        let ib = ctx
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("isekai-v2.terrain.ib"),
+                contents: bytemuck::cast_slice(&mesh.indices),
+                usage: wgpu::BufferUsages::INDEX,
+            });
 
         // Place vegetation instances inside this chunk. `place_instances`
         // centres its scatter at world origin; we translate into chunk-
@@ -337,11 +364,14 @@ impl TerrainAdapter {
         let veg_instance_vb = if instances.is_empty() {
             None
         } else {
-            Some(ctx.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                label: Some("veg.instances"),
-                contents: bytemuck::cast_slice(&instances),
-                usage: wgpu::BufferUsages::VERTEX,
-            }))
+            Some(
+                ctx.device
+                    .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                        label: Some("veg.instances"),
+                        contents: bytemuck::cast_slice(&instances),
+                        usage: wgpu::BufferUsages::VERTEX,
+                    }),
+            )
         };
 
         TerrainChunkGpu {
@@ -373,7 +403,12 @@ impl TerrainAdapter {
     }
 
     /// Backwards-compat single-chunk constructor.
-    pub fn from_biome(ctx: &RenderContext, biome: kami_terrain::BiomePreset, seed: f32, extent: u32) -> Self {
+    pub fn from_biome(
+        ctx: &RenderContext,
+        biome: kami_terrain::BiomePreset,
+        seed: f32,
+        extent: u32,
+    ) -> Self {
         Self::from_biome_grid(ctx, biome, seed, 1, extent)
     }
 }
@@ -402,7 +437,9 @@ impl RenderPipeline for TerrainAdapter {
                         continue; // skip interior of the ring
                     }
                     let coord = (ccx + dx, ccz + dz);
-                    if !self.chunks.contains_key(&coord) && !self.pending.iter().any(|c| *c == coord) {
+                    if !self.chunks.contains_key(&coord)
+                        && !self.pending.iter().any(|c| *c == coord)
+                    {
                         self.pending.push_back(coord);
                     }
                 }
@@ -412,7 +449,8 @@ impl RenderPipeline for TerrainAdapter {
         // Budget: 1 chunk per frame. Generation + upload take ~5-15 ms.
         if let Some(coord) = self.pending.pop_front() {
             // Guard against stale pending entries (already outside window).
-            if (coord.0 - ccx).abs() <= r && (coord.1 - ccz).abs() <= r
+            if (coord.0 - ccx).abs() <= r
+                && (coord.1 - ccz).abs() <= r
                 && !self.chunks.contains_key(&coord)
             {
                 let chunk = self.generate_chunk(ctx, coord.0, coord.1);
@@ -438,18 +476,24 @@ impl RenderPipeline for TerrainAdapter {
         let mut base_col = [[0.0; 4]; 4];
         let mut tip_col = [[0.0; 4]; 4];
         for i in 0..4 {
-            base_col[i] = [self.palette.base[i][0], self.palette.base[i][1], self.palette.base[i][2], 0.0];
-            tip_col[i]  = [self.palette.tip[i][0],  self.palette.tip[i][1],  self.palette.tip[i][2],  0.0];
+            base_col[i] = [
+                self.palette.base[i][0],
+                self.palette.base[i][1],
+                self.palette.base[i][2],
+                0.0,
+            ];
+            tip_col[i] = [
+                self.palette.tip[i][0],
+                self.palette.tip[i][1],
+                self.palette.tip[i][2],
+                0.0,
+            ];
         }
         let sun_dir = sun_from_time(camera.time);
         let fog_color = fog_from_sun(sun_dir);
         // Sun color shifts warm near horizon, cool near noon.
         let warmth = 1.0 - sun_dir.y.max(0.0);
-        let sun_color = [
-            1.0,
-            0.96 - warmth * 0.12,
-            0.88 - warmth * 0.28,
-        ];
+        let sun_color = [1.0, 0.96 - warmth * 0.12, 0.88 - warmth * 0.28];
         let t_u = kami_render::scene_pipelines::TerrainUniform {
             view_proj: view_proj.to_cols_array(),
             cam_pos: eye.to_array(),
@@ -465,7 +509,8 @@ impl RenderPipeline for TerrainAdapter {
             base_col,
             tip_col,
         };
-        ctx.queue.write_buffer(&self.pipeline.uniform, 0, bytemuck::bytes_of(&t_u));
+        ctx.queue
+            .write_buffer(&self.pipeline.uniform, 0, bytemuck::bytes_of(&t_u));
 
         let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("isekai-v2.terrain"),
@@ -522,14 +567,15 @@ impl RenderPipeline for TerrainAdapter {
             pass.set_pipeline(&self.veg_pipeline.pipeline);
             pass.set_bind_group(0, &self.veg_pipeline.bind_group, &[]);
             for chunk in self.chunks.values() {
-                let Some(inst_buf) = &chunk.veg_instance_vb else { continue };
+                let Some(inst_buf) = &chunk.veg_instance_vb else {
+                    continue;
+                };
                 pass.set_vertex_buffer(1, inst_buf.slice(..));
                 for &(species_id, start, count) in &chunk.veg_ranges {
-                    let Some(mesh) = self
-                        .veg_pipeline
-                        .species_meshes
-                        .get(species_id as usize)
-                    else { continue };
+                    let Some(mesh) = self.veg_pipeline.species_meshes.get(species_id as usize)
+                    else {
+                        continue;
+                    };
                     pass.set_vertex_buffer(0, mesh.vb.slice(..));
                     pass.set_index_buffer(mesh.ib.slice(..), wgpu::IndexFormat::Uint32);
                     pass.draw_indexed(0..mesh.index_count, 0, start..start + count);

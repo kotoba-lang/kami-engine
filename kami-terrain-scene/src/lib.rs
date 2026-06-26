@@ -352,9 +352,41 @@ pub fn shipped_biome(name: &str) -> Result<BiomeSpec, Error> {
     biome_from_edn(BIOMES_EDN, name)
 }
 
+/// Executor-edge resolver (ADR-0044/0046): resolve a named biome to a [`BiomeSpec`],
+/// loading from the shipped [`BIOMES_EDN`] and falling back to the compiled-in
+/// [`BiomePreset`] only if the EDN fails to parse/resolve. Returns `None` for an unknown
+/// biome name.
+///
+/// A native/GPU consumer (e.g. a `kami-app-*` terrain build) calls this instead of passing
+/// a hardcoded `BiomePreset` to the pipeline — so the heightmap/splat/palette are *data*
+/// (parity-tested here), retunable without recompiling. `BiomeSpec`'s
+/// [`to_heightmap_config`](BiomeSpec::to_heightmap_config) /
+/// [`to_splat_thresholds`](BiomeSpec::to_splat_thresholds) /
+/// [`to_material_palette`](BiomeSpec::to_material_palette) then yield the real engine structs.
+pub fn resolve_biome(name: &str) -> Option<BiomeSpec> {
+    match shipped_biome(name) {
+        Ok(b) => Some(b),
+        Err(_) => builtin_biome(name),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Executor-edge proof: `resolve_biome` is driven by the shipped EDN (equals
+    /// `shipped_biome`), with the builtin only as fallback, and `None` for unknowns.
+    #[test]
+    fn resolve_biome_is_driven_by_edn() {
+        for name in ALL_BIOME_NAMES {
+            assert_eq!(
+                resolve_biome(name).expect("biome resolves"),
+                shipped_biome(name).expect("biomes.edn resolves"),
+                "{name}: resolve_biome driven by biomes.edn"
+            );
+        }
+        assert!(resolve_biome("volcano").is_none(), "unknown → None");
+    }
 
     #[test]
     fn shipped_has_all_biomes() {

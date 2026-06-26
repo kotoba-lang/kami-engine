@@ -21,6 +21,9 @@ crate-type = ["cdylib", "rlib"]
 kami-app = { path = "../kami-app" }
 kami-pipelines = { path = "../kami-pipelines" }
 kami-terrain = { path = "../kami-terrain" }
+# Executor edge (ADR-0044/0046): the Quarry biome loads from kami-terrain-scene's
+# biomes.edn, falling back to the compiled-in BiomePreset::Quarry.
+kami-terrain-scene = { path = "../kami-terrain-scene" }
 log = { workspace = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]

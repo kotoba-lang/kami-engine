@@ -40,13 +40,28 @@ pub async fn run_quarry_walk_v2(canvas_id: &str) -> Result<(), JsValue> {
     // Shared pipelines from kami-pipelines. Swap biome → different
     // terrain palette + placement tolerances; no rendering code change.
     let sky = kami_pipelines::SkyAdapter::new(app.render_context());
-    let terrain = kami_pipelines::TerrainAdapter::streaming(
-        app.render_context(),
-        kami_terrain::BiomePreset::Quarry,
-        77.0,
-        128,
-        2,
-    );
+    // Executor edge (ADR-0044/0046): build the terrain from kami-terrain-scene's
+    // biomes.edn, falling back to the compiled-in BiomePreset::Quarry if the EDN fails.
+    let terrain = match kami_terrain_scene::resolve_biome("quarry") {
+        Some(b) => kami_pipelines::TerrainAdapter::streaming_with_config(
+            app.render_context(),
+            b.to_heightmap_config(77.0),
+            b.to_splat_thresholds(),
+            b.to_material_palette(),
+            128,
+            2,
+        ),
+        None => {
+            log::warn!("[quarry-walk] biomes.edn 'quarry' unavailable; using builtin BiomePreset");
+            kami_pipelines::TerrainAdapter::streaming(
+                app.render_context(),
+                kami_terrain::BiomePreset::Quarry,
+                77.0,
+                128,
+                2,
+            )
+        }
+    };
 
     // Quarry biome sand_line=5, so sea level ≈ 4 keeps water in valleys.
     let water = kami_pipelines::WaterAdapter::new(app.render_context(), 1024.0, 4.0);
