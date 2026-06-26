@@ -35,5 +35,20 @@ run() {
 run "backend: wasmtime (JIT — desktop/android)"
 run "backend: wasmi (no JIT — ios/ps5/switch)" --no-default-features --features backend-wasmi
 
+# Bonus: prove the Model-B dance composition actually RUNS under wasm32 — compiled
+# to wasm32-wasip1 and executed by the wasmtime runner, with the compiled-CLJ dance
+# logic.clj running wasm-in-wasm. This is the browser/Model-B path (wasm32), not
+# just native. Gated on wasmtime; skips gracefully if it is not installed.
+if command -v wasmtime >/dev/null 2>&1; then
+  echo "=================================================================="
+  echo "  wasm32 (wasip1): the dance Model-B composition RUNS in wasm"
+  echo "=================================================================="
+  rustup target add wasm32-wasip1 >/dev/null 2>&1 || true
+  cargo test --target wasm32-wasip1 -p "$PKG" --test dance_model_b \
+    --no-default-features --features backend-wasmi "${EXTRA[@]}"
+else
+  echo "… wasmtime not found — skipping the wasm32 run check (brew install wasmtime)"
+fi
+
 echo
 echo "✓ both backends green — no-JIT parity holds (ADR-0037 Phase 1)"
