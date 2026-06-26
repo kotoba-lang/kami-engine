@@ -23,6 +23,7 @@ members = [
     "kami-geo",
     "kami-map",
     "kami-web",
+    "kami-web-modelb",
     "kami-graph",
     "kami-text",
     "kami-ui-gpu",
