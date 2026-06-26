@@ -1005,10 +1005,16 @@ impl DanceScene {
         } else {
             render_ir
         };
-        // Live2D performer: drive Cubism params from the same pose + phase.
+        // Live2D performer: drive Cubism params from the same pose + phase; the
+        // avatar's `:voice` vowel timeline syncs its mouth lipsync too (parity
+        // with the VRM mouth).
         let live2d = self.live2d.as_ref().map(|b| {
             let phase = self.show.grid().phase();
-            b.render_entry(&b.drive(&snap.performer_pose, &phase))
+            let voice_mouth = self.avatar.voice.as_ref().and_then(|v| {
+                let beat = phase.beat as f32 + phase.beat_frac;
+                v.vowel_weight(beat).map(|(_, w)| w)
+            });
+            b.render_entry(&b.drive(&snap.performer_pose, &phase, voice_mouth))
         });
         DanceFrame {
             render_ir,

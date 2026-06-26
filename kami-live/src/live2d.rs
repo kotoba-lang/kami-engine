@@ -110,7 +110,10 @@ impl Live2DBinding {
 
     /// Resolve the parameter values for this frame: the rest `params` with the
     /// standard Cubism parameters driven by the beat-synced pose. Deterministic.
-    pub fn drive(&self, pose: &DancePose, phase: &BeatPhase) -> BTreeMap<String, f32> {
+    /// `voice_mouth` (the `:dance/avatar :voice` vowel weight, when authored)
+    /// drives the mouth lipsync instead of the default beat-open — so one
+    /// `:voice` timeline syncs the VRM *and* Live2D performer's mouth.
+    pub fn drive(&self, pose: &DancePose, phase: &BeatPhase, voice_mouth: Option<f32>) -> BTreeMap<String, f32> {
         let mut p = self.params.clone();
         let set = |p: &mut BTreeMap<String, f32>, k: &str, v: f32| {
             p.insert(k.to_string(), v);
@@ -128,8 +131,9 @@ impl Live2DBinding {
         let blink = blink_value(phase.time);
         set(&mut p, "ParamEyeLOpen", blink);
         set(&mut p, "ParamEyeROpen", blink);
-        // mouth lipsync: open on the front of each beat.
-        let mouth = (1.0 - (phase.beat_frac * std::f32::consts::TAU).cos()) * 0.5;
+        // mouth lipsync: the `:voice` vowel weight when authored, else beat-open.
+        let mouth = voice_mouth
+            .unwrap_or_else(|| (1.0 - (phase.beat_frac * std::f32::consts::TAU).cos()) * 0.5);
         set(&mut p, &self.lipsync, mouth.clamp(0.0, 1.0));
         // overlay the active inline motion (its params override the base ones).
         if let Some(name) = &self.active_motion {
@@ -311,7 +315,7 @@ mod tests {
             beat_frac: 0.5,
             bar_frac: 0.25,
         };
-        let p = b.drive(&pose, &phase);
+        let p = b.drive(&pose, &phase, None);
         // head angle follows yaw (0.3 rad ≈ 17°).
         assert!((p["ParamAngleX"] - 0.3f32.to_degrees()).abs() < 1e-3);
         // mouth opens at mid-beat (beat_frac 0.5 → 1 - cos(pi) = 2 → *0.5 = 1).
@@ -354,7 +358,7 @@ mod tests {
         );
         assert_eq!(b.active_motion.as_deref(), Some("wave"));
         let phase = BeatPhase { time: 1.0, beat: 2, bar: 0, phrase: 0, beat_frac: 0.5, bar_frac: 0.25 };
-        let p = b.drive(&DancePose::rest(), &phase);
+        let p = b.drive(&DancePose::rest(), &phase, None);
         // motion param present (overlaid) at its midpoint value.
         assert!((p["ParamArmL"] - 0.5).abs() < 1e-4, "motion overlaid: {:?}", p.get("ParamArmL"));
         // beat-driven base params still present alongside.
@@ -366,7 +370,18 @@ mod tests {
         let b = binding(r#"{:dance/live2d {:model "m"}}"#);
         let pose = DancePose::rest();
         let phase = BeatPhase { time: 1.234, beat: 2, bar: 0, phrase: 0, beat_frac: 0.3, bar_frac: 0.1 };
-        assert_eq!(b.drive(&pose, &phase), b.drive(&pose, &phase));
+        assert_eq!(b.drive(&pose, &phase, None), b.drive(&pose, &phase, None));
+    }
+
+    #[test]
+    fn voice_drives_live2d_mouth() {
+        // the `:dance/avatar :voice` vowel weight drives the Live2D mouth, not the
+        // beat — parity with the VRM mouth. At beat_frac 0 the beat lipsync is 0,
+        // so a non-zero result proves the voice override.
+        let b = binding(r#"{:dance/live2d {:model "m" :lipsync :ParamMouthOpenY}}"#);
+        let phase = BeatPhase { time: 0.0, beat: 0, bar: 0, phrase: 0, beat_frac: 0.0, bar_frac: 0.0 };
+        let p = b.drive(&DancePose::rest(), &phase, Some(0.8));
+        assert!((p["ParamMouthOpenY"] - 0.8).abs() < 1e-4, "voice vowel weight drives the mouth");
     }
 
     #[test]
@@ -374,7 +389,7 @@ mod tests {
         let b = binding(r#"{:dance/live2d {:model "haru.model3.json" :home [0 0 0]}}"#);
         let driven = b.drive(&DancePose::rest(), &BeatPhase {
             time: 0.0, beat: 0, bar: 0, phrase: 0, beat_frac: 0.0, bar_frac: 0.0,
-        });
+        }, None);
         let entry = b.render_entry(&driven);
         let m = entry.as_map().expect("entry is a map");
         assert_eq!(mget(m, "kind").and_then(|v| v.as_keyword()).map(|k| k.0.name.as_str()), Some("live2d"));
