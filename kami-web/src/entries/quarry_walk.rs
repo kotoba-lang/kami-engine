@@ -8,16 +8,16 @@ use std::rc::Rc;
 
 use glam::{Mat4, Vec3};
 use kami_game::quarry_scene::{
-    build_character_mesh, camera_matrices, character_model_matrix, tick_player,
-    CameraMode, CameraState, InputState, Player, EYE_HEIGHT,
+    CameraMode, CameraState, EYE_HEIGHT, InputState, Player, build_character_mesh, camera_matrices,
+    character_model_matrix, tick_player,
 };
 use kami_render::scene_pipelines::{
-    CharacterPipeline, CharacterUniform, SkyPipeline, SkyUniform,
-    TerrainPipeline, TerrainUniform, VegetationPipeline, VegetationUniform,
+    CharacterPipeline, CharacterUniform, SkyPipeline, SkyUniform, TerrainPipeline, TerrainUniform,
+    VegetationPipeline, VegetationUniform,
 };
 use kami_terrain::BiomePreset;
-use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use wasm_bindgen::prelude::*;
 use wgpu::util::DeviceExt;
 
 const WORLD_EXTENT: f32 = 512.0;
@@ -36,8 +36,7 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
 
     set_hud(&document, "s-loading", "Initializing WebGPU...");
 
-    let (device, queue, surface, mut config, format, _w, _h) =
-        crate::init_gpu(&canvas).await?;
+    let (device, queue, surface, mut config, format, _w, _h) = crate::init_gpu(&canvas).await?;
     let device = Rc::new(device);
     let queue = Rc::new(queue);
 
@@ -45,19 +44,46 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
     set_hud(&document, "s-loading", "Generating terrain...");
     let biome = BiomePreset::Quarry;
     let hm_cfg = biome.heightmap(TERRAIN_SEED);
-    let hm = kami_terrain::Heightmap::generate(513, 513, -WORLD_EXTENT * 0.5, -WORLD_EXTENT * 0.5, &hm_cfg);
+    let hm = kami_terrain::Heightmap::generate(
+        513,
+        513,
+        -WORLD_EXTENT * 0.5,
+        -WORLD_EXTENT * 0.5,
+        &hm_cfg,
+    );
     let st = biome.splat_thresholds();
-    let splat = kami_terrain::Splatmap::from_heightmap(&hm, st.sand_line, st.snow_line, st.rock_slope);
+    let splat =
+        kami_terrain::Splatmap::from_heightmap(&hm, st.sand_line, st.snow_line, st.rock_slope);
     let palette = biome.palette();
     let chunk = kami_terrain::generate_chunk_mesh(
-        &hm, &splat, -WORLD_EXTENT * 0.5, -WORLD_EXTENT * 0.5, 1, 1.0, 0,
+        &hm,
+        &splat,
+        -WORLD_EXTENT * 0.5,
+        -WORLD_EXTENT * 0.5,
+        1,
+        1.0,
+        0,
     );
-    let terrain_verts_flat: Vec<f32> = chunk.vertices.iter().flat_map(|v| [
-        v.position[0], v.position[1], v.position[2],
-        v.normal[0], v.normal[1], v.normal[2],
-        v.uv[0], v.uv[1],
-        v.splat[0], v.splat[1], v.splat[2], v.splat[3],
-    ]).collect();
+    let terrain_verts_flat: Vec<f32> = chunk
+        .vertices
+        .iter()
+        .flat_map(|v| {
+            [
+                v.position[0],
+                v.position[1],
+                v.position[2],
+                v.normal[0],
+                v.normal[1],
+                v.normal[2],
+                v.uv[0],
+                v.uv[1],
+                v.splat[0],
+                v.splat[1],
+                v.splat[2],
+                v.splat[3],
+            ]
+        })
+        .collect();
     let terrain_vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("terrain_vb"),
         contents: bytemuck::cast_slice(&terrain_verts_flat),
@@ -76,11 +102,17 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
     // ── Vegetation cache (reuse global VEG_CACHE via kami_vegetation) ──
     set_hud(&document, "s-loading", "Placing vegetation...");
     let placement_cfg = kami_vegetation::PlacementConfig {
-        seed: 77, extent: WORLD_EXTENT * 0.9, density_scale: 0.7,
+        seed: 77,
+        extent: WORLD_EXTENT * 0.9,
+        density_scale: 0.7,
         species_filter: Vec::new(),
     };
     let instances = kami_vegetation::place_instances(
-        &hm_rc, &splat, -WORLD_EXTENT * 0.5, -WORLD_EXTENT * 0.5, &placement_cfg,
+        &hm_rc,
+        &splat,
+        -WORLD_EXTENT * 0.5,
+        -WORLD_EXTENT * 0.5,
+        &placement_cfg,
     );
     let instance_count_total = instances.len() as u32;
     let instances_rc = Rc::new(instances);
@@ -105,14 +137,19 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
     let mut veg_pl = VegetationPipeline::new(&device, format, VEG_BUDGET);
     // Upload per-species meshes (grass 3-blade / fern / palm / conifer / bush)
     let mesh_lib = kami_vegetation::mesh::species_mesh_library();
-    let meshes_for_gpu: Vec<(u32, Vec<f32>, Vec<u32>)> = mesh_lib.iter()
+    let meshes_for_gpu: Vec<(u32, Vec<f32>, Vec<u32>)> = mesh_lib
+        .iter()
         .map(|(species, m)| (*species as u32, m.vertices.clone(), m.indices.clone()))
         .collect();
     veg_pl.upload_species_meshes(&device, &meshes_for_gpu);
     let char_pl = CharacterPipeline::new(&device, format);
 
     // Depth texture
-    let depth_tex = Rc::new(RefCell::new(create_depth_texture(&device, config.width, config.height)));
+    let depth_tex = Rc::new(RefCell::new(create_depth_texture(
+        &device,
+        config.width,
+        config.height,
+    )));
 
     // ── Player / camera / input (shared state) ──
     let player = Rc::new(RefCell::new({
@@ -122,15 +159,24 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
         for dx in (-100..=100).step_by(10) {
             for dz in (-100..=100).step_by(10) {
                 let h = sample_hm(&hm_rc, dx as f32, dz as f32);
-                if h < best.2 { best = (dx as f32, dz as f32, h); }
+                if h < best.2 {
+                    best = (dx as f32, dz as f32, h);
+                }
             }
         }
-        p.x = best.0; p.z = best.1; p.y = best.2;
+        p.x = best.0;
+        p.z = best.1;
+        p.y = best.2;
         p
     }));
     let input = Rc::new(RefCell::new(InputState::default()));
     let cam_state = Rc::new(RefCell::new(CameraState::default()));
-    let weather = Rc::new(RefCell::new(kami_atmosphere::Weather::overcast()));
+    // Executor edge (ADR-0044/0046): overcast preset from kami-atmosphere-scene's
+    // weather.edn, falling back to the compiled-in Weather::overcast().
+    let weather = Rc::new(RefCell::new(
+        kami_atmosphere_scene::resolve_weather("overcast")
+            .unwrap_or_else(kami_atmosphere::Weather::overcast),
+    ));
 
     // ── Event listeners ──
     attach_input_listeners(&canvas, &input, &cam_state)?;
@@ -178,11 +224,13 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
         // FPS
         {
             let mut fc = fps_c.borrow_mut();
-            fc.0 += 1; fc.1 += dt;
+            fc.0 += 1;
+            fc.1 += dt;
             if fc.1 >= 0.5 {
                 let fps = (fc.0 as f32 / fc.1).round() as u32;
                 set_hud(&document_c, "s-fps", &fps.to_string());
-                fc.0 = 0; fc.1 = 0.0;
+                fc.0 = 0;
+                fc.1 = 0.0;
             }
         }
 
@@ -217,36 +265,56 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
         let mut base_col = [[0.0f32; 4]; 4];
         let mut tip_col = [[0.0f32; 4]; 4];
         for i in 0..4 {
-            base_col[i] = [palette.base[i][0], palette.base[i][1], palette.base[i][2], 0.0];
-            tip_col[i]  = [palette.tip[i][0],  palette.tip[i][1],  palette.tip[i][2],  0.0];
+            base_col[i] = [
+                palette.base[i][0],
+                palette.base[i][1],
+                palette.base[i][2],
+                0.0,
+            ];
+            tip_col[i] = [palette.tip[i][0], palette.tip[i][1], palette.tip[i][2], 0.0];
         }
         let t_u = TerrainUniform {
             view_proj: view_proj.to_cols_array(),
-            cam_pos: eye.to_array(), _p0: 0.0,
-            sun_dir: sky_u.sun_dir, _p1: 0.0,
-            sun_color: sun_col_neutral, fog_density: sky_u.fog_density,
-            fog_color: fog_col, _p2: 0.0,
-            base_col, tip_col,
+            cam_pos: eye.to_array(),
+            _p0: 0.0,
+            sun_dir: sky_u.sun_dir,
+            _p1: 0.0,
+            sun_color: sun_col_neutral,
+            fog_density: sky_u.fog_density,
+            fog_color: fog_col,
+            _p2: 0.0,
+            base_col,
+            tip_col,
         };
         queue_c.write_buffer(&terrain_pl.uniform, 0, bytemuck::bytes_of(&t_u));
 
         let inv_vp = view_proj.inverse();
         let s_u = SkyUniform {
             inv_vp: inv_vp.to_cols_array(),
-            cam_pos: eye.to_array(), _p0: 0.0,
-            sun_dir: sky_u.sun_dir, _p1: 0.0,
-            fog_color: fog_col, overcast: cloud_u.coverage,
-            scroll_x: cloud_u.scroll_x, scroll_z: cloud_u.scroll_z,
-            altitude: cloud_u.altitude, _p2: 0.0,
+            cam_pos: eye.to_array(),
+            _p0: 0.0,
+            sun_dir: sky_u.sun_dir,
+            _p1: 0.0,
+            fog_color: fog_col,
+            overcast: cloud_u.coverage,
+            scroll_x: cloud_u.scroll_x,
+            scroll_z: cloud_u.scroll_z,
+            altitude: cloud_u.altitude,
+            _p2: 0.0,
         };
         queue_c.write_buffer(&sky_pl.uniform, 0, bytemuck::bytes_of(&s_u));
 
         let v_u = VegetationUniform {
             view_proj: view_proj.to_cols_array(),
-            cam_pos: eye.to_array(), time: gt,
-            sun_dir: sky_u.sun_dir, wind_speed: wind_u.speed,
-            fog_color: fog_col, fog_density: sky_u.fog_density,
-            wind_dir: wind_u.direction, gust_mul: wind_u.gust_multiplier, biome_dry: 1.0,
+            cam_pos: eye.to_array(),
+            time: gt,
+            sun_dir: sky_u.sun_dir,
+            wind_speed: wind_u.speed,
+            fog_color: fog_col,
+            fog_density: sky_u.fog_density,
+            wind_dir: wind_u.direction,
+            gust_mul: wind_u.gust_multiplier,
+            biome_dry: 1.0,
         };
         queue_c.write_buffer(&veg_pl.uniform, 0, bytemuck::bytes_of(&v_u));
 
@@ -254,23 +322,28 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
         let c_u = CharacterUniform {
             view_proj: view_proj.to_cols_array(),
             model: model.to_cols_array(),
-            cam_pos: eye.to_array(), _p0: 0.0,
-            sun_dir: sky_u.sun_dir, _p1: 0.0,
-            sun_color: sun_col_neutral, fog_density: sky_u.fog_density,
-            fog_color: fog_col, _p2: 0.0,
+            cam_pos: eye.to_array(),
+            _p0: 0.0,
+            sun_dir: sky_u.sun_dir,
+            _p1: 0.0,
+            sun_color: sun_col_neutral,
+            fog_density: sky_u.fog_density,
+            fog_color: fog_col,
+            _p2: 0.0,
         };
         queue_c.write_buffer(&char_pl.uniform, 0, bytemuck::bytes_of(&c_u));
 
         // Vegetation cull → partition by species (5 contiguous ranges in instance buffer)
-        let visible = kami_vegetation::cull_to_buffer(
-            &instances_c, eye.x, eye.z, VEG_BUDGET as usize,
-        );
+        let visible =
+            kami_vegetation::cull_to_buffer(&instances_c, eye.x, eye.z, VEG_BUDGET as usize);
         let render_count = (visible.len() / 8) as u32;
         // Re-sort by (species, original distance order preserved within species)
         let mut by_species: [Vec<f32>; 5] = Default::default();
         for chunk in visible.chunks_exact(8) {
             let sp = chunk[5] as u32 as usize;
-            if sp < 5 { by_species[sp].extend_from_slice(chunk); }
+            if sp < 5 {
+                by_species[sp].extend_from_slice(chunk);
+            }
         }
         // Pack contiguously + remember per-species ranges
         let mut packed: Vec<f32> = Vec::with_capacity(visible.len());
@@ -292,8 +365,20 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
             set_hud(&document_c, "s-h", &format!("{:.1}", p.y));
             set_hud(&document_c, "s-speed", &format!("{:.1} m/s", p.move_speed));
             let cm = cam_c.borrow();
-            set_hud(&document_c, "s-view", if cm.mode == CameraMode::FirstPerson { "FP" } else { "3P" });
-            set_hud(&document_c, "s-plants", &format!("{}/{}", render_count, instance_count_total));
+            set_hud(
+                &document_c,
+                "s-view",
+                if cm.mode == CameraMode::FirstPerson {
+                    "FP"
+                } else {
+                    "3P"
+                },
+            );
+            set_hud(
+                &document_c,
+                "s-plants",
+                &format!("{}/{}", render_count, instance_count_total),
+            );
         }
 
         // ── Render ──
@@ -307,10 +392,16 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
                 return;
             }
         };
-        let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
-        let depth_view = depth_c.borrow().create_view(&wgpu::TextureViewDescriptor::default());
+        let view = frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
+        let depth_view = depth_c
+            .borrow()
+            .create_view(&wgpu::TextureViewDescriptor::default());
 
-        let mut enc = device_c.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: Some("quarry_enc") });
+        let mut enc = device_c.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+            label: Some("quarry_enc"),
+        });
         {
             let mut pass = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("quarry_pass"),
@@ -318,7 +409,12 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
                     view: &view,
                     resolve_target: None,
                     ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0 }),
+                        load: wgpu::LoadOp::Clear(wgpu::Color {
+                            r: 0.0,
+                            g: 0.0,
+                            b: 0.0,
+                            a: 1.0,
+                        }),
                         store: wgpu::StoreOp::Store,
                     },
                 })],
@@ -330,7 +426,8 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
                     }),
                     stencil_ops: None,
                 }),
-                timestamp_writes: None, occlusion_query_set: None,
+                timestamp_writes: None,
+                occlusion_query_set: None,
             });
 
             // Sky
@@ -351,8 +448,12 @@ pub async fn run_with_quarry_walk(canvas_id: &str) -> Result<(), JsValue> {
                 pass.set_bind_group(0, &veg_pl.bind_group, &[]);
                 pass.set_vertex_buffer(1, veg_pl.instance_vb.slice(..));
                 for (sp_id, (start, count)) in species_ranges.iter().enumerate() {
-                    if *count == 0 { continue; }
-                    let Some(mesh) = veg_pl.species_meshes.get(sp_id) else { continue; };
+                    if *count == 0 {
+                        continue;
+                    }
+                    let Some(mesh) = veg_pl.species_meshes.get(sp_id) else {
+                        continue;
+                    };
                     pass.set_vertex_buffer(0, mesh.vb.slice(..));
                     pass.set_index_buffer(mesh.ib.slice(..), wgpu::IndexFormat::Uint32);
                     pass.draw_indexed(0..mesh.index_count, 0, *start..(*start + *count));
@@ -399,8 +500,14 @@ fn sample_hm(hm: &kami_terrain::Heightmap, x: f32, z: f32) -> f32 {
 fn create_depth_texture(device: &wgpu::Device, width: u32, height: u32) -> wgpu::Texture {
     device.create_texture(&wgpu::TextureDescriptor {
         label: Some("depth"),
-        size: wgpu::Extent3d { width, height, depth_or_array_layers: 1 },
-        mip_level_count: 1, sample_count: 1, dimension: wgpu::TextureDimension::D2,
+        size: wgpu::Extent3d {
+            width,
+            height,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
         format: wgpu::TextureFormat::Depth24Plus,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
         view_formats: &[],
@@ -426,18 +533,25 @@ fn attach_input_listeners(
 ) -> Result<(), JsValue> {
     let window = web_sys::window().ok_or("no window")?;
     // Keydown
-    let input_kd = input.clone(); let cam_kd = cam.clone();
+    let input_kd = input.clone();
+    let cam_kd = cam.clone();
     let kd = Closure::<dyn FnMut(_)>::new(move |e: web_sys::KeyboardEvent| {
         let k = e.key().to_lowercase();
         let mut i = input_kd.borrow_mut();
         match k.as_str() {
-            "w" => i.forward = true, "s" => i.back = true,
-            "a" => i.left = true,    "d" => i.right = true,
+            "w" => i.forward = true,
+            "s" => i.back = true,
+            "a" => i.left = true,
+            "d" => i.right = true,
             "shift" => i.sprint = true,
             " " => i.jump_pressed = true,
             "f" => {
                 let mut c = cam_kd.borrow_mut();
-                c.mode = if c.mode == CameraMode::FirstPerson { CameraMode::ThirdPerson } else { CameraMode::FirstPerson };
+                c.mode = if c.mode == CameraMode::FirstPerson {
+                    CameraMode::ThirdPerson
+                } else {
+                    CameraMode::FirstPerson
+                };
             }
             _ => {}
         }
@@ -451,8 +565,10 @@ fn attach_input_listeners(
         let k = e.key().to_lowercase();
         let mut i = input_ku.borrow_mut();
         match k.as_str() {
-            "w" => i.forward = false, "s" => i.back = false,
-            "a" => i.left = false,    "d" => i.right = false,
+            "w" => i.forward = false,
+            "s" => i.back = false,
+            "a" => i.left = false,
+            "d" => i.right = false,
             "shift" => i.sprint = false,
             _ => {}
         }
@@ -466,7 +582,11 @@ fn attach_input_listeners(
     let doc_mm = doc.clone();
     let canvas_ptr = canvas.clone();
     let mm = Closure::<dyn FnMut(_)>::new(move |e: web_sys::MouseEvent| {
-        if doc_mm.pointer_lock_element().map(|el| el == *canvas_ptr.as_ref()).unwrap_or(false) {
+        if doc_mm
+            .pointer_lock_element()
+            .map(|el| el == *canvas_ptr.as_ref())
+            .unwrap_or(false)
+        {
             let mut i = input_mm.borrow_mut();
             i.mouse_dx += e.movement_x() as f32;
             i.mouse_dy += e.movement_y() as f32;

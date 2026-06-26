@@ -24,6 +24,8 @@ kami-ui-gpu = { path = "../kami-ui-gpu" }
 kami-text = { path = "../kami-text" }
 kami-terrain = { path = "../kami-terrain" }
 kami-atmosphere = { path = "../kami-atmosphere" }
+# Executor edge (ADR-0044/0046): weather presets load from weather.edn, builtin fallback.
+kami-atmosphere-scene = { path = "../kami-atmosphere-scene" }
 kami-vegetation = { path = "../kami-vegetation" }
 glam = { workspace = true }
 bytemuck = { workspace = true }

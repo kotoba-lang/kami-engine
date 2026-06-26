@@ -27,7 +27,7 @@ use glam::Vec3;
 use kami_character::params::CharacterDef;
 use kami_game::scene::{IslandScene, MeshRef};
 use kami_game::terrain::HeightmapTerrain;
-use kami_game::voxel::{BlockType, VoxelChunk, VoxelWorld, CHUNK_SIZE};
+use kami_game::voxel::{BlockType, CHUNK_SIZE, VoxelChunk, VoxelWorld};
 use kami_game::voxel_mesh;
 use kami_render::camera::{Camera, CameraUniform, LightUniform, MaterialUniform};
 use kami_render::mesh;
@@ -132,7 +132,7 @@ struct InputState {
 /// Set up keyboard and mouse listeners on the canvas.
 fn setup_input(canvas: &web_sys::HtmlCanvasElement) -> Rc<RefCell<InputState>> {
     let input = Rc::new(RefCell::new(InputState {
-        pitch: -0.25, // look slightly down on spawn to see terrain
+        pitch: -0.25,      // look slightly down on spawn to see terrain
         selected_block: 3, // default placement: Stone
         ..Default::default()
     }));
@@ -213,8 +213,8 @@ fn setup_input(canvas: &web_sys::HtmlCanvasElement) -> Rc<RefCell<InputState>> {
 
     // Mine (left click) — fires only while pointer is locked.
     let input_mine = input.clone();
-    let mousedown = Closure::<dyn FnMut(web_sys::MouseEvent)>::new(
-        move |e: web_sys::MouseEvent| {
+    let mousedown =
+        Closure::<dyn FnMut(web_sys::MouseEvent)>::new(move |e: web_sys::MouseEvent| {
             let mut s = input_mine.borrow_mut();
             if s.pointer_locked {
                 match e.button() {
@@ -223,18 +223,16 @@ fn setup_input(canvas: &web_sys::HtmlCanvasElement) -> Rc<RefCell<InputState>> {
                     _ => {}
                 }
             }
-        },
-    );
+        });
     doc.add_event_listener_with_callback("mousedown", mousedown.as_ref().unchecked_ref())
         .ok();
     mousedown.forget();
 
     // Prevent context menu on right-click so place works.
-    let contextmenu = Closure::<dyn FnMut(web_sys::MouseEvent)>::new(
-        move |e: web_sys::MouseEvent| {
+    let contextmenu =
+        Closure::<dyn FnMut(web_sys::MouseEvent)>::new(move |e: web_sys::MouseEvent| {
             e.prevent_default();
-        },
-    );
+        });
     canvas
         .add_event_listener_with_callback("contextmenu", contextmenu.as_ref().unchecked_ref())
         .ok();
@@ -699,16 +697,25 @@ fn build_scene_batches(
                     // Material color from preset
                     let color = match part.material_preset.as_str() {
                         "skin" => {
-                            let tone = part.material_params.get("tone")
-                                .and_then(|v| v.as_f64()).unwrap_or(0.8) as f32;
+                            let tone = part
+                                .material_params
+                                .get("tone")
+                                .and_then(|v| v.as_f64())
+                                .unwrap_or(0.8) as f32;
                             let base = 0.4 + tone * 0.5;
                             [base, base * 0.82, base * 0.72, 1.0]
                         }
                         "hair" => {
-                            let lightness = part.material_params.get("lightness")
-                                .and_then(|v| v.as_f64()).unwrap_or(0.5) as f32;
-                            let hue = part.material_params.get("hue")
-                                .and_then(|v| v.as_f64()).unwrap_or(0.1) as f32;
+                            let lightness = part
+                                .material_params
+                                .get("lightness")
+                                .and_then(|v| v.as_f64())
+                                .unwrap_or(0.5) as f32;
+                            let hue = part
+                                .material_params
+                                .get("hue")
+                                .and_then(|v| v.as_f64())
+                                .unwrap_or(0.1) as f32;
                             // Simplified HSL → RGB for blonde/brown
                             let r = (lightness * 0.9 + hue * 0.3).min(1.0);
                             let g = (lightness * 0.75 + hue * 0.1).min(1.0);
@@ -716,17 +723,24 @@ fn build_scene_batches(
                             [r, g, b_val, 1.0]
                         }
                         "eye" => {
-                            if let Some(ic) = part.material_params.get("iris_color").and_then(|v| v.as_array()) {
+                            if let Some(ic) = part
+                                .material_params
+                                .get("iris_color")
+                                .and_then(|v| v.as_array())
+                            {
                                 let r = ic.first().and_then(|v| v.as_f64()).unwrap_or(0.3) as f32;
                                 let g = ic.get(1).and_then(|v| v.as_f64()).unwrap_or(0.5) as f32;
-                                let b_val = ic.get(2).and_then(|v| v.as_f64()).unwrap_or(0.8) as f32;
+                                let b_val =
+                                    ic.get(2).and_then(|v| v.as_f64()).unwrap_or(0.8) as f32;
                                 [r, g, b_val, 1.0]
                             } else {
                                 [0.3, 0.5, 0.8, 1.0]
                             }
                         }
                         "lip" => {
-                            if let Some(c) = part.material_params.get("color").and_then(|v| v.as_array()) {
+                            if let Some(c) =
+                                part.material_params.get("color").and_then(|v| v.as_array())
+                            {
                                 let r = c.first().and_then(|v| v.as_f64()).unwrap_or(0.8) as f32;
                                 let g = c.get(1).and_then(|v| v.as_f64()).unwrap_or(0.4) as f32;
                                 let b_val = c.get(2).and_then(|v| v.as_f64()).unwrap_or(0.4) as f32;
@@ -736,7 +750,9 @@ fn build_scene_batches(
                             }
                         }
                         "fabric" => {
-                            if let Some(c) = part.material_params.get("color").and_then(|v| v.as_array()) {
+                            if let Some(c) =
+                                part.material_params.get("color").and_then(|v| v.as_array())
+                            {
                                 let r = c.first().and_then(|v| v.as_f64()).unwrap_or(0.9) as f32;
                                 let g = c.get(1).and_then(|v| v.as_f64()).unwrap_or(0.9) as f32;
                                 let b_val = c.get(2).and_then(|v| v.as_f64()).unwrap_or(0.9) as f32;
@@ -799,45 +815,75 @@ fn build_scene_batches(
                 let key = format!("sdf_char:{}:{}", body_parts.len(), entity.id);
 
                 // Use first body part's color as MaterialUniform albedo
-                let first_color = body_parts.first()
-                    .map(|p| {
-                        match p.material_preset.as_str() {
-                            "skin" => {
-                                let tone = p.material_params.get("tone").and_then(|v| v.as_f64()).unwrap_or(0.8) as f32;
-                                let base = 0.4 + tone * 0.5;
-                                [base, base * 0.82, base * 0.72, 1.0]
-                            }
-                            "hair" => {
-                                let l = p.material_params.get("lightness").and_then(|v| v.as_f64()).unwrap_or(0.5) as f32;
-                                let h = p.material_params.get("hue").and_then(|v| v.as_f64()).unwrap_or(0.1) as f32;
-                                [(l * 0.9 + h * 0.3).min(1.0), (l * 0.75 + h * 0.1).min(1.0), (l * 0.5).min(1.0), 1.0]
-                            }
-                            "fabric" => {
-                                if let Some(c) = p.material_params.get("color").and_then(|v| v.as_array()) {
-                                    let r = c.first().and_then(|v| v.as_f64()).unwrap_or(0.9) as f32;
-                                    let g = c.get(1).and_then(|v| v.as_f64()).unwrap_or(0.9) as f32;
-                                    let b = c.get(2).and_then(|v| v.as_f64()).unwrap_or(0.9) as f32;
-                                    [r, g, b, 1.0]
-                                } else { [0.9, 0.9, 0.9, 1.0] }
-                            }
-                            "eye" => {
-                                if let Some(ic) = p.material_params.get("iris_color").and_then(|v| v.as_array()) {
-                                    let r = ic.first().and_then(|v| v.as_f64()).unwrap_or(0.3) as f32;
-                                    let g = ic.get(1).and_then(|v| v.as_f64()).unwrap_or(0.5) as f32;
-                                    let b = ic.get(2).and_then(|v| v.as_f64()).unwrap_or(0.8) as f32;
-                                    [r, g, b, 1.0]
-                                } else { [0.3, 0.5, 0.8, 1.0] }
-                            }
-                            "lip" => {
-                                if let Some(c) = p.material_params.get("color").and_then(|v| v.as_array()) {
-                                    let r = c.first().and_then(|v| v.as_f64()).unwrap_or(0.8) as f32;
-                                    let g = c.get(1).and_then(|v| v.as_f64()).unwrap_or(0.4) as f32;
-                                    let b = c.get(2).and_then(|v| v.as_f64()).unwrap_or(0.4) as f32;
-                                    [r, g, b, 1.0]
-                                } else { [0.8, 0.4, 0.4, 1.0] }
-                            }
-                            _ => [0.7, 0.7, 0.7, 1.0],
+                let first_color = body_parts
+                    .first()
+                    .map(|p| match p.material_preset.as_str() {
+                        "skin" => {
+                            let tone = p
+                                .material_params
+                                .get("tone")
+                                .and_then(|v| v.as_f64())
+                                .unwrap_or(0.8) as f32;
+                            let base = 0.4 + tone * 0.5;
+                            [base, base * 0.82, base * 0.72, 1.0]
                         }
+                        "hair" => {
+                            let l = p
+                                .material_params
+                                .get("lightness")
+                                .and_then(|v| v.as_f64())
+                                .unwrap_or(0.5) as f32;
+                            let h = p
+                                .material_params
+                                .get("hue")
+                                .and_then(|v| v.as_f64())
+                                .unwrap_or(0.1) as f32;
+                            [
+                                (l * 0.9 + h * 0.3).min(1.0),
+                                (l * 0.75 + h * 0.1).min(1.0),
+                                (l * 0.5).min(1.0),
+                                1.0,
+                            ]
+                        }
+                        "fabric" => {
+                            if let Some(c) =
+                                p.material_params.get("color").and_then(|v| v.as_array())
+                            {
+                                let r = c.first().and_then(|v| v.as_f64()).unwrap_or(0.9) as f32;
+                                let g = c.get(1).and_then(|v| v.as_f64()).unwrap_or(0.9) as f32;
+                                let b = c.get(2).and_then(|v| v.as_f64()).unwrap_or(0.9) as f32;
+                                [r, g, b, 1.0]
+                            } else {
+                                [0.9, 0.9, 0.9, 1.0]
+                            }
+                        }
+                        "eye" => {
+                            if let Some(ic) = p
+                                .material_params
+                                .get("iris_color")
+                                .and_then(|v| v.as_array())
+                            {
+                                let r = ic.first().and_then(|v| v.as_f64()).unwrap_or(0.3) as f32;
+                                let g = ic.get(1).and_then(|v| v.as_f64()).unwrap_or(0.5) as f32;
+                                let b = ic.get(2).and_then(|v| v.as_f64()).unwrap_or(0.8) as f32;
+                                [r, g, b, 1.0]
+                            } else {
+                                [0.3, 0.5, 0.8, 1.0]
+                            }
+                        }
+                        "lip" => {
+                            if let Some(c) =
+                                p.material_params.get("color").and_then(|v| v.as_array())
+                            {
+                                let r = c.first().and_then(|v| v.as_f64()).unwrap_or(0.8) as f32;
+                                let g = c.get(1).and_then(|v| v.as_f64()).unwrap_or(0.4) as f32;
+                                let b = c.get(2).and_then(|v| v.as_f64()).unwrap_or(0.4) as f32;
+                                [r, g, b, 1.0]
+                            } else {
+                                [0.8, 0.4, 0.4, 1.0]
+                            }
+                        }
+                        _ => [0.7, 0.7, 0.7, 1.0],
                     })
                     .unwrap_or([0.7, 0.7, 0.7, 1.0]);
                 let roughness = match body_parts.first().map(|p| p.material_preset.as_str()) {
@@ -869,7 +915,12 @@ fn build_scene_batches(
                 // GLB/VRM loading from CDN — fallback to sphere for now
                 let (pos, norm, uv, idx) = mesh::sphere(16, 32);
                 let v = mesh::interleave(&pos, &norm, &uv);
-                ("char_model:fallback".into(), v, idx, MaterialUniform::default())
+                (
+                    "char_model:fallback".into(),
+                    v,
+                    idx,
+                    MaterialUniform::default(),
+                )
             }
             _ => {
                 let (pos, norm, uv, idx) = mesh::cube();
@@ -1105,7 +1156,9 @@ pub async fn run_embed(canvas_id: &str, scene_json: &str) -> Result<(), JsValue>
 
     // Compute model center from entity positions (weighted toward character, not floor/backdrop)
     let center_y = {
-        let char_entities: Vec<_> = scene.entities.iter()
+        let char_entities: Vec<_> = scene
+            .entities
+            .iter()
             .filter(|e| e.position[1] > 0.1) // skip floor/ground entities
             .collect();
         if char_entities.is_empty() {
@@ -1165,7 +1218,7 @@ pub async fn run_embed(canvas_id: &str, scene_json: &str) -> Result<(), JsValue>
         // Slow orbit + subtle breathing motion (camera pitch oscillation)
         let orbit_dist = if scene_entity_count > 4 { 2.5 } else { 12.0 };
         let breath = (*t * 1.2).sin() * 0.008; // gentle vertical sway
-        let sway = (*t * 0.7).sin() * 0.003;   // subtle horizontal sway
+        let sway = (*t * 0.7).sin() * 0.003; // subtle horizontal sway
         camera.orbit(*t * 0.12 + sway, 0.25 + breath, orbit_dist);
         queue.write_buffer(&camera_buffer, 0, bytemuck::bytes_of(&camera.uniform()));
         render_frame_batches(
@@ -1245,15 +1298,22 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
         camera.target = Vec3::new(cam_pos.x, cam_pos.y, 0.0);
     }
 
-    let (camera_light_layout_res, material_layout, shadow_layout_res, camera_light_bg, shadow_bg, depth_view, pbr_pipeline) =
-        create_render_resources(
-            &device,
-            format,
-            &camera_buffer,
-            &light_buffer,
-            width,
-            height,
-        );
+    let (
+        camera_light_layout_res,
+        material_layout,
+        shadow_layout_res,
+        camera_light_bg,
+        shadow_bg,
+        depth_view,
+        pbr_pipeline,
+    ) = create_render_resources(
+        &device,
+        format,
+        &camera_buffer,
+        &light_buffer,
+        width,
+        height,
+    );
     let pbr_color_pipeline = pipeline::create_pbr_color_pipeline(
         &device,
         format,
@@ -1315,7 +1375,8 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
         mr: texture::default_mr_texture(&device, &queue),
     };
     let mut voxel_batches: Vec<DrawBatch> = Vec::new();
-    let mut initial_lod_map: std::collections::HashMap<[i32; 3], u32> = std::collections::HashMap::new();
+    let mut initial_lod_map: std::collections::HashMap<[i32; 3], u32> =
+        std::collections::HashMap::new();
     {
         let cs = CHUNK_SIZE as i32;
         let cam_pos = spawn_pos + Vec3::new(0.0, 2.0, 0.0);
@@ -1395,9 +1456,7 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
                     },
                     wgpu::BindGroupEntry {
                         binding: 2,
-                        resource: wgpu::BindingResource::Sampler(
-                            &fallback_for_voxel.white.sampler,
-                        ),
+                        resource: wgpu::BindingResource::Sampler(&fallback_for_voxel.white.sampler),
                     },
                     wgpu::BindGroupEntry {
                         binding: 3,
@@ -1413,15 +1472,11 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
                     },
                     wgpu::BindGroupEntry {
                         binding: 5,
-                        resource: wgpu::BindingResource::TextureView(
-                            &fallback_for_voxel.mr.view,
-                        ),
+                        resource: wgpu::BindingResource::TextureView(&fallback_for_voxel.mr.view),
                     },
                     wgpu::BindGroupEntry {
                         binding: 6,
-                        resource: wgpu::BindingResource::Sampler(
-                            &fallback_for_voxel.mr.sampler,
-                        ),
+                        resource: wgpu::BindingResource::Sampler(&fallback_for_voxel.mr.sampler),
                     },
                 ],
             });
@@ -1464,12 +1519,7 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
                 obj.into()
             }
         });
-        js_sys::Reflect::set(
-            &window,
-            &"__kami_target_block".into(),
-            getter.as_ref(),
-        )
-        .ok();
+        js_sys::Reflect::set(&window, &"__kami_target_block".into(), getter.as_ref()).ok();
         getter.forget();
     }
 
@@ -1544,10 +1594,18 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
 
             // Horizontal movement intent.
             let mut move_dir = Vec3::ZERO;
-            if s.forward { move_dir += forward; }
-            if s.backward { move_dir -= forward; }
-            if s.right { move_dir += right_dir; }
-            if s.left { move_dir -= right_dir; }
+            if s.forward {
+                move_dir += forward;
+            }
+            if s.backward {
+                move_dir -= forward;
+            }
+            if s.right {
+                move_dir += right_dir;
+            }
+            if s.left {
+                move_dir -= right_dir;
+            }
             if move_dir.length_squared() > 0.001 {
                 move_dir = move_dir.normalize() * MOVE_SPEED;
             }
@@ -1575,31 +1633,40 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
 
             // Resolve X axis.
             let new_x = camera.position.x + move_dir.x;
-            let x_blocked =
-                is_solid(new_x + PLAYER_RADIUS, feet_y + 0.1, camera.position.z) ||
-                is_solid(new_x - PLAYER_RADIUS, feet_y + 0.1, camera.position.z) ||
-                is_solid(new_x + PLAYER_RADIUS, feet_y + 1.0, camera.position.z) ||
-                is_solid(new_x - PLAYER_RADIUS, feet_y + 1.0, camera.position.z);
-            if !x_blocked { camera.position.x = new_x; }
+            let x_blocked = is_solid(new_x + PLAYER_RADIUS, feet_y + 0.1, camera.position.z)
+                || is_solid(new_x - PLAYER_RADIUS, feet_y + 0.1, camera.position.z)
+                || is_solid(new_x + PLAYER_RADIUS, feet_y + 1.0, camera.position.z)
+                || is_solid(new_x - PLAYER_RADIUS, feet_y + 1.0, camera.position.z);
+            if !x_blocked {
+                camera.position.x = new_x;
+            }
 
             // Resolve Z axis.
             let new_z = camera.position.z + move_dir.z;
-            let z_blocked =
-                is_solid(camera.position.x, feet_y + 0.1, new_z + PLAYER_RADIUS) ||
-                is_solid(camera.position.x, feet_y + 0.1, new_z - PLAYER_RADIUS) ||
-                is_solid(camera.position.x, feet_y + 1.0, new_z + PLAYER_RADIUS) ||
-                is_solid(camera.position.x, feet_y + 1.0, new_z - PLAYER_RADIUS);
-            if !z_blocked { camera.position.z = new_z; }
+            let z_blocked = is_solid(camera.position.x, feet_y + 0.1, new_z + PLAYER_RADIUS)
+                || is_solid(camera.position.x, feet_y + 0.1, new_z - PLAYER_RADIUS)
+                || is_solid(camera.position.x, feet_y + 1.0, new_z + PLAYER_RADIUS)
+                || is_solid(camera.position.x, feet_y + 1.0, new_z - PLAYER_RADIUS);
+            if !z_blocked {
+                camera.position.z = new_z;
+            }
 
             // Resolve Y axis (gravity + jump).
             let new_y = camera.position.y + player_vel_y;
             let new_feet = new_y - PLAYER_HEIGHT;
             if player_vel_y <= 0.0 {
                 // Falling: check block below feet.
-                let ground_solid =
-                    is_solid(camera.position.x, new_feet, camera.position.z) ||
-                    is_solid(camera.position.x + PLAYER_RADIUS * 0.5, new_feet, camera.position.z) ||
-                    is_solid(camera.position.x - PLAYER_RADIUS * 0.5, new_feet, camera.position.z);
+                let ground_solid = is_solid(camera.position.x, new_feet, camera.position.z)
+                    || is_solid(
+                        camera.position.x + PLAYER_RADIUS * 0.5,
+                        new_feet,
+                        camera.position.z,
+                    )
+                    || is_solid(
+                        camera.position.x - PLAYER_RADIUS * 0.5,
+                        new_feet,
+                        camera.position.z,
+                    );
                 if ground_solid {
                     // Snap to top of block.
                     let block_top = new_feet.floor() + 1.0;
@@ -1634,11 +1701,12 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
             drop(vw_phys);
 
             // Update camera look direction.
-            camera.target = camera.position + Vec3::new(
-                yaw.sin() * pitch.cos(),
-                pitch.sin(),
-                -yaw.cos() * pitch.cos(),
-            );
+            camera.target = camera.position
+                + Vec3::new(
+                    yaw.sin() * pitch.cos(),
+                    pitch.sin(),
+                    -yaw.cos() * pitch.cos(),
+                );
 
             // DDA voxel raycast from camera position along look direction.
             let ray_origin = camera.position;
@@ -1670,12 +1738,18 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
             // Handle mine/place actions with cooldown.
             let do_mine = s.mine;
             let do_place = s.place;
-            let sel_block = if s.selected_block == 0 { 3u8 } else { s.selected_block };
+            let sel_block = if s.selected_block == 0 {
+                3u8
+            } else {
+                s.selected_block
+            };
             s.mine = false;
             s.place = false;
             drop(s);
 
-            if interact_cooldown > 0 { interact_cooldown -= 1; }
+            if interact_cooldown > 0 {
+                interact_cooldown -= 1;
+            }
 
             if let Some((hx, hy, hz, nx, ny, nz)) = hit {
                 let cs = CHUNK_SIZE as i32;
@@ -1686,13 +1760,7 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
                     let cx = hx.div_euclid(cs);
                     let cy = hy.div_euclid(cs);
                     let cz = hz.div_euclid(cs);
-                    remesh_chunk(
-                        &vw,
-                        [cx, cy, cz],
-                        &queue,
-                        &vb_loop,
-                        &vbm_loop,
-                    );
+                    remesh_chunk(&vw, [cx, cy, cz], &queue, &vb_loop, &vbm_loop);
                 }
                 if do_place && interact_cooldown == 0 {
                     let px = hx + nx;
@@ -1700,10 +1768,10 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
                     let pz = hz + nz;
                     // Prevent placing block inside the player (check player AABB).
                     let feet_y = camera.position.y - PLAYER_HEIGHT;
-                    let player_collides =
-                        (px as f32 - camera.position.x).abs() < 1.0 &&
-                        (pz as f32 - camera.position.z).abs() < 1.0 &&
-                        (py as f32) >= feet_y - 0.5 && (py as f32) <= camera.position.y + 0.5;
+                    let player_collides = (px as f32 - camera.position.x).abs() < 1.0
+                        && (pz as f32 - camera.position.z).abs() < 1.0
+                        && (py as f32) >= feet_y - 0.5
+                        && (py as f32) <= camera.position.y + 0.5;
                     if !player_collides {
                         interact_cooldown = 6;
                         let mut vw = vw_loop.borrow_mut();
@@ -1711,20 +1779,15 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
                         let cx = px.div_euclid(cs);
                         let cy = py.div_euclid(cs);
                         let cz = pz.div_euclid(cs);
-                        remesh_chunk(
-                            &vw,
-                            [cx, cy, cz],
-                            &queue,
-                            &vb_loop,
-                            &vbm_loop,
-                        );
+                        remesh_chunk(&vw, [cx, cy, cz], &queue, &vb_loop, &vbm_loop);
                     }
                 }
             }
         }
         // LOD update: every 10 frames, check chunk distances and remesh if LOD changed.
         lod_frame_counter += 1;
-        if false && lod_frame_counter % 30 == 0 { // LOD disabled — chunk boundary artifacts
+        if false && lod_frame_counter % 30 == 0 {
+            // LOD disabled — chunk boundary artifacts
             let cam = camera.position;
             let cs = CHUNK_SIZE as f32;
             let vw = vw_loop.borrow();
@@ -1740,13 +1803,21 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
                 let cur = voxel_lod_map.get(&key).copied().unwrap_or(255);
                 // Hysteresis: 20% margin to prevent rapid LOD switching at boundaries.
                 let hyst = if cur == 255 { 0.0 } else { 6.0 };
-                let new_lod = if cur <= 0 && dist < LOD0_DIST + hyst { 0 }
-                    else if dist < LOD0_DIST { 0 }
-                    else if cur <= 1 && dist < LOD1_DIST + hyst { 1 }
-                    else if dist < LOD1_DIST { 1 }
-                    else if cur <= 2 && dist < LOD2_DIST + hyst { 2 }
-                    else if dist < LOD2_DIST { 2 }
-                    else { 3 };
+                let new_lod = if cur <= 0 && dist < LOD0_DIST + hyst {
+                    0
+                } else if dist < LOD0_DIST {
+                    0
+                } else if cur <= 1 && dist < LOD1_DIST + hyst {
+                    1
+                } else if dist < LOD1_DIST {
+                    1
+                } else if cur <= 2 && dist < LOD2_DIST + hyst {
+                    2
+                } else if dist < LOD2_DIST {
+                    2
+                } else {
+                    3
+                };
                 if new_lod != cur {
                     let vw = vw_loop.borrow();
                     remesh_chunk_lod(&vw, key, new_lod, &queue, &vb_loop, &vbm_loop);
@@ -1760,7 +1831,9 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
 
         // Advance day/night cycle.
         world_time += 1.0 / DAY_CYCLE_FRAMES;
-        if world_time >= 1.0 { world_time -= 1.0; }
+        if world_time >= 1.0 {
+            world_time -= 1.0;
+        }
 
         // Compute sky color from world_time (0=midnight → 0.5=noon → 1.0=midnight).
         let sky_color = {
@@ -1799,24 +1872,46 @@ pub async fn run_with_scene(canvas_id: &str, scene_json: &str) -> Result<(), JsV
         {
             let window = web_sys::window().unwrap();
             let state = js_sys::Object::new();
-            let phase = if world_time < 0.2 || world_time >= 0.85 { "NIGHT" }
-                else if world_time < 0.35 { "DAWN" }
-                else if world_time < 0.65 { "DAY" }
-                else { "DUSK" };
+            let phase = if world_time < 0.2 || world_time >= 0.85 {
+                "NIGHT"
+            } else if world_time < 0.35 {
+                "DAWN"
+            } else if world_time < 0.65 {
+                "DAY"
+            } else {
+                "DUSK"
+            };
             js_sys::Reflect::set(&state, &"timePhase".into(), &JsValue::from_str(phase)).ok();
-            js_sys::Reflect::set(&state, &"worldTime".into(), &JsValue::from_f64(world_time as f64)).ok();
+            js_sys::Reflect::set(
+                &state,
+                &"worldTime".into(),
+                &JsValue::from_f64(world_time as f64),
+            )
+            .ok();
             let pos = js_sys::Array::new();
             pos.push(&JsValue::from_f64(camera.position.x as f64));
             pos.push(&JsValue::from_f64(camera.position.y as f64));
             pos.push(&JsValue::from_f64(camera.position.z as f64));
             js_sys::Reflect::set(&state, &"position".into(), &pos).ok();
-            js_sys::Reflect::set(&state, &"velY".into(), &JsValue::from_f64(player_vel_y as f64)).ok();
-            js_sys::Reflect::set(&state, &"onGround".into(), &JsValue::from_bool(player_on_ground)).ok();
+            js_sys::Reflect::set(
+                &state,
+                &"velY".into(),
+                &JsValue::from_f64(player_vel_y as f64),
+            )
+            .ok();
+            js_sys::Reflect::set(
+                &state,
+                &"onGround".into(),
+                &JsValue::from_bool(player_on_ground),
+            )
+            .ok();
 
             // LOD distribution counts.
             let mut lod_counts = [0u32; 4];
             for &lod in voxel_lod_map.values() {
-                if (lod as usize) < 4 { lod_counts[lod as usize] += 1; }
+                if (lod as usize) < 4 {
+                    lod_counts[lod as usize] += 1;
+                }
             }
             js_sys::Reflect::set(&state, &"lod0".into(), &JsValue::from(lod_counts[0])).ok();
             js_sys::Reflect::set(&state, &"lod1".into(), &JsValue::from(lod_counts[1])).ok();
@@ -4944,11 +5039,7 @@ fn remesh_chunk(
             let mut vb = voxel_batches.borrow_mut();
             if let Some(batch) = vb.get_mut(batch_idx) {
                 queue.write_buffer(&batch.vertex_buffer, 0, bytemuck::cast_slice(&vm.vertices));
-                queue.write_buffer(
-                    &batch.index_buffer,
-                    0,
-                    bytemuck::cast_slice(&vm.indices),
-                );
+                queue.write_buffer(&batch.index_buffer, 0, bytemuck::cast_slice(&vm.indices));
                 batch.index_count = vm.index_count;
             }
         }
@@ -4961,38 +5052,40 @@ fn build_chunk_neighbors(world: &VoxelWorld, key: [i32; 3]) -> voxel_mesh::Chunk
     let s = CHUNK_SIZE;
     let mut nb = voxel_mesh::ChunkNeighbors::default();
 
-    let extract_slice = |nk: [i32; 3], axis: usize, d: usize| -> Option<[BlockType; CHUNK_SIZE * CHUNK_SIZE]> {
-        world.chunks.get(&nk).map(|c| {
-            let mut slice = [BlockType::Air; CHUNK_SIZE * CHUNK_SIZE];
-            let (u_axis, v_axis) = match axis {
-                0 => (1, 2),
-                1 => (0, 2),
-                _ => (0, 1),
-            };
-            for v in 0..s {
-                for u in 0..s {
-                    let mut pos = [0usize; 3];
-                    pos[axis] = d;
-                    pos[u_axis] = u;
-                    pos[v_axis] = v;
-                    slice[v * s + u] = c.get(pos[0], pos[1], pos[2]);
+    let extract_slice =
+        |nk: [i32; 3], axis: usize, d: usize| -> Option<[BlockType; CHUNK_SIZE * CHUNK_SIZE]> {
+            world.chunks.get(&nk).map(|c| {
+                let mut slice = [BlockType::Air; CHUNK_SIZE * CHUNK_SIZE];
+                let (u_axis, v_axis) = match axis {
+                    0 => (1, 2),
+                    1 => (0, 2),
+                    _ => (0, 1),
+                };
+                for v in 0..s {
+                    for u in 0..s {
+                        let mut pos = [0usize; 3];
+                        pos[axis] = d;
+                        pos[u_axis] = u;
+                        pos[v_axis] = v;
+                        slice[v * s + u] = c.get(pos[0], pos[1], pos[2]);
+                    }
                 }
-            }
-            slice
-        })
-    };
+                slice
+            })
+        };
 
     // Horizontal neighbors: if no neighbor chunk exists at world edge, treat as solid
     // to suppress side faces at world boundary (cleaner edge).
     let solid_boundary = Some([BlockType::Stone; CHUNK_SIZE * CHUNK_SIZE]);
-    nb.pos_x = extract_slice([key[0]+1, key[1], key[2]], 0, 0).or_else(|| solid_boundary.clone());
-    nb.neg_x = extract_slice([key[0]-1, key[1], key[2]], 0, s-1).or_else(|| solid_boundary.clone());
-    nb.pos_y = extract_slice([key[0], key[1]+1, key[2]], 1, 0); // above = Air if missing (correct)
+    nb.pos_x = extract_slice([key[0] + 1, key[1], key[2]], 0, 0).or_else(|| solid_boundary.clone());
+    nb.neg_x =
+        extract_slice([key[0] - 1, key[1], key[2]], 0, s - 1).or_else(|| solid_boundary.clone());
+    nb.pos_y = extract_slice([key[0], key[1] + 1, key[2]], 1, 0); // above = Air if missing (correct)
     // Below (neg_y): if no neighbor exists, treat as all-solid (suppress bedrock bottom face).
-    nb.neg_y = extract_slice([key[0], key[1]-1, key[2]], 1, s-1)
+    nb.neg_y = extract_slice([key[0], key[1] - 1, key[2]], 1, s - 1)
         .or_else(|| Some([BlockType::Stone; CHUNK_SIZE * CHUNK_SIZE]));
-    nb.pos_z = extract_slice([key[0], key[1], key[2]+1], 2, 0).or_else(|| solid_boundary.clone());
-    nb.neg_z = extract_slice([key[0], key[1], key[2]-1], 2, s-1).or_else(|| solid_boundary);
+    nb.pos_z = extract_slice([key[0], key[1], key[2] + 1], 2, 0).or_else(|| solid_boundary.clone());
+    nb.neg_z = extract_slice([key[0], key[1], key[2] - 1], 2, s - 1).or_else(|| solid_boundary);
     nb
 }
 
@@ -5020,11 +5113,7 @@ fn remesh_chunk_lod(
             let mut vb = voxel_batches.borrow_mut();
             if let Some(batch) = vb.get_mut(batch_idx) {
                 queue.write_buffer(&batch.vertex_buffer, 0, bytemuck::cast_slice(&vm.vertices));
-                queue.write_buffer(
-                    &batch.index_buffer,
-                    0,
-                    bytemuck::cast_slice(&vm.indices),
-                );
+                queue.write_buffer(&batch.index_buffer, 0, bytemuck::cast_slice(&vm.indices));
                 batch.index_count = vm.index_count;
             }
         }
@@ -5042,7 +5131,17 @@ fn render_frame_batches_ref(
     depth_view: &wgpu::TextureView,
     batches: &[&DrawBatch],
 ) {
-    render_frame_batches_sky(surface, device, queue, pipeline, camera_light_bg, shadow_bg, depth_view, batches, [0.94, 0.92, 0.84]);
+    render_frame_batches_sky(
+        surface,
+        device,
+        queue,
+        pipeline,
+        camera_light_bg,
+        shadow_bg,
+        depth_view,
+        batches,
+        [0.94, 0.92, 0.84],
+    );
 }
 
 /// Render frame with custom sky/clear color.
@@ -5258,7 +5357,12 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
     let char_mesh = kami_character::generate_character(&def);
     let total_verts: usize = char_mesh.parts.iter().map(|p| p.vertices.len()).sum();
     let total_tris: usize = char_mesh.parts.iter().map(|p| p.indices.len() / 3).sum();
-    log::info!("Character: {} parts, {} verts, {} tris", char_mesh.parts.len(), total_verts, total_tris);
+    log::info!(
+        "Character: {} parts, {} verts, {} tris",
+        char_mesh.parts.len(),
+        total_verts,
+        total_tris
+    );
 
     // Get canvas and init GPU
     let window = web_sys::window().ok_or("no window")?;
@@ -5277,11 +5381,8 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
         contents: bytemuck::bytes_of(&camera.uniform()),
         usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
     });
-    let light = LightUniform::directional(
-        Vec3::new(-0.5, -1.2, -0.8),
-        Vec3::new(1.0, 0.95, 0.9),
-        1.5,
-    );
+    let light =
+        LightUniform::directional(Vec3::new(-0.5, -1.2, -0.8), Vec3::new(1.0, 0.95, 0.9), 1.5);
     let light_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("char_light"),
         contents: bytemuck::bytes_of(&light),
@@ -5289,7 +5390,14 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
     });
 
     let (_, material_layout, _, camera_light_bg, shadow_bg, depth_view, pbr_pipeline) =
-        create_render_resources(&device, format, &camera_buffer, &light_buffer, width, height);
+        create_render_resources(
+            &device,
+            format,
+            &camera_buffer,
+            &light_buffer,
+            width,
+            height,
+        );
 
     // Create fallback textures for material bind groups
     let fallback_albedo = texture::default_white_texture(&device, &queue);
@@ -5309,7 +5417,9 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
     let mut batches: Vec<DrawBatch> = Vec::new();
 
     for part in &char_mesh.parts {
-        if part.vertices.is_empty() || part.indices.is_empty() { continue; }
+        if part.vertices.is_empty() || part.indices.is_empty() {
+            continue;
+        }
 
         // Interleave vertex data: pos3 + norm3 + uv2 = 32 bytes per vertex
         let mut vertex_data: Vec<f32> = Vec::with_capacity(part.vertices.len() * 8);
@@ -5340,7 +5450,12 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
 
         // Material uniform from kami-character PbrMaterial
         let pbr = kami_character::material::PbrMaterial::for_part(
-            part.material, &def.skin, &def.eyes, &def.mouth, &def.hair, &def.clothing,
+            part.material,
+            &def.skin,
+            &def.eyes,
+            &def.mouth,
+            &def.hair,
+            &def.clothing,
         );
         let mat_uniform = MaterialUniform {
             albedo: pbr.base_color,
@@ -5348,7 +5463,12 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
             roughness: pbr.roughness,
             has_albedo_tex: 0,
             has_normal_tex: 0,
-            subsurface_color: [pbr.subsurface_color[0], pbr.subsurface_color[1], pbr.subsurface_color[2], pbr.subsurface],
+            subsurface_color: [
+                pbr.subsurface_color[0],
+                pbr.subsurface_color[1],
+                pbr.subsurface_color[2],
+                pbr.subsurface,
+            ],
             subsurface_radius: [0.012, 0.036, 0.12],
             sss_model: if pbr.subsurface > 0.0 { 1 } else { 0 },
             aniso_tangent: [1.0, 0.0, 0.0],
@@ -5371,13 +5491,34 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
             label: Some(&format!("matbg_{}", part.name)),
             layout: &material_layout,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: mat_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 1, resource: wgpu::BindingResource::TextureView(&fallback_albedo.view) },
-                wgpu::BindGroupEntry { binding: 2, resource: wgpu::BindingResource::Sampler(sampler) },
-                wgpu::BindGroupEntry { binding: 3, resource: wgpu::BindingResource::TextureView(&fallback_normal.view) },
-                wgpu::BindGroupEntry { binding: 4, resource: wgpu::BindingResource::Sampler(sampler) },
-                wgpu::BindGroupEntry { binding: 5, resource: wgpu::BindingResource::TextureView(&fallback_mr.view) },
-                wgpu::BindGroupEntry { binding: 6, resource: wgpu::BindingResource::Sampler(sampler) },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: mat_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(&fallback_albedo.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::Sampler(sampler),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 3,
+                    resource: wgpu::BindingResource::TextureView(&fallback_normal.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 4,
+                    resource: wgpu::BindingResource::Sampler(sampler),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 5,
+                    resource: wgpu::BindingResource::TextureView(&fallback_mr.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 6,
+                    resource: wgpu::BindingResource::Sampler(sampler),
+                },
             ],
         });
 
@@ -5420,11 +5561,14 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
             Err(_) => {
                 let w = web_sys::window().unwrap();
                 let cb = f.lock().unwrap();
-                w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref()).unwrap();
+                w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref())
+                    .unwrap();
                 return;
             }
         };
-        let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
+        let view = frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
 
         let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
         {
@@ -5434,7 +5578,12 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
                     view: &view,
                     resolve_target: None,
                     ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color { r: 0.05, g: 0.04, b: 0.07, a: 1.0 }),
+                        load: wgpu::LoadOp::Clear(wgpu::Color {
+                            r: 0.05,
+                            g: 0.04,
+                            b: 0.07,
+                            a: 1.0,
+                        }),
                         store: wgpu::StoreOp::Store,
                     },
                 })],
@@ -5466,12 +5615,14 @@ pub async fn run_with_character(canvas_id: &str, character_json: &str) -> Result
 
         let w = web_sys::window().unwrap();
         let cb = f.lock().unwrap();
-        w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref()).unwrap();
+        w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref())
+            .unwrap();
     }));
 
     let w = web_sys::window().unwrap();
     let cb = g.lock().unwrap();
-    w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref()).unwrap();
+    w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref())
+        .unwrap();
 
     log::info!("Character PBR render loop started");
     Ok(())
@@ -5488,7 +5639,10 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
     let resp_value = wasm_bindgen_futures::JsFuture::from(window.fetch_with_str(vrm_url)).await?;
     let resp: web_sys::Response = resp_value.dyn_into()?;
     if !resp.ok() {
-        return Err(JsValue::from_str(&format!("fetch failed: {}", resp.status())));
+        return Err(JsValue::from_str(&format!(
+            "fetch failed: {}",
+            resp.status()
+        )));
     }
     let buf = wasm_bindgen_futures::JsFuture::from(resp.array_buffer()?).await?;
     let uint8 = js_sys::Uint8Array::new(&buf);
@@ -5498,33 +5652,61 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
     // Parse GLB
     let scene = kami_render::gltf_loader::load_glb(&glb_data)
         .map_err(|e| JsValue::from_str(&format!("GLB parse error: {e}")))?;
-    log::info!("Parsed: {} meshes, {} materials, {} nodes, {} textures",
-        scene.meshes.len(), scene.materials.len(), scene.nodes.len(), scene.textures.len());
+    log::info!(
+        "Parsed: {} meshes, {} materials, {} nodes, {} textures",
+        scene.meshes.len(),
+        scene.materials.len(),
+        scene.nodes.len(),
+        scene.textures.len()
+    );
 
     // Init GPU
     let document = window.document().ok_or("no document")?;
-    let canvas = document.get_element_by_id(canvas_id)
-        .ok_or("canvas not found")?.dyn_into::<web_sys::HtmlCanvasElement>()?;
+    let canvas = document
+        .get_element_by_id(canvas_id)
+        .ok_or("canvas not found")?
+        .dyn_into::<web_sys::HtmlCanvasElement>()?;
     let (device, queue, surface, _config, format, width, height) = init_gpu(&canvas).await?;
 
     // Create render resources
     let camera = Camera::new(width as f32 / height as f32);
     let camera_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("vrm_camera"), contents: bytemuck::bytes_of(&camera.uniform()),
+        label: Some("vrm_camera"),
+        contents: bytemuck::bytes_of(&camera.uniform()),
         usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
     });
-    let light = LightUniform::directional(Vec3::new(-0.5, -1.2, -0.8), Vec3::new(1.0, 0.95, 0.9), 1.5);
+    let light =
+        LightUniform::directional(Vec3::new(-0.5, -1.2, -0.8), Vec3::new(1.0, 0.95, 0.9), 1.5);
     let light_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("vrm_light"), contents: bytemuck::bytes_of(&light),
+        label: Some("vrm_light"),
+        contents: bytemuck::bytes_of(&light),
         usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
     });
 
-    let (camera_light_layout_ref, material_layout, shadow_layout_ref, camera_light_bg, shadow_bg, depth_view, pbr_pipeline) =
-        create_render_resources(&device, format, &camera_buffer, &light_buffer, width, height);
+    let (
+        camera_light_layout_ref,
+        material_layout,
+        shadow_layout_ref,
+        camera_light_bg,
+        shadow_bg,
+        depth_view,
+        pbr_pipeline,
+    ) = create_render_resources(
+        &device,
+        format,
+        &camera_buffer,
+        &light_buffer,
+        width,
+        height,
+    );
 
     // Create MToon pipeline (same bind group layout, different shader)
     let mtoon_pipeline = pipeline::create_mtoon_pipeline(
-        &device, format, &camera_light_layout_ref, &material_layout, &shadow_layout_ref,
+        &device,
+        format,
+        &camera_light_layout_ref,
+        &material_layout,
+        &shadow_layout_ref,
     );
 
     // GPU skinning: create bone palette layout + skinned pipeline + initial identity
@@ -5534,9 +5716,19 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
     let bone_layout = pipeline::create_bone_palette_layout(&device);
     let morph_layout = pipeline::create_morph_layout(&device);
     let skinned_mtoon_pipeline = pipeline::create_skinned_mtoon_pipeline(
-        &device, format, &camera_light_layout_ref, &material_layout, &shadow_layout_ref, &bone_layout, &morph_layout,
+        &device,
+        format,
+        &camera_light_layout_ref,
+        &material_layout,
+        &shadow_layout_ref,
+        &bone_layout,
+        &morph_layout,
     );
-    let joint_count = scene.skins.first().map(|s| s.joint_node_indices.len()).unwrap_or(1);
+    let joint_count = scene
+        .skins
+        .first()
+        .map(|s| s.joint_node_indices.len())
+        .unwrap_or(1);
     // Initial palette: identity matrices (bind pose — visually equivalent to
     // non-skinned path). L4 will compute real joint_matrices from Skeleton.
     let identity_mat: [f32; 16] = glam::Mat4::IDENTITY.to_cols_array();
@@ -5551,9 +5743,16 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
     let bone_bg = device.create_bind_group(&wgpu::BindGroupDescriptor {
         label: Some("vrm_bone_bg"),
         layout: &bone_layout,
-        entries: &[wgpu::BindGroupEntry { binding: 0, resource: bone_buffer.as_entire_binding() }],
+        entries: &[wgpu::BindGroupEntry {
+            binding: 0,
+            resource: bone_buffer.as_entire_binding(),
+        }],
     });
-    log::info!("VRM skinning: use_skinned={}, joint_count={}", use_skinned, joint_count);
+    log::info!(
+        "VRM skinning: use_skinned={}, joint_count={}",
+        use_skinned,
+        joint_count
+    );
 
     // Upload textures to GPU
     let fallback_albedo = texture::default_white_texture(&device, &queue);
@@ -5562,7 +5761,15 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
 
     let mut gpu_textures: Vec<texture::GpuTexture> = Vec::new();
     for tex in &scene.textures {
-        let gpu = texture::create_texture(&device, &queue, &tex.pixels, tex.width, tex.height, "vrm_tex", true);
+        let gpu = texture::create_texture(
+            &device,
+            &queue,
+            &tex.pixels,
+            tex.width,
+            tex.height,
+            "vrm_tex",
+            true,
+        );
         gpu_textures.push(gpu);
     }
 
@@ -5592,7 +5799,9 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
 
     for node in &scene.nodes {
         let mesh = &scene.meshes[node.mesh_index];
-        if mesh.vertices.is_empty() || mesh.indices.is_empty() { continue; }
+        if mesh.vertices.is_empty() || mesh.indices.is_empty() {
+            continue;
+        }
 
         // Build vertex buffer. If skinned path active, de-interleave the 32B
         // layout and pack into 56B skinned layout with per-mesh joints/weights.
@@ -5619,44 +5828,75 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
             })
         } else {
             device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                label: Some("vrm_vb"), contents: bytemuck::cast_slice(&mesh.vertices),
+                label: Some("vrm_vb"),
+                contents: bytemuck::cast_slice(&mesh.vertices),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             })
         };
         let ib = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("vrm_ib"), contents: bytemuck::cast_slice(&mesh.indices),
+            label: Some("vrm_ib"),
+            contents: bytemuck::cast_slice(&mesh.indices),
             usage: wgpu::BufferUsages::INDEX,
         });
         let base_transform = node.transform;
         let inst_data = base_transform.to_cols_array();
         let inst = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("vrm_inst"), contents: bytemuck::cast_slice(&inst_data),
+            label: Some("vrm_inst"),
+            contents: bytemuck::cast_slice(&inst_data),
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
         });
 
         let mat = &scene.materials[node.material_index];
         let mat_buf = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("vrm_mat"), contents: bytemuck::bytes_of(mat),
+            label: Some("vrm_mat"),
+            contents: bytemuck::bytes_of(mat),
             usage: wgpu::BufferUsages::UNIFORM,
         });
 
         // Select albedo texture (if material has one)
-        let albedo_view = if let Some(Some(tex_idx)) = scene.material_texture_map.get(node.material_index) {
-            if let Some(gpu_tex) = gpu_textures.get(*tex_idx) {
-                &gpu_tex.view
-            } else { &fallback_albedo.view }
-        } else { &fallback_albedo.view };
+        let albedo_view =
+            if let Some(Some(tex_idx)) = scene.material_texture_map.get(node.material_index) {
+                if let Some(gpu_tex) = gpu_textures.get(*tex_idx) {
+                    &gpu_tex.view
+                } else {
+                    &fallback_albedo.view
+                }
+            } else {
+                &fallback_albedo.view
+            };
 
         let mat_bg = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: Some("vrm_matbg"), layout: &material_layout,
+            label: Some("vrm_matbg"),
+            layout: &material_layout,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: mat_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 1, resource: wgpu::BindingResource::TextureView(albedo_view) },
-                wgpu::BindGroupEntry { binding: 2, resource: wgpu::BindingResource::Sampler(sampler) },
-                wgpu::BindGroupEntry { binding: 3, resource: wgpu::BindingResource::TextureView(&fallback_normal.view) },
-                wgpu::BindGroupEntry { binding: 4, resource: wgpu::BindingResource::Sampler(sampler) },
-                wgpu::BindGroupEntry { binding: 5, resource: wgpu::BindingResource::TextureView(&fallback_mr.view) },
-                wgpu::BindGroupEntry { binding: 6, resource: wgpu::BindingResource::Sampler(sampler) },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: mat_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(albedo_view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::Sampler(sampler),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 3,
+                    resource: wgpu::BindingResource::TextureView(&fallback_normal.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 4,
+                    resource: wgpu::BindingResource::Sampler(sampler),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 5,
+                    resource: wgpu::BindingResource::TextureView(&fallback_mr.view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 6,
+                    resource: wgpu::BindingResource::Sampler(sampler),
+                },
             ],
         });
 
@@ -5668,7 +5908,8 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
             let vert_count = (mesh.vertices.len() / 8) as u32;
             let target_count = targets.len() as u32;
             // Concatenated deltas: target_count × vert_count × 3 f32. Empty → 3 zero f32 dummy.
-            let mut flat_deltas: Vec<f32> = Vec::with_capacity((target_count * vert_count * 3) as usize);
+            let mut flat_deltas: Vec<f32> =
+                Vec::with_capacity((target_count * vert_count * 3) as usize);
             for t in targets {
                 // Pad target to vert_count × 3 in case extraction produced fewer (unlikely).
                 let expected = (vert_count * 3) as usize;
@@ -5676,7 +5917,10 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
                     flat_deltas.extend_from_slice(&t.position_deltas[..expected]);
                 } else {
                     flat_deltas.extend_from_slice(&t.position_deltas);
-                    flat_deltas.resize(flat_deltas.len() + (expected - t.position_deltas.len()), 0.0);
+                    flat_deltas.resize(
+                        flat_deltas.len() + (expected - t.position_deltas.len()),
+                        0.0,
+                    );
                 }
             }
             if flat_deltas.is_empty() {
@@ -5704,8 +5948,14 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
                 label: Some("vrm_morph_bg"),
                 layout: &morph_layout,
                 entries: &[
-                    wgpu::BindGroupEntry { binding: 0, resource: delta_buf.as_entire_binding() },
-                    wgpu::BindGroupEntry { binding: 1, resource: info_buf.as_entire_binding() },
+                    wgpu::BindGroupEntry {
+                        binding: 0,
+                        resource: delta_buf.as_entire_binding(),
+                    },
+                    wgpu::BindGroupEntry {
+                        binding: 1,
+                        resource: info_buf.as_entire_binding(),
+                    },
                 ],
             });
             // delta_buf kept alive via bind group; info_buf we hold so we can write weights.
@@ -5715,9 +5965,14 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
         };
 
         batches.push(VrmBatch {
-            vertex_buffer: vb, index_buffer: ib,
-            index_count: mesh.index_count, instance_buffer: inst, material_bg: mat_bg,
-            is_mtoon, morph_bg, morph_info_buffer,
+            vertex_buffer: vb,
+            index_buffer: ib,
+            index_count: mesh.index_count,
+            instance_buffer: inst,
+            material_bg: mat_bg,
+            is_mtoon,
+            morph_bg,
+            morph_info_buffer,
             label: node.label.clone(),
             base_transform,
         });
@@ -5738,8 +5993,15 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
 
     // Interactive orbit state: yaw, pitch, distance, dragging, auto_rotate, last_x, last_y
     // Initial yaw=PI to face front of VRM (model is rotated 180°)
-    let orbit_state: Rc<RefCell<(f32, f32, f32, bool, bool, f32, f32)>> =
-        Rc::new(RefCell::new((std::f32::consts::PI, 0.2f32, 2.5f32, false, true, 0.0, 0.0)));
+    let orbit_state: Rc<RefCell<(f32, f32, f32, bool, bool, f32, f32)>> = Rc::new(RefCell::new((
+        std::f32::consts::PI,
+        0.2f32,
+        2.5f32,
+        false,
+        true,
+        0.0,
+        0.0,
+    )));
 
     // Mouse events for orbit control
     {
@@ -5751,14 +6013,18 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
             s.5 = e.client_x() as f32;
             s.6 = e.client_y() as f32;
         });
-        canvas.add_event_listener_with_callback("mousedown", md.as_ref().unchecked_ref()).ok();
+        canvas
+            .add_event_listener_with_callback("mousedown", md.as_ref().unchecked_ref())
+            .ok();
         md.forget();
     }
     {
         let os = orbit_state.clone();
         let mm = Closure::<dyn FnMut(web_sys::MouseEvent)>::new(move |e: web_sys::MouseEvent| {
             let mut s = os.borrow_mut();
-            if !s.3 { return; }
+            if !s.3 {
+                return;
+            }
             let dx = e.client_x() as f32 - s.5;
             let dy = e.client_y() as f32 - s.6;
             s.0 += dx * 0.005; // yaw
@@ -5766,7 +6032,9 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
             s.5 = e.client_x() as f32;
             s.6 = e.client_y() as f32;
         });
-        canvas.add_event_listener_with_callback("mousemove", mm.as_ref().unchecked_ref()).ok();
+        canvas
+            .add_event_listener_with_callback("mousemove", mm.as_ref().unchecked_ref())
+            .ok();
         mm.forget();
     }
     {
@@ -5774,7 +6042,9 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
         let mu = Closure::<dyn FnMut(web_sys::MouseEvent)>::new(move |_: web_sys::MouseEvent| {
             os.borrow_mut().3 = false;
         });
-        canvas.add_event_listener_with_callback("mouseup", mu.as_ref().unchecked_ref()).ok();
+        canvas
+            .add_event_listener_with_callback("mouseup", mu.as_ref().unchecked_ref())
+            .ok();
         mu.forget();
     }
     // Wheel zoom
@@ -5785,10 +6055,13 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
             let mut s = os.borrow_mut();
             s.2 = (s.2 + e.delta_y() as f32 * 0.002).clamp(0.5, 6.0); // distance
         });
-        canvas.add_event_listener_with_callback_and_add_event_listener_options(
-            "wheel", wh.as_ref().unchecked_ref(),
-            web_sys::AddEventListenerOptions::new().passive(false),
-        ).ok();
+        canvas
+            .add_event_listener_with_callback_and_add_event_listener_options(
+                "wheel",
+                wh.as_ref().unchecked_ref(),
+                web_sys::AddEventListenerOptions::new().passive(false),
+            )
+            .ok();
         wh.forget();
     }
     // Touch events for mobile
@@ -5797,11 +6070,15 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
         let ts = Closure::<dyn FnMut(web_sys::TouchEvent)>::new(move |e: web_sys::TouchEvent| {
             if let Some(t) = e.touches().get(0) {
                 let mut s = os.borrow_mut();
-                s.3 = true; s.4 = false;
-                s.5 = t.client_x() as f32; s.6 = t.client_y() as f32;
+                s.3 = true;
+                s.4 = false;
+                s.5 = t.client_x() as f32;
+                s.6 = t.client_y() as f32;
             }
         });
-        canvas.add_event_listener_with_callback("touchstart", ts.as_ref().unchecked_ref()).ok();
+        canvas
+            .add_event_listener_with_callback("touchstart", ts.as_ref().unchecked_ref())
+            .ok();
         ts.forget();
     }
     {
@@ -5809,14 +6086,20 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
         let tm = Closure::<dyn FnMut(web_sys::TouchEvent)>::new(move |e: web_sys::TouchEvent| {
             if let Some(t) = e.touches().get(0) {
                 let mut s = os.borrow_mut();
-                if !s.3 { return; }
+                if !s.3 {
+                    return;
+                }
                 let dx = t.client_x() as f32 - s.5;
                 let dy = t.client_y() as f32 - s.6;
-                s.0 += dx * 0.005; s.1 = (s.1 - dy * 0.005).clamp(-1.2, 1.2);
-                s.5 = t.client_x() as f32; s.6 = t.client_y() as f32;
+                s.0 += dx * 0.005;
+                s.1 = (s.1 - dy * 0.005).clamp(-1.2, 1.2);
+                s.5 = t.client_x() as f32;
+                s.6 = t.client_y() as f32;
             }
         });
-        canvas.add_event_listener_with_callback("touchmove", tm.as_ref().unchecked_ref()).ok();
+        canvas
+            .add_event_listener_with_callback("touchmove", tm.as_ref().unchecked_ref())
+            .ok();
         tm.forget();
     }
     {
@@ -5824,53 +6107,75 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
         let te = Closure::<dyn FnMut(web_sys::TouchEvent)>::new(move |_: web_sys::TouchEvent| {
             os.borrow_mut().3 = false;
         });
-        canvas.add_event_listener_with_callback("touchend", te.as_ref().unchecked_ref()).ok();
+        canvas
+            .add_event_listener_with_callback("touchend", te.as_ref().unchecked_ref())
+            .ok();
         te.forget();
     }
 
     // ── M1 locomotion: WASD → root translation, camera orbits VRM ──────────
     // State: (root_x, root_y, root_z, facing_yaw, key_w, key_a, key_s, key_d)
     // key_* are bool stored as f32 (1.0 / 0.0) for tuple homogeneity.
-    let locomotion: Rc<RefCell<(f32, f32, f32, f32, bool, bool, bool, bool)>> =
-        Rc::new(RefCell::new((0.0, 0.0, 0.0, 0.0, false, false, false, false)));
+    let locomotion: Rc<RefCell<(f32, f32, f32, f32, bool, bool, bool, bool)>> = Rc::new(
+        RefCell::new((0.0, 0.0, 0.0, 0.0, false, false, false, false)),
+    );
     {
         let loc = locomotion.clone();
         let os = orbit_state.clone();
-        let kd = Closure::<dyn FnMut(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
-            let key = e.key().to_lowercase();
-            let mut l = loc.borrow_mut();
-            match key.as_str() {
-                "w" => { l.4 = true; os.borrow_mut().4 = false; }
-                "a" => { l.5 = true; os.borrow_mut().4 = false; }
-                "s" => { l.6 = true; os.borrow_mut().4 = false; }
-                "d" => { l.7 = true; os.borrow_mut().4 = false; }
-                _ => {}
-            }
-        });
-        web_sys::window().unwrap()
-            .add_event_listener_with_callback("keydown", kd.as_ref().unchecked_ref()).ok();
+        let kd =
+            Closure::<dyn FnMut(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
+                let key = e.key().to_lowercase();
+                let mut l = loc.borrow_mut();
+                match key.as_str() {
+                    "w" => {
+                        l.4 = true;
+                        os.borrow_mut().4 = false;
+                    }
+                    "a" => {
+                        l.5 = true;
+                        os.borrow_mut().4 = false;
+                    }
+                    "s" => {
+                        l.6 = true;
+                        os.borrow_mut().4 = false;
+                    }
+                    "d" => {
+                        l.7 = true;
+                        os.borrow_mut().4 = false;
+                    }
+                    _ => {}
+                }
+            });
+        web_sys::window()
+            .unwrap()
+            .add_event_listener_with_callback("keydown", kd.as_ref().unchecked_ref())
+            .ok();
         kd.forget();
     }
     {
         let loc = locomotion.clone();
-        let ku = Closure::<dyn FnMut(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
-            let key = e.key().to_lowercase();
-            let mut l = loc.borrow_mut();
-            match key.as_str() {
-                "w" => l.4 = false,
-                "a" => l.5 = false,
-                "s" => l.6 = false,
-                "d" => l.7 = false,
-                _ => {}
-            }
-        });
-        web_sys::window().unwrap()
-            .add_event_listener_with_callback("keyup", ku.as_ref().unchecked_ref()).ok();
+        let ku =
+            Closure::<dyn FnMut(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
+                let key = e.key().to_lowercase();
+                let mut l = loc.borrow_mut();
+                match key.as_str() {
+                    "w" => l.4 = false,
+                    "a" => l.5 = false,
+                    "s" => l.6 = false,
+                    "d" => l.7 = false,
+                    _ => {}
+                }
+            });
+        web_sys::window()
+            .unwrap()
+            .add_event_listener_with_callback("keyup", ku.as_ref().unchecked_ref())
+            .ok();
         ku.forget();
     }
 
     let time = Arc::new(std::sync::Mutex::new(0.0f32));
-    let f: Arc<std::sync::Mutex<Option<Closure<dyn FnMut()>>>> = Arc::new(std::sync::Mutex::new(None));
+    let f: Arc<std::sync::Mutex<Option<Closure<dyn FnMut()>>>> =
+        Arc::new(std::sync::Mutex::new(None));
     let g = f.clone();
     let time_clone = time.clone();
     let orbit_render = orbit_state.clone();
@@ -5890,10 +6195,18 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
             let dt = 1.0 / 60.0f32;
             let speed = 2.0f32;
             let mut local = glam::Vec3::ZERO;
-            if l.4 { local.z -= 1.0; }
-            if l.6 { local.z += 1.0; }
-            if l.5 { local.x -= 1.0; }
-            if l.7 { local.x += 1.0; }
+            if l.4 {
+                local.z -= 1.0;
+            }
+            if l.6 {
+                local.z += 1.0;
+            }
+            if l.5 {
+                local.x -= 1.0;
+            }
+            if l.7 {
+                local.x += 1.0;
+            }
             if local.length_squared() > 0.0 {
                 local = local.normalize();
                 // Camera looks from (+sin(yaw), *, +cos(yaw)) toward target. World forward
@@ -5913,7 +6226,8 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
         queue.write_buffer(&camera_buffer, 0, bytemuck::bytes_of(&camera.uniform()));
 
         // Update each VRM batch instance transform with root TRS
-        let root_tr = glam::Mat4::from_translation(root_pos) * glam::Mat4::from_rotation_y(facing_yaw);
+        let root_tr =
+            glam::Mat4::from_translation(root_pos) * glam::Mat4::from_rotation_y(facing_yaw);
         for batch in batches.iter() {
             let m = (root_tr * batch.base_transform).to_cols_array();
             queue.write_buffer(&batch.instance_buffer, 0, bytemuck::cast_slice(&m));
@@ -5943,7 +6257,12 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
                 if let Some(sim) = s.spring_sim.as_mut() {
                     sim.step(
                         1.0 / 60.0,
-                        |node_idx| node_to_bone.get(&node_idx).and_then(|b| user_world.get(*b)).copied(),
+                        |node_idx| {
+                            node_to_bone
+                                .get(&node_idx)
+                                .and_then(|b| user_world.get(*b))
+                                .copied()
+                        },
                         &mut spring_patches,
                     );
                 }
@@ -5964,15 +6283,29 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
                 if let Some(solver) = s.constraint_solver.as_ref() {
                     let source_local_rot = |node_idx: usize| -> Option<glam::Quat> {
                         node_to_bone.get(&node_idx).and_then(|&bi| {
-                            effective.get(bi).and_then(|o| *o)
+                            effective
+                                .get(bi)
+                                .and_then(|o| *o)
                                 .map(glam::Quat::from_array)
-                                .or_else(|| sk.bones.get(bi).map(|b| glam::Quat::from_array(b.local_rotation)))
+                                .or_else(|| {
+                                    sk.bones
+                                        .get(bi)
+                                        .map(|b| glam::Quat::from_array(b.local_rotation))
+                                })
                         })
                     };
                     let world_lookup = |node_idx: usize| -> Option<glam::Mat4> {
-                        node_to_bone.get(&node_idx).and_then(|b| post_spring_world.get(*b)).copied()
+                        node_to_bone
+                            .get(&node_idx)
+                            .and_then(|b| post_spring_world.get(*b))
+                            .copied()
                     };
-                    solver.apply(source_local_rot, world_lookup, world_lookup, &mut constraint_patches);
+                    solver.apply(
+                        source_local_rot,
+                        world_lookup,
+                        world_lookup,
+                        &mut constraint_patches,
+                    );
                 }
                 for (node_idx, q) in &constraint_patches {
                     if let Some(&bi) = node_to_bone.get(node_idx) {
@@ -5986,7 +6319,10 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
                 let palette = compute_pose_palette(&sk, &effective);
                 let bytes: Vec<u8> = palette
                     .iter()
-                    .flat_map(|m| m.iter().flat_map(|col| col.iter().flat_map(|f| f.to_le_bytes())))
+                    .flat_map(|m| {
+                        m.iter()
+                            .flat_map(|col| col.iter().flat_map(|f| f.to_le_bytes()))
+                    })
                     .collect();
                 queue.write_buffer(&bone_buffer, 0, &bytes);
                 s.pose_dirty = false;
@@ -6014,25 +6350,42 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
                 return;
             }
             if s.dirty && !use_skinned {
-                let active_weights: Vec<(usize,f32)> = s.morph_weights.iter().enumerate().filter(|(_,w)| w.abs() > 0.001).map(|(i,w)| (i,*w)).collect();
+                let active_weights: Vec<(usize, f32)> = s
+                    .morph_weights
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, w)| w.abs() > 0.001)
+                    .map(|(i, w)| (i, *w))
+                    .collect();
                 if !active_weights.is_empty() {
-                    log::info!("Applying morphs: {:?}", &active_weights[..active_weights.len().min(5)]);
+                    log::info!(
+                        "Applying morphs: {:?}",
+                        &active_weights[..active_weights.len().min(5)]
+                    );
                 }
                 let mut applied = 0;
                 for (batch_idx, batch) in batches.iter().enumerate() {
-                    if batch_idx >= s.base_vertices.len() { break; }
+                    if batch_idx >= s.base_vertices.len() {
+                        break;
+                    }
                     let base = &s.base_vertices[batch_idx];
                     let deltas = &s.morph_deltas[batch_idx];
-                    if deltas.is_empty() { continue; }
+                    if deltas.is_empty() {
+                        continue;
+                    }
 
                     let mut morphed = base.clone();
                     let vert_count = base.len() / 8; // 8 floats per vertex (pos3+norm3+uv2)
                     let mut any_applied = false;
 
                     for (ti, delta) in deltas.iter().enumerate() {
-                        if ti >= s.morph_weights.len() { break; }
+                        if ti >= s.morph_weights.len() {
+                            break;
+                        }
                         let w = s.morph_weights[ti];
-                        if w.abs() < 0.001 { continue; }
+                        if w.abs() < 0.001 {
+                            continue;
+                        }
                         any_applied = true;
                         let delta_verts = delta.len() / 3;
                         let scale = 1.0;
@@ -6044,30 +6397,53 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
                     }
                     // Always re-upload if any weight changed (even to reset to base)
                     queue.write_buffer(&batch.vertex_buffer, 0, bytemuck::cast_slice(&morphed));
-                    if any_applied { applied += 1; }
+                    if any_applied {
+                        applied += 1;
+                    }
                 }
-                if applied > 0 { log::info!("Morphed {} batches", applied); }
+                if applied > 0 {
+                    log::info!("Morphed {} batches", applied);
+                }
                 s.dirty = false;
             }
         });
 
         let frame = match surface.get_current_texture() {
             Ok(f) => f,
-            Err(_) => { let w = web_sys::window().unwrap(); let cb = f.lock().unwrap();
-                w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref()).unwrap(); return; }
+            Err(_) => {
+                let w = web_sys::window().unwrap();
+                let cb = f.lock().unwrap();
+                w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref())
+                    .unwrap();
+                return;
+            }
         };
-        let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
+        let view = frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
         let mut enc = device.create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
         {
             let mut pass = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("vrm_pass"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view, resolve_target: None,
-                    ops: wgpu::Operations { load: wgpu::LoadOp::Clear(wgpu::Color { r: 0.05, g: 0.04, b: 0.07, a: 1.0 }), store: wgpu::StoreOp::Store },
+                    view: &view,
+                    resolve_target: None,
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(wgpu::Color {
+                            r: 0.05,
+                            g: 0.04,
+                            b: 0.07,
+                            a: 1.0,
+                        }),
+                        store: wgpu::StoreOp::Store,
+                    },
                 })],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: &depth_view,
-                    depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Clear(1.0), store: wgpu::StoreOp::Store }),
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(1.0),
+                        store: wgpu::StoreOp::Store,
+                    }),
                     stencil_ops: None,
                 }),
                 ..Default::default()
@@ -6081,7 +6457,9 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
                 pass.set_pipeline(&skinned_mtoon_pipeline);
                 pass.set_bind_group(3, &bone_bg, &[]);
                 for batch in batches.iter() {
-                    if hidden_snapshot.contains(&batch.label) { continue; }
+                    if hidden_snapshot.contains(&batch.label) {
+                        continue;
+                    }
                     pass.set_bind_group(1, &batch.material_bg, &[]);
                     if let Some(mbg) = batch.morph_bg.as_ref() {
                         pass.set_bind_group(4, mbg, &[]);
@@ -6115,17 +6493,28 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
         frame.present();
         let w = web_sys::window().unwrap();
         let cb = f.lock().unwrap();
-        w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref()).unwrap();
+        w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref())
+            .unwrap();
     }));
 
     let w = web_sys::window().unwrap();
     let cb = g.lock().unwrap();
-    w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref()).unwrap();
+    w.request_animation_frame(cb.as_ref().unwrap().as_ref().unchecked_ref())
+        .unwrap();
 
     // Store morph data for JS API
-    let morph_count = scene.morph_targets.iter().map(|m| m.len()).max().unwrap_or(0);
+    let morph_count = scene
+        .morph_targets
+        .iter()
+        .map(|m| m.len())
+        .max()
+        .unwrap_or(0);
     let morph_names = scene.morph_target_names.clone();
-    log::info!("VRM: {} morph targets, names: {:?}", morph_count, &morph_names[..morph_names.len().min(5)]);
+    log::info!(
+        "VRM: {} morph targets, names: {:?}",
+        morph_count,
+        &morph_names[..morph_names.len().min(5)]
+    );
 
     // Store base vertex data + morph targets for CPU blending
     let mut total_morph_deltas = 0usize;
@@ -6142,20 +6531,35 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
             let deltas: Vec<Vec<f32>> = targets.iter().map(|t| t.position_deltas.clone()).collect();
             if !deltas.is_empty() {
                 total_morph_deltas += deltas.len();
-                log::info!("Batch {}: {} verts, {} morph targets (first delta len: {})",
-                    s.base_vertices.len() - 1, mesh.vertices.len() / 8,
-                    deltas.len(), deltas.first().map(|d| d.len()).unwrap_or(0));
+                log::info!(
+                    "Batch {}: {} verts, {} morph targets (first delta len: {})",
+                    s.base_vertices.len() - 1,
+                    mesh.vertices.len() / 8,
+                    deltas.len(),
+                    deltas.first().map(|d| d.len()).unwrap_or(0)
+                );
             }
             s.morph_deltas.push(deltas);
         }
         s.dirty = false;
     });
-    log::info!("VRM morph state: {} total morph delta arrays loaded", total_morph_deltas);
+    log::info!(
+        "VRM morph state: {} total morph delta arrays loaded",
+        total_morph_deltas
+    );
 
     // Populate skeleton state (L1/L2: data pipeline only; no GPU skinning yet).
     let skeleton = build_skeleton_from_gltf(&scene);
-    let joint_count = scene.skins.first().map(|s| s.joint_node_indices.len()).unwrap_or(0);
-    let skinned_mesh_count = scene.nodes.iter().filter(|n| n.skin_index.is_some()).count();
+    let joint_count = scene
+        .skins
+        .first()
+        .map(|s| s.joint_node_indices.len())
+        .unwrap_or(0);
+    let skinned_mesh_count = scene
+        .nodes
+        .iter()
+        .filter(|n| n.skin_index.is_some())
+        .count();
 
     // L6/L7: parse VRM extensions (spring bones + node constraints).
     let (spring_sim, constraint_solver, vrm_chain_count, vrm_constraint_count) =
@@ -6194,7 +6598,10 @@ pub async fn run_embed_vrm(canvas_id: &str, vrm_url: &str) -> Result<(), JsValue
     });
     log::info!(
         "VRM skin state: {} joints, {} skinned meshes, {} spring chains, {} node constraints",
-        joint_count, skinned_mesh_count, vrm_chain_count, vrm_constraint_count
+        joint_count,
+        skinned_mesh_count,
+        vrm_chain_count,
+        vrm_constraint_count
     );
 
     log::info!("VRM PBR render loop started");
@@ -6275,7 +6682,9 @@ thread_local! {
 pub fn reset_vrm_morphs() {
     VRM_MORPH_STATE.with(|state| {
         let mut s = state.borrow_mut();
-        for w in s.morph_weights.iter_mut() { *w = 0.0; }
+        for w in s.morph_weights.iter_mut() {
+            *w = 0.0;
+        }
         s.dirty = true;
     });
 }
@@ -6324,7 +6733,9 @@ fn compute_world_transforms(
     let n = skeleton.bones.len();
     let mut local = Vec::with_capacity(n);
     for (i, b) in skeleton.bones.iter().enumerate() {
-        let rot = overrides.get(i).and_then(|o| *o)
+        let rot = overrides
+            .get(i)
+            .and_then(|o| *o)
             .map(glam::Quat::from_array)
             .unwrap_or_else(|| glam::Quat::from_array(b.local_rotation));
         let pos = glam::Vec3::from(b.local_position);
@@ -6351,7 +6762,9 @@ fn compute_pose_palette(
     let n = skeleton.bones.len();
     let mut local = Vec::with_capacity(n);
     for (i, b) in skeleton.bones.iter().enumerate() {
-        let rot = overrides.get(i).and_then(|o| *o)
+        let rot = overrides
+            .get(i)
+            .and_then(|o| *o)
             .map(glam::Quat::from_array)
             .unwrap_or_else(|| glam::Quat::from_array(b.local_rotation));
         let pos = glam::Vec3::from(b.local_position);
@@ -6382,7 +6795,9 @@ fn compute_pose_palette(
 /// relationships within the skin's joint subset. Bones listed in
 /// `skin.joint_node_indices` become the skeleton bones; their parents are
 /// remapped if the parent is also a joint, else the bone becomes a root.
-fn build_skeleton_from_gltf(scene: &kami_render::gltf_loader::GltfScene) -> Option<kami_skeleton::Skeleton> {
+fn build_skeleton_from_gltf(
+    scene: &kami_render::gltf_loader::GltfScene,
+) -> Option<kami_skeleton::Skeleton> {
     let skin = scene.skins.first()?;
     if skin.joint_node_indices.is_empty() {
         return None;
@@ -6427,11 +6842,18 @@ pub fn get_vrm_skeleton_info() -> String {
         out.push_str("\"bones\":[");
         if let Some(sk) = &s.skeleton {
             for (i, b) in sk.bones.iter().enumerate() {
-                if i > 0 { out.push(','); }
-                let parent = b.parent.map(|p| p.to_string()).unwrap_or_else(|| "null".into());
-                out.push_str(&format!("{{\"name\":{},\"parent\":{}}}",
+                if i > 0 {
+                    out.push(',');
+                }
+                let parent = b
+                    .parent
+                    .map(|p| p.to_string())
+                    .unwrap_or_else(|| "null".into());
+                out.push_str(&format!(
+                    "{{\"name\":{},\"parent\":{}}}",
                     serde_json::to_string(&b.name).unwrap_or_else(|_| "\"\"".into()),
-                    parent));
+                    parent
+                ));
             }
         }
         out.push_str("]}");
@@ -6491,9 +6913,8 @@ thread_local! {
 /// List VRM draw-batch labels (`"{meshName}:{materialName}"`) as a JSON array.
 #[wasm_bindgen]
 pub fn get_vrm_mesh_labels() -> String {
-    VRM_PART_STATE.with(|s| {
-        serde_json::to_string(&s.borrow().labels).unwrap_or_else(|_| "[]".into())
-    })
+    VRM_PART_STATE
+        .with(|s| serde_json::to_string(&s.borrow().labels).unwrap_or_else(|_| "[]".into()))
 }
 
 /// Toggle visibility for all batches whose label contains `substring`.
@@ -6553,21 +6974,28 @@ pub fn compose_vrm_with_preset(
     // Keep base parts whose category != target.
     for p in &base_parts {
         if p.category != cat {
-            sources.push(kami_vrm::PartSource { part: p, doc: &base_doc });
+            sources.push(kami_vrm::PartSource {
+                part: p,
+                doc: &base_doc,
+            });
         }
     }
     // Add preset parts whose category == target.
     for p in &preset_parts {
         if p.category == cat {
-            sources.push(kami_vrm::PartSource { part: p, doc: &preset_doc });
+            sources.push(kami_vrm::PartSource {
+                part: p,
+                doc: &preset_doc,
+            });
         }
     }
     if sources.is_empty() {
         return Err(JsValue::from_str("no parts to compose"));
     }
 
-    let composed = kami_vrm::compose::compose(&sources, &kami_vrm::ComposeConfig { skeleton_base: 0 })
-        .map_err(|e| JsValue::from_str(&format!("compose: {e:?}")))?;
+    let composed =
+        kami_vrm::compose::compose(&sources, &kami_vrm::ComposeConfig { skeleton_base: 0 })
+            .map_err(|e| JsValue::from_str(&format!("compose: {e:?}")))?;
     let glb = kami_vrm::export_glb(&composed)
         .map_err(|e| JsValue::from_str(&format!("export: {e:?}")))?;
     Ok(glb)
@@ -6578,7 +7006,9 @@ pub fn compose_vrm_with_preset(
 pub fn reset_vrm_pose() {
     VRM_SKIN_STATE.with(|state| {
         let mut s = state.borrow_mut();
-        for o in s.pose_overrides.iter_mut() { *o = None; }
+        for o in s.pose_overrides.iter_mut() {
+            *o = None;
+        }
         s.pose_dirty = true;
     });
 }
@@ -6641,7 +7071,12 @@ pub fn evaluate_motion(motion_key: &str, time: f32) -> String {
         "dance" => {
             bones.push(("hips", (t * 6.0).sin() * 3.0, (t * 3.0).sin() * 10.0, 0.0));
             bones.push(("leftUpperArm", 0.0, 0.0, 50.0 + (t * 3.0).sin() * 20.0));
-            bones.push(("rightUpperArm", 0.0, 0.0, -50.0 + (t * 3.0 + 1.0).sin() * 20.0));
+            bones.push((
+                "rightUpperArm",
+                0.0,
+                0.0,
+                -50.0 + (t * 3.0 + 1.0).sin() * 20.0,
+            ));
             bones.push(("head", 0.0, 0.0, (t * 3.0).sin() * 8.0));
             bones.push(("spine", 0.0, (t * 3.0).sin() * 5.0, 0.0));
         }
@@ -6661,13 +7096,28 @@ pub fn evaluate_motion(motion_key: &str, time: f32) -> String {
         "excited" => {
             bones.push(("hips", (t * 6.0).sin().abs() * 4.0, 0.0, 0.0));
             bones.push(("leftUpperArm", 0.0, 0.0, 40.0 + (t * 5.0).sin() * 25.0));
-            bones.push(("rightUpperArm", 0.0, 0.0, -40.0 + (t * 5.0 + 1.0).sin() * 25.0));
+            bones.push((
+                "rightUpperArm",
+                0.0,
+                0.0,
+                -40.0 + (t * 5.0 + 1.0).sin() * 25.0,
+            ));
             bones.push(("leftLowerArm", 0.0, 70.0 + (t * 5.0).sin() * 30.0, 0.0));
-            bones.push(("rightLowerArm", 0.0, -70.0 + (t * 5.0 + 1.0).sin() * 30.0, 0.0));
+            bones.push((
+                "rightLowerArm",
+                0.0,
+                -70.0 + (t * 5.0 + 1.0).sin() * 30.0,
+                0.0,
+            ));
             bones.push(("head", -5.0 + (t * 3.0).sin() * 5.0, 0.0, 0.0));
         }
         "sad_sway" => {
-            bones.push(("head", 15.0 + (t * 0.6).sin() * 3.0, 0.0, (t * 0.8).sin() * 5.0));
+            bones.push((
+                "head",
+                15.0 + (t * 0.6).sin() * 3.0,
+                0.0,
+                (t * 0.8).sin() * 5.0,
+            ));
             bones.push(("spine", 8.0 + (t * 0.6).sin() * 2.0, 0.0, 0.0));
         }
         _ => {}
@@ -6894,8 +7344,15 @@ pub fn generate_terrain_chunk(config_json: &str) -> String {
     }
 
     let cfg: Cfg = serde_json::from_str(config_json).unwrap_or(Cfg {
-        width: None, depth: None, seed: None, max_height: None,
-        frequency: None, octaves: None, origin_x: None, origin_z: None, lod: None,
+        width: None,
+        depth: None,
+        seed: None,
+        max_height: None,
+        frequency: None,
+        octaves: None,
+        origin_x: None,
+        origin_z: None,
+        lod: None,
         biome: None,
     });
 
@@ -6915,9 +7372,15 @@ pub fn generate_terrain_chunk(config_json: &str) -> String {
     let seed = cfg.seed.unwrap_or(42.0);
     let mut hm_cfg = biome.heightmap(seed);
     // Allow per-call overrides
-    if let Some(mh) = cfg.max_height { hm_cfg.max_height = mh; }
-    if let Some(f) = cfg.frequency { hm_cfg.frequency = f; }
-    if let Some(o) = cfg.octaves { hm_cfg.octaves = o; }
+    if let Some(mh) = cfg.max_height {
+        hm_cfg.max_height = mh;
+    }
+    if let Some(f) = cfg.frequency {
+        hm_cfg.frequency = f;
+    }
+    if let Some(o) = cfg.octaves {
+        hm_cfg.octaves = o;
+    }
 
     let st = biome.splat_thresholds();
     let palette = biome.palette();
@@ -6927,14 +7390,26 @@ pub fn generate_terrain_chunk(config_json: &str) -> String {
     let chunk = generate_chunk_mesh(&hm, &splat, ox, oz, stride, 1.0, lod);
 
     // Flatten TerrainVertex to f32 array (12 floats per vertex)
-    let verts: Vec<f32> = chunk.vertices.iter().flat_map(|v| {
-        [
-            v.position[0], v.position[1], v.position[2],
-            v.normal[0], v.normal[1], v.normal[2],
-            v.uv[0], v.uv[1],
-            v.splat[0], v.splat[1], v.splat[2], v.splat[3],
-        ]
-    }).collect();
+    let verts: Vec<f32> = chunk
+        .vertices
+        .iter()
+        .flat_map(|v| {
+            [
+                v.position[0],
+                v.position[1],
+                v.position[2],
+                v.normal[0],
+                v.normal[1],
+                v.normal[2],
+                v.uv[0],
+                v.uv[1],
+                v.splat[0],
+                v.splat[1],
+                v.splat[2],
+                v.splat[3],
+            ]
+        })
+        .collect();
 
     serde_json::json!({
         "vertices": verts,
@@ -6947,7 +7422,8 @@ pub fn generate_terrain_chunk(config_json: &str) -> String {
             "base": palette.base,
             "tip": palette.tip,
         },
-    }).to_string()
+    })
+    .to_string()
 }
 
 // ── Vegetation cache for per-frame culling ──
@@ -6965,19 +7441,48 @@ pub fn cache_vegetation(config_json: &str) -> u32 {
 
     #[derive(serde::Deserialize)]
     struct TerrainCfg {
-        width: Option<u32>, depth: Option<u32>, seed: Option<f32>,
-        max_height: Option<f32>, frequency: Option<f32>, octaves: Option<u32>,
-        origin_x: Option<f32>, origin_z: Option<f32>, biome: Option<String>,
+        width: Option<u32>,
+        depth: Option<u32>,
+        seed: Option<f32>,
+        max_height: Option<f32>,
+        frequency: Option<f32>,
+        octaves: Option<u32>,
+        origin_x: Option<f32>,
+        origin_z: Option<f32>,
+        biome: Option<String>,
     }
     #[derive(serde::Deserialize)]
-    struct PlaceCfg { seed: Option<u32>, extent: Option<f32>, density_scale: Option<f32> }
+    struct PlaceCfg {
+        seed: Option<u32>,
+        extent: Option<f32>,
+        density_scale: Option<f32>,
+    }
     #[derive(serde::Deserialize)]
-    struct Cfg { terrain: Option<TerrainCfg>, placement: Option<PlaceCfg> }
+    struct Cfg {
+        terrain: Option<TerrainCfg>,
+        placement: Option<PlaceCfg>,
+    }
 
-    let cfg: Cfg = serde_json::from_str(config_json).unwrap_or(Cfg { terrain: None, placement: None });
-    let t = cfg.terrain.unwrap_or(TerrainCfg { width: None, depth: None, seed: None,
-        max_height: None, frequency: None, octaves: None, origin_x: None, origin_z: None, biome: None });
-    let p = cfg.placement.unwrap_or(PlaceCfg { seed: None, extent: None, density_scale: None });
+    let cfg: Cfg = serde_json::from_str(config_json).unwrap_or(Cfg {
+        terrain: None,
+        placement: None,
+    });
+    let t = cfg.terrain.unwrap_or(TerrainCfg {
+        width: None,
+        depth: None,
+        seed: None,
+        max_height: None,
+        frequency: None,
+        octaves: None,
+        origin_x: None,
+        origin_z: None,
+        biome: None,
+    });
+    let p = cfg.placement.unwrap_or(PlaceCfg {
+        seed: None,
+        extent: None,
+        density_scale: None,
+    });
 
     let biome = match t.biome.as_deref() {
         Some("quarry") => BiomePreset::Quarry,
@@ -6986,9 +7491,15 @@ pub fn cache_vegetation(config_json: &str) -> u32 {
         _ => BiomePreset::Plains,
     };
     let mut hm_cfg = biome.heightmap(t.seed.unwrap_or(42.0));
-    if let Some(mh) = t.max_height { hm_cfg.max_height = mh; }
-    if let Some(f) = t.frequency { hm_cfg.frequency = f; }
-    if let Some(o) = t.octaves { hm_cfg.octaves = o; }
+    if let Some(mh) = t.max_height {
+        hm_cfg.max_height = mh;
+    }
+    if let Some(f) = t.frequency {
+        hm_cfg.frequency = f;
+    }
+    if let Some(o) = t.octaves {
+        hm_cfg.octaves = o;
+    }
     let w = t.width.unwrap_or(257);
     let d = t.depth.unwrap_or(257);
     let ox = t.origin_x.unwrap_or(-128.0);
@@ -7037,7 +7548,8 @@ pub fn compute_sky_uniform(time_of_day: f32) -> String {
         "fog_color": u.fog_color,
         "fog_density": u.fog_density,
         "time_of_day": u.time_of_day,
-    }).to_string()
+    })
+    .to_string()
 }
 
 /// Generate water plane mesh + Gerstner wave parameters.
@@ -7055,7 +7567,9 @@ pub fn generate_water_mesh(config_json: &str) -> String {
     }
 
     let cfg: Cfg = serde_json::from_str(config_json).unwrap_or(Cfg {
-        sea_level: None, extent: None, resolution: None,
+        sea_level: None,
+        extent: None,
+        resolution: None,
     });
 
     let water_cfg = WaterConfig {
@@ -7067,19 +7581,32 @@ pub fn generate_water_mesh(config_json: &str) -> String {
 
     let (verts, indices) = kami_terrain::generate_water_mesh(&water_cfg);
 
-    let flat_verts: Vec<f32> = verts.iter().flat_map(|v| {
-        [v.position[0], v.position[1], v.position[2], v.uv[0], v.uv[1]]
-    }).collect();
-
-    let waves: Vec<serde_json::Value> = water_cfg.waves.iter().map(|w| {
-        serde_json::json!({
-            "direction": w.direction,
-            "amplitude": w.amplitude,
-            "wavelength": w.wavelength,
-            "speed": w.speed,
-            "steepness": w.steepness,
+    let flat_verts: Vec<f32> = verts
+        .iter()
+        .flat_map(|v| {
+            [
+                v.position[0],
+                v.position[1],
+                v.position[2],
+                v.uv[0],
+                v.uv[1],
+            ]
         })
-    }).collect();
+        .collect();
+
+    let waves: Vec<serde_json::Value> = water_cfg
+        .waves
+        .iter()
+        .map(|w| {
+            serde_json::json!({
+                "direction": w.direction,
+                "amplitude": w.amplitude,
+                "wavelength": w.wavelength,
+                "speed": w.speed,
+                "steepness": w.steepness,
+            })
+        })
+        .collect();
 
     serde_json::json!({
         "vertices": flat_verts,
@@ -7088,7 +7615,8 @@ pub fn generate_water_mesh(config_json: &str) -> String {
         "index_count": indices.len(),
         "sea_level": water_cfg.sea_level,
         "waves": waves,
-    }).to_string()
+    })
+    .to_string()
 }
 
 /// Compute 4 Gerstner waves from wind direction + speed + gust.
@@ -7100,15 +7628,18 @@ pub fn generate_water_mesh(config_json: &str) -> String {
 #[wasm_bindgen]
 pub fn compute_wind_waves(dir_x: f32, dir_z: f32, wind_speed: f32, gust: f32) -> String {
     let waves = kami_terrain::waves_from_wind([dir_x, dir_z], wind_speed, gust);
-    let arr: Vec<serde_json::Value> = waves.iter().map(|w| {
-        serde_json::json!({
-            "direction": w.direction,
-            "amplitude": w.amplitude,
-            "wavelength": w.wavelength,
-            "speed": w.speed,
-            "steepness": w.steepness,
+    let arr: Vec<serde_json::Value> = waves
+        .iter()
+        .map(|w| {
+            serde_json::json!({
+                "direction": w.direction,
+                "amplitude": w.amplitude,
+                "wavelength": w.wavelength,
+                "speed": w.speed,
+                "steepness": w.steepness,
+            })
         })
-    }).collect();
+        .collect();
     serde_json::json!({ "waves": arr }).to_string()
 }
 
@@ -7121,19 +7652,46 @@ pub fn generate_vegetation(config_json: &str) -> String {
 
     #[derive(serde::Deserialize)]
     struct TerrainCfg {
-        width: Option<u32>, depth: Option<u32>, seed: Option<f32>,
-        max_height: Option<f32>, frequency: Option<f32>, octaves: Option<u32>,
-        origin_x: Option<f32>, origin_z: Option<f32>,
+        width: Option<u32>,
+        depth: Option<u32>,
+        seed: Option<f32>,
+        max_height: Option<f32>,
+        frequency: Option<f32>,
+        octaves: Option<u32>,
+        origin_x: Option<f32>,
+        origin_z: Option<f32>,
     }
     #[derive(serde::Deserialize)]
-    struct PlaceCfg { seed: Option<u32>, extent: Option<f32>, density_scale: Option<f32> }
+    struct PlaceCfg {
+        seed: Option<u32>,
+        extent: Option<f32>,
+        density_scale: Option<f32>,
+    }
     #[derive(serde::Deserialize)]
-    struct Cfg { terrain: Option<TerrainCfg>, placement: Option<PlaceCfg> }
+    struct Cfg {
+        terrain: Option<TerrainCfg>,
+        placement: Option<PlaceCfg>,
+    }
 
-    let cfg: Cfg = serde_json::from_str(config_json).unwrap_or(Cfg { terrain: None, placement: None });
-    let t = cfg.terrain.unwrap_or(TerrainCfg { width: None, depth: None, seed: None,
-        max_height: None, frequency: None, octaves: None, origin_x: None, origin_z: None });
-    let p = cfg.placement.unwrap_or(PlaceCfg { seed: None, extent: None, density_scale: None });
+    let cfg: Cfg = serde_json::from_str(config_json).unwrap_or(Cfg {
+        terrain: None,
+        placement: None,
+    });
+    let t = cfg.terrain.unwrap_or(TerrainCfg {
+        width: None,
+        depth: None,
+        seed: None,
+        max_height: None,
+        frequency: None,
+        octaves: None,
+        origin_x: None,
+        origin_z: None,
+    });
+    let p = cfg.placement.unwrap_or(PlaceCfg {
+        seed: None,
+        extent: None,
+        density_scale: None,
+    });
 
     let hm_cfg = HeightmapConfig {
         seed: t.seed.unwrap_or(42.0),
@@ -7158,15 +7716,28 @@ pub fn generate_vegetation(config_json: &str) -> String {
     };
     let instances = place_instances(&hm, &splat, ox, oz, &pc);
 
-    let flat: Vec<f32> = instances.iter().flat_map(|i| {
-        [i.position[0], i.position[1], i.position[2], i.scale,
-         i.rotation, i.species, i.wind_phase, i.color_tint]
-    }).collect();
+    let flat: Vec<f32> = instances
+        .iter()
+        .flat_map(|i| {
+            [
+                i.position[0],
+                i.position[1],
+                i.position[2],
+                i.scale,
+                i.rotation,
+                i.species,
+                i.wind_phase,
+                i.color_tint,
+            ]
+        })
+        .collect();
 
     let mut by_species = [0u32; 5];
     for i in &instances {
         let s = i.species as usize;
-        if s < 5 { by_species[s] += 1; }
+        if s < 5 {
+            by_species[s] += 1;
+        }
     }
 
     serde_json::json!({
@@ -7176,7 +7747,8 @@ pub fn generate_vegetation(config_json: &str) -> String {
             "grass": by_species[0], "fern": by_species[1], "palm": by_species[2],
             "conifer": by_species[3], "bush": by_species[4],
         },
-    }).to_string()
+    })
+    .to_string()
 }
 
 /// Compute full weather state (sky + wind + clouds) for one frame.
@@ -7189,11 +7761,10 @@ pub fn compute_weather(time_of_day: f32, game_time: f32) -> String {
 /// Compute weather with a named preset.
 #[wasm_bindgen]
 pub fn compute_weather_preset(time_of_day: f32, game_time: f32, preset: &str) -> String {
-    let mut weather = match preset {
-        "overcast" => kami_atmosphere::Weather::overcast(),
-        "clear" => kami_atmosphere::Weather::clear(),
-        _ => kami_atmosphere::Weather::default(),
-    };
+    // Executor edge (ADR-0044/0046): named presets load from kami-atmosphere-scene's
+    // weather.edn (builtin fallback); an unknown name keeps the old `Weather::default()`.
+    let mut weather =
+        kami_atmosphere_scene::resolve_weather(preset).unwrap_or_else(kami_atmosphere::Weather::default);
     if time_of_day >= 0.0 {
         weather.day_night.time = time_of_day;
     }
@@ -7228,5 +7799,6 @@ pub fn compute_weather_preset(time_of_day: f32, game_time: f32, preset: &str) ->
             "density": cloud.density,
             "sharpness": cloud.sharpness,
         },
-    }).to_string()
+    })
+    .to_string()
 }
