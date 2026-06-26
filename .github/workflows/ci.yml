@@ -68,3 +68,4 @@ jobs:
         run: |
           rustup target add wasm32-unknown-unknown
           cargo build -p kami-script-runtime --no-default-features --features backend-wasmi --target wasm32-unknown-unknown
+          cargo build -p kami-web-modelb --target wasm32-unknown-unknown

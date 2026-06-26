@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--
+  Web Model-B shell — the VRM dance running in the browser as a compiled-CLJ game.
+
+  Build the wasm first (from the repo root):
+      wasm-pack build --target web kami-web-modelb
+  then serve this directory and open index.html:
+      python3 -m http.server 8080   # → http://localhost:8080/kami-web-modelb/web/
+
+  What runs in-page (all wasm32):
+   - kami-live parses the shipped :dance/* EDN → a LiveShow (native choreography),
+   - the shipped dance/logic.clj is compiled to WASM in-page and ticked by the
+     wasmi (no-JIT) runtime — the game's WASM runs *wasm-in-wasm*.
+  Each frame returns the render-IR EDN; feed it to the kami-webgpu WebGPU executor
+  to draw the avatar + crowd (the GPU layer). This shell proves the compiled-CLJ
+  half is live (the audience ring fills, the show advances) and surfaces the
+  render-IR the GPU stage consumes.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>kami — web Model-B dance (compiled CLJ in the browser)</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; background: #f0ead6; color: #3a3a3a;
+           font-family: "Nunito", system-ui, sans-serif; font-weight: 700;
+           display: flex; min-height: 100vh; align-items: center; justify-content: center; }
+    .card { background: #fff; border-radius: 16px; padding: 28px 36px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.08); max-width: 560px; }
+    h1 { margin: 0 0 4px; font-size: 20px; }
+    .sub { color: #8a8a8a; font-size: 13px; margin-bottom: 18px; }
+    .stat { display: flex; justify-content: space-between; padding: 6px 0;
+            border-bottom: 1px dashed #eee; font-variant-numeric: tabular-nums; }
+    .stat b { color: #e0608a; }
+    pre { background: #faf7ef; border-radius: 10px; padding: 10px 12px; font-size: 11px;
+          color: #6a6a6a; max-height: 120px; overflow: auto; white-space: pre-wrap; word-break: break-all; }
+    .err { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎶 web Model-B dance</h1>
+    <div class="sub">choreography as EDN data · behaviour as compiled Clojure · running wasm-in-wasm</div>
+    <div class="stat"><span>compiled-CLJ status</span><b id="status">booting…</b></div>
+    <div class="stat"><span>show frames ticked</span><b id="frames">0</b></div>
+    <div class="stat"><span>audience seated (CLJ <code>seat-audience</code>)</span><b id="fans">0</b></div>
+    <div class="stat"><span>render-IR size (→ kami-webgpu)</span><b id="ir">0 B</b></div>
+    <pre id="irhead">render-IR preview…</pre>
+  </div>
+
+  <script type="module">
+    import init, { WebDance } from "../pkg/kami_web_modelb.js";
+
+    const $ = (id) => document.getElementById(id);
+    try {
+      await init();                       // load the wasm32 module
+      const dance = new WebDance();       // parse scene.edn + compile logic.clj in-page
+      $("status").textContent = "running ✓";
+      let frames = 0;
+      const loop = () => {
+        const ir = dance.tick(1 / 60);    // native LiveShow + compiled-CLJ logic
+        frames++;
+        $("frames").textContent = frames;
+        $("fans").textContent = dance.fan_count();
+        $("ir").textContent = `${ir.length.toLocaleString()} B`;
+        if (frames % 12 === 0) $("irhead").textContent = ir.slice(0, 360) + " …";
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+    } catch (e) {
+      $("status").className = "err";
+      $("status").textContent = "error";
+      $("irhead").className = "err";
+      $("irhead").textContent = String(e);
+      console.error(e);
+    }
+  </script>
+</body>
+</html>

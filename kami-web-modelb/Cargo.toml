@@ -1,0 +1,16 @@
+[package]
+name = "kami-web-modelb"
+version = "0.1.0"
+edition = "2021"
+description = "Web Model-B: the VRM dance running in-browser as a compiled-CLJ game (native LiveShow + wasmi-driven dance logic.clj, wasm-in-wasm)."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Native choreography (LiveShow) — builds for wasm32 (pure data, no GPU).
+kami-live = { path = "../kami-live" }
+# Compiled-CLJ gameplay on the no-JIT (wasmi) backend → runs wasm-in-wasm in-page.
+kami-script-runtime = { path = "../kami-script-runtime", default-features = false, features = ["backend-wasmi"] }
+hecs = { workspace = true }
+wasm-bindgen = "0.2"
