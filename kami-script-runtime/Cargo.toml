@@ -31,6 +31,9 @@ backend-wasmi    = ["dep:wasmi"]
 
 [dev-dependencies]
 hecs = { workspace = true }
+# Model-B composition test (tests/dance_model_b.rs): drive kami-live's native
+# LiveShow + the compiled-CLJ dance logic in one host loop. Test-only, no cycle.
+kami-live = { path = "../kami-live" }
 # Parse the EDN that `kami spec` emits, to round-trip-test the bb-pipeline contract.
 kami-scene = { path = "../kami-scene" }
 # Headless frame-pipeline example (examples/frame_pipeline.rs): the host drives the
