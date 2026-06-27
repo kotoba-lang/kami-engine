@@ -306,33 +306,50 @@
   each `:data` is a flat vector of decoded numbers (f32/mat4 → f32; f16/quat → f32
   via `f16->f32`; integer dtypes → ints), in the same order `pack` wrote them.
   Verifies the 'KAMI' magic and reads the little-endian headers exactly as the
-  Rust `KamiFrame` reader does. Pure; round-trips `pack`."
+  Rust `KamiFrame` reader does. Bounds-checks every column header + payload against
+  the buffer length and throws a typed `ex-info` (`:kami.ipc/error` ∈ #{:too-short
+  :bad-magic :unknown-dtype :column-out-of-bounds}, mirroring the Rust decoder's
+  `DecodeError`) rather than letting an out-of-range index escape. Pure; round-trips
+  `pack`."
   [buffer]
-  (let [buf (vec buffer)]
-    (when (< (count buf) header-bytes)
-      (throw (ex-info "unpack: buffer shorter than 16-byte header" {:len (count buf)})))
+  (let [buf (vec buffer)
+        n   (count buf)]
+    (when (< n header-bytes)
+      (throw (ex-info "unpack: buffer shorter than 16-byte header"
+                      {:kami.ipc/error :too-short :len n})))
     (let [magic* (rd-u32 buf 0)]
       (when-not (= magic* magic)
         (throw (ex-info "unpack: bad magic (not a KAMI frame)"
-                        {:got magic* :want magic}))))
+                        {:kami.ipc/error :bad-magic :got magic* :want magic}))))
     (let [version* (rd-u16 buf 4)
           ncols    (rd-u16 buf 6)
           frame-n  (rd-u32 buf 8)
           columns
           (mapv
            (fn [i]
-             (let [base   (+ header-bytes (* (long i) column-header-bytes))
-                   enum   (long (nth buf base))
-                   stride (long (nth buf (inc base)))
-                   len    (rd-u32 buf (+ base 4))
-                   off    (rd-u32 buf (+ base 8))
-                   dt     (or (enum->dtype enum)
-                              (throw (ex-info "unpack: unknown dtype enum" {:enum enum})))
-                   per    (case dt :mat4 16 :quat 4 1)
-                   esz    (long (/ (long (:elsize (dtype dt))) per)) ; bytes per flat element
-                   n-el   (* len per stride)
-                   data   (mapv #(decode-element dt buf (+ off (* (long %) esz)))
-                                (range n-el))]
-               {:dtype dt :stride stride :len len :offset off :data data}))
+             (let [base (+ header-bytes (* (long i) column-header-bytes))]
+               (when (> (+ base column-header-bytes) n)
+                 (throw (ex-info "unpack: truncated inside column headers"
+                                 {:kami.ipc/error :too-short :column i
+                                  :need (+ base column-header-bytes) :len n})))
+               (let [enum   (long (nth buf base))
+                     stride (long (nth buf (inc base)))
+                     len    (rd-u32 buf (+ base 4))
+                     off    (rd-u32 buf (+ base 8))
+                     dt     (or (enum->dtype enum)
+                                (throw (ex-info "unpack: unknown dtype enum"
+                                                {:kami.ipc/error :unknown-dtype
+                                                 :column i :enum enum})))
+                     per    (case dt :mat4 16 :quat 4 1)
+                     esz    (long (/ (long (:elsize (dtype dt))) per)) ; bytes per flat element
+                     n-el   (* len per stride)
+                     end    (+ off (* esz n-el))]
+                 (when (> end n)
+                   (throw (ex-info "unpack: column payload out of bounds"
+                                   {:kami.ipc/error :column-out-of-bounds
+                                    :column i :offset off :end end :len n})))
+                 {:dtype dt :stride stride :len len :offset off
+                  :data (mapv #(decode-element dt buf (+ off (* (long %) esz)))
+                              (range n-el))})))
            (range ncols))]
       {:n frame-n :version version* :ncols ncols :columns columns})))

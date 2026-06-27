@@ -187,6 +187,22 @@
       (is (thrown? #?(:clj Exception :cljs js/Error)
                    (ipc/unpack (assoc (:buffer packed) 0 0)))))))
 
+(deftest ipc-unpack-rejects-malformed
+  ;; typed errors mirror the Rust decoder's DecodeError (no raw index-out-of-range).
+  ;; frame has 2 columns → header region = 16 + 2×16 = 48 bytes.
+  (let [w   (ecs/load-snapshot snap)
+        buf (:buffer (ipc/pack (render/frame w {:n 1 :aspect 1.0})))
+        err (fn [b] (try (ipc/unpack b) :no-throw
+                         (catch #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) e
+                           (:kami.ipc/error (ex-data e)))))]
+    (is (= 2 (:ncols (ipc/unpack buf))))                         ; sanity: valid buffer decodes
+    (testing "every malformation yields a typed kami.ipc error"
+      (is (= :bad-magic            (err (assoc buf 0 0))))       ; clobbered magic
+      (is (= :too-short            (err (subvec buf 0 8))))      ; below the 16-byte header
+      (is (= :too-short            (err (subvec buf 0 24))))     ; truncated mid column header
+      (is (= :column-out-of-bounds (err (subvec buf 0 48))))     ; headers ok, payload gone
+      (is (= :unknown-dtype        (err (assoc buf 16 9)))))))   ; col0 dtype byte → unknown tag
+
 (deftest ipc-f16-roundtrip
   (let [f16  @#'ipc/f16-bits
         f16' @#'ipc/f16->f32
