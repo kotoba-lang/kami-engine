@@ -124,4 +124,6 @@
    :kokoro   kokoro
    :insights (vec insights)
    :named    named
-   :bond     (long (Math/round (* 10.0 grace)))})
+   ;; Math/round already yields a long on the JVM and an integer-valued number
+   ;; in cljs; no `long` coercion (which cljs lacks) needed.
+   :bond     (Math/round (* 10.0 grace))})
