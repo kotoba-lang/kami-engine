@@ -24,15 +24,45 @@ use kami_script_runtime::{KamiScriptRuntime, Tag};
 #[cfg(target_arch = "wasm32")]
 mod gpu;
 
-/// Step 1 of the GPU visual: bring up a wgpu surface over the `<canvas id=…>` and
-/// clear/present it (proves the compliant wgpu path is live in-page). The
-/// render-IR pixel blit layers onto this next.
+/// The web Model-B dance with **GPU display**: composes the dance (native LiveShow
+/// + compiled-CLJ logic) and draws it to a `<canvas>` via wgpu — the engine's CPU
+/// rasteriser (`kami_webgpu_rs::render`) blitted as a fullscreen texture (compliant:
+/// wgpu, never Canvas2D). Drive `frame(dt)` from a `requestAnimationFrame` loop.
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
-pub async fn gpu_clear(canvas_id: String, w: u32, h: u32) -> Result<(), JsValue> {
-    let g = gpu::Gpu::new(&canvas_id, w, h).await.map_err(|e| JsValue::from_str(&e))?;
-    g.present_clear().map_err(|e| JsValue::from_str(&e))?;
-    Ok(())
+pub struct WebDanceGpu {
+    dance: WebDance,
+    gpu: gpu::Gpu,
+    w: u32,
+    h: u32,
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+impl WebDanceGpu {
+    /// Compose the dance and bring up the GPU surface over `<canvas id=…>`.
+    pub async fn start(canvas_id: String, w: u32, h: u32) -> Result<WebDanceGpu, JsValue> {
+        console_error_panic_hook::set_once();
+        let dance = WebDance::new()?;
+        let gpu = gpu::Gpu::new(&canvas_id, w, h).await.map_err(|e| JsValue::from_str(&e))?;
+        Ok(WebDanceGpu { dance, gpu, w, h })
+    }
+
+    /// One frame: tick the dance (native show + compiled-CLJ logic), rasterise the
+    /// render-IR, and blit it to the canvas.
+    pub fn frame(&mut self, dt: f32) -> Result<(), JsValue> {
+        let ir = self.dance.tick(dt);
+        let (mut g, insts) = kami_webgpu_rs::parse_ir(&ir);
+        g.eye = Some([0.0, 1.5, 4.2]);
+        g.target = Some([0.0, 0.95, 0.0]);
+        let px = kami_webgpu_rs::render(&g, &insts, self.w, self.h);
+        self.gpu.blit_rgba(&px, self.w, self.h).map_err(|e| JsValue::from_str(&e))
+    }
+
+    /// Audience fans the compiled-CLJ logic has seated (liveness proof).
+    pub fn fan_count(&self) -> usize {
+        self.dance.fan_count()
+    }
 }
 
 /// The shipped dance artifacts — choreography as data, behaviour as Clojure.

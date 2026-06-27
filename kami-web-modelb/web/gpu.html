@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!--
+  Web Model-B shell — the VRM dance running in the browser as a compiled-CLJ game,
+  drawn with wgpu (WebGPU → WebGL2 fallback; never Canvas2D).
+
+  Build the wasm first (from the repo root):
+      wasm-pack build --target web kami-web-modelb
+  then serve this directory and open index.html:
+      python3 -m http.server 8080   # → http://localhost:8080/kami-web-modelb/web/
+
+  All wasm32, in-page: kami-live parses the :dance/* EDN → a LiveShow; the shipped
+  dance/logic.clj is compiled to WASM in-page and ticked by the wasmi runtime
+  (wasm-in-wasm); each frame's render-IR is CPU-rasterised by kami-webgpu-rs and
+  blitted to the canvas via wgpu.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>kami — web Model-B dance (compiled CLJ + wgpu in the browser)</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; background: #f0ead6; color: #3a3a3a;
+           font-family: "Nunito", system-ui, sans-serif; font-weight: 700;
+           display: flex; min-height: 100vh; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+    canvas { background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.10); }
+    .card { background: #fff; border-radius: 16px; padding: 22px 28px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.08); min-width: 240px; }
+    h1 { margin: 0 0 4px; font-size: 18px; }
+    .sub { color: #8a8a8a; font-size: 12px; margin-bottom: 16px; }
+    .stat { display: flex; justify-content: space-between; padding: 6px 0;
+            border-bottom: 1px dashed #eee; font-variant-numeric: tabular-nums; }
+    .stat b { color: #e0608a; }
+    .err { color: #c0392b; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <canvas id="gpu" width="420" height="480"></canvas>
+  <div class="card">
+    <h1>🎶 web Model-B dance</h1>
+    <div class="sub">EDN choreography · compiled-CLJ logic · wgpu draw · wasm-in-wasm</div>
+    <div class="stat"><span>display</span><b id="status">booting…</b></div>
+    <div class="stat"><span>frames drawn (wgpu)</span><b id="frames">0</b></div>
+    <div class="stat"><span>audience seated (CLJ)</span><b id="fans">0</b></div>
+    <pre id="err" class="err"></pre>
+  </div>
+
+  <script type="module">
+    import init, { WebDanceGpu } from "../pkg/kami_web_modelb.js";
+    const $ = (id) => document.getElementById(id);
+    try {
+      await init();
+      const dance = await WebDanceGpu.start("gpu", 420, 480);
+      $("status").textContent = "wgpu drawing ✓";
+      let frames = 0;
+      const loop = () => {
+        dance.frame(1 / 60);          // tick + CPU rasterise + wgpu blit
+        frames++;
+        $("frames").textContent = frames;
+        $("fans").textContent = dance.fan_count();
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+    } catch (e) {
+      $("status").textContent = "error";
+      $("err").textContent = String(e);
+      console.error(e);
+    }
+  </script>
+</body>
+</html>
