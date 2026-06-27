@@ -12,8 +12,8 @@
 
 use std::process::exit;
 
-use kami_live::lint::{lint_scene, Severity};
-use kami_live::scene::{run_headless, DanceScene};
+use kami_live::lint::{Severity, lint_scene};
+use kami_live::scene::{DanceScene, run_headless};
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();

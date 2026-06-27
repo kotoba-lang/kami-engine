@@ -262,12 +262,12 @@ impl SkeletalMeshAsset {
 /// 64 bytes/vertex: pos(12) + normal(12) + uv(8) + tangent(16) + joints(8) + weights(8).
 pub fn skinned_vertex_buffer_layout() -> Vec<(u64, u32, &'static str)> {
     vec![
-        (0, 0, "float32x3"),   // position
-        (12, 1, "float32x3"),  // normal
-        (24, 2, "float32x2"),  // uv
-        (32, 3, "float32x4"),  // tangent
-        (48, 4, "uint16x4"),   // joint_indices
-        (56, 5, "uint16x4"),   // joint_weights
+        (0, 0, "float32x3"),  // position
+        (12, 1, "float32x3"), // normal
+        (24, 2, "float32x2"), // uv
+        (32, 3, "float32x4"), // tangent
+        (48, 4, "uint16x4"),  // joint_indices
+        (56, 5, "uint16x4"),  // joint_weights
     ]
 }
 
@@ -322,8 +322,22 @@ mod tests {
             vertices: vec![],
             indices: vec![0, 1, 2, 3, 4, 5, 6, 7, 8],
             lod_sections: vec![
-                LodSection { lod_level: 0, index_start: 0, index_count: 6, material_slot: 0, vertex_start: 0, vertex_count: 4 },
-                LodSection { lod_level: 1, index_start: 6, index_count: 3, material_slot: 0, vertex_start: 0, vertex_count: 3 },
+                LodSection {
+                    lod_level: 0,
+                    index_start: 0,
+                    index_count: 6,
+                    material_slot: 0,
+                    vertex_start: 0,
+                    vertex_count: 4,
+                },
+                LodSection {
+                    lod_level: 1,
+                    index_start: 6,
+                    index_count: 3,
+                    material_slot: 0,
+                    vertex_start: 0,
+                    vertex_count: 3,
+                },
             ],
             morph_targets: vec![],
             material_slots: vec![],
@@ -339,7 +353,7 @@ mod tests {
     fn test_vertex_layout() {
         let layout = skinned_vertex_buffer_layout();
         assert_eq!(layout.len(), 6);
-        assert_eq!(layout[0].0, 0);  // position offset
+        assert_eq!(layout[0].0, 0); // position offset
         assert_eq!(layout[5].0, 56); // weights offset
     }
 }

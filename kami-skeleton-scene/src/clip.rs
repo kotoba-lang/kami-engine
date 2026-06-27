@@ -14,7 +14,7 @@
 //! ```
 
 use glam::{Quat, Vec3};
-use kami_scene::{mget, num, root_map, vec3, EdnValue};
+use kami_scene::{EdnValue, mget, num, root_map, vec3};
 use kami_skeleton::{AnimationClip, BoneTrack, Interpolation, Keyframe};
 
 fn opt_vec3(v: Option<&EdnValue>) -> Option<Vec3> {
@@ -29,7 +29,11 @@ fn opt_quat(v: Option<&EdnValue>) -> Option<Quat> {
     if s.is_empty() {
         return None;
     }
-    let g = |i: usize| s.get(i).map(|x| num(Some(x))).unwrap_or(if i == 3 { 1.0 } else { 0.0 });
+    let g = |i: usize| {
+        s.get(i)
+            .map(|x| num(Some(x)))
+            .unwrap_or(if i == 3 { 1.0 } else { 0.0 })
+    };
     Some(Quat::from_xyzw(g(0), g(1), g(2), g(3)))
 }
 
@@ -49,14 +53,24 @@ where
     F: Fn(&str) -> Option<usize>,
 {
     let root = root_map(src)?;
-    let name = mget(&root, "name").and_then(|v| v.as_string()).unwrap_or("clip").to_string();
-    let looping = mget(&root, "loop").and_then(|v| v.as_bool()).unwrap_or(false);
+    let name = mget(&root, "name")
+        .and_then(|v| v.as_string())
+        .unwrap_or("clip")
+        .to_string();
+    let looping = mget(&root, "loop")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
 
     let mut tracks = Vec::new();
     let mut max_t = 0.0f32;
-    for t in mget(&root, "tracks").and_then(|v| v.as_vector()).unwrap_or(&[]) {
+    for t in mget(&root, "tracks")
+        .and_then(|v| v.as_vector())
+        .unwrap_or(&[])
+    {
         let Some(tm) = t.as_map() else { continue };
-        let Some(bone) = ident(mget(tm, "bone")).and_then(|n| bone_index(&n)) else { continue };
+        let Some(bone) = ident(mget(tm, "bone")).and_then(|n| bone_index(&n)) else {
+            continue;
+        };
         let interp = ident(mget(tm, "interp"))
             .map(|n| Interpolation::by_name(&n))
             .unwrap_or(Interpolation::Linear);
@@ -79,7 +93,11 @@ where
         if keyframes.is_empty() {
             continue;
         }
-        tracks.push(BoneTrack { bone_index: bone, keyframes, interpolation: interp });
+        tracks.push(BoneTrack {
+            bone_index: bone,
+            keyframes,
+            interpolation: interp,
+        });
     }
 
     let duration = mget(&root, "duration")
@@ -87,7 +105,12 @@ where
         .filter(|d| *d > 0.0)
         .unwrap_or(max_t);
 
-    Some(AnimationClip { name, duration, tracks, looping })
+    Some(AnimationClip {
+        name,
+        duration,
+        tracks,
+        looping,
+    })
 }
 
 #[cfg(test)]

@@ -18,7 +18,7 @@ use kami_character::anim_blueprint::{
     BlendCurve, BlendProfile, BlendSpace2DEntry, BlendSpaceEntry, Comparison, LayerBlendMode,
     TransitionCondition,
 };
-use kami_scene::{kw_key, mget, num, root_map, EdnValue};
+use kami_scene::{EdnValue, kw_key, mget, num, root_map};
 
 /// The canonical anim-blueprint CONFIG shipped with this crate.
 pub const ANIM_BLUEPRINT_EDN: &str = include_str!("../data/anim_blueprint.edn");
@@ -39,7 +39,10 @@ type Map = BTreeMap<EdnValue, EdnValue>;
 // --- tolerant scalar readers ---------------------------------------------------------
 
 fn str_at(m: &Map, key: &str) -> String {
-    mget(m, key).and_then(|v| v.as_string()).unwrap_or("").to_string()
+    mget(m, key)
+        .and_then(|v| v.as_string())
+        .unwrap_or("")
+        .to_string()
 }
 fn bool_at(m: &Map, key: &str) -> bool {
     mget(m, key).and_then(|v| v.as_bool()).unwrap_or(false)

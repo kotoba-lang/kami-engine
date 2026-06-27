@@ -10,13 +10,13 @@ use serde::{Deserialize, Serialize};
 use crate::beam::{Beam, BeamId, BreakGroup};
 use crate::controls::Controls;
 use crate::ground::Ground;
-use crate::implicit::{implicit_step, CgState};
-use crate::integrator::{substep_count, IntegratorConfig};
+use crate::implicit::{CgState, implicit_step};
+use crate::integrator::{IntegratorConfig, substep_count};
 use crate::node::{Node, NodeId};
-use crate::powertrain::{rad_to_rpm, rpm_to_rad, Powertrain};
+use crate::powertrain::{Powertrain, rad_to_rpm, rpm_to_rad};
 use crate::rigid_chassis::RigidChassis;
 use crate::triangle::Triangle;
-use crate::wheel::{pacejka_force, wheel_frame, ContactInputs, Wheel, WheelContactMode};
+use crate::wheel::{ContactInputs, Wheel, WheelContactMode, pacejka_force, wheel_frame};
 
 /// Integrator algorithm choice for the soft-body inner loop.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -136,11 +136,7 @@ impl Vehicle {
                 m += n.mass;
             }
         }
-        if m > 0.0 {
-            acc / m
-        } else {
-            Vec3::ZERO
-        }
+        if m > 0.0 { acc / m } else { Vec3::ZERO }
     }
 
     /// Chassis-frame velocity (mass-weighted).
@@ -153,11 +149,7 @@ impl Vehicle {
                 m += n.mass;
             }
         }
-        if m > 0.0 {
-            acc / m
-        } else {
-            Vec3::ZERO
-        }
+        if m > 0.0 { acc / m } else { Vec3::ZERO }
     }
 
     /// Snap a beam given its fail-group (tearing a panel off all at once).
@@ -302,10 +294,7 @@ impl Vehicle {
                 continue;
             }
             for &id in &[w.axle_n1, w.axle_n2] {
-                let i = self
-                    .nodes
-                    .iter()
-                    .position(|nn| nn.id == id);
+                let i = self.nodes.iter().position(|nn| nn.id == id);
                 if let Some(i) = i {
                     let s = ground.sample(self.nodes[i].position.x, self.nodes[i].position.z);
                     let target_y = s.height + w.radius;
@@ -325,8 +314,13 @@ impl Vehicle {
         // ── Phase B: Implicit Euler step ──
         let n_count = self.nodes.len();
         let external_forces: Vec<Vec3> = self.nodes.iter().map(|n| n.force).collect();
-        let _iters =
-            implicit_step(&mut self.nodes, &self.beams, &external_forces, dt, &mut self.cg_state);
+        let _iters = implicit_step(
+            &mut self.nodes,
+            &self.beams,
+            &external_forces,
+            dt,
+            &mut self.cg_state,
+        );
         let _ = n_count;
 
         // ── Phase C: Plastic deformation update ──
@@ -570,7 +564,10 @@ impl Vehicle {
                 // Bounded beams: skip projection when length is inside the
                 // idle range. Outside, project to the nearer bound.
                 let target = match b.beam_type {
-                    BeamType::Bounded { min_ratio, max_ratio } => {
+                    BeamType::Bounded {
+                        min_ratio,
+                        max_ratio,
+                    } => {
                         let ratio = len / rest;
                         if ratio >= min_ratio && ratio <= max_ratio {
                             continue;
@@ -677,7 +674,8 @@ impl Vehicle {
             self.powertrain.engine.omega // disengaged
         };
 
-        let clutch_engagement = (1.0 - self.controls.clutch_pedal) * if shifting { 0.0 } else { 1.0 };
+        let clutch_engagement =
+            (1.0 - self.controls.clutch_pedal) * if shifting { 0.0 } else { 1.0 };
         self.powertrain.clutch.engagement = clutch_engagement;
 
         // Requested torque downstream = engine torque pushed through ratio.
@@ -805,23 +803,14 @@ impl Vehicle {
             // so XPBD can balance it inside 10 iterations. 80 kN/m × 5 cm
             // pen = 4 kN/wheel which matches static load of a midsize car.
             let v_normal = -hub_vel.y;
-            let fz = (penetration * 80_000.0 + v_normal.max(0.0) * 2_000.0)
-                .clamp(0.0, 30_000.0);
+            let fz = (penetration * 80_000.0 + v_normal.max(0.0) * 2_000.0).clamp(0.0, 30_000.0);
 
             // Velocity components in heading frame.
             let vx = hub_vel.dot(forward);
             let vy = hub_vel.dot(left);
             let vs = w.angular_velocity * w.radius;
 
-            let mut forces = pacejka_force(
-                &w.tire,
-                ContactInputs {
-                    fz,
-                    vx,
-                    vy,
-                    vs,
-                },
-            );
+            let mut forces = pacejka_force(&w.tire, ContactInputs { fz, vx, vy, vs });
             forces.fx *= sample.grip_modifier * sample.friction_mu;
             forces.fy *= sample.grip_modifier * sample.friction_mu;
             w.last_slip_ratio = forces.slip_ratio;
@@ -873,7 +862,8 @@ impl Vehicle {
                         // so we can grab its two angular neighbours.
                         let centre_node_id = self.nodes[centre_i].id;
                         let n_ring = w.tire_nodes.len();
-                        let centre_slot = w.tire_nodes
+                        let centre_slot = w
+                            .tire_nodes
                             .iter()
                             .position(|&id| id == centre_node_id)
                             .unwrap_or(0);
@@ -936,7 +926,10 @@ impl Vehicle {
 
     fn fetch_wheel_omegas(&self) -> [(f32, f32); 2] {
         let g = |i: usize| -> f32 {
-            self.wheels.get(i).map(|w| w.angular_velocity).unwrap_or(0.0)
+            self.wheels
+                .get(i)
+                .map(|w| w.angular_velocity)
+                .unwrap_or(0.0)
         };
         [(g(0), g(1)), (g(2), g(3))]
     }
@@ -1017,11 +1010,7 @@ fn avg(opts: &[Option<&Wheel>]) -> f32 {
             n += 1;
         }
     }
-    if n == 0 {
-        0.0
-    } else {
-        sum / n as f32
-    }
+    if n == 0 { 0.0 } else { sum / n as f32 }
 }
 
 #[cfg(test)]
@@ -1054,7 +1043,11 @@ mod tests {
     fn beam_pulls_nodes_back_to_rest_length() {
         use crate::beam::DeformParams;
         let mut v = Vehicle::new("two-node-beam");
-        v.add_node(Node::new(0, Vec3::ZERO, 1.0).with_friction(0.0).with_drag(0.0));
+        v.add_node(
+            Node::new(0, Vec3::ZERO, 1.0)
+                .with_friction(0.0)
+                .with_drag(0.0),
+        );
         v.add_node(
             Node::new(1, Vec3::new(1.05, 0.0, 0.0), 1.0)
                 .with_friction(0.0)

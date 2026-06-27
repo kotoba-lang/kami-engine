@@ -200,10 +200,9 @@ fn decode_feature(payload: &[u8], tile: TileCoord, ctx: &LayerContext) -> Option
                 VectorGeometry::Point(paths.pop().unwrap()[0])
             } else {
                 VectorGeometry::MultiPoint(
-                    paths.into_iter()
-                        .filter_map(|mut path| {
-                            if path.len() == 1 { path.pop() } else { None }
-                        })
+                    paths
+                        .into_iter()
+                        .filter_map(|mut path| if path.len() == 1 { path.pop() } else { None })
                         .collect(),
                 )
             }
@@ -225,7 +224,10 @@ fn decode_feature(payload: &[u8], tile: TileCoord, ctx: &LayerContext) -> Option
     })
 }
 
-fn decode_feature_tags(tags_payload: Option<&[u8]>, ctx: &LayerContext) -> JsonMap<String, JsonValue> {
+fn decode_feature_tags(
+    tags_payload: Option<&[u8]>,
+    ctx: &LayerContext,
+) -> JsonMap<String, JsonValue> {
     let mut out = JsonMap::new();
     let Some(tags_buf) = tags_payload else {
         return out;

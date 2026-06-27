@@ -1,36 +1,59 @@
+pub use lef::{LefLibrary, LefMacro, LefPin, LefRect, MacroClass};
+pub use liberty::{
+    LibertyCell, LibertyLibrary, LibertyPin, LookupTable, PinDirection, TimingArc, TimingType,
+};
+pub use memory::{MemoryCompilerResult, MemorySpec, MemoryType, compile_memory};
+pub use stdcell::{CellFunction, StdCell, StdCellLibrary};
 /// KAMI PDK — Process Design Kit management.
 ///
 /// Technology node definitions, Liberty timing characterisation, LEF physical
 /// layout abstractions, standard cell libraries with predefined generic cells,
 /// and a statistical memory compiler for SRAM/ROM/RegFile estimation.
-
-pub use technology::{TechNode, TechFile, LayerDef, LayerType};
-pub use liberty::{LibertyLibrary, LibertyCell, LibertyPin, TimingArc, LookupTable, PinDirection, TimingType};
-pub use lef::{LefLibrary, LefMacro, LefPin, LefRect, MacroClass};
-pub use stdcell::{StdCellLibrary, StdCell, CellFunction};
-pub use memory::{MemoryType, MemorySpec, MemoryCompilerResult, compile_memory};
+pub use technology::{LayerDef, LayerType, TechFile, TechNode};
 
 // ── technology ───────────────────────────────────────────────────────────────
 
 pub mod technology {
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
     use std::collections::HashMap;
 
     /// Semiconductor technology node.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
     pub enum TechNode {
-        N180, N130, N90, N65, N45, N28, N22, N16, N14, N10, N7, N5, N3, N2,
+        N180,
+        N130,
+        N90,
+        N65,
+        N45,
+        N28,
+        N22,
+        N16,
+        N14,
+        N10,
+        N7,
+        N5,
+        N3,
+        N2,
     }
 
     impl TechNode {
         /// Feature size in nanometres.
         pub fn feature_nm(&self) -> u32 {
             match self {
-                Self::N180 => 180, Self::N130 => 130, Self::N90 => 90,
-                Self::N65 => 65, Self::N45 => 45, Self::N28 => 28,
-                Self::N22 => 22, Self::N16 => 16, Self::N14 => 14,
-                Self::N10 => 10, Self::N7 => 7, Self::N5 => 5,
-                Self::N3 => 3, Self::N2 => 2,
+                Self::N180 => 180,
+                Self::N130 => 130,
+                Self::N90 => 90,
+                Self::N65 => 65,
+                Self::N45 => 45,
+                Self::N28 => 28,
+                Self::N22 => 22,
+                Self::N16 => 16,
+                Self::N14 => 14,
+                Self::N10 => 10,
+                Self::N7 => 7,
+                Self::N5 => 5,
+                Self::N3 => 3,
+                Self::N2 => 2,
             }
         }
     }
@@ -110,12 +133,42 @@ pub mod technology {
             min_spacing.insert("diffusion".into(), feat * 1.5);
 
             let layer_map = vec![
-                LayerDef { name: "nwell".into(), gds_number: 1, gds_datatype: 0, layer_type: LayerType::Well },
-                LayerDef { name: "diffusion".into(), gds_number: 2, gds_datatype: 0, layer_type: LayerType::Diffusion },
-                LayerDef { name: "poly".into(), gds_number: 3, gds_datatype: 0, layer_type: LayerType::Poly },
-                LayerDef { name: "metal1".into(), gds_number: 10, gds_datatype: 0, layer_type: LayerType::Metal },
-                LayerDef { name: "via1".into(), gds_number: 11, gds_datatype: 0, layer_type: LayerType::Via },
-                LayerDef { name: "metal2".into(), gds_number: 12, gds_datatype: 0, layer_type: LayerType::Metal },
+                LayerDef {
+                    name: "nwell".into(),
+                    gds_number: 1,
+                    gds_datatype: 0,
+                    layer_type: LayerType::Well,
+                },
+                LayerDef {
+                    name: "diffusion".into(),
+                    gds_number: 2,
+                    gds_datatype: 0,
+                    layer_type: LayerType::Diffusion,
+                },
+                LayerDef {
+                    name: "poly".into(),
+                    gds_number: 3,
+                    gds_datatype: 0,
+                    layer_type: LayerType::Poly,
+                },
+                LayerDef {
+                    name: "metal1".into(),
+                    gds_number: 10,
+                    gds_datatype: 0,
+                    layer_type: LayerType::Metal,
+                },
+                LayerDef {
+                    name: "via1".into(),
+                    gds_number: 11,
+                    gds_datatype: 0,
+                    layer_type: LayerType::Via,
+                },
+                LayerDef {
+                    name: "metal2".into(),
+                    gds_number: 12,
+                    gds_datatype: 0,
+                    layer_type: LayerType::Metal,
+                },
             ];
 
             Self {
@@ -133,7 +186,7 @@ pub mod technology {
 // ── liberty ──────────────────────────────────────────────────────────────────
 
 pub mod liberty {
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
 
     /// Pin direction.
     #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -262,8 +315,12 @@ pub mod liberty {
             if trimmed.starts_with("cell") && trimmed.contains('(') {
                 // Flush previous cell.
                 if let Some(mut cell) = current_cell.take() {
-                    if let Some(pin) = current_pin.take() { cell.pins.push(pin); }
-                    if let Some(arc) = current_arc.take() { cell.timing_arcs.push(arc); }
+                    if let Some(pin) = current_pin.take() {
+                        cell.pins.push(pin);
+                    }
+                    if let Some(arc) = current_arc.take() {
+                        cell.timing_arcs.push(arc);
+                    }
                     lib.cells.push(cell);
                 }
                 let name = extract_paren_name(trimmed).unwrap_or_default();
@@ -280,10 +337,14 @@ pub mod liberty {
 
             if trimmed.starts_with("pin") && trimmed.contains('(') && current_cell.is_some() {
                 if let Some(pin) = current_pin.take() {
-                    if let Some(ref mut cell) = current_cell { cell.pins.push(pin); }
+                    if let Some(ref mut cell) = current_cell {
+                        cell.pins.push(pin);
+                    }
                 }
                 if let Some(arc) = current_arc.take() {
-                    if let Some(ref mut cell) = current_cell { cell.timing_arcs.push(arc); }
+                    if let Some(ref mut cell) = current_cell {
+                        cell.timing_arcs.push(arc);
+                    }
                 }
                 in_timing = false;
                 let name = extract_paren_name(trimmed).unwrap_or_default();
@@ -301,7 +362,10 @@ pub mod liberty {
                 in_timing = true;
                 current_arc = Some(TimingArc {
                     from_pin: String::new(),
-                    to_pin: current_pin.as_ref().map(|p| p.name.clone()).unwrap_or_default(),
+                    to_pin: current_pin
+                        .as_ref()
+                        .map(|p| p.name.clone())
+                        .unwrap_or_default(),
                     timing_type: TimingType::Combinational,
                     cell_rise: LookupTable::scalar(0.0),
                     cell_fall: LookupTable::scalar(0.0),
@@ -314,10 +378,18 @@ pub mod liberty {
             // Attribute parsing.
             if let Some((key, val)) = parse_attr(trimmed) {
                 match key.as_str() {
-                    "nom_voltage" => { lib.nom_voltage = val.parse().unwrap_or(lib.nom_voltage); }
-                    "nom_temperature" => { lib.nom_temperature = val.parse().unwrap_or(lib.nom_temperature); }
-                    "time_unit" => { lib.time_unit = val.trim_matches('"').to_string(); }
-                    "capacitance_unit" => { lib.capacitance_unit = val.trim_matches('"').to_string(); }
+                    "nom_voltage" => {
+                        lib.nom_voltage = val.parse().unwrap_or(lib.nom_voltage);
+                    }
+                    "nom_temperature" => {
+                        lib.nom_temperature = val.parse().unwrap_or(lib.nom_temperature);
+                    }
+                    "time_unit" => {
+                        lib.time_unit = val.trim_matches('"').to_string();
+                    }
+                    "capacitance_unit" => {
+                        lib.capacitance_unit = val.trim_matches('"').to_string();
+                    }
                     "area" if current_cell.is_some() => {
                         if let Some(ref mut cell) = current_cell {
                             cell.area = val.parse().unwrap_or(0.0);
@@ -364,8 +436,12 @@ pub mod liberty {
 
         // Flush last cell.
         if let Some(mut cell) = current_cell {
-            if let Some(pin) = current_pin { cell.pins.push(pin); }
-            if let Some(arc) = current_arc { cell.timing_arcs.push(arc); }
+            if let Some(pin) = current_pin {
+                cell.pins.push(pin);
+            }
+            if let Some(arc) = current_arc {
+                cell.timing_arcs.push(arc);
+            }
             lib.cells.push(cell);
         }
         lib
@@ -380,7 +456,11 @@ pub mod liberty {
     fn parse_attr(s: &str) -> Option<(String, String)> {
         let colon = s.find(':')?;
         let key = s[..colon].trim().to_string();
-        let val = s[colon + 1..].trim().trim_end_matches(';').trim().to_string();
+        let val = s[colon + 1..]
+            .trim()
+            .trim_end_matches(';')
+            .trim()
+            .to_string();
         Some((key, val))
     }
 }
@@ -388,7 +468,7 @@ pub mod liberty {
 // ── lef ──────────────────────────────────────────────────────────────────────
 
 pub mod lef {
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
 
     /// LEF macro class.
     #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -452,11 +532,15 @@ pub mod lef {
         for line in input.lines() {
             let trimmed = line.trim();
             let tokens: Vec<&str> = trimmed.split_whitespace().collect();
-            if tokens.is_empty() { continue; }
+            if tokens.is_empty() {
+                continue;
+            }
 
             match tokens[0] {
                 "MACRO" if tokens.len() >= 2 => {
-                    if let Some(m) = current_macro.take() { lib.macros.push(m); }
+                    if let Some(m) = current_macro.take() {
+                        lib.macros.push(m);
+                    }
                     current_macro = Some(LefMacro {
                         name: tokens[1].to_string(),
                         class: MacroClass::Core,
@@ -487,7 +571,11 @@ pub mod lef {
                 }
                 "SYMMETRY" if current_macro.is_some() && tokens.len() >= 2 => {
                     if let Some(ref mut m) = current_macro {
-                        m.symmetry = tokens[1..].join(" ").trim_end_matches(';').trim().to_string();
+                        m.symmetry = tokens[1..]
+                            .join(" ")
+                            .trim_end_matches(';')
+                            .trim()
+                            .to_string();
                     }
                 }
                 "SITE" if current_macro.is_some() && tokens.len() >= 2 => {
@@ -497,7 +585,9 @@ pub mod lef {
                 }
                 "PIN" if current_macro.is_some() && tokens.len() >= 2 => {
                     if let Some(pin) = current_pin.take() {
-                        if let Some(ref mut m) = current_macro { m.pins.push(pin); }
+                        if let Some(ref mut m) = current_macro {
+                            m.pins.push(pin);
+                        }
                     }
                     in_obs = false;
                     current_pin = Some(LefPin {
@@ -513,7 +603,9 @@ pub mod lef {
                 }
                 "OBS" if current_macro.is_some() => {
                     if let Some(pin) = current_pin.take() {
-                        if let Some(ref mut m) = current_macro { m.pins.push(pin); }
+                        if let Some(ref mut m) = current_macro {
+                            m.pins.push(pin);
+                        }
                     }
                     in_obs = true;
                 }
@@ -525,9 +617,14 @@ pub mod lef {
                     let y1: f64 = tokens[2].parse().unwrap_or(0.0);
                     let x2: f64 = tokens[3].parse().unwrap_or(0.0);
                     let y2: f64 = tokens[4].trim_end_matches(';').parse().unwrap_or(0.0);
-                    let r = LefRect { layer: current_layer.clone(), rect: (x1, y1, x2, y2) };
+                    let r = LefRect {
+                        layer: current_layer.clone(),
+                        rect: (x1, y1, x2, y2),
+                    };
                     if in_obs {
-                        if let Some(ref mut m) = current_macro { m.obs.push(r); }
+                        if let Some(ref mut m) = current_macro {
+                            m.obs.push(r);
+                        }
                     } else if let Some(ref mut pin) = current_pin {
                         pin.port.push(r);
                     }
@@ -536,23 +633,38 @@ pub mod lef {
                     // END of PIN, OBS, or MACRO.
                     if in_obs && tokens.len() == 1 {
                         in_obs = false;
-                    } else if current_pin.is_some() && tokens.len() >= 2 && tokens[1] != current_macro.as_ref().map(|m| m.name.as_str()).unwrap_or("") {
+                    } else if current_pin.is_some()
+                        && tokens.len() >= 2
+                        && tokens[1]
+                            != current_macro
+                                .as_ref()
+                                .map(|m| m.name.as_str())
+                                .unwrap_or("")
+                    {
                         if let Some(pin) = current_pin.take() {
-                            if let Some(ref mut m) = current_macro { m.pins.push(pin); }
+                            if let Some(ref mut m) = current_macro {
+                                m.pins.push(pin);
+                            }
                         }
                     } else if tokens.len() >= 2 {
                         // END <macro_name>
                         if let Some(pin) = current_pin.take() {
-                            if let Some(ref mut m) = current_macro { m.pins.push(pin); }
+                            if let Some(ref mut m) = current_macro {
+                                m.pins.push(pin);
+                            }
                         }
-                        if let Some(m) = current_macro.take() { lib.macros.push(m); }
+                        if let Some(m) = current_macro.take() {
+                            lib.macros.push(m);
+                        }
                     }
                 }
                 _ => {}
             }
         }
         if let Some(mut m) = current_macro {
-            if let Some(pin) = current_pin { m.pins.push(pin); }
+            if let Some(pin) = current_pin {
+                m.pins.push(pin);
+            }
             lib.macros.push(m);
         }
         lib
@@ -562,14 +674,28 @@ pub mod lef {
 // ── stdcell ──────────────────────────────────────────────────────────────────
 
 pub mod stdcell {
-    use serde::{Serialize, Deserialize};
     use crate::technology::TechNode;
+    use serde::{Deserialize, Serialize};
 
     /// Standard cell logic function.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
     pub enum CellFunction {
-        Inv, Nand2, Nand3, Nor2, Nor3, And2, Or2, Xor2,
-        Buf, Dff, Latch, Mux2, Aoi21, Oai21, TieHi, TieLo,
+        Inv,
+        Nand2,
+        Nand3,
+        Nor2,
+        Nor3,
+        And2,
+        Or2,
+        Xor2,
+        Buf,
+        Dff,
+        Latch,
+        Mux2,
+        Aoi21,
+        Oai21,
+        TieHi,
+        TieLo,
     }
 
     /// A standard cell definition.
@@ -600,7 +726,11 @@ pub mod stdcell {
         /// Return cells sorted by area (ascending).
         pub fn cells_sorted_by_area(&self) -> Vec<&StdCell> {
             let mut sorted: Vec<&StdCell> = self.cells.iter().collect();
-            sorted.sort_by(|a, b| a.area.partial_cmp(&b.area).unwrap_or(std::cmp::Ordering::Equal));
+            sorted.sort_by(|a, b| {
+                a.area
+                    .partial_cmp(&b.area)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
             sorted
         }
     }
@@ -608,8 +738,13 @@ pub mod stdcell {
     /// Create a generic standard cell library with ~20 cells at realistic areas.
     pub fn create_generic_lib(node: TechNode) -> StdCellLibrary {
         let scale = node.feature_nm() as f64 / 7.0; // normalise to N7
-        let cell = |name: &str, func: CellFunction, drive: u32, base_area: f64,
-                     inputs: &[&str], outputs: &[&str]| -> StdCell {
+        let cell = |name: &str,
+                    func: CellFunction,
+                    drive: u32,
+                    base_area: f64,
+                    inputs: &[&str],
+                    outputs: &[&str]|
+         -> StdCell {
             StdCell {
                 name: name.to_string(),
                 function: func,
@@ -621,27 +756,83 @@ pub mod stdcell {
         };
 
         let cells = vec![
-            cell("INV_X1",   CellFunction::Inv,   1, 0.798,  &["A"],         &["Y"]),
-            cell("INV_X2",   CellFunction::Inv,   2, 1.064,  &["A"],         &["Y"]),
-            cell("INV_X4",   CellFunction::Inv,   4, 1.596,  &["A"],         &["Y"]),
-            cell("BUF_X1",   CellFunction::Buf,   1, 1.596,  &["A"],         &["Y"]),
-            cell("BUF_X2",   CellFunction::Buf,   2, 2.128,  &["A"],         &["Y"]),
-            cell("NAND2_X1", CellFunction::Nand2, 1, 1.064,  &["A", "B"],    &["Y"]),
-            cell("NAND2_X2", CellFunction::Nand2, 2, 1.596,  &["A", "B"],    &["Y"]),
-            cell("NAND3_X1", CellFunction::Nand3, 1, 1.330,  &["A","B","C"], &["Y"]),
-            cell("NOR2_X1",  CellFunction::Nor2,  1, 1.064,  &["A", "B"],    &["Y"]),
-            cell("NOR2_X2",  CellFunction::Nor2,  2, 1.596,  &["A", "B"],    &["Y"]),
-            cell("NOR3_X1",  CellFunction::Nor3,  1, 1.330,  &["A","B","C"], &["Y"]),
-            cell("AND2_X1",  CellFunction::And2,  1, 1.596,  &["A", "B"],    &["Y"]),
-            cell("OR2_X1",   CellFunction::Or2,   1, 1.596,  &["A", "B"],    &["Y"]),
-            cell("XOR2_X1",  CellFunction::Xor2,  1, 2.660,  &["A", "B"],    &["Y"]),
-            cell("AOI21_X1", CellFunction::Aoi21, 1, 1.330,  &["A","B","C"], &["Y"]),
-            cell("OAI21_X1", CellFunction::Oai21, 1, 1.330,  &["A","B","C"], &["Y"]),
-            cell("MUX2_X1",  CellFunction::Mux2,  1, 2.660,  &["A","B","S"], &["Y"]),
-            cell("DFF_X1",   CellFunction::Dff,   1, 4.256,  &["D", "CK"],   &["Q"]),
-            cell("LATCH_X1", CellFunction::Latch, 1, 3.192,  &["D", "G"],    &["Q"]),
-            cell("TIEHI_X1", CellFunction::TieHi, 1, 0.798,  &[],            &["Y"]),
-            cell("TIELO_X1", CellFunction::TieLo, 1, 0.798,  &[],            &["Y"]),
+            cell("INV_X1", CellFunction::Inv, 1, 0.798, &["A"], &["Y"]),
+            cell("INV_X2", CellFunction::Inv, 2, 1.064, &["A"], &["Y"]),
+            cell("INV_X4", CellFunction::Inv, 4, 1.596, &["A"], &["Y"]),
+            cell("BUF_X1", CellFunction::Buf, 1, 1.596, &["A"], &["Y"]),
+            cell("BUF_X2", CellFunction::Buf, 2, 2.128, &["A"], &["Y"]),
+            cell(
+                "NAND2_X1",
+                CellFunction::Nand2,
+                1,
+                1.064,
+                &["A", "B"],
+                &["Y"],
+            ),
+            cell(
+                "NAND2_X2",
+                CellFunction::Nand2,
+                2,
+                1.596,
+                &["A", "B"],
+                &["Y"],
+            ),
+            cell(
+                "NAND3_X1",
+                CellFunction::Nand3,
+                1,
+                1.330,
+                &["A", "B", "C"],
+                &["Y"],
+            ),
+            cell("NOR2_X1", CellFunction::Nor2, 1, 1.064, &["A", "B"], &["Y"]),
+            cell("NOR2_X2", CellFunction::Nor2, 2, 1.596, &["A", "B"], &["Y"]),
+            cell(
+                "NOR3_X1",
+                CellFunction::Nor3,
+                1,
+                1.330,
+                &["A", "B", "C"],
+                &["Y"],
+            ),
+            cell("AND2_X1", CellFunction::And2, 1, 1.596, &["A", "B"], &["Y"]),
+            cell("OR2_X1", CellFunction::Or2, 1, 1.596, &["A", "B"], &["Y"]),
+            cell("XOR2_X1", CellFunction::Xor2, 1, 2.660, &["A", "B"], &["Y"]),
+            cell(
+                "AOI21_X1",
+                CellFunction::Aoi21,
+                1,
+                1.330,
+                &["A", "B", "C"],
+                &["Y"],
+            ),
+            cell(
+                "OAI21_X1",
+                CellFunction::Oai21,
+                1,
+                1.330,
+                &["A", "B", "C"],
+                &["Y"],
+            ),
+            cell(
+                "MUX2_X1",
+                CellFunction::Mux2,
+                1,
+                2.660,
+                &["A", "B", "S"],
+                &["Y"],
+            ),
+            cell("DFF_X1", CellFunction::Dff, 1, 4.256, &["D", "CK"], &["Q"]),
+            cell(
+                "LATCH_X1",
+                CellFunction::Latch,
+                1,
+                3.192,
+                &["D", "G"],
+                &["Q"],
+            ),
+            cell("TIEHI_X1", CellFunction::TieHi, 1, 0.798, &[], &["Y"]),
+            cell("TIELO_X1", CellFunction::TieLo, 1, 0.798, &[], &["Y"]),
         ];
 
         StdCellLibrary {
@@ -656,7 +847,7 @@ pub mod stdcell {
 
 pub mod memory {
     use crate::technology::TechNode;
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
 
     /// Memory macro type.
     #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -714,20 +905,19 @@ pub mod memory {
         let log2_words = (spec.words as f64).log2().max(1.0);
         let timing_scale = feat / 7.0;
         let read_time_ns = (0.2 + 0.05 * log2_words) * timing_scale;
-        let write_time_ns = read_time_ns * match spec.mem_type {
-            MemoryType::Sram => 1.1,
-            MemoryType::Rom => 0.0, // ROM is read-only
-            MemoryType::RegFile => 0.9,
-        };
+        let write_time_ns = read_time_ns
+            * match spec.mem_type {
+                MemoryType::Sram => 1.1,
+                MemoryType::Rom => 0.0, // ROM is read-only
+                MemoryType::RegFile => 0.9,
+            };
 
         // Leakage (µW): proportional to total bits and node.
         let leakage_per_bit_uw = 1e-6 * (feat / 7.0); // ~1 nW/bit at N7
         let leakage_uw = total_bits * leakage_per_bit_uw;
 
         // Pin list.
-        let mut pins = vec![
-            "CLK".into(), "CEN".into(), "WEN".into(),
-        ];
+        let mut pins = vec!["CLK".into(), "CEN".into(), "WEN".into()];
         for i in 0..addr_bits(spec.words) {
             pins.push(format!("A[{}]", i));
         }
@@ -743,7 +933,10 @@ pub mod memory {
                 MemoryType::Rom => "ROM",
                 MemoryType::RegFile => "RF",
             },
-            spec.words, spec.bits, spec.mux, spec.banks
+            spec.words,
+            spec.bits,
+            spec.mux,
+            spec.banks
         );
 
         MemoryCompilerResult {
@@ -757,7 +950,9 @@ pub mod memory {
     }
 
     fn addr_bits(words: u32) -> u32 {
-        if words <= 1 { return 1; }
+        if words <= 1 {
+            return 1;
+        }
         32 - (words - 1).leading_zeros()
     }
 }
@@ -773,7 +968,11 @@ mod tests {
         let tf = TechFile::for_node(TechNode::N7);
         assert!(tf.get_min_width("poly").is_some());
         let w = tf.get_min_width("poly").unwrap();
-        assert!(w > 0.0 && w < 1.0, "poly min_width should be sub-micron, got {}", w);
+        assert!(
+            w > 0.0 && w < 1.0,
+            "poly min_width should be sub-micron, got {}",
+            w
+        );
         assert!(tf.metal_pitch(1).is_some());
     }
 
@@ -812,7 +1011,11 @@ library (test_lib) {
     #[test]
     fn stdcell_library_generic() {
         let lib = stdcell::create_generic_lib(TechNode::N7);
-        assert!(lib.cells.len() >= 20, "expected >=20 cells, got {}", lib.cells.len());
+        assert!(
+            lib.cells.len() >= 20,
+            "expected >=20 cells, got {}",
+            lib.cells.len()
+        );
         let invs = lib.find_by_function(&CellFunction::Inv);
         assert!(invs.len() >= 3, "expected >=3 inverters");
         let sorted = lib.cells_sorted_by_area();
@@ -833,7 +1036,10 @@ library (test_lib) {
         let result = memory::compile_memory(&spec, TechNode::N7);
         assert!(result.area_um2 > 0.0, "area should be positive");
         assert!(result.read_time_ns > 0.0, "read time should be positive");
-        assert!(result.write_time_ns > result.read_time_ns * 0.9, "write >= 0.9*read for SRAM");
+        assert!(
+            result.write_time_ns > result.read_time_ns * 0.9,
+            "write >= 0.9*read for SRAM"
+        );
         assert!(result.name.starts_with("SRAM_1024x32"));
         // Check address pins: 1024 words = 10 address bits.
         let addr_count = result.pins.iter().filter(|p| p.starts_with("A[")).count();

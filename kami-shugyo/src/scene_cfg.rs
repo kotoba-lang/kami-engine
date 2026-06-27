@@ -107,8 +107,7 @@ pub fn load_scene_yaml(yaml_text: &str) -> Result<SceneCfg, SceneCfgError> {
 mod tests {
     use super::*;
 
-    const CARTPOLE_SCENE: &str =
-        include_str!("../../fixtures/cartpole/scene.yaml");
+    const CARTPOLE_SCENE: &str = include_str!("../../fixtures/cartpole/scene.yaml");
 
     #[test]
     fn parses_cartpole_scene_yaml() {

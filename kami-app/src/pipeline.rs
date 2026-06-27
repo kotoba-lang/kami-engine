@@ -16,13 +16,7 @@ use hecs::World;
 use kami_render::RenderContext;
 
 pub trait RenderPipeline: 'static {
-    fn prepare(
-        &mut self,
-        _ctx: &RenderContext,
-        _camera: &Camera,
-        _world: &World,
-    ) {
-    }
+    fn prepare(&mut self, _ctx: &RenderContext, _camera: &Camera, _world: &World) {}
 
     fn record(
         &self,

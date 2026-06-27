@@ -90,7 +90,9 @@ impl CadSceneAdapter {
         let world_normals: Vec<[f32; 3]> = normals
             .iter()
             .map(|n| {
-                let wn = normal_mat.transform_vector3(Vec3::new(n[0], n[1], n[2])).normalize_or_zero();
+                let wn = normal_mat
+                    .transform_vector3(Vec3::new(n[0], n[1], n[2]))
+                    .normalize_or_zero();
                 [wn.x, wn.y, wn.z]
             })
             .collect();
@@ -139,14 +141,24 @@ impl CadSceneAdapter {
         let world_normals: Vec<[f32; 3]> = normals
             .iter()
             .map(|n| {
-                let wn = normal_mat.transform_vector3(Vec3::new(n[0], n[1], n[2])).normalize_or_zero();
+                let wn = normal_mat
+                    .transform_vector3(Vec3::new(n[0], n[1], n[2]))
+                    .normalize_or_zero();
                 [wn.x, wn.y, wn.z]
             })
             .collect();
 
         {
             let mut core = self.inner.core.borrow_mut();
-            core.replace_batch(&self.inner.device, idx, positions, normals, indices, base_color, world);
+            core.replace_batch(
+                &self.inner.device,
+                idx,
+                positions,
+                normals,
+                indices,
+                base_color,
+                world,
+            );
         }
         let mut cpu = self.inner.cpu.borrow_mut();
         if let Some(batch) = cpu.get_mut(idx) {
@@ -216,10 +228,10 @@ impl CadSceneAdapter {
 
     pub fn selected_feature(&self) -> Option<(String, String)> {
         let cpu = self.inner.cpu.borrow();
-        self.inner
-            .selected
-            .get()
-            .and_then(|i| cpu.get(i).map(|b| (b.feature_id.clone(), b.feature_name.clone())))
+        self.inner.selected.get().and_then(|i| {
+            cpu.get(i)
+                .map(|b| (b.feature_id.clone(), b.feature_name.clone()))
+        })
     }
 
     fn rebuild_batch_color(&self, idx: usize, override_color: Option<[f32; 3]>) {
@@ -227,7 +239,14 @@ impl CadSceneAdapter {
         let Some(batch) = cpu.get(idx) else { return };
         let color = override_color.unwrap_or(batch.base_color);
         let mut core = self.inner.core.borrow_mut();
-        core.replace_batch_color(&self.inner.device, idx, &batch.positions, &batch.normals, &batch.indices, color);
+        core.replace_batch_color(
+            &self.inner.device,
+            idx,
+            &batch.positions,
+            &batch.normals,
+            &batch.indices,
+            color,
+        );
     }
 }
 

@@ -40,7 +40,7 @@
 use std::collections::BTreeMap;
 
 use kami_autodrive::{AutopilotConfig, VehicleClass, VehicleLimits};
-use kami_scene::{kw_key, mget, num, root_map, EdnValue};
+use kami_scene::{EdnValue, kw_key, mget, num, root_map};
 
 /// The canonical per-class preset CONFIG shipped with this crate (both tables).
 /// This is the source of truth; the compiled-in presets are the parity-tested
@@ -429,7 +429,10 @@ mod tests {
     #[test]
     fn non_map_root_is_an_error() {
         assert!(matches!(limits_specs_from_edn("42"), Err(Error::NotAMap)));
-        assert!(matches!(autopilot_specs_from_edn("42"), Err(Error::NotAMap)));
+        assert!(matches!(
+            autopilot_specs_from_edn("42"),
+            Err(Error::NotAMap)
+        ));
     }
 
     #[test]

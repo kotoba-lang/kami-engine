@@ -47,7 +47,10 @@ fn vectorized_reach_rollout_converges_per_env_and_stays_independent() {
     let mut envs = ArticulationBatch::from_urdf(&sys, gravity, dt, NUM_ENVS);
 
     // The action/observation layout is keyed by joint name, as in Isaac Lab.
-    assert_eq!(envs.dof_names(), &["shoulder".to_string(), "elbow".to_string()]);
+    assert_eq!(
+        envs.dof_names(),
+        &["shoulder".to_string(), "elbow".to_string()]
+    );
     let shoulder = envs.get_dof_index("shoulder").unwrap();
     let elbow = envs.get_dof_index("elbow").unwrap();
     assert_eq!((shoulder, elbow), (0, 1));
@@ -85,7 +88,10 @@ fn vectorized_reach_rollout_converges_per_env_and_stays_independent() {
         let qd = envs.get_joint_velocities();
         assert_eq!(q.len(), NUM_ENVS * NDOF);
         assert_eq!(qd.len(), NUM_ENVS * NDOF);
-        assert!(q.iter().chain(qd.iter()).all(|v| v.is_finite()), "non-finite state");
+        assert!(
+            q.iter().chain(qd.iter()).all(|v| v.is_finite()),
+            "non-finite state"
+        );
 
         // End-effector pose + Jacobian observations, one row per env.
         let (pos, quat) = envs.get_world_poses("fore").expect("ee link");
@@ -107,9 +113,16 @@ fn vectorized_reach_rollout_converges_per_env_and_stays_independent() {
         let tgt = per_env_target(e, NUM_ENVS);
         let es = (q[e * NDOF + shoulder] - tgt[0]).abs();
         let ee = (q[e * NDOF + elbow] - tgt[1]).abs();
-        assert!(es < 0.03 && ee < 0.03, "env {e} did not reach target: q={:?} tgt={tgt:?}", &q[e * NDOF..e * NDOF + NDOF]);
+        assert!(
+            es < 0.03 && ee < 0.03,
+            "env {e} did not reach target: q={:?} tgt={tgt:?}",
+            &q[e * NDOF..e * NDOF + NDOF]
+        );
         // Settled (near rest) — a converged reach.
-        assert!(qd[e * NDOF + shoulder].abs() < 0.05 && qd[e * NDOF + elbow].abs() < 0.05, "env {e} not settled");
+        assert!(
+            qd[e * NDOF + shoulder].abs() < 0.05 && qd[e * NDOF + elbow].abs() < 0.05,
+            "env {e} not settled"
+        );
     }
 
     // Envs are genuinely independent: distinct targets → distinct end-effector
@@ -119,7 +132,10 @@ fn vectorized_reach_rollout_converges_per_env_and_stays_independent() {
         .iter()
         .map(|p| p[0]) // end-effector x
         .fold((f32::MAX, f32::MIN), |(lo, hi), x| (lo.min(x), hi.max(x)));
-    assert!(spread.1 - spread.0 > 0.5, "end-effector positions did not diverge across envs");
+    assert!(
+        spread.1 - spread.0 > 0.5,
+        "end-effector positions did not diverge across envs"
+    );
 }
 
 #[test]
@@ -127,12 +143,16 @@ fn reset_midway_returns_every_env_to_zero() {
     // Isaac `world.reset()` semantics on the batch: after driving away, a reset
     // returns all envs to the zero pose and clears the active PD drive.
     let sys = parse_urdf(ARM2_URDF).expect("urdf");
-    let mut envs = ArticulationBatch::from_urdf(&sys, glam::Vec3::new(0.0, 0.0, -9.81), 1.0 / 240.0, 4);
+    let mut envs =
+        ArticulationBatch::from_urdf(&sys, glam::Vec3::new(0.0, 0.0, -9.81), 1.0 / 240.0, 4);
     envs.set_joint_position_targets(&vec![0.5; 4 * 2], 100.0, 15.0);
     for _ in 0..500 {
         envs.step();
     }
-    assert!(envs.get_joint_positions().iter().any(|&v| v.abs() > 0.05), "did not move");
+    assert!(
+        envs.get_joint_positions().iter().any(|&v| v.abs() > 0.05),
+        "did not move"
+    );
 
     envs.reset();
     let q = envs.get_joint_positions();
@@ -143,5 +163,8 @@ fn reset_midway_returns_every_env_to_zero() {
     // pulls slightly, but the old 0.5 target must not spring it back).
     envs.step();
     let q2 = envs.get_joint_positions();
-    assert!(q2.iter().all(|v| v.is_finite()) && q2.iter().all(|&v| v.abs() < 0.05), "drive not cleared: {q2:?}");
+    assert!(
+        q2.iter().all(|v| v.is_finite()) && q2.iter().all(|&v| v.abs() < 0.05),
+        "drive not cleared: {q2:?}"
+    );
 }

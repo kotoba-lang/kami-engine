@@ -28,7 +28,12 @@ pub struct RtConfig {
 
 impl Default for RtConfig {
     fn default() -> Self {
-        Self { max_bounces: 4, spp: 8, clamp: 10.0, seed: 0 }
+        Self {
+            max_bounces: 4,
+            spp: 8,
+            clamp: 10.0,
+            seed: 0,
+        }
     }
 }
 
@@ -100,7 +105,12 @@ mod tests {
 
     #[test]
     fn wgsl_bakes_integrator_params() {
-        let cfg = RtConfig { max_bounces: 6, spp: 16, clamp: 8.0, seed: 7 };
+        let cfg = RtConfig {
+            max_bounces: 6,
+            spp: 16,
+            clamp: 8.0,
+            seed: 7,
+        };
         let src = wgsl_ray_query("gi", &cfg);
         assert!(src.contains("RT_MAX_BOUNCES: u32 = 6u"));
         assert!(src.contains("RT_SPP: u32 = 16u"));

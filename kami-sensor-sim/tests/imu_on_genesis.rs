@@ -35,7 +35,9 @@ fn sample_imu(
 fn cart_imu_reads_plus_g_at_rest_and_proper_accel_under_force() {
     let dt = 1.0 / 240.0;
     let mut world = IsaacWorld::new(dt);
-    let h = world.add_articulation(parse_urdf(CARTPOLE_URDF).unwrap()).unwrap();
+    let h = world
+        .add_articulation(parse_urdf(CARTPOLE_URDF).unwrap())
+        .unwrap();
     let mut imu = Imu::new("imu", "/World/cart/imu", "cart");
     world.reset();
     imu.reset();
@@ -43,14 +45,25 @@ fn cart_imu_reads_plus_g_at_rest_and_proper_accel_under_force() {
     // At rest: a real accelerometer reads +g along world/body up (z); the cart
     // does not rotate, so body frame == world frame.
     let r0 = sample_imu(&mut imu, &world, h, "cart", world.current_time());
-    assert!((r0.linear_acceleration.z - 9.81).abs() < 1e-2, "rest +g: {:?}", r0.linear_acceleration);
-    assert!(r0.linear_acceleration.x.abs() < 1e-2, "rest x≈0: {:?}", r0.linear_acceleration);
+    assert!(
+        (r0.linear_acceleration.z - 9.81).abs() < 1e-2,
+        "rest +g: {:?}",
+        r0.linear_acceleration
+    );
+    assert!(
+        r0.linear_acceleration.x.abs() < 1e-2,
+        "rest x≈0: {:?}",
+        r0.linear_acceleration
+    );
 
     // Push the cart along +x; the proper acceleration must show a +x component
     // (inertial accel from the drive force) on top of the +g up reading.
     let mut saw_positive_ax = false;
     for _ in 0..15 {
-        world.articulation_mut(h).unwrap().set_joint_efforts(&[25.0, 0.0]);
+        world
+            .articulation_mut(h)
+            .unwrap()
+            .set_joint_efforts(&[25.0, 0.0]);
         world.step();
         let r = sample_imu(&mut imu, &world, h, "cart", world.current_time());
         assert!(r.linear_acceleration.is_finite());
@@ -58,7 +71,11 @@ fn cart_imu_reads_plus_g_at_rest_and_proper_accel_under_force() {
             saw_positive_ax = true;
         }
         // The up-reading persists throughout (no vertical motion).
-        assert!((r.linear_acceleration.z - 9.81).abs() < 1e-1, "z stays +g: {:?}", r.linear_acceleration);
+        assert!(
+            (r.linear_acceleration.z - 9.81).abs() < 1e-1,
+            "z stays +g: {:?}",
+            r.linear_acceleration
+        );
     }
     assert!(saw_positive_ax, "IMU never saw the +x drive acceleration");
 }
@@ -69,13 +86,18 @@ fn pole_imu_reports_nonzero_angular_velocity_while_swinging() {
     // pole link's IMU must report a non-zero body angular velocity.
     let dt = 1.0 / 240.0;
     let mut world = IsaacWorld::new(dt);
-    let h = world.add_articulation(parse_urdf(CARTPOLE_URDF).unwrap()).unwrap();
+    let h = world
+        .add_articulation(parse_urdf(CARTPOLE_URDF).unwrap())
+        .unwrap();
     let mut imu = Imu::new("imu", "/World/pole_link/imu", "pole_link");
     world.reset();
     imu.reset();
     // Tilt the pole off-vertical so gravity produces a torque (DOF order
     // [cart_slider, pole_revolute]).
-    world.articulation_mut(h).unwrap().set_joint_positions(&[0.0, 0.3]);
+    world
+        .articulation_mut(h)
+        .unwrap()
+        .set_joint_positions(&[0.0, 0.3]);
 
     let mut max_wy = 0.0_f32;
     for _ in 0..120 {
@@ -84,5 +106,8 @@ fn pole_imu_reports_nonzero_angular_velocity_while_swinging() {
         assert!(r.angular_velocity.is_finite());
         max_wy = max_wy.max(r.angular_velocity.y.abs());
     }
-    assert!(max_wy > 0.1, "swinging pole IMU saw little angular velocity: {max_wy}");
+    assert!(
+        max_wy > 0.1,
+        "swinging pole IMU saw little angular velocity: {max_wy}"
+    );
 }

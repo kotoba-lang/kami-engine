@@ -1,5 +1,4 @@
 /// JTAG / Boundary Scan — IEEE 1149.1 TAP controller modeling and BSDL generation.
-
 use serde::{Deserialize, Serialize};
 
 /// Standard JTAG instructions.
@@ -95,7 +94,11 @@ pub fn generate_bsdl(device: &BsdlDevice) -> String {
     out.push_str("    TMS   : in  bit;\n");
     out.push_str("    TCK   : in  bit;\n");
     for (i, cell) in device.boundary_register.iter().enumerate() {
-        let sep = if i + 1 < device.boundary_register.len() { ";" } else { "" };
+        let sep = if i + 1 < device.boundary_register.len() {
+            ";"
+        } else {
+            ""
+        };
         out.push_str(&format!("    {}  : inout bit{}\n", cell.pin_name, sep));
     }
     out.push_str("  );\n\n");
@@ -115,7 +118,11 @@ pub fn generate_bsdl(device: &BsdlDevice) -> String {
         device.name
     ));
     for (i, instr) in device.instructions.iter().enumerate() {
-        let sep = if i + 1 < device.instructions.len() { " &" } else { "" };
+        let sep = if i + 1 < device.instructions.len() {
+            " &"
+        } else {
+            ""
+        };
         out.push_str(&format!(
             "    \"{} ({})\"{}",
             instr.name(),
@@ -131,10 +138,7 @@ pub fn generate_bsdl(device: &BsdlDevice) -> String {
         "  attribute IDCODE_REGISTER of {} : entity is\n",
         device.name
     ));
-    out.push_str(&format!(
-        "    \"{:032b}\";\n\n",
-        device.idcode
-    ));
+    out.push_str(&format!("    \"{:032b}\";\n\n", device.idcode));
 
     // Boundary register
     out.push_str(&format!(
@@ -151,10 +155,18 @@ pub fn generate_bsdl(device: &BsdlDevice) -> String {
             Some(c) => format!("{c}"),
             None => "X".into(),
         };
-        let sep = if i + 1 < device.boundary_register.len() { "," } else { "" };
+        let sep = if i + 1 < device.boundary_register.len() {
+            ","
+        } else {
+            ""
+        };
         out.push_str(&format!(
             "    \"{}  ({}, {}, input, X, {}, 0, Z)\"{}\n",
-            i, cell.cell_type.bsdl_name(), cell.pin_name, ctrl, sep
+            i,
+            cell.cell_type.bsdl_name(),
+            cell.pin_name,
+            ctrl,
+            sep
         ));
     }
     out.push_str("  ;\n\n");
@@ -178,8 +190,16 @@ mod tests {
                 JtagInstruction::Idcode,
             ],
             boundary_register: vec![
-                BoundaryScanCell { pin_name: "PA0".into(), cell_type: CellType::BC1, control_cell: None },
-                BoundaryScanCell { pin_name: "PA1".into(), cell_type: CellType::BC1, control_cell: Some(0) },
+                BoundaryScanCell {
+                    pin_name: "PA0".into(),
+                    cell_type: CellType::BC1,
+                    control_cell: None,
+                },
+                BoundaryScanCell {
+                    pin_name: "PA1".into(),
+                    cell_type: CellType::BC1,
+                    control_cell: Some(0),
+                },
             ],
             idcode: 0x0491_A03F,
         }
@@ -215,6 +235,9 @@ mod tests {
         let dev = sample_device();
         assert_eq!(JtagInstruction::Bypass.opcode(4), "1111");
         assert_eq!(JtagInstruction::Extest.opcode(4), "0000");
-        assert_eq!(JtagInstruction::Idcode.opcode(dev.instruction_length), "0010");
+        assert_eq!(
+            JtagInstruction::Idcode.opcode(dev.instruction_length),
+            "0010"
+        );
     }
 }

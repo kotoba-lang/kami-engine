@@ -27,13 +27,13 @@ pub enum GltfError {
 /// best-effort load (the extension's effect is ignored).
 #[cfg(feature = "gltf-loader")]
 pub const SUPPORTED_EXTENSIONS: &[&str] = &[
-    "KHR_mesh_quantization",     // dequantized in this loader
-    "EXT_meshopt_compression",   // decoded by crate::meshopt before import
-    "KHR_texture_basisu",        // KTX2/UASTC transcoded in this loader
-    "VRMC_vrm",                  // VRM 1.0 (handled here + kami-vrm)
-    "VRMC_materials_mtoon",      // MToon → MToon pipeline
-    "VRMC_springBone",           // kami-vrm
-    "VRMC_node_constraint",      // kami-vrm
+    "KHR_mesh_quantization",   // dequantized in this loader
+    "EXT_meshopt_compression", // decoded by crate::meshopt before import
+    "KHR_texture_basisu",      // KTX2/UASTC transcoded in this loader
+    "VRMC_vrm",                // VRM 1.0 (handled here + kami-vrm)
+    "VRMC_materials_mtoon",    // MToon → MToon pipeline
+    "VRMC_springBone",         // kami-vrm
+    "VRMC_node_constraint",    // kami-vrm
 ];
 
 /// Read a vec`comps` vertex attribute from a possibly-quantized accessor,
@@ -75,11 +75,7 @@ fn read_quantized_attr(
                 }
                 DataType::U16 => {
                     let x = u16::from_le_bytes(buf.get(o..o + 2)?.try_into().ok()?);
-                    if norm {
-                        x as f32 / 65535.0
-                    } else {
-                        x as f32
-                    }
+                    if norm { x as f32 / 65535.0 } else { x as f32 }
                 }
                 DataType::I8 => {
                     let x = *buf.get(o)? as i8;
@@ -91,11 +87,7 @@ fn read_quantized_attr(
                 }
                 DataType::U8 => {
                     let x = *buf.get(o)?;
-                    if norm {
-                        x as f32 / 255.0
-                    } else {
-                        x as f32
-                    }
+                    if norm { x as f32 / 255.0 } else { x as f32 }
                 }
             };
             out.push(v);
@@ -112,7 +104,11 @@ fn read_quantized_attr(
 fn load_gltf_image(img: &gltf::Image, buffers: &[gltf::buffer::Data]) -> GltfTexture {
     use gltf::image::Source;
 
-    let placeholder = || GltfTexture { pixels: vec![255, 255, 255, 255], width: 1, height: 1 };
+    let placeholder = || GltfTexture {
+        pixels: vec![255, 255, 255, 255],
+        width: 1,
+        height: 1,
+    };
 
     // Resolve the raw encoded bytes + optional mime type.
     let (bytes, mime): (std::borrow::Cow<[u8]>, Option<String>) = match img.source() {
@@ -145,7 +141,11 @@ fn load_gltf_image(img: &gltf::Image, buffers: &[gltf::buffer::Data]) -> GltfTex
     let is_ktx2 = crate::basisu::is_ktx2(&bytes) || mime.as_deref() == Some("image/ktx2");
     if is_ktx2 {
         return match crate::basisu::decode_ktx2(&bytes) {
-            Ok(d) => GltfTexture { pixels: d.rgba, width: d.width, height: d.height },
+            Ok(d) => GltfTexture {
+                pixels: d.rgba,
+                width: d.width,
+                height: d.height,
+            },
             Err(e) => {
                 log::warn!("KHR_texture_basisu: {e} — using placeholder");
                 placeholder()
@@ -157,7 +157,11 @@ fn load_gltf_image(img: &gltf::Image, buffers: &[gltf::buffer::Data]) -> GltfTex
         Ok(dyn_img) => {
             let rgba = dyn_img.to_rgba8();
             let (w, h) = (rgba.width(), rgba.height());
-            GltfTexture { pixels: rgba.into_raw(), width: w, height: h }
+            GltfTexture {
+                pixels: rgba.into_raw(),
+                width: w,
+                height: h,
+            }
         }
         Err(e) => {
             log::warn!("image decode failed: {e} — using placeholder");
@@ -370,7 +374,9 @@ pub fn load_glb(data: &[u8]) -> Result<GltfScene, GltfError> {
 
         // Detect MToon: check if VRM extensions exist in the document.
         // If document has VRMC_vrm extension, all materials are treated as MToon.
-        let has_vrm = document.extensions_used().any(|e| e == "VRMC_vrm" || e == "VRMC_materials_mtoon");
+        let has_vrm = document
+            .extensions_used()
+            .any(|e| e == "VRMC_vrm" || e == "VRMC_materials_mtoon");
         let is_mtoon = has_vrm;
 
         // Detect material type from name for appropriate PBR settings
@@ -390,14 +396,23 @@ pub fn load_glb(data: &[u8]) -> Result<GltfScene, GltfError> {
         // MToon shade parameters: shade_color = slightly darker base, shade_shift = -0.1 (more lit)
         let (sub_color, sub_radius, hair_scat) = if is_mtoon {
             // shade_color (RGB) = base_color * 0.85 (slightly darkened), shade_shift (A) = -0.1
-            let sc = [base_color[0] * 0.85, base_color[1] * 0.8, base_color[2] * 0.85, -0.1];
+            let sc = [
+                base_color[0] * 0.85,
+                base_color[1] * 0.8,
+                base_color[2] * 0.85,
+                -0.1,
+            ];
             // shade_toony=0.5 (r0), rim_intensity=0.3 (r1), rim_fresnel=3.0 (r2)
             let sr = [0.5_f32, 0.3, 3.0];
             // rim_color (RGB) = white, rim_lift (A) = 0.0
             let hs = [1.0_f32, 1.0, 1.0, 0.0];
             (sc, sr, hs)
         } else {
-            ([0.9, 0.5, 0.35, subsurface], [0.012_f32, 0.036, 0.12], [0.8_f32, 0.6, 0.4, 0.3])
+            (
+                [0.9, 0.5, 0.35, subsurface],
+                [0.012_f32, 0.036, 0.12],
+                [0.8_f32, 0.6, 0.4, 0.3],
+            )
         };
 
         materials.push(MaterialUniform {
@@ -470,7 +485,11 @@ pub fn load_glb(data: &[u8]) -> Result<GltfScene, GltfError> {
             inverse_bind_matrices,
         });
     }
-    log::info!("glTF: {} skins, {} nodes in hierarchy", skins.len(), node_hierarchy.len());
+    log::info!(
+        "glTF: {} skins, {} nodes in hierarchy",
+        skins.len(),
+        node_hierarchy.len()
+    );
 
     // Extract ALL meshes (all primitives) + morph targets
     let mut meshes = Vec::new();
@@ -493,7 +512,8 @@ pub fn load_glb(data: &[u8]) -> Result<GltfScene, GltfError> {
                 if let Some(prim) = first_prim {
                     let target_count = prim.morph_targets().count();
                     if target_count > 0 && morph_target_names.is_empty() {
-                        morph_target_names = (0..target_count).map(|i| format!("morph_{}", i)).collect();
+                        morph_target_names =
+                            (0..target_count).map(|i| format!("morph_{}", i)).collect();
                     }
                 }
             }
@@ -560,7 +580,9 @@ pub fn load_glb(data: &[u8]) -> Result<GltfScene, GltfError> {
                 for (pos_opt, _norm_opt, _tan_opt) in morph_reader.read_morph_targets() {
                     let deltas: Vec<f32> = match pos_opt {
                         Some(pos_iter) => {
-                            let v: Vec<f32> = pos_iter.flat_map(|p: [f32; 3]| [p[0], p[1], p[2]]).collect();
+                            let v: Vec<f32> = pos_iter
+                                .flat_map(|p: [f32; 3]| [p[0], p[1], p[2]])
+                                .collect();
                             v
                         }
                         None => Vec::new(),
@@ -570,10 +592,18 @@ pub fn load_glb(data: &[u8]) -> Result<GltfScene, GltfError> {
                         let min_d = deltas.iter().cloned().fold(0.0f32, f32::min);
                         let non_zero = deltas.iter().filter(|d| d.abs() > 0.0001).count();
                         if mesh_morphs.len() < 6 && non_zero > 0 {
-                            log::info!("morph[{}]: {} floats, {} non-zero, range [{:.6}, {:.6}]",
-                                mesh_morphs.len(), deltas.len(), non_zero, min_d, max_d);
+                            log::info!(
+                                "morph[{}]: {} floats, {} non-zero, range [{:.6}, {:.6}]",
+                                mesh_morphs.len(),
+                                deltas.len(),
+                                non_zero,
+                                min_d,
+                                max_d
+                            );
                         }
-                        mesh_morphs.push(MorphTarget { position_deltas: deltas });
+                        mesh_morphs.push(MorphTarget {
+                            position_deltas: deltas,
+                        });
                     }
                 }
 
@@ -631,9 +661,11 @@ pub fn load_glb(data: &[u8]) -> Result<GltfScene, GltfError> {
         }
     }
 
-    log::info!("glTF: {} morph target names, meshes with morphs: {}",
+    log::info!(
+        "glTF: {} morph target names, meshes with morphs: {}",
         morph_target_names.len(),
-        all_morph_targets.iter().filter(|m| !m.is_empty()).count());
+        all_morph_targets.iter().filter(|m| !m.is_empty()).count()
+    );
 
     Ok(GltfScene {
         meshes,

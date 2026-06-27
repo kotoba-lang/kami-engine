@@ -17,8 +17,8 @@ use std::time::Instant;
 
 use glam::{Mat4, Vec3};
 use kami_core::actor::components::Position;
-use kami_script_runtime::{KamiScriptRuntime, Tag, BACKEND};
 use kami_scene::{kw_key, mget, num, vec3};
+use kami_script_runtime::{BACKEND, KamiScriptRuntime, Tag};
 use winit::application::ApplicationHandler;
 use winit::event::{ElementState, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, EventLoop};
@@ -63,7 +63,6 @@ struct Scene3 {
     ground_col: [f32; 3],
 }
 
-
 /// Parse the scene; `None` (not a panic) if `src` isn't a valid EDN map.
 fn parse_scene(src: &str) -> Option<Scene3> {
     let parsed = kami_scene::root_map(src)?;
@@ -77,7 +76,11 @@ fn parse_scene(src: &str) -> Option<Scene3> {
             if let (Some(tag), Some(p)) = (kw_key(k), v.as_map()) {
                 profiles.insert(
                     tag,
-                    Prof { color: vec3(mget(p, "color")), w: num(mget(p, "w")), h: num(mget(p, "h")) },
+                    Prof {
+                        color: vec3(mget(p, "color")),
+                        w: num(mget(p, "w")),
+                        h: num(mget(p, "h")),
+                    },
                 );
             }
         }
@@ -99,7 +102,12 @@ fn parse_scene(src: &str) -> Option<Scene3> {
         }
     }
     if buildings.is_empty() {
-        buildings.push(Building { color: [0.6, 0.6, 0.65], min_h: 2.0, max_h: 6.0, w: 2.0 });
+        buildings.push(Building {
+            color: [0.6, 0.6, 0.65],
+            min_h: 2.0,
+            max_h: 6.0,
+            w: 2.0,
+        });
     }
     let trees = pget("trees").and_then(|t| t.as_map());
     let tget = |k: &str| trees.and_then(|t| mget(t, k));
@@ -108,7 +116,10 @@ fn parse_scene(src: &str) -> Option<Scene3> {
     let sget = |k: &str| sky.and_then(|s| mget(s, k));
 
     Some(Scene3 {
-        title: mget(root, "game/title").and_then(|t| t.as_string()).unwrap_or("kami-clj-play3d").to_string(),
+        title: mget(root, "game/title")
+            .and_then(|t| t.as_string())
+            .unwrap_or("kami-clj-play3d")
+            .to_string(),
         player_speed: num(wget("player-speed")),
         camera_dist: num(wget("camera-dist")),
         camera_height: num(wget("camera-height")),
@@ -135,7 +146,10 @@ fn parse_scene(src: &str) -> Option<Scene3> {
 /// Read a game file or exit with a clear message (no panic backtrace).
 fn read_or_exit(base: &std::path::Path, name: &str) -> String {
     std::fs::read_to_string(base.join(name)).unwrap_or_else(|e| {
-        eprintln!("kami-clj-play3d: cannot read {}: {e}", base.join(name).display());
+        eprintln!(
+            "kami-clj-play3d: cannot read {}: {e}",
+            base.join(name).display()
+        );
         std::process::exit(1);
     })
 }
@@ -180,19 +194,70 @@ struct UiRect {
 impl UiRect {
     /// from screen fractions (0..1, origin top-left) → NDC rect.
     fn screen(x: f32, y: f32, w: f32, h: f32, color: [f32; 4]) -> UiRect {
-        UiRect { rect: [x * 2.0 - 1.0, 1.0 - (y + h) * 2.0, w * 2.0, h * 2.0], color }
+        UiRect {
+            rect: [x * 2.0 - 1.0, 1.0 - (y + h) * 2.0, w * 2.0, h * 2.0],
+            color,
+        }
     }
 }
 
 fn cube() -> (Vec<Vertex>, Vec<u16>) {
     // 6 faces, per-face normal, unit cube centered at origin.
     let faces: [([f32; 3], [[f32; 3]; 4]); 6] = [
-        ([0.0, 0.0, 1.0], [[-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [0.5, 0.5, 0.5], [-0.5, 0.5, 0.5]]),
-        ([0.0, 0.0, -1.0], [[0.5, -0.5, -0.5], [-0.5, -0.5, -0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5]]),
-        ([1.0, 0.0, 0.0], [[0.5, -0.5, 0.5], [0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [0.5, 0.5, 0.5]]),
-        ([-1.0, 0.0, 0.0], [[-0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [-0.5, 0.5, 0.5], [-0.5, 0.5, -0.5]]),
-        ([0.0, 1.0, 0.0], [[-0.5, 0.5, 0.5], [0.5, 0.5, 0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, -0.5]]),
-        ([0.0, -1.0, 0.0], [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [0.5, -0.5, 0.5], [-0.5, -0.5, 0.5]]),
+        (
+            [0.0, 0.0, 1.0],
+            [
+                [-0.5, -0.5, 0.5],
+                [0.5, -0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+            ],
+        ),
+        (
+            [0.0, 0.0, -1.0],
+            [
+                [0.5, -0.5, -0.5],
+                [-0.5, -0.5, -0.5],
+                [-0.5, 0.5, -0.5],
+                [0.5, 0.5, -0.5],
+            ],
+        ),
+        (
+            [1.0, 0.0, 0.0],
+            [
+                [0.5, -0.5, 0.5],
+                [0.5, -0.5, -0.5],
+                [0.5, 0.5, -0.5],
+                [0.5, 0.5, 0.5],
+            ],
+        ),
+        (
+            [-1.0, 0.0, 0.0],
+            [
+                [-0.5, -0.5, -0.5],
+                [-0.5, -0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+                [-0.5, 0.5, -0.5],
+            ],
+        ),
+        (
+            [0.0, 1.0, 0.0],
+            [
+                [-0.5, 0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [0.5, 0.5, -0.5],
+                [-0.5, 0.5, -0.5],
+            ],
+        ),
+        (
+            [0.0, -1.0, 0.0],
+            [
+                [-0.5, -0.5, -0.5],
+                [0.5, -0.5, -0.5],
+                [0.5, -0.5, 0.5],
+                [-0.5, -0.5, 0.5],
+            ],
+        ),
     ];
     let mut v = Vec::new();
     let mut idx = Vec::new();
@@ -224,8 +289,16 @@ fn build_terrain(extent: f32, res: usize) -> (Vec<Vertex>, Vec<u32>) {
             let x = -extent + i as f32 * step;
             let z = -extent + j as f32 * step;
             let e = 1.0;
-            let n = Vec3::new(terrain_h(x - e, z) - terrain_h(x + e, z), 2.0 * e, terrain_h(x, z - e) - terrain_h(x, z + e)).normalize();
-            v.push(Vertex { pos: [x, terrain_h(x, z), z], normal: [n.x, n.y, n.z] });
+            let n = Vec3::new(
+                terrain_h(x - e, z) - terrain_h(x + e, z),
+                2.0 * e,
+                terrain_h(x, z - e) - terrain_h(x, z + e),
+            )
+            .normalize();
+            v.push(Vertex {
+                pos: [x, terrain_h(x, z), z],
+                normal: [n.x, n.y, n.z],
+            });
         }
     }
     let w = (res + 1) as u32;
@@ -241,8 +314,9 @@ fn build_terrain(extent: f32, res: usize) -> (Vec<Vertex>, Vec<u32>) {
 
 fn model_box(base: Vec3, w: f32, h: f32) -> [[f32; 4]; 4] {
     // a box of footprint w×w and height h whose base sits on `base`.
-    (Mat4::from_translation(base + Vec3::new(0.0, h * 0.5, 0.0)) * Mat4::from_scale(Vec3::new(w, h, w)))
-        .to_cols_array_2d()
+    (Mat4::from_translation(base + Vec3::new(0.0, h * 0.5, 0.0))
+        * Mat4::from_scale(Vec3::new(w, h, w)))
+    .to_cols_array_2d()
 }
 
 /// A thin wall panel (width `w`, height `h`, thin `depth`) yawed to face the
@@ -311,7 +385,7 @@ impl Weapon {
 /// Enemy archetype by entity id → (size scale, colour, hit points).
 fn bot_kind(id: u32) -> (f32, [f32; 3], u32) {
     match id % 3 {
-        0 => (1.5, [0.9, 0.3, 0.25], 3), // brute: big, red, tanky
+        0 => (1.5, [0.9, 0.3, 0.25], 3),  // brute: big, red, tanky
         2 => (0.8, [0.95, 0.85, 0.3], 1), // runner: small, yellow
         _ => (1.0, [0.6, 0.7, 0.85], 1),  // grunt: normal
     }
@@ -336,7 +410,10 @@ struct Audio {
 impl Audio {
     fn new() -> Option<Self> {
         let (s, h) = rodio::OutputStream::try_default().ok()?;
-        Some(Audio { _stream: s, handle: h })
+        Some(Audio {
+            _stream: s,
+            handle: h,
+        })
     }
     fn blip(&self, freq: f32, ms: u64, amp: f32) {
         use rodio::Source;
@@ -350,29 +427,79 @@ impl Audio {
 /// Append a blocky humanoid (legs/torso/arms/head/visor) to `inst`, standing on
 /// `ground`, facing `yaw`, with a walk cycle when `moving`. Stylized boxes — no
 /// skinned mesh, but reads as a character with motion.
-fn push_character(inst: &mut Vec<Instance>, ground: Vec3, yaw: f32, walk: f32, moving: bool, scale: f32, color: [f32; 3]) {
+fn push_character(
+    inst: &mut Vec<Instance>,
+    ground: Vec3,
+    yaw: f32,
+    walk: f32,
+    moving: bool,
+    scale: f32,
+    color: [f32; 3],
+) {
     let rot = Mat4::from_rotation_y(yaw);
     let tint = |m: f32| [color[0] * m, color[1] * m, color[2] * m, 1.0];
     let mut part = |local: Vec3, size: Vec3, col: [f32; 4]| {
-        let m = Mat4::from_translation(ground) * rot * Mat4::from_translation(local * scale) * Mat4::from_scale(size * scale);
-        inst.push(Instance { model: m.to_cols_array_2d(), color: col });
+        let m = Mat4::from_translation(ground)
+            * rot
+            * Mat4::from_translation(local * scale)
+            * Mat4::from_scale(size * scale);
+        inst.push(Instance {
+            model: m.to_cols_array_2d(),
+            color: col,
+        });
     };
     let sw = if moving { walk.sin() } else { 0.0 };
-    let bob = if moving { (walk * 2.0).sin().abs() * 0.07 } else { 0.0 };
+    let bob = if moving {
+        (walk * 2.0).sin().abs() * 0.07
+    } else {
+        0.0
+    };
     // forward is -z; legs/arms swing along z, opposite each other
-    part(Vec3::new(-0.18, 0.45 + bob, sw * 0.35), Vec3::new(0.26, 0.95, 0.30), tint(0.7));
-    part(Vec3::new(0.18, 0.45 + bob, -sw * 0.35), Vec3::new(0.26, 0.95, 0.30), tint(0.7));
-    part(Vec3::new(0.0, 1.25 + bob, 0.0), Vec3::new(0.70, 0.90, 0.45), tint(1.0)); // torso
-    part(Vec3::new(-0.5, 1.30 + bob, -sw * 0.30), Vec3::new(0.20, 0.80, 0.24), tint(0.92)); // arms
-    part(Vec3::new(0.5, 1.30 + bob, sw * 0.30), Vec3::new(0.20, 0.80, 0.24), tint(0.92));
-    part(Vec3::new(0.0, 1.95 + bob, 0.0), Vec3::new(0.45, 0.45, 0.45), tint(1.15)); // head
-    part(Vec3::new(0.0, 1.95 + bob, -0.24), Vec3::new(0.30, 0.18, 0.05), [0.1, 0.1, 0.12, 1.0]); // visor (shows facing)
+    part(
+        Vec3::new(-0.18, 0.45 + bob, sw * 0.35),
+        Vec3::new(0.26, 0.95, 0.30),
+        tint(0.7),
+    );
+    part(
+        Vec3::new(0.18, 0.45 + bob, -sw * 0.35),
+        Vec3::new(0.26, 0.95, 0.30),
+        tint(0.7),
+    );
+    part(
+        Vec3::new(0.0, 1.25 + bob, 0.0),
+        Vec3::new(0.70, 0.90, 0.45),
+        tint(1.0),
+    ); // torso
+    part(
+        Vec3::new(-0.5, 1.30 + bob, -sw * 0.30),
+        Vec3::new(0.20, 0.80, 0.24),
+        tint(0.92),
+    ); // arms
+    part(
+        Vec3::new(0.5, 1.30 + bob, sw * 0.30),
+        Vec3::new(0.20, 0.80, 0.24),
+        tint(0.92),
+    );
+    part(
+        Vec3::new(0.0, 1.95 + bob, 0.0),
+        Vec3::new(0.45, 0.45, 0.45),
+        tint(1.15),
+    ); // head
+    part(
+        Vec3::new(0.0, 1.95 + bob, -0.24),
+        Vec3::new(0.30, 0.18, 0.05),
+        [0.1, 0.1, 0.12, 1.0],
+    ); // visor (shows facing)
 }
 
 /// A soft blob shadow: a dark flat box on the ground (cheap grounding, no shadow map).
 fn push_shadow(inst: &mut Vec<Instance>, ground: Vec3, r: f32) {
-    let m = Mat4::from_translation(ground + Vec3::new(0.0, 0.05, 0.0)) * Mat4::from_scale(Vec3::new(r, 0.05, r));
-    inst.push(Instance { model: m.to_cols_array_2d(), color: [0.05, 0.06, 0.07, 1.0] });
+    let m = Mat4::from_translation(ground + Vec3::new(0.0, 0.05, 0.0))
+        * Mat4::from_scale(Vec3::new(r, 0.05, r));
+    inst.push(Instance {
+        model: m.to_cols_array_2d(),
+        color: [0.05, 0.06, 0.07, 1.0],
+    });
 }
 
 /// An axis-aligned wall footprint in world XZ, for player collision.
@@ -384,38 +511,103 @@ struct Aabb {
 
 /// A hollow building you can walk into: 4 walls (a door gap on the south side) +
 /// a roof. Pushes the wall boxes to `inst` and their footprints to `aabbs`.
-fn make_building(c: Vec3, room: f32, h: f32, color: [f32; 3], inst: &mut Vec<Instance>, aabbs: &mut Vec<Aabb>) {
+fn make_building(
+    c: Vec3,
+    room: f32,
+    h: f32,
+    color: [f32; 3],
+    inst: &mut Vec<Instance>,
+    aabbs: &mut Vec<Aabb>,
+) {
     let half = room * 0.5;
     let th = 0.5;
     let col = [color[0], color[1], color[2], 1.0];
-    let mut wall = |center: Vec3, yaw: f32, w: f32, depth: f32, ax_min: glam::Vec2, ax_max: glam::Vec2| {
-        inst.push(Instance { model: model_wall(center, yaw, w, h, depth), color: col });
-        aabbs.push(Aabb { min: ax_min, max: ax_max });
-    };
+    let mut wall =
+        |center: Vec3, yaw: f32, w: f32, depth: f32, ax_min: glam::Vec2, ax_max: glam::Vec2| {
+            inst.push(Instance {
+                model: model_wall(center, yaw, w, h, depth),
+                color: col,
+            });
+            aabbs.push(Aabb {
+                min: ax_min,
+                max: ax_max,
+            });
+        };
     let (cx, cz) = (c.x, c.z);
     // north / east / west walls (full)
-    wall(Vec3::new(cx, 0.0, cz + half), 0.0, room, th,
-         glam::vec2(cx - half, cz + half - th * 0.5), glam::vec2(cx + half, cz + half + th * 0.5));
-    wall(Vec3::new(cx + half, 0.0, cz), std::f32::consts::FRAC_PI_2, room, th,
-         glam::vec2(cx + half - th * 0.5, cz - half), glam::vec2(cx + half + th * 0.5, cz + half));
-    wall(Vec3::new(cx - half, 0.0, cz), std::f32::consts::FRAC_PI_2, room, th,
-         glam::vec2(cx - half - th * 0.5, cz - half), glam::vec2(cx - half + th * 0.5, cz + half));
+    wall(
+        Vec3::new(cx, 0.0, cz + half),
+        0.0,
+        room,
+        th,
+        glam::vec2(cx - half, cz + half - th * 0.5),
+        glam::vec2(cx + half, cz + half + th * 0.5),
+    );
+    wall(
+        Vec3::new(cx + half, 0.0, cz),
+        std::f32::consts::FRAC_PI_2,
+        room,
+        th,
+        glam::vec2(cx + half - th * 0.5, cz - half),
+        glam::vec2(cx + half + th * 0.5, cz + half),
+    );
+    wall(
+        Vec3::new(cx - half, 0.0, cz),
+        std::f32::consts::FRAC_PI_2,
+        room,
+        th,
+        glam::vec2(cx - half - th * 0.5, cz - half),
+        glam::vec2(cx - half + th * 0.5, cz + half),
+    );
     // south wall with a centred door gap → two segments
     let gd = room * 0.45;
     let seg = (room - gd) * 0.5;
-    wall(Vec3::new(cx - half + seg * 0.5, 0.0, cz - half), 0.0, seg, th,
-         glam::vec2(cx - half, cz - half - th * 0.5), glam::vec2(cx - half + seg, cz - half + th * 0.5));
-    wall(Vec3::new(cx + half - seg * 0.5, 0.0, cz - half), 0.0, seg, th,
-         glam::vec2(cx + half - seg, cz - half - th * 0.5), glam::vec2(cx + half, cz - half + th * 0.5));
+    wall(
+        Vec3::new(cx - half + seg * 0.5, 0.0, cz - half),
+        0.0,
+        seg,
+        th,
+        glam::vec2(cx - half, cz - half - th * 0.5),
+        glam::vec2(cx - half + seg, cz - half + th * 0.5),
+    );
+    wall(
+        Vec3::new(cx + half - seg * 0.5, 0.0, cz - half),
+        0.0,
+        seg,
+        th,
+        glam::vec2(cx + half - seg, cz - half - th * 0.5),
+        glam::vec2(cx + half, cz - half + th * 0.5),
+    );
     // roof (no collision; player can't reach it)
-    inst.push(Instance { model: model_box(Vec3::new(cx, h, cz), room, th), color: [color[0] * 0.85, color[1] * 0.85, color[2] * 0.85, 1.0] });
+    inst.push(Instance {
+        model: model_box(Vec3::new(cx, h, cz), room, th),
+        color: [color[0] * 0.85, color[1] * 0.85, color[2] * 0.85, 1.0],
+    });
     // lit window insets on the north + south facades (alpha 0.0 = emissive sentinel)
     let win = |cyx: f32, cyy: f32, cyz: f32, w: f32, hh: f32, d: f32| {
-        let m = Mat4::from_translation(Vec3::new(cyx, cyy, cyz)) * Mat4::from_scale(Vec3::new(w, hh, d));
-        Instance { model: m.to_cols_array_2d(), color: [1.0, 0.85, 0.5, 0.0] }
+        let m = Mat4::from_translation(Vec3::new(cyx, cyy, cyz))
+            * Mat4::from_scale(Vec3::new(w, hh, d));
+        Instance {
+            model: m.to_cols_array_2d(),
+            color: [1.0, 0.85, 0.5, 0.0],
+        }
     };
-    inst.push(win(cx, h * 0.55, cz + half + 0.07, room * 0.34, h * 0.34, 0.14));
-    inst.push(win(cx, h * 0.55, cz - half - 0.07, room * 0.34, h * 0.34, 0.14));
+    inst.push(win(
+        cx,
+        h * 0.55,
+        cz + half + 0.07,
+        room * 0.34,
+        h * 0.34,
+        0.14,
+    ));
+    inst.push(win(
+        cx,
+        h * 0.55,
+        cz - half - 0.07,
+        room * 0.34,
+        h * 0.34,
+        0.14,
+    ));
 }
 
 /// Push the player (world XZ) out of any wall AABB it has entered (with radius `r`).
@@ -668,7 +860,11 @@ fn make_depth(device: &wgpu::Device, w: u32, h: u32) -> wgpu::TextureView {
     device
         .create_texture(&wgpu::TextureDescriptor {
             label: Some("depth"),
-            size: wgpu::Extent3d { width: w.max(1), height: h.max(1), depth_or_array_layers: 1 },
+            size: wgpu::Extent3d {
+                width: w.max(1),
+                height: h.max(1),
+                depth_or_array_layers: 1,
+            },
             mip_level_count: 1,
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
@@ -741,9 +937,9 @@ struct App {
     game: Game,
     scene: Scene3,
     keys: Keys,
-    props: Vec<Instance>, // static world dressing
+    props: Vec<Instance>,  // static world dressing
     wall_aabbs: Vec<Aabb>, // building walls, for player collision
-    walls: Vec<Instance>, // player-built wall pieces
+    walls: Vec<Instance>,  // player-built wall pieces
     particles: Vec<Particle3>,
     bullets: Vec<Bullet>,
     phase: Phase,
@@ -863,7 +1059,12 @@ impl App {
                 .await
                 .unwrap();
             let caps = surface.get_capabilities(&adapter);
-            let format = caps.formats.iter().find(|f| f.is_srgb()).copied().unwrap_or(caps.formats[0]);
+            let format = caps
+                .formats
+                .iter()
+                .find(|f| f.is_srgb())
+                .copied()
+                .unwrap_or(caps.formats[0]);
             let config = wgpu::SurfaceConfiguration {
                 usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
                 format,
@@ -889,14 +1090,21 @@ impl App {
             entries: &[wgpu::BindGroupLayoutEntry {
                 binding: 0,
                 visibility: wgpu::ShaderStages::VERTEX | wgpu::ShaderStages::FRAGMENT,
-                ty: wgpu::BindingType::Buffer { ty: wgpu::BufferBindingType::Uniform, has_dynamic_offset: false, min_binding_size: None },
+                ty: wgpu::BindingType::Buffer {
+                    ty: wgpu::BufferBindingType::Uniform,
+                    has_dynamic_offset: false,
+                    min_binding_size: None,
+                },
                 count: None,
             }],
         });
         let bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: Some("bind"),
             layout: &bgl,
-            entries: &[wgpu::BindGroupEntry { binding: 0, resource: globals_buf.as_entire_binding() }],
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: globals_buf.as_entire_binding(),
+            }],
         });
         let pl = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("pl"),
@@ -907,7 +1115,11 @@ impl App {
         // --- shadow map: sun depth texture + comparison sampler + bind group ---
         let shadow_tex = device.create_texture(&wgpu::TextureDescriptor {
             label: Some("shadow"),
-            size: wgpu::Extent3d { width: 2048, height: 2048, depth_or_array_layers: 1 },
+            size: wgpu::Extent3d {
+                width: 2048,
+                height: 2048,
+                depth_or_array_layers: 1,
+            },
             mip_level_count: 1,
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
@@ -948,8 +1160,14 @@ impl App {
             label: Some("shadow-bind"),
             layout: &shadow_bgl,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: wgpu::BindingResource::TextureView(&shadow_view) },
-                wgpu::BindGroupEntry { binding: 1, resource: wgpu::BindingResource::Sampler(&shadow_smp) },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&shadow_view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&shadow_smp),
+                },
             ],
         });
         // box/ground sample the shadow map → they use a 2-group layout.
@@ -975,8 +1193,18 @@ impl App {
         let sky_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("sky"),
             layout: Some(&pl),
-            vertex: wgpu::VertexState { module: &shader, entry_point: Some("sky_vs"), buffers: &[], compilation_options: Default::default() },
-            fragment: Some(wgpu::FragmentState { module: &shader, entry_point: Some("sky_fs"), targets: &[Some(config.format.into())], compilation_options: Default::default() }),
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: Some("sky_vs"),
+                buffers: &[],
+                compilation_options: Default::default(),
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &shader,
+                entry_point: Some("sky_fs"),
+                targets: &[Some(config.format.into())],
+                compilation_options: Default::default(),
+            }),
             primitive: wgpu::PrimitiveState::default(),
             depth_stencil: Some(depth_state(false, wgpu::CompareFunction::Always)),
             multisample: wgpu::MultisampleState::default(),
@@ -985,22 +1213,50 @@ impl App {
         });
         // terrain heightmap mesh (vast, undulating ground)
         let (tverts, tindices) = build_terrain(220.0, 168);
-        let terrain_vbuf = create_init_buffer(&device, "tv", bytemuck::cast_slice(&tverts), wgpu::BufferUsages::VERTEX);
-        let terrain_ibuf = create_init_buffer(&device, "ti", bytemuck::cast_slice(&tindices), wgpu::BufferUsages::INDEX);
+        let terrain_vbuf = create_init_buffer(
+            &device,
+            "tv",
+            bytemuck::cast_slice(&tverts),
+            wgpu::BufferUsages::VERTEX,
+        );
+        let terrain_ibuf = create_init_buffer(
+            &device,
+            "ti",
+            bytemuck::cast_slice(&tindices),
+            wgpu::BufferUsages::INDEX,
+        );
         let terrain_index_count = tindices.len() as u32;
         let terrain_vbl = wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Vertex>() as u64,
             step_mode: wgpu::VertexStepMode::Vertex,
             attributes: &[
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x3, offset: 0, shader_location: 0 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x3, offset: 12, shader_location: 1 },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x3,
+                    offset: 0,
+                    shader_location: 0,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x3,
+                    offset: 12,
+                    shader_location: 1,
+                },
             ],
         };
         let ground_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("ground"),
             layout: Some(&pl_lit),
-            vertex: wgpu::VertexState { module: &shader, entry_point: Some("ground_vs"), buffers: &[terrain_vbl], compilation_options: Default::default() },
-            fragment: Some(wgpu::FragmentState { module: &shader, entry_point: Some("ground_fs"), targets: &[Some(config.format.into())], compilation_options: Default::default() }),
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: Some("ground_vs"),
+                buffers: &[terrain_vbl],
+                compilation_options: Default::default(),
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &shader,
+                entry_point: Some("ground_fs"),
+                targets: &[Some(config.format.into())],
+                compilation_options: Default::default(),
+            }),
             primitive: wgpu::PrimitiveState::default(),
             depth_stencil: Some(depth_state(true, wgpu::CompareFunction::LessEqual)),
             multisample: wgpu::MultisampleState::default(),
@@ -1011,8 +1267,18 @@ impl App {
         let water_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("water"),
             layout: Some(&pl),
-            vertex: wgpu::VertexState { module: &shader, entry_point: Some("water_vs"), buffers: &[], compilation_options: Default::default() },
-            fragment: Some(wgpu::FragmentState { module: &shader, entry_point: Some("water_fs"), targets: &[Some(config.format.into())], compilation_options: Default::default() }),
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: Some("water_vs"),
+                buffers: &[],
+                compilation_options: Default::default(),
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &shader,
+                entry_point: Some("water_fs"),
+                targets: &[Some(config.format.into())],
+                compilation_options: Default::default(),
+            }),
             primitive: wgpu::PrimitiveState::default(),
             depth_stencil: Some(depth_state(true, wgpu::CompareFunction::LessEqual)),
             multisample: wgpu::MultisampleState::default(),
@@ -1024,28 +1290,69 @@ impl App {
             array_stride: std::mem::size_of::<Vertex>() as u64,
             step_mode: wgpu::VertexStepMode::Vertex,
             attributes: &[
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x3, offset: 0, shader_location: 0 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x3, offset: 12, shader_location: 1 },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x3,
+                    offset: 0,
+                    shader_location: 0,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x3,
+                    offset: 12,
+                    shader_location: 1,
+                },
             ],
         };
         let ibl = wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Instance>() as u64,
             step_mode: wgpu::VertexStepMode::Instance,
             attributes: &[
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 0, shader_location: 2 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 16, shader_location: 3 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 32, shader_location: 4 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 48, shader_location: 5 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 64, shader_location: 6 },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x4,
+                    offset: 0,
+                    shader_location: 2,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x4,
+                    offset: 16,
+                    shader_location: 3,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x4,
+                    offset: 32,
+                    shader_location: 4,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x4,
+                    offset: 48,
+                    shader_location: 5,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x4,
+                    offset: 64,
+                    shader_location: 6,
+                },
             ],
         };
         let vbuffers = [vbl, ibl];
         let box_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("box"),
             layout: Some(&pl_lit),
-            vertex: wgpu::VertexState { module: &shader, entry_point: Some("box_vs"), buffers: &vbuffers, compilation_options: Default::default() },
-            fragment: Some(wgpu::FragmentState { module: &shader, entry_point: Some("box_fs"), targets: &[Some(config.format.into())], compilation_options: Default::default() }),
-            primitive: wgpu::PrimitiveState { cull_mode: Some(wgpu::Face::Back), ..Default::default() },
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: Some("box_vs"),
+                buffers: &vbuffers,
+                compilation_options: Default::default(),
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &shader,
+                entry_point: Some("box_fs"),
+                targets: &[Some(config.format.into())],
+                compilation_options: Default::default(),
+            }),
+            primitive: wgpu::PrimitiveState {
+                cull_mode: Some(wgpu::Face::Back),
+                ..Default::default()
+            },
             depth_stencil: Some(depth_state(true, wgpu::CompareFunction::LessEqual)),
             multisample: wgpu::MultisampleState::default(),
             multiview: None,
@@ -1055,9 +1362,17 @@ impl App {
         let shadow_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("shadow"),
             layout: Some(&pl),
-            vertex: wgpu::VertexState { module: &shader, entry_point: Some("shadow_vs"), buffers: &vbuffers, compilation_options: Default::default() },
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: Some("shadow_vs"),
+                buffers: &vbuffers,
+                compilation_options: Default::default(),
+            },
             fragment: None,
-            primitive: wgpu::PrimitiveState { cull_mode: Some(wgpu::Face::Back), ..Default::default() },
+            primitive: wgpu::PrimitiveState {
+                cull_mode: Some(wgpu::Face::Back),
+                ..Default::default()
+            },
             depth_stencil: Some(depth_state(true, wgpu::CompareFunction::LessEqual)),
             multisample: wgpu::MultisampleState::default(),
             multiview: None,
@@ -1074,14 +1389,27 @@ impl App {
             array_stride: std::mem::size_of::<UiRect>() as u64,
             step_mode: wgpu::VertexStepMode::Instance,
             attributes: &[
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 0, shader_location: 0 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 16, shader_location: 1 },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x4,
+                    offset: 0,
+                    shader_location: 0,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x4,
+                    offset: 16,
+                    shader_location: 1,
+                },
             ],
         };
         let ui_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("ui"),
             layout: Some(&ui_pl),
-            vertex: wgpu::VertexState { module: &shader, entry_point: Some("ui_vs"), buffers: &[ui_ibl], compilation_options: Default::default() },
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: Some("ui_vs"),
+                buffers: &[ui_ibl],
+                compilation_options: Default::default(),
+            },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
                 entry_point: Some("ui_fs"),
@@ -1107,8 +1435,18 @@ impl App {
         });
 
         let (verts, indices) = cube();
-        let vbuf = create_init_buffer(&device, "v", bytemuck::cast_slice(&verts), wgpu::BufferUsages::VERTEX);
-        let ibuf = create_init_buffer(&device, "i", bytemuck::cast_slice(&indices), wgpu::BufferUsages::INDEX);
+        let vbuf = create_init_buffer(
+            &device,
+            "v",
+            bytemuck::cast_slice(&verts),
+            wgpu::BufferUsages::VERTEX,
+        );
+        let ibuf = create_init_buffer(
+            &device,
+            "i",
+            bytemuck::cast_slice(&indices),
+            wgpu::BufferUsages::INDEX,
+        );
         let instance_cap = 8192u32;
         let instance_buf = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("inst"),
@@ -1119,11 +1457,31 @@ impl App {
         let depth = make_depth(&device, config.width, config.height);
 
         self.gpu = Some(Gpu {
-            device, queue, surface, config, depth, sky_pipeline, ground_pipeline, water_pipeline, box_pipeline,
-            shadow_pipeline, shadow_view, shadow_bind,
-            terrain_vbuf, terrain_ibuf, terrain_index_count,
-            ui_pipeline, ui_buf, ui_cap,
-            globals_buf, bind, vbuf, ibuf, index_count: indices.len() as u32, instance_buf, instance_cap,
+            device,
+            queue,
+            surface,
+            config,
+            depth,
+            sky_pipeline,
+            ground_pipeline,
+            water_pipeline,
+            box_pipeline,
+            shadow_pipeline,
+            shadow_view,
+            shadow_bind,
+            terrain_vbuf,
+            terrain_ibuf,
+            terrain_index_count,
+            ui_pipeline,
+            ui_buf,
+            ui_cap,
+            globals_buf,
+            bind,
+            vbuf,
+            ibuf,
+            index_count: indices.len() as u32,
+            instance_buf,
+            instance_cap,
         });
     }
 
@@ -1184,7 +1542,11 @@ impl App {
         }
         let dz = |x: f32, y: f32| {
             let v = glam::vec2(x, y);
-            if v.length() < 0.18 { glam::Vec2::ZERO } else { v }
+            if v.length() < 0.18 {
+                glam::Vec2::ZERO
+            } else {
+                v
+            }
         };
         if let (Some(g), Some(id)) = (self.gilrs.as_ref(), self.active_pad) {
             let gp = g.gamepad(id);
@@ -1216,10 +1578,18 @@ impl App {
 
         // --- camera orbit from arrows + right stick ---
         let dt = 0.016;
-        if self.keys.left { self.cam_yaw -= 1.6 * dt; }
-        if self.keys.right { self.cam_yaw += 1.6 * dt; }
-        if self.keys.up { self.cam_pitch = (self.cam_pitch + 1.2 * dt).min(1.3); }
-        if self.keys.down { self.cam_pitch = (self.cam_pitch - 1.2 * dt).max(0.1); }
+        if self.keys.left {
+            self.cam_yaw -= 1.6 * dt;
+        }
+        if self.keys.right {
+            self.cam_yaw += 1.6 * dt;
+        }
+        if self.keys.up {
+            self.cam_pitch = (self.cam_pitch + 1.2 * dt).min(1.3);
+        }
+        if self.keys.down {
+            self.cam_pitch = (self.cam_pitch - 1.2 * dt).max(0.1);
+        }
         self.poll_pad(dt); // gamepad: sticks + buttons (also nudges cam_yaw/pitch)
 
         // --- camera-relative ground movement → feed CLJ (keyboard + left stick) ---
@@ -1228,12 +1598,22 @@ impl App {
         let fwd = glam::Vec2::new(-sy, -cy);
         let right = glam::Vec2::new(cy, -sy);
         let mut mv = glam::Vec2::ZERO;
-        if self.keys.w { mv += fwd; }
-        if self.keys.s { mv -= fwd; }
-        if self.keys.d { mv += right; }
-        if self.keys.a { mv -= right; }
+        if self.keys.w {
+            mv += fwd;
+        }
+        if self.keys.s {
+            mv -= fwd;
+        }
+        if self.keys.d {
+            mv += right;
+        }
+        if self.keys.a {
+            mv -= right;
+        }
         mv += fwd * self.pad_move.y + right * self.pad_move.x; // left stick
-        if mv.length_squared() > 0.0 { mv = mv.normalize(); }
+        if mv.length_squared() > 0.0 {
+            mv = mv.normalize();
+        }
         let player_moving = mv.length_squared() > 0.0;
         if player_moving {
             self.face_yaw = (-mv.x).atan2(-mv.y); // face the movement direction
@@ -1265,7 +1645,11 @@ impl App {
 
         let (player, ents) = self.game.snapshot();
         let gs = self.scene.ground_scale;
-        let pw = Vec3::new(player[0] * gs, terrain_h(player[0] * gs, player[1] * gs) + self.height, player[1] * gs);
+        let pw = Vec3::new(
+            player[0] * gs,
+            terrain_h(player[0] * gs, player[1] * gs) + self.height,
+            player[1] * gs,
+        );
 
         // --- shooting feedback: the CLJ weapon despawns bots; burst where one vanished ---
         let cur_bots: HashMap<u32, Vec3> = ents
@@ -1372,10 +1756,18 @@ impl App {
                         (self.rng_next() * 2.0 - 1.0) * spread,
                     );
                     let dir = (base_dir + jitter).normalize_or_zero();
-                    self.bullets.push(Bullet { pos: chest, vel: dir * 48.0, life: 0.8 });
+                    self.bullets.push(Bullet {
+                        pos: chest,
+                        vel: dir * 48.0,
+                        life: 0.8,
+                    });
                 }
                 self.ammo -= 1; // one trigger pull = one round (shotgun pellets included)
-                let fhz = match self.weapon { Weapon::Pistol => 520.0, Weapon::Rifle => 700.0, Weapon::Shotgun => 300.0 };
+                let fhz = match self.weapon {
+                    Weapon::Pistol => 520.0,
+                    Weapon::Rifle => 700.0,
+                    Weapon::Shotgun => 300.0,
+                };
                 self.sfx(fhz, 28, 0.09); // muzzle blip
             }
         }
@@ -1401,8 +1793,17 @@ impl App {
                 Some(at) => {
                     // hit-detection viz: a quick white impact spark at contact
                     for _ in 0..6 {
-                        let j = Vec3::new(self.rng_next() * 2.0 - 1.0, self.rng_next() * 2.0 - 1.0, self.rng_next() * 2.0 - 1.0);
-                        self.particles.push(Particle3 { pos: at, vel: j * 5.0, age: 0.0, life: 0.18 });
+                        let j = Vec3::new(
+                            self.rng_next() * 2.0 - 1.0,
+                            self.rng_next() * 2.0 - 1.0,
+                            self.rng_next() * 2.0 - 1.0,
+                        );
+                        self.particles.push(Particle3 {
+                            pos: at,
+                            vel: j * 5.0,
+                            age: 0.0,
+                            life: 0.18,
+                        });
                     }
                 }
                 None if b.life > 0.0 => surviving.push(b),
@@ -1464,8 +1865,17 @@ impl App {
                 }
             }
             for _ in 0..12 {
-                let j = Vec3::new(self.rng_next() * 2.0 - 1.0, self.rng_next() * 2.0, self.rng_next() * 2.0 - 1.0);
-                self.particles.push(Particle3 { pos: it.pos + Vec3::new(0.0, 1.0, 0.0), vel: j * 4.0, age: 0.0, life: 0.5 });
+                let j = Vec3::new(
+                    self.rng_next() * 2.0 - 1.0,
+                    self.rng_next() * 2.0,
+                    self.rng_next() * 2.0 - 1.0,
+                );
+                self.particles.push(Particle3 {
+                    pos: it.pos + Vec3::new(0.0, 1.0, 0.0),
+                    vel: j * 4.0,
+                    age: 0.0,
+                    life: 0.5,
+                });
             }
         }
 
@@ -1483,7 +1893,12 @@ impl App {
         let vp = proj * view;
 
         // sun shadow frustum: orthographic, centred on the player's ground spot.
-        let sun = Vec3::new(self.scene.sun_dir[0], self.scene.sun_dir[1], self.scene.sun_dir[2]).normalize();
+        let sun = Vec3::new(
+            self.scene.sun_dir[0],
+            self.scene.sun_dir[1],
+            self.scene.sun_dir[2],
+        )
+        .normalize();
         let s_center = Vec3::new(pw.x, 0.0, pw.z);
         let light_vp = Mat4::orthographic_rh(-45.0, 45.0, -45.0, 45.0, 1.0, 200.0)
             * Mat4::look_at_rh(s_center - sun * 80.0, s_center, Vec3::Y);
@@ -1494,7 +1909,11 @@ impl App {
         for (tag, pos, id) in &ents {
             if let Some(p) = self.scene.profiles.get(tag) {
                 let h = if tag == "player" { self.height } else { 0.0 };
-                let ground = Vec3::new(pos[0] * gs, terrain_h(pos[0] * gs, pos[1] * gs) + h, pos[1] * gs);
+                let ground = Vec3::new(
+                    pos[0] * gs,
+                    terrain_h(pos[0] * gs, pos[1] * gs) + h,
+                    pos[1] * gs,
+                );
                 // facing: player faces its movement; bots face the player
                 let (yaw, moving) = if tag == "player" {
                     (self.face_yaw, player_moving)
@@ -1510,28 +1929,49 @@ impl App {
                     (1.0, p.color)
                 };
                 // blob shadow on the ground (stays grounded even mid-jump)
-                push_shadow(&mut inst, Vec3::new(pos[0] * gs, terrain_h(pos[0] * gs, pos[1] * gs), pos[1] * gs), p.w * 0.7 * scl);
+                push_shadow(
+                    &mut inst,
+                    Vec3::new(
+                        pos[0] * gs,
+                        terrain_h(pos[0] * gs, pos[1] * gs),
+                        pos[1] * gs,
+                    ),
+                    p.w * 0.7 * scl,
+                );
                 push_character(&mut inst, ground, yaw, walk, moving, p.h / 1.9 * scl, col);
             }
         }
         // glider canopy above the player while skydiving
         if self.phase == Phase::Skydive {
             let canopy = pw + Vec3::new(0.0, 3.0, 0.0);
-            inst.push(Instance { model: model_box(canopy, 3.4, 0.2), color: [0.95, 0.45, 0.32, 1.0] });
+            inst.push(Instance {
+                model: model_box(canopy, 3.4, 0.2),
+                color: [0.95, 0.45, 0.32, 1.0],
+            });
         }
         // floating HP bar above the player (length + colour = health)
         {
             let frac = (self.hp / 100.0).clamp(0.06, 1.0);
             let bar = pw + Vec3::new(0.0, 3.6, 0.0);
-            inst.push(Instance { model: model_wall(bar, self.cam_yaw, 2.2 * frac, 0.26, 0.08), color: [1.0 - frac, 0.15 + frac * 0.8, 0.18, 1.0] });
+            inst.push(Instance {
+                model: model_wall(bar, self.cam_yaw, 2.2 * frac, 0.26, 0.08),
+                color: [1.0 - frac, 0.15 + frac * 0.8, 0.18, 1.0],
+            });
         }
         // storm wall: a ring of glowing pillars at the current safe radius
         let sr = self.storm_radius * gs;
         let ring = 140usize;
         for kk in 0..ring {
             let ang = (kk as f32 / ring as f32) * std::f32::consts::TAU;
-            let rp = Vec3::new(ang.cos() * sr, terrain_h(ang.cos() * sr, ang.sin() * sr), ang.sin() * sr);
-            inst.push(Instance { model: model_box(rp, 0.6, 7.0), color: [0.72, 0.32, 1.0, 1.0] });
+            let rp = Vec3::new(
+                ang.cos() * sr,
+                terrain_h(ang.cos() * sr, ang.sin() * sr),
+                ang.sin() * sr,
+            );
+            inst.push(Instance {
+                model: model_box(rp, 0.6, 7.0),
+                color: [0.72, 0.32, 1.0, 1.0],
+            });
         }
         // building loot: a bobbing, spinning crate colored by kind
         for it in &self.items {
@@ -1544,12 +1984,18 @@ impl App {
             let m = Mat4::from_translation(it.pos + Vec3::new(0.0, bob, 0.0))
                 * Mat4::from_rotation_y(self.time * 2.0)
                 * Mat4::from_scale(Vec3::splat(0.6));
-            inst.push(Instance { model: m.to_cols_array_2d(), color: [col[0], col[1], col[2], 1.0] });
+            inst.push(Instance {
+                model: m.to_cols_array_2d(),
+                color: [col[0], col[1], col[2], 1.0],
+            });
         }
         // bullets: bright tracer cubes (tinted by weapon)
         let (_, _, _, _, bcol) = self.weapon.params();
         for b in &self.bullets {
-            inst.push(Instance { model: model_box(b.pos, 0.16, 0.16), color: [bcol[0], bcol[1], bcol[2], 1.0] });
+            inst.push(Instance {
+                model: model_box(b.pos, 0.16, 0.16),
+                color: [bcol[0], bcol[1], bcol[2], 1.0],
+            });
         }
         // hit particles: small bright cubes that fade as they age
         for p in &self.particles {
@@ -1568,37 +2014,94 @@ impl App {
             sun_dir: [sky.sun_dir[0], sky.sun_dir[1], sky.sun_dir[2], 0.0],
             sun_col: [sky.sun_col[0], sky.sun_col[1], sky.sun_col[2], 1.0],
             sky_zenith: [sky.sky_zenith[0], sky.sky_zenith[1], sky.sky_zenith[2], 1.0],
-            sky_horizon: [sky.sky_horizon[0], sky.sky_horizon[1], sky.sky_horizon[2], 1.0],
+            sky_horizon: [
+                sky.sky_horizon[0],
+                sky.sky_horizon[1],
+                sky.sky_horizon[2],
+                1.0,
+            ],
             ground_col: [sky.ground_col[0], sky.ground_col[1], sky.ground_col[2], 1.0],
-            params: [sky.fog, self.time, gpu.config.width as f32, gpu.config.height as f32],
+            params: [
+                sky.fog,
+                self.time,
+                gpu.config.width as f32,
+                gpu.config.height as f32,
+            ],
             params2: [self.storm_radius, 0.0, 0.0, 0.0],
             light_vp: light_vp.to_cols_array_2d(),
         };
-        gpu.queue.write_buffer(&gpu.globals_buf, 0, bytemuck::bytes_of(&globals));
-        gpu.queue.write_buffer(&gpu.instance_buf, 0, bytemuck::cast_slice(&inst[..count as usize]));
+        gpu.queue
+            .write_buffer(&gpu.globals_buf, 0, bytemuck::bytes_of(&globals));
+        gpu.queue.write_buffer(
+            &gpu.instance_buf,
+            0,
+            bytemuck::cast_slice(&inst[..count as usize]),
+        );
 
         // --- HUD + minimap (screen-space quads) ---
         let aspect = gpu.config.width as f32 / gpu.config.height as f32;
         let (mag, reload_frames) = self.weapon.ammo_spec();
         let mut ui: Vec<UiRect> = Vec::new();
         // HP bar (bottom-left)
-        ui.push(UiRect::screen(0.03, 0.93, 0.26, 0.028, [0.0, 0.0, 0.0, 0.5]));
+        ui.push(UiRect::screen(
+            0.03,
+            0.93,
+            0.26,
+            0.028,
+            [0.0, 0.0, 0.0, 0.5],
+        ));
         let hpf = (self.hp / 100.0).clamp(0.0, 1.0);
-        ui.push(UiRect::screen(0.03, 0.93, 0.26 * hpf, 0.028, [1.0 - hpf, 0.2 + 0.7 * hpf, 0.25, 0.95]));
+        ui.push(UiRect::screen(
+            0.03,
+            0.93,
+            0.26 * hpf,
+            0.028,
+            [1.0 - hpf, 0.2 + 0.7 * hpf, 0.25, 0.95],
+        ));
         // ammo / reload bar (above HP)
-        ui.push(UiRect::screen(0.03, 0.885, 0.26, 0.024, [0.0, 0.0, 0.0, 0.5]));
+        ui.push(UiRect::screen(
+            0.03,
+            0.885,
+            0.26,
+            0.024,
+            [0.0, 0.0, 0.0, 0.5],
+        ));
         if self.reload_t > 0 {
             let rf = 1.0 - self.reload_t as f32 / reload_frames as f32;
-            ui.push(UiRect::screen(0.03, 0.885, 0.26 * rf, 0.024, [1.0, 0.7, 0.1, 0.95]));
+            ui.push(UiRect::screen(
+                0.03,
+                0.885,
+                0.26 * rf,
+                0.024,
+                [1.0, 0.7, 0.1, 0.95],
+            ));
         } else {
             let af = self.ammo as f32 / mag as f32;
-            ui.push(UiRect::screen(0.03, 0.885, 0.26 * af, 0.024, [0.85, 0.85, 0.9, 0.95]));
+            ui.push(UiRect::screen(
+                0.03,
+                0.885,
+                0.26 * af,
+                0.024,
+                [0.85, 0.85, 0.9, 0.95],
+            ));
         }
         // weapon swatch + lives pips
         let (_, _, _, _, wcol) = self.weapon.params();
-        ui.push(UiRect::screen(0.03, 0.845, 0.03, 0.03, [wcol[0], wcol[1], wcol[2], 1.0]));
+        ui.push(UiRect::screen(
+            0.03,
+            0.845,
+            0.03,
+            0.03,
+            [wcol[0], wcol[1], wcol[2], 1.0],
+        ));
         for k in 0..self.lives {
-            ui.push(UiRect::screen(0.075 + k as f32 * 0.022, 0.85, 0.016, 0.02, [0.3, 1.0, 0.4, 0.95]));
+            ui.push(UiRect::screen(
+                0.075 + k as f32 * 0.022,
+                0.85,
+                0.016,
+                0.02,
+                [0.3, 1.0, 0.4, 0.95],
+            ));
         }
         // minimap (top-right)
         let (mmx, mmy, mmw) = (0.80, 0.04, 0.17);
@@ -1609,7 +2112,13 @@ impl App {
         let dot = |wx: f32, wz: f32, ds: f32, col: [f32; 4], list: &mut Vec<UiRect>| {
             let (dx, dz) = ((wx - player[0]) / range, (wz - player[1]) / range);
             if dx.abs() <= 1.0 && dz.abs() <= 1.0 {
-                list.push(UiRect::screen(mcx + dx * mmw * 0.5 - ds * 0.5, mcy + dz * mmh * 0.5 - ds * 0.5, ds, ds, col));
+                list.push(UiRect::screen(
+                    mcx + dx * mmw * 0.5 - ds * 0.5,
+                    mcy + dz * mmh * 0.5 - ds * 0.5,
+                    ds,
+                    ds,
+                    col,
+                ));
             }
         };
         for (t, p, id) in &ents {
@@ -1619,11 +2128,21 @@ impl App {
             }
         }
         for it in &self.items {
-            dot(it.pos.x / gs, it.pos.z / gs, 0.012, [0.3, 1.0, 0.45, 1.0], &mut ui);
+            dot(
+                it.pos.x / gs,
+                it.pos.z / gs,
+                0.012,
+                [0.3, 1.0, 0.45, 1.0],
+                &mut ui,
+            );
         }
         dot(player[0], player[1], 0.016, [1.0, 1.0, 1.0, 1.0], &mut ui);
         let ui_count = ui.len().min(gpu.ui_cap as usize) as u32;
-        gpu.queue.write_buffer(&gpu.ui_buf, 0, bytemuck::cast_slice(&ui[..ui_count as usize]));
+        gpu.queue.write_buffer(
+            &gpu.ui_buf,
+            0,
+            bytemuck::cast_slice(&ui[..ui_count as usize]),
+        );
 
         let frame = match gpu.surface.get_current_texture() {
             Ok(f) => f,
@@ -1632,8 +2151,12 @@ impl App {
                 return;
             }
         };
-        let v = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
-        let mut enc = gpu.device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: Some("enc") });
+        let v = frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
+        let mut enc = gpu
+            .device
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: Some("enc") });
         // --- pass 1: render the scene depth from the sun into the shadow map ---
         {
             let mut sp = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -1641,7 +2164,10 @@ impl App {
                 color_attachments: &[],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: &gpu.shadow_view,
-                    depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Clear(1.0), store: wgpu::StoreOp::Store }),
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(1.0),
+                        store: wgpu::StoreOp::Store,
+                    }),
                     stencil_ops: None,
                 }),
                 timestamp_writes: None,
@@ -1663,11 +2189,22 @@ impl App {
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view: &v,
                     resolve_target: None,
-                    ops: wgpu::Operations { load: wgpu::LoadOp::Clear(wgpu::Color { r: 0.5, g: 0.6, b: 0.8, a: 1.0 }), store: wgpu::StoreOp::Store },
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(wgpu::Color {
+                            r: 0.5,
+                            g: 0.6,
+                            b: 0.8,
+                            a: 1.0,
+                        }),
+                        store: wgpu::StoreOp::Store,
+                    },
                 })],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: &gpu.depth,
-                    depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Clear(1.0), store: wgpu::StoreOp::Store }),
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(1.0),
+                        store: wgpu::StoreOp::Store,
+                    }),
                     stencil_ops: None,
                 }),
                 timestamp_writes: None,
@@ -1711,13 +2248,25 @@ impl App {
 
         self.frames += 1;
         if self.frames % 120 == 0 {
-            println!("perf[{BACKEND}]: {:.0} fps · bots {} · kills {}", self.fps, ents.iter().filter(|(t, _, _)| t == "bot").count(), self.score);
+            println!(
+                "perf[{BACKEND}]: {:.0} fps · bots {} · kills {}",
+                self.fps,
+                ents.iter().filter(|(t, _, _)| t == "bot").count(),
+                self.score
+            );
         }
         if let Some(w) = self.window.as_ref() {
             if self.phase == Phase::Skydive {
-                w.set_title(&format!("{} · {:.0} fps · SKYDIVE — alt {:.0}m · WASD steer", self.scene.title, self.fps, self.height));
+                w.set_title(&format!(
+                    "{} · {:.0} fps · SKYDIVE — alt {:.0}m · WASD steer",
+                    self.scene.title, self.fps, self.height
+                ));
             } else {
-                let ammo_str = if self.reload_t > 0 { "RELOADING".to_string() } else { format!("{}/{}", self.ammo, self.reserve) };
+                let ammo_str = if self.reload_t > 0 {
+                    "RELOADING".to_string()
+                } else {
+                    format!("{}/{}", self.ammo, self.reserve)
+                };
                 w.set_title(&format!(
                     "{} · {:.0} fps · {} {} · HP {:.0} · lives {} · kills {} · {} bots · [1/2/3] wpn [R] reload [B] build",
                     self.scene.title, self.fps, self.weapon.name(), ammo_str, self.hp, self.lives, self.score,
@@ -1749,16 +2298,38 @@ fn scatter_props(s: &Scene3) -> (Vec<Instance>, Vec<Aabb>, Vec<Vec3>) {
         let kind = rnd();
         if kind < 0.18 {
             // rock cluster (spatial detail, no collision)
-            out.push(Instance { model: model_box(base, 1.7, 0.9), color: [0.5, 0.5, 0.55, 1.0] });
-            out.push(Instance { model: model_box(base + Vec3::new(0.7, 0.0, 0.4), 1.0, 0.6), color: [0.44, 0.44, 0.5, 1.0] });
+            out.push(Instance {
+                model: model_box(base, 1.7, 0.9),
+                color: [0.5, 0.5, 0.55, 1.0],
+            });
+            out.push(Instance {
+                model: model_box(base + Vec3::new(0.7, 0.0, 0.4), 1.0, 0.6),
+                color: [0.44, 0.44, 0.5, 1.0],
+            });
         } else if kind < 0.30 {
             // supply crate
-            out.push(Instance { model: model_box(base, 1.1, 1.0), color: [0.6, 0.45, 0.28, 1.0] });
-            out.push(Instance { model: model_box(base + Vec3::new(0.0, 1.0, 0.0), 0.7, 0.5), color: [0.52, 0.38, 0.22, 1.0] });
+            out.push(Instance {
+                model: model_box(base, 1.1, 1.0),
+                color: [0.6, 0.45, 0.28, 1.0],
+            });
+            out.push(Instance {
+                model: model_box(base + Vec3::new(0.0, 1.0, 0.0), 0.7, 0.5),
+                color: [0.52, 0.38, 0.22, 1.0],
+            });
         } else if rnd() < s.tree_ratio {
             // tree: trunk + canopy (solid decoration, no collision)
-            out.push(Instance { model: model_box(base, s.tree_w * 0.3, s.tree_h * 0.5), color: [0.45, 0.32, 0.2, 1.0] });
-            out.push(Instance { model: model_box(base + Vec3::new(0.0, s.tree_h * 0.5, 0.0), s.tree_w, s.tree_h * 0.6), color: [s.tree_color[0], s.tree_color[1], s.tree_color[2], 1.0] });
+            out.push(Instance {
+                model: model_box(base, s.tree_w * 0.3, s.tree_h * 0.5),
+                color: [0.45, 0.32, 0.2, 1.0],
+            });
+            out.push(Instance {
+                model: model_box(
+                    base + Vec3::new(0.0, s.tree_h * 0.5, 0.0),
+                    s.tree_w,
+                    s.tree_h * 0.6,
+                ),
+                color: [s.tree_color[0], s.tree_color[1], s.tree_color[2], 1.0],
+            });
         } else {
             // a hollow, enterable building with collidable walls + a door
             let b = &s.buildings[(rnd() * s.buildings.len() as f32) as usize % s.buildings.len()];
@@ -1771,9 +2342,18 @@ fn scatter_props(s: &Scene3) -> (Vec<Instance>, Vec<Aabb>, Vec<Vec3>) {
     (out, aabbs, centers)
 }
 
-fn create_init_buffer(device: &wgpu::Device, label: &str, data: &[u8], usage: wgpu::BufferUsages) -> wgpu::Buffer {
+fn create_init_buffer(
+    device: &wgpu::Device,
+    label: &str,
+    data: &[u8],
+    usage: wgpu::BufferUsages,
+) -> wgpu::Buffer {
     use wgpu::util::DeviceExt;
-    device.create_buffer_init(&wgpu::util::BufferInitDescriptor { label: Some(label), contents: data, usage })
+    device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some(label),
+        contents: data,
+        usage,
+    })
 }
 
 impl ApplicationHandler for App {
@@ -1848,11 +2428,7 @@ impl ApplicationHandler for App {
 fn integrate_jump(height: f32, vel: f32, gravity: f32, dt: f32) -> (f32, f32) {
     let v = vel - gravity * dt;
     let h = height + v * dt;
-    if h <= 0.0 {
-        (0.0, 0.0)
-    } else {
-        (h, v)
-    }
+    if h <= 0.0 { (0.0, 0.0) } else { (h, v) }
 }
 
 fn game_dir() -> std::path::PathBuf {
@@ -1880,16 +2456,33 @@ fn main() {
         let (g, insts) = kami_webgpu_rs::scene_to_ir(&scene_src);
         let (w, h) = (960u32, 600u32);
         let px = kami_webgpu_rs::render(&g, &insts, w, h);
-        image::save_buffer("play3d-data-render.png", &px, w, h, image::ExtendedColorType::Rgba8).unwrap();
-        println!("kami-clj-play3d: data-renderer PNG → play3d-data-render.png ({} instances)", insts.len());
+        image::save_buffer(
+            "play3d-data-render.png",
+            &px,
+            w,
+            h,
+            image::ExtendedColorType::Rgba8,
+        )
+        .unwrap();
+        println!(
+            "kami-clj-play3d: data-renderer PNG → play3d-data-render.png ({} instances)",
+            insts.len()
+        );
         return;
     }
     let logic = read_or_exit(&base, "logic.clj");
     let scene = parse_scene(&scene_src).unwrap_or_else(|| {
-        eprintln!("kami-clj-play3d: {} is not a valid EDN scene map", base.join("scene.edn").display());
+        eprintln!(
+            "kami-clj-play3d: {} is not a valid EDN scene map",
+            base.join("scene.edn").display()
+        );
         std::process::exit(2);
     });
-    println!("kami-clj-play3d: loaded '{}' (CLJ→WASM {BACKEND}, {} profiles).", scene.title, scene.profiles.len());
+    println!(
+        "kami-clj-play3d: loaded '{}' (CLJ→WASM {BACKEND}, {} profiles).",
+        scene.title,
+        scene.profiles.len()
+    );
     let event_loop = EventLoop::new().expect("event loop");
     event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);
     let mut app = App::new(&logic, scene);

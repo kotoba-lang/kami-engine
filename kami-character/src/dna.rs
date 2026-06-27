@@ -260,7 +260,7 @@ impl<'a> BeReader<'a> {
         // lods array
         let lods_count = self.u32() as usize;
         self.pos += lods_count * 2; // u16[]
-        // indices matrix (outer count, then inner arrays)
+                                    // indices matrix (outer count, then inner arrays)
         let outer = self.u32() as usize;
         for _ in 0..outer {
             let inner = self.u32() as usize;
@@ -289,7 +289,9 @@ impl DnaFile {
         let generation = r.u16();
         let version = r.u16();
         if generation != 2 || version != 1 {
-            return Err(format!("Unsupported DNA version: gen={generation} ver={version}"));
+            return Err(format!(
+                "Unsupported DNA version: gen={generation} ver={version}"
+            ));
         }
 
         // Section lookup table (8 × u32 BE)
@@ -414,7 +416,7 @@ impl DnaFile {
         // Each mesh: u32 end-offset, then mesh data sequentially
         for _ in 0..mesh_count {
             let _end_offset = r.u32(); // ArchiveOffset (backpatch target, skip)
-            // Positions (SoA, centimeters)
+                                       // Positions (SoA, centimeters)
             let mut positions = r.soa_vec3();
             // Convert cm → m
             for x in &mut positions.xs {
@@ -645,7 +647,9 @@ mod tests {
         buf.extend_from_slice(&0u32.to_be_bytes()); // metadata count
         buf.extend_from_slice(&0u16.to_be_bytes()); // translationUnit
         buf.extend_from_slice(&0u16.to_be_bytes()); // rotationUnit
-        buf.extend_from_slice(&[0u16.to_be_bytes(), 1u16.to_be_bytes(), 2u16.to_be_bytes()].concat()); // coordSys
+        buf.extend_from_slice(
+            &[0u16.to_be_bytes(), 1u16.to_be_bytes(), 2u16.to_be_bytes()].concat(),
+        ); // coordSys
         buf.extend_from_slice(&2u16.to_be_bytes()); // lodCount
         buf.extend_from_slice(&7u16.to_be_bytes()); // maxLOD
         buf.extend_from_slice(&0u32.to_be_bytes()); // complexity (empty string)
@@ -687,7 +691,7 @@ mod tests {
         buf.extend_from_slice(&2u32.to_be_bytes());
         buf.extend_from_slice(&0xFFFFu16.to_be_bytes()); // root: no parent
         buf.extend_from_slice(&0u16.to_be_bytes()); // head: parent=root
-        // Neutral joint translations (SoA)
+                                                    // Neutral joint translations (SoA)
         buf.extend_from_slice(&2u32.to_be_bytes()); // xs
         buf.extend_from_slice(&0.0f32.to_be_bytes());
         buf.extend_from_slice(&0.0f32.to_be_bytes());
@@ -711,9 +715,9 @@ mod tests {
 
         // Positions (SoA) — 4 vertices (quad) in centimeters
         for vals in [
-            [-5.0f32, 5.0, 5.0, -5.0],   // xs
-            [0.0, 0.0, 10.0, 10.0],       // ys
-            [0.0, 0.0, 0.0, 0.0],         // zs
+            [-5.0f32, 5.0, 5.0, -5.0], // xs
+            [0.0, 0.0, 10.0, 10.0],    // ys
+            [0.0, 0.0, 0.0, 0.0],      // zs
         ] {
             buf.extend_from_slice(&(vals.len() as u32).to_be_bytes());
             for v in vals {
@@ -756,7 +760,7 @@ mod tests {
         // Skin weights: 0
         buf.extend_from_slice(&0u16.to_be_bytes()); // max_influences
         buf.extend_from_slice(&0u32.to_be_bytes()); // count
-        // Blend shapes: 0
+                                                    // Blend shapes: 0
         buf.extend_from_slice(&0u32.to_be_bytes());
 
         // Backpatch section offsets
@@ -806,7 +810,7 @@ mod tests {
         assert_eq!(mesh.positions.len(), 4);
         assert_eq!(mesh.faces.len(), 1);
         assert_eq!(mesh.faces[0].len(), 4); // quad face
-        // Positions are converted from cm to m
+                                            // Positions are converted from cm to m
         assert!((mesh.positions.xs[0] - (-0.05)).abs() < 0.001); // -5cm → -0.05m
     }
 

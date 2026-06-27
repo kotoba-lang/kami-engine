@@ -196,8 +196,7 @@ pub mod upf {
         /// Validate the UPF design, returning a list of warning/error messages.
         pub fn validate(&self) -> Vec<String> {
             let mut errors = Vec::new();
-            let domain_names: Vec<&str> =
-                self.domains.iter().map(|d| d.name.as_str()).collect();
+            let domain_names: Vec<&str> = self.domains.iter().map(|d| d.name.as_str()).collect();
 
             // Every switch must reference an existing domain.
             for sw in &self.switches {
@@ -390,8 +389,11 @@ pub mod ir_drop {
                         sum += v[r][c + 1];
                         count += 1;
                     }
-                    let current =
-                        current_map.get(r).and_then(|row| row.get(c)).copied().unwrap_or(0.0);
+                    let current = current_map
+                        .get(r)
+                        .and_then(|row| row.get(c))
+                        .copied()
+                        .unwrap_or(0.0);
                     let new_v = sum / count as f64 - current * resistance_per_unit / count as f64;
                     let delta = (new_v - v[r][c]).abs();
                     if delta > max_delta {
@@ -430,7 +432,11 @@ pub mod ir_drop {
 
         IrDropResult {
             max_drop_mv,
-            avg_drop_mv: if count > 0 { total_drop / count as f64 } else { 0.0 },
+            avg_drop_mv: if count > 0 {
+                total_drop / count as f64
+            } else {
+                0.0
+            },
             worst_node: worst,
             hotspots,
         }

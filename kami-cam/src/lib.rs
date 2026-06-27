@@ -1,18 +1,17 @@
+pub mod gcode;
+pub mod stock;
 /// KAMI CAM — Computer-Aided Manufacturing
 ///
 /// Toolpath generation, G-code output, tool library, stock definition, and CNC
 /// post-processor. Accepts geometry as generic input (DVec3 points / mesh data)
 /// to avoid circular dependency on kami-cad.
-
 pub mod tool;
-pub mod stock;
 pub mod toolpath;
-pub mod gcode;
 
-pub use tool::{Tool, ToolType, ToolMaterial, ToolLibrary};
-pub use stock::{Stock, StockShape, CamMaterial};
-pub use toolpath::{CamOperation, CamJob, ToolpathSegment, SegmentType};
 pub use gcode::{GcodeConfig, MachineType, PostProcessor, generate_gcode};
+pub use stock::{CamMaterial, Stock, StockShape};
+pub use tool::{Tool, ToolLibrary, ToolMaterial, ToolType};
+pub use toolpath::{CamJob, CamOperation, SegmentType, ToolpathSegment};
 
 // ---------------------------------------------------------------------------
 // tool — cutting tool definitions and library

@@ -2,9 +2,9 @@
 
 use std::collections::HashMap;
 
+use crate::VrmError;
 use crate::gltf_types::*;
 use crate::vrm_types::*;
-use crate::VrmError;
 
 /// Source specification: a part + its source document.
 pub struct PartSource<'a> {
@@ -22,7 +22,10 @@ pub struct ComposeConfig {
 ///
 /// Phases: skeleton unification → buffer merge → mesh merge →
 /// joint remap → material merge → spring bone merge → expression merge → rebuild.
-pub fn compose(sources: &[PartSource<'_>], config: &ComposeConfig) -> Result<VrmDocument, VrmError> {
+pub fn compose(
+    sources: &[PartSource<'_>],
+    config: &ComposeConfig,
+) -> Result<VrmDocument, VrmError> {
     if sources.is_empty() {
         return Err(VrmError::Part("no sources provided".into()));
     }
@@ -200,7 +203,9 @@ pub fn compose(sources: &[PartSource<'_>], config: &ComposeConfig) -> Result<Vrm
             let new_idx = unified_textures.len();
             unified_textures.push(Texture {
                 sampler: tex.sampler.map(|s| s + sampler_base),
-                source: tex.source.and_then(|s| image_remap.get(&(src_idx, s)).copied()),
+                source: tex
+                    .source
+                    .and_then(|s| image_remap.get(&(src_idx, s)).copied()),
             });
             texture_remap.insert((src_idx, tex_idx), new_idx);
         }
@@ -263,8 +268,11 @@ pub fn compose(sources: &[PartSource<'_>], config: &ComposeConfig) -> Result<Vrm
                     for target in &mut prim.targets {
                         for (_attr, val) in target.iter_mut() {
                             if let Some(idx) = val.as_u64() {
-                                if let Some(&new_idx) = accessor_remap.get(&(src_idx, idx as usize)) {
-                                    *val = serde_json::Value::Number(serde_json::Number::from(new_idx));
+                                if let Some(&new_idx) = accessor_remap.get(&(src_idx, idx as usize))
+                                {
+                                    *val = serde_json::Value::Number(serde_json::Number::from(
+                                        new_idx,
+                                    ));
                                 }
                             }
                         }
@@ -364,7 +372,10 @@ pub fn compose(sources: &[PartSource<'_>], config: &ComposeConfig) -> Result<Vrm
 
         // Collider groups
         for (gi, group) in src.doc.spring_bone_collider_groups.iter().enumerate() {
-            let has_relevant = group.colliders.iter().any(|c| src.part.collider_indices.contains(c));
+            let has_relevant = group
+                .colliders
+                .iter()
+                .any(|c| src.part.collider_indices.contains(c));
             if !has_relevant {
                 continue;
             }
@@ -420,7 +431,9 @@ pub fn compose(sources: &[PartSource<'_>], config: &ComposeConfig) -> Result<Vrm
             if let Some(expr) = src.doc.expressions.get(ei) {
                 // Check if we already have this preset
                 let existing = expr.preset.and_then(|preset| {
-                    unified_expressions.iter_mut().find(|e| e.preset == Some(preset))
+                    unified_expressions
+                        .iter_mut()
+                        .find(|e| e.preset == Some(preset))
                 });
 
                 if let Some(existing) = existing {
@@ -553,7 +566,10 @@ pub fn compose(sources: &[PartSource<'_>], config: &ComposeConfig) -> Result<Vrm
             generator: Some("kami-vrm".into()),
         },
         scene: Some(0),
-        scenes: vec![Scene { nodes: scene_nodes, name: None }],
+        scenes: vec![Scene {
+            nodes: scene_nodes,
+            name: None,
+        }],
         nodes: unified_nodes,
         meshes: unified_meshes,
         accessors: unified_accessors,

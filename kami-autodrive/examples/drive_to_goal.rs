@@ -5,7 +5,9 @@
 //! ```
 
 use glam::{Affine3A, Quat, Vec2, Vec3};
-use kami_autodrive::{Autopilot, AutopilotConfig, BicycleModel, DriveState, Plant, Pose2, VehicleClass};
+use kami_autodrive::{
+    Autopilot, AutopilotConfig, BicycleModel, DriveState, Plant, Pose2, VehicleClass,
+};
 use kami_sensor_sim::{Lidar, LidarIntrinsics, LidarReturn, Primitive, Scene};
 
 const MOUNT_Z: f32 = 1.0;

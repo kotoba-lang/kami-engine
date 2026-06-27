@@ -103,7 +103,11 @@ mod tests {
         // Open grid: an L-shaped path should smooth into more, rounded
         // waypoints, all collision-free.
         let grid = OccupancyGrid::centered(Vec2::new(5.0, 5.0), 20.0, 0.5);
-        let l_path = [Vec2::new(0.0, 0.0), Vec2::new(10.0, 0.0), Vec2::new(10.0, 10.0)];
+        let l_path = [
+            Vec2::new(0.0, 0.0),
+            Vec2::new(10.0, 0.0),
+            Vec2::new(10.0, 10.0),
+        ];
         let s = super::smooth(&l_path, &grid, 2);
         assert!(s.len() > l_path.len(), "smoothing should add waypoints");
         assert!(path_is_clear(&s, &grid), "smoothed path must stay clear");
@@ -111,7 +115,10 @@ mod tests {
         assert!(s.first().unwrap().distance(l_path[0]) < 1e-4);
         assert!(s.last().unwrap().distance(l_path[2]) < 1e-4);
         // The corner is cut: the sharp vertex (10,0) is no longer on the path.
-        assert!(s.iter().all(|p| p.distance(Vec2::new(10.0, 0.0)) > 0.5), "corner should be rounded");
+        assert!(
+            s.iter().all(|p| p.distance(Vec2::new(10.0, 0.0)) > 0.5),
+            "corner should be rounded"
+        );
     }
 
     #[test]
@@ -124,9 +131,16 @@ mod tests {
             grid.mark_world(Vec2::new(5.0, y));
             y += 0.25;
         }
-        let tight = [Vec2::new(0.0, 6.0), Vec2::new(5.5, 6.0), Vec2::new(5.5, 0.0)];
+        let tight = [
+            Vec2::new(0.0, 6.0),
+            Vec2::new(5.5, 6.0),
+            Vec2::new(5.5, 0.0),
+        ];
         let s = super::smooth(&tight, &grid, 2);
-        assert!(path_is_clear(&s, &grid), "fallback must keep the path collision-free");
+        assert!(
+            path_is_clear(&s, &grid),
+            "fallback must keep the path collision-free"
+        );
     }
 
     #[test]
@@ -140,7 +154,10 @@ mod tests {
         }
         let inflated = grid.inflated(0.5);
         let path = plan(&inflated, Vec2::new(0.0, 0.0), Vec2::new(10.0, 0.0)).expect("path");
-        assert!(path_is_clear(&path, &inflated), "planned path crosses the wall");
+        assert!(
+            path_is_clear(&path, &inflated),
+            "planned path crosses the wall"
+        );
         // A detour is longer than the 10 m straight line.
         let len: f32 = path.windows(2).map(|w| w[0].distance(w[1])).sum();
         assert!(len > 10.0, "expected a detour, got {len:.1} m");

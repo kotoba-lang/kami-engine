@@ -189,7 +189,10 @@ mod tests {
         let s = StagePreset::Hall.build();
         let perf = s.zone(StageZone::Performer).unwrap();
         let pit = s.zone(StageZone::Pit).unwrap();
-        assert!(pit.centre.z < perf.centre.z, "pit should be downstream (-Z)");
+        assert!(
+            pit.centre.z < perf.centre.z,
+            "pit should be downstream (-Z)"
+        );
     }
 
     #[test]

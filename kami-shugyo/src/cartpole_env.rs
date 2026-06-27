@@ -12,11 +12,16 @@ use kami_genesis::{ArticulationHandle, CartpoleState, World};
 struct Lcg(u64);
 impl Lcg {
     fn new(seed: u64) -> Self {
-        Lcg(seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407))
+        Lcg(seed
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407))
     }
     fn next_f32_centered(&mut self, half_range: f32) -> f32 {
         // LCG step
-        self.0 = self.0.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.0 = self
+            .0
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         let u = ((self.0 >> 33) as f32) / (1u64 << 31) as f32; // [0,1)
         (u * 2.0 - 1.0) * half_range
     }
@@ -56,7 +61,12 @@ impl CartpoleEnv {
     }
 
     fn observation_inner(&self) -> Vec<f32> {
-        let s = self.world.get(self.handle).unwrap().cartpole_state().unwrap();
+        let s = self
+            .world
+            .get(self.handle)
+            .unwrap()
+            .cartpole_state()
+            .unwrap();
         vec![s.x, s.x_dot, s.theta, s.theta_dot]
     }
 
@@ -83,7 +93,10 @@ impl RLEnv for CartpoleEnv {
             theta: self.rng.next_f32_centered(0.05),
             theta_dot: self.rng.next_f32_centered(0.05),
         };
-        self.world.get_mut(self.handle).unwrap().set_cartpole_state(init);
+        self.world
+            .get_mut(self.handle)
+            .unwrap()
+            .set_cartpole_state(init);
         self.steps_in_episode = 0;
         self.observation_inner()
     }
@@ -93,7 +106,10 @@ impl RLEnv for CartpoleEnv {
         let force = action[0];
         let decimation = self.cfg.scene.decimation.max(1);
         for _ in 0..decimation {
-            self.world.get_mut(self.handle).unwrap().set_cart_force(force);
+            self.world
+                .get_mut(self.handle)
+                .unwrap()
+                .set_cart_force(force);
             self.world.step();
         }
         self.steps_in_episode += decimation;
@@ -111,7 +127,12 @@ impl RLEnv for CartpoleEnv {
             + r.cart_vel_penalty * x_dot * x_dot
             + r.pole_vel_penalty * theta_dot * theta_dot;
 
-        StepResult { observation: obs, reward, terminated, truncated }
+        StepResult {
+            observation: obs,
+            reward,
+            terminated,
+            truncated,
+        }
     }
 
     fn observation_dim(&self) -> usize {
@@ -127,10 +148,8 @@ mod tests {
     use super::*;
     use crate::scene_cfg::load_scene_yaml;
 
-    const CARTPOLE_URDF: &str =
-        include_str!("../../fixtures/cartpole/cartpole.urdf");
-    const CARTPOLE_SCENE: &str =
-        include_str!("../../fixtures/cartpole/scene.yaml");
+    const CARTPOLE_URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
+    const CARTPOLE_SCENE: &str = include_str!("../../fixtures/cartpole/scene.yaml");
 
     fn make_env() -> CartpoleEnv {
         let cfg = load_scene_yaml(CARTPOLE_SCENE).unwrap();
@@ -167,7 +186,10 @@ mod tests {
                 break;
             }
         }
-        assert!(terminated, "passive cartpole should tip over from small init");
+        assert!(
+            terminated,
+            "passive cartpole should tip over from small init"
+        );
     }
 
     #[test]
@@ -186,6 +208,9 @@ mod tests {
                 break;
             }
         }
-        assert!(total_r > 0.0, "good balancing should yield positive cumulative reward");
+        assert!(
+            total_r > 0.0,
+            "good balancing should yield positive cumulative reward"
+        );
     }
 }

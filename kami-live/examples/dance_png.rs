@@ -8,8 +8,8 @@
 //! placeholder for the skinned VRM mesh, which replaces it once the GPU executor
 //! consumes the render-IR `:meshes` (ADR-0044 phase 3 / run_embed_vrm).
 
-use kami_live::scene::DanceScene;
 use kami_live::DancePose;
+use kami_live::scene::DanceScene;
 use kami_webgpu_rs::Instance;
 
 const SCENE: &str = include_str!("../../kami-clj-play3d/games/dance/scene.edn");
@@ -17,7 +17,11 @@ const SCENE: &str = include_str!("../../kami-clj-play3d/games/dance/scene.edn");
 /// A stick-figure humanoid (6 lit boxes) posed from the dance pose.
 fn humanoid(p: &DancePose) -> Vec<Instance> {
     let (s, c) = (p.root_yaw.sin(), p.root_yaw.cos());
-    let base = [p.root_translation.x, p.vertical_bob.max(-0.2), p.root_translation.z];
+    let base = [
+        p.root_translation.x,
+        p.vertical_bob.max(-0.2),
+        p.root_translation.z,
+    ];
     let arm_lift = p.arms_up * 0.35;
     // (local x, base y, local z), (w, h), color
     let parts: [([f32; 3], [f32; 2], [f32; 3]); 6] = [
@@ -25,8 +29,16 @@ fn humanoid(p: &DancePose) -> Vec<Instance> {
         ([0.13, 0.0, 0.0], [0.16, 0.80], [0.20, 0.24, 0.42]),  // right leg
         ([0.0, 0.80, 0.0], [0.42, 0.55], [0.30, 0.45, 0.90]),  // torso
         ([0.0, 1.42, 0.0], [0.26, 0.26], [0.95, 0.80, 0.70]),  // head
-        ([-0.32, 0.85 + arm_lift, 0.0], [0.14, 0.45], [0.95, 0.80, 0.70]), // left arm
-        ([0.32, 0.85 + arm_lift, 0.0], [0.14, 0.45], [0.95, 0.80, 0.70]),  // right arm
+        (
+            [-0.32, 0.85 + arm_lift, 0.0],
+            [0.14, 0.45],
+            [0.95, 0.80, 0.70],
+        ), // left arm
+        (
+            [0.32, 0.85 + arm_lift, 0.0],
+            [0.14, 0.45],
+            [0.95, 0.80, 0.70],
+        ), // right arm
     ];
     parts
         .iter()
@@ -70,16 +82,25 @@ fn main() {
         scene_insts.extend(humanoid(&scene.show.snapshot().performer_pose));
         let px = kami_webgpu_rs::render(&g, &scene_insts, w, h);
         if i % 8 == 0 {
-            image::save_buffer(format!("dance_{i:02}.png"), &px, w, h, image::ExtendedColorType::Rgba8).unwrap();
+            image::save_buffer(
+                format!("dance_{i:02}.png"),
+                &px,
+                w,
+                h,
+                image::ExtendedColorType::Rgba8,
+            )
+            .unwrap();
         }
         let img = image::RgbaImage::from_raw(w, h, px).unwrap();
-        let mut frame = image::Frame::from_parts(img, 0, 0, image::Delay::from_numer_denom_ms(60, 1));
+        let mut frame =
+            image::Frame::from_parts(img, 0, 0, image::Delay::from_numer_denom_ms(60, 1));
         gif_frames.push(frame);
     }
     // encode the animated GIF (looping).
     let file = std::fs::File::create("dance.gif").unwrap();
     let mut enc = image::codecs::gif::GifEncoder::new(file);
-    enc.set_repeat(image::codecs::gif::Repeat::Infinite).unwrap();
+    enc.set_repeat(image::codecs::gif::Repeat::Infinite)
+        .unwrap();
     enc.encode_frames(gif_frames.into_iter()).unwrap();
     println!("wrote dance.gif (32 frames) + sample PNGs — the humanoid dances the shuffle");
 }

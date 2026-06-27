@@ -10,5 +10,5 @@
         :asset-path "/js"
         ;; No :init-fn — index.html drives boot explicitly (after wasm init).
         ;; `^:export` on sip.web/boot exposes it as window.sip.web.boot.
-        :modules    {:sip {:entries [sip.web]}}
+        :modules    {:sip {:entries [sip.web sip.ui]}}
         :release    {:compiler-options {:optimizations :advanced}}}}}

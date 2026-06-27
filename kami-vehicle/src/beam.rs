@@ -89,7 +89,14 @@ pub struct Beam {
 }
 
 impl Beam {
-    pub fn new(id: BeamId, n1: NodeId, n2: NodeId, rest_length: f32, spring: f32, damping: f32) -> Self {
+    pub fn new(
+        id: BeamId,
+        n1: NodeId,
+        n2: NodeId,
+        rest_length: f32,
+        spring: f32,
+        damping: f32,
+    ) -> Self {
         Self {
             id,
             n1,

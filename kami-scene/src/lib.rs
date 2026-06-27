@@ -19,8 +19,13 @@ pub fn kw_key(k: &EdnValue) -> Option<String> {
 
 /// Look up `key` (a `"ns/name"` or bare `"name"` string) in a parsed EDN map.
 pub fn mget<'a>(m: &'a BTreeMap<EdnValue, EdnValue>, key: &str) -> Option<&'a EdnValue> {
-    m.iter()
-        .find_map(|(k, v)| if kw_key(k).as_deref() == Some(key) { Some(v) } else { None })
+    m.iter().find_map(|(k, v)| {
+        if kw_key(k).as_deref() == Some(key) {
+            Some(v)
+        } else {
+            None
+        }
+    })
 }
 
 /// Read a number as `f32`, coercing integers; `0.0` when absent or non-numeric.
@@ -62,7 +67,10 @@ mod tests {
     fn keyword_keys_bare_and_namespaced() {
         let m = map("{:world 1 :render/profiles 2}");
         assert!(mget(&m, "world").is_some());
-        assert!(mget(&m, "render/profiles").is_some(), "namespaced key resolves");
+        assert!(
+            mget(&m, "render/profiles").is_some(),
+            "namespaced key resolves"
+        );
         assert!(mget(&m, "profiles").is_none(), "namespace must match too");
         assert!(mget(&m, "missing").is_none());
     }
@@ -80,16 +88,30 @@ mod tests {
     fn vec3_pads_short_and_handles_non_vector() {
         let m = map("{:full [0.1 0.2 0.3] :short [9.0] :scalar 4.0 :ints [1 2 3]}");
         assert_eq!(vec3(mget(&m, "full")), [0.1, 0.2, 0.3]);
-        assert_eq!(vec3(mget(&m, "short")), [9.0, 0.0, 0.0], "short pads with 0");
-        assert_eq!(vec3(mget(&m, "scalar")), [0.0, 0.0, 0.0], "non-vector → zeros");
-        assert_eq!(vec3(mget(&m, "ints")), [1.0, 2.0, 3.0], "int vector coerces");
+        assert_eq!(
+            vec3(mget(&m, "short")),
+            [9.0, 0.0, 0.0],
+            "short pads with 0"
+        );
+        assert_eq!(
+            vec3(mget(&m, "scalar")),
+            [0.0, 0.0, 0.0],
+            "non-vector → zeros"
+        );
+        assert_eq!(
+            vec3(mget(&m, "ints")),
+            [1.0, 2.0, 3.0],
+            "int vector coerces"
+        );
         assert_eq!(vec3(mget(&m, "absent")), [0.0, 0.0, 0.0]);
     }
 
     #[test]
     fn nested_maps_round_trip() {
         let m = map("{:world {:player-speed 300.0 :arena 460.0}}");
-        let w = mget(&m, "world").and_then(|v| v.as_map()).expect("nested map");
+        let w = mget(&m, "world")
+            .and_then(|v| v.as_map())
+            .expect("nested map");
         assert_eq!(num(mget(w, "player-speed")), 300.0);
         assert_eq!(num(mget(w, "arena")), 460.0);
     }
@@ -97,7 +119,10 @@ mod tests {
     #[test]
     fn bad_input_is_graceful() {
         assert!(root_map("not a map, just a number 5").map_or(true, |_| true)); // no panic
-        assert!(root_map("{:unclosed 1").is_none(), "malformed EDN → None, no panic");
+        assert!(
+            root_map("{:unclosed 1").is_none(),
+            "malformed EDN → None, no panic"
+        );
         assert!(root_map("42").is_none(), "non-map top form → None");
     }
 }

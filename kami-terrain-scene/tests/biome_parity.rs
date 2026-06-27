@@ -10,8 +10,8 @@
 
 use kami_terrain::BiomePreset;
 use kami_terrain_scene::{
-    biomes_from_edn, builtin_biome, shipped_biomes, BiomeSpec, HeightmapSpec, ALL_BIOME_NAMES,
-    BIOMES_EDN,
+    ALL_BIOME_NAMES, BIOMES_EDN, BiomeSpec, HeightmapSpec, biomes_from_edn, builtin_biome,
+    shipped_biomes,
 };
 
 const EPS: f32 = 1e-6;
@@ -36,18 +36,39 @@ fn assert_biome_eq(name: &str, edn: &BiomeSpec) {
     // Heightmap (seed is supplied per-call, not stored — compare the seedless fields).
     let hm = &edn.heightmap;
     let oh = &oracle.heightmap;
-    assert!((hm.max_height - oh.max_height).abs() < EPS, "{name}: max_height");
-    assert!((hm.frequency - oh.frequency).abs() < EPS, "{name}: frequency");
+    assert!(
+        (hm.max_height - oh.max_height).abs() < EPS,
+        "{name}: max_height"
+    );
+    assert!(
+        (hm.frequency - oh.frequency).abs() < EPS,
+        "{name}: frequency"
+    );
     assert_eq!(hm.octaves, oh.octaves, "{name}: octaves");
-    assert!((hm.lacunarity - oh.lacunarity).abs() < EPS, "{name}: lacunarity");
-    assert!((hm.persistence - oh.persistence).abs() < EPS, "{name}: persistence");
+    assert!(
+        (hm.lacunarity - oh.lacunarity).abs() < EPS,
+        "{name}: lacunarity"
+    );
+    assert!(
+        (hm.persistence - oh.persistence).abs() < EPS,
+        "{name}: persistence"
+    );
 
     // Splat thresholds.
     let s = &edn.splat;
     let os = &oracle.splat;
-    assert!((s.sand_line - os.sand_line).abs() < EPS, "{name}: sand_line");
-    assert!((s.snow_line - os.snow_line).abs() < EPS, "{name}: snow_line");
-    assert!((s.rock_slope - os.rock_slope).abs() < EPS, "{name}: rock_slope");
+    assert!(
+        (s.sand_line - os.sand_line).abs() < EPS,
+        "{name}: sand_line"
+    );
+    assert!(
+        (s.snow_line - os.snow_line).abs() < EPS,
+        "{name}: snow_line"
+    );
+    assert!(
+        (s.rock_slope - os.rock_slope).abs() < EPS,
+        "{name}: rock_slope"
+    );
 
     // Palette (4 base + 4 tip RGB).
     for layer in 0..4 {
@@ -103,17 +124,38 @@ fn converters_match_hardcoded() {
         let hc = spec.to_heightmap_config(seed);
         let oh = p.heightmap(seed);
         assert!((hc.seed - oh.seed).abs() < EPS, "{name}: seed threaded");
-        assert!((hc.max_height - oh.max_height).abs() < EPS, "{name}: hc max_height");
-        assert!((hc.frequency - oh.frequency).abs() < EPS, "{name}: hc frequency");
+        assert!(
+            (hc.max_height - oh.max_height).abs() < EPS,
+            "{name}: hc max_height"
+        );
+        assert!(
+            (hc.frequency - oh.frequency).abs() < EPS,
+            "{name}: hc frequency"
+        );
         assert_eq!(hc.octaves, oh.octaves, "{name}: hc octaves");
-        assert!((hc.lacunarity - oh.lacunarity).abs() < EPS, "{name}: hc lacunarity");
-        assert!((hc.persistence - oh.persistence).abs() < EPS, "{name}: hc persistence");
+        assert!(
+            (hc.lacunarity - oh.lacunarity).abs() < EPS,
+            "{name}: hc lacunarity"
+        );
+        assert!(
+            (hc.persistence - oh.persistence).abs() < EPS,
+            "{name}: hc persistence"
+        );
 
         let st = spec.to_splat_thresholds();
         let ot = p.splat_thresholds();
-        assert!((st.sand_line - ot.sand_line).abs() < EPS, "{name}: st sand_line");
-        assert!((st.snow_line - ot.snow_line).abs() < EPS, "{name}: st snow_line");
-        assert!((st.rock_slope - ot.rock_slope).abs() < EPS, "{name}: st rock_slope");
+        assert!(
+            (st.sand_line - ot.sand_line).abs() < EPS,
+            "{name}: st sand_line"
+        );
+        assert!(
+            (st.snow_line - ot.snow_line).abs() < EPS,
+            "{name}: st snow_line"
+        );
+        assert!(
+            (st.rock_slope - ot.rock_slope).abs() < EPS,
+            "{name}: st rock_slope"
+        );
 
         let mp = spec.to_material_palette();
         let op = p.palette();
@@ -126,13 +168,15 @@ fn converters_match_hardcoded() {
 /// default for those keys — the tolerant merge contract.
 #[test]
 fn omitted_heightmap_fields_inherit_defaults() {
-    let loaded =
-        biomes_from_edn("{:terrain/biomes {:p {:heightmap {:max-height 50.0}}}}").unwrap();
+    let loaded = biomes_from_edn("{:terrain/biomes {:p {:heightmap {:max-height 50.0}}}}").unwrap();
     let hm = &loaded["p"].heightmap;
     let d = HeightmapSpec::defaults();
     assert_eq!(hm.max_height, 50.0);
     assert_eq!(hm.frequency, d.frequency, "absent → default frequency");
     assert_eq!(hm.octaves, d.octaves, "absent → default octaves");
     assert_eq!(hm.lacunarity, d.lacunarity, "absent → default lacunarity");
-    assert_eq!(hm.persistence, d.persistence, "absent → default persistence");
+    assert_eq!(
+        hm.persistence, d.persistence,
+        "absent → default persistence"
+    );
 }

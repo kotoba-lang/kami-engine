@@ -4,7 +4,7 @@
 
 use kami_vehicle::{
     ground::FlatGround,
-    models::sedan::{sedan, SedanSpec},
+    models::sedan::{SedanSpec, sedan},
 };
 
 fn main() {
@@ -25,7 +25,11 @@ fn main() {
         if step % 12 == 0 {
             let kmh = car.speed() * 3.6;
             let rpm = car.engine_rpm();
-            let wl = car.wheels.first().map(|w| w.angular_velocity).unwrap_or(0.0);
+            let wl = car
+                .wheels
+                .first()
+                .map(|w| w.angular_velocity)
+                .unwrap_or(0.0);
             let wr = car.wheels.get(1).map(|w| w.angular_velocity).unwrap_or(0.0);
             println!(
                 "{:>5.2} {:>9.2} {:>9.0} {:>9.2} {:>9.2}",

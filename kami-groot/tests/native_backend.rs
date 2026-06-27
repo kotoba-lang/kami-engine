@@ -2,7 +2,7 @@
 //! zero NVIDIA assets: configure an embodiment, build a native policy, and run
 //! `get_action` over a VLA observation.
 
-use kami_groot::{Episode, EmbodimentConfig, Gr00tPolicy, Observation};
+use kami_groot::{EmbodimentConfig, Episode, Gr00tPolicy, Observation};
 
 fn test_arm() -> EmbodimentConfig {
     EmbodimentConfig::from_robot(
@@ -53,8 +53,16 @@ fn native_policy_emits_chunked_action_within_limits() {
 #[test]
 fn episode_record_roundtrips() {
     let mut ep = Episode::new("test_arm");
-    ep.push(vec![0.0, 0.1, 0.2], vec![0.0, 0.0, 0.0], Some("reach".into()));
-    ep.push(vec![0.1, 0.1, 0.2], vec![0.1, 0.0, -0.1], Some("reach".into()));
+    ep.push(
+        vec![0.0, 0.1, 0.2],
+        vec![0.0, 0.0, 0.0],
+        Some("reach".into()),
+    );
+    ep.push(
+        vec![0.1, 0.1, 0.2],
+        vec![0.1, 0.0, -0.1],
+        Some("reach".into()),
+    );
     assert_eq!(ep.len(), 2);
 
     let json = serde_json::to_string(&ep).unwrap();

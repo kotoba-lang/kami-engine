@@ -4,7 +4,7 @@
 //! LOD billboard ranges per species come from `lod.rs`.
 
 use crate::instance::InstanceData;
-use crate::lod::{classify_lod, LodTier};
+use crate::lod::{LodTier, classify_lod};
 use crate::species::SpeciesId;
 
 /// Cull + sort by distance. Returns indices into the input slice, closest first.
@@ -56,9 +56,14 @@ pub fn cull_to_buffer(
     for i in idxs {
         let inst = &instances[i as usize];
         out.extend_from_slice(&[
-            inst.position[0], inst.position[1], inst.position[2],
-            inst.scale, inst.rotation, inst.species,
-            inst.wind_phase, inst.color_tint,
+            inst.position[0],
+            inst.position[1],
+            inst.position[2],
+            inst.scale,
+            inst.rotation,
+            inst.species,
+            inst.wind_phase,
+            inst.color_tint,
         ]);
     }
     out
@@ -91,11 +96,14 @@ pub fn build_patches(instances: &[InstanceData], cell_size: f32) -> Vec<Patch> {
         map.entry((cx, cz)).or_default().push(i as u32);
     }
     let half = cell_size * 0.5;
-    map.into_iter().map(|((cx, cz), ids)| Patch {
-        cell_x: cx, cell_z: cz,
-        center: [cx as f32 * cell_size + half, cz as f32 * cell_size + half],
-        instances: ids,
-    }).collect()
+    map.into_iter()
+        .map(|((cx, cz), ids)| Patch {
+            cell_x: cx,
+            cell_z: cz,
+            center: [cx as f32 * cell_size + half, cz as f32 * cell_size + half],
+            instances: ids,
+        })
+        .collect()
 }
 
 /// Fast patch-level cull: reject entire cells beyond `max_dist` from camera
@@ -108,11 +116,19 @@ pub fn patches_in_range(
     cell_size: f32,
 ) -> Vec<usize> {
     let max_d2 = (max_dist + cell_size * 0.71).powi(2); // add half-diagonal
-    patches.iter().enumerate().filter_map(|(i, p)| {
-        let dx = p.center[0] - cam_x;
-        let dz = p.center[1] - cam_z;
-        if dx * dx + dz * dz < max_d2 { Some(i) } else { None }
-    }).collect()
+    patches
+        .iter()
+        .enumerate()
+        .filter_map(|(i, p)| {
+            let dx = p.center[0] - cam_x;
+            let dz = p.center[1] - cam_z;
+            if dx * dx + dz * dz < max_d2 {
+                Some(i)
+            } else {
+                None
+            }
+        })
+        .collect()
 }
 
 /// Patch-aware cull: use spatial cells to pre-reject far patches, then do
@@ -137,25 +153,28 @@ pub fn cull_with_patches(
         candidates.extend_from_slice(&patches[pi].instances);
     }
     // Per-instance distance sort within candidates
-    let mut visible: Vec<(f32, u32)> = candidates.into_iter().filter_map(|i| {
-        let inst = &instances[i as usize];
-        let dx = inst.position[0] - cam_x;
-        let dz = inst.position[2] - cam_z;
-        let d2 = dx * dx + dz * dz;
-        // Species-based LOD
-        let species = match inst.species as u32 {
-            0 => crate::species::SpeciesId::Grass,
-            1 => crate::species::SpeciesId::Fern,
-            2 => crate::species::SpeciesId::PalmTree,
-            3 => crate::species::SpeciesId::Conifer,
-            _ => crate::species::SpeciesId::Bush,
-        };
-        if crate::lod::classify_lod(d2.sqrt(), species) == crate::lod::LodTier::Culled {
-            None
-        } else {
-            Some((d2, i))
-        }
-    }).collect();
+    let mut visible: Vec<(f32, u32)> = candidates
+        .into_iter()
+        .filter_map(|i| {
+            let inst = &instances[i as usize];
+            let dx = inst.position[0] - cam_x;
+            let dz = inst.position[2] - cam_z;
+            let d2 = dx * dx + dz * dz;
+            // Species-based LOD
+            let species = match inst.species as u32 {
+                0 => crate::species::SpeciesId::Grass,
+                1 => crate::species::SpeciesId::Fern,
+                2 => crate::species::SpeciesId::PalmTree,
+                3 => crate::species::SpeciesId::Conifer,
+                _ => crate::species::SpeciesId::Bush,
+            };
+            if crate::lod::classify_lod(d2.sqrt(), species) == crate::lod::LodTier::Culled {
+                None
+            } else {
+                Some((d2, i))
+            }
+        })
+        .collect();
     if visible.len() > budget {
         visible.select_nth_unstable_by(budget, |a, b| a.0.partial_cmp(&b.0).unwrap());
         visible.truncate(budget);
@@ -166,9 +185,14 @@ pub fn cull_with_patches(
     for (_, i) in visible {
         let inst = &instances[i as usize];
         out.extend_from_slice(&[
-            inst.position[0], inst.position[1], inst.position[2],
-            inst.scale, inst.rotation, inst.species,
-            inst.wind_phase, inst.color_tint,
+            inst.position[0],
+            inst.position[1],
+            inst.position[2],
+            inst.scale,
+            inst.rotation,
+            inst.species,
+            inst.wind_phase,
+            inst.color_tint,
         ]);
     }
     out
@@ -180,17 +204,21 @@ mod tests {
 
     fn mk(x: f32, z: f32, species: f32) -> InstanceData {
         InstanceData {
-            position: [x, 0.0, z], scale: 1.0, rotation: 0.0,
-            species, wind_phase: 0.0, color_tint: 0.0,
+            position: [x, 0.0, z],
+            scale: 1.0,
+            rotation: 0.0,
+            species,
+            wind_phase: 0.0,
+            color_tint: 0.0,
         }
     }
 
     #[test]
     fn closest_first() {
         let inst = vec![
-            mk(50.0, 0.0, 0.0),  // far grass
-            mk(5.0, 0.0, 0.0),   // near grass
-            mk(20.0, 0.0, 0.0),  // mid grass
+            mk(50.0, 0.0, 0.0), // far grass
+            mk(5.0, 0.0, 0.0),  // near grass
+            mk(20.0, 0.0, 0.0), // mid grass
         ];
         let idxs = cull_by_distance(&inst, 0.0, 0.0, 10);
         assert_eq!(idxs, vec![1, 2, 0]);
@@ -222,9 +250,9 @@ mod tests {
     #[test]
     fn patches_bin_instances() {
         let inst = vec![
-            mk(5.0, 5.0, 0.0),    // cell (0, 0)
-            mk(70.0, 5.0, 0.0),        // cell (2, 0) with cell_size=32
-            mk(10.0, 10.0, 0.0),       // cell (0, 0)
+            mk(5.0, 5.0, 0.0),   // cell (0, 0)
+            mk(70.0, 5.0, 0.0),  // cell (2, 0) with cell_size=32
+            mk(10.0, 10.0, 0.0), // cell (0, 0)
         ];
         let patches = build_patches(&inst, 32.0);
         assert_eq!(patches.len(), 2);

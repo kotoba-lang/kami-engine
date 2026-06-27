@@ -87,7 +87,12 @@ impl OsDesktop {
     }
 
     /// Push a notification toast.
-    pub fn show_notification(&mut self, title: String, body: String, level: notification::NotificationLevel) {
+    pub fn show_notification(
+        &mut self,
+        title: String,
+        body: String,
+        level: notification::NotificationLevel,
+    ) {
         self.notifications.push_toast(title, body, level, 5000);
     }
 

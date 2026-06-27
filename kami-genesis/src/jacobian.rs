@@ -27,7 +27,16 @@ pub struct Jacobian {
 
 impl Jacobian {
     pub fn zeros(n: usize) -> Self {
-        Jacobian { rows: [vec![0.0; n], vec![0.0; n], vec![0.0; n], vec![0.0; n], vec![0.0; n], vec![0.0; n]] }
+        Jacobian {
+            rows: [
+                vec![0.0; n],
+                vec![0.0; n],
+                vec![0.0; n],
+                vec![0.0; n],
+                vec![0.0; n],
+                vec![0.0; n],
+            ],
+        }
     }
     pub fn cols(&self) -> usize {
         self.rows[0].len()
@@ -95,7 +104,12 @@ pub fn cartpole_link_jacobian(theta: f32, link: &str, _cfg: &CartpoleConfig) -> 
 // Since q rotates about world −y, ω in world frame is along −y. The
 // `J_ω_y` row therefore carries a negative sign convention.
 
-pub fn dp_link_jacobian(q1: f32, q2: f32, link: &str, cfg: &DoublePendulumConfig) -> Option<Jacobian> {
+pub fn dp_link_jacobian(
+    q1: f32,
+    q2: f32,
+    link: &str,
+    cfg: &DoublePendulumConfig,
+) -> Option<Jacobian> {
     match link {
         "world" => Some(Jacobian::zeros(2)),
         "link1" => {
@@ -298,8 +312,12 @@ mod tests {
             let s12 = (q[0] + q[1]).sin();
             let c12 = (q[0] + q[1]).cos();
             [
-                l1 * s1 + lc2 * s12, 0.0, -l1 * c1 - lc2 * c12,
-                0.0, q[0] + q[1], 0.0,
+                l1 * s1 + lc2 * s12,
+                0.0,
+                -l1 * c1 - lc2 * c12,
+                0.0,
+                q[0] + q[1],
+                0.0,
             ]
         });
         assert_jacobian_close(&j, &fnum, 1e-3);
@@ -340,10 +358,8 @@ mod tests {
             let t1 = t0 + qv[1];
             let t2 = t1 + qv[2];
             // link3 com position
-            let px =
-                l[0] * t0.sin() + l[1] * t1.sin() + lc3 * t2.sin();
-            let pz =
-                -l[0] * t0.cos() - l[1] * t1.cos() - lc3 * t2.cos();
+            let px = l[0] * t0.sin() + l[1] * t1.sin() + lc3 * t2.sin();
+            let pz = -l[0] * t0.cos() - l[1] * t1.cos() - lc3 * t2.cos();
             [px, 0.0, pz, 0.0, t2, 0.0]
         });
         assert_jacobian_close(&j, &fnum, 1e-3);
@@ -379,11 +395,9 @@ mod tests {
     #[test]
     fn dp_jacobian_times_qdot_matches_link_state_velocity() {
         use crate::double_pendulum::DoublePendulumState;
-        use crate::world::{World};
+        use crate::world::World;
         use kami_articulated::parse_urdf;
-        const DP_URDF: &str = include_str!(
-            "../../fixtures/double_pendulum/double_pendulum.urdf"
-        );
+        const DP_URDF: &str = include_str!("../../fixtures/double_pendulum/double_pendulum.urdf");
 
         let q1 = 0.4_f32;
         let q2 = -0.3_f32;
@@ -399,15 +413,33 @@ mod tests {
         let sys = parse_urdf(DP_URDF).unwrap();
         let mut world = World::new(9.81, 1.0 / 240.0);
         let h = world.add_articulation(sys).unwrap();
-        world.get_mut(h).unwrap().set_double_pendulum_state(DoublePendulumState {
-            q1, q2, q1_dot: qd1, q2_dot: qd2,
-        });
+        world
+            .get_mut(h)
+            .unwrap()
+            .set_double_pendulum_state(DoublePendulumState {
+                q1,
+                q2,
+                q1_dot: qd1,
+                q2_dot: qd2,
+            });
         let ls = world.get(h).unwrap().link_state("link2").unwrap();
-        assert!((ls.linear_velocity.x - vx).abs() < 1e-5,
-                "vx: link_state={}, J*qdot={}", ls.linear_velocity.x, vx);
-        assert!((ls.linear_velocity.z - vz).abs() < 1e-5,
-                "vz: link_state={}, J*qdot={}", ls.linear_velocity.z, vz);
-        assert!((ls.angular_velocity.y - wy).abs() < 1e-5,
-                "wy: link_state={}, J*qdot={}", ls.angular_velocity.y, wy);
+        assert!(
+            (ls.linear_velocity.x - vx).abs() < 1e-5,
+            "vx: link_state={}, J*qdot={}",
+            ls.linear_velocity.x,
+            vx
+        );
+        assert!(
+            (ls.linear_velocity.z - vz).abs() < 1e-5,
+            "vz: link_state={}, J*qdot={}",
+            ls.linear_velocity.z,
+            vz
+        );
+        assert!(
+            (ls.angular_velocity.y - wy).abs() < 1e-5,
+            "wy: link_state={}, J*qdot={}",
+            ls.angular_velocity.y,
+            wy
+        );
     }
 }

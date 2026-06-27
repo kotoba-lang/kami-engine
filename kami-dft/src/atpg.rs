@@ -1,6 +1,5 @@
 /// Automatic Test Pattern Generation — fault modeling and pattern generation
 /// for stuck-at and transition faults.
-
 use serde::{Deserialize, Serialize};
 
 /// Fault model types.
@@ -58,8 +57,8 @@ pub fn generate_patterns(mut faults: Vec<Fault>, gate_count: u32) -> AtpgResult 
     for fault in &mut faults {
         // D-algorithm simplified: set the faulted net to the activating value
         let activating_value = match fault.fault_type {
-            FaultType::StuckAt0 => 1u64,    // Drive 1 to detect SA0
-            FaultType::StuckAt1 => 0u64,    // Drive 0 to detect SA1
+            FaultType::StuckAt0 => 1u64, // Drive 1 to detect SA0
+            FaultType::StuckAt1 => 0u64, // Drive 0 to detect SA1
             FaultType::TransitionSlow | FaultType::TransitionFast => {
                 // Transition faults need launch-capture pairs; simplified here
                 rng_state = xorshift64(rng_state);
@@ -79,7 +78,10 @@ pub fn generate_patterns(mut faults: Vec<Fault>, gate_count: u32) -> AtpgResult 
         let pattern = TestPattern {
             inputs: vec![
                 (fault.net_name.clone(), activating_value),
-                ("random_fill".into(), random_input % (1 << gate_count.min(16))),
+                (
+                    "random_fill".into(),
+                    random_input % (1 << gate_count.min(16)),
+                ),
             ],
             expected: vec![
                 ("out".into(), activating_value), // Simplified: expect propagated value
@@ -140,9 +142,21 @@ mod tests {
     #[test]
     fn stuck_at_coverage_is_positive() {
         let faults = vec![
-            Fault { net_name: "n1".into(), fault_type: FaultType::StuckAt0, detected: false },
-            Fault { net_name: "n2".into(), fault_type: FaultType::StuckAt1, detected: false },
-            Fault { net_name: "n3".into(), fault_type: FaultType::StuckAt0, detected: false },
+            Fault {
+                net_name: "n1".into(),
+                fault_type: FaultType::StuckAt0,
+                detected: false,
+            },
+            Fault {
+                net_name: "n2".into(),
+                fault_type: FaultType::StuckAt1,
+                detected: false,
+            },
+            Fault {
+                net_name: "n3".into(),
+                fault_type: FaultType::StuckAt0,
+                detected: false,
+            },
         ];
         let result = generate_patterns(faults, 8);
         assert!(result.fault_coverage > 0.0);
@@ -154,8 +168,16 @@ mod tests {
     #[test]
     fn pattern_count_matches_faults() {
         let faults = vec![
-            Fault { net_name: "a".into(), fault_type: FaultType::StuckAt0, detected: false },
-            Fault { net_name: "b".into(), fault_type: FaultType::TransitionSlow, detected: false },
+            Fault {
+                net_name: "a".into(),
+                fault_type: FaultType::StuckAt0,
+                detected: false,
+            },
+            Fault {
+                net_name: "b".into(),
+                fault_type: FaultType::TransitionSlow,
+                detected: false,
+            },
         ];
         let result = generate_patterns(faults, 4);
         assert_eq!(result.patterns.len(), 2);

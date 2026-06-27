@@ -10,7 +10,7 @@
 //! example stays hermetic. Real glTF files (decimated CAD exports) plug
 //! in through the same `from_gltf_json` entry point.
 
-use kami_cad_import::ingest::gltf::{from_gltf_json, IngestOptions};
+use kami_cad_import::ingest::gltf::{IngestOptions, from_gltf_json};
 use kami_cad_import::{jbeam_emit, sbom};
 
 fn main() {

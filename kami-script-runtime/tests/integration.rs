@@ -27,8 +27,11 @@ fn empty_script_init_tick() {
 fn spawn_entity_returns_nonzero_id() {
     let mut rt = make_runtime();
     // init spawns an entity; the entity id is returned from init
-    rt.load_clj("spawner", "(defn init [] (spawn-entity \"player\")) (defn tick [dt] 0)")
-        .expect("compile+load");
+    rt.load_clj(
+        "spawner",
+        "(defn init [] (spawn-entity \"player\")) (defn tick [dt] 0)",
+    )
+    .expect("compile+load");
     rt.call_init("spawner").expect("init");
     rt.call_tick("spawner", 16).expect("tick");
 }
@@ -74,8 +77,44 @@ fn audio_queue_filled_by_play_sound() {
     rt.call_init("audio-test").expect("init");
     rt.call_tick("audio-test", 16).expect("tick");
     let queue = rt.drain_audio_queue();
-    assert!(!queue.is_empty(), "expected audio queue entry after play-sound");
+    assert!(
+        !queue.is_empty(),
+        "expected audio queue entry after play-sound"
+    );
     assert_eq!(queue[0].0, "coin");
+}
+
+#[test]
+fn steam_queue_filled_by_steam_builtins() {
+    use kami_script_runtime::{SteamBackend, SteamEvent, StubSteam};
+
+    let mut rt = make_runtime();
+    let src = r#"
+      (defn init [] (steam-rich-presence! "status" "menu"))
+      (defn tick [dt]
+        (steam-unlock! "FIRST_WIN")
+        (steam-set-stat! "kills" 7))
+    "#;
+    rt.load_clj("steam-test", src).expect("compile+load");
+    rt.call_init("steam-test").expect("init");
+    // init emitted the rich-presence; drain it before the tick.
+    assert_eq!(
+        rt.drain_steam_queue(),
+        vec![SteamEvent::SetRichPresence("status".into(), "menu".into())]
+    );
+    rt.call_tick("steam-test", 16).expect("tick");
+    let events = rt.drain_steam_queue();
+    assert_eq!(
+        events,
+        vec![
+            SteamEvent::UnlockAchievement("FIRST_WIN".into()),
+            SteamEvent::SetStat("kills".into(), 7),
+        ]
+    );
+    // Draining twice yields nothing — the queue is consumed, not duplicated.
+    assert!(rt.drain_steam_queue().is_empty());
+    // The default backend accepts the batch without panicking (off-Steam path).
+    StubSteam.apply(events);
 }
 
 #[test]
@@ -90,7 +129,10 @@ fn draw_queue_filled_by_draw_mesh() {
     rt.call_init("render-test").expect("init");
     rt.call_tick("render-test", 16).expect("tick");
     let queue = rt.drain_draw_queue();
-    assert!(!queue.is_empty(), "expected draw queue entry after draw-mesh!");
+    assert!(
+        !queue.is_empty(),
+        "expected draw queue entry after draw-mesh!"
+    );
     assert_eq!(queue[0].mesh, "player-mesh");
 }
 

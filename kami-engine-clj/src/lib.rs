@@ -126,7 +126,7 @@ fn strip_shebang(src: &str) -> &str {
     if let Some(rest) = src.strip_prefix("#!") {
         match rest.find('\n') {
             Some(i) => &rest[i + 1..],
-            None    => "",
+            None => "",
         }
     } else {
         src

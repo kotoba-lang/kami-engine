@@ -82,7 +82,10 @@ pub fn decode_uastc_block(block: &[u8; 16]) -> Result<[[u8; 4]; 16], BasisError>
         return Err(BasisError::BadBlock(mode as u32));
     }
 
-    let mut br = BitReader { bytes: block, pos: 0 };
+    let mut br = BitReader {
+        bytes: block,
+        pos: 0,
+    };
     br.pos = t::HUFF_CODES[mode][1] as usize; // skip the mode huffman code
 
     // Solid-color mode.
@@ -233,7 +236,8 @@ pub fn decode_uastc_block(block: &[u8; 16]) -> Result<[[u8; 4]; 16], BasisError>
     } else {
         let (a0, a1, a2) = (anchors[0], anchors[1], anchors[2]);
         for (i, w) in weights.iter_mut().take(16).enumerate() {
-            let is_anchor = i as u8 == a0 || (subsets >= 2 && i as u8 == a1) || (subsets >= 3 && i as u8 == a2);
+            let is_anchor =
+                i as u8 == a0 || (subsets >= 2 && i as u8 == a1) || (subsets >= 3 && i as u8 == a2);
             *w = if is_anchor {
                 br.read(weight_bits as u32 - 1) as u8
             } else {
@@ -371,7 +375,9 @@ pub fn decode_ktx2(data: &[u8]) -> Result<DecodedImage, BasisError> {
     let lvl_uncomp = u64le(data, li + 16).ok_or(BasisError::Truncated)? as usize;
     let _ = level_count;
 
-    let raw = data.get(lvl_off..lvl_off + lvl_len).ok_or(BasisError::Truncated)?;
+    let raw = data
+        .get(lvl_off..lvl_off + lvl_len)
+        .ok_or(BasisError::Truncated)?;
 
     // Supercompression of the level data.
     let level_data: Vec<u8> = match supercompression {
@@ -381,7 +387,8 @@ pub fn decode_ktx2(data: &[u8]) -> Result<DecodedImage, BasisError> {
             use std::io::Read;
             let mut dec = flate2::read::ZlibDecoder::new(raw);
             let mut out = Vec::with_capacity(lvl_uncomp.max(raw.len()));
-            dec.read_to_end(&mut out).map_err(|e| BasisError::Zlib(e.to_string()))?;
+            dec.read_to_end(&mut out)
+                .map_err(|e| BasisError::Zlib(e.to_string()))?;
             out
         }
         other => return Err(BasisError::UnsupportedSupercompression(other)),
@@ -414,7 +421,11 @@ pub fn decode_ktx2(data: &[u8]) -> Result<DecodedImage, BasisError> {
         }
     }
 
-    Ok(DecodedImage { width, height, rgba })
+    Ok(DecodedImage {
+        width,
+        height,
+        rgba,
+    })
 }
 
 #[cfg(test)]

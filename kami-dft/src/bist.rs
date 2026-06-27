@@ -1,5 +1,4 @@
 /// Built-In Self-Test — memory BIST (MBIST) and logic BIST (LBIST) generation.
-
 use serde::{Deserialize, Serialize};
 
 /// Type of BIST controller.
@@ -23,11 +22,11 @@ impl MarchAlgorithm {
     /// Number of march elements (read/write operations per address) for each algorithm.
     pub fn march_elements(&self) -> usize {
         match self {
-            MarchAlgorithm::MarchC => 10,       // {w0}; {r0,w1}; {r1,w0}; {r0,w1}; {r1,w0}; {r0}
+            MarchAlgorithm::MarchC => 10, // {w0}; {r0,w1}; {r1,w0}; {r0,w1}; {r1,w0}; {r0}
             MarchAlgorithm::MarchCMinus => 10,
             MarchAlgorithm::MarchB => 17,
             MarchAlgorithm::MarchA => 15,
-            MarchAlgorithm::Checkerboard => 4,  // write pattern, read pattern, write complement, read complement
+            MarchAlgorithm::Checkerboard => 4, // write pattern, read pattern, write complement, read complement
         }
     }
 }

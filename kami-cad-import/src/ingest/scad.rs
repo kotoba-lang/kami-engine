@@ -202,7 +202,11 @@ pub fn from_annotated(
             mass_kg: e.annotation.mass_kg,
             parent: e.annotation.parent.clone(),
             break_group: e.annotation.break_group,
-            source: e.annotation.source.clone().unwrap_or_else(|| assembly_source.clone()),
+            source: e
+                .annotation
+                .source
+                .clone()
+                .unwrap_or_else(|| assembly_source.clone()),
             supplier: e.annotation.supplier.clone(),
             revision: e
                 .annotation
@@ -234,7 +238,9 @@ mod tests {
 
     #[test]
     fn cube_aabb_matches_size() {
-        let p = ScadPrim::Cube { size: [2.0, 1.0, 0.5] };
+        let p = ScadPrim::Cube {
+            size: [2.0, 1.0, 0.5],
+        };
         let t = ScadTransform::default();
         let (lo, hi) = world_aabb(&p, &t);
         assert_eq!(lo, [-1.0, -0.5, -0.25]);
@@ -243,7 +249,9 @@ mod tests {
 
     #[test]
     fn translate_moves_aabb() {
-        let p = ScadPrim::Cube { size: [2.0, 2.0, 2.0] };
+        let p = ScadPrim::Cube {
+            size: [2.0, 2.0, 2.0],
+        };
         let t = ScadTransform::default().translate(10.0, 0.0, 0.0);
         let (lo, hi) = world_aabb(&p, &t);
         assert_eq!(lo, [9.0, -1.0, -1.0]);
@@ -252,7 +260,11 @@ mod tests {
 
     #[test]
     fn cylinder_y_axis_aabb() {
-        let p = ScadPrim::Cylinder { h: 1.0, r1: 0.3, r2: 0.3 };
+        let p = ScadPrim::Cylinder {
+            h: 1.0,
+            r1: 0.3,
+            r2: 0.3,
+        };
         let t = ScadTransform::default();
         let (lo, hi) = world_aabb(&p, &t);
         assert_eq!(lo, [-0.3, -0.5, -0.3]);
@@ -263,7 +275,9 @@ mod tests {
     fn from_annotated_round_trip() {
         let entities = vec![
             AnnotatedEntity {
-                primitive: ScadPrim::Cube { size: [1.7, 0.35, 4.0] },
+                primitive: ScadPrim::Cube {
+                    size: [1.7, 0.35, 4.0],
+                },
                 transform: ScadTransform::default().translate(0.0, 0.4, 0.0),
                 annotation: ScadAnnotation {
                     part_id: "chassis".into(),
@@ -279,7 +293,9 @@ mod tests {
                 },
             },
             AnnotatedEntity {
-                primitive: ScadPrim::Cube { size: [1.6, 0.08, 0.9] },
+                primitive: ScadPrim::Cube {
+                    size: [1.6, 0.08, 0.9],
+                },
                 transform: ScadTransform::default().translate(0.0, 0.74, 1.65),
                 annotation: ScadAnnotation {
                     part_id: "hood".into(),
@@ -316,7 +332,9 @@ mod tests {
     #[test]
     fn rejects_unknown_parent() {
         let entities = vec![AnnotatedEntity {
-            primitive: ScadPrim::Cube { size: [1.0, 1.0, 1.0] },
+            primitive: ScadPrim::Cube {
+                size: [1.0, 1.0, 1.0],
+            },
             transform: ScadTransform::default(),
             annotation: ScadAnnotation {
                 part_id: "p1".into(),

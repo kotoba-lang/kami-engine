@@ -20,7 +20,13 @@ fn periodic_fixes_keep_dead_reckoning_bounded() {
 
     // Ground-truth vehicle driving a gentle curve.
     let mut truth = BicycleModel::new(start, VehicleClass::Car.limits());
-    let cmd = Command { throttle: 0.4, brake: 0.0, steer: 0.2, handbrake: 0.0, reverse: false };
+    let cmd = Command {
+        throttle: 0.4,
+        brake: 0.0,
+        steer: 0.2,
+        handbrake: 0.0,
+        reverse: false,
+    };
 
     let mut corrected = StateEstimator::new(start);
     let mut free = StateEstimator::new(start); // dead-reckon only, never corrected

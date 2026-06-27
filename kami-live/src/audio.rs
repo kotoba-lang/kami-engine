@@ -329,25 +329,3 @@ impl DrumSlot {
         }
     }
 }
-
-/// The default soundscape: a drum kit + bass + the common trigger `:sound`s
-/// (coin / whoosh / …), each a `kami.audio`-style recipe. A `:dance/audio :bank`
-/// map overrides or extends these per scene.
-pub fn default_sound_bank() -> std::collections::BTreeMap<String, SoundCue> {
-    use std::collections::BTreeMap;
-    let mut b = BTreeMap::new();
-    let mut put = |n: &str, c: SoundCue| { b.insert(n.to_string(), c); };
-    put("kick", SoundCue::new("sine", 120.0, Some(45.0), 0.18, 0.5));
-    put("snare", SoundCue::new("triangle", 220.0, Some(160.0), 0.12, 0.35));
-    put("closed-hat", SoundCue::new("square", 8000.0, Some(6000.0), 0.03, 0.12));
-    put("open-hat", SoundCue::new("square", 7000.0, Some(5000.0), 0.12, 0.12));
-    put("clap", SoundCue::new("triangle", 1200.0, Some(800.0), 0.08, 0.25));
-    put("crash", SoundCue::new("square", 6000.0, Some(3000.0), 0.5, 0.15));
-    put("tom", SoundCue::new("sine", 180.0, Some(90.0), 0.2, 0.3));
-    put("rim", SoundCue::new("square", 1800.0, Some(1500.0), 0.04, 0.15));
-    put("bass", SoundCue::new("sawtooth", 80.0, None, 0.25, 0.4));
-    put("pad", SoundCue::new("sine", 261.0, None, 0.6, 0.1));
-    put("coin", SoundCue::new("square", 988.0, Some(1319.0), 0.12, 0.2));
-    put("whoosh", SoundCue::new("sine", 800.0, Some(200.0), 0.2, 0.15));
-    b
-}

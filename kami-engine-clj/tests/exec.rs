@@ -113,18 +113,34 @@ fn defatom_persists_state_across_ticks() {
     let mut store: wasmtime::Store<()> = wasmtime::Store::new(&engine, ());
     let instance = wasmtime::Instance::new(&mut store, &module, &[]).expect("instantiate");
 
-    let step = instance.get_typed_func::<i64, i64>(&mut store, "step").unwrap();
+    let step = instance
+        .get_typed_func::<i64, i64>(&mut store, "step")
+        .unwrap();
     for _ in 0..200 {
         step.call(&mut store, 0).unwrap();
     }
-    let hit = instance.get_typed_func::<i64, i64>(&mut store, "hit").unwrap();
+    let hit = instance
+        .get_typed_func::<i64, i64>(&mut store, "hit")
+        .unwrap();
     hit.call(&mut store, 0).unwrap();
     hit.call(&mut store, 0).unwrap();
 
-    let getscore = instance.get_typed_func::<(), i64>(&mut store, "getscore").unwrap();
-    let getlives = instance.get_typed_func::<(), i64>(&mut store, "getlives").unwrap();
-    assert_eq!(getscore.call(&mut store, ()).unwrap(), 200, "score must accumulate across 200 ticks");
-    assert_eq!(getlives.call(&mut store, ()).unwrap(), 1, "lives 3 - 2 hits = 1");
+    let getscore = instance
+        .get_typed_func::<(), i64>(&mut store, "getscore")
+        .unwrap();
+    let getlives = instance
+        .get_typed_func::<(), i64>(&mut store, "getlives")
+        .unwrap();
+    assert_eq!(
+        getscore.call(&mut store, ()).unwrap(),
+        200,
+        "score must accumulate across 200 ticks"
+    );
+    assert_eq!(
+        getlives.call(&mut store, ()).unwrap(),
+        1,
+        "lives 3 - 2 hits = 1"
+    );
 }
 
 /// defatom cells are exported as WASM globals so the HOST can read game state directly (the
@@ -132,13 +148,18 @@ fn defatom_persists_state_across_ticks() {
 #[test]
 fn defatom_globals_are_exported_for_the_host() {
     use kami_engine_clj::compile_str;
-    let wasm = compile_str("(defatom lives 3) (defatom score 0) (defn init [] 0)").expect("compile");
+    let wasm =
+        compile_str("(defatom lives 3) (defatom score 0) (defn init [] 0)").expect("compile");
     let engine = wasmtime::Engine::default();
     let module = wasmtime::Module::new(&engine, &wasm).expect("module");
     let mut store: wasmtime::Store<()> = wasmtime::Store::new(&engine, ());
     let instance = wasmtime::Instance::new(&mut store, &module, &[]).expect("instantiate");
-    let lives = instance.get_global(&mut store, "lives").expect("lives global must be exported");
-    let score = instance.get_global(&mut store, "score").expect("score global must be exported");
+    let lives = instance
+        .get_global(&mut store, "lives")
+        .expect("lives global must be exported");
+    let score = instance
+        .get_global(&mut store, "score")
+        .expect("score global must be exported");
     assert_eq!(lives.get(&mut store).i64(), Some(3));
     assert_eq!(score.get(&mut store).i64(), Some(0));
 }
@@ -165,16 +186,16 @@ fn desugar_forms_compute() {
     assert_eq!(eval("(when-not (< 2 1) 5)"), 5); // cond false → 5
     // case = nested (= expr v) dispatch, with optional default
     assert_eq!(eval("(case 2 1 10 2 20 3 30 99)"), 20); // matches 2
-    assert_eq!(eval("(case 7 1 10 2 20 99)"), 99);      // default
-    assert_eq!(eval("(case 7 1 10 2 20)"), 0);          // no match, no default → 0
+    assert_eq!(eval("(case 7 1 10 2 20 99)"), 99); // default
+    assert_eq!(eval("(case 7 1 10 2 20)"), 0); // no match, no default → 0
 }
 
 #[test]
 fn binding_and_loop_forms_compute() {
     // if-let binds, then branches on the bound value's truthiness (0 = falsy)
-    assert_eq!(eval("(if-let [x (+ 2 3)] x 99)"), 5);  // x=5 truthy → x
+    assert_eq!(eval("(if-let [x (+ 2 3)] x 99)"), 5); // x=5 truthy → x
     assert_eq!(eval("(if-let [x (- 5 5)] x 99)"), 99); // x=0 falsy  → else
-    assert_eq!(eval("(if-let [x 0] 1)"), 0);           // no else    → 0
+    assert_eq!(eval("(if-let [x 0] 1)"), 0); // no else    → 0
     // when-let runs the body only when the binding is truthy
     assert_eq!(eval("(when-let [x 7] (+ x 1))"), 8);
     assert_eq!(eval("(when-let [x 0] (+ x 1))"), 0);
@@ -207,7 +228,7 @@ fn numeric_gameplay_forms_compute() {
     assert_eq!(eval("(max 3 7)"), 7);
     assert_eq!(eval("(max (- 0 2) (- 0 9))"), -2);
     // clamp = (min (max x lo) hi) — the gameplay staple (health/position bounds)
-    assert_eq!(eval("(clamp 5 0 10)"), 5);   // in range
+    assert_eq!(eval("(clamp 5 0 10)"), 5); // in range
     assert_eq!(eval("(clamp 15 0 10)"), 10); // above
     assert_eq!(eval("(clamp (- 0 3) 0 10)"), 0); // below
 }
@@ -216,20 +237,23 @@ fn numeric_gameplay_forms_compute() {
 fn threading_with_special_form_steps() {
     // regression: special-form steps (clamp/min/max/case) thread at the EDN level and desugar — they
     // were previously mis-lowered to an undefined call. This is what real gameplay (-> tuning) needs.
-    assert_eq!(eval("(-> 15 (clamp 0 10))"), 10);          // clamp as a -> step
-    assert_eq!(eval("(-> 3 (max 7) (min 5))"), 5);         // max then min: max(3,7)=7, min(7,5)=5
-    assert_eq!(eval("(-> 2 (case 1 10 2 20 99))"), 20);    // case subject threaded in
+    assert_eq!(eval("(-> 15 (clamp 0 10))"), 10); // clamp as a -> step
+    assert_eq!(eval("(-> 3 (max 7) (min 5))"), 5); // max then min: max(3,7)=7, min(7,5)=5
+    assert_eq!(eval("(-> 2 (case 1 10 2 20 99))"), 20); // case subject threaded in
     assert_eq!(eval("(cond-> 15 (< 1 2) (clamp 0 10))"), 10); // cond-> with a special-form step
 }
 
 #[test]
 fn bitwise_ops_compute() {
-    assert_eq!(eval("(bit-and 12 10)"), 8);          // 1100 & 1010 = 1000
-    assert_eq!(eval("(bit-or 12 10)"), 14);          // 1100 | 1010 = 1110
-    assert_eq!(eval("(bit-xor 12 10)"), 6);          // 1100 ^ 1010 = 0110
-    assert_eq!(eval("(bit-shift-left 1 4)"), 16);    // 1 << 4
-    assert_eq!(eval("(bit-shift-right 64 2)"), 16);  // 64 >> 2
-    assert_eq!(eval("(bit-or 1 2 4)"), 7);           // variadic
+    assert_eq!(eval("(bit-and 12 10)"), 8); // 1100 & 1010 = 1000
+    assert_eq!(eval("(bit-or 12 10)"), 14); // 1100 | 1010 = 1110
+    assert_eq!(eval("(bit-xor 12 10)"), 6); // 1100 ^ 1010 = 0110
+    assert_eq!(eval("(bit-shift-left 1 4)"), 16); // 1 << 4
+    assert_eq!(eval("(bit-shift-right 64 2)"), 16); // 64 >> 2
+    assert_eq!(eval("(bit-or 1 2 4)"), 7); // variadic
     // a flags bitset: set bit0 + bit2, then test bit2 → 4
-    assert_eq!(eval("(bit-and (bit-or (bit-shift-left 1 0) (bit-shift-left 1 2)) (bit-shift-left 1 2))"), 4);
+    assert_eq!(
+        eval("(bit-and (bit-or (bit-shift-left 1 0) (bit-shift-left 1 2)) (bit-shift-left 1 2))"),
+        4
+    );
 }

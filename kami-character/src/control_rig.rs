@@ -209,13 +209,12 @@ impl ControlRig {
                     let t = ((input_val - in_min) / (in_max - in_min)).clamp(0.0, 1.0);
                     out_min + t * (out_max - out_min)
                 }
-                RigNodeType::Blend { weights } => {
-                    node.inputs
-                        .iter()
-                        .zip(weights.iter())
-                        .map(|(&(src, _), &w)| node_values[src] * w)
-                        .sum()
-                }
+                RigNodeType::Blend { weights } => node
+                    .inputs
+                    .iter()
+                    .zip(weights.iter())
+                    .map(|(&(src, _), &w)| node_values[src] * w)
+                    .sum(),
                 RigNodeType::RotationAxis { axis } => {
                     if let Some(bone_idx) = node.target_bone {
                         let axis_vec = Vec3::from_array(*axis).normalize_or_zero();
@@ -304,7 +303,11 @@ mod tests {
         let rig = ControlRig::metahuman_face_rig();
         assert!(!rig.nodes.is_empty());
         // 19 AU mappings × 3 nodes each (control + multiply + rotation) = 57
-        assert!(rig.nodes.len() >= 19 * 3, "Expected 57+ nodes, got {}", rig.nodes.len());
+        assert!(
+            rig.nodes.len() >= 19 * 3,
+            "Expected 57+ nodes, got {}",
+            rig.nodes.len()
+        );
     }
 
     #[test]

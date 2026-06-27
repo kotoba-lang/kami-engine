@@ -17,11 +17,11 @@
 //! (no tolerance) unless noted.
 
 use kami_vehicle::{
-    build_vehicle, DrivelineLayout, Gearbox, PacejkaParams, TorqueCurve, VehicleKind,
+    DrivelineLayout, Gearbox, PacejkaParams, TorqueCurve, VehicleKind, build_vehicle,
 };
 use kami_vehicle_scene::{
-    builtin_engine, builtin_gearbox, builtin_tire, engines_from_edn, garage_from_edn,
-    gearboxes_from_edn, tires_from_edn, GarageSpec, LayoutSpec, ALL_VEHICLE_KINDS, GARAGE_EDN,
+    ALL_VEHICLE_KINDS, GARAGE_EDN, GarageSpec, LayoutSpec, builtin_engine, builtin_gearbox,
+    builtin_tire, engines_from_edn, garage_from_edn, gearboxes_from_edn, tires_from_edn,
 };
 
 /// For each of the 6 VehicleKinds, every SedanSpec field loaded from EDN must
@@ -42,7 +42,10 @@ fn garage_edn_matches_builtin() {
         assert_eq!(edn.track_width, spec.track_width, "{id}: track_width");
         assert_eq!(edn.ride_height, spec.ride_height, "{id}: ride_height");
         assert_eq!(edn.roof_height, spec.roof_height, "{id}: roof_height");
-        assert_eq!(edn.overhang_front, spec.overhang_front, "{id}: overhang_front");
+        assert_eq!(
+            edn.overhang_front, spec.overhang_front,
+            "{id}: overhang_front"
+        );
         assert_eq!(edn.overhang_rear, spec.overhang_rear, "{id}: overhang_rear");
         assert_eq!(edn.mass_chassis, spec.mass_chassis, "{id}: mass_chassis");
         assert_eq!(edn.mass_engine, spec.mass_engine, "{id}: mass_engine");
@@ -63,8 +66,7 @@ fn garage_edn_matches_builtin() {
 
         // Effective final_drive (build() overrides per kind).
         assert_eq!(
-            edn.final_drive,
-            v.powertrain.gearbox.final_drive,
+            edn.final_drive, v.powertrain.gearbox.final_drive,
             "{id}: final_drive"
         );
 
@@ -93,7 +95,11 @@ fn garage_edn_matches_builtin() {
         assert_eq!(edn_d_lat, tire0.d_lat, "{id}: tire d_lat");
 
         // The whole struct equals the builtin mirror assembled from Rust.
-        assert_eq!(edn, &GarageSpec::builtin(kind), "{id}: full GarageSpec parity");
+        assert_eq!(
+            edn,
+            &GarageSpec::builtin(kind),
+            "{id}: full GarageSpec parity"
+        );
     }
 
     // Sports is the one that should carry the sticky-tire override.
@@ -129,7 +135,12 @@ fn engines_edn_matches_builtin() {
             builtin.torque_curve.len(),
             "{id}: torque-curve point count"
         );
-        for (i, (a, b)) in edn.torque_curve.iter().zip(builtin.torque_curve.iter()).enumerate() {
+        for (i, (a, b)) in edn
+            .torque_curve
+            .iter()
+            .zip(builtin.torque_curve.iter())
+            .enumerate()
+        {
             assert_eq!(a.0, b.0, "{id}: curve[{i}] rpm");
             assert_eq!(a.1, b.1, "{id}: curve[{i}] nm");
         }
@@ -147,8 +158,7 @@ fn engines_edn_matches_builtin() {
     // effective curve on the built Vehicle.
     let pickup_v = build_vehicle(VehicleKind::Pickup);
     assert_eq!(
-        engines["pickup-v6"].torque_curve,
-        pickup_v.powertrain.engine.torque_curve.points,
+        engines["pickup-v6"].torque_curve, pickup_v.powertrain.engine.torque_curve.points,
         "pickup-v6 curve == build_vehicle(Pickup) curve"
     );
     assert_eq!(
@@ -157,8 +167,7 @@ fn engines_edn_matches_builtin() {
     );
     let bus_v = build_vehicle(VehicleKind::Bus);
     assert_eq!(
-        engines["bus-diesel"].torque_curve,
-        bus_v.powertrain.engine.torque_curve.points,
+        engines["bus-diesel"].torque_curve, bus_v.powertrain.engine.torque_curve.points,
         "bus-diesel curve == build_vehicle(Bus) curve"
     );
     assert_eq!(
@@ -177,7 +186,10 @@ fn gearbox_edn_matches_builtin() {
     let g = Gearbox::manual_6();
 
     assert_eq!(edn.ratios, g.ratios, "manual-6 ratios");
-    assert_eq!(edn.final_drive, g.final_drive, "manual-6 final_drive (base)");
+    assert_eq!(
+        edn.final_drive, g.final_drive,
+        "manual-6 final_drive (base)"
+    );
     assert_eq!(edn.inertia, g.inertia, "manual-6 inertia");
     assert_eq!(edn.shift_time, g.shift_time, "manual-6 shift_time");
     assert_eq!(edn, &builtin, "full GearboxSpec parity");

@@ -88,7 +88,11 @@ impl Node {
 
     /// Recompute `inv_mass` after loading from JBeam JSON (where it is skipped).
     pub fn refresh_inv_mass(&mut self) {
-        self.inv_mass = if self.mass > 0.0 { 1.0 / self.mass } else { 0.0 };
+        self.inv_mass = if self.mass > 0.0 {
+            1.0 / self.mass
+        } else {
+            0.0
+        };
     }
 }
 

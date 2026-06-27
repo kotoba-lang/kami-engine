@@ -31,13 +31,26 @@ pub mod brep {
         /// Infinite plane defined by origin + normal.
         Plane { origin: DVec3, normal: DVec3 },
         /// Cylinder: axis origin, axis direction, radius.
-        Cylinder { origin: DVec3, axis: DVec3, radius: f64 },
+        Cylinder {
+            origin: DVec3,
+            axis: DVec3,
+            radius: f64,
+        },
         /// Cone: apex, axis direction, half-angle (radians).
-        Cone { apex: DVec3, axis: DVec3, half_angle: f64 },
+        Cone {
+            apex: DVec3,
+            axis: DVec3,
+            half_angle: f64,
+        },
         /// Sphere: center, radius.
         Sphere { center: DVec3, radius: f64 },
         /// Torus: center, axis, major radius, minor radius.
-        Torus { center: DVec3, axis: DVec3, major_radius: f64, minor_radius: f64 },
+        Torus {
+            center: DVec3,
+            axis: DVec3,
+            major_radius: f64,
+            minor_radius: f64,
+        },
         /// B-spline surface: degree_u, degree_v, control points grid (row-major),
         /// knot vectors, rows, cols.
         BSplineSurface {
@@ -57,9 +70,18 @@ pub mod brep {
         /// Line segment: origin + direction (unit).
         Line { origin: DVec3, direction: DVec3 },
         /// Circle: center, normal, radius.
-        Circle { center: DVec3, normal: DVec3, radius: f64 },
+        Circle {
+            center: DVec3,
+            normal: DVec3,
+            radius: f64,
+        },
         /// Ellipse: center, normal, semi-major axis vector, semi-minor length.
-        Ellipse { center: DVec3, normal: DVec3, semi_major: DVec3, semi_minor: f64 },
+        Ellipse {
+            center: DVec3,
+            normal: DVec3,
+            semi_major: DVec3,
+            semi_minor: f64,
+        },
         /// B-spline curve: degree, control points, knot vector.
         BSplineCurve {
             degree: u32,
@@ -73,7 +95,11 @@ pub mod brep {
         pub fn evaluate(&self, t: f64) -> DVec3 {
             match self {
                 Curve::Line { origin, direction } => *origin + *direction * t,
-                Curve::Circle { center, normal, radius } => {
+                Curve::Circle {
+                    center,
+                    normal,
+                    radius,
+                } => {
                     // Build local frame from normal.
                     let n = normal.normalize();
                     let u = if n.x.abs() < 0.9 {
@@ -84,13 +110,22 @@ pub mod brep {
                     let v = n.cross(u);
                     *center + u * (radius * t.cos()) + v * (radius * t.sin())
                 }
-                Curve::Ellipse { center, normal, semi_major, semi_minor } => {
+                Curve::Ellipse {
+                    center,
+                    normal,
+                    semi_major,
+                    semi_minor,
+                } => {
                     let n = normal.normalize();
                     let u = semi_major.normalize();
                     let v = n.cross(u).normalize();
                     *center + u * (semi_major.length() * t.cos()) + v * (*semi_minor * t.sin())
                 }
-                Curve::BSplineCurve { degree, control_points, knots } => {
+                Curve::BSplineCurve {
+                    degree,
+                    control_points,
+                    knots,
+                } => {
                     // De Boor evaluation.
                     if control_points.is_empty() {
                         return DVec3::ZERO;
@@ -197,7 +232,9 @@ pub mod brep {
         /// For a quick approximation, counts unique start/end vertex references
         /// across a supplied edge list.
         pub fn vertex_count(&self, edges: &[BrepEdge]) -> usize {
-            let edge_ids: std::collections::HashSet<TopoId> = self.shells.iter()
+            let edge_ids: std::collections::HashSet<TopoId> = self
+                .shells
+                .iter()
                 .flat_map(|s| &s.faces)
                 .flat_map(|f| &f.wires)
                 .flat_map(|w| w.iter())
@@ -216,11 +253,7 @@ pub mod brep {
         /// Axis-aligned bounding box from all face surfaces.
         /// Returns (min, max) corners. For plane faces, uses wire edge endpoints
         /// as an approximation (requires edges + vertices).
-        pub fn bounding_box(
-            &self,
-            edges: &[BrepEdge],
-            vertices: &[BrepVertex],
-        ) -> (DVec3, DVec3) {
+        pub fn bounding_box(&self, edges: &[BrepEdge], vertices: &[BrepVertex]) -> (DVec3, DVec3) {
             let mut min = DVec3::splat(f64::INFINITY);
             let mut max = DVec3::splat(f64::NEG_INFINITY);
             let vert_map: std::collections::HashMap<TopoId, DVec3> =
@@ -285,7 +318,11 @@ pub mod brep {
     }
 
     /// Helper: build a rectangular box solid from 8 vertices, 12 edges, 6 faces.
-    pub fn make_box(id: TopoId, min: DVec3, max: DVec3) -> (BrepSolid, Vec<BrepEdge>, Vec<BrepVertex>) {
+    pub fn make_box(
+        id: TopoId,
+        min: DVec3,
+        max: DVec3,
+    ) -> (BrepSolid, Vec<BrepEdge>, Vec<BrepVertex>) {
         let verts = [
             DVec3::new(min.x, min.y, min.z), // 0
             DVec3::new(max.x, min.y, min.z), // 1
@@ -296,28 +333,49 @@ pub mod brep {
             DVec3::new(max.x, max.y, max.z), // 6
             DVec3::new(min.x, max.y, max.z), // 7
         ];
-        let brep_verts: Vec<BrepVertex> = verts.iter().enumerate().map(|(i, &p)| {
-            BrepVertex { id: (i + 1) as u64, point: p }
-        }).collect();
+        let brep_verts: Vec<BrepVertex> = verts
+            .iter()
+            .enumerate()
+            .map(|(i, &p)| BrepVertex {
+                id: (i + 1) as u64,
+                point: p,
+            })
+            .collect();
 
         // 12 edges of a box.
         let edge_defs: [(usize, usize); 12] = [
-            (0,1),(1,2),(2,3),(3,0), // bottom
-            (4,5),(5,6),(6,7),(7,4), // top
-            (0,4),(1,5),(2,6),(3,7), // verticals
+            (0, 1),
+            (1, 2),
+            (2, 3),
+            (3, 0), // bottom
+            (4, 5),
+            (5, 6),
+            (6, 7),
+            (7, 4), // top
+            (0, 4),
+            (1, 5),
+            (2, 6),
+            (3, 7), // verticals
         ];
-        let brep_edges: Vec<BrepEdge> = edge_defs.iter().enumerate().map(|(i, &(s, e))| {
-            let sv = &brep_verts[s];
-            let ev = &brep_verts[e];
-            let dir = (ev.point - sv.point).normalize();
-            BrepEdge {
-                id: (100 + i) as u64,
-                curve: Curve::Line { origin: sv.point, direction: dir },
-                start_vertex: sv.id,
-                end_vertex: ev.id,
-                t_range: (0.0, sv.point.distance(ev.point)),
-            }
-        }).collect();
+        let brep_edges: Vec<BrepEdge> = edge_defs
+            .iter()
+            .enumerate()
+            .map(|(i, &(s, e))| {
+                let sv = &brep_verts[s];
+                let ev = &brep_verts[e];
+                let dir = (ev.point - sv.point).normalize();
+                BrepEdge {
+                    id: (100 + i) as u64,
+                    curve: Curve::Line {
+                        origin: sv.point,
+                        direction: dir,
+                    },
+                    start_vertex: sv.id,
+                    end_vertex: ev.id,
+                    t_range: (0.0, sv.point.distance(ev.point)),
+                }
+            })
+            .collect();
 
         // 6 faces: bottom(Z-), top(Z+), front(Y-), back(Y+), left(X-), right(X+).
         // Each wire is an ordered list of edge indices forming a closed loop.
@@ -325,25 +383,29 @@ pub mod brep {
         // Edge map: 0:(0,1) 1:(1,2) 2:(2,3) 3:(3,0) 4:(4,5) 5:(5,6) 6:(6,7)
         //           7:(7,4) 8:(0,4) 9:(1,5) 10:(2,6) 11:(3,7)
         let face_wires: [(&[usize], DVec3); 6] = [
-            (&[0,1,2,3], DVec3::new(0.0, 0.0, -1.0)),       // bottom: v0->v1->v2->v3
-            (&[4,5,6,7], DVec3::new(0.0, 0.0, 1.0)),        // top: v4->v5->v6->v7
-            (&[0,9,4,8], DVec3::new(0.0, -1.0, 0.0)),       // front: v0->v1->v5->v4
-            (&[2,11,6,10], DVec3::new(0.0, 1.0, 0.0)),      // back: v2->v3->v7->v6
-            (&[3,8,7,11], DVec3::new(-1.0, 0.0, 0.0)),      // left: v3->v0->v4->v7
-            (&[1,10,5,9], DVec3::new(1.0, 0.0, 0.0)),       // right: v1->v2->v6->v5
+            (&[0, 1, 2, 3], DVec3::new(0.0, 0.0, -1.0)), // bottom: v0->v1->v2->v3
+            (&[4, 5, 6, 7], DVec3::new(0.0, 0.0, 1.0)),  // top: v4->v5->v6->v7
+            (&[0, 9, 4, 8], DVec3::new(0.0, -1.0, 0.0)), // front: v0->v1->v5->v4
+            (&[2, 11, 6, 10], DVec3::new(0.0, 1.0, 0.0)), // back: v2->v3->v7->v6
+            (&[3, 8, 7, 11], DVec3::new(-1.0, 0.0, 0.0)), // left: v3->v0->v4->v7
+            (&[1, 10, 5, 9], DVec3::new(1.0, 0.0, 0.0)), // right: v1->v2->v6->v5
         ];
-        let faces: Vec<BrepFace> = face_wires.iter().enumerate().map(|(i, (eidxs, normal))| {
-            let wire: Vec<TopoId> = eidxs.iter().map(|&ei| brep_edges[ei].id).collect();
-            BrepFace {
-                id: (200 + i) as u64,
-                surface: Surface::Plane {
-                    origin: (min + max) * 0.5,
-                    normal: *normal,
-                },
-                wires: vec![wire],
-                orientation: Orientation::Forward,
-            }
-        }).collect();
+        let faces: Vec<BrepFace> = face_wires
+            .iter()
+            .enumerate()
+            .map(|(i, (eidxs, normal))| {
+                let wire: Vec<TopoId> = eidxs.iter().map(|&ei| brep_edges[ei].id).collect();
+                BrepFace {
+                    id: (200 + i) as u64,
+                    surface: Surface::Plane {
+                        origin: (min + max) * 0.5,
+                        normal: *normal,
+                    },
+                    wires: vec![wire],
+                    orientation: Orientation::Forward,
+                }
+            })
+            .collect();
 
         let shell = BrepShell {
             id: 300,
@@ -351,17 +413,24 @@ pub mod brep {
             orientation: Orientation::Forward,
         };
 
-        (BrepSolid { id, shells: vec![shell] }, brep_edges, brep_verts)
+        (
+            BrepSolid {
+                id,
+                shells: vec![shell],
+            },
+            brep_edges,
+            brep_verts,
+        )
     }
 }
 
 // ── Parametric Feature Tree ──
 
 pub mod feature {
+    use crate::brep::{self, BrepEdge, BrepSolid, BrepVertex, TopoId};
     use glam::DVec3;
-    use serde::{Deserialize, Serialize};
-    use crate::brep::{self, BrepSolid, BrepEdge, BrepVertex, TopoId};
     use kami_eng_core::constraint::ConstraintKind;
+    use serde::{Deserialize, Serialize};
 
     /// Feature identifier within a feature tree.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -387,7 +456,10 @@ pub mod feature {
         XZ,
         YZ,
         /// Custom plane: origin + normal.
-        Custom { origin: DVec3, normal: DVec3 },
+        Custom {
+            origin: DVec3,
+            normal: DVec3,
+        },
     }
 
     impl SketchPlane {
@@ -458,12 +530,31 @@ pub mod feature {
     /// 2D sketch entity (drawn on a SketchPlane).
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub enum SketchEntity {
-        Line { start: glam::DVec2, end: glam::DVec2 },
-        Arc { center: glam::DVec2, radius: f64, start_angle: f64, end_angle: f64 },
-        Circle { center: glam::DVec2, radius: f64 },
-        Spline { control_points: Vec<glam::DVec2> },
-        Dimension { entity_ref: u64, value: f64 },
-        Constraint { kind: SketchConstraintKind, entity_refs: Vec<u64> },
+        Line {
+            start: glam::DVec2,
+            end: glam::DVec2,
+        },
+        Arc {
+            center: glam::DVec2,
+            radius: f64,
+            start_angle: f64,
+            end_angle: f64,
+        },
+        Circle {
+            center: glam::DVec2,
+            radius: f64,
+        },
+        Spline {
+            control_points: Vec<glam::DVec2>,
+        },
+        Dimension {
+            entity_ref: u64,
+            value: f64,
+        },
+        Constraint {
+            kind: SketchConstraintKind,
+            entity_refs: Vec<u64>,
+        },
     }
 
     /// Parametric feature definition.
@@ -572,12 +663,17 @@ pub mod feature {
 
     impl FeatureTree {
         pub fn new() -> Self {
-            Self { entries: Vec::new() }
+            Self {
+                entries: Vec::new(),
+            }
         }
 
         /// Append a feature to the end of the tree.
         pub fn add_feature(&mut self, feature: Feature) {
-            self.entries.push(FeatureEntry { feature, suppressed: false });
+            self.entries.push(FeatureEntry {
+                feature,
+                suppressed: false,
+            });
         }
 
         /// Suppress a feature (skip during evaluation).
@@ -629,7 +725,12 @@ pub mod feature {
                     continue;
                 }
                 match &entry.feature {
-                    Feature::Extrude { direction, distance, operation, .. } => {
+                    Feature::Extrude {
+                        direction,
+                        distance,
+                        operation,
+                        ..
+                    } => {
                         match operation {
                             BooleanOp::New => {
                                 // Generate a prism: for simplicity, create a unit-square
@@ -683,9 +784,9 @@ pub mod feature {
 // ── Assembly ──
 
 pub mod assembly {
+    use crate::brep::TopoId;
     use glam::DAffine3;
     use serde::{Deserialize, Serialize};
-    use crate::brep::TopoId;
 
     /// Reference to a part (could be a BREP solid ID, file path, or external ref).
     #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -710,15 +811,42 @@ pub mod assembly {
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub enum AssemblyConstraint {
         /// Mate: coincident faces (face-to-face contact).
-        Mate { instance_a: u64, face_a: TopoId, instance_b: u64, face_b: TopoId },
+        Mate {
+            instance_a: u64,
+            face_a: TopoId,
+            instance_b: u64,
+            face_b: TopoId,
+        },
         /// Align: co-planar faces (same direction normals).
-        Align { instance_a: u64, face_a: TopoId, instance_b: u64, face_b: TopoId },
+        Align {
+            instance_a: u64,
+            face_a: TopoId,
+            instance_b: u64,
+            face_b: TopoId,
+        },
         /// Insert: concentric + mate (cylindrical fit).
-        Insert { instance_a: u64, face_a: TopoId, instance_b: u64, face_b: TopoId },
+        Insert {
+            instance_a: u64,
+            face_a: TopoId,
+            instance_b: u64,
+            face_b: TopoId,
+        },
         /// Angle: fixed angle between two planes.
-        Angle { instance_a: u64, face_a: TopoId, instance_b: u64, face_b: TopoId, angle: f64 },
+        Angle {
+            instance_a: u64,
+            face_a: TopoId,
+            instance_b: u64,
+            face_b: TopoId,
+            angle: f64,
+        },
         /// Distance: offset between two faces.
-        Distance { instance_a: u64, face_a: TopoId, instance_b: u64, face_b: TopoId, distance: f64 },
+        Distance {
+            instance_a: u64,
+            face_a: TopoId,
+            instance_b: u64,
+            face_b: TopoId,
+            distance: f64,
+        },
     }
 
     /// Bill-of-materials entry.
@@ -773,13 +901,31 @@ pub mod assembly {
             // Basic validation: check all referenced instances exist.
             for c in &self.constraints {
                 let (a, b) = match c {
-                    AssemblyConstraint::Mate { instance_a, instance_b, .. }
-                    | AssemblyConstraint::Align { instance_a, instance_b, .. }
-                    | AssemblyConstraint::Insert { instance_a, instance_b, .. }
-                    | AssemblyConstraint::Angle { instance_a, instance_b, .. }
-                    | AssemblyConstraint::Distance { instance_a, instance_b, .. } => {
-                        (*instance_a, *instance_b)
+                    AssemblyConstraint::Mate {
+                        instance_a,
+                        instance_b,
+                        ..
                     }
+                    | AssemblyConstraint::Align {
+                        instance_a,
+                        instance_b,
+                        ..
+                    }
+                    | AssemblyConstraint::Insert {
+                        instance_a,
+                        instance_b,
+                        ..
+                    }
+                    | AssemblyConstraint::Angle {
+                        instance_a,
+                        instance_b,
+                        ..
+                    }
+                    | AssemblyConstraint::Distance {
+                        instance_a,
+                        instance_b,
+                        ..
+                    } => (*instance_a, *instance_b),
                 };
                 if !self.instances.iter().any(|i| i.id == a) {
                     return Err(format!("instance {} not found", a));
@@ -800,8 +946,12 @@ pub mod assembly {
                     *map.entry(inst.part_ref.name.clone()).or_insert(0) += 1;
                 }
             }
-            let mut bom: Vec<BomEntry> = map.into_iter()
-                .map(|(part_name, quantity)| BomEntry { part_name, quantity })
+            let mut bom: Vec<BomEntry> = map
+                .into_iter()
+                .map(|(part_name, quantity)| BomEntry {
+                    part_name,
+                    quantity,
+                })
                 .collect();
             bom.sort_by(|a, b| a.part_name.cmp(&b.part_name));
             bom
@@ -827,8 +977,8 @@ pub mod assembly {
 // ── Tessellation ──
 
 pub mod tessellate {
+    use crate::brep::{BrepEdge, BrepFace, BrepSolid, BrepVertex, Surface, TopoId};
     use glam::DVec3;
-    use crate::brep::{BrepSolid, BrepEdge, BrepVertex, BrepFace, Surface, TopoId};
 
     /// Tessellate a BREP solid into triangle mesh.
     /// Returns (positions, indices) where each triangle is 3 consecutive indices.
@@ -846,10 +996,7 @@ pub mod tessellate {
 
         for shell in &solid.shells {
             for face in &shell.faces {
-                tessellate_face(
-                    face, &edge_map, &vert_map,
-                    &mut positions, &mut indices,
-                );
+                tessellate_face(face, &edge_map, &vert_map, &mut positions, &mut indices);
             }
         }
         (positions, indices)
@@ -867,11 +1014,13 @@ pub mod tessellate {
             Surface::Plane { .. } => {
                 tessellate_planar_face(face, edge_map, vert_map, positions, indices);
             }
-            Surface::Cylinder { origin, axis, radius } => {
+            Surface::Cylinder {
+                origin,
+                axis,
+                radius,
+            } => {
                 tessellate_cylinder_face(
-                    *origin, *axis, *radius,
-                    face, edge_map, vert_map,
-                    positions, indices,
+                    *origin, *axis, *radius, face, edge_map, vert_map, positions, indices,
                 );
             }
             Surface::Sphere { center, radius } => {
@@ -1034,11 +1183,7 @@ mod tests {
 
     #[test]
     fn create_box_solid() {
-        let (solid, edges, verts) = brep::make_box(
-            1,
-            DVec3::ZERO,
-            DVec3::new(10.0, 20.0, 30.0),
-        );
+        let (solid, edges, verts) = brep::make_box(1, DVec3::ZERO, DVec3::new(10.0, 20.0, 30.0));
         assert_eq!(solid.face_count(), 6, "box has 6 faces");
         assert_eq!(solid.edge_count(), 12, "box has 12 edges");
         assert_eq!(solid.vertex_count(&edges), 8, "box has 8 vertices");
@@ -1061,12 +1206,10 @@ mod tests {
         tree.add_feature(feature::Feature::Sketch {
             id: feature::FeatureId(1),
             plane: feature::SketchPlane::XY,
-            entities: vec![
-                feature::SketchEntity::Circle {
-                    center: glam::DVec2::ZERO,
-                    radius: 5.0,
-                },
-            ],
+            entities: vec![feature::SketchEntity::Circle {
+                center: glam::DVec2::ZERO,
+                radius: 5.0,
+            }],
         });
         tree.add_feature(feature::Feature::Extrude {
             id: feature::FeatureId(2),
@@ -1106,8 +1249,14 @@ mod tests {
     #[test]
     fn assembly_bom() {
         let mut asm = assembly::Assembly::new("test_assembly");
-        let bolt = assembly::PartRef { solid_id: 1, name: "M6_bolt".into() };
-        let nut = assembly::PartRef { solid_id: 2, name: "M6_nut".into() };
+        let bolt = assembly::PartRef {
+            solid_id: 1,
+            name: "M6_bolt".into(),
+        };
+        let nut = assembly::PartRef {
+            solid_id: 2,
+            name: "M6_nut".into(),
+        };
         asm.add_instance(bolt.clone(), DAffine3::IDENTITY, "bolt_1");
         asm.add_instance(bolt.clone(), DAffine3::IDENTITY, "bolt_2");
         asm.add_instance(nut.clone(), DAffine3::IDENTITY, "nut_1");
@@ -1123,29 +1272,28 @@ mod tests {
 
     #[test]
     fn tessellation_produces_vertices_and_indices() {
-        let (solid, edges, verts) = brep::make_box(
-            1,
-            DVec3::ZERO,
-            DVec3::new(1.0, 1.0, 1.0),
-        );
+        let (solid, edges, verts) = brep::make_box(1, DVec3::ZERO, DVec3::new(1.0, 1.0, 1.0));
         let (positions, indices) = tessellate::tessellate_solid(&solid, &edges, &verts);
-        assert!(!positions.is_empty(), "tessellation should produce positions");
+        assert!(
+            !positions.is_empty(),
+            "tessellation should produce positions"
+        );
         assert!(!indices.is_empty(), "tessellation should produce indices");
         // Every index should be valid.
         for &idx in &indices {
             assert!((idx as usize) < positions.len(), "index out of bounds");
         }
         // Indices should be multiples of 3 (complete triangles).
-        assert_eq!(indices.len() % 3, 0, "indices should form complete triangles");
+        assert_eq!(
+            indices.len() % 3,
+            0,
+            "indices should form complete triangles"
+        );
     }
 
     #[test]
     fn surface_area_unit_cube() {
-        let (solid, edges, verts) = brep::make_box(
-            1,
-            DVec3::ZERO,
-            DVec3::new(1.0, 1.0, 1.0),
-        );
+        let (solid, edges, verts) = brep::make_box(1, DVec3::ZERO, DVec3::new(1.0, 1.0, 1.0));
         let area = solid.surface_area(&edges, &verts);
         // Surface area of unit cube = 6.0. Each face is 2 triangles, each 0.5 area.
         assert!(
@@ -1157,11 +1305,7 @@ mod tests {
 
     #[test]
     fn volume_positive_for_solid() {
-        let (solid, edges, verts) = brep::make_box(
-            1,
-            DVec3::ZERO,
-            DVec3::new(2.0, 3.0, 4.0),
-        );
+        let (solid, edges, verts) = brep::make_box(1, DVec3::ZERO, DVec3::new(2.0, 3.0, 4.0));
         let vol = solid.volume(&edges, &verts);
         // Signed tetrahedron method on fan-triangulated faces yields an
         // approximation; verify it is positive and nonzero.
@@ -1171,7 +1315,10 @@ mod tests {
     #[test]
     fn assembly_constraint_solve_validates_instances() {
         let mut asm = assembly::Assembly::new("constrained");
-        let part = assembly::PartRef { solid_id: 1, name: "plate".into() };
+        let part = assembly::PartRef {
+            solid_id: 1,
+            name: "plate".into(),
+        };
         let id_a = asm.add_instance(part.clone(), DAffine3::IDENTITY, "plate_a");
         let id_b = asm.add_instance(part.clone(), DAffine3::IDENTITY, "plate_b");
         asm.add_constraint(assembly::AssemblyConstraint::Mate {

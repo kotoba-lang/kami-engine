@@ -69,8 +69,12 @@ impl VectorizedEeReachEnv {
             return Err(format!("end-effector link '{ee_link}' not found"));
         }
         let rngs = (0..num_envs).map(|i| Lcg::new(i as u64)).collect();
-        let contact =
-            ContactSensor::new("ee_touch", "/World/ee/touch", ee_link, cfg.contact_radius.max(0.0));
+        let contact = ContactSensor::new(
+            "ee_touch",
+            "/World/ee/touch",
+            ee_link,
+            cfg.contact_radius.max(0.0),
+        );
         Ok(VectorizedEeReachEnv {
             batch,
             num_envs,
@@ -98,7 +102,11 @@ impl VectorizedEeReachEnv {
         }
         let mut scene = Scene::new();
         scene.add(Primitive::Sphere {
-            center: glam::Vec3::new(self.goals[e * 3], self.goals[e * 3 + 1], self.goals[e * 3 + 2]),
+            center: glam::Vec3::new(
+                self.goals[e * 3],
+                self.goals[e * 3 + 1],
+                self.goals[e * 3 + 2],
+            ),
             radius: 0.0,
         });
         self.contact.sample(ee, &scene, 0.0).in_contact
@@ -135,7 +143,13 @@ impl VectorizedEeReachEnv {
     /// operational-space (Cartesian) goal reaching.
     pub fn solve_ik_to_goals(&self, iters: usize, lambda: f32) -> Vec<f32> {
         self.batch
-            .solve_ik_point(&self.ee_link, self.cfg.tool_offset, &self.goals, iters, lambda)
+            .solve_ik_point(
+                &self.ee_link,
+                self.cfg.tool_offset,
+                &self.goals,
+                iters,
+                lambda,
+            )
             .expect("ee_link validated in new()")
     }
 
@@ -181,7 +195,8 @@ impl VectorizedEeReachEnv {
         }
         // 2. FK: place the arm at the reference config, read the tool world pos.
         self.batch.set_joint_positions(&self.ref_q);
-        self.batch.set_joint_velocities(&vec![0.0; self.num_envs * self.ndof]);
+        self.batch
+            .set_joint_velocities(&vec![0.0; self.num_envs * self.ndof]);
         let tool = self.tool_world();
         for e in 0..self.num_envs {
             self.goals[e * 3] = tool[e].x;
@@ -202,14 +217,18 @@ impl VectorizedEeReachEnv {
         let noised;
         let actions: &[f32] = if self.cfg.action_noise_std > 0.0 {
             let std = self.cfg.action_noise_std;
-            noised = actions.iter().map(|a| a + self.noise_rng.next_signed() * std).collect::<Vec<f32>>();
+            noised = actions
+                .iter()
+                .map(|a| a + self.noise_rng.next_signed() * std)
+                .collect::<Vec<f32>>();
             &noised
         } else {
             actions
         };
         self.batch
             .set_joint_position_targets(actions, self.cfg.kp, self.cfg.kd);
-        self.batch.set_computed_torque_control(self.cfg.computed_torque);
+        self.batch
+            .set_computed_torque_control(self.cfg.computed_torque);
         for _ in 0..self.cfg.decimation {
             self.batch.step();
         }
@@ -230,7 +249,9 @@ impl VectorizedEeReachEnv {
             let dy = ee[e].y - self.goals[e * 3 + 1];
             let dz = ee[e].z - self.goals[e * 3 + 2];
             let sq = dx * dx + dy * dy + dz * dz;
-            let act_sq: f32 = (0..self.ndof).map(|d| actions[e * self.ndof + d].powi(2)).sum();
+            let act_sq: f32 = (0..self.ndof)
+                .map(|d| actions[e * self.ndof + d].powi(2))
+                .sum();
             // Touch bonus: reward contact with the goal region (sensor-in-loop).
             let bonus = if self.ee_in_contact(ee[e], e) {
                 self.cfg.contact_bonus
@@ -366,7 +387,11 @@ mod tests {
         }
         for s in &last {
             assert_eq!(s.observation[od - 1], 1.0, "touch flag not set at goal");
-            assert!(s.reward > 5.0, "contact bonus not applied: reward {}", s.reward);
+            assert!(
+                s.reward > 5.0,
+                "contact bonus not applied: reward {}",
+                s.reward
+            );
             assert!(s.terminated);
         }
     }
@@ -376,7 +401,10 @@ mod tests {
         // With a tool offset down the fore link, the controlled point is the tip
         // (needs both joints). FK-sampled goals + IK must still reach it, and the
         // observation's ee_pos is the tool point (not the link origin).
-        let cfg = ReachCfg { tool_offset: [0.0, 0.0, -0.5], ..ReachCfg::default() };
+        let cfg = ReachCfg {
+            tool_offset: [0.0, 0.0, -0.5],
+            ..ReachCfg::default()
+        };
         let mut e = VectorizedEeReachEnv::new(2, ARM2_URDF, "fore", cfg).unwrap();
         let obs = e.reset_all(Some(3));
         let od = e.observation_dim_per_env();
@@ -391,7 +419,10 @@ mod tests {
         for _ in 0..299 {
             last = e.step_all(&cmd);
         }
-        assert!(last.iter().all(|s| s.terminated), "tool-point IK did not reach goal: {last:?}");
+        assert!(
+            last.iter().all(|s| s.terminated),
+            "tool-point IK did not reach goal: {last:?}"
+        );
         // The reported ee_pos (obs index 2*ndof..) is the tool point: it equals
         // the goal within tolerance now that we've arrived.
         let fin = e.observations_flat();
@@ -425,13 +456,19 @@ mod tests {
         for _ in 0..299 {
             last = e.step_all(&cmd);
         }
-        assert!(last.iter().all(|s| s.terminated), "IK control did not reach goal: {last:?}");
+        assert!(
+            last.iter().all(|s| s.terminated),
+            "IK control did not reach goal: {last:?}"
+        );
     }
 
     #[test]
     fn action_noise_dr_is_reproducible_and_perturbs_the_ee_trajectory() {
         let run = |std: f32| -> Vec<f32> {
-            let cfg = ReachCfg { action_noise_std: std, ..ReachCfg::default() };
+            let cfg = ReachCfg {
+                action_noise_std: std,
+                ..ReachCfg::default()
+            };
             let mut e = VectorizedEeReachEnv::new(2, ARM2_URDF, "fore", cfg).unwrap();
             e.reset_all(Some(8));
             let cmd = vec![0.3_f32; e.num_envs * e.action_dim_per_env()];
@@ -443,7 +480,11 @@ mod tests {
         let a = run(0.2);
         let b = run(0.2);
         assert_eq!(a, b, "EE action-noise DR not reproducible");
-        assert_ne!(a, run(0.0), "action noise had no effect on the EE trajectory");
+        assert_ne!(
+            a,
+            run(0.0),
+            "action noise had no effect on the EE trajectory"
+        );
         assert!(a.iter().all(|v| v.is_finite()));
     }
 
@@ -464,6 +505,9 @@ mod tests {
         }
         let r1: f32 = last.iter().map(|s| s.reward).sum();
         assert!(r1 > r0, "reward did not improve: {r0} -> {r1}");
-        assert!(last.iter().all(|s| s.terminated), "EE did not reach goal: {last:?}");
+        assert!(
+            last.iter().all(|s| s.terminated),
+            "EE did not reach goal: {last:?}"
+        );
     }
 }

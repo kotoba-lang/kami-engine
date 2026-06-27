@@ -1,18 +1,17 @@
+pub use analysis::{AnalysisResult, AnalysisType, solve_dc_op};
 /// KAMI SPICE — circuit simulation engine.
 ///
 /// Modified Nodal Analysis (MNA) based SPICE simulator supporting DC operating
 /// point, DC sweep, AC analysis, transient analysis, and Monte Carlo runs.
 /// Includes SPICE netlist parser/exporter and device model library.
-
 pub use circuit::{SpiceCircuit, SpiceElement};
-pub use analysis::{AnalysisType, AnalysisResult, solve_dc_op};
-pub use model::{ModelLibrary, MosfetModel, BjtModel, DiodeModel};
-pub use netlist::{parse_spice_netlist, export_spice};
+pub use model::{BjtModel, DiodeModel, ModelLibrary, MosfetModel};
+pub use netlist::{export_spice, parse_spice_netlist};
 
 // ── circuit ──────────────────────────────────────────────────────────────────
 
 pub mod circuit {
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
     use std::collections::HashMap;
 
     /// MOSFET type (N-channel or P-channel).
@@ -32,9 +31,24 @@ pub mod circuit {
     /// A single SPICE circuit element.
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub enum SpiceElement {
-        Resistor { name: String, n1: String, n2: String, value: f64 },
-        Capacitor { name: String, n1: String, n2: String, value: f64 },
-        Inductor { name: String, n1: String, n2: String, value: f64 },
+        Resistor {
+            name: String,
+            n1: String,
+            n2: String,
+            value: f64,
+        },
+        Capacitor {
+            name: String,
+            n1: String,
+            n2: String,
+            value: f64,
+        },
+        Inductor {
+            name: String,
+            n1: String,
+            n2: String,
+            value: f64,
+        },
         VoltageSource {
             name: String,
             n_pos: String,
@@ -100,27 +114,54 @@ pub mod circuit {
                     SpiceElement::Resistor { n1, n2, .. }
                     | SpiceElement::Capacitor { n1, n2, .. }
                     | SpiceElement::Inductor { n1, n2, .. } => {
-                        if n1 != "0" && n1 != "gnd" { nodes.insert(n1.clone()); }
-                        if n2 != "0" && n2 != "gnd" { nodes.insert(n2.clone()); }
+                        if n1 != "0" && n1 != "gnd" {
+                            nodes.insert(n1.clone());
+                        }
+                        if n2 != "0" && n2 != "gnd" {
+                            nodes.insert(n2.clone());
+                        }
                     }
                     SpiceElement::VoltageSource { n_pos, n_neg, .. }
                     | SpiceElement::CurrentSource { n_pos, n_neg, .. } => {
-                        if n_pos != "0" && n_pos != "gnd" { nodes.insert(n_pos.clone()); }
-                        if n_neg != "0" && n_neg != "gnd" { nodes.insert(n_neg.clone()); }
-                    }
-                    SpiceElement::Mosfet { gate, drain, source, bulk, .. } => {
-                        for n in [gate, drain, source, bulk] {
-                            if n != "0" && n != "gnd" { nodes.insert(n.clone()); }
+                        if n_pos != "0" && n_pos != "gnd" {
+                            nodes.insert(n_pos.clone());
+                        }
+                        if n_neg != "0" && n_neg != "gnd" {
+                            nodes.insert(n_neg.clone());
                         }
                     }
-                    SpiceElement::Bjt { collector, base, emitter, .. } => {
+                    SpiceElement::Mosfet {
+                        gate,
+                        drain,
+                        source,
+                        bulk,
+                        ..
+                    } => {
+                        for n in [gate, drain, source, bulk] {
+                            if n != "0" && n != "gnd" {
+                                nodes.insert(n.clone());
+                            }
+                        }
+                    }
+                    SpiceElement::Bjt {
+                        collector,
+                        base,
+                        emitter,
+                        ..
+                    } => {
                         for n in [collector, base, emitter] {
-                            if n != "0" && n != "gnd" { nodes.insert(n.clone()); }
+                            if n != "0" && n != "gnd" {
+                                nodes.insert(n.clone());
+                            }
                         }
                     }
                     SpiceElement::Diode { anode, cathode, .. } => {
-                        if anode != "0" && anode != "gnd" { nodes.insert(anode.clone()); }
-                        if cathode != "0" && cathode != "gnd" { nodes.insert(cathode.clone()); }
+                        if anode != "0" && anode != "gnd" {
+                            nodes.insert(anode.clone());
+                        }
+                        if cathode != "0" && cathode != "gnd" {
+                            nodes.insert(cathode.clone());
+                        }
                     }
                 }
             }
@@ -137,17 +178,33 @@ pub mod circuit {
 
 pub mod analysis {
     use crate::circuit::{SpiceCircuit, SpiceElement};
-    use serde::{Serialize, Deserialize};
+    use serde::{Deserialize, Serialize};
     use std::collections::HashMap;
 
     /// Type of analysis to perform.
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub enum AnalysisType {
         DcOp,
-        DcSweep { source: String, start: f64, stop: f64, step: f64 },
-        AcAnalysis { fstart: f64, fstop: f64, points_per_decade: u32 },
-        Transient { tstep: f64, tstop: f64, tstart: f64 },
-        MonteCarlo { num_runs: u32, analysis: Box<AnalysisType> },
+        DcSweep {
+            source: String,
+            start: f64,
+            stop: f64,
+            step: f64,
+        },
+        AcAnalysis {
+            fstart: f64,
+            fstop: f64,
+            points_per_decade: u32,
+        },
+        Transient {
+            tstep: f64,
+            tstop: f64,
+            tstart: f64,
+        },
+        MonteCarlo {
+            num_runs: u32,
+            analysis: Box<AnalysisType>,
+        },
     }
 
     /// Result of a circuit analysis.
@@ -166,13 +223,21 @@ pub mod analysis {
                 SpiceElement::Resistor { n1, n2, .. }
                 | SpiceElement::Capacitor { n1, n2, .. }
                 | SpiceElement::Inductor { n1, n2, .. } => {
-                    if n1 != "0" && n1 != "gnd" { nodes.insert(n1.clone()); }
-                    if n2 != "0" && n2 != "gnd" { nodes.insert(n2.clone()); }
+                    if n1 != "0" && n1 != "gnd" {
+                        nodes.insert(n1.clone());
+                    }
+                    if n2 != "0" && n2 != "gnd" {
+                        nodes.insert(n2.clone());
+                    }
                 }
                 SpiceElement::VoltageSource { n_pos, n_neg, .. }
                 | SpiceElement::CurrentSource { n_pos, n_neg, .. } => {
-                    if n_pos != "0" && n_pos != "gnd" { nodes.insert(n_pos.clone()); }
-                    if n_neg != "0" && n_neg != "gnd" { nodes.insert(n_neg.clone()); }
+                    if n_pos != "0" && n_pos != "gnd" {
+                        nodes.insert(n_pos.clone());
+                    }
+                    if n_neg != "0" && n_neg != "gnd" {
+                        nodes.insert(n_neg.clone());
+                    }
                 }
                 _ => {}
             }
@@ -185,7 +250,11 @@ pub mod analysis {
     }
 
     fn node_idx(map: &HashMap<String, usize>, name: &str) -> Option<usize> {
-        if name == "0" || name == "gnd" { None } else { map.get(name).copied() }
+        if name == "0" || name == "gnd" {
+            None
+        } else {
+            map.get(name).copied()
+        }
     }
 
     /// Solve DC operating point using Modified Nodal Analysis (MNA).
@@ -197,9 +266,11 @@ pub mod analysis {
         let n = node_map.len();
 
         // Count voltage sources (each adds one MNA row/col).
-        let vsrc_count = circuit.elements.iter().filter(|e| {
-            matches!(e, SpiceElement::VoltageSource { .. })
-        }).count();
+        let vsrc_count = circuit
+            .elements
+            .iter()
+            .filter(|e| matches!(e, SpiceElement::VoltageSource { .. }))
+            .count();
 
         let size = n + vsrc_count;
         // Augmented matrix [A | b] stored row-major.
@@ -212,14 +283,24 @@ pub mod analysis {
                     let g = 1.0 / value;
                     let i1 = node_idx(&node_map, n1);
                     let i2 = node_idx(&node_map, n2);
-                    if let Some(a) = i1 { mat[a][a] += g; }
-                    if let Some(b) = i2 { mat[b][b] += g; }
+                    if let Some(a) = i1 {
+                        mat[a][a] += g;
+                    }
+                    if let Some(b) = i2 {
+                        mat[b][b] += g;
+                    }
                     if let (Some(a), Some(b)) = (i1, i2) {
                         mat[a][b] -= g;
                         mat[b][a] -= g;
                     }
                 }
-                SpiceElement::VoltageSource { n_pos, n_neg, dc_value, name: _, .. } => {
+                SpiceElement::VoltageSource {
+                    n_pos,
+                    n_neg,
+                    dc_value,
+                    name: _,
+                    ..
+                } => {
                     let row = n + vsrc_idx;
                     let i_pos = node_idx(&node_map, n_pos);
                     let i_neg = node_idx(&node_map, n_neg);
@@ -235,12 +316,21 @@ pub mod analysis {
                     mat[row][size] = *dc_value;
                     vsrc_idx += 1;
                 }
-                SpiceElement::CurrentSource { n_pos, n_neg, dc_value, .. } => {
+                SpiceElement::CurrentSource {
+                    n_pos,
+                    n_neg,
+                    dc_value,
+                    ..
+                } => {
                     // Current flows from n_pos to n_neg (out of n_pos, into n_neg).
                     let i_pos = node_idx(&node_map, n_pos);
                     let i_neg = node_idx(&node_map, n_neg);
-                    if let Some(a) = i_pos { mat[a][size] -= dc_value; }
-                    if let Some(b) = i_neg { mat[b][size] += dc_value; }
+                    if let Some(a) = i_pos {
+                        mat[a][size] -= dc_value;
+                    }
+                    if let Some(b) = i_neg {
+                        mat[b][size] += dc_value;
+                    }
                 }
                 _ => {
                     // Nonlinear devices (MOSFET, BJT, diode) require iterative
@@ -296,7 +386,9 @@ pub mod analysis {
         vsrc_idx = 0;
         for el in &circuit.elements {
             if let SpiceElement::VoltageSource { name, .. } = el {
-                result.branch_currents.insert(name.clone(), vec![x[n + vsrc_idx]]);
+                result
+                    .branch_currents
+                    .insert(name.clone(), vec![x[n + vsrc_idx]]);
                 vsrc_idx += 1;
             }
         }
@@ -307,8 +399,8 @@ pub mod analysis {
 // ── model ────────────────────────────────────────────────────────────────────
 
 pub mod model {
-    use crate::circuit::{MosfetType, BjtType};
-    use serde::{Serialize, Deserialize};
+    use crate::circuit::{BjtType, MosfetType};
+    use serde::{Deserialize, Serialize};
     use std::collections::HashMap;
 
     /// MOSFET compact model parameters (Level 1 style).
@@ -411,15 +503,18 @@ pub mod model {
         }
 
         pub fn add_mosfet(&mut self, model: MosfetModel) {
-            self.models.insert(model.name.clone(), DeviceModel::Mosfet(model));
+            self.models
+                .insert(model.name.clone(), DeviceModel::Mosfet(model));
         }
 
         pub fn add_bjt(&mut self, model: BjtModel) {
-            self.models.insert(model.name.clone(), DeviceModel::Bjt(model));
+            self.models
+                .insert(model.name.clone(), DeviceModel::Bjt(model));
         }
 
         pub fn add_diode(&mut self, model: DiodeModel) {
-            self.models.insert(model.name.clone(), DeviceModel::Diode(model));
+            self.models
+                .insert(model.name.clone(), DeviceModel::Diode(model));
         }
 
         pub fn get(&self, name: &str) -> Option<&DeviceModel> {
@@ -435,7 +530,7 @@ pub mod model {
 // ── netlist ──────────────────────────────────────────────────────────────────
 
 pub mod netlist {
-    use crate::circuit::{SpiceCircuit, SpiceElement, MosfetType, BjtType};
+    use crate::circuit::{BjtType, MosfetType, SpiceCircuit, SpiceElement};
     use thiserror::Error;
 
     #[derive(Debug, Error)]
@@ -474,7 +569,9 @@ pub mod netlist {
             }
 
             let tokens: Vec<&str> = trimmed.split_whitespace().collect();
-            if tokens.is_empty() { continue; }
+            if tokens.is_empty() {
+                continue;
+            }
 
             let first = tokens[0];
             let prefix = first.chars().next().unwrap_or(' ');
@@ -586,10 +683,9 @@ pub mod netlist {
                     // Directives.
                     let directive = tokens[0].to_lowercase();
                     if directive == ".model" && tokens.len() >= 3 {
-                        circuit.models.insert(
-                            tokens[1].to_string(),
-                            tokens[2..].join(" "),
-                        );
+                        circuit
+                            .models
+                            .insert(tokens[1].to_string(), tokens[2..].join(" "));
                     }
                     // .dc, .ac, .tran stored as metadata (analysis type
                     // selection handled by the caller).
@@ -605,7 +701,9 @@ pub mod netlist {
     /// Parse engineering notation (e.g. "1k" → 1000, "10u" → 10e-6).
     fn parse_eng(s: &str) -> f64 {
         let s = s.trim();
-        if s.is_empty() { return 0.0; }
+        if s.is_empty() {
+            return 0.0;
+        }
         // Try direct parse first.
         if let Ok(v) = s.parse::<f64>() {
             return v;
@@ -628,13 +726,18 @@ pub mod netlist {
     }
 
     fn split_suffix(s: &str) -> (&str, &str) {
-        let idx = s.find(|c: char| c.is_alphabetic() || c == 'µ').unwrap_or(s.len());
+        let idx = s
+            .find(|c: char| c.is_alphabetic() || c == 'µ')
+            .unwrap_or(s.len());
         (&s[..idx], &s[idx..])
     }
 
     fn find_param(tokens: &[&str], key: &str) -> Option<f64> {
         for t in tokens {
-            if let Some(rest) = t.strip_prefix(key).or_else(|| t.strip_prefix(&key.to_lowercase())) {
+            if let Some(rest) = t
+                .strip_prefix(key)
+                .or_else(|| t.strip_prefix(&key.to_lowercase()))
+            {
                 if let Some(val) = rest.strip_prefix('=') {
                     return Some(parse_eng(val));
                 }
@@ -648,31 +751,82 @@ pub mod netlist {
         let mut out = String::from("KAMI SPICE netlist\n");
         for el in &circuit.elements {
             match el {
-                SpiceElement::Resistor { name, n1, n2, value } => {
+                SpiceElement::Resistor {
+                    name,
+                    n1,
+                    n2,
+                    value,
+                } => {
                     out.push_str(&format!("{} {} {} {}\n", name, n1, n2, value));
                 }
-                SpiceElement::Capacitor { name, n1, n2, value } => {
+                SpiceElement::Capacitor {
+                    name,
+                    n1,
+                    n2,
+                    value,
+                } => {
                     out.push_str(&format!("{} {} {} {}\n", name, n1, n2, value));
                 }
-                SpiceElement::Inductor { name, n1, n2, value } => {
+                SpiceElement::Inductor {
+                    name,
+                    n1,
+                    n2,
+                    value,
+                } => {
                     out.push_str(&format!("{} {} {} {}\n", name, n1, n2, value));
                 }
-                SpiceElement::VoltageSource { name, n_pos, n_neg, dc_value, .. } => {
+                SpiceElement::VoltageSource {
+                    name,
+                    n_pos,
+                    n_neg,
+                    dc_value,
+                    ..
+                } => {
                     out.push_str(&format!("{} {} {} {}\n", name, n_pos, n_neg, dc_value));
                 }
-                SpiceElement::CurrentSource { name, n_pos, n_neg, dc_value } => {
+                SpiceElement::CurrentSource {
+                    name,
+                    n_pos,
+                    n_neg,
+                    dc_value,
+                } => {
                     out.push_str(&format!("{} {} {} {}\n", name, n_pos, n_neg, dc_value));
                 }
-                SpiceElement::Mosfet { name, drain, gate, source, bulk, model_name, w, l, .. } => {
+                SpiceElement::Mosfet {
+                    name,
+                    drain,
+                    gate,
+                    source,
+                    bulk,
+                    model_name,
+                    w,
+                    l,
+                    ..
+                } => {
                     out.push_str(&format!(
                         "{} {} {} {} {} {} W={} L={}\n",
                         name, drain, gate, source, bulk, model_name, w, l
                     ));
                 }
-                SpiceElement::Bjt { name, collector, base, emitter, model_name, .. } => {
-                    out.push_str(&format!("{} {} {} {} {}\n", name, collector, base, emitter, model_name));
+                SpiceElement::Bjt {
+                    name,
+                    collector,
+                    base,
+                    emitter,
+                    model_name,
+                    ..
+                } => {
+                    out.push_str(&format!(
+                        "{} {} {} {} {}\n",
+                        name, collector, base, emitter, model_name
+                    ));
                 }
-                SpiceElement::Diode { name, anode, cathode, model_name } => {
+                SpiceElement::Diode {
+                    name,
+                    anode,
+                    cathode,
+                    model_name,
+                } => {
                     out.push_str(&format!("{} {} {} {}\n", name, anode, cathode, model_name));
                 }
             }
@@ -757,10 +911,16 @@ R2 mid 0 1k
         let mut ckt = SpiceCircuit::new();
         assert_eq!(ckt.element_count(), 0);
         ckt.add_element(circuit::SpiceElement::Resistor {
-            name: "R1".into(), n1: "a".into(), n2: "b".into(), value: 100.0,
+            name: "R1".into(),
+            n1: "a".into(),
+            n2: "b".into(),
+            value: 100.0,
         });
         ckt.add_element(circuit::SpiceElement::Capacitor {
-            name: "C1".into(), n1: "a".into(), n2: "b".into(), value: 1e-12,
+            name: "C1".into(),
+            n1: "a".into(),
+            n2: "b".into(),
+            value: 1e-12,
         });
         assert_eq!(ckt.element_count(), 2);
         assert_eq!(ckt.node_count(), 2);
@@ -779,7 +939,10 @@ R2 mid 0 1k
             ac_phase: 0.0,
         });
         ckt.add_element(circuit::SpiceElement::Resistor {
-            name: "R1".into(), n1: "in".into(), n2: "out".into(), value: 1000.0,
+            name: "R1".into(),
+            n1: "in".into(),
+            n2: "out".into(),
+            value: 1000.0,
         });
 
         let exported = netlist::export_spice(&ckt);
@@ -799,7 +962,10 @@ R2 mid 0 1k
             dc_value: 1e-3,
         });
         ckt.add_element(circuit::SpiceElement::Resistor {
-            name: "R1".into(), n1: "a".into(), n2: "0".into(), value: 1000.0,
+            name: "R1".into(),
+            n1: "a".into(),
+            n2: "0".into(),
+            value: 1000.0,
         });
 
         let result = solve_dc_op(&ckt);

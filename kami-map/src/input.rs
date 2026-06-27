@@ -16,7 +16,8 @@ pub fn on_pointer_move(map: &mut KamiMap, dx: f32, dy: f32) {
     if unsafe { !DRAGGING } {
         return;
     }
-    if map.projection_mode == ProjectionMode::Globe || map.projection_mode == ProjectionMode::Cosmic {
+    if map.projection_mode == ProjectionMode::Globe || map.projection_mode == ProjectionMode::Cosmic
+    {
         let pixels_per_degree = (map.width.max(map.height) as f64 * 0.85).max(240.0);
         map.center.lng -= dx as f64 * 180.0 / pixels_per_degree;
         map.center.lat += dy as f64 * 120.0 / pixels_per_degree;

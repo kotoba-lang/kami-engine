@@ -44,7 +44,12 @@ impl Splatmap {
     /// - Above `snow_line`: snow
     /// - Slope > `rock_threshold`: rock
     /// - Otherwise: grass
-    pub fn from_heightmap(hm: &Heightmap, sand_line: f32, snow_line: f32, rock_threshold: f32) -> Self {
+    pub fn from_heightmap(
+        hm: &Heightmap,
+        sand_line: f32,
+        snow_line: f32,
+        rock_threshold: f32,
+    ) -> Self {
         let mut data = Vec::with_capacity((hm.width * hm.depth) as usize);
 
         for z in 0..hm.depth {
@@ -69,7 +74,8 @@ impl Splatmap {
 
                 // Slope override: steep = rock
                 if slope > rock_threshold {
-                    let rock_blend = ((slope - rock_threshold) / (1.0 - rock_threshold)).clamp(0.0, 1.0);
+                    let rock_blend =
+                        ((slope - rock_threshold) / (1.0 - rock_threshold)).clamp(0.0, 1.0);
                     for i in 0..4 {
                         w.weights[i] *= 1.0 - rock_blend;
                     }

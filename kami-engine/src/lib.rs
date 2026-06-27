@@ -10,10 +10,10 @@
 
 pub use kami_core as core;
 pub use kami_knp as knp;
-pub use kami_render as render;
-pub use kami_rtc as rtc;
 pub use kami_mine_ai as mine_ai;
 pub use kami_mine_pds as mine_pds;
+pub use kami_render as render;
+pub use kami_rtc as rtc;
 
 pub use kami_core::actor::components::*;
 pub use kami_core::actor::{ActorId, ActorType, Authority};

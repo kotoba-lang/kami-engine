@@ -22,7 +22,8 @@ const DEMO: &str = include_str!("../../kami-clj-play3d/games/rt-audio-demo/logic
 #[test]
 fn rt_enable_sets_active_recipe() {
     let mut rt = make_runtime();
-    rt.load_clj("demo", DEMO).expect("compile + load demo logic.clj");
+    rt.load_clj("demo", DEMO)
+        .expect("compile + load demo logic.clj");
     rt.call_init("demo").expect("init");
     // init calls (rt-enable! "gi")
     assert_eq!(rt.rt_recipe().as_deref(), Some("gi"));
@@ -31,7 +32,8 @@ fn rt_enable_sets_active_recipe() {
 #[test]
 fn set_listener_tracks_the_player() {
     let mut rt = make_runtime();
-    rt.load_clj("demo", DEMO).expect("compile + load demo logic.clj");
+    rt.load_clj("demo", DEMO)
+        .expect("compile + load demo logic.clj");
     rt.call_init("demo").expect("init"); // spawns player at origin
     rt.call_systems("demo", 16).expect("systems"); // `listen` sets the listener
 

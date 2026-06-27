@@ -20,8 +20,8 @@ use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 use kami_core::actor::components::Position;
-use kami_script_runtime::{KamiScriptRuntime, Tag, BACKEND};
 use kami_scene::{kw_key, mget, num, vec3};
+use kami_script_runtime::{BACKEND, KamiScriptRuntime, Tag};
 use winit::application::ApplicationHandler;
 use winit::event::{ElementState, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, EventLoop};
@@ -50,7 +50,6 @@ struct Scene {
     burst_size: f32,
 }
 
-
 /// Parse the scene; `None` (not a panic) if `src` isn't a valid EDN map.
 fn parse_scene(src: &str) -> Option<Scene> {
     let parsed = kami_scene::root_map(src)?;
@@ -69,7 +68,9 @@ fn parse_scene(src: &str) -> Option<Scene> {
                         color: vec3(mget(prof, "color")),
                         size: num(mget(prof, "size")),
                         glow: num(mget(prof, "glow")),
-                        pulse: mget(prof, "pulse").and_then(|b| b.as_bool()).unwrap_or(false),
+                        pulse: mget(prof, "pulse")
+                            .and_then(|b| b.as_bool())
+                            .unwrap_or(false),
                     },
                 );
             }
@@ -99,7 +100,10 @@ fn parse_scene(src: &str) -> Option<Scene> {
 /// Read a game file or exit with a clear message (no panic backtrace).
 fn read_or_exit(base: &std::path::Path, name: &str) -> String {
     std::fs::read_to_string(base.join(name)).unwrap_or_else(|e| {
-        eprintln!("kami-clj-play: cannot read {}: {e}", base.join(name).display());
+        eprintln!(
+            "kami-clj-play: cannot read {}: {e}",
+            base.join(name).display()
+        );
         std::process::exit(1);
     })
 }
@@ -141,7 +145,15 @@ fn glyph(c: char) -> [u8; 5] {
     }
 }
 
-fn push_text(inst: &mut Vec<Instance>, text: &str, x0: f32, y0: f32, cell: f32, aspect: f32, color: [f32; 3]) {
+fn push_text(
+    inst: &mut Vec<Instance>,
+    text: &str,
+    x0: f32,
+    y0: f32,
+    cell: f32,
+    aspect: f32,
+    color: [f32; 3],
+) {
     let mut col0 = 0.0f32;
     for ch in text.chars() {
         let g = glyph(ch);
@@ -149,7 +161,10 @@ fn push_text(inst: &mut Vec<Instance>, text: &str, x0: f32, y0: f32, cell: f32, 
             for col in 0..3 {
                 if (bits >> (2 - col)) & 1 == 1 {
                     inst.push(Instance {
-                        center: [x0 + (col0 + col as f32) * cell / aspect, y0 - row as f32 * cell],
+                        center: [
+                            x0 + (col0 + col as f32) * cell / aspect,
+                            y0 - row as f32 * cell,
+                        ],
                         radius: cell * 0.42,
                         glow: 0.5,
                         color,
@@ -480,10 +495,26 @@ impl App {
             array_stride: std::mem::size_of::<Instance>() as u64,
             step_mode: wgpu::VertexStepMode::Instance,
             attributes: &[
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x2, offset: 0, shader_location: 0 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32,   offset: 8, shader_location: 1 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32,   offset: 12, shader_location: 2 },
-                wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x3, offset: 16, shader_location: 3 },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x2,
+                    offset: 0,
+                    shader_location: 0,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32,
+                    offset: 8,
+                    shader_location: 1,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32,
+                    offset: 12,
+                    shader_location: 2,
+                },
+                wgpu::VertexAttribute {
+                    format: wgpu::VertexFormat::Float32x3,
+                    offset: 16,
+                    shader_location: 3,
+                },
             ],
         };
         let sprite_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
@@ -521,8 +552,16 @@ impl App {
         });
 
         self.gpu = Some(Gpu {
-            device, queue, surface, config, bg_pipeline, sprite_pipeline,
-            globals_buffer, bind_group, instance_buffer, instance_cap,
+            device,
+            queue,
+            surface,
+            config,
+            bg_pipeline,
+            sprite_pipeline,
+            globals_buffer,
+            bind_group,
+            instance_buffer,
+            instance_cap,
         });
     }
 
@@ -534,7 +573,11 @@ impl App {
         if let Some(prev) = self.last_frame {
             let ms = now.duration_since(prev).as_secs_f32() * 1000.0;
             self.frame_ms = self.frame_ms * 0.9 + ms * 0.1;
-            self.fps = if self.frame_ms > 0.0 { 1000.0 / self.frame_ms } else { 0.0 };
+            self.fps = if self.frame_ms > 0.0 {
+                1000.0 / self.frame_ms
+            } else {
+                0.0
+            };
             self.frame_hist.push(ms);
             if self.frame_hist.len() > 96 {
                 self.frame_hist.remove(0);
@@ -556,7 +599,8 @@ impl App {
         let my = (self.keys.up as i32 - self.keys.down as i32) as f32;
         // Time just the CLJ game step (host loop + wasm systems + integrate).
         let t0 = Instant::now();
-        self.game.step(mx, my, self.scene.player_speed, self.scene.arena);
+        self.game
+            .step(mx, my, self.scene.player_speed, self.scene.arena);
         self.step_ms = self.step_ms * 0.9 + t0.elapsed().as_secs_f32() * 1000.0 * 0.1;
 
         let (player, ents) = self.game.snapshot();
@@ -574,14 +618,23 @@ impl App {
             .filter(|(id, _)| !cur.contains_key(id))
             .map(|(_, p)| *p)
             .collect();
-        let (bn, bs, bl) = (self.scene.burst_count, self.scene.burst_speed, self.scene.burst_life);
+        let (bn, bs, bl) = (
+            self.scene.burst_count,
+            self.scene.burst_speed,
+            self.scene.burst_life,
+        );
         for p in dead {
             self.score += 1;
             for _ in 0..bn {
                 let vx = self.rand() * bs;
                 let vy = self.rand() * bs;
                 let life = bl * (0.7 + self.rand().abs() * 0.6);
-                self.particles.push(Particle { pos: p, vel: [vx, vy], age: 0.0, life });
+                self.particles.push(Particle {
+                    pos: p,
+                    vel: [vx, vy],
+                    age: 0.0,
+                    life,
+                });
             }
         }
         self.prev_enemies = cur;
@@ -595,7 +648,11 @@ impl App {
         }
         self.particles.retain(|p| p.age < p.life);
 
-        let scale = if self.scene.camera_scale > 1.0 { 1.0 / self.scene.camera_scale } else { 1.0 / 620.0 };
+        let scale = if self.scene.camera_scale > 1.0 {
+            1.0 / self.scene.camera_scale
+        } else {
+            1.0 / 620.0
+        };
         let burst_color = self.scene.burst_color;
         let burst_size = self.scene.burst_size;
         let time = self.time;
@@ -611,7 +668,10 @@ impl App {
         let Some(gpu) = self.gpu.as_mut() else { return };
         let aspect = gpu.config.width as f32 / gpu.config.height as f32;
         let to_ndc = |w: [f32; 2]| -> [f32; 2] {
-            [(w[0] - player[0]) * scale * aspect, (w[1] - player[1]) * scale]
+            [
+                (w[0] - player[0]) * scale * aspect,
+                (w[1] - player[1]) * scale,
+            ]
         };
 
         let mut inst: Vec<Instance> = Vec::with_capacity(ents.len() + self.particles.len());
@@ -621,7 +681,11 @@ impl App {
                 center: to_ndc(p.pos),
                 radius: burst_size * f + 0.004,
                 glow: 0.9 * f,
-                color: [burst_color[0], burst_color[1] * (0.6 + 0.4 * f), burst_color[2]],
+                color: [
+                    burst_color[0],
+                    burst_color[1] * (0.6 + 0.4 * f),
+                    burst_color[2],
+                ],
                 _pad: 0.0,
             });
         }
@@ -631,8 +695,14 @@ impl App {
                 enemies += 1;
             }
             // Render purely from the data-driven profile — no hardcoded look.
-            let Some(prof) = profiles.get(tag) else { continue };
-            let r = if prof.pulse { prof.size + 0.004 * (time * 6.0).sin() } else { prof.size };
+            let Some(prof) = profiles.get(tag) else {
+                continue;
+            };
+            let r = if prof.pulse {
+                prof.size + 0.004 * (time * 6.0).sin()
+            } else {
+                prof.size
+            };
             inst.push(Instance {
                 center: to_ndc(*pos),
                 radius: r,
@@ -646,11 +716,51 @@ impl App {
         if debug {
             let cell = 0.017;
             let cyan = [0.55, 1.0, 0.95];
-            push_text(&mut inst, &format!("FPS {:.0}", fps), -0.97, 0.95, cell, aspect, cyan);
-            push_text(&mut inst, &format!("FRAME {:.1}MS", frame_ms), -0.97, 0.87, cell, aspect, cyan);
-            push_text(&mut inst, &format!("STEP {:.2}MS", step_ms), -0.97, 0.79, cell, aspect, cyan);
-            push_text(&mut inst, &format!("ENT {} PAR {}", enemies, par_count), -0.97, 0.71, cell, aspect, cyan);
-            push_text(&mut inst, &backend_label, -0.97, 0.63, cell, aspect, [0.6, 0.8, 1.0]);
+            push_text(
+                &mut inst,
+                &format!("FPS {:.0}", fps),
+                -0.97,
+                0.95,
+                cell,
+                aspect,
+                cyan,
+            );
+            push_text(
+                &mut inst,
+                &format!("FRAME {:.1}MS", frame_ms),
+                -0.97,
+                0.87,
+                cell,
+                aspect,
+                cyan,
+            );
+            push_text(
+                &mut inst,
+                &format!("STEP {:.2}MS", step_ms),
+                -0.97,
+                0.79,
+                cell,
+                aspect,
+                cyan,
+            );
+            push_text(
+                &mut inst,
+                &format!("ENT {} PAR {}", enemies, par_count),
+                -0.97,
+                0.71,
+                cell,
+                aspect,
+                cyan,
+            );
+            push_text(
+                &mut inst,
+                &backend_label,
+                -0.97,
+                0.63,
+                cell,
+                aspect,
+                [0.6, 0.8, 1.0],
+            );
             // frametime graph: dotted curve of recent frames, coloured by budget.
             let (base_y, height, budget) = (0.45, 0.13, 16.7f32);
             for (i, ms) in frame_hist.iter().enumerate() {
@@ -663,17 +773,31 @@ impl App {
                 } else {
                     [1.0, 0.35, 0.35]
                 };
-                inst.push(Instance { center: [x, y], radius: 0.006, glow: 0.4, color: c, _pad: 0.0 });
+                inst.push(Instance {
+                    center: [x, y],
+                    radius: 0.006,
+                    glow: 0.4,
+                    color: c,
+                    _pad: 0.0,
+                });
             }
         }
 
         let count = inst.len().min(gpu.instance_cap as usize) as u32;
 
-        let globals = Globals { cam: player, aspect, time };
-        gpu.queue.write_buffer(&gpu.globals_buffer, 0, bytemuck::bytes_of(&globals));
+        let globals = Globals {
+            cam: player,
+            aspect,
+            time,
+        };
+        gpu.queue
+            .write_buffer(&gpu.globals_buffer, 0, bytemuck::bytes_of(&globals));
         if count > 0 {
-            gpu.queue
-                .write_buffer(&gpu.instance_buffer, 0, bytemuck::cast_slice(&inst[..count as usize]));
+            gpu.queue.write_buffer(
+                &gpu.instance_buffer,
+                0,
+                bytemuck::cast_slice(&inst[..count as usize]),
+            );
         }
 
         let frame = match gpu.surface.get_current_texture() {
@@ -683,7 +807,9 @@ impl App {
                 return;
             }
         };
-        let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
+        let view = frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
         let mut enc = gpu
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: Some("enc") });
@@ -694,7 +820,12 @@ impl App {
                     view: &view,
                     resolve_target: None,
                     ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color { r: 0.05, g: 0.06, b: 0.10, a: 1.0 }),
+                        load: wgpu::LoadOp::Clear(wgpu::Color {
+                            r: 0.05,
+                            g: 0.06,
+                            b: 0.10,
+                            a: 1.0,
+                        }),
                         store: wgpu::StoreOp::Store,
                     },
                 })],
@@ -753,10 +884,18 @@ impl ApplicationHandler for App {
                 match event.physical_key {
                     PhysicalKey::Code(KeyCode::Escape) if down => event_loop.exit(),
                     PhysicalKey::Code(KeyCode::F1) if down => self.debug = !self.debug,
-                    PhysicalKey::Code(KeyCode::ArrowLeft) | PhysicalKey::Code(KeyCode::KeyA) => self.keys.left = down,
-                    PhysicalKey::Code(KeyCode::ArrowRight) | PhysicalKey::Code(KeyCode::KeyD) => self.keys.right = down,
-                    PhysicalKey::Code(KeyCode::ArrowUp) | PhysicalKey::Code(KeyCode::KeyW) => self.keys.up = down,
-                    PhysicalKey::Code(KeyCode::ArrowDown) | PhysicalKey::Code(KeyCode::KeyS) => self.keys.down = down,
+                    PhysicalKey::Code(KeyCode::ArrowLeft) | PhysicalKey::Code(KeyCode::KeyA) => {
+                        self.keys.left = down
+                    }
+                    PhysicalKey::Code(KeyCode::ArrowRight) | PhysicalKey::Code(KeyCode::KeyD) => {
+                        self.keys.right = down
+                    }
+                    PhysicalKey::Code(KeyCode::ArrowUp) | PhysicalKey::Code(KeyCode::KeyW) => {
+                        self.keys.up = down
+                    }
+                    PhysicalKey::Code(KeyCode::ArrowDown) | PhysicalKey::Code(KeyCode::KeyS) => {
+                        self.keys.down = down
+                    }
                     _ => {}
                 }
             }
@@ -796,7 +935,10 @@ fn main() {
     let logic = read_or_exit(&base, "logic.clj");
     let scene_src = read_or_exit(&base, "scene.edn");
     let scene = parse_scene(&scene_src).unwrap_or_else(|| {
-        eprintln!("kami-clj-play: {} is not a valid EDN scene map", base.join("scene.edn").display());
+        eprintln!(
+            "kami-clj-play: {} is not a valid EDN scene map",
+            base.join("scene.edn").display()
+        );
         std::process::exit(2);
     });
     println!(

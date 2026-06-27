@@ -41,7 +41,11 @@ use crate::vj::{VJDeck, VJFrame};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ShowEvent {
     /// New track started at the given show-time.
-    TrackChanged { index: usize, title: String, bpm: f32 },
+    TrackChanged {
+        index: usize,
+        title: String,
+        bpm: f32,
+    },
     /// A cue point fired.
     Cue { track_index: usize, cue: CuePoint },
     /// Beat-grid event (re-emitted for downstream consumers).
@@ -492,7 +496,9 @@ mod tests {
         let mut saw_drop = false;
         for _ in 0..30 {
             let evs = s.tick(0.5);
-            if evs.iter().any(|e| matches!(e, ShowEvent::Cue { cue, .. } if matches!(cue.kind, CueKind::Drop))) {
+            if evs.iter().any(
+                |e| matches!(e, ShowEvent::Cue { cue, .. } if matches!(cue.kind, CueKind::Drop)),
+            ) {
                 saw_drop = true;
                 break;
             }

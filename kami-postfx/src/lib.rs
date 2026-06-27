@@ -190,9 +190,9 @@ impl PostFxPipeline {
             radius: 0.85,
         });
         p.add(PostEffect::ColorGrade {
-            lift: [0.0, -0.01, 0.02],    // subtle cool shadows
-            gamma: [1.0, 1.0, 0.98],      // neutral mids
-            gain: [1.05, 1.02, 1.0],      // warm highlights
+            lift: [0.0, -0.01, 0.02], // subtle cool shadows
+            gamma: [1.0, 1.0, 0.98],  // neutral mids
+            gain: [1.05, 1.02, 1.0],  // warm highlights
         });
         p
     }

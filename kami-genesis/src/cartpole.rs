@@ -48,7 +48,12 @@ pub struct CartpoleState {
 
 impl Default for CartpoleState {
     fn default() -> Self {
-        CartpoleState { x: 0.0, x_dot: 0.0, theta: 0.0, theta_dot: 0.0 }
+        CartpoleState {
+            x: 0.0,
+            x_dot: 0.0,
+            theta: 0.0,
+            theta_dot: 0.0,
+        }
     }
 }
 
@@ -69,8 +74,7 @@ impl CartpoleState {
         let temp =
             (force + pole_mass_length * self.theta_dot * self.theta_dot * sin_t) / total_mass;
         let theta_acc = (cfg.gravity * sin_t - cos_t * temp)
-            / (cfg.pole_half_length
-                * (4.0 / 3.0 - cfg.pole_mass * cos_t * cos_t / total_mass));
+            / (cfg.pole_half_length * (4.0 / 3.0 - cfg.pole_mass * cos_t * cos_t / total_mass));
         let x_acc = temp - pole_mass_length * theta_acc * cos_t / total_mass;
 
         // Semi-implicit Euler: advance velocity first, then position with new velocity.
@@ -89,11 +93,17 @@ mod tests {
     fn pendulum_falls_from_small_initial_tilt() {
         // No control force; pole tilted 0.1 rad should fall (theta grows).
         let cfg = CartpoleConfig::default();
-        let mut s = CartpoleState { theta: 0.1, ..Default::default() };
+        let mut s = CartpoleState {
+            theta: 0.1,
+            ..Default::default()
+        };
         for _ in 0..120 {
             s.step(0.0, &cfg);
         }
-        assert!(s.theta.abs() > 0.1, "pole should fall from tilt under gravity");
+        assert!(
+            s.theta.abs() > 0.1,
+            "pole should fall from tilt under gravity"
+        );
     }
 
     #[test]
@@ -104,7 +114,10 @@ mod tests {
             s.step(10.0, &cfg);
         }
         assert!(s.x > 0.0, "positive force should move cart in +x");
-        assert!(s.x_dot > 0.0, "positive force should give positive velocity");
+        assert!(
+            s.x_dot > 0.0,
+            "positive force should give positive velocity"
+        );
     }
 
     #[test]
@@ -115,7 +128,10 @@ mod tests {
         for _ in 0..60 {
             s.step(0.0, &cfg);
         }
-        assert!(s.theta.abs() < 1e-3, "perfectly balanced pole stays balanced");
+        assert!(
+            s.theta.abs() < 1e-3,
+            "perfectly balanced pole stays balanced"
+        );
     }
 
     #[test]
@@ -125,7 +141,10 @@ mod tests {
         let mut s = CartpoleState::default();
         s.step(10000.0, &cfg);
         // velocity from one step under 100 N clamped force on 1.1 kg system ≈ 1.5 m/s
-        assert!(s.x_dot.abs() < 2.0, "force should be clamped, not 10000 N applied");
+        assert!(
+            s.x_dot.abs() < 2.0,
+            "force should be clamped, not 10000 N applied"
+        );
         assert!(s.x_dot.is_finite());
     }
 }

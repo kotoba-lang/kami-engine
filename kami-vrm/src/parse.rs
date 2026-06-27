@@ -1,9 +1,9 @@
 //! VRM document parser: GLB bytes → VrmDocument.
 
+use crate::VrmError;
 use crate::compat::convert_v0x_to_v1;
 use crate::gltf_types::GltfDocument;
 use crate::vrm_types::*;
-use crate::VrmError;
 
 /// Parse VRM GLB bytes into a VrmDocument.
 ///
@@ -28,9 +28,7 @@ pub fn parse_vrm(data: &[u8]) -> Result<VrmDocument, VrmError> {
     } else if is_v0 {
         parse_vrm_0x(gltf, bin)
     } else {
-        Err(VrmError::MissingExtension(
-            "VRMC_vrm or VRM".into(),
-        ))
+        Err(VrmError::MissingExtension("VRMC_vrm or VRM".into()))
     }
 }
 
@@ -99,8 +97,17 @@ fn parse_vrm_0x(gltf: GltfDocument, bin: Vec<u8>) -> Result<VrmDocument, VrmErro
         .and_then(|e| e.get("VRM"))
         .ok_or_else(|| VrmError::MissingExtension("VRM".into()))?;
 
-    let (meta, humanoid, expressions, spring_bones, colliders, collider_groups, mtoon_materials, look_at, first_person) =
-        convert_v0x_to_v1(vrm_ext, &gltf)?;
+    let (
+        meta,
+        humanoid,
+        expressions,
+        spring_bones,
+        colliders,
+        collider_groups,
+        mtoon_materials,
+        look_at,
+        first_person,
+    ) = convert_v0x_to_v1(vrm_ext, &gltf)?;
 
     Ok(VrmDocument {
         gltf,
@@ -122,20 +129,48 @@ fn parse_vrm_0x(gltf: GltfDocument, bin: Vec<u8>) -> Result<VrmDocument, VrmErro
 // ── VRM 1.0 parsers ──
 
 fn parse_meta_v1(vrmc: &serde_json::Value) -> Result<VrmMeta, VrmError> {
-    let meta = vrmc.get("meta").ok_or_else(|| VrmError::MissingExtension("VRMC_vrm.meta".into()))?;
+    let meta = vrmc
+        .get("meta")
+        .ok_or_else(|| VrmError::MissingExtension("VRMC_vrm.meta".into()))?;
     Ok(VrmMeta {
-        name: meta.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string(),
-        version: meta.get("version").and_then(|v| v.as_str()).map(String::from),
+        name: meta
+            .get("name")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string(),
+        version: meta
+            .get("version")
+            .and_then(|v| v.as_str())
+            .map(String::from),
         authors: meta
             .get("authors")
             .and_then(|v| v.as_array())
-            .map(|a| a.iter().filter_map(|v| v.as_str().map(String::from)).collect())
+            .map(|a| {
+                a.iter()
+                    .filter_map(|v| v.as_str().map(String::from))
+                    .collect()
+            })
             .unwrap_or_default(),
-        license_url: meta.get("licenseUrl").and_then(|v| v.as_str()).map(String::from),
-        allow_redistribution: meta.get("allowRedistribution").and_then(|v| v.as_str()).map(|s| s == "allow"),
-        thumbnail_image: meta.get("thumbnailImage").and_then(|v| v.as_u64()).map(|v| v as usize),
-        avatar_permission: meta.get("avatarPermission").and_then(|v| v.as_str()).map(String::from),
-        commercial_usage: meta.get("commercialUsage").and_then(|v| v.as_str()).map(String::from),
+        license_url: meta
+            .get("licenseUrl")
+            .and_then(|v| v.as_str())
+            .map(String::from),
+        allow_redistribution: meta
+            .get("allowRedistribution")
+            .and_then(|v| v.as_str())
+            .map(|s| s == "allow"),
+        thumbnail_image: meta
+            .get("thumbnailImage")
+            .and_then(|v| v.as_u64())
+            .map(|v| v as usize),
+        avatar_permission: meta
+            .get("avatarPermission")
+            .and_then(|v| v.as_str())
+            .map(String::from),
+        commercial_usage: meta
+            .get("commercialUsage")
+            .and_then(|v| v.as_str())
+            .map(String::from),
     })
 }
 
@@ -174,7 +209,8 @@ fn parse_expressions_v1(vrmc: &serde_json::Value) -> Vec<VrmExpression> {
     // Preset expressions
     if let Some(preset) = expressions.get("preset").and_then(|v| v.as_object()) {
         for (name, val) in preset {
-            if let Some(expr) = parse_single_expression(name, val, ExpressionPreset::from_str(name)) {
+            if let Some(expr) = parse_single_expression(name, val, ExpressionPreset::from_str(name))
+            {
                 result.push(expr);
             }
         }
@@ -263,7 +299,10 @@ fn parse_single_expression(
     Some(VrmExpression {
         name: name.to_string(),
         preset,
-        is_binary: val.get("isBinary").and_then(|v| v.as_bool()).unwrap_or(false),
+        is_binary: val
+            .get("isBinary")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false),
         morph_target_binds,
         material_color_binds,
         texture_transform_binds,
@@ -310,7 +349,11 @@ fn parse_first_person_v1(vrmc: &serde_json::Value) -> Option<VrmFirstPerson> {
 
 fn parse_spring_bone_v1(
     sb_ext: &serde_json::Value,
-) -> (Vec<VrmSpringBoneChain>, Vec<VrmCollider>, Vec<VrmColliderGroup>) {
+) -> (
+    Vec<VrmSpringBoneChain>,
+    Vec<VrmCollider>,
+    Vec<VrmColliderGroup>,
+) {
     // Colliders
     let colliders: Vec<VrmCollider> = sb_ext
         .get("colliders")
@@ -334,7 +377,10 @@ fn parse_spring_bone_v1(
                     } else {
                         return None;
                     };
-                    Some(VrmCollider { node, shape: collider_shape })
+                    Some(VrmCollider {
+                        node,
+                        shape: collider_shape,
+                    })
                 })
                 .collect()
         })
@@ -351,7 +397,11 @@ fn parse_spring_bone_v1(
                     colliders: g
                         .get("colliders")
                         .and_then(|v| v.as_array())
-                        .map(|a| a.iter().filter_map(|v| v.as_u64().map(|n| n as usize)).collect())
+                        .map(|a| {
+                            a.iter()
+                                .filter_map(|v| v.as_u64().map(|n| n as usize))
+                                .collect()
+                        })
                         .unwrap_or_default(),
                 })
                 .collect()
@@ -373,14 +423,30 @@ fn parse_spring_bone_v1(
                                 .filter_map(|j| {
                                     Some(SpringJoint {
                                         node: j.get("node")?.as_u64()? as usize,
-                                        hit_radius: j.get("hitRadius").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
-                                        stiffness: j.get("stiffness").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                                        gravity_power: j.get("gravityPower").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
+                                        hit_radius: j
+                                            .get("hitRadius")
+                                            .and_then(|v| v.as_f64())
+                                            .unwrap_or(0.0)
+                                            as f32,
+                                        stiffness: j
+                                            .get("stiffness")
+                                            .and_then(|v| v.as_f64())
+                                            .unwrap_or(1.0)
+                                            as f32,
+                                        gravity_power: j
+                                            .get("gravityPower")
+                                            .and_then(|v| v.as_f64())
+                                            .unwrap_or(0.0)
+                                            as f32,
                                         gravity_dir: j
                                             .get("gravityDir")
                                             .and_then(parse_f32_3)
                                             .unwrap_or([0.0, -1.0, 0.0]),
-                                        drag_force: j.get("dragForce").and_then(|v| v.as_f64()).unwrap_or(0.4) as f32,
+                                        drag_force: j
+                                            .get("dragForce")
+                                            .and_then(|v| v.as_f64())
+                                            .unwrap_or(0.4)
+                                            as f32,
                                     })
                                 })
                                 .collect()
@@ -392,7 +458,11 @@ fn parse_spring_bone_v1(
                         collider_groups: s
                             .get("colliderGroups")
                             .and_then(|v| v.as_array())
-                            .map(|a| a.iter().filter_map(|v| v.as_u64().map(|n| n as usize)).collect())
+                            .map(|a| {
+                                a.iter()
+                                    .filter_map(|v| v.as_u64().map(|n| n as usize))
+                                    .collect()
+                            })
                             .unwrap_or_default(),
                         center: s.get("center").and_then(|v| v.as_u64()).map(|n| n as usize),
                     }
@@ -413,30 +483,90 @@ fn parse_mtoon_materials(gltf: &GltfDocument) -> Vec<VrmMtoonMaterial> {
             Some(VrmMtoonMaterial {
                 material_index: i,
                 shade_color_factor: parse_f32_3(ext.get("shadeColorFactor")?).unwrap_or([0.0; 3]),
-                shade_multiply_texture: ext.get("shadeMultiplyTexture").and_then(|v| v.get("index")).and_then(|v| v.as_u64()).map(|n| n as usize),
-                shading_shift_factor: ext.get("shadingShiftFactor").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
-                shading_toony_factor: ext.get("shadingToonyFactor").and_then(|v| v.as_f64()).unwrap_or(0.9) as f32,
-                gi_equalization_factor: ext.get("giEqualizationFactor").and_then(|v| v.as_f64()).unwrap_or(0.9) as f32,
-                rim_color_factor: ext.get("parametricRimColorFactor").and_then(parse_f32_3).unwrap_or([0.0; 3]),
-                rim_lighting_mix_factor: ext.get("rimLightingMixFactor").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                rim_fresnel_power_factor: ext.get("parametricRimFresnelPowerFactor").and_then(|v| v.as_f64()).unwrap_or(5.0) as f32,
-                rim_lift_factor: ext.get("parametricRimLiftFactor").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
-                rim_multiply_texture: ext.get("rimMultiplyTexture").and_then(|v| v.get("index")).and_then(|v| v.as_u64()).map(|n| n as usize),
+                shade_multiply_texture: ext
+                    .get("shadeMultiplyTexture")
+                    .and_then(|v| v.get("index"))
+                    .and_then(|v| v.as_u64())
+                    .map(|n| n as usize),
+                shading_shift_factor: ext
+                    .get("shadingShiftFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.0) as f32,
+                shading_toony_factor: ext
+                    .get("shadingToonyFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.9) as f32,
+                gi_equalization_factor: ext
+                    .get("giEqualizationFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.9) as f32,
+                rim_color_factor: ext
+                    .get("parametricRimColorFactor")
+                    .and_then(parse_f32_3)
+                    .unwrap_or([0.0; 3]),
+                rim_lighting_mix_factor: ext
+                    .get("rimLightingMixFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(1.0) as f32,
+                rim_fresnel_power_factor: ext
+                    .get("parametricRimFresnelPowerFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(5.0) as f32,
+                rim_lift_factor: ext
+                    .get("parametricRimLiftFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.0) as f32,
+                rim_multiply_texture: ext
+                    .get("rimMultiplyTexture")
+                    .and_then(|v| v.get("index"))
+                    .and_then(|v| v.as_u64())
+                    .map(|n| n as usize),
                 outline_width_mode: match ext.get("outlineWidthMode").and_then(|v| v.as_str()) {
                     Some("worldCoordinates") => OutlineWidthMode::WorldCoordinates,
                     Some("screenCoordinates") => OutlineWidthMode::ScreenCoordinates,
                     _ => OutlineWidthMode::None,
                 },
-                outline_width_factor: ext.get("outlineWidthFactor").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
-                outline_color_factor: ext.get("outlineColorFactor").and_then(parse_f32_3).unwrap_or([0.0; 3]),
-                outline_lighting_mix_factor: ext.get("outlineLightingMixFactor").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                matcap_texture: ext.get("matcapTexture").and_then(|v| v.get("index")).and_then(|v| v.as_u64()).map(|n| n as usize),
-                parametric_rim_color_factor: ext.get("parametricRimColorFactor").and_then(parse_f32_3).unwrap_or([0.0; 3]),
-                uv_animation_scroll_x: ext.get("uvAnimationScrollXSpeedFactor").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
-                uv_animation_scroll_y: ext.get("uvAnimationScrollYSpeedFactor").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
-                uv_animation_rotation: ext.get("uvAnimationRotationSpeedFactor").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
-                render_queue_offset: ext.get("renderQueueOffsetNumber").and_then(|v| v.as_i64()).unwrap_or(0) as i32,
-                transparent_with_z_write: ext.get("transparentWithZWrite").and_then(|v| v.as_bool()).unwrap_or(false),
+                outline_width_factor: ext
+                    .get("outlineWidthFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.0) as f32,
+                outline_color_factor: ext
+                    .get("outlineColorFactor")
+                    .and_then(parse_f32_3)
+                    .unwrap_or([0.0; 3]),
+                outline_lighting_mix_factor: ext
+                    .get("outlineLightingMixFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(1.0) as f32,
+                matcap_texture: ext
+                    .get("matcapTexture")
+                    .and_then(|v| v.get("index"))
+                    .and_then(|v| v.as_u64())
+                    .map(|n| n as usize),
+                parametric_rim_color_factor: ext
+                    .get("parametricRimColorFactor")
+                    .and_then(parse_f32_3)
+                    .unwrap_or([0.0; 3]),
+                uv_animation_scroll_x: ext
+                    .get("uvAnimationScrollXSpeedFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.0) as f32,
+                uv_animation_scroll_y: ext
+                    .get("uvAnimationScrollYSpeedFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.0) as f32,
+                uv_animation_rotation: ext
+                    .get("uvAnimationRotationSpeedFactor")
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.0) as f32,
+                render_queue_offset: ext
+                    .get("renderQueueOffsetNumber")
+                    .and_then(|v| v.as_i64())
+                    .unwrap_or(0) as i32,
+                transparent_with_z_write: ext
+                    .get("transparentWithZWrite")
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false),
             })
         })
         .collect()
@@ -469,7 +599,10 @@ fn parse_node_constraints(gltf: &GltfDocument) -> Vec<VrmNodeConstraint> {
             } else {
                 return None;
             };
-            Some(VrmNodeConstraint { node: i, constraint: ct })
+            Some(VrmNodeConstraint {
+                node: i,
+                constraint: ct,
+            })
         })
         .collect()
 }
@@ -494,15 +627,18 @@ fn parse_f32_3(v: &serde_json::Value) -> Option<[f32; 3]> {
 
 fn parse_f32_2(v: &serde_json::Value) -> Option<[f32; 2]> {
     let arr = v.as_array()?;
-    Some([
-        arr.first()?.as_f64()? as f32,
-        arr.get(1)?.as_f64()? as f32,
-    ])
+    Some([arr.first()?.as_f64()? as f32, arr.get(1)?.as_f64()? as f32])
 }
 
 fn parse_range_map(v: &serde_json::Value) -> RangeMap {
     RangeMap {
-        input_max_value: v.get("inputMaxValue").and_then(|v| v.as_f64()).unwrap_or(90.0) as f32,
-        output_scale: v.get("outputScale").and_then(|v| v.as_f64()).unwrap_or(10.0) as f32,
+        input_max_value: v
+            .get("inputMaxValue")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(90.0) as f32,
+        output_scale: v
+            .get("outputScale")
+            .and_then(|v| v.as_f64())
+            .unwrap_or(10.0) as f32,
     }
 }

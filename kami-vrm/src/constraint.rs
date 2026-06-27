@@ -52,15 +52,29 @@ impl ConstraintSolver {
                 .map(Quat::from_array)
                 .unwrap_or(Quat::IDENTITY);
             let (source_node, kind) = match c.constraint {
-                ConstraintType::Rotation { source, weight } => {
-                    (source, Kind::Rotation { weight })
-                }
-                ConstraintType::Aim { source, aim_axis, weight } => {
-                    (source, Kind::Aim { aim_axis: Vec3::from(aim_axis), weight })
-                }
-                ConstraintType::Roll { source, roll_axis, weight } => {
-                    (source, Kind::Roll { roll_axis: Vec3::from(roll_axis), weight })
-                }
+                ConstraintType::Rotation { source, weight } => (source, Kind::Rotation { weight }),
+                ConstraintType::Aim {
+                    source,
+                    aim_axis,
+                    weight,
+                } => (
+                    source,
+                    Kind::Aim {
+                        aim_axis: Vec3::from(aim_axis),
+                        weight,
+                    },
+                ),
+                ConstraintType::Roll {
+                    source,
+                    roll_axis,
+                    weight,
+                } => (
+                    source,
+                    Kind::Roll {
+                        roll_axis: Vec3::from(roll_axis),
+                        weight,
+                    },
+                ),
             };
             let source_initial_local_rot = doc
                 .gltf
@@ -96,8 +110,7 @@ impl ConstraintSolver {
         mut source_world: W,
         mut dest_head_world: H,
         out: &mut Vec<(usize, [f32; 4])>,
-    )
-    where
+    ) where
         L: FnMut(usize) -> Option<Quat>,
         W: FnMut(usize) -> Option<Mat4>,
         H: FnMut(usize) -> Option<Mat4>,

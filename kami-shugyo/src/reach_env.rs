@@ -23,11 +23,16 @@ use kami_genesis::ArticulationBatch;
 pub(crate) struct Lcg(u64);
 impl Lcg {
     pub(crate) fn new(seed: u64) -> Self {
-        Lcg(seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407))
+        Lcg(seed
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407))
     }
     /// Next f32 in `[-1, 1)`.
     pub(crate) fn next_signed(&mut self) -> f32 {
-        self.0 = self.0.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.0 = self
+            .0
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         let u = ((self.0 >> 40) as f32) / ((1u64 << 24) as f32); // [0,1)
         2.0 * u - 1.0
     }
@@ -244,7 +249,8 @@ impl VectorizedReachEnv {
         };
         self.batch
             .set_joint_position_targets(targets, self.cfg.kp, self.cfg.kd);
-        self.batch.set_computed_torque_control(self.cfg.computed_torque);
+        self.batch
+            .set_computed_torque_control(self.cfg.computed_torque);
         for _ in 0..self.cfg.decimation {
             self.batch.step();
         }
@@ -345,7 +351,10 @@ mod tests {
         let mut e = env(4);
         assert_eq!(e.action_dim_per_env(), 2);
         assert_eq!(e.observation_dim_per_env(), 6);
-        assert_eq!(e.dof_names(), &["shoulder".to_string(), "elbow".to_string()]);
+        assert_eq!(
+            e.dof_names(),
+            &["shoulder".to_string(), "elbow".to_string()]
+        );
         let obs = e.reset_all(Some(0));
         assert_eq!(obs.len(), 4 * 6);
         assert!(obs.iter().all(|v| v.is_finite()));
@@ -362,7 +371,10 @@ mod tests {
         assert_ne!(oa, oc, "different seed should differ");
         // Goals differ across envs (per-env sampling), not all identical.
         let g = a.goals();
-        assert!(g[0..2] != g[2..4] || g[2..4] != g[4..6], "per-env goals identical");
+        assert!(
+            g[0..2] != g[2..4] || g[2..4] != g[4..6],
+            "per-env goals identical"
+        );
     }
 
     #[test]
@@ -383,15 +395,24 @@ mod tests {
         }
         let r1: f32 = last.iter().map(|s| s.reward).sum();
         assert!(r1 > r0, "reward did not improve: {r0} -> {r1}");
-        assert!(last.iter().all(|s| s.terminated), "not all envs reached goal: {last:?}");
-        assert!(last.iter().all(|s| s.observation.iter().all(|v| v.is_finite())));
+        assert!(
+            last.iter().all(|s| s.terminated),
+            "not all envs reached goal: {last:?}"
+        );
+        assert!(
+            last.iter()
+                .all(|s| s.observation.iter().all(|v| v.is_finite()))
+        );
     }
 
     #[test]
     fn normalized_actions_rescale_to_limits_and_reach_goal() {
         // With normalized_actions, commanding the goal as a [-1,1] action
         // (mapped through the joint limits) must reach the joint-space goal.
-        let cfg = ReachCfg { normalized_actions: true, ..Default::default() };
+        let cfg = ReachCfg {
+            normalized_actions: true,
+            ..Default::default()
+        };
         let mut e = VectorizedReachEnv::new(4, ARM2_URDF, cfg).unwrap();
         e.reset_all(Some(5));
         let goals = e.goals().to_vec();
@@ -413,7 +434,10 @@ mod tests {
         for _ in 0..299 {
             last = e.step_all(&norm);
         }
-        assert!(last.iter().all(|s| s.terminated), "normalized control did not reach goal: {last:?}");
+        assert!(
+            last.iter().all(|s| s.terminated),
+            "normalized control did not reach goal: {last:?}"
+        );
     }
 
     #[test]
@@ -425,7 +449,13 @@ mod tests {
         let run = |dr: Option<(f32, f32)>, seed: u64| -> Vec<f32> {
             // Plain PD (no gravity comp) driven to a fixed target: the steady-
             // state droop g(q)/kp differs with per-env gravity → envs diverge.
-            let cfg = ReachCfg { gravity_dr: dr, computed_torque: false, kp: 50.0, kd: 8.0, ..ReachCfg::default() };
+            let cfg = ReachCfg {
+                gravity_dr: dr,
+                computed_torque: false,
+                kp: 50.0,
+                kd: 8.0,
+                ..ReachCfg::default()
+            };
             let mut e = VectorizedReachEnv::new(4, ARM2_URDF, cfg).unwrap();
             e.reset_all(Some(seed));
             let target = vec![0.5_f32; e.num_envs * e.action_dim_per_env()];
@@ -444,7 +474,11 @@ mod tests {
             "gravity DR did not diverge the envs"
         );
         // Reproducible under a fixed seed.
-        assert_eq!(with_dr, run(Some((0.3, 1.7)), 5), "gravity DR not reproducible");
+        assert_eq!(
+            with_dr,
+            run(Some((0.3, 1.7)), 5),
+            "gravity DR not reproducible"
+        );
         // Without DR, all envs share gravity → identical joint evolution.
         let no_dr = run(None, 5);
         for e in 1..4 {
@@ -500,7 +534,10 @@ mod tests {
     fn obs_noise_dr_noises_stepresult_but_keeps_ground_truth_clean() {
         // Observation noise appears in the StepResult the policy receives, while
         // observations_flat stays the clean ground truth. Reproducible by seed.
-        let cfg = ReachCfg { obs_noise_std: 0.1, ..ReachCfg::default() };
+        let cfg = ReachCfg {
+            obs_noise_std: 0.1,
+            ..ReachCfg::default()
+        };
         let mut e = VectorizedReachEnv::new(2, ARM2_URDF, cfg).unwrap();
         e.reset_all(Some(5));
         let cmd = vec![0.2_f32; e.num_envs * e.action_dim_per_env()];
@@ -518,11 +555,22 @@ mod tests {
         assert!((0..noisy.len()).all(|i| (noisy[i] - clean[i]).abs() < 0.11));
 
         // Reproducible: a fresh env, same seed + same action → identical noisy obs.
-        let mut e2 = VectorizedReachEnv::new(2, ARM2_URDF, ReachCfg { obs_noise_std: 0.1, ..ReachCfg::default() }).unwrap();
+        let mut e2 = VectorizedReachEnv::new(
+            2,
+            ARM2_URDF,
+            ReachCfg {
+                obs_noise_std: 0.1,
+                ..ReachCfg::default()
+            },
+        )
+        .unwrap();
         e2.reset_all(Some(5));
         let res2 = e2.step_all(&cmd);
         let noisy2: Vec<f32> = res2.iter().flat_map(|r| r.observation.clone()).collect();
-        assert_eq!(noisy, noisy2, "obs noise not reproducible under a fixed seed");
+        assert_eq!(
+            noisy, noisy2,
+            "obs noise not reproducible under a fixed seed"
+        );
     }
 
     #[test]
@@ -530,7 +578,10 @@ mod tests {
         // Action-noise DR must (a) be reproducible under a fixed seed, (b) change
         // the trajectory vs the no-noise run, and (c) stay finite/bounded.
         let run = |std: f32, seed: u64| -> Vec<f32> {
-            let cfg = ReachCfg { action_noise_std: std, ..ReachCfg::default() };
+            let cfg = ReachCfg {
+                action_noise_std: std,
+                ..ReachCfg::default()
+            };
             let mut e = VectorizedReachEnv::new(2, ARM2_URDF, cfg).unwrap();
             e.reset_all(Some(seed));
             let cmd = vec![0.3_f32; e.num_envs * e.action_dim_per_env()];
@@ -545,14 +596,22 @@ mod tests {
         assert_eq!(a, b, "action-noise DR not reproducible under a fixed seed");
         let clean = run(0.0, 99);
         assert_ne!(a, clean, "action noise had no effect on the trajectory");
-        assert!(a.iter().all(|v| v.is_finite()), "noisy rollout went non-finite");
+        assert!(
+            a.iter().all(|v| v.is_finite()),
+            "noisy rollout went non-finite"
+        );
     }
 
     #[test]
     fn truncates_at_episode_cap_when_goal_unreachable() {
         // A short cap + a goal the (zero-gain-free) policy won't hold instantly:
         // command zeros while the goal is non-zero → never within tol → truncate.
-        let cfg = ReachCfg { max_steps: 5, goal_range: 1.0, goal_tol: 1e-4, ..Default::default() };
+        let cfg = ReachCfg {
+            max_steps: 5,
+            goal_range: 1.0,
+            goal_tol: 1e-4,
+            ..Default::default()
+        };
         let mut e = VectorizedReachEnv::new(2, ARM2_URDF, cfg).unwrap();
         e.reset_all(Some(3));
         let zeros = vec![0.0; e.num_envs * e.action_dim_per_env()];
@@ -560,6 +619,9 @@ mod tests {
         for _ in 0..4 {
             res = e.step_all(&zeros);
         }
-        assert!(res.iter().all(|s| s.truncated), "episode did not truncate at cap");
+        assert!(
+            res.iter().all(|s| s.truncated),
+            "episode did not truncate at cap"
+        );
     }
 }

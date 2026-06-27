@@ -5,7 +5,9 @@
 //! perception -> planning -> control loop reaches a goal and avoids obstacles.
 
 use glam::{Affine3A, Quat, Vec2, Vec3};
-use kami_autodrive::{Autopilot, AutopilotConfig, BicycleModel, DriveState, Plant, Pose2, VehicleClass};
+use kami_autodrive::{
+    Autopilot, AutopilotConfig, BicycleModel, DriveState, Plant, Pose2, VehicleClass,
+};
 use kami_sensor_sim::{Lidar, LidarIntrinsics, Primitive, Scene};
 
 /// A planar 360° ring lidar mounted at `MOUNT_Z`.
@@ -92,10 +94,19 @@ fn routes_around_a_blocking_obstacle() {
     });
     let goal = Vec2::new(40.0, 0.0);
     // Conservative collision radius around the box for the assertion.
-    let (pose, arrived, collided) =
-        run(VehicleClass::Car, goal, &scene, &[(obstacle_center, 5.0)], 1200);
+    let (pose, arrived, collided) = run(
+        VehicleClass::Car,
+        goal,
+        &scene,
+        &[(obstacle_center, 5.0)],
+        1200,
+    );
 
-    assert!(arrived, "should route around and arrive, ended at {:?}", pose);
+    assert!(
+        arrived,
+        "should route around and arrive, ended at {:?}",
+        pose
+    );
     assert!(!collided, "must not drive through the obstacle");
 }
 
@@ -134,7 +145,10 @@ fn emergency_stops_for_a_sudden_wall() {
         }
     }
     assert!(stopped_short, "should brake to a stop before the wall");
-    assert!(min_dist_to_wall > 0.5, "stopped too close / clipped the wall");
+    assert!(
+        min_dist_to_wall > 0.5,
+        "stopped too close / clipped the wall"
+    );
 }
 
 #[test]
@@ -151,7 +165,10 @@ fn ship_with_wide_turns_still_arrives() {
 fn lidar_ingest_marks_occupancy() {
     use kami_autodrive::OccupancyGrid;
     let mut scene = Scene::new();
-    scene.add(Primitive::Sphere { center: Vec3::new(10.0, 0.0, 1.0), radius: 1.5 });
+    scene.add(Primitive::Sphere {
+        center: Vec3::new(10.0, 0.0, 1.0),
+        radius: 1.5,
+    });
     let pose = Pose2::new(0.0, 0.0, 0.0);
     let returns = sweep(&scene, pose);
 
@@ -170,5 +187,8 @@ fn lidar_ingest_marks_occupancy() {
             }
         }
     }
-    assert!(any, "lidar hit on the sphere should mark occupancy near x=8.5");
+    assert!(
+        any,
+        "lidar hit on the sphere should mark occupancy near x=8.5"
+    );
 }

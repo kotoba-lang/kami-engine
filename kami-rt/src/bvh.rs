@@ -18,7 +18,10 @@ pub struct Aabb {
 
 impl Aabb {
     pub fn empty() -> Self {
-        Self { min: Vec3::splat(f32::INFINITY), max: Vec3::splat(f32::NEG_INFINITY) }
+        Self {
+            min: Vec3::splat(f32::INFINITY),
+            max: Vec3::splat(f32::NEG_INFINITY),
+        }
     }
     pub fn grow_point(&mut self, p: Vec3) {
         self.min = self.min.min(p);
@@ -93,11 +96,7 @@ impl Tri {
             return None;
         }
         let t = e2.dot(q) * inv;
-        if t > 1e-4 {
-            Some(t)
-        } else {
-            None
-        }
+        if t > 1e-4 { Some(t) } else { None }
     }
 }
 
@@ -151,7 +150,13 @@ impl Bvh {
     pub fn build(tris: Vec<Tri>) -> Self {
         if tris.is_empty() {
             return Self {
-                nodes: vec![Node { aabb: Aabb::empty(), left: 0, right: 0, start: 0, count: 0 }],
+                nodes: vec![Node {
+                    aabb: Aabb::empty(),
+                    left: 0,
+                    right: 0,
+                    start: 0,
+                    count: 0,
+                }],
                 tri_order: vec![],
                 tris,
             };
@@ -178,7 +183,11 @@ impl Bvh {
 
         let mut nodes = Vec::new();
         build_range(&tris, &tri_order, 0, tri_order.len(), &mut nodes);
-        Self { nodes, tri_order, tris }
+        Self {
+            nodes,
+            tri_order,
+            tris,
+        }
     }
 
     /// Total node count (1 for an empty BVH).
@@ -225,7 +234,13 @@ fn build_range(tris: &[Tri], order: &[u32], lo: usize, hi: usize, nodes: &mut Ve
         aabb.union(&tris[i as usize].aabb());
     }
     let idx = nodes.len() as u32;
-    nodes.push(Node { aabb, left: 0, right: 0, start: lo as u32, count: 0 });
+    nodes.push(Node {
+        aabb,
+        left: 0,
+        right: 0,
+        start: lo as u32,
+        count: 0,
+    });
 
     let count = hi - lo;
     if count <= LEAF_MAX {
@@ -256,9 +271,19 @@ mod tests {
                 let b = Vec3::new(x + 0.9, y, 0.0);
                 let c = Vec3::new(x, y + 0.9, 0.0);
                 let d = Vec3::new(x + 0.9, y + 0.9, 0.0);
-                tris.push(Tri { v0: a, v1: b, v2: c, id });
+                tris.push(Tri {
+                    v0: a,
+                    v1: b,
+                    v2: c,
+                    id,
+                });
                 id += 1;
-                tris.push(Tri { v0: b, v1: d, v2: c, id });
+                tris.push(Tri {
+                    v0: b,
+                    v1: d,
+                    v2: c,
+                    id,
+                });
                 id += 1;
             }
         }
@@ -281,7 +306,9 @@ mod tests {
             id: 42,
         }];
         let bvh = Bvh::build(tris);
-        let hit = bvh.traverse(Vec3::new(0.0, 0.0, 0.0), -Vec3::Z).expect("should hit");
+        let hit = bvh
+            .traverse(Vec3::new(0.0, 0.0, 0.0), -Vec3::Z)
+            .expect("should hit");
         assert_eq!(hit.tri_id, 42);
         assert!((hit.t - 5.0).abs() < 1e-4);
     }

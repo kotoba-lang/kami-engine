@@ -4,7 +4,9 @@
 //! demonstrated end-to-end on the 6-DOF arm under gravity. All KAMI-native.
 
 use kami_articulated::parse_urdf;
-use kami_genesis::{ArticulationBatch, JointTrajectory, QuinticPolynomialTrajectory, WaypointTrajectory};
+use kami_genesis::{
+    ArticulationBatch, JointTrajectory, QuinticPolynomialTrajectory, WaypointTrajectory,
+};
 
 const ARM6_URDF: &str = include_str!("../../fixtures/giemon_arm6/giemon_arm6.urdf");
 
@@ -82,7 +84,11 @@ fn cartesian_waypoint_path_is_tracked_via_ik_trajectory_and_control() {
         let (q, _qd, _qdd) = traj.sample(tk);
         probe2.set_joint_positions(&q);
         let (p, qt) = ee_pose(&probe2);
-        assert!(dist_v3(p, cart_pos[k]) < 1e-3, "wp{k} pos off: {}", dist_v3(p, cart_pos[k]));
+        assert!(
+            dist_v3(p, cart_pos[k]) < 1e-3,
+            "wp{k} pos off: {}",
+            dist_v3(p, cart_pos[k])
+        );
         let dot: f32 = (0..4).map(|i| qt[i] * cart_quat[k][i]).sum();
         assert!(dot.abs() > 0.999, "wp{k} orientation off: dot {dot}");
     }
@@ -97,7 +103,10 @@ fn cartesian_waypoint_path_is_tracked_via_ik_trajectory_and_control() {
         prev = p;
         assert!(p.iter().all(|v| v.is_finite()));
     }
-    assert!(path_len > 0.02 && path_len < 10.0, "implausible path length {path_len}");
+    assert!(
+        path_len > 0.02 && path_len < 10.0,
+        "implausible path length {path_len}"
+    );
     let _ = ndof;
 }
 
@@ -130,15 +139,22 @@ fn smooth_quintic_move_is_followed_and_reaches_goal_on_the_6dof_arm() {
         arm.step();
         if s > 10 {
             let cur = arm.get_joint_positions();
-            max_q_track = max_q_track.max((0..6).map(|i| (cur[i] - q[i]).abs()).fold(0.0, f32::max));
+            max_q_track =
+                max_q_track.max((0..6).map(|i| (cur[i] - q[i]).abs()).fold(0.0, f32::max));
         }
         let p = ee_pose(&arm).0;
         moved += dist_v3(prev_ee, p);
         prev_ee = p;
     }
     // With the damping-corrected inverse dynamics, 6-DOF tracking is near-exact.
-    assert!(max_q_track < 0.02, "6-DOF tracking not near-exact: {max_q_track} rad");
-    assert!(moved > 0.01 && prev_ee.iter().all(|v| v.is_finite()), "EE did not move smoothly");
+    assert!(
+        max_q_track < 0.02,
+        "6-DOF tracking not near-exact: {max_q_track} rad"
+    );
+    assert!(
+        moved > 0.01 && prev_ee.iter().all(|v| v.is_finite()),
+        "EE did not move smoothly"
+    );
 
     // Settle (endpoint velocity is zero) → the EE reaches the goal pose exactly.
     for _ in 0..1500 {
@@ -146,7 +162,14 @@ fn smooth_quintic_move_is_followed_and_reaches_goal_on_the_6dof_arm() {
         arm.step();
     }
     let (fp, fq) = ee_pose(&arm);
-    assert!(dist_v3(fp, goal_pos) < 0.02, "EE position off after settle: {}", dist_v3(fp, goal_pos));
+    assert!(
+        dist_v3(fp, goal_pos) < 0.02,
+        "EE position off after settle: {}",
+        dist_v3(fp, goal_pos)
+    );
     let dot: f32 = (0..4).map(|i| fq[i] * goal_quat[i]).sum();
-    assert!(dot.abs() > 0.99, "EE orientation off after settle: dot {dot}");
+    assert!(
+        dot.abs() > 0.99,
+        "EE orientation off after settle: dot {dot}"
+    );
 }

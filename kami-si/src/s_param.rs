@@ -1,5 +1,4 @@
 /// S-parameter representation and Touchstone export for 2-port networks.
-
 use serde::{Deserialize, Serialize};
 
 /// 2-port S-parameter data across frequency.
@@ -32,11 +31,15 @@ pub struct SParamMetrics {
 impl SParameter {
     /// Compute summary metrics from the S-parameter data.
     pub fn metrics(&self) -> SParamMetrics {
-        let insertion_loss_db = self.s21.iter()
+        let insertion_loss_db = self
+            .s21
+            .iter()
             .map(|(mag, _)| 20.0 * mag.log10())
             .fold(f64::INFINITY, f64::min);
 
-        let return_loss_db = self.s11.iter()
+        let return_loss_db = self
+            .s11
+            .iter()
             .map(|(mag, _)| -20.0 * mag.log10())
             .fold(f64::INFINITY, f64::min);
 
@@ -47,13 +50,19 @@ impl SParameter {
             0.0
         };
 
-        let bandwidth_3db_ghz = self.freq_ghz.iter()
+        let bandwidth_3db_ghz = self
+            .freq_ghz
+            .iter()
             .zip(self.s21.iter())
             .find(|(_, (mag, _))| 20.0 * mag.log10() < s21_db_0 - 3.0)
             .map(|(f, _)| *f)
             .unwrap_or(*self.freq_ghz.last().unwrap_or(&0.0));
 
-        SParamMetrics { insertion_loss_db, return_loss_db, bandwidth_3db_ghz }
+        SParamMetrics {
+            insertion_loss_db,
+            return_loss_db,
+            bandwidth_3db_ghz,
+        }
     }
 }
 
@@ -87,10 +96,34 @@ mod tests {
     fn sample_sparam() -> SParameter {
         SParameter {
             freq_ghz: vec![0.1, 1.0, 5.0, 10.0, 20.0],
-            s11: vec![(0.05, -10.0), (0.08, -20.0), (0.15, -45.0), (0.25, -80.0), (0.40, -120.0)],
-            s21: vec![(0.98, -5.0), (0.95, -15.0), (0.80, -40.0), (0.55, -90.0), (0.30, -150.0)],
-            s12: vec![(0.01, 170.0), (0.02, 160.0), (0.03, 140.0), (0.04, 100.0), (0.05, 60.0)],
-            s22: vec![(0.04, -8.0), (0.06, -18.0), (0.12, -40.0), (0.20, -70.0), (0.35, -110.0)],
+            s11: vec![
+                (0.05, -10.0),
+                (0.08, -20.0),
+                (0.15, -45.0),
+                (0.25, -80.0),
+                (0.40, -120.0),
+            ],
+            s21: vec![
+                (0.98, -5.0),
+                (0.95, -15.0),
+                (0.80, -40.0),
+                (0.55, -90.0),
+                (0.30, -150.0),
+            ],
+            s12: vec![
+                (0.01, 170.0),
+                (0.02, 160.0),
+                (0.03, 140.0),
+                (0.04, 100.0),
+                (0.05, 60.0),
+            ],
+            s22: vec![
+                (0.04, -8.0),
+                (0.06, -18.0),
+                (0.12, -40.0),
+                (0.20, -70.0),
+                (0.35, -110.0),
+            ],
         }
     }
 
@@ -99,14 +132,24 @@ mod tests {
         let sp = sample_sparam();
         let ts = export_touchstone(&sp);
         assert!(ts.contains("# GHz S MA R 50"), "Missing Touchstone header");
-        let data_lines: Vec<&str> = ts.lines().filter(|l| !l.starts_with('!') && !l.starts_with('#')).collect();
-        assert_eq!(data_lines.len(), 5, "Should have one line per frequency point");
+        let data_lines: Vec<&str> = ts
+            .lines()
+            .filter(|l| !l.starts_with('!') && !l.starts_with('#'))
+            .collect();
+        assert_eq!(
+            data_lines.len(),
+            5,
+            "Should have one line per frequency point"
+        );
     }
 
     #[test]
     fn metrics_insertion_loss_negative_db() {
         let sp = sample_sparam();
         let m = sp.metrics();
-        assert!(m.insertion_loss_db < 0.0, "Insertion loss should be negative dB");
+        assert!(
+            m.insertion_loss_db < 0.0,
+            "Insertion loss should be negative dB"
+        );
     }
 }

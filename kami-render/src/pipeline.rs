@@ -426,11 +426,31 @@ pub fn vertex_buffer_layout_skinned() -> wgpu::VertexBufferLayout<'static> {
         array_stride: 56,
         step_mode: wgpu::VertexStepMode::Vertex,
         attributes: &[
-            wgpu::VertexAttribute { offset: 0,  shader_location: 0, format: wgpu::VertexFormat::Float32x3 },
-            wgpu::VertexAttribute { offset: 12, shader_location: 1, format: wgpu::VertexFormat::Float32x3 },
-            wgpu::VertexAttribute { offset: 24, shader_location: 2, format: wgpu::VertexFormat::Float32x2 },
-            wgpu::VertexAttribute { offset: 32, shader_location: 8, format: wgpu::VertexFormat::Uint16x4 },
-            wgpu::VertexAttribute { offset: 40, shader_location: 9, format: wgpu::VertexFormat::Float32x4 },
+            wgpu::VertexAttribute {
+                offset: 0,
+                shader_location: 0,
+                format: wgpu::VertexFormat::Float32x3,
+            },
+            wgpu::VertexAttribute {
+                offset: 12,
+                shader_location: 1,
+                format: wgpu::VertexFormat::Float32x3,
+            },
+            wgpu::VertexAttribute {
+                offset: 24,
+                shader_location: 2,
+                format: wgpu::VertexFormat::Float32x2,
+            },
+            wgpu::VertexAttribute {
+                offset: 32,
+                shader_location: 8,
+                format: wgpu::VertexFormat::Uint16x4,
+            },
+            wgpu::VertexAttribute {
+                offset: 40,
+                shader_location: 9,
+                format: wgpu::VertexFormat::Float32x4,
+            },
         ],
     }
 }
@@ -497,7 +517,13 @@ pub fn create_skinned_mtoon_pipeline(
     });
     let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
         label: Some("kami-skinned-mtoon-layout"),
-        bind_group_layouts: &[camera_light_layout, material_layout, shadow_layout, bone_layout, morph_layout],
+        bind_group_layouts: &[
+            camera_light_layout,
+            material_layout,
+            shadow_layout,
+            bone_layout,
+            morph_layout,
+        ],
         push_constant_ranges: &[],
     });
     device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {

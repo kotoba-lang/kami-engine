@@ -80,9 +80,9 @@ impl CompositorState {
 
     /// Update drag position. Returns (window_id, new_x, new_y) if dragging.
     pub fn update_drag(&self, mouse_x: f32, mouse_y: f32) -> Option<(u64, f32, f32)> {
-        self.drag.as_ref().map(|d| {
-            (d.window_id, mouse_x - d.offset_x, mouse_y - d.offset_y)
-        })
+        self.drag
+            .as_ref()
+            .map(|d| (d.window_id, mouse_x - d.offset_x, mouse_y - d.offset_y))
     }
 
     /// End the current drag operation.

@@ -45,12 +45,14 @@ pub mod vehicle;
 pub mod wheel;
 
 pub use beam::{Beam, BeamId, BeamType, BreakGroup, DeformParams};
-pub use models::garage::{build as build_vehicle, VehicleKind};
 pub use builder::VehicleBuilder;
 pub use controls::Controls;
-pub use ground::{ClosureGround, FlatGround, Ground, GroundSample, MapGround, SurfaceKind, SurfaceZone};
+pub use ground::{
+    ClosureGround, FlatGround, Ground, GroundSample, MapGround, SurfaceKind, SurfaceZone,
+};
 pub use integrator::IntegratorConfig;
 pub use jbeam::{JBeamError, JBeamFile, load_str};
+pub use models::garage::{VehicleKind, build as build_vehicle};
 pub use node::{Node, NodeGroup, NodeId};
 pub use powertrain::{
     Clutch, Differential, DifferentialKind, DrivelineLayout, Engine, Gearbox, Powertrain,
@@ -59,14 +61,13 @@ pub use powertrain::{
 pub use triangle::{Triangle, TriangleGroup, TriangleId};
 pub use vehicle::{IntegratorMode, Vehicle};
 pub use wheel::{
-    cornering_stiffness, pacejka_force, ContactForces, ContactInputs, PacejkaParams, Wheel,
-    WheelId,
+    ContactForces, ContactInputs, PacejkaParams, Wheel, WheelId, cornering_stiffness, pacejka_force,
 };
 
 #[cfg(test)]
 mod integration_tests {
     use super::*;
-    use crate::models::sedan::{sedan, SedanSpec};
+    use crate::models::sedan::{SedanSpec, sedan};
 
     #[test]
     fn sedan_settles_with_no_input() {
@@ -95,7 +96,11 @@ mod integration_tests {
         v.step(1.0 / 60.0, &g);
         // After 1 frame all 4 wheels should have non-zero drive torque.
         for w in &v.wheels {
-            assert!(w.drive_torque.abs() > 1.0, "wheel {} drive torque too low", w.id);
+            assert!(
+                w.drive_torque.abs() > 1.0,
+                "wheel {} drive torque too low",
+                w.id
+            );
         }
     }
 

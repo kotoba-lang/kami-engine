@@ -81,10 +81,22 @@ mod tests {
     fn fp() -> VrmFirstPerson {
         VrmFirstPerson {
             mesh_annotations: vec![
-                MeshAnnotation { node: 1, annotation_type: FirstPersonFlag::ThirdPersonOnly }, // head
-                MeshAnnotation { node: 2, annotation_type: FirstPersonFlag::Both },             // body
-                MeshAnnotation { node: 3, annotation_type: FirstPersonFlag::FirstPersonOnly },  // fp arms
-                MeshAnnotation { node: 4, annotation_type: FirstPersonFlag::Auto },
+                MeshAnnotation {
+                    node: 1,
+                    annotation_type: FirstPersonFlag::ThirdPersonOnly,
+                }, // head
+                MeshAnnotation {
+                    node: 2,
+                    annotation_type: FirstPersonFlag::Both,
+                }, // body
+                MeshAnnotation {
+                    node: 3,
+                    annotation_type: FirstPersonFlag::FirstPersonOnly,
+                }, // fp arms
+                MeshAnnotation {
+                    node: 4,
+                    annotation_type: FirstPersonFlag::Auto,
+                },
             ],
         }
     }

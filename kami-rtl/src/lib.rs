@@ -700,7 +700,8 @@ pub mod synthesis {
         /// Removes gates whose inputs are all constant (tied to primary inputs
         /// named `1'b0` or `1'b1`) and propagates the resulting constant output.
         pub fn optimize(&mut self) {
-            let mut constants: std::collections::HashMap<String, bool> = std::collections::HashMap::new();
+            let mut constants: std::collections::HashMap<String, bool> =
+                std::collections::HashMap::new();
             constants.insert("1'b0".to_string(), false);
             constants.insert("1'b1".to_string(), true);
 
@@ -730,7 +731,11 @@ pub mod synthesis {
                         GateType::Mux => {
                             // inputs: [sel, a, b] → sel ? b : a
                             if input_vals.len() >= 3 {
-                                if input_vals[0] { input_vals[2] } else { input_vals[1] }
+                                if input_vals[0] {
+                                    input_vals[2]
+                                } else {
+                                    input_vals[1]
+                                }
                             } else {
                                 continue;
                             }

@@ -15,7 +15,13 @@ pub enum SpeciesId {
 
 impl SpeciesId {
     pub fn all() -> &'static [SpeciesId] {
-        &[SpeciesId::Grass, SpeciesId::Fern, SpeciesId::PalmTree, SpeciesId::Conifer, SpeciesId::Bush]
+        &[
+            SpeciesId::Grass,
+            SpeciesId::Fern,
+            SpeciesId::PalmTree,
+            SpeciesId::Conifer,
+            SpeciesId::Bush,
+        ]
     }
 }
 
@@ -59,12 +65,12 @@ pub fn species_table() -> Vec<Species> {
         Species {
             id: SpeciesId::Grass,
             name: "grass",
-            min_height: 16.0,        // above water
-            max_height: 95.0,        // wider range
+            min_height: 16.0, // above water
+            max_height: 95.0, // wider range
             max_slope: 0.55,
             // Grass tolerates rocky/sandy substrates (dry tussock grass in nature)
             material_affinity: [1.0, 0.5, 0.6, 0.0],
-            density: 500.0,          // dense
+            density: 500.0, // dense
             min_distance: 0.5,
             height: 0.8,
             scale_range: [0.7, 1.4],
@@ -91,7 +97,7 @@ pub fn species_table() -> Vec<Species> {
             id: SpeciesId::PalmTree,
             name: "palm",
             min_height: 16.0,
-            max_height: 30.0,        // tropical coast
+            max_height: 30.0, // tropical coast
             max_slope: 0.3,
             material_affinity: [0.5, 0.0, 0.6, 0.0], // sand + grass
             density: 2.0,

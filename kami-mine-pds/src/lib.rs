@@ -126,7 +126,9 @@ impl MineLedger {
             return Err(MinePdsError::MineralNotFound(record.mineral_id));
         }
         if !(record.quantity_tons.is_finite() && record.quantity_tons >= 0.0) {
-            return Err(MinePdsError::InvalidQuantity(record.quantity_tons.to_string()));
+            return Err(MinePdsError::InvalidQuantity(
+                record.quantity_tons.to_string(),
+            ));
         }
 
         self.extraction_records.push(record);

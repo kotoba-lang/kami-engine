@@ -5,10 +5,10 @@
 use pyo3::prelude::*;
 
 use crate::{
+    SceneError,
     camera::CameraSpec,
     render::{RenderOpts, RenderResult},
     scene::{EnvironmentSpec, MangakaScene},
-    SceneError,
 };
 
 #[pyclass(name = "MangakaScene")]
@@ -20,7 +20,9 @@ pub struct PyMangakaScene {
 impl PyMangakaScene {
     #[new]
     fn new() -> Self {
-        Self { inner: MangakaScene::new() }
+        Self {
+            inner: MangakaScene::new(),
+        }
     }
 
     fn set_background_json(&mut self, env_json: &str) -> PyResult<()> {
@@ -56,7 +58,10 @@ impl PyMangakaScene {
             .map_err(|e: SceneError| {
                 PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string())
             })?;
-        Ok(results.into_iter().map(|r: RenderResult| r.base_png).collect())
+        Ok(results
+            .into_iter()
+            .map(|r: RenderResult| r.base_png)
+            .collect())
     }
 }
 

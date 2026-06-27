@@ -1,5 +1,4 @@
 /// IC package type definitions and estimation.
-
 use serde::{Deserialize, Serialize};
 
 /// IC package type with geometry parameters.
@@ -12,7 +11,11 @@ pub enum PackageType {
     /// Chip Scale Package.
     CSP { rows: u32, cols: u32, pitch_mm: f64 },
     /// Wafer Level Chip Scale Package.
-    WLCSP { bump_rows: u32, bump_cols: u32, bump_pitch_um: f64 },
+    WLCSP {
+        bump_rows: u32,
+        bump_cols: u32,
+        bump_pitch_um: f64,
+    },
     /// System in Package.
     SiP,
     /// 2.5D chiplet with silicon interposer.
@@ -48,24 +51,39 @@ pub fn estimate_package(pkg_type: PackageType, die_size_mm: (f64, f64)) -> Packa
     let (die_x, die_y) = die_size_mm;
 
     let (pin_count, body_x, body_y, body_z) = match &pkg_type {
-        PackageType::QFP { pin_count, pitch_mm } => {
+        PackageType::QFP {
+            pin_count,
+            pitch_mm,
+        } => {
             let side_pins = pin_count / 4;
             let body_side = side_pins as f64 * pitch_mm + 2.0;
             (*pin_count, body_side, body_side, 1.4)
         }
-        PackageType::BGA { rows, cols, pitch_mm } => {
+        PackageType::BGA {
+            rows,
+            cols,
+            pitch_mm,
+        } => {
             let count = rows * cols;
             let bx = *cols as f64 * pitch_mm + 1.0;
             let by = *rows as f64 * pitch_mm + 1.0;
             (count, bx, by, 1.2)
         }
-        PackageType::CSP { rows, cols, pitch_mm } => {
+        PackageType::CSP {
+            rows,
+            cols,
+            pitch_mm,
+        } => {
             let count = rows * cols;
             let bx = *cols as f64 * pitch_mm + 0.5;
             let by = *rows as f64 * pitch_mm + 0.5;
             (count, bx, by, 0.8)
         }
-        PackageType::WLCSP { bump_rows, bump_cols, bump_pitch_um } => {
+        PackageType::WLCSP {
+            bump_rows,
+            bump_cols,
+            bump_pitch_um,
+        } => {
             let count = bump_rows * bump_cols;
             let pitch_mm = bump_pitch_um / 1000.0;
             let bx = die_x + pitch_mm;
@@ -98,7 +116,11 @@ pub fn estimate_package(pkg_type: PackageType, die_size_mm: (f64, f64)) -> Packa
         PackageType::QFP { pin_count, .. } => format!("QFP-{pin_count}"),
         PackageType::BGA { rows, cols, .. } => format!("BGA-{}", rows * cols),
         PackageType::CSP { rows, cols, .. } => format!("CSP-{}", rows * cols),
-        PackageType::WLCSP { bump_rows, bump_cols, .. } => format!("WLCSP-{}", bump_rows * bump_cols),
+        PackageType::WLCSP {
+            bump_rows,
+            bump_cols,
+            ..
+        } => format!("WLCSP-{}", bump_rows * bump_cols),
         PackageType::SiP => "SiP".to_string(),
         PackageType::Chiplet2_5D => "Chiplet-2.5D".to_string(),
         PackageType::Chiplet3D => "Chiplet-3D".to_string(),
@@ -122,7 +144,11 @@ mod tests {
     #[test]
     fn bga_pin_count_correct() {
         let pkg = estimate_package(
-            PackageType::BGA { rows: 16, cols: 16, pitch_mm: 0.8 },
+            PackageType::BGA {
+                rows: 16,
+                cols: 16,
+                pitch_mm: 0.8,
+            },
             (5.0, 5.0),
         );
         assert_eq!(pkg.pin_count, 256);
@@ -132,7 +158,10 @@ mod tests {
     #[test]
     fn qfp_pin_count_preserved() {
         let pkg = estimate_package(
-            PackageType::QFP { pin_count: 144, pitch_mm: 0.5 },
+            PackageType::QFP {
+                pin_count: 144,
+                pitch_mm: 0.5,
+            },
             (4.0, 4.0),
         );
         assert_eq!(pkg.pin_count, 144);

@@ -12,8 +12,8 @@ use crate::CljError;
 /// Useful for headless unit-testing that the module instantiates cleanly.
 pub fn run_init_headless(wasm: &[u8]) -> Result<(), CljError> {
     let engine = Engine::default();
-    let module = Module::new(&engine, wasm)
-        .map_err(|e| CljError::Run(format!("module load: {e}")))?;
+    let module =
+        Module::new(&engine, wasm).map_err(|e| CljError::Run(format!("module load: {e}")))?;
     let mut store: Store<()> = Store::new(&engine, ());
     // Instantiate with no linker — modules that call host imports will trap here,
     // which is expected for modules that need the full kami-script-runtime host.

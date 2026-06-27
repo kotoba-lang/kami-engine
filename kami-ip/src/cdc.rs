@@ -1,5 +1,4 @@
 /// Clock Domain Crossing (CDC) analysis and violation detection.
-
 use serde::{Deserialize, Serialize};
 
 /// Type of CDC crossing.
@@ -115,7 +114,9 @@ pub fn analyze_cdc(signals: &[CdcSignal], clocks: &[ClockDomain]) -> CdcReport {
         if sig.source_clock == sig.dest_clock {
             continue;
         }
-        if !clock_names.contains(&sig.source_clock.as_str()) || !clock_names.contains(&sig.dest_clock.as_str()) {
+        if !clock_names.contains(&sig.source_clock.as_str())
+            || !clock_names.contains(&sig.dest_clock.as_str())
+        {
             continue;
         }
 
@@ -154,7 +155,10 @@ pub fn analyze_cdc(signals: &[CdcSignal], clocks: &[ClockDomain]) -> CdcReport {
         }
     }
 
-    CdcReport { crossings, violations }
+    CdcReport {
+        crossings,
+        violations,
+    }
 }
 
 #[cfg(test)]
@@ -163,8 +167,14 @@ mod tests {
 
     fn test_clocks() -> Vec<ClockDomain> {
         vec![
-            ClockDomain { name: "clk_100".to_string(), freq_mhz: 100.0 },
-            ClockDomain { name: "clk_200".to_string(), freq_mhz: 200.0 },
+            ClockDomain {
+                name: "clk_100".to_string(),
+                freq_mhz: 100.0,
+            },
+            ClockDomain {
+                name: "clk_200".to_string(),
+                freq_mhz: 200.0,
+            },
         ]
     }
 
@@ -181,7 +191,10 @@ mod tests {
         let report = analyze_cdc(&signals, &test_clocks());
         assert_eq!(report.crossings.len(), 1);
         assert_eq!(report.violations.len(), 1);
-        assert_eq!(report.violations[0].issue, CdcViolationKind::MissingSynchronizer);
+        assert_eq!(
+            report.violations[0].issue,
+            CdcViolationKind::MissingSynchronizer
+        );
     }
 
     #[test]

@@ -6,13 +6,15 @@
 //! ILD + distance) → mix_stereo (per-ear gain + ITD sample delay) → WAV bytes.
 //! Listen on headphones: a 440 Hz tone sweeps right → front → left → back.
 
-use kami_audio::binaural::{mix_stereo, spatialize, Hrtf, Rolloff, Voice};
-use kami_audio::wav::encode_pcm16_stereo;
-use kami_audio::Listener;
 use glam::Vec3;
+use kami_audio::Listener;
+use kami_audio::binaural::{Hrtf, Rolloff, Voice, mix_stereo, spatialize};
+use kami_audio::wav::encode_pcm16_stereo;
 
 fn main() {
-    let path = std::env::args().nth(1).unwrap_or_else(|| "/tmp/orbit.wav".into());
+    let path = std::env::args()
+        .nth(1)
+        .unwrap_or_else(|| "/tmp/orbit.wav".into());
     let sr = 48_000u32;
     let secs = 4.0f32;
     let frames = (sr as f32 * secs) as usize;
@@ -35,7 +37,14 @@ fn main() {
         let angle = (i as f32 / frames as f32) * std::f32::consts::TAU; // full circle
         let pos = Vec3::new(angle.sin() * 3.0, 0.0, -angle.cos() * 3.0);
         let p = spatialize(&listener, &hrtf, &rolloff, pos, 1.0);
-        let chunk = mix_stereo(&[Voice { params: p, mono: &tone[i..i + n] }], sr, n + 64);
+        let chunk = mix_stereo(
+            &[Voice {
+                params: p,
+                mono: &tone[i..i + n],
+            }],
+            sr,
+            n + 64,
+        );
         for f in 0..n {
             stereo[(i + f) * 2] += chunk[f * 2];
             stereo[(i + f) * 2 + 1] += chunk[f * 2 + 1];

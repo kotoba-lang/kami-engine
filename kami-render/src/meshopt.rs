@@ -309,28 +309,48 @@ fn decode_vertex_block(
                 } else {
                     &BITS_V1[ctrl as usize..]
                 };
-                pos = decode_bytes(
-                    input,
-                    pos,
-                    &mut buffer[lane..],
-                    vertex_count_aligned,
-                    bits,
-                )?;
+                pos = decode_bytes(input, pos, &mut buffer[lane..], vertex_count_aligned, bits)?;
             }
         }
 
         let channel = if version == 0 { 0 } else { channels[k / 4] };
         match channel & 3 {
             0 => decode_deltas1(
-                &buffer, &mut transposed, k, vertex_count, vertex_size, last_vertex, k, 1, false, 0,
+                &buffer,
+                &mut transposed,
+                k,
+                vertex_count,
+                vertex_size,
+                last_vertex,
+                k,
+                1,
+                false,
+                0,
             ),
             1 => decode_deltas1(
-                &buffer, &mut transposed, k, vertex_count, vertex_size, last_vertex, k, 2, false, 0,
+                &buffer,
+                &mut transposed,
+                k,
+                vertex_count,
+                vertex_size,
+                last_vertex,
+                k,
+                2,
+                false,
+                0,
             ),
             2 => {
                 let rot = (32u32.wrapping_sub((channel >> 4) as u32)) & 31;
                 decode_deltas1(
-                    &buffer, &mut transposed, k, vertex_count, vertex_size, last_vertex, k, 4, true,
+                    &buffer,
+                    &mut transposed,
+                    k,
+                    vertex_count,
+                    vertex_size,
+                    last_vertex,
+                    k,
+                    4,
+                    true,
                     rot,
                 );
             }
@@ -370,7 +390,9 @@ pub fn decode_vertex_buffer(
     }
     let version = header & 0x0f;
     if version > DECODE_VERTEX_VERSION {
-        return Err(MeshoptError::Unsupported(format!("vertex version {version}")));
+        return Err(MeshoptError::Unsupported(format!(
+            "vertex version {version}"
+        )));
     }
     let mut pos = 1usize;
 
@@ -495,7 +517,9 @@ pub fn decode_index_buffer(
 ) -> Result<(), MeshoptError> {
     debug_assert!(index_count % 3 == 0);
     if index_size != 2 && index_size != 4 {
-        return Err(MeshoptError::Unsupported(format!("index_size={index_size}")));
+        return Err(MeshoptError::Unsupported(format!(
+            "index_size={index_size}"
+        )));
     }
     if buffer.len() < 1 + index_count / 3 + 16 {
         return Err(MeshoptError::UnexpectedEof);
@@ -505,7 +529,9 @@ pub fn decode_index_buffer(
     }
     let version = buffer[0] & 0x0f;
     if version > DECODE_INDEX_VERSION {
-        return Err(MeshoptError::Unsupported(format!("index version {version}")));
+        return Err(MeshoptError::Unsupported(format!(
+            "index version {version}"
+        )));
     }
 
     let mut edgefifo = [[!0u32; 2]; 16];
@@ -678,7 +704,9 @@ pub fn decode_index_sequence(
     buffer: &[u8],
 ) -> Result<(), MeshoptError> {
     if index_size != 2 && index_size != 4 {
-        return Err(MeshoptError::Unsupported(format!("index_size={index_size}")));
+        return Err(MeshoptError::Unsupported(format!(
+            "index_size={index_size}"
+        )));
     }
     if buffer.len() < 1 + index_count + 4 {
         return Err(MeshoptError::UnexpectedEof);
@@ -959,9 +987,7 @@ pub fn decode_meshopt_glb(data: &[u8]) -> Result<Option<Vec<u8>>, MeshoptError> 
 
     for view in &views_json {
         let mut view = view.clone();
-        let ext = view
-            .pointer("/extensions/EXT_meshopt_compression")
-            .cloned();
+        let ext = view.pointer("/extensions/EXT_meshopt_compression").cloned();
 
         let bytes: Vec<u8> = if let Some(ext) = ext {
             // compressed view → decode
@@ -970,7 +996,10 @@ pub fn decode_meshopt_glb(data: &[u8]) -> Result<Option<Vec<u8>>, MeshoptError> 
             let src_len = ext.get("byteLength").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
             let stride = ext.get("byteStride").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
             let count = ext.get("count").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
-            let mode = ext.get("mode").and_then(|v| v.as_str()).unwrap_or("ATTRIBUTES");
+            let mode = ext
+                .get("mode")
+                .and_then(|v| v.as_str())
+                .unwrap_or("ATTRIBUTES");
             let filter = ext.get("filter").and_then(|v| v.as_str()).unwrap_or("NONE");
 
             let src = buffers
@@ -1051,8 +1080,7 @@ pub fn decode_meshopt_glb(data: &[u8]) -> Result<Option<Vec<u8>>, MeshoptError> 
     }
 
     // --- re-serialize as GLB ---
-    let mut json_out =
-        serde_json::to_vec(&root).map_err(|e| MeshoptError::Json(e.to_string()))?;
+    let mut json_out = serde_json::to_vec(&root).map_err(|e| MeshoptError::Json(e.to_string()))?;
     while json_out.len() % 4 != 0 {
         json_out.push(b' '); // JSON chunk padded with spaces
     }
@@ -1260,9 +1288,11 @@ mod tests {
         let oj: serde_json::Value = serde_json::from_slice(&out[20..20 + jlen]).unwrap();
         // extension stripped
         assert!(oj.get("extensionsRequired").is_none());
-        assert!(oj["bufferViews"][0]
-            .pointer("/extensions/EXT_meshopt_compression")
-            .is_none());
+        assert!(
+            oj["bufferViews"][0]
+                .pointer("/extensions/EXT_meshopt_compression")
+                .is_none()
+        );
         let off = oj["bufferViews"][0]["byteOffset"].as_u64().unwrap() as usize;
         let len = oj["bufferViews"][0]["byteLength"].as_u64().unwrap() as usize;
         assert_eq!(len, vexp.len());

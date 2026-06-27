@@ -31,7 +31,12 @@ fn cartpole_1024_env_batch_runs_and_diverges() {
             // Spread initial perturbation across [-0.05, +0.05) rad pole angle
             // so envs diverge but most stay near upright at step 0.
             let theta0 = ((i as f32 / N_ENVS as f32) - 0.5) * 0.1;
-            CartpoleState { x: 0.0, x_dot: 0.0, theta: theta0, theta_dot: 0.0 }
+            CartpoleState {
+                x: 0.0,
+                x_dot: 0.0,
+                theta: theta0,
+                theta_dot: 0.0,
+            }
         })
         .collect();
 
@@ -39,7 +44,10 @@ fn cartpole_1024_env_batch_runs_and_diverges() {
     let cfg = CartpoleConfig::default();
 
     let initial_theta_std = state_field_std(&states, |s| s.theta);
-    assert!(initial_theta_std > 1e-3, "initial perturbation must produce nonzero std");
+    assert!(
+        initial_theta_std > 1e-3,
+        "initial perturbation must produce nonzero std"
+    );
 
     let t0 = Instant::now();
     for _ in 0..N_STEPS {
@@ -57,7 +65,10 @@ fn cartpole_1024_env_batch_runs_and_diverges() {
     let mean_abs_theta = states.iter().map(|s| s.theta.abs()).sum::<f32>() / N_ENVS as f32;
     let final_theta_std = state_field_std(&states, |s| s.theta);
     let theta_min = states.iter().map(|s| s.theta).fold(f32::INFINITY, f32::min);
-    let theta_max = states.iter().map(|s| s.theta).fold(f32::NEG_INFINITY, f32::max);
+    let theta_max = states
+        .iter()
+        .map(|s| s.theta)
+        .fold(f32::NEG_INFINITY, f32::max);
     let frac_envs_past_quarter_pi = states
         .iter()
         .filter(|s| s.theta.abs() > std::f32::consts::FRAC_PI_4)
@@ -74,9 +85,15 @@ fn cartpole_1024_env_batch_runs_and_diverges() {
     println!("final mean |θ|    : {mean_abs_theta:.4} rad");
     println!("final θ std       : {final_theta_std:.4} rad  (expect > initial; divergence)");
     println!("final θ range     : [{theta_min:.3}, {theta_max:.3}] rad");
-    println!("envs past ±π/4    : {:.1}%  (observation; small initial perturbations + no control → tail-only spin)", frac_envs_past_quarter_pi * 100.0);
+    println!(
+        "envs past ±π/4    : {:.1}%  (observation; small initial perturbations + no control → tail-only spin)",
+        frac_envs_past_quarter_pi * 100.0
+    );
     println!("WGSL_SOURCE bytes : {}", WGSL_SOURCE.len());
-    println!("workgroup_size    : 64 ({:.0} workgroups for {N_ENVS} envs)", N_ENVS as f32 / 64.0);
+    println!(
+        "workgroup_size    : 64 ({:.0} workgroups for {N_ENVS} envs)",
+        N_ENVS as f32 / 64.0
+    );
     println!("===============================================");
 
     // Acceptance gates — physics-meaningful
@@ -111,12 +128,13 @@ fn cartpole_1024_env_batch_runs_and_diverges() {
     assert!(WGSL_SOURCE.contains("struct State"));
 }
 
-fn state_field_std<F: Fn(&CartpoleState) -> f32>(
-    states: &[CartpoleState],
-    field: F,
-) -> f32 {
+fn state_field_std<F: Fn(&CartpoleState) -> f32>(states: &[CartpoleState], field: F) -> f32 {
     let n = states.len() as f32;
     let mean = states.iter().map(&field).sum::<f32>() / n;
-    let var = states.iter().map(|s| (field(s) - mean).powi(2)).sum::<f32>() / n;
+    let var = states
+        .iter()
+        .map(|s| (field(s) - mean).powi(2))
+        .sum::<f32>()
+        / n;
     var.sqrt()
 }

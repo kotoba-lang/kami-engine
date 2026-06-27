@@ -1,5 +1,4 @@
 /// Thermal analysis for IC packages.
-
 use serde::{Deserialize, Serialize};
 
 /// Thermal analysis result.
@@ -76,8 +75,11 @@ mod tests {
         };
         let result = calculate_thermal(&spec);
         // Tj = 25 + 2 * (5 + 20) = 75 C
-        assert!((result.junction_temp_c - 75.0).abs() < 0.01,
-            "Expected Tj=75, got {}", result.junction_temp_c);
+        assert!(
+            (result.junction_temp_c - 75.0).abs() < 0.01,
+            "Expected Tj=75, got {}",
+            result.junction_temp_c
+        );
         assert!(result.case_temp_c > spec.ambient_c);
         assert!(result.junction_temp_c > result.case_temp_c);
     }
@@ -97,7 +99,11 @@ mod tests {
         };
         let r_nat = calculate_thermal(&base);
         let r_forced = calculate_thermal(&forced);
-        assert!(r_forced.theta_ja < r_nat.theta_ja,
-            "Forced airflow should reduce theta_ja: {} < {}", r_forced.theta_ja, r_nat.theta_ja);
+        assert!(
+            r_forced.theta_ja < r_nat.theta_ja,
+            "Forced airflow should reduce theta_ja: {} < {}",
+            r_forced.theta_ja,
+            r_nat.theta_ja
+        );
     }
 }

@@ -948,12 +948,27 @@ mod tests {
 <link name="body"><inertial><origin xyz="0 0 0"/><mass value="5"/><inertia ixx="0.05" iyy="0.05" izz="0.05" ixy="0" ixz="0" iyz="0"/></inertial></link>
 </robot>"#;
         let sys = kami_articulated::parse_urdf(urdf).unwrap();
-        let cfg = Articulation3dConfig::from_articulated_system(&sys, Vec3::new(0.0, 0.0, -9.81), 1.0 / 240.0);
+        let cfg = Articulation3dConfig::from_articulated_system(
+            &sys,
+            Vec3::new(0.0, 0.0, -9.81),
+            1.0 / 240.0,
+        );
         let body = cfg.body_index("body").unwrap();
         let radius = 0.1;
         let cw = ContactWorld::new(
-            vec![(body, Collider::Sphere { center: Vec3::ZERO, radius })],
-            ContactParams { ground_z: 0.0, restitution: 0.0, friction: 0.0, ..Default::default() },
+            vec![(
+                body,
+                Collider::Sphere {
+                    center: Vec3::ZERO,
+                    radius,
+                },
+            )],
+            ContactParams {
+                ground_z: 0.0,
+                restitution: 0.0,
+                friction: 0.0,
+                ..Default::default()
+            },
         );
         let mut st = Articulation3dState::zeros(cfg.ndof);
         st.q[0] = -0.1; // centre 0.1 below ground → penetrated by radius+0.1 = 0.2
@@ -965,9 +980,20 @@ mod tests {
             max_q = max_q.max(st.q[0]);
         }
         // Pushed out to the surface, at rest, with no launch overshoot above it.
-        assert!(max_q < surface + 0.03, "penetration push-out launched the body: max_q={max_q}");
-        assert!((st.q[0] - surface).abs() < 0.03, "did not settle at surface: q={}", st.q[0]);
-        assert!(st.qdot[0].abs() < 0.2, "residual velocity after settle: {}", st.qdot[0]);
+        assert!(
+            max_q < surface + 0.03,
+            "penetration push-out launched the body: max_q={max_q}"
+        );
+        assert!(
+            (st.q[0] - surface).abs() < 0.03,
+            "did not settle at surface: q={}",
+            st.q[0]
+        );
+        assert!(
+            st.qdot[0].abs() < 0.2,
+            "residual velocity after settle: {}",
+            st.qdot[0]
+        );
     }
 
     #[test]
@@ -986,11 +1012,26 @@ mod tests {
 <link name="body"><inertial><origin xyz="0 0 0"/><mass value="5"/><inertia ixx="0.05" iyy="0.05" izz="0.05" ixy="0" ixz="0" iyz="0"/></inertial></link>
 </robot>"#;
         let sys = kami_articulated::parse_urdf(urdf).unwrap();
-        let cfg = Articulation3dConfig::from_articulated_system(&sys, Vec3::new(0.0, 0.0, -9.81), 1.0 / 480.0);
+        let cfg = Articulation3dConfig::from_articulated_system(
+            &sys,
+            Vec3::new(0.0, 0.0, -9.81),
+            1.0 / 480.0,
+        );
         let body = cfg.body_index("body").unwrap();
         let cw = ContactWorld::new(
-            vec![(body, Collider::Sphere { center: Vec3::ZERO, radius: 0.1 })],
-            ContactParams { ground_z: 0.0, restitution: 1.0, friction: 0.0, ..Default::default() },
+            vec![(
+                body,
+                Collider::Sphere {
+                    center: Vec3::ZERO,
+                    radius: 0.1,
+                },
+            )],
+            ContactParams {
+                ground_z: 0.0,
+                restitution: 1.0,
+                friction: 0.0,
+                ..Default::default()
+            },
         );
         let mut st = Articulation3dState::zeros(cfg.ndof);
         st.q[0] = 1.0; // drop from z = 1
@@ -1007,7 +1048,10 @@ mod tests {
             }
         }
         // Bounded residual (integrator-level, ~10%) — not runaway.
-        assert!(emax <= e0 * 1.12, "elastic contact injected too much energy: e0={e0} emax={emax}");
+        assert!(
+            emax <= e0 * 1.12,
+            "elastic contact injected too much energy: e0={e0} emax={emax}"
+        );
         // Energy ≈ conserved: the elastic bounce rebounds near the drop height.
         assert!(apex > 0.85, "e=1 bounce lost too much energy: apex={apex}");
     }

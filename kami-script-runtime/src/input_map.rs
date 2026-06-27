@@ -33,7 +33,11 @@ impl VirtualStick {
     /// A stick centred at `center` with the given travel `radius` and a 15%
     /// dead zone — a sane default for a touch thumbstick.
     pub fn new(center: [f32; 2], radius: f32) -> Self {
-        Self { center, radius, dead_zone: 0.15 }
+        Self {
+            center,
+            radius,
+            dead_zone: 0.15,
+        }
     }
 
     /// Map an active touch point to `[x, y]` in `[-1, 1]`, **y up**.
@@ -45,7 +49,11 @@ impl VirtualStick {
     pub fn axes(&self, touch: [f32; 2]) -> [f32; 2] {
         let dx = touch[0] - self.center[0];
         let dy = touch[1] - self.center[1];
-        let r = if self.radius > f32::EPSILON { self.radius } else { 1.0 };
+        let r = if self.radius > f32::EPSILON {
+            self.radius
+        } else {
+            1.0
+        };
         let mag = (dx * dx + dy * dy).sqrt();
         let dead = self.dead_zone.clamp(0.0, 0.999) * r;
         if mag <= dead {
@@ -104,8 +112,7 @@ impl ButtonEdges {
     /// newly pressed (down this frame, not last) and newly released. Updates the
     /// internal previous-frame set.
     pub fn update(&mut self, held: &[&str]) -> Edges {
-        let cur: std::collections::HashSet<String> =
-            held.iter().map(|s| s.to_string()).collect();
+        let cur: std::collections::HashSet<String> = held.iter().map(|s| s.to_string()).collect();
         let mut pressed: Vec<String> = cur.difference(&self.prev).cloned().collect();
         let mut released: Vec<String> = self.prev.difference(&cur).cloned().collect();
         pressed.sort();

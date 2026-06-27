@@ -38,15 +38,15 @@
 
 use std::collections::BTreeMap;
 
-use kami_scene::{mget, num, root_map, vec3, EdnValue};
+use kami_scene::{EdnValue, mget, num, root_map, vec3};
 use kami_vehicle::{MapGround, SurfaceKind, SurfaceZone};
 
 mod garage;
 pub use garage::{
+    ALL_VEHICLE_KINDS, EngineSpec, GARAGE_EDN, GarageSpec, GearboxSpec, LayoutSpec, TireSpec,
     build_from_edn, build_from_spec, builtin_engine, builtin_gearbox, builtin_tire,
     differential_from_id, engines_from_edn, garage_from_edn, gearboxes_from_edn, shipped_engines,
-    shipped_garage, tires_from_edn, EngineSpec, GarageSpec, GearboxSpec, LayoutSpec, TireSpec,
-    ALL_VEHICLE_KINDS, GARAGE_EDN,
+    shipped_garage, tires_from_edn,
 };
 
 /// The canonical ground CONFIG shipped with this crate (surface table + maps).
@@ -222,7 +222,10 @@ pub fn map_from_edn(src: &str, map_id: &str) -> Result<MapGround, Error> {
         .unwrap_or(SurfaceKind::AsphaltDry);
 
     let mut zones = Vec::new();
-    for z in mget(map, "zones").and_then(|v| v.as_vector()).unwrap_or(&[]) {
+    for z in mget(map, "zones")
+        .and_then(|v| v.as_vector())
+        .unwrap_or(&[])
+    {
         let Some(zm) = z.as_map() else { continue };
         zones.push(SurfaceZone {
             x_min: num(mget(zm, "x-min")),
@@ -287,6 +290,9 @@ mod tests {
     #[test]
     fn non_map_root_is_an_error() {
         assert!(matches!(SurfaceTable::from_edn("42"), Err(Error::NotAMap)));
-        assert!(matches!(map_from_edn("42", "demo-circuit"), Err(Error::NotAMap)));
+        assert!(matches!(
+            map_from_edn("42", "demo-circuit"),
+            Err(Error::NotAMap)
+        ));
     }
 }

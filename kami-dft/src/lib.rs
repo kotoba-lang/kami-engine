@@ -1,12 +1,13 @@
+pub mod atpg;
+pub mod bist;
+pub mod jtag;
 /// KAMI Design for Test — scan chain insertion, BIST generation,
 /// ATPG pattern generation, and JTAG/BSDL support.
-
 pub mod scan;
-pub mod bist;
-pub mod atpg;
-pub mod jtag;
 
-pub use scan::{ScanChainConfig, ScanCell, ScanChain, ScanStats};
-pub use bist::{BistType, MbistConfig, MbistController, LbistConfig, LbistController, MarchAlgorithm};
-pub use atpg::{FaultType, Fault, TestPattern, AtpgResult};
-pub use jtag::{JtagInstruction, BoundaryScanCell, CellType, BsdlDevice};
+pub use atpg::{AtpgResult, Fault, FaultType, TestPattern};
+pub use bist::{
+    BistType, LbistConfig, LbistController, MarchAlgorithm, MbistConfig, MbistController,
+};
+pub use jtag::{BoundaryScanCell, BsdlDevice, CellType, JtagInstruction};
+pub use scan::{ScanCell, ScanChain, ScanChainConfig, ScanStats};

@@ -35,13 +35,25 @@ pub struct ArticulationAction {
 
 impl ArticulationAction {
     pub fn positions(targets: Vec<f32>) -> Self {
-        ArticulationAction { joint_positions: Some(targets), joint_velocities: None, joint_efforts: None }
+        ArticulationAction {
+            joint_positions: Some(targets),
+            joint_velocities: None,
+            joint_efforts: None,
+        }
     }
     pub fn velocities(targets: Vec<f32>) -> Self {
-        ArticulationAction { joint_positions: None, joint_velocities: Some(targets), joint_efforts: None }
+        ArticulationAction {
+            joint_positions: None,
+            joint_velocities: Some(targets),
+            joint_efforts: None,
+        }
     }
     pub fn efforts(targets: Vec<f32>) -> Self {
-        ArticulationAction { joint_positions: None, joint_velocities: None, joint_efforts: Some(targets) }
+        ArticulationAction {
+            joint_positions: None,
+            joint_velocities: None,
+            joint_efforts: Some(targets),
+        }
     }
     pub fn empty(dof: usize) -> Self {
         ArticulationAction {
@@ -176,10 +188,8 @@ mod tests {
     use crate::world::World;
     use kami_articulated::parse_urdf;
 
-    const CARTPOLE_URDF: &str =
-        include_str!("../../fixtures/cartpole/cartpole.urdf");
-    const DP_URDF: &str =
-        include_str!("../../fixtures/double_pendulum/double_pendulum.urdf");
+    const CARTPOLE_URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
+    const DP_URDF: &str = include_str!("../../fixtures/double_pendulum/double_pendulum.urdf");
 
     fn cartpole_world() -> (World, super::super::world::ArticulationHandle) {
         let sys = parse_urdf(CARTPOLE_URDF).unwrap();
@@ -202,7 +212,9 @@ mod tests {
         // pole is un-actuated and may swing freely in response to cart motion —
         // we only verify the slider DOF tracks.
         let (mut w, h) = cartpole_world();
-        let mut ctrl = ArticulationController::new(2, /*kp=*/ 200.0, /*kd=*/ 20.0, /*max=*/ 100.0);
+        let mut ctrl = ArticulationController::new(
+            2, /*kp=*/ 200.0, /*kd=*/ 20.0, /*max=*/ 100.0,
+        );
         let action = ArticulationAction::positions(vec![0.5, 0.0]);
         for _ in 0..600 {
             ctrl.apply_action(w.get_mut(h).unwrap(), &action);
@@ -223,11 +235,13 @@ mod tests {
         let target = vec![std::f32::consts::FRAC_PI_2, 0.0];
         let action = ArticulationAction::positions(target.clone());
         // Start at target so settle is fast.
-        w.get_mut(h).unwrap().set_double_pendulum_state(DoublePendulumState {
-            q1: target[0],
-            q2: target[1],
-            ..Default::default()
-        });
+        w.get_mut(h)
+            .unwrap()
+            .set_double_pendulum_state(DoublePendulumState {
+                q1: target[0],
+                q2: target[1],
+                ..Default::default()
+            });
         for _ in 0..1200 {
             ctrl.apply_action(w.get_mut(h).unwrap(), &action);
             w.step();
@@ -268,9 +282,17 @@ mod tests {
             w.step();
         }
         let vel = w.get(h).unwrap().joint_velocities();
-        assert!(vel[0] > 3.0 && vel[0] < 5.5, "x_dot from 5 N effort: got {}", vel[0]);
+        assert!(
+            vel[0] > 3.0 && vel[0] < 5.5,
+            "x_dot from 5 N effort: got {}",
+            vel[0]
+        );
         let torques = ctrl.get_last_torques();
-        assert!((torques[0] - 5.0).abs() < 1e-5, "direct passthrough: got {}", torques[0]);
+        assert!(
+            (torques[0] - 5.0).abs() < 1e-5,
+            "direct passthrough: got {}",
+            torques[0]
+        );
     }
 
     #[test]
@@ -302,11 +324,13 @@ mod tests {
         let (mut w, h) = dp_world();
         let mut ctrl = ArticulationController::new(2, 500.0, 50.0, 200.0);
         let target = vec![std::f32::consts::FRAC_PI_2, 0.0];
-        w.get_mut(h).unwrap().set_double_pendulum_state(DoublePendulumState {
-            q1: target[0],
-            q2: target[1],
-            ..Default::default()
-        });
+        w.get_mut(h)
+            .unwrap()
+            .set_double_pendulum_state(DoublePendulumState {
+                q1: target[0],
+                q2: target[1],
+                ..Default::default()
+            });
         // Feedforward: rough gravity-comp at horizontal link 1.
         // Gravity torque on q1 at q=(π/2, 0): g1 = (m1+m2)·g·l1·sin(π/2) +
         // m2·g·lc2·sin(π/2). With m=1, g=9.81, l1=lc2_offset=1, lc2=0.5:

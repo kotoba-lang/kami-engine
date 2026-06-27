@@ -94,7 +94,11 @@ impl FileExplorerState {
             return;
         }
         if let Some(pos) = self.current_path.rfind('/') {
-            let parent = if pos == 0 { "/" } else { &self.current_path[..pos] };
+            let parent = if pos == 0 {
+                "/"
+            } else {
+                &self.current_path[..pos]
+            };
             self.current_path = parent.to_string();
             self.entries.clear();
             self.selected.clear();

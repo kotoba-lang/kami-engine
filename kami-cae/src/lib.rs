@@ -141,8 +141,16 @@ pub mod mesh {
             MeshStats {
                 node_count: self.nodes.len(),
                 element_count: self.elements.len(),
-                min_quality: if self.elements.is_empty() { 0.0 } else { quality },
-                avg_quality: if self.elements.is_empty() { 0.0 } else { quality },
+                min_quality: if self.elements.is_empty() {
+                    0.0
+                } else {
+                    quality
+                },
+                avg_quality: if self.elements.is_empty() {
+                    0.0
+                } else {
+                    quality
+                },
             }
         }
     }
@@ -366,20 +374,11 @@ pub mod boundary {
             value: DVec3,
         },
         /// Concentrated force on a named node set.
-        Force {
-            node_set: String,
-            value: DVec3,
-        },
+        Force { node_set: String, value: DVec3 },
         /// Uniform pressure on a named face set.
-        Pressure {
-            face_set: String,
-            value: f64,
-        },
+        Pressure { face_set: String, value: f64 },
         /// Prescribed temperature on a named node set.
-        Temperature {
-            node_set: String,
-            value: f64,
-        },
+        Temperature { node_set: String, value: f64 },
         /// Convection on a named face set.
         Convection {
             face_set: String,
@@ -553,8 +552,16 @@ pub mod solver {
             let ke = cross_section_area * youngs_modulus / length;
 
             // DOF indices
-            let dofs_i = [n_i.0 as usize * 3, n_i.0 as usize * 3 + 1, n_i.0 as usize * 3 + 2];
-            let dofs_j = [n_j.0 as usize * 3, n_j.0 as usize * 3 + 1, n_j.0 as usize * 3 + 2];
+            let dofs_i = [
+                n_i.0 as usize * 3,
+                n_i.0 as usize * 3 + 1,
+                n_i.0 as usize * 3 + 2,
+            ];
+            let dofs_j = [
+                n_j.0 as usize * 3,
+                n_j.0 as usize * 3 + 1,
+                n_j.0 as usize * 3 + 2,
+            ];
 
             let d = [dir.x, dir.y, dir.z];
 
@@ -791,12 +798,8 @@ pub mod postprocess {
     /// the values are returned per element (caller may average to nodes).
     pub fn export_color_map_data(result: &AnalysisResult, field: ResultField) -> Vec<f64> {
         match field {
-            ResultField::Displacement => {
-                result.displacement.iter().map(|d| d.length()).collect()
-            }
-            ResultField::VonMisesStress | ResultField::PrincipalStress => {
-                result.stress.clone()
-            }
+            ResultField::Displacement => result.displacement.iter().map(|d| d.length()).collect(),
+            ResultField::VonMisesStress | ResultField::PrincipalStress => result.stress.clone(),
             ResultField::Strain => result.strain.clone(),
             ResultField::SafetyFactor => {
                 // Safety factor = yield / stress.  Use a placeholder yield
@@ -805,7 +808,13 @@ pub mod postprocess {
                 result
                     .stress
                     .iter()
-                    .map(|&s| if s > 0.0 { yield_stress / s } else { f64::INFINITY })
+                    .map(|&s| {
+                        if s > 0.0 {
+                            yield_stress / s
+                        } else {
+                            f64::INFINITY
+                        }
+                    })
                     .collect()
             }
             ResultField::Temperature | ResultField::ModeShape => {

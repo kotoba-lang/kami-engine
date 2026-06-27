@@ -14,9 +14,9 @@
 
 use glam::Vec2;
 use kami_vehicle::{
-    ground::FlatGround,
-    models::garage::{build, VehicleKind},
     IntegratorMode, Vehicle,
+    ground::FlatGround,
+    models::garage::{VehicleKind, build},
 };
 
 use crate::plant::Plant;

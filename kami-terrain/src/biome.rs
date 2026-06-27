@@ -43,33 +43,65 @@ impl BiomePreset {
     pub fn heightmap(&self, seed: f32) -> HeightmapConfig {
         match self {
             BiomePreset::Plains => HeightmapConfig {
-                seed, max_height: 80.0, frequency: 0.008, octaves: 7,
-                lacunarity: 2.0, persistence: 0.5,
+                seed,
+                max_height: 80.0,
+                frequency: 0.008,
+                octaves: 7,
+                lacunarity: 2.0,
+                persistence: 0.5,
             },
             BiomePreset::Quarry => HeightmapConfig {
                 // Rolling hills + mid-scale mesas. ~80m main feature wavelength,
                 // 7 octaves for detail layering, persistence <0.5 keeps high-freq
                 // gentle (prevents jagged noise). Works at 512m world scale.
-                seed, max_height: 120.0, frequency: 0.012, octaves: 7,
-                lacunarity: 2.1, persistence: 0.45,
+                seed,
+                max_height: 120.0,
+                frequency: 0.012,
+                octaves: 7,
+                lacunarity: 2.1,
+                persistence: 0.45,
             },
             BiomePreset::Desert => HeightmapConfig {
-                seed, max_height: 45.0, frequency: 0.006, octaves: 5,
-                lacunarity: 2.0, persistence: 0.45,
+                seed,
+                max_height: 45.0,
+                frequency: 0.006,
+                octaves: 5,
+                lacunarity: 2.0,
+                persistence: 0.45,
             },
             BiomePreset::Tundra => HeightmapConfig {
-                seed, max_height: 110.0, frequency: 0.005, octaves: 6,
-                lacunarity: 2.0, persistence: 0.5,
+                seed,
+                max_height: 110.0,
+                frequency: 0.005,
+                octaves: 6,
+                lacunarity: 2.0,
+                persistence: 0.5,
             },
         }
     }
 
     pub fn splat_thresholds(&self) -> SplatThresholds {
         match self {
-            BiomePreset::Plains => SplatThresholds { sand_line: 15.0, snow_line: 100.0, rock_slope: 0.4 },
-            BiomePreset::Quarry => SplatThresholds { sand_line: 5.0,  snow_line: 200.0, rock_slope: 0.22 },
-            BiomePreset::Desert => SplatThresholds { sand_line: 200.0, snow_line: 999.0, rock_slope: 0.6 },
-            BiomePreset::Tundra => SplatThresholds { sand_line: 10.0, snow_line: 55.0,  rock_slope: 0.45 },
+            BiomePreset::Plains => SplatThresholds {
+                sand_line: 15.0,
+                snow_line: 100.0,
+                rock_slope: 0.4,
+            },
+            BiomePreset::Quarry => SplatThresholds {
+                sand_line: 5.0,
+                snow_line: 200.0,
+                rock_slope: 0.22,
+            },
+            BiomePreset::Desert => SplatThresholds {
+                sand_line: 200.0,
+                snow_line: 999.0,
+                rock_slope: 0.6,
+            },
+            BiomePreset::Tundra => SplatThresholds {
+                sand_line: 10.0,
+                snow_line: 55.0,
+                rock_slope: 0.45,
+            },
         }
     }
 
@@ -152,11 +184,18 @@ mod tests {
 
     #[test]
     fn all_biomes_have_palette() {
-        let biomes = [BiomePreset::Plains, BiomePreset::Quarry, BiomePreset::Desert, BiomePreset::Tundra];
+        let biomes = [
+            BiomePreset::Plains,
+            BiomePreset::Quarry,
+            BiomePreset::Desert,
+            BiomePreset::Tundra,
+        ];
         for b in &biomes {
             let p = b.palette();
             for rgb in &p.base {
-                for &c in rgb { assert!(c >= 0.0 && c <= 1.0); }
+                for &c in rgb {
+                    assert!(c >= 0.0 && c <= 1.0);
+                }
             }
         }
     }

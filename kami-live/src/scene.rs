@@ -48,7 +48,7 @@ use kami_scene::{EdnValue, mget, num, root_map, vec3};
 use std::collections::BTreeMap;
 
 use crate::audio::{
-    default_sound_bank, midi_to_hz, AudioPattern, BassLine, BassNote, DrumPattern, DrumSlot, SoundCue,
+    midi_to_hz, AudioPattern, BassLine, BassNote, DrumPattern, DrumSlot, SoundCue,
 };
 use crate::crowd::CrowdConfig;
 use crate::lighting::{Envelope, LightingCue, LightingFixture};
@@ -594,36 +594,50 @@ pub fn cue_kind_by_name(name: &str) -> CueKind {
     }
 }
 
-/// Build the scene's sound bank: the [`default_sound_bank`] plus any
-/// `:dance/audio :bank {<name> {:wave :freq :to :dur :gain}}` overrides/additions.
+/// The default kami.audio sound bank, shipped as EDN data (ADR-0038 single
+/// source). The drum/bass/SFX recipes a scene starts from live here, not in a
+/// Rust `default_sound_bank()` mirror; a scene's `:dance/audio :bank` overrides.
+pub const DEFAULT_AUDIO_EDN: &str = include_str!("../data/audio.edn");
+
+/// Build the scene's sound bank: the shipped [`DEFAULT_AUDIO_EDN`] defaults plus
+/// any `:dance/audio :bank {<name> {:wave :freq :to :dur :gain}}` overrides.
 fn parse_sound_bank(root: &BTreeMap<EdnValue, EdnValue>) -> BTreeMap<String, SoundCue> {
-    let mut bank = default_sound_bank();
-    if let Some(bm) = mget(root, "dance/audio")
+    let mut bank = BTreeMap::new();
+    if let Some(defaults) = root_map(DEFAULT_AUDIO_EDN) {
+        merge_sound_bank(&mut bank, &defaults);
+    }
+    merge_sound_bank(&mut bank, root);
+    bank
+}
+
+/// Merge any `:dance/audio :bank` cues from `root` into `bank` (override by name).
+fn merge_sound_bank(bank: &mut BTreeMap<String, SoundCue>, root: &BTreeMap<EdnValue, EdnValue>) {
+    let Some(bm) = mget(root, "dance/audio")
         .and_then(|v| v.as_map())
         .and_then(|am| mget(am, "bank").and_then(|v| v.as_map()))
-    {
-        for (k, v) in bm {
-            let name = k
-                .as_keyword()
-                .map(|kw| kw.0.name.clone())
-                .or_else(|| k.as_string().map(|s| s.to_string()));
-            let (Some(name), Some(cm)) = (name, v.as_map()) else { continue };
-            bank.insert(
-                name,
-                SoundCue {
-                    wave: mget(cm, "wave")
-                        .and_then(|v| v.as_string().map(|s| s.to_string()))
-                        .or_else(|| ident(mget(cm, "wave")))
-                        .unwrap_or_else(|| "sine".into()),
-                    freq: mget(cm, "freq").map(|v| num(Some(v))).unwrap_or(440.0),
-                    to: mget(cm, "to").map(|v| num(Some(v))),
-                    dur: mget(cm, "dur").map(|v| num(Some(v))).unwrap_or(0.1),
-                    gain: mget(cm, "gain").map(|v| num(Some(v))).unwrap_or(0.2),
-                },
-            );
-        }
+    else {
+        return;
+    };
+    for (k, v) in bm {
+        let name = k
+            .as_keyword()
+            .map(|kw| kw.0.name.clone())
+            .or_else(|| k.as_string().map(|s| s.to_string()));
+        let (Some(name), Some(cm)) = (name, v.as_map()) else { continue };
+        bank.insert(
+            name,
+            SoundCue {
+                wave: mget(cm, "wave")
+                    .and_then(|v| v.as_string().map(|s| s.to_string()))
+                    .or_else(|| ident(mget(cm, "wave")))
+                    .unwrap_or_else(|| "sine".into()),
+                freq: mget(cm, "freq").map(|v| num(Some(v))).unwrap_or(440.0),
+                to: mget(cm, "to").map(|v| num(Some(v))),
+                dur: mget(cm, "dur").map(|v| num(Some(v))).unwrap_or(0.1),
+                gain: mget(cm, "gain").map(|v| num(Some(v))).unwrap_or(0.2),
+            },
+        );
     }
-    bank
 }
 
 /// Project a [`SoundCue`] recipe into a `kami.audio`-style EDN map

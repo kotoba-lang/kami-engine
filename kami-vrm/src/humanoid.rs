@@ -3,8 +3,8 @@
 use glam::Mat4;
 use kami_skeleton::{Bone, Skeleton};
 
-use crate::vrm_types::{HumanBoneName, VrmDocument};
 use crate::VrmError;
+use crate::vrm_types::{HumanBoneName, VrmDocument};
 
 /// Convert VRM humanoid bone mapping to kami-skeleton::Skeleton.
 ///

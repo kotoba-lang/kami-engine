@@ -307,11 +307,11 @@ fn node_local_transform(n: &GltfNode) -> Mat4 {
     )
 }
 
-fn mesh_local_aabb(
-    doc: &GltfDoc,
-    mesh_idx: usize,
-) -> Result<(Vec3, Vec3), GltfError> {
-    let mesh = doc.meshes.get(mesh_idx).ok_or(GltfError::BadMeshIndex(mesh_idx))?;
+fn mesh_local_aabb(doc: &GltfDoc, mesh_idx: usize) -> Result<(Vec3, Vec3), GltfError> {
+    let mesh = doc
+        .meshes
+        .get(mesh_idx)
+        .ok_or(GltfError::BadMeshIndex(mesh_idx))?;
     let mut lo = Vec3::splat(f32::INFINITY);
     let mut hi = Vec3::splat(f32::NEG_INFINITY);
     for prim in &mesh.primitives {
@@ -319,13 +319,22 @@ fn mesh_local_aabb(
             Some(i) => i,
             None => continue,
         };
-        let acc = doc.accessors.get(acc_idx).ok_or(GltfError::BadAccessor(acc_idx))?;
-        let mn = acc.min.as_ref().ok_or_else(|| GltfError::MissingAccessorBounds {
-            mesh: mesh.name.clone().unwrap_or_default(),
-        })?;
-        let mx = acc.max.as_ref().ok_or_else(|| GltfError::MissingAccessorBounds {
-            mesh: mesh.name.clone().unwrap_or_default(),
-        })?;
+        let acc = doc
+            .accessors
+            .get(acc_idx)
+            .ok_or(GltfError::BadAccessor(acc_idx))?;
+        let mn = acc
+            .min
+            .as_ref()
+            .ok_or_else(|| GltfError::MissingAccessorBounds {
+                mesh: mesh.name.clone().unwrap_or_default(),
+            })?;
+        let mx = acc
+            .max
+            .as_ref()
+            .ok_or_else(|| GltfError::MissingAccessorBounds {
+                mesh: mesh.name.clone().unwrap_or_default(),
+            })?;
         if mn.len() < 3 || mx.len() < 3 {
             return Err(GltfError::MissingAccessorBounds {
                 mesh: mesh.name.clone().unwrap_or_default(),
@@ -380,45 +389,46 @@ fn walk_node(
     parent_world: Mat4,
     parent_part_id: Option<String>,
 ) -> Result<(), GltfError> {
-    let node = ctx.doc.nodes.get(node_idx).ok_or(GltfError::BadNodeIndex(node_idx))?;
+    let node = ctx
+        .doc
+        .nodes
+        .get(node_idx)
+        .ok_or(GltfError::BadNodeIndex(node_idx))?;
     let world = parent_world * node_local_transform(node);
 
     // Decide whether this node becomes a VehiclePart.
-    let part_for_this_node: Option<(etzhayyimPart, usize)> = if let Some(part) = node
-        .extras
-        .as_ref()
-        .and_then(|e| e.gftd_part.as_ref())
-    {
-        let mesh_idx = node.mesh.ok_or_else(|| GltfError::PartWithoutMesh {
-            node_idx,
-            name: node.name.clone().unwrap_or_default(),
-        })?;
-        Some((part.clone_into_owned(), mesh_idx))
-    } else if let (Some((auto_kind, auto_mat)), Some(mesh_idx)) =
-        (ctx.options.auto_part_kind, node.mesh)
-    {
-        let auto_id = node
-            .name
-            .clone()
-            .unwrap_or_else(|| format!("node_{node_idx}"));
-        Some((
-            etzhayyimPart {
-                id: auto_id.clone(),
-                display_name: node.name.clone(),
-                kind: kind_label(auto_kind).to_string(),
-                material: material_label(auto_mat).to_string(),
-                mass_kg: None,
-                parent: None,
-                break_group: None,
-                supplier: None,
-                source: None,
-                revision: None,
-            },
-            mesh_idx,
-        ))
-    } else {
-        None
-    };
+    let part_for_this_node: Option<(etzhayyimPart, usize)> =
+        if let Some(part) = node.extras.as_ref().and_then(|e| e.gftd_part.as_ref()) {
+            let mesh_idx = node.mesh.ok_or_else(|| GltfError::PartWithoutMesh {
+                node_idx,
+                name: node.name.clone().unwrap_or_default(),
+            })?;
+            Some((part.clone_into_owned(), mesh_idx))
+        } else if let (Some((auto_kind, auto_mat)), Some(mesh_idx)) =
+            (ctx.options.auto_part_kind, node.mesh)
+        {
+            let auto_id = node
+                .name
+                .clone()
+                .unwrap_or_else(|| format!("node_{node_idx}"));
+            Some((
+                etzhayyimPart {
+                    id: auto_id.clone(),
+                    display_name: node.name.clone(),
+                    kind: kind_label(auto_kind).to_string(),
+                    material: material_label(auto_mat).to_string(),
+                    mass_kg: None,
+                    parent: None,
+                    break_group: None,
+                    supplier: None,
+                    source: None,
+                    revision: None,
+                },
+                mesh_idx,
+            ))
+        } else {
+            None
+        };
 
     let this_part_id = if let Some((part, mesh_idx)) = part_for_this_node {
         let (lo, hi) = mesh_local_aabb(ctx.doc, mesh_idx)?;
@@ -514,7 +524,10 @@ pub fn from_gltf_json(json: &str, opts: &IngestOptions) -> Result<VehicleAssembl
         .ok_or(GltfError::MissingVehicleAnnotation)?;
 
     let scene_idx = opts.scene_index.or(doc.scene).unwrap_or(0);
-    let scene = doc.scenes.get(scene_idx).ok_or(GltfError::BadScene(scene_idx))?;
+    let scene = doc
+        .scenes
+        .get(scene_idx)
+        .ok_or(GltfError::BadScene(scene_idx))?;
 
     let mut ctx = WalkCtx {
         doc: &doc,
@@ -858,8 +871,16 @@ mod tests {
         let asm = from_gltf_json(&doc, &IngestOptions::default()).unwrap();
         let p = &asm.parts[0];
         let expected = 0.5_f32 * 2.0_f32.sqrt();
-        assert!((p.aabb_max[0] - expected).abs() < 1e-3, "x: {}", p.aabb_max[0]);
-        assert!((p.aabb_max[2] - expected).abs() < 1e-3, "z: {}", p.aabb_max[2]);
+        assert!(
+            (p.aabb_max[0] - expected).abs() < 1e-3,
+            "x: {}",
+            p.aabb_max[0]
+        );
+        assert!(
+            (p.aabb_max[2] - expected).abs() < 1e-3,
+            "z: {}",
+            p.aabb_max[2]
+        );
         // Y axis is unchanged by a Y-rotation.
         assert!((p.aabb_max[1] - 0.5).abs() < 1e-4, "y: {}", p.aabb_max[1]);
     }

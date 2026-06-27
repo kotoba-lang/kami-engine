@@ -1,5 +1,4 @@
 /// Standard cell placement — greedy left-to-right row-based placement.
-
 use serde::{Deserialize, Serialize};
 
 /// Cell orientation (DEF/LEF convention).
@@ -69,27 +68,47 @@ impl Placement {
         let total_cells = self.cells.len();
         let total_row_area: f64 = self.rows.iter().map(|r| r.total_width() * r.height).sum();
         // Assume each cell occupies one site_width * row_height
-        let cell_area: f64 = self.cells.iter().map(|c| {
-            if let Some(row) = self.rows.get(c.row_idx) {
-                row.site_width * row.height
-            } else {
-                0.0
-            }
-        }).sum();
-        let utilization = if total_row_area > 0.0 { cell_area / total_row_area } else { 0.0 };
+        let cell_area: f64 = self
+            .cells
+            .iter()
+            .map(|c| {
+                if let Some(row) = self.rows.get(c.row_idx) {
+                    row.site_width * row.height
+                } else {
+                    0.0
+                }
+            })
+            .sum();
+        let utilization = if total_row_area > 0.0 {
+            cell_area / total_row_area
+        } else {
+            0.0
+        };
 
         // HPWL: simple bounding-box estimate over all cells
         let hpwl = if self.cells.len() >= 2 {
             let min_x = self.cells.iter().map(|c| c.x).fold(f64::INFINITY, f64::min);
-            let max_x = self.cells.iter().map(|c| c.x).fold(f64::NEG_INFINITY, f64::max);
+            let max_x = self
+                .cells
+                .iter()
+                .map(|c| c.x)
+                .fold(f64::NEG_INFINITY, f64::max);
             let min_y = self.cells.iter().map(|c| c.y).fold(f64::INFINITY, f64::min);
-            let max_y = self.cells.iter().map(|c| c.y).fold(f64::NEG_INFINITY, f64::max);
+            let max_y = self
+                .cells
+                .iter()
+                .map(|c| c.y)
+                .fold(f64::NEG_INFINITY, f64::max);
             (max_x - min_x) + (max_y - min_y)
         } else {
             0.0
         };
 
-        PlacementStats { total_cells, utilization, hpwl }
+        PlacementStats {
+            total_cells,
+            utilization,
+            hpwl,
+        }
     }
 }
 
@@ -117,12 +136,19 @@ pub fn place_cells(netlist: Vec<NetlistCell>, rows: Vec<PlacementRow>) -> Placem
             site_cursor = 0;
         }
         if row_idx >= placement.rows.len() {
-            log::warn!("No space for cell '{}', placement overflow", cell.instance_name);
+            log::warn!(
+                "No space for cell '{}', placement overflow",
+                cell.instance_name
+            );
             break;
         }
 
         let row = &placement.rows[row_idx];
-        let orientation = if row_idx % 2 == 0 { Orientation::N } else { Orientation::FS };
+        let orientation = if row_idx % 2 == 0 {
+            Orientation::N
+        } else {
+            Orientation::FS
+        };
         let x = site_cursor as f64 * row.site_width;
         let y = row.y;
 
@@ -148,14 +174,26 @@ mod tests {
     #[test]
     fn left_to_right_placement() {
         let rows = vec![
-            PlacementRow { y: 0.0, height: 10.0, site_width: 1.0, num_sites: 5 },
-            PlacementRow { y: 10.0, height: 10.0, site_width: 1.0, num_sites: 5 },
+            PlacementRow {
+                y: 0.0,
+                height: 10.0,
+                site_width: 1.0,
+                num_sites: 5,
+            },
+            PlacementRow {
+                y: 10.0,
+                height: 10.0,
+                site_width: 1.0,
+                num_sites: 5,
+            },
         ];
-        let cells: Vec<NetlistCell> = (0..8).map(|i| NetlistCell {
-            cell_name: "INV".into(),
-            instance_name: format!("U{i}"),
-            width_sites: 1,
-        }).collect();
+        let cells: Vec<NetlistCell> = (0..8)
+            .map(|i| NetlistCell {
+                cell_name: "INV".into(),
+                instance_name: format!("U{i}"),
+                width_sites: 1,
+            })
+            .collect();
 
         let p = place_cells(cells, rows);
         assert_eq!(p.cells.len(), 8);
@@ -170,12 +208,23 @@ mod tests {
 
     #[test]
     fn placement_stats_hpwl() {
-        let rows = vec![
-            PlacementRow { y: 0.0, height: 10.0, site_width: 1.0, num_sites: 100 },
-        ];
+        let rows = vec![PlacementRow {
+            y: 0.0,
+            height: 10.0,
+            site_width: 1.0,
+            num_sites: 100,
+        }];
         let cells = vec![
-            NetlistCell { cell_name: "BUF".into(), instance_name: "U0".into(), width_sites: 1 },
-            NetlistCell { cell_name: "BUF".into(), instance_name: "U1".into(), width_sites: 1 },
+            NetlistCell {
+                cell_name: "BUF".into(),
+                instance_name: "U0".into(),
+                width_sites: 1,
+            },
+            NetlistCell {
+                cell_name: "BUF".into(),
+                instance_name: "U1".into(),
+                width_sites: 1,
+            },
         ];
         let p = place_cells(cells, rows);
         let stats = p.placement_stats();

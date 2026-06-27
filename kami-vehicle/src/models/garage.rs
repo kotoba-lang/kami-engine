@@ -8,7 +8,7 @@ use crate::powertrain::{DrivelineLayout, TorqueCurve};
 use crate::vehicle::Vehicle;
 use crate::wheel::PacejkaParams;
 
-use super::sedan::{sedan, SedanSpec};
+use super::sedan::{SedanSpec, sedan};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VehicleKind {

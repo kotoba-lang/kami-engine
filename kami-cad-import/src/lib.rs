@@ -17,14 +17,14 @@
 //! Phase 0/1 PoC: programmatic / OpenSCAD source. STEP and glTF
 //! ingest land in Phase 1.1.
 
-pub mod part;
-pub mod jbeam_emit;
-pub mod sbom;
-pub mod ingest;
-pub mod register;
 pub mod demos;
+pub mod ingest;
+pub mod jbeam_emit;
+pub mod part;
+pub mod register;
+pub mod sbom;
 
 pub use part::{
-    Hardpoint, HardpointKind, Material, PartKind, ProvenanceSource,
-    Supplier, VehicleAssembly, VehiclePart,
+    Hardpoint, HardpointKind, Material, PartKind, ProvenanceSource, Supplier, VehicleAssembly,
+    VehiclePart,
 };

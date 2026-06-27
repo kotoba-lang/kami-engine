@@ -1,5 +1,4 @@
 /// Clock Tree Synthesis — balanced buffer tree construction for clock distribution.
-
 use serde::{Deserialize, Serialize};
 
 /// Specification for clock tree construction.
@@ -96,7 +95,8 @@ pub fn build_clock_tree(spec: &CtsSpec, sink_positions: &[(f64, f64)]) -> ClockT
             root_buffer: CtsBuffer {
                 name: format!("{}_root", spec.clock_name),
                 cell_type: spec.buffer_cell.clone(),
-                x: 0.0, y: 0.0,
+                x: 0.0,
+                y: 0.0,
                 load_cap: 0.0,
             },
             levels: Vec::new(),
@@ -108,7 +108,8 @@ pub fn build_clock_tree(spec: &CtsSpec, sink_positions: &[(f64, f64)]) -> ClockT
     let root_buffer = CtsBuffer {
         name: format!("{}_root", spec.clock_name),
         cell_type: spec.buffer_cell.clone(),
-        x: cx, y: cy,
+        x: cx,
+        y: cy,
         load_cap: sink_positions.len() as f64 * 0.01, // rough estimate
     };
 
@@ -119,7 +120,10 @@ pub fn build_clock_tree(spec: &CtsSpec, sink_positions: &[(f64, f64)]) -> ClockT
 
     // Recursively bisect until each group has <= 4 sinks
     while current_groups.iter().any(|(_, sinks)| sinks.len() > 4) {
-        let mut level = CtsLevel { buffers: Vec::new(), wire_segments: Vec::new() };
+        let mut level = CtsLevel {
+            buffers: Vec::new(),
+            wire_segments: Vec::new(),
+        };
         let mut next_groups = Vec::new();
 
         for (parent_name, sinks) in &current_groups {
@@ -139,7 +143,8 @@ pub fn build_clock_tree(spec: &CtsSpec, sink_positions: &[(f64, f64)]) -> ClockT
                 level.buffers.push(CtsBuffer {
                     name: buf_name.clone(),
                     cell_type: spec.buffer_cell.clone(),
-                    x: bx, y: by,
+                    x: bx,
+                    y: by,
                     load_cap: half.len() as f64 * 0.01,
                 });
                 level.wire_segments.push(CtsWire {
@@ -156,7 +161,10 @@ pub fn build_clock_tree(spec: &CtsSpec, sink_positions: &[(f64, f64)]) -> ClockT
     }
 
     // Final level: wire from leaf buffers to sinks
-    let mut leaf_level = CtsLevel { buffers: Vec::new(), wire_segments: Vec::new() };
+    let mut leaf_level = CtsLevel {
+        buffers: Vec::new(),
+        wire_segments: Vec::new(),
+    };
     for (parent_name, sinks) in &current_groups {
         let parent_pos = find_buf_pos(&root_buffer, &levels, parent_name);
         for (i, &(sx, sy)) in sinks.iter().enumerate() {
@@ -173,7 +181,10 @@ pub fn build_clock_tree(spec: &CtsSpec, sink_positions: &[(f64, f64)]) -> ClockT
         levels.push(leaf_level);
     }
 
-    ClockTree { root_buffer, levels }
+    ClockTree {
+        root_buffer,
+        levels,
+    }
 }
 
 fn centroid(points: &[(f64, f64)]) -> (f64, f64) {
@@ -186,8 +197,16 @@ fn centroid(points: &[(f64, f64)]) -> (f64, f64) {
 fn bisect_sinks(sinks: &[(f64, f64)]) -> (Vec<(f64, f64)>, Vec<(f64, f64)>) {
     let mut sorted = sinks.to_vec();
     // Split along the longer axis
-    let (min_x, max_x) = sorted.iter().fold((f64::INFINITY, f64::NEG_INFINITY), |(mn, mx), p| (mn.min(p.0), mx.max(p.0)));
-    let (min_y, max_y) = sorted.iter().fold((f64::INFINITY, f64::NEG_INFINITY), |(mn, mx), p| (mn.min(p.1), mx.max(p.1)));
+    let (min_x, max_x) = sorted
+        .iter()
+        .fold((f64::INFINITY, f64::NEG_INFINITY), |(mn, mx), p| {
+            (mn.min(p.0), mx.max(p.0))
+        });
+    let (min_y, max_y) = sorted
+        .iter()
+        .fold((f64::INFINITY, f64::NEG_INFINITY), |(mn, mx), p| {
+            (mn.min(p.1), mx.max(p.1))
+        });
     if (max_x - min_x) >= (max_y - min_y) {
         sorted.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
     } else {
@@ -224,9 +243,9 @@ mod tests {
             buffer_cell: "CLKBUF_X4".into(),
         };
         // 16 sinks in a grid
-        let sinks: Vec<(f64, f64)> = (0..16).map(|i| {
-            ((i % 4) as f64 * 100.0, (i / 4) as f64 * 100.0)
-        }).collect();
+        let sinks: Vec<(f64, f64)> = (0..16)
+            .map(|i| ((i % 4) as f64 * 100.0, (i / 4) as f64 * 100.0))
+            .collect();
 
         let tree = build_clock_tree(&spec, &sinks);
         let stats = tree.clock_tree_stats();

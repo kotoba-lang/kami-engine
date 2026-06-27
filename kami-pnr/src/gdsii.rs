@@ -2,7 +2,6 @@
 ///
 /// Reference: GDSII Stream Format Manual (Calma GDS II).
 /// Record format: 2 bytes length + 1 byte record type + 1 byte data type + payload.
-
 use serde::{Deserialize, Serialize};
 
 // GDSII record type constants
@@ -177,7 +176,11 @@ pub fn export_gdsii(structures: &[GdsiiStructure]) -> Vec<u8> {
 
         for element in &structure.elements {
             match element {
-                GdsiiElement::Boundary { layer, datatype, xy } => {
+                GdsiiElement::Boundary {
+                    layer,
+                    datatype,
+                    xy,
+                } => {
                     write_empty_record(&mut buf, BOUNDARY);
                     write_int16_record(&mut buf, LAYER, &[*layer]);
                     write_int16_record(&mut buf, DATATYPE, &[*datatype]);
@@ -185,7 +188,12 @@ pub fn export_gdsii(structures: &[GdsiiStructure]) -> Vec<u8> {
                     write_int32_record(&mut buf, XY, &coords);
                     write_empty_record(&mut buf, ENDEL);
                 }
-                GdsiiElement::Path { layer, datatype, width, xy } => {
+                GdsiiElement::Path {
+                    layer,
+                    datatype,
+                    width,
+                    xy,
+                } => {
                     write_empty_record(&mut buf, PATH);
                     write_int16_record(&mut buf, LAYER, &[*layer]);
                     write_int16_record(&mut buf, DATATYPE, &[*datatype]);

@@ -65,13 +65,16 @@ pub fn place_instances(
     let active_species: Vec<&Species> = if config.species_filter.is_empty() {
         table.iter().collect()
     } else {
-        table.iter().filter(|s| config.species_filter.contains(&s.id)).collect()
+        table
+            .iter()
+            .filter(|s| config.species_filter.contains(&s.id))
+            .collect()
     };
 
     for (idx, species) in active_species.iter().enumerate() {
         let mut rng = Rng::new(config.seed.wrapping_add(idx as u32 * 7919));
-        let count = (species.density * config.density_scale
-            * (config.extent / 100.0).powi(2)) as usize;
+        let count =
+            (species.density * config.density_scale * (config.extent / 100.0).powi(2)) as usize;
 
         let mut placed: Vec<(f32, f32)> = Vec::with_capacity(count);
         let min_dist_sq = species.min_distance * species.min_distance;
@@ -178,7 +181,12 @@ mod tests {
         let cfg = HeightmapConfig::default();
         let hm = Heightmap::generate(65, 65, 0.0, 0.0, &cfg);
         let splat = Splatmap::from_heightmap(&hm, 15.0, 90.0, 0.45);
-        let pc = PlacementConfig { seed: 7, extent: 32.0, density_scale: 0.3, species_filter: vec![] };
+        let pc = PlacementConfig {
+            seed: 7,
+            extent: 32.0,
+            density_scale: 0.3,
+            species_filter: vec![],
+        };
         let a = place_instances(&hm, &splat, 0.0, 0.0, &pc);
         let b = place_instances(&hm, &splat, 0.0, 0.0, &pc);
         assert_eq!(a.len(), b.len());

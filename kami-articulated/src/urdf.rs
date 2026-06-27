@@ -15,7 +15,10 @@ pub enum ParseError {
     #[error("missing required element: {0}")]
     MissingElement(&'static str),
     #[error("missing required attribute `{attr}` on element `{elem}`")]
-    MissingAttr { elem: &'static str, attr: &'static str },
+    MissingAttr {
+        elem: &'static str,
+        attr: &'static str,
+    },
     #[error("invalid number `{0}` in {1}")]
     InvalidNumber(String, &'static str),
     #[error("unsupported joint type `{0}` (expected prismatic | revolute | fixed | continuous)")]
@@ -32,7 +35,10 @@ pub struct Pose {
 
 impl Default for Pose {
     fn default() -> Self {
-        Pose { xyz: Vec3::ZERO, rpy: Vec3::ZERO }
+        Pose {
+            xyz: Vec3::ZERO,
+            rpy: Vec3::ZERO,
+        }
     }
 }
 
@@ -137,13 +143,20 @@ pub fn parse_urdf(xml: &str) -> Result<ArticulatedSystem, ParseError> {
         }
     }
 
-    Ok(ArticulatedSystem { name, links, joints })
+    Ok(ArticulatedSystem {
+        name,
+        links,
+        joints,
+    })
 }
 
 fn parse_link(node: Node) -> Result<Link, ParseError> {
     let name = node
         .attribute("name")
-        .ok_or(ParseError::MissingAttr { elem: "link", attr: "name" })?
+        .ok_or(ParseError::MissingAttr {
+            elem: "link",
+            attr: "name",
+        })?
         .to_string();
     let mut inertia = Inertia::default();
 
@@ -170,11 +183,15 @@ fn parse_link(node: Node) -> Result<Link, ParseError> {
 fn parse_joint(node: Node) -> Result<Joint, ParseError> {
     let name = node
         .attribute("name")
-        .ok_or(ParseError::MissingAttr { elem: "joint", attr: "name" })?
+        .ok_or(ParseError::MissingAttr {
+            elem: "joint",
+            attr: "name",
+        })?
         .to_string();
-    let kind_str = node
-        .attribute("type")
-        .ok_or(ParseError::MissingAttr { elem: "joint", attr: "type" })?;
+    let kind_str = node.attribute("type").ok_or(ParseError::MissingAttr {
+        elem: "joint",
+        attr: "type",
+    })?;
     let kind = match kind_str {
         "fixed" => JointKind::Fixed,
         "prismatic" => JointKind::Prismatic,
@@ -278,9 +295,10 @@ fn parse_vec3(s: &str) -> Result<Vec3, ParseError> {
 }
 
 fn parse_attr_f32(node: Node, attr: &str, ctx: &'static str) -> Result<f32, ParseError> {
-    let raw = node
-        .attribute(attr)
-        .ok_or(ParseError::MissingAttr { elem: ctx, attr: leak(attr) })?;
+    let raw = node.attribute(attr).ok_or(ParseError::MissingAttr {
+        elem: ctx,
+        attr: leak(attr),
+    })?;
     raw.parse::<f32>()
         .map_err(|_| ParseError::InvalidNumber(raw.to_string(), ctx))
 }
@@ -293,9 +311,7 @@ fn leak(s: &str) -> &'static str {
 mod tests {
     use super::*;
 
-    const CARTPOLE_URDF: &str = include_str!(
-        "../../fixtures/cartpole/cartpole.urdf"
-    );
+    const CARTPOLE_URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
 
     #[test]
     fn parses_cartpole_urdf() {
@@ -308,8 +324,16 @@ mod tests {
     #[test]
     fn cartpole_topology_correct() {
         let sys = parse_urdf(CARTPOLE_URDF).unwrap();
-        let slider = sys.joints.iter().find(|j| j.name == "slider_to_cart").unwrap();
-        let revolute = sys.joints.iter().find(|j| j.name == "cart_to_pole").unwrap();
+        let slider = sys
+            .joints
+            .iter()
+            .find(|j| j.name == "slider_to_cart")
+            .unwrap();
+        let revolute = sys
+            .joints
+            .iter()
+            .find(|j| j.name == "cart_to_pole")
+            .unwrap();
 
         assert_eq!(slider.kind, JointKind::Prismatic);
         assert_eq!(slider.parent, "world");

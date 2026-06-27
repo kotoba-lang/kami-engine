@@ -111,11 +111,7 @@ impl ScalarField {
         // Snapshot the old values so the update is simultaneous (we
         // can't mutate and read the same buffer for Laplacian).
         let old = ScalarField {
-            chunks: self
-                .chunks
-                .iter()
-                .map(|(c, v)| (*c, v.clone()))
-                .collect(),
+            chunks: self.chunks.iter().map(|(c, v)| (*c, v.clone())).collect(),
         };
         let decay_coeff = (1.0 - decay * dt).max(0.0);
 
@@ -125,9 +121,12 @@ impl ScalarField {
         for &cc in old.chunks.keys() {
             active.push(cc);
             for (dx, dy, dz) in [
-                (-1, 0, 0), (1, 0, 0),
-                (0, -1, 0), (0, 1, 0),
-                (0, 0, -1), (0, 0, 1),
+                (-1, 0, 0),
+                (1, 0, 0),
+                (0, -1, 0),
+                (0, 1, 0),
+                (0, 0, -1),
+                (0, 0, 1),
             ] {
                 let ncc = (cc.0 + dx, cc.1 + dy, cc.2 + dz);
                 if !active.contains(&ncc) {
@@ -224,7 +223,12 @@ impl ScalarField {
                         let idx = lx + ly * CHUNK_SIZE + lz * CHUNK_SIZE * CHUNK_SIZE;
                         let v = cells[idx];
                         if v.abs() > threshold {
-                            f(base_x + lx as i32, base_y + ly as i32, base_z + lz as i32, v);
+                            f(
+                                base_x + lx as i32,
+                                base_y + ly as i32,
+                                base_z + lz as i32,
+                                v,
+                            );
                         }
                     }
                 }
@@ -277,11 +281,17 @@ pub struct EdgeField {
 }
 
 impl Default for EdgeField {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl EdgeField {
-    pub fn new() -> Self { Self { chunks: HashMap::new() } }
+    pub fn new() -> Self {
+        Self {
+            chunks: HashMap::new(),
+        }
+    }
 
     /// Raw edge value along axis `a` (0=X, 1=Y, 2=Z) at cell (x,y,z).
     pub fn get(&self, x: i32, y: i32, z: i32, a: usize) -> f32 {
@@ -293,7 +303,10 @@ impl EdgeField {
     pub fn set(&mut self, x: i32, y: i32, z: i32, a: usize, val: f32) {
         let cc = ScalarField::chunk_coord(x, y, z);
         let li = ScalarField::local_index(x, y, z);
-        let chunk = self.chunks.entry(cc).or_insert_with(|| Box::new([[0.0; 3]; CHUNK_CELLS]));
+        let chunk = self
+            .chunks
+            .entry(cc)
+            .or_insert_with(|| Box::new([[0.0; 3]; CHUNK_CELLS]));
         chunk[li][a] = val;
     }
 
@@ -320,7 +333,9 @@ impl EdgeField {
         }
     }
 
-    pub fn chunk_count(&self) -> usize { self.chunks.len() }
+    pub fn chunk_count(&self) -> usize {
+        self.chunks.len()
+    }
     pub fn memory_bytes(&self) -> usize {
         self.chunks.len() * CHUNK_CELLS * 3 * std::mem::size_of::<f32>()
     }
@@ -404,9 +419,15 @@ impl EdgeField {
                         let z = bz + lz as i32;
                         let i = lx + ly * CHUNK_SIZE + lz * CHUNK_SIZE * CHUNK_SIZE;
                         let me = solid(x, y, z);
-                        if me || solid(x + 1, y, z) { cells[i][0] = 0.0; }
-                        if me || solid(x, y + 1, z) { cells[i][1] = 0.0; }
-                        if me || solid(x, y, z + 1) { cells[i][2] = 0.0; }
+                        if me || solid(x + 1, y, z) {
+                            cells[i][0] = 0.0;
+                        }
+                        if me || solid(x, y + 1, z) {
+                            cells[i][1] = 0.0;
+                        }
+                        if me || solid(x, y, z + 1) {
+                            cells[i][2] = 0.0;
+                        }
                     }
                 }
             }
@@ -481,7 +502,10 @@ impl ScalarField {
             let base_x = cc.0 * CHUNK_SIZE as i32;
             let base_y = cc.1 * CHUNK_SIZE as i32;
             let base_z = cc.2 * CHUNK_SIZE as i32;
-            let dst = self.chunks.entry(*cc).or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
+            let dst = self
+                .chunks
+                .entry(*cc)
+                .or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
             for lz in 0..CHUNK_SIZE {
                 for ly in 0..CHUNK_SIZE {
                     for lx in 0..CHUNK_SIZE {
@@ -509,7 +533,10 @@ impl ScalarField {
             let base_x = cc.0 * CHUNK_SIZE as i32;
             let base_y = cc.1 * CHUNK_SIZE as i32;
             let base_z = cc.2 * CHUNK_SIZE as i32;
-            let dst = self.chunks.entry(*cc).or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
+            let dst = self
+                .chunks
+                .entry(*cc)
+                .or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
             for lz in 0..CHUNK_SIZE {
                 for ly in 0..CHUNK_SIZE {
                     for lx in 0..CHUNK_SIZE {
@@ -639,9 +666,12 @@ pub fn solve_poisson_jacobi(rhs: &ScalarField, iterations: u32) -> ScalarField {
     let seed: Vec<ChunkCoord> = active_set.iter().copied().collect();
     for cc in seed {
         for (dx, dy, dz) in [
-            (-1, 0, 0), (1, 0, 0),
-            (0, -1, 0), (0, 1, 0),
-            (0, 0, -1), (0, 0, 1),
+            (-1, 0, 0),
+            (1, 0, 0),
+            (0, -1, 0),
+            (0, 1, 0),
+            (0, 0, -1),
+            (0, 0, 1),
         ] {
             active_set.insert((cc.0 + dx, cc.1 + dy, cc.2 + dz));
         }
@@ -658,7 +688,10 @@ pub fn solve_poisson_jacobi(rhs: &ScalarField, iterations: u32) -> ScalarField {
             let base_x = cc.0 * CHUNK_SIZE as i32;
             let base_y = cc.1 * CHUNK_SIZE as i32;
             let base_z = cc.2 * CHUNK_SIZE as i32;
-            let dst = p.chunks.entry(cc).or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
+            let dst = p
+                .chunks
+                .entry(cc)
+                .or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
             for lz in 0..CHUNK_SIZE {
                 for ly in 0..CHUNK_SIZE {
                     for lx in 0..CHUNK_SIZE {
@@ -701,13 +734,21 @@ pub fn solve_poisson_jacobi(rhs: &ScalarField, iterations: u32) -> ScalarField {
 fn smooth_jacobi_h(p: &mut ScalarField, rhs: &ScalarField, iterations: u32, h: f32) {
     let h2 = h * h;
     let omega = 2.0 / 3.0_f32;
-    let mut active: std::collections::HashSet<ChunkCoord> =
-        rhs.chunks.keys().copied().collect();
-    for cc in p.chunks.keys().copied().collect::<Vec<_>>() { active.insert(cc); }
+    let mut active: std::collections::HashSet<ChunkCoord> = rhs.chunks.keys().copied().collect();
+    for cc in p.chunks.keys().copied().collect::<Vec<_>>() {
+        active.insert(cc);
+    }
     let seed: Vec<ChunkCoord> = active.iter().copied().collect();
     for cc in seed {
-        for (dx, dy, dz) in [(-1,0,0),(1,0,0),(0,-1,0),(0,1,0),(0,0,-1),(0,0,1)] {
-            active.insert((cc.0+dx, cc.1+dy, cc.2+dz));
+        for (dx, dy, dz) in [
+            (-1, 0, 0),
+            (1, 0, 0),
+            (0, -1, 0),
+            (0, 1, 0),
+            (0, 0, -1),
+            (0, 0, 1),
+        ] {
+            active.insert((cc.0 + dx, cc.1 + dy, cc.2 + dz));
         }
     }
     let active: Vec<ChunkCoord> = active.into_iter().collect();
@@ -719,16 +760,22 @@ fn smooth_jacobi_h(p: &mut ScalarField, rhs: &ScalarField, iterations: u32, h: f
             let bx = cc.0 * CHUNK_SIZE as i32;
             let by = cc.1 * CHUNK_SIZE as i32;
             let bz = cc.2 * CHUNK_SIZE as i32;
-            let dst = p.chunks.entry(cc).or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
+            let dst = p
+                .chunks
+                .entry(cc)
+                .or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
             for lz in 0..CHUNK_SIZE {
                 for ly in 0..CHUNK_SIZE {
                     for lx in 0..CHUNK_SIZE {
                         let x = bx + lx as i32;
                         let y = by + ly as i32;
                         let z = bz + lz as i32;
-                        let nsum = p_old.get(x + 1, y, z) + p_old.get(x - 1, y, z)
-                                 + p_old.get(x, y + 1, z) + p_old.get(x, y - 1, z)
-                                 + p_old.get(x, y, z + 1) + p_old.get(x, y, z - 1);
+                        let nsum = p_old.get(x + 1, y, z)
+                            + p_old.get(x - 1, y, z)
+                            + p_old.get(x, y + 1, z)
+                            + p_old.get(x, y - 1, z)
+                            + p_old.get(x, y, z + 1)
+                            + p_old.get(x, y, z - 1);
                         let target = (nsum - h2 * rhs.get(x, y, z)) / 6.0;
                         let i = lx + ly * CHUNK_SIZE + lz * CHUNK_SIZE * CHUNK_SIZE;
                         let old = p_old.get(x, y, z);
@@ -745,7 +792,9 @@ fn compute_residual(p: &ScalarField, rhs: &ScalarField, h: f32) -> ScalarField {
     let h2 = h * h;
     let mut r = ScalarField::new();
     let mut active: std::collections::HashSet<ChunkCoord> = rhs.chunks.keys().copied().collect();
-    for cc in p.chunks.keys().copied() { active.insert(cc); }
+    for cc in p.chunks.keys().copied() {
+        active.insert(cc);
+    }
     for cc in active {
         let bx = cc.0 * CHUNK_SIZE as i32;
         let by = cc.1 * CHUNK_SIZE as i32;
@@ -756,12 +805,17 @@ fn compute_residual(p: &ScalarField, rhs: &ScalarField, h: f32) -> ScalarField {
                     let x = bx + lx as i32;
                     let y = by + ly as i32;
                     let z = bz + lz as i32;
-                    let nsum = p.get(x + 1, y, z) + p.get(x - 1, y, z)
-                             + p.get(x, y + 1, z) + p.get(x, y - 1, z)
-                             + p.get(x, y, z + 1) + p.get(x, y, z - 1);
+                    let nsum = p.get(x + 1, y, z)
+                        + p.get(x - 1, y, z)
+                        + p.get(x, y + 1, z)
+                        + p.get(x, y - 1, z)
+                        + p.get(x, y, z + 1)
+                        + p.get(x, y, z - 1);
                     let lap = (nsum - 6.0 * p.get(x, y, z)) / h2;
                     let val = rhs.get(x, y, z) - lap;
-                    if val.abs() > 1e-6 { r.set(x, y, z, val); }
+                    if val.abs() > 1e-6 {
+                        r.set(x, y, z, val);
+                    }
                 }
             }
         }
@@ -782,7 +836,9 @@ fn restrict_scalar(f: &ScalarField) -> ScalarField {
                 for lx in 0..CHUNK_SIZE {
                     let i = lx + ly * CHUNK_SIZE + lz * CHUNK_SIZE * CHUNK_SIZE;
                     let v = cells[i];
-                    if v == 0.0 { continue; }
+                    if v == 0.0 {
+                        continue;
+                    }
                     let cx = (bx + lx as i32).div_euclid(2);
                     let cy = (by + ly as i32).div_euclid(2);
                     let cz = (bz + lz as i32).div_euclid(2);
@@ -815,7 +871,9 @@ fn prolongate_scalar(f: &ScalarField) -> ScalarField {
                 for lx in 0..CHUNK_SIZE {
                     let i = lx + ly * CHUNK_SIZE + lz * CHUNK_SIZE * CHUNK_SIZE;
                     let v = cells[i];
-                    if v == 0.0 { continue; }
+                    if v == 0.0 {
+                        continue;
+                    }
                     let cx = bx + lx as i32;
                     let cy = by + ly as i32;
                     let cz = bz + lz as i32;
@@ -851,8 +909,13 @@ pub fn solve_poisson_multigrid(
     smooth_jacobi_h(&mut e_c, &r_c, coarse, 2.0);
     let e = prolongate_scalar(&e_c);
     for (cc, cells) in &e.chunks {
-        let dst = p.chunks.entry(*cc).or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
-        for i in 0..CHUNK_CELLS { dst[i] += cells[i]; }
+        let dst = p
+            .chunks
+            .entry(*cc)
+            .or_insert_with(|| Box::new([0.0; CHUNK_CELLS]));
+        for i in 0..CHUNK_CELLS {
+            dst[i] += cells[i];
+        }
     }
     smooth_jacobi_h(&mut p, rhs, fine_post, 1.0);
     p.chunks.retain(|_, c| c.iter().any(|v| v.abs() > 1e-5));
@@ -862,7 +925,9 @@ pub fn solve_poisson_multigrid(
 /// Multigrid variant of [`project_divergence_free`]. ~3× faster than
 /// the plain Jacobi projection at equivalent divergence residuals.
 pub fn project_divergence_free_mg(wind: &mut EdgeField) {
-    if wind.chunks.is_empty() { return; }
+    if wind.chunks.is_empty() {
+        return;
+    }
     let divergence = div(wind);
     let pressure = solve_poisson_multigrid(&divergence, 2, 6, 2);
     let grad_p = d_0(&pressure);
@@ -904,11 +969,17 @@ pub struct FaceField {
 }
 
 impl Default for FaceField {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl FaceField {
-    pub fn new() -> Self { Self { chunks: HashMap::new() } }
+    pub fn new() -> Self {
+        Self {
+            chunks: HashMap::new(),
+        }
+    }
 
     pub fn get(&self, x: i32, y: i32, z: i32, a: usize) -> f32 {
         let cc = ScalarField::chunk_coord(x, y, z);
@@ -919,7 +990,10 @@ impl FaceField {
     pub fn set(&mut self, x: i32, y: i32, z: i32, a: usize, val: f32) {
         let cc = ScalarField::chunk_coord(x, y, z);
         let li = ScalarField::local_index(x, y, z);
-        let chunk = self.chunks.entry(cc).or_insert_with(|| Box::new([[0.0; 3]; CHUNK_CELLS]));
+        let chunk = self
+            .chunks
+            .entry(cc)
+            .or_insert_with(|| Box::new([[0.0; 3]; CHUNK_CELLS]));
         chunk[li][a] = val;
     }
 
@@ -935,7 +1009,9 @@ impl FaceField {
         self.vec_at(x, y, z).length()
     }
 
-    pub fn chunk_count(&self) -> usize { self.chunks.len() }
+    pub fn chunk_count(&self) -> usize {
+        self.chunks.len()
+    }
     pub fn memory_bytes(&self) -> usize {
         self.chunks.len() * CHUNK_CELLS * 3 * std::mem::size_of::<f32>()
     }
@@ -970,8 +1046,15 @@ pub fn d_1(e: &EdgeField) -> FaceField {
     // neighbour edges on chunk boundaries participate.
     let mut active: std::collections::HashSet<ChunkCoord> = e.chunks.keys().copied().collect();
     for cc in e.chunks.keys().copied().collect::<Vec<_>>() {
-        for (dx, dy, dz) in [(-1,0,0),(1,0,0),(0,-1,0),(0,1,0),(0,0,-1),(0,0,1)] {
-            active.insert((cc.0+dx, cc.1+dy, cc.2+dz));
+        for (dx, dy, dz) in [
+            (-1, 0, 0),
+            (1, 0, 0),
+            (0, -1, 0),
+            (0, 1, 0),
+            (0, 0, -1),
+            (0, 0, 1),
+        ] {
+            active.insert((cc.0 + dx, cc.1 + dy, cc.2 + dz));
         }
     }
     for cc in active {
@@ -987,13 +1070,13 @@ pub fn d_1(e: &EdgeField) -> FaceField {
                     // +YZ face normal (a=0): circulation around YZ loop
                     // at cell (x,y,z). curl_x = ∂E_z/∂y − ∂E_y/∂z.
                     let cx = (e.get(x, y + 1, z, 2) - e.get(x, y, z, 2))
-                          - (e.get(x, y, z + 1, 1) - e.get(x, y, z, 1));
+                        - (e.get(x, y, z + 1, 1) - e.get(x, y, z, 1));
                     // +ZX face (a=1): curl_y = ∂E_x/∂z − ∂E_z/∂x.
                     let cy = (e.get(x, y, z + 1, 0) - e.get(x, y, z, 0))
-                          - (e.get(x + 1, y, z, 2) - e.get(x, y, z, 2));
+                        - (e.get(x + 1, y, z, 2) - e.get(x, y, z, 2));
                     // +XY face (a=2): curl_z = ∂E_y/∂x − ∂E_x/∂y.
                     let cz = (e.get(x + 1, y, z, 1) - e.get(x, y, z, 1))
-                          - (e.get(x, y + 1, z, 0) - e.get(x, y, z, 0));
+                        - (e.get(x, y + 1, z, 0) - e.get(x, y, z, 0));
                     if cx.abs() + cy.abs() + cz.abs() > 1e-6 {
                         out.set(x, y, z, 0, cx);
                         out.set(x, y, z, 1, cy);
@@ -1003,7 +1086,10 @@ pub fn d_1(e: &EdgeField) -> FaceField {
             }
         }
     }
-    out.chunks.retain(|_, c| c.iter().any(|v| v[0].abs() + v[1].abs() + v[2].abs() > 1e-5));
+    out.chunks.retain(|_, c| {
+        c.iter()
+            .any(|v| v[0].abs() + v[1].abs() + v[2].abs() > 1e-5)
+    });
     out
 }
 
@@ -1014,8 +1100,15 @@ pub fn curl_face_to_edge(b: &FaceField) -> EdgeField {
     let mut out = EdgeField::new();
     let mut active: std::collections::HashSet<ChunkCoord> = b.chunks.keys().copied().collect();
     for cc in b.chunks.keys().copied().collect::<Vec<_>>() {
-        for (dx, dy, dz) in [(-1,0,0),(1,0,0),(0,-1,0),(0,1,0),(0,0,-1),(0,0,1)] {
-            active.insert((cc.0+dx, cc.1+dy, cc.2+dz));
+        for (dx, dy, dz) in [
+            (-1, 0, 0),
+            (1, 0, 0),
+            (0, -1, 0),
+            (0, 1, 0),
+            (0, 0, -1),
+            (0, 0, 1),
+        ] {
+            active.insert((cc.0 + dx, cc.1 + dy, cc.2 + dz));
         }
     }
     for cc in active {
@@ -1030,13 +1123,13 @@ pub fn curl_face_to_edge(b: &FaceField) -> EdgeField {
                     let z = bz + lz as i32;
                     // +X edge: (curl F)_x = ∂F_z/∂y − ∂F_y/∂z.
                     let ex = (b.get(x, y, z, 2) - b.get(x, y - 1, z, 2))
-                          - (b.get(x, y, z, 1) - b.get(x, y, z - 1, 1));
+                        - (b.get(x, y, z, 1) - b.get(x, y, z - 1, 1));
                     // +Y edge: (curl F)_y = ∂F_x/∂z − ∂F_z/∂x.
                     let ey = (b.get(x, y, z, 0) - b.get(x, y, z - 1, 0))
-                          - (b.get(x, y, z, 2) - b.get(x - 1, y, z, 2));
+                        - (b.get(x, y, z, 2) - b.get(x - 1, y, z, 2));
                     // +Z edge: (curl F)_z = ∂F_y/∂x − ∂F_x/∂y.
                     let ez = (b.get(x, y, z, 1) - b.get(x - 1, y, z, 1))
-                          - (b.get(x, y, z, 0) - b.get(x, y - 1, z, 0));
+                        - (b.get(x, y, z, 0) - b.get(x, y - 1, z, 0));
                     if ex.abs() + ey.abs() + ez.abs() > 1e-6 {
                         out.set(x, y, z, 0, ex);
                         out.set(x, y, z, 1, ey);
@@ -1046,7 +1139,10 @@ pub fn curl_face_to_edge(b: &FaceField) -> EdgeField {
             }
         }
     }
-    out.chunks.retain(|_, c| c.iter().any(|v| v[0].abs() + v[1].abs() + v[2].abs() > 1e-5));
+    out.chunks.retain(|_, c| {
+        c.iter()
+            .any(|v| v[0].abs() + v[1].abs() + v[2].abs() > 1e-5)
+    });
     out
 }
 
@@ -1057,7 +1153,10 @@ pub fn step_maxwell(e: &mut EdgeField, b: &mut FaceField, c: f32, dt: f32) {
     // Faraday: B -= dt · d_1(E)
     let curl_e = d_1(e);
     for (cc, cells) in &curl_e.chunks {
-        let dst = b.chunks.entry(*cc).or_insert_with(|| Box::new([[0.0; 3]; CHUNK_CELLS]));
+        let dst = b
+            .chunks
+            .entry(*cc)
+            .or_insert_with(|| Box::new([[0.0; 3]; CHUNK_CELLS]));
         for i in 0..CHUNK_CELLS {
             dst[i][0] -= dt * cells[i][0];
             dst[i][1] -= dt * cells[i][1];
@@ -1068,7 +1167,10 @@ pub fn step_maxwell(e: &mut EdgeField, b: &mut FaceField, c: f32, dt: f32) {
     let curl_b = curl_face_to_edge(b);
     let k = c * c * dt;
     for (cc, cells) in &curl_b.chunks {
-        let dst = e.chunks.entry(*cc).or_insert_with(|| Box::new([[0.0; 3]; CHUNK_CELLS]));
+        let dst = e
+            .chunks
+            .entry(*cc)
+            .or_insert_with(|| Box::new([[0.0; 3]; CHUNK_CELLS]));
         for i in 0..CHUNK_CELLS {
             dst[i][0] += k * cells[i][0];
             dst[i][1] += k * cells[i][1];
@@ -1098,13 +1200,21 @@ pub struct Maxwell {
 
 impl Default for Maxwell {
     fn default() -> Self {
-        Self { e: EdgeField::new(), b: FaceField::new(), c: 1.0 }
+        Self {
+            e: EdgeField::new(),
+            b: FaceField::new(),
+            c: 1.0,
+        }
     }
 }
 
 impl Maxwell {
     pub fn new(c: f32) -> Self {
-        Self { e: EdgeField::new(), b: FaceField::new(), c }
+        Self {
+            e: EdgeField::new(),
+            b: FaceField::new(),
+            c,
+        }
     }
 
     /// Advance one leapfrog step. Call per tick with fixed dt.
@@ -1117,11 +1227,15 @@ impl Maxwell {
     pub fn energy(&self) -> f32 {
         let mut e2 = 0.0_f32;
         for cells in self.e.chunks.values() {
-            for c in cells.iter() { e2 += c[0]*c[0] + c[1]*c[1] + c[2]*c[2]; }
+            for c in cells.iter() {
+                e2 += c[0] * c[0] + c[1] * c[1] + c[2] * c[2];
+            }
         }
         let mut b2 = 0.0_f32;
         for cells in self.b.chunks.values() {
-            for c in cells.iter() { b2 += c[0]*c[0] + c[1]*c[1] + c[2]*c[2]; }
+            for c in cells.iter() {
+                b2 += c[0] * c[0] + c[1] * c[1] + c[2] * c[2];
+            }
         }
         0.5 * (e2 + self.c * self.c * b2)
     }
@@ -1153,8 +1267,15 @@ pub fn vorticity_confine(wind: &mut EdgeField, epsilon: f32, dt: f32) {
     let mut footprint: std::collections::HashSet<ChunkCoord> =
         omega.chunks.keys().copied().collect();
     for cc in omega.chunks.keys().copied().collect::<Vec<_>>() {
-        for (dx, dy, dz) in [(-1,0,0),(1,0,0),(0,-1,0),(0,1,0),(0,0,-1),(0,0,1)] {
-            footprint.insert((cc.0+dx, cc.1+dy, cc.2+dz));
+        for (dx, dy, dz) in [
+            (-1, 0, 0),
+            (1, 0, 0),
+            (0, -1, 0),
+            (0, 1, 0),
+            (0, 0, -1),
+            (0, 0, 1),
+        ] {
+            footprint.insert((cc.0 + dx, cc.1 + dy, cc.2 + dz));
         }
     }
     for cc in &footprint {
@@ -1168,7 +1289,9 @@ pub fn vorticity_confine(wind: &mut EdgeField, epsilon: f32, dt: f32) {
                     let y = by + ly as i32;
                     let z = bz + lz as i32;
                     let m = omega.vec_at(x, y, z).length();
-                    if m > 1e-4 { mag.set(x, y, z, m); }
+                    if m > 1e-4 {
+                        mag.set(x, y, z, m);
+                    }
                 }
             }
         }
@@ -1190,11 +1313,15 @@ pub fn vorticity_confine(wind: &mut EdgeField, epsilon: f32, dt: f32) {
                     let gz = 0.5 * (mag.get(x, y, z + 1) - mag.get(x, y, z - 1));
                     let g = glam::Vec3::new(gx, gy, gz);
                     let gl = g.length();
-                    if gl < 1e-5 { continue; }
+                    if gl < 1e-5 {
+                        continue;
+                    }
                     let n = g / gl;
                     let w = omega.vec_at(x, y, z);
                     let f = epsilon * n.cross(w) * dt;
-                    if f.length_squared() < 1e-10 { continue; }
+                    if f.length_squared() < 1e-10 {
+                        continue;
+                    }
                     let ex = wind.get(x, y, z, 0) + f.x;
                     let ey = wind.get(x, y, z, 1) + f.y;
                     let ez = wind.get(x, y, z, 2) + f.z;
@@ -1296,7 +1423,9 @@ mod tests {
         m.dipole_e(0, 0, 0, 1, 1.0);
         let e0 = m.energy();
         assert!(e0 > 0.0);
-        for _ in 0..20 { m.step(1.0); }
+        for _ in 0..20 {
+            m.step(1.0);
+        }
         let e1 = m.energy();
         assert!(e1.is_finite(), "energy NaN");
         // Without a source, energy drifts at most slowly; require it
@@ -1324,9 +1453,13 @@ mod tests {
         let p = solve_poisson_multigrid(&rhs, 2, 6, 4);
         let res = compute_residual(&p, &rhs, 1.0);
         let mut max = 0.0_f32;
-        for z in -5..=5 { for y in -5..=5 { for x in -5..=5 {
-            max = max.max(res.get(x, y, z).abs());
-        }}}
+        for z in -5..=5 {
+            for y in -5..=5 {
+                for x in -5..=5 {
+                    max = max.max(res.get(x, y, z).abs());
+                }
+            }
+        }
         assert!(max.is_finite() && max < 1.0, "residual blew up: {}", max);
     }
 
@@ -1367,7 +1500,10 @@ mod tests {
         }
         let t1 = field_total(&s);
         let rel = (t1 - t0).abs() / t0;
-        assert!(rel < 2e-3, "heat not conserved: t0={t0:.4} t1={t1:.4} (rel {rel:.5})");
+        assert!(
+            rel < 2e-3,
+            "heat not conserved: t0={t0:.4} t1={t1:.4} (rel {rel:.5})"
+        );
         let mut cells = 0usize;
         s.for_each_nonzero(0.01, |_, _, _, _| cells += 1);
         assert!(cells > 1, "blob did not diffuse: {cells} cell(s)");
@@ -1407,6 +1543,9 @@ mod tests {
         div(&wind).for_each_nonzero(0.0, |_, _, _, v| d1 += v * v);
         assert!(d0 > 0.0, "test field had no divergence to begin with");
         let ratio = d1 / d0;
-        assert!(ratio < 0.2, "projection left too much divergence: after/before = {ratio:.4}");
+        assert!(
+            ratio < 0.2,
+            "projection left too much divergence: after/before = {ratio:.4}"
+        );
     }
 }

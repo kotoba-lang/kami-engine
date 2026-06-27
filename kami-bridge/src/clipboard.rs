@@ -53,7 +53,7 @@ mod platform {
     use windows::Win32::System::DataExchange::{
         CloseClipboard, GetClipboardData, OpenClipboard, SetClipboardData,
     };
-    use windows::Win32::System::Memory::{GlobalAlloc, GlobalLock, GlobalUnlock, GMEM_MOVEABLE};
+    use windows::Win32::System::Memory::{GMEM_MOVEABLE, GlobalAlloc, GlobalLock, GlobalUnlock};
 
     const CF_UNICODETEXT: u32 = 13;
 

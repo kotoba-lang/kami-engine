@@ -3,7 +3,6 @@
 
 pub mod addons;
 pub mod animation;
-pub mod quarry_scene;
 pub mod arena;
 pub mod battle_royale;
 pub mod brainrot_mesh;
@@ -21,6 +20,7 @@ pub mod pokoa;
 pub mod pokoa_mesh;
 pub mod prediction;
 pub mod quality;
+pub mod quarry_scene;
 pub mod ranked;
 pub mod sabiotoshi;
 pub mod scene;

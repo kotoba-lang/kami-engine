@@ -131,10 +131,7 @@ mod tests {
         let glb = write_glb(json, bin);
 
         // Verify header
-        assert_eq!(
-            u32::from_le_bytes(glb[0..4].try_into().unwrap()),
-            GLB_MAGIC
-        );
+        assert_eq!(u32::from_le_bytes(glb[0..4].try_into().unwrap()), GLB_MAGIC);
         assert_eq!(
             u32::from_le_bytes(glb[4..8].try_into().unwrap()),
             GLB_VERSION

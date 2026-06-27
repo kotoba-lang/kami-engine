@@ -266,11 +266,15 @@ fn build_part_component(asm: &VehicleAssembly, part: &VehiclePart) -> CdxCompone
         manufacturer: if part.supplier.name.is_empty() {
             None
         } else {
-            Some(CdxOrganization { name: part.supplier.name.clone() })
+            Some(CdxOrganization {
+                name: part.supplier.name.clone(),
+            })
         },
         purl: synth_purl(asm, part),
         cpe: part.supplier.cpe.clone(),
-        licenses: vec![CdxLicense { expression: part.source.license.clone() }],
+        licenses: vec![CdxLicense {
+            expression: part.source.license.clone(),
+        }],
         evidence: Some(CdxEvidence {
             identity: CdxEvidenceIdentity {
                 field: "hash",
@@ -293,10 +297,14 @@ fn build_root_component(asm: &VehicleAssembly) -> CdxComponent {
         name: asm.display_name.clone(),
         version: asm.revision.clone(),
         description: Some(format!("driver.etzhayyim.com vehicle {}", asm.vehicle_id)),
-        manufacturer: Some(CdxOrganization { name: "gftd".into() }),
+        manufacturer: Some(CdxOrganization {
+            name: "gftd".into(),
+        }),
         purl: vehicle_purl(asm),
         cpe: String::new(),
-        licenses: vec![CdxLicense { expression: asm.source.license.clone() }],
+        licenses: vec![CdxLicense {
+            expression: asm.source.license.clone(),
+        }],
         evidence: Some(CdxEvidence {
             identity: CdxEvidenceIdentity {
                 field: "hash",
@@ -329,7 +337,10 @@ fn build_dependencies(asm: &VehicleAssembly) -> Vec<CdxDependency> {
     let mut deps: std::collections::BTreeMap<String, Vec<String>> =
         std::collections::BTreeMap::new();
 
-    deps.insert(asm.vehicle_id.clone(), asm.parts.iter().map(|p| p.id.clone()).collect());
+    deps.insert(
+        asm.vehicle_id.clone(),
+        asm.parts.iter().map(|p| p.id.clone()).collect(),
+    );
 
     // parent → child
     for p in &asm.parts {
@@ -341,15 +352,22 @@ fn build_dependencies(asm: &VehicleAssembly) -> Vec<CdxDependency> {
     // hardpoints — surface as bidirectional edges (target depends on source).
     // We record both directions so a CVE on either side flags the other.
     for hp in &asm.hardpoints {
-        deps.entry(hp.from_part.clone()).or_default().push(hp.to_part.clone());
-        deps.entry(hp.to_part.clone()).or_default().push(hp.from_part.clone());
+        deps.entry(hp.from_part.clone())
+            .or_default()
+            .push(hp.to_part.clone());
+        deps.entry(hp.to_part.clone())
+            .or_default()
+            .push(hp.from_part.clone());
     }
 
     deps.into_iter()
         .map(|(bom_ref, mut depends_on)| {
             depends_on.sort();
             depends_on.dedup();
-            CdxDependency { bom_ref, depends_on }
+            CdxDependency {
+                bom_ref,
+                depends_on,
+            }
         })
         .collect()
 }
@@ -393,7 +411,10 @@ pub fn emit(asm: &VehicleAssembly, opts: &CycloneDxOptions) -> Result<String, As
         .clone()
         .unwrap_or_else(|| format!("urn:uuid:{}", deterministic_uuid_v5(&asm.source.sha256)));
 
-    let timestamp = opts.timestamp.clone().unwrap_or_else(|| "1970-01-01T00:00:00Z".into());
+    let timestamp = opts
+        .timestamp
+        .clone()
+        .unwrap_or_else(|| "1970-01-01T00:00:00Z".into());
 
     let file = CdxFile {
         bom_format: "CycloneDX",
@@ -409,7 +430,11 @@ pub fn emit(asm: &VehicleAssembly, opts: &CycloneDxOptions) -> Result<String, As
             }],
             component: root,
         },
-        components: asm.parts.iter().map(|p| build_part_component(asm, p)).collect(),
+        components: asm
+            .parts
+            .iter()
+            .map(|p| build_part_component(asm, p))
+            .collect(),
         dependencies: build_dependencies(asm),
     };
 

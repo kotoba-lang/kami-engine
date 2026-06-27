@@ -3,7 +3,7 @@
 //!
 //! Run: `cargo bench -p kami-autodrive`
 
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, criterion_group, criterion_main};
 use glam::{Affine3A, Quat, Vec2, Vec3};
 use kami_autodrive::{Autopilot, AutopilotConfig, BicycleModel, Plant, Pose2, VehicleClass};
 use kami_sensor_sim::{Lidar, LidarIntrinsics, LidarReturn, Primitive, Scene};
@@ -72,7 +72,11 @@ fn bench(c: &mut Criterion) {
 
     c.bench_function("bicycle_step", |b| {
         let mut car = BicycleModel::new(start, VehicleClass::Car.limits());
-        let cmd = kami_autodrive::Command { throttle: 0.5, steer: 0.1, ..Default::default() };
+        let cmd = kami_autodrive::Command {
+            throttle: 0.5,
+            steer: 0.1,
+            ..Default::default()
+        };
         b.iter(|| {
             car.step(black_box(cmd), 1.0 / 30.0);
             black_box(car.pose())

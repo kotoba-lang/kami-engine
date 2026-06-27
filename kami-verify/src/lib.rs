@@ -680,13 +680,9 @@ mod tests {
         // 3 points + 1 cross bin = 4, 3 hit → 75%
         assert!((report.total_coverage() - 75.0).abs() < 0.01);
         // Line: 1 of 2 → 50%
-        assert!(
-            (report.coverage_by_type(coverage::CoverageType::Line) - 50.0).abs() < 0.01
-        );
+        assert!((report.coverage_by_type(coverage::CoverageType::Line) - 50.0).abs() < 0.01);
         // Toggle: 1 of 1 → 100%
-        assert!(
-            (report.coverage_by_type(coverage::CoverageType::Toggle) - 100.0).abs() < 0.01
-        );
+        assert!((report.coverage_by_type(coverage::CoverageType::Toggle) - 100.0).abs() < 0.01);
         let uncov = report.uncovered_points();
         assert_eq!(uncov.len(), 1);
         assert_eq!(uncov[0].name, "p2");

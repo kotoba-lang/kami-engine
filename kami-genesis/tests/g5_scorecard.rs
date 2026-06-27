@@ -19,10 +19,8 @@
 
 use kami_genesis::{CartpoleConfig, CartpoleState};
 
-const ISAAC_CSV: &str =
-    "../fixtures/cartpole/reference_freefall_isaac.csv";
-const ANALYTIC_CSV: &str =
-    "../fixtures/cartpole/reference_freefall_analytic.csv";
+const ISAAC_CSV: &str = "../fixtures/cartpole/reference_freefall_isaac.csv";
+const ANALYTIC_CSV: &str = "../fixtures/cartpole/reference_freefall_analytic.csv";
 
 /// One reference row: cartpole state at a step.
 #[derive(Debug, Clone, Copy)]
@@ -52,7 +50,10 @@ fn parse_csv(text: &str) -> Vec<Row> {
             f(cols[3]),
             f(cols[4]),
         ) {
-            rows.push(Row { step, state: [x, xd, th, thd] });
+            rows.push(Row {
+                step,
+                state: [x, xd, th, thd],
+            });
         }
     }
     rows
@@ -80,7 +81,10 @@ fn load_reference() -> Option<(Vec<Row>, bool)> {
 /// (action=0, theta0=0.1, cfg=default), producing one state per step.
 fn kami_rollout(steps: usize) -> Vec<[f32; 4]> {
     let cfg = CartpoleConfig::default();
-    let mut s = CartpoleState { theta: 0.1, ..Default::default() };
+    let mut s = CartpoleState {
+        theta: 0.1,
+        ..Default::default()
+    };
     let mut traj = Vec::with_capacity(steps);
     for _ in 0..steps {
         s.step(0.0, &cfg);
@@ -123,7 +127,11 @@ fn g5_csv_schema_parses() {
     }
     eprintln!(
         "[G5] reference = {} ({} rows)",
-        if is_isaac { "ISAAC (NVIDIA ground truth)" } else { "analytic stand-in" },
+        if is_isaac {
+            "ISAAC (NVIDIA ground truth)"
+        } else {
+            "analytic stand-in"
+        },
         rows.len()
     );
 }
@@ -153,7 +161,10 @@ fn g5_score_is_monotonic_in_error() {
         .collect();
     let s_exact = g5_score(&reference, &exact);
     let s_pert = g5_score(&reference, &perturbed);
-    assert!(s_exact > s_pert, "perturbed not worse: exact={s_exact} pert={s_pert}");
+    assert!(
+        s_exact > s_pert,
+        "perturbed not worse: exact={s_exact} pert={s_pert}"
+    );
     for s in [s_exact, s_pert] {
         assert!((0.0..=1.0).contains(&s), "score out of [0,1]: {s}");
     }

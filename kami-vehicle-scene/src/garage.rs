@@ -28,7 +28,7 @@
 
 use std::collections::BTreeMap;
 
-use kami_scene::{kw_key, mget, num, EdnValue};
+use kami_scene::{EdnValue, kw_key, mget, num};
 use kami_vehicle::{
     Differential, DrivelineLayout, Engine, Gearbox, PacejkaParams, TorqueCurve, VehicleKind,
 };
@@ -432,9 +432,7 @@ pub fn build_from_spec(
     v.enable_rigid_chassis();
 
     // ── Engine: torque-curve from the named preset, max_rpm from the spec ──
-    let engine = engines
-        .get(&spec.engine)
-        .ok_or(Error::NoTable("engines"))?;
+    let engine = engines.get(&spec.engine).ok_or(Error::NoTable("engines"))?;
     v.powertrain.engine.torque_curve = engine.torque_curve();
     // The EDN authors `:max-rpm` only when build() overrides the preset's own
     // limit (hatchback/sports/pickup/bus); 0.0 = "keep the engine preset".
@@ -583,7 +581,9 @@ pub fn builtin_engine(id: &str) -> Option<EngineSpec> {
     // two presets that build() rev-limits.
     let base = |curve: TorqueCurve| Engine::new(curve);
     match id {
-        "na-2-0-gasoline" => Some(EngineSpec::from_engine(&base(TorqueCurve::na_2_0_gasoline()))),
+        "na-2-0-gasoline" => Some(EngineSpec::from_engine(&base(
+            TorqueCurve::na_2_0_gasoline(),
+        ))),
         "turbo-2-0" => Some(EngineSpec::from_engine(&base(TorqueCurve::turbo_2_0()))),
         "pickup-v6" => {
             // build() override: max_rpm 6000 + the inline pickup curve.
@@ -668,10 +668,7 @@ fn pairs(v: Option<&EdnValue>) -> Vec<(f32, f32)> {
             s.iter()
                 .filter_map(|p| {
                     let inner = p.as_vector()?;
-                    Some((
-                        num(inner.first()),
-                        num(inner.get(1)),
-                    ))
+                    Some((num(inner.first()), num(inner.get(1))))
                 })
                 .collect()
         })

@@ -34,7 +34,12 @@ fn step_n_long_trajectory_matches_step_loop_at_1000_steps() {
     let initial: Vec<CartpoleState> = (0..N_ENVS)
         .map(|i| {
             let theta0 = ((i as f32 / N_ENVS as f32) - 0.5) * 0.1;
-            CartpoleState { x: 0.0, x_dot: 0.0, theta: theta0, theta_dot: 0.0 }
+            CartpoleState {
+                x: 0.0,
+                x_dot: 0.0,
+                theta: theta0,
+                theta_dot: 0.0,
+            }
         })
         .collect();
 
@@ -49,7 +54,9 @@ fn step_n_long_trajectory_matches_step_loop_at_1000_steps() {
     // Batched path.
     let mut batched_states = initial.clone();
     let t = Instant::now();
-    backend.step_n(&mut batched_states, &actions, &cfg, N_STEPS_LONG).unwrap();
+    backend
+        .step_n(&mut batched_states, &actions, &cfg, N_STEPS_LONG)
+        .unwrap();
     let batched_wall = t.elapsed();
 
     // Compute deltas across full state vector.

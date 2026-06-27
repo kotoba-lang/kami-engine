@@ -1,5 +1,4 @@
 /// Workpiece stock definitions and material presets.
-
 use glam::DVec3;
 use serde::{Deserialize, Serialize};
 
@@ -89,7 +88,11 @@ impl Stock {
     /// For `FromMesh`, computes from vertex extents.
     pub fn dimensions(&self) -> DVec3 {
         match &self.shape {
-            StockShape::Block { width, height, depth } => DVec3::new(*width, *height, *depth),
+            StockShape::Block {
+                width,
+                height,
+                depth,
+            } => DVec3::new(*width, *height, *depth),
             StockShape::Cylinder { diameter, length } => DVec3::new(*diameter, *diameter, *length),
             StockShape::FromMesh { vertices, .. } => {
                 if vertices.is_empty() {

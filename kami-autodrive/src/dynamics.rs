@@ -112,7 +112,8 @@ impl Plant for ShipHydro {
             let du = (tau_u - self.d11 * self.u - self.d11q * self.u * self.u.abs()
                 + self.m22 * self.v * self.r)
                 / self.m11;
-            let dv = (-self.d22 * self.v - self.d22q * self.v * self.v.abs()
+            let dv = (-self.d22 * self.v
+                - self.d22q * self.v * self.v.abs()
                 - self.m11 * self.u * self.r)
                 / self.m22;
             let dr = (tau_r - self.d33 * self.r - self.d33q * self.r * self.r.abs()) / self.m33;
@@ -322,7 +323,13 @@ mod tests {
     use crate::classes::VehicleClass;
 
     fn full_throttle() -> Command {
-        Command { throttle: 1.0, brake: 0.0, steer: 0.0, handbrake: 0.0, reverse: false }
+        Command {
+            throttle: 1.0,
+            brake: 0.0,
+            steer: 0.0,
+            handbrake: 0.0,
+            reverse: false,
+        }
     }
 
     #[test]
@@ -340,7 +347,11 @@ mod tests {
             ship.step(full_throttle(), 0.1); // 120 s
         }
         // Quadratic drag balances thrust just below max_speed; no overshoot.
-        assert!(ship.u > 0.85 * limits.max_speed, "surge {} < target", ship.u);
+        assert!(
+            ship.u > 0.85 * limits.max_speed,
+            "surge {} < target",
+            ship.u
+        );
         assert!(ship.u <= limits.max_speed + 0.1, "overshoot {}", ship.u);
     }
 
@@ -348,29 +359,56 @@ mod tests {
     fn ship_rudder_has_no_authority_at_rest() {
         // Rudder moment ∝ u²: a stationary ship cannot yaw (physically real).
         let mut ship = ShipHydro::new(Pose2::new(0.0, 0.0, 0.0), VehicleClass::Ship.limits());
-        let hard_over = Command { throttle: 0.0, brake: 0.0, steer: 1.0, handbrake: 0.0, reverse: false };
+        let hard_over = Command {
+            throttle: 0.0,
+            brake: 0.0,
+            steer: 1.0,
+            handbrake: 0.0,
+            reverse: false,
+        };
         for _ in 0..50 {
             ship.step(hard_over, 0.1);
         }
-        assert!(ship.r.abs() < 1e-3 && ship.pose.yaw.abs() < 1e-3, "yawed at rest: r={}", ship.r);
+        assert!(
+            ship.r.abs() < 1e-3 && ship.pose.yaw.abs() < 1e-3,
+            "yawed at rest: r={}",
+            ship.r
+        );
     }
 
     #[test]
     fn fixed_wing_stall_speed_matches_formula() {
-        let plane = FixedWing::new(Pose2::new(0.0, 0.0, 0.0), 0.0, VehicleClass::Aircraft.limits());
+        let plane = FixedWing::new(
+            Pose2::new(0.0, 0.0, 0.0),
+            0.0,
+            VehicleClass::Aircraft.limits(),
+        );
         let rho = isa_density(0.0);
         let expected = (2.0 * 1200.0 * G / (rho * 16.0 * 1.4)).sqrt();
-        assert!((plane.stall_speed() - expected).abs() < 0.1, "{}", plane.stall_speed());
+        assert!(
+            (plane.stall_speed() - expected).abs() < 0.1,
+            "{}",
+            plane.stall_speed()
+        );
     }
 
     #[test]
     fn fixed_wing_holds_airspeed_above_stall_under_thrust() {
-        let mut plane = FixedWing::new(Pose2::new(0.0, 0.0, 0.0), 500.0, VehicleClass::Aircraft.limits());
+        let mut plane = FixedWing::new(
+            Pose2::new(0.0, 0.0, 0.0),
+            500.0,
+            VehicleClass::Aircraft.limits(),
+        );
         let stall = plane.stall_speed();
         for _ in 0..400 {
             plane.step(full_throttle(), 1.0 / 30.0);
         }
-        assert!(plane.airspeed > stall, "airspeed {} dropped below stall {}", plane.airspeed, stall);
+        assert!(
+            plane.airspeed > stall,
+            "airspeed {} dropped below stall {}",
+            plane.airspeed,
+            stall
+        );
     }
 
     #[test]
@@ -380,7 +418,11 @@ mod tests {
             d.step(full_throttle(), 1.0 / 50.0); // 2 s
         }
         assert!(d.tilt > 0.05, "should tilt to translate, tilt={}", d.tilt);
-        assert!(d.pose.x > 1.0 && d.pose.y.abs() < 0.5, "moves +x along heading: {:?}", d.pose);
+        assert!(
+            d.pose.x > 1.0 && d.pose.y.abs() < 0.5,
+            "moves +x along heading: {:?}",
+            d.pose
+        );
     }
 
     #[test]
@@ -389,6 +431,10 @@ mod tests {
         for _ in 0..100 {
             d.step(Command::coast(), 1.0 / 50.0);
         }
-        assert!(d.speed() < 0.2, "should not drift when idle, v={}", d.speed());
+        assert!(
+            d.speed() < 0.2,
+            "should not drift when idle, v={}",
+            d.speed()
+        );
     }
 }

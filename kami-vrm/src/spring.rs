@@ -13,8 +13,15 @@ use crate::vrm_types::{ColliderShape, VrmDocument};
 /// Resolved collider for spring simulation.
 #[derive(Clone, Copy)]
 enum Shape {
-    Sphere { offset: Vec3, radius: f32 },
-    Capsule { offset: Vec3, tail: Vec3, radius: f32 },
+    Sphere {
+        offset: Vec3,
+        radius: f32,
+    },
+    Capsule {
+        offset: Vec3,
+        tail: Vec3,
+        radius: f32,
+    },
 }
 
 struct ColliderEntry {
@@ -79,13 +86,20 @@ impl SpringSimulator {
                         offset: Vec3::from(offset),
                         radius,
                     },
-                    ColliderShape::Capsule { offset, tail, radius } => Shape::Capsule {
+                    ColliderShape::Capsule {
+                        offset,
+                        tail,
+                        radius,
+                    } => Shape::Capsule {
                         offset: Vec3::from(offset),
                         tail: Vec3::from(tail),
                         radius,
                     },
                 };
-                ColliderEntry { node: c.node, shape }
+                ColliderEntry {
+                    node: c.node,
+                    shape,
+                }
             })
             .collect();
 
@@ -104,24 +118,25 @@ impl SpringSimulator {
                     .unwrap_or(Quat::IDENTITY);
 
                 // Determine bone axis & length from the next joint's local position.
-                let (bone_axis_local, bone_length, has_tail) = if let Some(next) = chain.joints.get(i + 1) {
-                    let next_pos = doc
-                        .gltf
-                        .nodes
-                        .get(next.node)
-                        .and_then(|n| n.translation)
-                        .map(Vec3::from)
-                        .unwrap_or(Vec3::Y * 0.07);
-                    let len = next_pos.length();
-                    if len > 1e-6 {
-                        (next_pos / len, len, true)
+                let (bone_axis_local, bone_length, has_tail) =
+                    if let Some(next) = chain.joints.get(i + 1) {
+                        let next_pos = doc
+                            .gltf
+                            .nodes
+                            .get(next.node)
+                            .and_then(|n| n.translation)
+                            .map(Vec3::from)
+                            .unwrap_or(Vec3::Y * 0.07);
+                        let len = next_pos.length();
+                        if len > 1e-6 {
+                            (next_pos / len, len, true)
+                        } else {
+                            (Vec3::Y, 0.07, false)
+                        }
                     } else {
+                        // Chain tip — no next joint; simulate with fallback axis.
                         (Vec3::Y, 0.07, false)
-                    }
-                } else {
-                    // Chain tip — no next joint; simulate with fallback axis.
-                    (Vec3::Y, 0.07, false)
-                };
+                    };
 
                 statics.push(JointStatic {
                     node: joint.node,
@@ -149,11 +164,18 @@ impl SpringSimulator {
                 }
             }
 
-            chains.push(ChainStatic { joints: statics, colliders: chain_colliders });
+            chains.push(ChainStatic {
+                joints: statics,
+                colliders: chain_colliders,
+            });
             runtime.push(rts);
         }
 
-        SpringSimulator { chains, runtime, colliders }
+        SpringSimulator {
+            chains,
+            runtime,
+            colliders,
+        }
     }
 
     /// Advance simulation by `dt` seconds and write per-joint quaternion
@@ -234,14 +256,20 @@ impl SpringSimulator {
                                 next_tail = c_world + d * (min_dist / dl);
                             }
                         }
-                        Shape::Capsule { offset, tail, radius } => {
+                        Shape::Capsule {
+                            offset,
+                            tail,
+                            radius,
+                        } => {
                             let a = world.transform_point3(*offset);
                             let b = world.transform_point3(*tail);
                             let ab = b - a;
                             let ab_len_sq = ab.length_squared();
                             let t = if ab_len_sq > 1e-8 {
                                 ((next_tail - a).dot(ab) / ab_len_sq).clamp(0.0, 1.0)
-                            } else { 0.0 };
+                            } else {
+                                0.0
+                            };
                             let closest = a + ab * t;
                             let min_dist = js.hit_radius + *radius;
                             let d = next_tail - closest;
@@ -266,7 +294,9 @@ impl SpringSimulator {
                 // Compute new local rotation: rotate bone_axis_local so that in world
                 // space it points along (next_tail - head_world).
                 let desired_dir_world = (next_tail - head_world).normalize_or_zero();
-                if rest_dir_world.length_squared() < 1e-8 || desired_dir_world.length_squared() < 1e-8 {
+                if rest_dir_world.length_squared() < 1e-8
+                    || desired_dir_world.length_squared() < 1e-8
+                {
                     continue;
                 }
                 let delta_q_world = Quat::from_rotation_arc(rest_dir_world, desired_dir_world);
@@ -278,8 +308,17 @@ impl SpringSimulator {
                 // Simpler: compute new_world_rot then factor out parent.
                 // We don't have parent_world_rot directly. Approximation: apply delta_q_world on the local rotation.
                 // In most VRM chains the parent rotation is identity-ish near the rest pose, so:
-                let new_local_rot = (world_rot.conjugate() * delta_q_world * world_rot) * js.initial_local_rot;
-                out.push((js.node, [new_local_rot.x, new_local_rot.y, new_local_rot.z, new_local_rot.w]));
+                let new_local_rot =
+                    (world_rot.conjugate() * delta_q_world * world_rot) * js.initial_local_rot;
+                out.push((
+                    js.node,
+                    [
+                        new_local_rot.x,
+                        new_local_rot.y,
+                        new_local_rot.z,
+                        new_local_rot.w,
+                    ],
+                ));
             }
         }
     }
@@ -291,7 +330,10 @@ impl SpringSimulator {
 
     /// Total number of simulated joints across all chains.
     pub fn joint_count(&self) -> usize {
-        self.chains.iter().map(|c| c.joints.iter().filter(|j| j.has_tail).count()).sum()
+        self.chains
+            .iter()
+            .map(|c| c.joints.iter().filter(|j| j.has_tail).count())
+            .sum()
     }
 
     /// Total number of colliders available.

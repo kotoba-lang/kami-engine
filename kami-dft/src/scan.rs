@@ -1,6 +1,5 @@
 /// Scan chain insertion — distributes flip-flops into scan chains for
 /// manufacturing test access.
-
 use serde::{Deserialize, Serialize};
 
 /// Configuration for scan chain insertion.
@@ -50,7 +49,12 @@ impl ScanChain {
         let total_ffs: usize = chains.iter().map(|c| c.length).sum();
         let max_length = chains.iter().map(|c| c.length).max().unwrap_or(0);
         let min_length = chains.iter().map(|c| c.length).min().unwrap_or(0);
-        ScanStats { num_chains, total_ffs, max_length, min_length }
+        ScanStats {
+            num_chains,
+            total_ffs,
+            max_length,
+            min_length,
+        }
     }
 }
 

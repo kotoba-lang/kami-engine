@@ -32,12 +32,14 @@ use std::process::Command;
 
 use thiserror::Error;
 
-use crate::ingest::gltf::{from_gltf_json, GltfError, IngestOptions};
+use crate::ingest::gltf::{GltfError, IngestOptions, from_gltf_json};
 use crate::part::{AssemblyError, VehicleAssembly};
 
 #[derive(Debug, Error)]
 pub enum StepError {
-    #[error("freecad CLI not found on PATH — install via `brew install --cask freecad` (macOS) or `apt-get install freecad` (Debian)")]
+    #[error(
+        "freecad CLI not found on PATH — install via `brew install --cask freecad` (macOS) or `apt-get install freecad` (Debian)"
+    )]
     FreeCadNotFound,
     #[error("freecad invocation failed (exit={exit}): {stderr}")]
     FreeCadFailed { exit: i32, stderr: String },
@@ -120,7 +122,10 @@ pub struct StepOptions {
 
 /// Convert a STEP / IGES file to a `VehicleAssembly` via FreeCAD CLI +
 /// glTF.
-pub fn from_step_file(input: impl AsRef<Path>, opts: &StepOptions) -> Result<VehicleAssembly, StepError> {
+pub fn from_step_file(
+    input: impl AsRef<Path>,
+    opts: &StepOptions,
+) -> Result<VehicleAssembly, StepError> {
     let input = input.as_ref();
     if !input.exists() {
         return Err(StepError::InputNotFound(input.to_path_buf()));

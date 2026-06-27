@@ -2,7 +2,6 @@
 ///
 /// P10 integrated pipeline:
 /// RTL -> PnR -> GDSII -> Verify/Power/DFT/SI/Yield -> STA -> DRC/LVS -> Signoff.
-
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -326,10 +325,15 @@ pub fn run_minimal_flow(input: &FlowInput) -> Result<SignoffReport, FlowError> {
     let floorplan_violations = fp.validate();
 
     let equiv = run_verify();
-    let (dynamic_power_mw, ir_max_drop_mv) =
-        run_power(input.cell_count_estimate, input.clock_freq_mhz, input.supply_v);
-    let (dft_scan_chain_count, dft_atpg_coverage) =
-        run_dft((input.cell_count_estimate / 100).max(16), input.cell_count_estimate / 10);
+    let (dynamic_power_mw, ir_max_drop_mv) = run_power(
+        input.cell_count_estimate,
+        input.clock_freq_mhz,
+        input.supply_v,
+    );
+    let (dft_scan_chain_count, dft_atpg_coverage) = run_dft(
+        (input.cell_count_estimate / 100).max(16),
+        input.cell_count_estimate / 10,
+    );
     let (si_z0_ohm, si_eye_height_mv) = run_si();
     let (yield_pass_ratio, pvt_corner_count) = run_yield();
     let (sta_setup_slack_ps, sta_hold_slack_ps) =

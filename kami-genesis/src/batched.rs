@@ -111,10 +111,17 @@ impl ArticulationBatch {
     /// reproducible). Only the dynamics differ per env — kinematics (FK / IK /
     /// Jacobians) is mass/gravity-independent and stays shared. Pass `(1.0, 1.0)`
     /// for a dimension to leave it nominal; `clear_physics_randomization` resets.
-    pub fn randomize_physics(&mut self, seed: u64, gravity_scale: (f32, f32), mass_scale: (f32, f32)) {
+    pub fn randomize_physics(
+        &mut self,
+        seed: u64,
+        gravity_scale: (f32, f32),
+        mass_scale: (f32, f32),
+    ) {
         let mut s = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
         let mut next = |lo: f32, hi: f32| {
-            s = s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            s = s
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             let u = ((s >> 40) as f32) / ((1u64 << 24) as f32); // [0,1)
             lo + (hi - lo) * u
         };
@@ -517,7 +524,9 @@ impl ArticulationBatch {
         let mut out = vec![0.0_f32; self.num_envs() * ndof];
         for (e, st) in self.states.iter().enumerate() {
             let t = glam::Vec3::new(targets[e * 3], targets[e * 3 + 1], targets[e * 3 + 2]);
-            let sol = self.cfg.solve_position_ik(link, pl, t, &st.q, iters, lambda);
+            let sol = self
+                .cfg
+                .solve_position_ik(link, pl, t, &st.q, iters, lambda);
             out[e * ndof..(e + 1) * ndof].copy_from_slice(&sol);
         }
         Some(out)
@@ -540,7 +549,11 @@ impl ArticulationBatch {
         let ndof = self.cfg.ndof;
         let mut out = vec![0.0_f32; self.num_envs() * ndof];
         for (e, st) in self.states.iter().enumerate() {
-            let tp = glam::Vec3::new(targets_pos[e * 3], targets_pos[e * 3 + 1], targets_pos[e * 3 + 2]);
+            let tp = glam::Vec3::new(
+                targets_pos[e * 3],
+                targets_pos[e * 3 + 1],
+                targets_pos[e * 3 + 2],
+            );
             // input order (w, x, y, z) → glam (x, y, z, w).
             let tq = glam::Quat::from_xyzw(
                 targets_quat[e * 4 + 1],
@@ -603,7 +616,9 @@ impl ArticulationBatch {
         Some(
             self.states
                 .iter()
-                .map(|st| Jacobian { rows: self.cfg.geometric_jacobian(link, &st.q) })
+                .map(|st| Jacobian {
+                    rows: self.cfg.geometric_jacobian(link, &st.q),
+                })
                 .collect(),
         )
     }
@@ -814,7 +829,11 @@ mod tests {
         b.set_joint_positions(&[0.1, 0.2, 0.3]);
         b.set_joint_velocities(&[0.0, 1.0, -1.0]);
         let q_seed = b.get_joint_positions();
-        assert_eq!(q_seed, vec![0.1, 0.2, 0.3], "set_joint_velocities clobbered positions");
+        assert_eq!(
+            q_seed,
+            vec![0.1, 0.2, 0.3],
+            "set_joint_velocities clobbered positions"
+        );
 
         for _ in 0..30 {
             b.step();
@@ -856,10 +875,12 @@ mod tests {
         }
         // env0 (q1=0) vs env2 (q1=1.2): the distal link's linear-velocity rows
         // depend on the proximal angle, so at least one entry must differ.
-        let differs = (0..6).any(|r| {
-            (0..ndof).any(|c| (jac[0].rows[r][c] - jac[2].rows[r][c]).abs() > 1e-4)
-        });
-        assert!(differs, "per-env Jacobians did not diverge with proximal angle");
+        let differs =
+            (0..6).any(|r| (0..ndof).any(|c| (jac[0].rows[r][c] - jac[2].rows[r][c]).abs() > 1e-4));
+        assert!(
+            differs,
+            "per-env Jacobians did not diverge with proximal angle"
+        );
         // Unknown link → None (matches single-env get_jacobian).
         assert!(b.get_jacobians("nope").is_none());
     }
@@ -879,7 +900,9 @@ mod tests {
         }
         // Different joint angles → the link sits at different world orientations,
         // so env0 and env2 quats must differ.
-        let dq = (0..4).map(|i| (quats[0][i] - quats[2][i]).abs()).fold(0.0, f32::max);
+        let dq = (0..4)
+            .map(|i| (quats[0][i] - quats[2][i]).abs())
+            .fold(0.0, f32::max);
         assert!(dq > 1e-3, "per-env world poses did not diverge");
         assert!(b.get_world_poses("nope").is_none());
     }
@@ -936,7 +959,10 @@ mod tests {
         let q = b.get_joint_positions();
         // With the PD drive cleared and zero effort, the rest pose is held
         // (no spring back toward the old 0.8 target).
-        assert!((q[0] - 0.2).abs() < 1e-2 && (q[1] - 0.2).abs() < 1e-2, "drive not cleared: {q:?}");
+        assert!(
+            (q[0] - 0.2).abs() < 1e-2 && (q[1] - 0.2).abs() < 1e-2,
+            "drive not cleared: {q:?}"
+        );
     }
 
     #[test]
@@ -975,7 +1001,12 @@ mod tests {
                 + (reached[e][1] - targets[e * 3 + 1]).powi(2)
                 + (reached[e][2] - targets[e * 3 + 2]).powi(2))
             .sqrt();
-            assert!(d < 0.02, "env {e} IK miss: {d} m (reached {:?} target {:?})", reached[e], &targets[e * 3..e * 3 + 3]);
+            assert!(
+                d < 0.02,
+                "env {e} IK miss: {d} m (reached {:?} target {:?})",
+                reached[e],
+                &targets[e * 3..e * 3 + 3]
+            );
         }
         // Unknown link → None.
         assert!(b.solve_ik("nope", &targets, 10, 0.01).is_none());
@@ -1002,7 +1033,10 @@ mod tests {
         b.set_joint_positions(&sol);
 
         let (pos2, quat2) = b.get_world_poses("link6").unwrap();
-        let dpos = ((pos2[0][0] - tp[0]).powi(2) + (pos2[0][1] - tp[1]).powi(2) + (pos2[0][2] - tp[2]).powi(2)).sqrt();
+        let dpos = ((pos2[0][0] - tp[0]).powi(2)
+            + (pos2[0][1] - tp[1]).powi(2)
+            + (pos2[0][2] - tp[2]).powi(2))
+        .sqrt();
         assert!(dpos < 0.03, "pose IK position miss: {dpos} m");
         // Orientation: |q·q_target| ≈ 1 (same rotation up to sign).
         let dot: f32 = (0..4).map(|i| quat2[0][i] * tq[i]).sum();
@@ -1037,7 +1071,10 @@ mod tests {
         let q2 = glam::Quat::from_xyzw(quat2[0][1], quat2[0][2], quat2[0][3], quat2[0][0]);
         let tool_reached = glam::Vec3::from(pos2[0]) + q2 * tool_v;
         let d = (tool_reached - tool_target).length();
-        assert!(d < 0.02, "tool IK miss: {d} m (reached {tool_reached:?} target {tool_target:?})");
+        assert!(
+            d < 0.02,
+            "tool IK miss: {d} m (reached {tool_reached:?} target {tool_target:?})"
+        );
     }
 
     #[test]
@@ -1055,7 +1092,8 @@ mod tests {
         // Track the min-jerk move with gravity-comped PD, with/without the
         // velocity feedforward; report the worst mid-move joint tracking error.
         let track = |use_ff: bool| -> f32 {
-            let mut arm = ArticulationBatch::from_urdf(&sys, glam::Vec3::new(0.0, 0.0, -9.81), dt, 1);
+            let mut arm =
+                ArticulationBatch::from_urdf(&sys, glam::Vec3::new(0.0, 0.0, -9.81), dt, 1);
             let mut max_err = 0.0_f32;
             for s in 0..=steps {
                 let t = s as f32 * dt;
@@ -1080,8 +1118,14 @@ mod tests {
         let err_noff = track(false);
         // The velocity feedforward measurably cuts the rest-damped tracking lag
         // (acceleration feedforward, not modelled here, would close the rest).
-        assert!(err_ff < err_noff * 0.85, "vel feedforward should cut lag: ff {err_ff} vs no-ff {err_noff}");
-        assert!(err_ff < 0.2, "feedforward tracking error unreasonably large: {err_ff} rad");
+        assert!(
+            err_ff < err_noff * 0.85,
+            "vel feedforward should cut lag: ff {err_ff} vs no-ff {err_noff}"
+        );
+        assert!(
+            err_ff < 0.2,
+            "feedforward tracking error unreasonably large: {err_ff} rad"
+        );
     }
 
     #[test]
@@ -1106,7 +1150,10 @@ mod tests {
         }
         // Feedback linearization + full feedforward → tracking error is tiny,
         // far below the velocity-only-feedforward PD result (~0.13 rad earlier).
-        assert!(max_err < 0.01, "computed-torque tracking not near-exact: {max_err} rad");
+        assert!(
+            max_err < 0.01,
+            "computed-torque tracking not near-exact: {max_err} rad"
+        );
     }
 
     #[test]
@@ -1138,7 +1185,10 @@ mod tests {
         let q2 = b.get_joint_positions();
         for e in 1..4 {
             for d in 0..ndof {
-                assert!((q2[e * ndof + d] - q2[d]).abs() < 1e-5, "envs differ after clearing mass DR");
+                assert!(
+                    (q2[e * ndof + d] - q2[d]).abs() < 1e-5,
+                    "envs differ after clearing mass DR"
+                );
             }
         }
     }
@@ -1148,7 +1198,8 @@ mod tests {
         // Domain randomisation: per-env gravity scaling makes otherwise-identical
         // envs fall at different rates, while kinematics (shape) is unchanged.
         let sys = kami_articulated::parse_urdf(TWO_LINK_URDF).unwrap();
-        let mut b = ArticulationBatch::from_urdf(&sys, glam::Vec3::new(0.0, 0.0, -9.81), 1.0 / 240.0, 4);
+        let mut b =
+            ArticulationBatch::from_urdf(&sys, glam::Vec3::new(0.0, 0.0, -9.81), 1.0 / 240.0, 4);
         b.randomize_gravity(7, 0.3, 1.7); // wide spread so envs clearly differ
         let ndof = b.num_dof();
 
@@ -1161,10 +1212,11 @@ mod tests {
         assert!(q.iter().all(|v| v.is_finite()));
         // Different per-env gravity → the four envs reach different joint angles.
         let env0 = &q[0..ndof];
-        let env_diff = (1..4).any(|e| {
-            (0..ndof).any(|d| (q[e * ndof + d] - env0[d]).abs() > 1e-3)
-        });
-        assert!(env_diff, "per-env gravity DR produced identical dynamics: {q:?}");
+        let env_diff = (1..4).any(|e| (0..ndof).any(|d| (q[e * ndof + d] - env0[d]).abs() > 1e-3));
+        assert!(
+            env_diff,
+            "per-env gravity DR produced identical dynamics: {q:?}"
+        );
 
         // Clearing reverts to shared gravity → all envs identical again.
         b.clear_physics_randomization();
@@ -1176,7 +1228,10 @@ mod tests {
         let q2 = b.get_joint_positions();
         for e in 1..4 {
             for d in 0..ndof {
-                assert!((q2[e * ndof + d] - q2[d]).abs() < 1e-5, "envs differ after clearing DR");
+                assert!(
+                    (q2[e * ndof + d] - q2[d]).abs() < 1e-5,
+                    "envs differ after clearing DR"
+                );
             }
         }
     }
@@ -1201,7 +1256,12 @@ mod tests {
         b.set_joint_positions(&[0.0, 0.0, 0.0, 0.0]);
         b.set_joint_position_targets(&[0.5, 0.5, 0.5, 0.5], 100.0, 20.0);
         b.step();
-        assert!(b.get_applied_joint_efforts().iter().any(|&v| v.abs() > 1e-3), "PD torque not recorded");
+        assert!(
+            b.get_applied_joint_efforts()
+                .iter()
+                .any(|&v| v.abs() > 1e-3),
+            "PD torque not recorded"
+        );
 
         // reset clears them.
         b.reset();
@@ -1215,7 +1275,10 @@ mod tests {
         let lim = b.get_dof_limits();
         assert_eq!(lim.len(), b.num_dof());
         for (i, l) in lim.iter().enumerate() {
-            assert!((l[0] + 3.14).abs() < 1e-3 && (l[1] - 3.14).abs() < 1e-3, "dof {i}: {l:?}");
+            assert!(
+                (l[0] + 3.14).abs() < 1e-3 && (l[1] - 3.14).abs() < 1e-3,
+                "dof {i}: {l:?}"
+            );
         }
     }
 
@@ -1226,16 +1289,24 @@ mod tests {
         let sys = kami_articulated::parse_urdf(TWO_LINK_URDF).unwrap();
         let mut b = ArticulationBatch::from_urdf(&sys, glam::Vec3::ZERO, 1.0 / 240.0, 1);
         b.set_joint_position_targets_with_gains(
-            &[0.5, 0.5],     // both targets 0.5
-            &[400.0, 0.0],   // joint 1 has no stiffness
+            &[0.5, 0.5],   // both targets 0.5
+            &[400.0, 0.0], // joint 1 has no stiffness
             &[20.0, 5.0],
         );
         for _ in 0..4000 {
             b.step();
         }
         let q = b.get_joint_positions();
-        assert!((q[0] - 0.5).abs() < 0.02, "stiff joint did not track: {}", q[0]);
-        assert!(q[1].abs() < 0.05, "zero-stiffness joint moved to target: {}", q[1]);
+        assert!(
+            (q[0] - 0.5).abs() < 0.02,
+            "stiff joint did not track: {}",
+            q[0]
+        );
+        assert!(
+            q[1].abs() < 0.05,
+            "zero-stiffness joint moved to target: {}",
+            q[1]
+        );
     }
 
     #[test]
@@ -1263,9 +1334,18 @@ mod tests {
         let comp = settle(true);
         let err = |q: [f32; 2]| (q[0] - target[0]).abs() + (q[1] - target[1]).abs();
 
-        assert!(err(plain) > 0.03, "expected visible droop without comp: {plain:?}");
-        assert!(err(comp) < 0.01, "gravity comp did not hold target: {comp:?}");
-        assert!(err(comp) < err(plain) * 0.5, "comp not clearly better: {comp:?} vs {plain:?}");
+        assert!(
+            err(plain) > 0.03,
+            "expected visible droop without comp: {plain:?}"
+        );
+        assert!(
+            err(comp) < 0.01,
+            "gravity comp did not hold target: {comp:?}"
+        );
+        assert!(
+            err(comp) < err(plain) * 0.5,
+            "comp not clearly better: {comp:?} vs {plain:?}"
+        );
     }
 
     #[test]
@@ -1295,7 +1375,11 @@ mod tests {
             );
         }
         // env0 commanded zero velocity stays near rest.
-        assert!(qd[0].abs() < 0.03 && qd[1].abs() < 0.03, "env0 drifted: {:?}", &qd[0..ndof]);
+        assert!(
+            qd[0].abs() < 0.03 && qd[1].abs() < 0.03,
+            "env0 drifted: {:?}",
+            &qd[0..ndof]
+        );
     }
 
     #[test]
@@ -1322,8 +1406,14 @@ mod tests {
 
         let plain = settle(false);
         let ct = settle(true);
-        assert!(plain > 0.02, "expected plain-PD droop under gravity: {plain}");
+        assert!(
+            plain > 0.02,
+            "expected plain-PD droop under gravity: {plain}"
+        );
         assert!(ct < 0.005, "computed torque did not track exactly: {ct}");
-        assert!(ct < plain * 0.25, "computed torque not clearly better: {ct} vs {plain}");
+        assert!(
+            ct < plain * 0.25,
+            "computed torque not clearly better: {ct} vs {plain}"
+        );
     }
 }

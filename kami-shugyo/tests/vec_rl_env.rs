@@ -62,5 +62,8 @@ fn generic_rollout_runs_over_any_env() {
     assert!(rj.is_finite() && re.is_finite());
     // Reward is negative distance-based, so a non-converged zero-action rollout
     // accrues strictly negative reward.
-    assert!(rj < 0.0 && re < 0.0, "expected negative shaping reward: {rj}, {re}");
+    assert!(
+        rj < 0.0 && re < 0.0,
+        "expected negative shaping reward: {rj}, {re}"
+    );
 }

@@ -67,35 +67,17 @@ pub enum RoomEvent {
     /// A peer left the room.
     PeerLeft { peer_id: PeerId },
     /// A peer's connection state changed.
-    PeerStateChanged {
-        peer_id: PeerId,
-        state: PeerState,
-    },
+    PeerStateChanged { peer_id: PeerId, state: PeerState },
     /// Received an SDP offer (need to create answer).
-    OfferReceived {
-        from: PeerId,
-        sdp: String,
-    },
+    OfferReceived { from: PeerId, sdp: String },
     /// Received an SDP answer.
-    AnswerReceived {
-        from: PeerId,
-        sdp: String,
-    },
+    AnswerReceived { from: PeerId, sdp: String },
     /// Received an ICE candidate.
-    IceCandidateReceived {
-        from: PeerId,
-        candidate: String,
-    },
+    IceCandidateReceived { from: PeerId, candidate: String },
     /// Peer position updated (spatial audio).
-    PositionUpdated {
-        peer_id: PeerId,
-        position: [f32; 3],
-    },
+    PositionUpdated { peer_id: PeerId, position: [f32; 3] },
     /// Data channel message received.
-    DataReceived {
-        from: PeerId,
-        data: String,
-    },
+    DataReceived { from: PeerId, data: String },
 }
 
 /// Room state machine. Platform-agnostic peer and signaling management.
@@ -131,7 +113,12 @@ impl Room {
     /// Generate a join signal to broadcast to the room.
     pub fn join(&mut self, display_name: &str) -> SignalMessage {
         let seq = self.next_seq();
-        SignalMessage::join(self.local_peer_id.clone(), self.id.clone(), display_name, seq)
+        SignalMessage::join(
+            self.local_peer_id.clone(),
+            self.id.clone(),
+            display_name,
+            seq,
+        )
     }
 
     /// Generate a leave signal.
@@ -355,8 +342,13 @@ mod tests {
         room.process_signal(&join_msg);
 
         // Alice sends offer
-        let offer_msg =
-            SignalMessage::offer("alice".into(), "local".into(), "test-room".into(), "sdp-offer".into(), 1);
+        let offer_msg = SignalMessage::offer(
+            "alice".into(),
+            "local".into(),
+            "test-room".into(),
+            "sdp-offer".into(),
+            1,
+        );
         let events = room.process_signal(&offer_msg);
         assert!(matches!(events[0], RoomEvent::OfferReceived { .. }));
 
@@ -375,7 +367,8 @@ mod tests {
         room.process_signal(&join_msg);
 
         // Alice updates position
-        let pos_msg = SignalMessage::position("alice".into(), "test-room".into(), [3.0, 0.0, -2.0], 1);
+        let pos_msg =
+            SignalMessage::position("alice".into(), "test-room".into(), [3.0, 0.0, -2.0], 1);
         let events = room.process_signal(&pos_msg);
         assert!(matches!(events[0], RoomEvent::PositionUpdated { .. }));
 

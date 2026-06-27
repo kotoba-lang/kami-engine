@@ -48,8 +48,12 @@ fn box_scene(center: Vec2) -> Scene {
 
 /// Distance from point `p` to the (axis-aligned) box surface; 0 if inside.
 fn point_box_clearance(p: Vec2, center: Vec2) -> f32 {
-    let dx = (center.x - BOX_HALF - p.x).max(p.x - (center.x + BOX_HALF)).max(0.0);
-    let dy = (center.y - BOX_HALF - p.y).max(p.y - (center.y + BOX_HALF)).max(0.0);
+    let dx = (center.x - BOX_HALF - p.x)
+        .max(p.x - (center.x + BOX_HALF))
+        .max(0.0);
+    let dy = (center.y - BOX_HALF - p.y)
+        .max(p.y - (center.y + BOX_HALF))
+        .max(0.0);
     (dx * dx + dy * dy).sqrt()
 }
 
@@ -92,7 +96,10 @@ fn car_yields_to_a_crossing_box_then_arrives() {
     // Arrival proves the fresh-each-tick map let the box clear (an accumulating
     // map would smear the box's track into a permanent wall and deadlock).
     assert!(arrived, "car should reach the goal after the box clears");
-    assert!(min_clear > 0.3, "car clipped the crossing box (min clearance {min_clear:.2} m)");
+    assert!(
+        min_clear > 0.3,
+        "car clipped the crossing box (min clearance {min_clear:.2} m)"
+    );
     assert!(
         min_speed_mid < 3.5,
         "car should slow for the crossing box (dynamic reaction); min mid-speed {min_speed_mid:.1}"

@@ -21,7 +21,9 @@ fn hash2d(x: i32, y: i32) -> f32 {
     (n & 0x7fffffff) as f32 / 0x7fffffff as f32
 }
 
-fn smoothstep01(t: f32) -> f32 { t * t * (3.0 - 2.0 * t) }
+fn smoothstep01(t: f32) -> f32 {
+    t * t * (3.0 - 2.0 * t)
+}
 
 fn value_noise(x: f32, y: f32) -> f32 {
     let xi = x.floor() as i32;
@@ -63,8 +65,8 @@ impl Default for WindFieldConfig {
             base_dir: Vec2::new(1.0, 0.3),
             base_speed: 5.0,
             gust_mul: 1.0,
-            spatial_freq: 0.012,   // ~83m main ripple wavelength
-            temporal_freq: 0.25,   // slow temporal drift
+            spatial_freq: 0.012, // ~83m main ripple wavelength
+            temporal_freq: 0.25, // slow temporal drift
             local_variation: 0.5,
         }
     }
@@ -82,7 +84,7 @@ pub fn sample_wind(x: f32, z: f32, t: f32, cfg: &WindFieldConfig) -> Vec2 {
     // Main ripple (large scale)
     let nx1 = x * cfg.spatial_freq + t * cfg.temporal_freq;
     let nz1 = z * cfg.spatial_freq + t * cfg.temporal_freq * 0.7;
-    let n1 = value_noise(nx1, nz1) * 2.0 - 1.0;  // -1..1
+    let n1 = value_noise(nx1, nz1) * 2.0 - 1.0; // -1..1
 
     // Finer ripple (half wavelength)
     let nx2 = x * cfg.spatial_freq * 2.0 + t * cfg.temporal_freq * 1.5 + 13.0;
@@ -139,6 +141,9 @@ mod tests {
         cfg.local_variation = 0.0;
         let w = sample_wind(123.0, 456.0, 78.0, &cfg);
         let expected = cfg.base_dir.normalize() * cfg.base_speed;
-        assert!((w - expected).length() < 0.01, "with 0 variation, should return base wind");
+        assert!(
+            (w - expected).length() < 0.01,
+            "with 0 variation, should return base wind"
+        );
     }
 }

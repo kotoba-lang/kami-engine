@@ -4,21 +4,20 @@
 //! Runs N parallel Cartpole envs with the LQR upright-balance controller and
 //! reports average episode length + cumulative return.
 
-use kami_genesis::{CartpoleConfig, LqrController, LqrWeights, CartpoleState};
+use kami_genesis::{CartpoleConfig, CartpoleState, LqrController, LqrWeights};
 use kami_shugyo::{VectorizedCartpoleEnv, load_scene_yaml};
 
-const URDF: &str = include_str!(
-    "../../fixtures/cartpole/cartpole.urdf"
-);
-const SCENE: &str = include_str!(
-    "../../fixtures/cartpole/scene.yaml"
-);
+const URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
+const SCENE: &str = include_str!("../../fixtures/cartpole/scene.yaml");
 
 fn main() {
     let cfg = load_scene_yaml(SCENE).expect("scene.yaml");
     let lqr = LqrController::build(&CartpoleConfig::default(), LqrWeights::default());
     println!("LQR controller built: K={:?}", lqr.gain);
-    println!("DARE: {} iters, residual={:.3e}", lqr.dare_iters, lqr.dare_residual);
+    println!(
+        "DARE: {} iters, residual={:.3e}",
+        lqr.dare_iters, lqr.dare_residual
+    );
     println!();
 
     let n_envs = 128;

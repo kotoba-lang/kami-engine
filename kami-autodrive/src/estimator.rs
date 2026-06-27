@@ -35,11 +35,17 @@ pub struct StateEstimator {
 
 impl StateEstimator {
     pub fn new(initial: Pose2) -> Self {
-        Self { pose: initial, speed: 0.0 }
+        Self {
+            pose: initial,
+            speed: 0.0,
+        }
     }
 
     pub fn with_speed(initial: Pose2, speed: f32) -> Self {
-        Self { pose: initial, speed }
+        Self {
+            pose: initial,
+            speed,
+        }
     }
 
     pub fn pose(&self) -> Pose2 {
@@ -122,6 +128,9 @@ mod tests {
         e.correct(Pose2::new(0.0, 0.0, -3.0), 1.0);
         // Short arc: 3.0 + 0.283 = 3.283 (≡ −3.0 mod 2π), NOT the long −3.0.
         let y = e.pose().yaw;
-        assert!((y - 3.283).abs() < 0.05, "should wrap the short way, got {y}");
+        assert!(
+            (y - 3.283).abs() < 0.05,
+            "should wrap the short way, got {y}"
+        );
     }
 }

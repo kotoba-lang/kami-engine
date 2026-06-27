@@ -80,6 +80,9 @@ pub use input_map::{ButtonEdges, Edges, VirtualStick, apply_dead_zone};
 pub mod platform;
 pub use platform::{InputDefault, LogicHost, PlatformSpec, RenderBackend, Target, TexFmt};
 
+pub mod steam;
+pub use steam::{SteamBackend, SteamEvent, StubSteam};
+
 // ---------------------------------------------------------------------------
 // Error type
 // ---------------------------------------------------------------------------
@@ -138,6 +141,10 @@ pub struct HostState {
     // --- Queues (drained by the engine after each tick) --------------------
     pub audio_queue: Vec<(String, [f32; 3])>,
     pub draw_queue: Vec<DrawCommand>,
+    /// Valve Steamworks effects emitted this tick (ADR-0048). Output-only — the
+    /// engine drains these into a `steam::SteamBackend`; nothing feeds back into
+    /// the sim, so runs stay deterministic across backends with/without Steam.
+    pub steam_queue: Vec<SteamEvent>,
 
     // --- Binaural listener pose (set-listener!): [px,py,pz, fx,fy,fz] -------
     /// Read by the audio backend (kami-audio) to spatialize `audio_queue`.
@@ -189,6 +196,7 @@ impl HostState {
             pointer_y: 0.0,
             audio_queue: Vec::new(),
             draw_queue: Vec::new(),
+            steam_queue: Vec::new(),
             listener: [0.0, 0.0, 0.0, 0.0, 0.0, -1.0],
             rt_recipe: None,
             delta_ms: 0,
@@ -284,6 +292,7 @@ impl KamiScriptRuntime {
         bind_input(&mut linker)?;
         bind_render(&mut linker)?;
         bind_audio(&mut linker)?;
+        bind_steam(&mut linker)?;
         bind_time(&mut linker)?;
         bind_random(&mut linker)?;
 
@@ -557,6 +566,13 @@ impl KamiScriptRuntime {
     /// Drain audio-play commands accumulated during the last tick.
     pub fn drain_audio_queue(&mut self) -> Vec<(String, [f32; 3])> {
         std::mem::take(&mut self.store.data_mut().audio_queue)
+    }
+
+    /// Drain Valve Steamworks effects (achievement/stat/rich-presence) emitted
+    /// during the last tick (ADR-0048). Forward the batch to a
+    /// `steam::SteamBackend::apply`. Output-only — draining never affects the sim.
+    pub fn drain_steam_queue(&mut self) -> Vec<SteamEvent> {
+        std::mem::take(&mut self.store.data_mut().steam_queue)
     }
 
     /// Listener pose [px,py,pz, fx,fy,fz] last set via `set-listener!`
@@ -1196,6 +1212,59 @@ fn bind_audio(linker: &mut Linker<HostState>) -> Result<(), RuntimeError> {
         "set-listener",
         |mut caller: Caller<'_, HostState>, x: f32, y: f32, z: f32, fx: f32, fy: f32, fz: f32| {
             caller.data_mut().listener = [x, y, z, fx, fy, fz];
+        },
+    )?;
+
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// Steam host bindings (Valve Steamworks, ADR-0048)
+//
+// Output-only effects sink, mirroring `bind_audio`: each call buffers a
+// `SteamEvent` the engine drains after the tick (see `drain_steam_queue`).
+// Nothing reads back, so the sim stays deterministic across backends regardless
+// of whether Steam is connected.
+// ---------------------------------------------------------------------------
+
+fn bind_steam(linker: &mut Linker<HostState>) -> Result<(), RuntimeError> {
+    let m = "kami:engine/steam@1.0.0";
+
+    // unlock-achievement(id-ptr, id-len)
+    linker.func_wrap(
+        m,
+        "unlock-achievement",
+        |mut caller: Caller<'_, HostState>, ptr: i32, len: i32| {
+            let id = read_guest_str(&mut caller, ptr, len);
+            caller
+                .data_mut()
+                .steam_queue
+                .push(SteamEvent::UnlockAchievement(id));
+        },
+    )?;
+    // set-stat(name-ptr, name-len, value)
+    linker.func_wrap(
+        m,
+        "set-stat",
+        |mut caller: Caller<'_, HostState>, ptr: i32, len: i32, value: i64| {
+            let name = read_guest_str(&mut caller, ptr, len);
+            caller
+                .data_mut()
+                .steam_queue
+                .push(SteamEvent::SetStat(name, value));
+        },
+    )?;
+    // set-rich-presence(key-ptr, key-len, val-ptr, val-len)
+    linker.func_wrap(
+        m,
+        "set-rich-presence",
+        |mut caller: Caller<'_, HostState>, kptr: i32, klen: i32, vptr: i32, vlen: i32| {
+            let key = read_guest_str(&mut caller, kptr, klen);
+            let val = read_guest_str(&mut caller, vptr, vlen);
+            caller
+                .data_mut()
+                .steam_queue
+                .push(SteamEvent::SetRichPresence(key, val));
         },
     )?;
 

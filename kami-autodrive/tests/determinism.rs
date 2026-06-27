@@ -45,7 +45,12 @@ fn run() -> Vec<(u32, u32, u32, u32)> {
     let mut trace = Vec::new();
     for _ in 0..1200 {
         let p = car.pose();
-        trace.push((p.x.to_bits(), p.y.to_bits(), p.yaw.to_bits(), car.speed().to_bits()));
+        trace.push((
+            p.x.to_bits(),
+            p.y.to_bits(),
+            p.yaw.to_bits(),
+            car.speed().to_bits(),
+        ));
         if ap.state == DriveState::Arrived {
             break;
         }
@@ -61,5 +66,8 @@ fn identical_runs_are_bit_identical() {
     let b = run();
     assert_eq!(a.len(), b.len(), "trajectory length differs between runs");
     assert!(a.len() > 100, "scenario should produce a real trajectory");
-    assert_eq!(a, b, "two identical runs diverged — nondeterminism crept in");
+    assert_eq!(
+        a, b,
+        "two identical runs diverged — nondeterminism crept in"
+    );
 }

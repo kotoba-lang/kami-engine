@@ -37,7 +37,10 @@ fn arrives_immediately_when_goal_is_the_start() {
     ap.set_goal(start.pos());
     let cmd = ap.step(start, 0.0, &[], start, 1.0 / 30.0);
     assert_eq!(ap.state, DriveState::Arrived);
-    assert!(cmd.brake > 0.0 && cmd.throttle == 0.0, "should hold a stop at the goal");
+    assert!(
+        cmd.brake > 0.0 && cmd.throttle == 0.0,
+        "should hold a stop at the goal"
+    );
 }
 
 #[test]
@@ -68,7 +71,10 @@ fn unreachable_goal_blocks_without_panic_or_collision() {
     let mut rammed = false;
     for _ in 0..2000 {
         let p = car.pose();
-        assert!(finite_pose(p) && car.speed().is_finite(), "values went non-finite: {p:?}");
+        assert!(
+            finite_pose(p) && car.speed().is_finite(),
+            "values went non-finite: {p:?}"
+        );
         if p.x >= 6.0 {
             rammed = true; // crossed into the wall
         }
@@ -80,7 +86,10 @@ fn unreachable_goal_blocks_without_panic_or_collision() {
     }
     assert!(!rammed, "must never drive into the impassable wall");
     // It settles to a safe non-moving stop in front of the wall.
-    assert!(car.speed().abs() < 0.2 && car.pose().x < 6.0, "should hold short of the wall");
+    assert!(
+        car.speed().abs() < 0.2 && car.pose().x < 6.0,
+        "should hold short of the wall"
+    );
 }
 
 #[test]

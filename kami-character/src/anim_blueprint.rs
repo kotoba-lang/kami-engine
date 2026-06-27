@@ -252,9 +252,18 @@ impl AnimBlueprint {
                     state_type: AnimStateType::BlendSpace1D {
                         axis_param: "speed".into(),
                         entries: vec![
-                            BlendSpaceEntry { clip_name: "walk".into(), position: 0.3 },
-                            BlendSpaceEntry { clip_name: "jog".into(), position: 0.6 },
-                            BlendSpaceEntry { clip_name: "run".into(), position: 1.0 },
+                            BlendSpaceEntry {
+                                clip_name: "walk".into(),
+                                position: 0.3,
+                            },
+                            BlendSpaceEntry {
+                                clip_name: "jog".into(),
+                                position: 0.6,
+                            },
+                            BlendSpaceEntry {
+                                clip_name: "run".into(),
+                                position: 1.0,
+                            },
                         ],
                     },
                     play_rate: 1.0,
@@ -310,8 +319,14 @@ impl AnimBlueprint {
                     state_type: AnimStateType::BlendSpace1D {
                         axis_param: "jaw_open".into(),
                         entries: vec![
-                            BlendSpaceEntry { clip_name: "viseme_rest".into(), position: 0.0 },
-                            BlendSpaceEntry { clip_name: "viseme_open".into(), position: 1.0 },
+                            BlendSpaceEntry {
+                                clip_name: "viseme_rest".into(),
+                                position: 0.0,
+                            },
+                            BlendSpaceEntry {
+                                clip_name: "viseme_open".into(),
+                                position: 1.0,
+                            },
                         ],
                     },
                     play_rate: 1.0,

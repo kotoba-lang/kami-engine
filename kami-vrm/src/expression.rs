@@ -145,17 +145,23 @@ impl<'a> ExpressionManager<'a> {
                 continue;
             }
             for b in &e.morph_target_binds {
-                *out.morphs.entry((b.mesh_index, b.morph_index)).or_insert(0.0) += w * b.weight;
+                *out.morphs
+                    .entry((b.mesh_index, b.morph_index))
+                    .or_insert(0.0) += w * b.weight;
             }
             for b in &e.material_color_binds {
-                let entry = color_acc.entry((b.material_index, b.property.clone())).or_insert(([0.0; 4], 0.0));
+                let entry = color_acc
+                    .entry((b.material_index, b.property.clone()))
+                    .or_insert(([0.0; 4], 0.0));
                 for i in 0..4 {
                     entry.0[i] += b.target_value[i] * w;
                 }
                 entry.1 += w;
             }
             for b in &e.texture_transform_binds {
-                let entry = uv_acc.entry(b.material_index).or_insert(([0.0; 2], [0.0; 2], 0.0));
+                let entry = uv_acc
+                    .entry(b.material_index)
+                    .or_insert(([0.0; 2], [0.0; 2], 0.0));
                 for i in 0..2 {
                     entry.0[i] += b.offset[i] * w;
                     entry.1[i] += b.scale[i] * w;
@@ -208,7 +214,11 @@ mod tests {
             is_binary: false,
             morph_target_binds: morphs
                 .into_iter()
-                .map(|(m, i, w)| MorphTargetBind { mesh_index: m, morph_index: i, weight: w })
+                .map(|(m, i, w)| MorphTargetBind {
+                    mesh_index: m,
+                    morph_index: i,
+                    weight: w,
+                })
                 .collect(),
             material_color_binds: vec![],
             texture_transform_binds: vec![],
@@ -225,7 +235,12 @@ mod tests {
     #[test]
     fn accumulates_morph_binds_by_weight() {
         let exprs = vec![
-            expr("happy", Some(ExpressionPreset::Happy), vec![(0, 1, 1.0), (0, 2, 0.5)], None),
+            expr(
+                "happy",
+                Some(ExpressionPreset::Happy),
+                vec![(0, 1, 1.0), (0, 2, 0.5)],
+                None,
+            ),
             expr("aa", Some(ExpressionPreset::Aa), vec![(0, 5, 1.0)], None),
         ];
         let mgr = ExpressionManager::new(&exprs);
@@ -239,24 +254,50 @@ mod tests {
     fn block_override_suppresses_blink() {
         // a "surprised" expression that Blocks blink, active alongside blink.
         let exprs = vec![
-            expr("surprised", Some(ExpressionPreset::Surprised), vec![], Some(OverrideType::Block)),
-            expr("blink", Some(ExpressionPreset::Blink), vec![(0, 9, 1.0)], None),
+            expr(
+                "surprised",
+                Some(ExpressionPreset::Surprised),
+                vec![],
+                Some(OverrideType::Block),
+            ),
+            expr(
+                "blink",
+                Some(ExpressionPreset::Blink),
+                vec![(0, 9, 1.0)],
+                None,
+            ),
         ];
         let mgr = ExpressionManager::new(&exprs);
         let r = mgr.resolve(&weights(&[("surprised", 1.0), ("blink", 1.0)]));
         assert_eq!(r.blink_factor, 0.0, "blink blocked");
-        assert!(r.morphs.get(&(0, 9)).copied().unwrap_or(0.0) < 1e-6, "blink morph suppressed");
+        assert!(
+            r.morphs.get(&(0, 9)).copied().unwrap_or(0.0) < 1e-6,
+            "blink morph suppressed"
+        );
     }
 
     #[test]
     fn blend_override_attenuates_blink() {
         let exprs = vec![
-            expr("happy", Some(ExpressionPreset::Happy), vec![], Some(OverrideType::Blend)),
-            expr("blink", Some(ExpressionPreset::Blink), vec![(0, 9, 1.0)], None),
+            expr(
+                "happy",
+                Some(ExpressionPreset::Happy),
+                vec![],
+                Some(OverrideType::Blend),
+            ),
+            expr(
+                "blink",
+                Some(ExpressionPreset::Blink),
+                vec![(0, 9, 1.0)],
+                None,
+            ),
         ];
         let mgr = ExpressionManager::new(&exprs);
         let r = mgr.resolve(&weights(&[("happy", 0.25), ("blink", 1.0)]));
-        assert!((r.blink_factor - 0.75).abs() < 1e-6, "blink attenuated by 1-0.25");
+        assert!(
+            (r.blink_factor - 0.75).abs() < 1e-6,
+            "blink attenuated by 1-0.25"
+        );
         assert!((r.morphs[&(0, 9)] - 0.75).abs() < 1e-6);
     }
 
@@ -285,17 +326,36 @@ mod tests {
 
     #[test]
     fn binary_expression_snaps() {
-        let exprs = vec![expr("blink", Some(ExpressionPreset::Blink), vec![(0, 9, 1.0)], None)];
+        let exprs = vec![expr(
+            "blink",
+            Some(ExpressionPreset::Blink),
+            vec![(0, 9, 1.0)],
+            None,
+        )];
         let mut binary = exprs;
         binary[0].is_binary = true;
         let mgr = ExpressionManager::new(&binary);
-        assert!(mgr.resolve(&weights(&[("blink", 0.4)])).morphs.get(&(0, 9)).is_none(), "below 0.5 → off");
-        assert!((mgr.resolve(&weights(&[("blink", 0.6)])).morphs[&(0, 9)] - 1.0).abs() < 1e-6, "above 0.5 → on");
+        assert!(
+            mgr.resolve(&weights(&[("blink", 0.4)]))
+                .morphs
+                .get(&(0, 9))
+                .is_none(),
+            "below 0.5 → off"
+        );
+        assert!(
+            (mgr.resolve(&weights(&[("blink", 0.6)])).morphs[&(0, 9)] - 1.0).abs() < 1e-6,
+            "above 0.5 → on"
+        );
     }
 
     #[test]
     fn unknown_expression_is_ignored() {
-        let exprs = vec![expr("happy", Some(ExpressionPreset::Happy), vec![(0, 1, 1.0)], None)];
+        let exprs = vec![expr(
+            "happy",
+            Some(ExpressionPreset::Happy),
+            vec![(0, 1, 1.0)],
+            None,
+        )];
         let mgr = ExpressionManager::new(&exprs);
         let r = mgr.resolve(&weights(&[("nonexistent", 1.0)]));
         assert!(r.morphs.is_empty());

@@ -9,8 +9,8 @@
 use glam::{Mat4, Vec3};
 use hecs::World;
 use kami_app::{Camera, RenderPipeline};
-use kami_render::scene_pipelines::{WaterPipeline, WaterUniform};
 use kami_render::RenderContext;
+use kami_render::scene_pipelines::{WaterPipeline, WaterUniform};
 use wgpu::util::DeviceExt;
 
 use crate::{fog_from_sun, sun_from_time};
@@ -37,18 +37,30 @@ impl WaterAdapter {
         let (verts, idxs) = kami_terrain::generate_water_mesh(&cfg);
         let flat: Vec<f32> = verts
             .iter()
-            .flat_map(|v| [v.position[0], v.position[1], v.position[2], v.uv[0], v.uv[1]])
+            .flat_map(|v| {
+                [
+                    v.position[0],
+                    v.position[1],
+                    v.position[2],
+                    v.uv[0],
+                    v.uv[1],
+                ]
+            })
             .collect();
-        let vb = ctx.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("water.vb"),
-            contents: bytemuck::cast_slice(&flat),
-            usage: wgpu::BufferUsages::VERTEX,
-        });
-        let ib = ctx.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("water.ib"),
-            contents: bytemuck::cast_slice(&idxs),
-            usage: wgpu::BufferUsages::INDEX,
-        });
+        let vb = ctx
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("water.vb"),
+                contents: bytemuck::cast_slice(&flat),
+                usage: wgpu::BufferUsages::VERTEX,
+            });
+        let ib = ctx
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("water.ib"),
+                contents: bytemuck::cast_slice(&idxs),
+                usage: wgpu::BufferUsages::INDEX,
+            });
         let pipeline = WaterPipeline::new(&ctx.device, ctx.format);
         Self {
             pipeline,

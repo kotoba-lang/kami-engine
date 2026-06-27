@@ -99,8 +99,17 @@ fn drives_on_estimated_pose_through_fix_dropout() {
 
     let truth = car.pose();
     assert!(arrived, "should reach the goal driving on the estimate");
-    assert!(truth.pos().distance(goal) < 3.0, "true pose should end near goal ({truth:?})");
-    assert!(!collided, "must not hit the wall despite navigating on a noisy estimate");
+    assert!(
+        truth.pos().distance(goal) < 3.0,
+        "true pose should end near goal ({truth:?})"
+    );
+    assert!(
+        !collided,
+        "must not hit the wall despite navigating on a noisy estimate"
+    );
     // Sanity: the estimate stayed reasonable throughout (else success was luck).
-    assert!(max_est_err < 2.0, "estimate drifted too far ({max_est_err:.2} m)");
+    assert!(
+        max_est_err < 2.0,
+        "estimate drifted too far ({max_est_err:.2} m)"
+    );
 }

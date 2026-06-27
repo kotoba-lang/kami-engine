@@ -114,13 +114,9 @@ impl LightingDesigner {
     pub fn resolve(&self, phase: BeatPhase) -> Vec<LightingFrame> {
         let mut out = Vec::with_capacity(LightingFixture::all().len());
         for f in LightingFixture::all() {
-            let cue = self
-                .cues
-                .iter()
-                .rev()
-                .find(|(c, start)| {
-                    c.fixture == f && phase.bar >= *start && phase.bar < start + c.bars
-                });
+            let cue = self.cues.iter().rev().find(|(c, start)| {
+                c.fixture == f && phase.bar >= *start && phase.bar < start + c.bars
+            });
             let frame = match cue {
                 None => LightingFrame {
                     fixture: f,
@@ -158,11 +154,7 @@ fn envelope_amp(env: Envelope, phase: BeatPhase, start_bar: u32, bars: u32) -> f
         Envelope::Strobe { duty } => {
             // 8 eighths per bar of 4 beats. fire if 8th-frac < duty.
             let frac = (phase.bar_frac * 8.0).fract();
-            if frac < duty {
-                1.0
-            } else {
-                0.0
-            }
+            if frac < duty { 1.0 } else { 0.0 }
         }
         Envelope::Ramp => {
             let total = (bars.max(1)) as f32;
@@ -214,19 +206,28 @@ mod tests {
             bar_frac: 0.0,
         };
         let f = d.resolve(p);
-        let front = f.iter().find(|x| x.fixture == LightingFixture::FrontPar).unwrap();
+        let front = f
+            .iter()
+            .find(|x| x.fixture == LightingFixture::FrontPar)
+            .unwrap();
         assert!(front.intensity < 0.1, "ambient before cue start");
 
         // bar 3 → in window
         let p2 = BeatPhase { bar: 3, ..p };
         let f2 = d.resolve(p2);
-        let front2 = f2.iter().find(|x| x.fixture == LightingFixture::FrontPar).unwrap();
+        let front2 = f2
+            .iter()
+            .find(|x| x.fixture == LightingFixture::FrontPar)
+            .unwrap();
         assert!((front2.intensity - 1.0).abs() < 1e-5);
 
         // bar 6 → expired
         let p3 = BeatPhase { bar: 6, ..p };
         let f3 = d.resolve(p3);
-        let front3 = f3.iter().find(|x| x.fixture == LightingFixture::FrontPar).unwrap();
+        let front3 = f3
+            .iter()
+            .find(|x| x.fixture == LightingFixture::FrontPar)
+            .unwrap();
         assert!(front3.intensity < 0.1, "expired");
     }
 
@@ -258,8 +259,16 @@ mod tests {
         };
         let f0 = d.resolve(on_beat);
         let f1 = d.resolve(mid_beat);
-        let i0 = f0.iter().find(|f| f.fixture == LightingFixture::Strobe).unwrap().intensity;
-        let i1 = f1.iter().find(|f| f.fixture == LightingFixture::Strobe).unwrap().intensity;
+        let i0 = f0
+            .iter()
+            .find(|f| f.fixture == LightingFixture::Strobe)
+            .unwrap()
+            .intensity;
+        let i1 = f1
+            .iter()
+            .find(|f| f.fixture == LightingFixture::Strobe)
+            .unwrap()
+            .intensity;
         assert!(i0 > i1, "pulse decays after beat");
     }
 
@@ -312,7 +321,10 @@ mod tests {
             d.on_event(ev);
         }
         let frames = d.resolve(g.phase());
-        let laser = frames.iter().find(|f| f.fixture == LightingFixture::Laser).unwrap();
+        let laser = frames
+            .iter()
+            .find(|f| f.fixture == LightingFixture::Laser)
+            .unwrap();
         assert!((laser.intensity - 0.9).abs() < 1e-5);
     }
 }

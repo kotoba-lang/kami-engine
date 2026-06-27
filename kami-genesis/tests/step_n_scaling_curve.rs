@@ -45,8 +45,10 @@ fn step_n_speedup_scales_favorably_with_n() {
     println!("║         step_n speedup scaling — 1024 envs × variable N           ║");
     println!("║         R1.2 batched-dispatch headroom characterization           ║");
     println!("╠══════════════════════════════════════════════════════════════════╣");
-    println!("║ {:>5} {:>12} {:>14} {:>14} {:>10} ║",
-             "N", "loop (ms)", "step_n (ms)", "loop μs/step", "speedup");
+    println!(
+        "║ {:>5} {:>12} {:>14} {:>14} {:>10} ║",
+        "N", "loop (ms)", "step_n (ms)", "loop μs/step", "speedup"
+    );
     println!("╠══════════════════════════════════════════════════════════════════╣");
 
     let mut speedups = Vec::with_capacity(N_STEPS_GRID.len());
@@ -60,7 +62,9 @@ fn step_n_speedup_scales_favorably_with_n() {
 
         let mut batched_states = make_states();
         let t = Instant::now();
-        backend.step_n(&mut batched_states, &actions, &cfg, n_steps).unwrap();
+        backend
+            .step_n(&mut batched_states, &actions, &cfg, n_steps)
+            .unwrap();
         let batched_wall = t.elapsed();
 
         let speedup = loop_wall.as_nanos() as f64 / batched_wall.as_nanos() as f64;
@@ -85,27 +89,42 @@ fn step_n_speedup_scales_favorably_with_n() {
 
     println!("\n  Asymptotic (N={n_max}) speedup: {max_speedup:.2}×");
     println!("  Threshold (N={n_min}) speedup:   {min_speedup:.2}×");
-    println!("  Ratio (large/small N):       {:.1}×", max_speedup / min_speedup.max(0.1));
+    println!(
+        "  Ratio (large/small N):       {:.1}×",
+        max_speedup / min_speedup.max(0.1)
+    );
 
     // Acceptance gates:
     //   1. At N=1, no expected speedup (≤2× is reasonable noise margin).
     //   2. At N≥100, speedup should be ≥10× (matches iter 11/12 baseline).
     //   3. At N=1000, speedup should be ≥15× (long-trajectory amortization).
 
-    let small_n_speedup = speedups.iter().find(|(n, _)| *n == 1).map(|(_, s)| *s).unwrap();
+    let small_n_speedup = speedups
+        .iter()
+        .find(|(n, _)| *n == 1)
+        .map(|(_, s)| *s)
+        .unwrap();
     assert!(
         small_n_speedup < 5.0,
         "at N=1, step_n shouldn't show >5× speedup (got {small_n_speedup:.2}×) — \
          either step() got slower or step_n bypasses single-step overhead artificially"
     );
 
-    let medium_n_speedup = speedups.iter().find(|(n, _)| *n == 100).map(|(_, s)| *s).unwrap();
+    let medium_n_speedup = speedups
+        .iter()
+        .find(|(n, _)| *n == 100)
+        .map(|(_, s)| *s)
+        .unwrap();
     assert!(
         medium_n_speedup >= 10.0,
         "at N=100, step_n speedup should be ≥10× per iter-11 baseline (got {medium_n_speedup:.2}×)"
     );
 
-    let large_n_speedup = speedups.iter().find(|(n, _)| *n == 1000).map(|(_, s)| *s).unwrap();
+    let large_n_speedup = speedups
+        .iter()
+        .find(|(n, _)| *n == 1000)
+        .map(|(_, s)| *s)
+        .unwrap();
     assert!(
         large_n_speedup >= 15.0,
         "at N=1000, step_n speedup should be ≥15× per iter-13 baseline (got {large_n_speedup:.2}×)"
@@ -116,7 +135,12 @@ fn make_states() -> Vec<CartpoleState> {
     (0..N_ENVS)
         .map(|i| {
             let theta0 = ((i as f32 / N_ENVS as f32) - 0.5) * 0.1;
-            CartpoleState { x: 0.0, x_dot: 0.0, theta: theta0, theta_dot: 0.0 }
+            CartpoleState {
+                x: 0.0,
+                x_dot: 0.0,
+                theta: theta0,
+                theta_dot: 0.0,
+            }
         })
         .collect()
 }

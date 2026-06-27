@@ -14,7 +14,7 @@
 use std::sync::{Arc, Mutex};
 
 use kami_core::actor::components::{Position, Velocity};
-use kami_script_runtime::{KamiScriptRuntime, Tag, VirtualStick, BACKEND};
+use kami_script_runtime::{BACKEND, KamiScriptRuntime, Tag, VirtualStick};
 
 // A whole little game in the kami-clj subset: a player entity whose velocity
 // each tick is driven by the abstract "MoveX"/"MoveY" axes the host feeds.

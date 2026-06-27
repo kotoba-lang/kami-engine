@@ -1,5 +1,4 @@
 /// G-code generation from toolpath segments with post-processor configuration.
-
 use serde::{Deserialize, Serialize};
 use std::fmt::Write;
 
@@ -107,8 +106,12 @@ pub fn generate_gcode(segments: &[ToolpathSegment], config: &GcodeConfig) -> Str
 
     // Units
     match config.units {
-        GcodeUnits::Millimeters => { let _ = writeln!(out, "G21 (metric)"); }
-        GcodeUnits::Inches => { let _ = writeln!(out, "G20 (imperial)"); }
+        GcodeUnits::Millimeters => {
+            let _ = writeln!(out, "G21 (metric)");
+        }
+        GcodeUnits::Inches => {
+            let _ = writeln!(out, "G20 (imperial)");
+        }
     }
 
     // Absolute positioning

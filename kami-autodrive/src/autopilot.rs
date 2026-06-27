@@ -5,8 +5,8 @@ use glam::Vec2;
 use kami_sensor_sim::{Camera, DepthImage, LidarReturn};
 
 use crate::classes::{VehicleClass, VehicleLimits};
-use crate::control::{curvature_speed_limit, PurePursuit, SpeedController};
-use crate::perception::{forward_clearance, forward_clearance_camera, OccupancyGrid};
+use crate::control::{PurePursuit, SpeedController, curvature_speed_limit};
+use crate::perception::{OccupancyGrid, forward_clearance, forward_clearance_camera};
 use crate::planner;
 use crate::types::{Command, Pose2};
 
@@ -284,7 +284,8 @@ impl Autopilot {
         }
         self.grid.ingest_lidar(lidar, sensor, self.cfg.z_band);
         for (depth, camera) in cameras {
-            self.grid.ingest_camera_depth(depth, camera, self.cfg.camera_z_band);
+            self.grid
+                .ingest_camera_depth(depth, camera, self.cfg.camera_z_band);
         }
 
         // 2. Reactive emergency stop, independent of the planner — fused over
@@ -304,7 +305,10 @@ impl Autopilot {
         //    expensive step — is deferred to the replan branch only.
         self.steps_since_replan = self.steps_since_replan.saturating_add(1);
         let path_blocked = self.path.len() >= 2
-            && self.path.windows(2).any(|w| !self.grid.line_clear(w[0], w[1]));
+            && self
+                .path
+                .windows(2)
+                .any(|w| !self.grid.line_clear(w[0], w[1]));
         let need_replan = self.path.len() < 2
             || path_blocked
             || self.steps_since_replan >= self.cfg.replan_period;
@@ -331,8 +335,11 @@ impl Autopilot {
         // 5. Longitudinal: min of cruise / curvature / goal-approach /
         //    obstacle-proximity caps.
         let mut target_speed = self.cfg.limits.max_speed;
-        target_speed =
-            target_speed.min(curvature_speed_limit(&self.path, target_idx, self.cfg.lateral_accel));
+        target_speed = target_speed.min(curvature_speed_limit(
+            &self.path,
+            target_idx,
+            self.cfg.lateral_accel,
+        ));
         // Decelerate to (near) rest at the goal: v ≤ √(2·d_max·distance).
         let d_goal = pose.pos().distance(goal);
         target_speed = target_speed.min((2.0 * self.cfg.limits.max_decel * d_goal).sqrt());
@@ -362,7 +369,13 @@ impl Autopilot {
         }
 
         let (throttle, brake) = self.speed_ctl.update(target_speed, speed, dt);
-        let mut cmd = Command { throttle, brake, steer, handbrake: 0.0, reverse: false };
+        let mut cmd = Command {
+            throttle,
+            brake,
+            steer,
+            handbrake: 0.0,
+            reverse: false,
+        };
         cmd.clamp();
         cmd
     }
@@ -437,12 +450,22 @@ impl Autopilot {
         };
 
         let (steer, _) = self.pursuit.steer(pose, speed, &[pose.pos(), target]);
-        self.state = if self.arrived { DriveState::Arrived } else { DriveState::Loitering };
+        self.state = if self.arrived {
+            DriveState::Arrived
+        } else {
+            DriveState::Loitering
+        };
 
         self.last_target_speed = self.cfg.limits.max_speed * speed_frac;
         self.last_cross_track = (d - r).abs();
         let (throttle, brake) = self.speed_ctl.update(self.last_target_speed, speed, dt);
-        let mut cmd = Command { throttle, brake, steer, handbrake: 0.0, reverse: false };
+        let mut cmd = Command {
+            throttle,
+            brake,
+            steer,
+            handbrake: 0.0,
+            reverse: false,
+        };
         cmd.clamp();
         cmd
     }

@@ -12,8 +12,8 @@
 use bytemuck::{Pod, Zeroable};
 use glam::{Mat4, Vec3};
 use kami_render::RenderContext;
-use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use wasm_bindgen::prelude::*;
 
 use crate::scene::MangakaScene;
 
@@ -35,11 +35,21 @@ struct Uniforms {
 }
 
 const CHAR_PALETTE: [[f32; 4]; MAX_CHARS] = [
-    [0.92, 0.86, 0.78, 1.0], [0.78, 0.86, 0.92, 1.0], [0.86, 0.78, 0.92, 1.0],
-    [0.92, 0.78, 0.78, 1.0], [0.78, 0.92, 0.86, 1.0], [0.92, 0.92, 0.78, 1.0],
-    [0.78, 0.78, 0.92, 1.0], [0.92, 0.78, 0.92, 1.0], [0.78, 0.92, 0.78, 1.0],
-    [0.92, 0.86, 0.92, 1.0], [0.86, 0.92, 0.78, 1.0], [0.78, 0.86, 0.78, 1.0],
-    [0.92, 0.78, 0.86, 1.0], [0.78, 0.92, 0.92, 1.0], [0.86, 0.86, 0.86, 1.0],
+    [0.92, 0.86, 0.78, 1.0],
+    [0.78, 0.86, 0.92, 1.0],
+    [0.86, 0.78, 0.92, 1.0],
+    [0.92, 0.78, 0.78, 1.0],
+    [0.78, 0.92, 0.86, 1.0],
+    [0.92, 0.92, 0.78, 1.0],
+    [0.78, 0.78, 0.92, 1.0],
+    [0.92, 0.78, 0.92, 1.0],
+    [0.78, 0.92, 0.78, 1.0],
+    [0.92, 0.86, 0.92, 1.0],
+    [0.86, 0.92, 0.78, 1.0],
+    [0.78, 0.86, 0.78, 1.0],
+    [0.92, 0.78, 0.86, 1.0],
+    [0.78, 0.92, 0.92, 1.0],
+    [0.86, 0.86, 0.86, 1.0],
     [0.66, 0.66, 0.66, 1.0],
 ];
 
@@ -236,7 +246,9 @@ impl ScenePreview {
         let ids = self.scene.character_ids();
         let count = ids.len().min(MAX_CHARS);
         for (i, id) in ids.iter().take(MAX_CHARS).enumerate() {
-            let Some(ch) = self.scene.characters.get(id) else { continue };
+            let Some(ch) = self.scene.characters.get(id) else {
+                continue;
+            };
             let t = ch.root_xform.translation;
             chars[i] = [t.x, t.y + 0.85, t.z, 0.55];
             chars_radius[i] = [0.25, 0.0, 0.0, 0.0];

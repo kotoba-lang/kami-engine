@@ -911,11 +911,9 @@ mod tests {
             .min_by(|a, b| {
                 let a_cover = nearest_tree_to_point(game, a.pos);
                 let b_cover = nearest_tree_to_point(game, b.pos);
-                let a_cost = game.player_pos.distance(a_cover)
-                    + a_cover.distance(a.pos) * 0.7
+                let a_cost = game.player_pos.distance(a_cover) + a_cover.distance(a.pos) * 0.7
                     - game.gorilla_pos.distance(a_cover) * 0.15;
-                let b_cost = game.player_pos.distance(b_cover)
-                    + b_cover.distance(b.pos) * 0.7
+                let b_cost = game.player_pos.distance(b_cover) + b_cover.distance(b.pos) * 0.7
                     - game.gorilla_pos.distance(b_cover) * 0.15;
                 a_cost.partial_cmp(&b_cost).unwrap_or(Ordering::Equal)
             })

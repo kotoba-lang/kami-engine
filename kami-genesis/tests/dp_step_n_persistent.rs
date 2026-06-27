@@ -33,7 +33,9 @@ fn dp_step_n_persistent_matches_step_loop_exact() {
 
     let mut loop_states = initial.clone();
     for _ in 0..N_STEPS {
-        backend.step_double_pendulum(&mut loop_states, &torques, &cfg).unwrap();
+        backend
+            .step_double_pendulum(&mut loop_states, &torques, &cfg)
+            .unwrap();
     }
 
     let mut batched_states = initial.clone();
@@ -54,8 +56,14 @@ fn dp_step_n_persistent_matches_step_loop_exact() {
     println!("max |Δq2|         : {max_dq2:.3e}");
     println!("=========================================");
 
-    assert!(max_dq1 < 1e-5, "DP step_n vs step-loop q1 diff > 1e-5: {max_dq1:.3e}");
-    assert!(max_dq2 < 1e-5, "DP step_n vs step-loop q2 diff > 1e-5: {max_dq2:.3e}");
+    assert!(
+        max_dq1 < 1e-5,
+        "DP step_n vs step-loop q1 diff > 1e-5: {max_dq1:.3e}"
+    );
+    assert!(
+        max_dq2 < 1e-5,
+        "DP step_n vs step-loop q2 diff > 1e-5: {max_dq2:.3e}"
+    );
 }
 
 #[test]
@@ -72,12 +80,16 @@ fn dp_step_n_persistent_beats_step_loop_by_5x_or_more() {
     let torques = vec![[0.0f32, 0.0f32]; N_ENVS];
 
     let mut warm = make_states();
-    backend.step_double_pendulum(&mut warm, &torques, &cfg).unwrap();
+    backend
+        .step_double_pendulum(&mut warm, &torques, &cfg)
+        .unwrap();
 
     let mut loop_states = make_states();
     let t = Instant::now();
     for _ in 0..N_STEPS {
-        backend.step_double_pendulum(&mut loop_states, &torques, &cfg).unwrap();
+        backend
+            .step_double_pendulum(&mut loop_states, &torques, &cfg)
+            .unwrap();
     }
     let elapsed_loop = t.elapsed();
 

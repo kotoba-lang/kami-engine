@@ -1,8 +1,8 @@
 //! Blendshape system — shape deformations + 52 ARKit expression targets.
 
-use glam::Vec3;
+use crate::params::{EyeParams, FaceShapeParams, MouthParams, NoseParams};
 use crate::BlendshapeTarget;
-use crate::params::{FaceShapeParams, EyeParams, NoseParams, MouthParams};
+use glam::Vec3;
 
 /// Apply face shape blendshapes to base mesh vertices.
 pub fn apply_face_shape(verts: &mut [Vec3], params: &FaceShapeParams) {
@@ -100,38 +100,68 @@ pub fn apply_mouth_shape(verts: &mut [Vec3], params: &MouthParams) {
 /// Each target contains per-vertex position deltas.
 pub fn generate_arkit_targets(n_verts: usize) -> Vec<BlendshapeTarget> {
     let arkit_names = [
-        "eyeBlinkLeft", "eyeBlinkRight",
-        "eyeLookDownLeft", "eyeLookDownRight",
-        "eyeLookInLeft", "eyeLookInRight",
-        "eyeLookOutLeft", "eyeLookOutRight",
-        "eyeLookUpLeft", "eyeLookUpRight",
-        "eyeSquintLeft", "eyeSquintRight",
-        "eyeWideLeft", "eyeWideRight",
-        "jawForward", "jawLeft", "jawRight", "jawOpen",
-        "mouthClose", "mouthFunnel", "mouthPucker",
-        "mouthLeft", "mouthRight",
-        "mouthSmileLeft", "mouthSmileRight",
-        "mouthFrownLeft", "mouthFrownRight",
-        "mouthDimpleLeft", "mouthDimpleRight",
-        "mouthStretchLeft", "mouthStretchRight",
-        "mouthRollLower", "mouthRollUpper",
-        "mouthShrugLower", "mouthShrugUpper",
-        "mouthPressLeft", "mouthPressRight",
-        "mouthLowerDownLeft", "mouthLowerDownRight",
-        "mouthUpperUpLeft", "mouthUpperUpRight",
-        "browDownLeft", "browDownRight",
+        "eyeBlinkLeft",
+        "eyeBlinkRight",
+        "eyeLookDownLeft",
+        "eyeLookDownRight",
+        "eyeLookInLeft",
+        "eyeLookInRight",
+        "eyeLookOutLeft",
+        "eyeLookOutRight",
+        "eyeLookUpLeft",
+        "eyeLookUpRight",
+        "eyeSquintLeft",
+        "eyeSquintRight",
+        "eyeWideLeft",
+        "eyeWideRight",
+        "jawForward",
+        "jawLeft",
+        "jawRight",
+        "jawOpen",
+        "mouthClose",
+        "mouthFunnel",
+        "mouthPucker",
+        "mouthLeft",
+        "mouthRight",
+        "mouthSmileLeft",
+        "mouthSmileRight",
+        "mouthFrownLeft",
+        "mouthFrownRight",
+        "mouthDimpleLeft",
+        "mouthDimpleRight",
+        "mouthStretchLeft",
+        "mouthStretchRight",
+        "mouthRollLower",
+        "mouthRollUpper",
+        "mouthShrugLower",
+        "mouthShrugUpper",
+        "mouthPressLeft",
+        "mouthPressRight",
+        "mouthLowerDownLeft",
+        "mouthLowerDownRight",
+        "mouthUpperUpLeft",
+        "mouthUpperUpRight",
+        "browDownLeft",
+        "browDownRight",
         "browInnerUp",
-        "browOuterUpLeft", "browOuterUpRight",
-        "cheekPuff", "cheekSquintLeft", "cheekSquintRight",
-        "noseSneerLeft", "noseSneerRight",
+        "browOuterUpLeft",
+        "browOuterUpRight",
+        "cheekPuff",
+        "cheekSquintLeft",
+        "cheekSquintRight",
+        "noseSneerLeft",
+        "noseSneerRight",
         "tongueOut",
     ];
 
-    arkit_names.iter().map(|name| {
-        // Placeholder deltas (zero) — populated from captured data or procedural rules
-        BlendshapeTarget {
-            name: name.to_string(),
-            deltas: vec![Vec3::ZERO; n_verts],
-        }
-    }).collect()
+    arkit_names
+        .iter()
+        .map(|name| {
+            // Placeholder deltas (zero) — populated from captured data or procedural rules
+            BlendshapeTarget {
+                name: name.to_string(),
+                deltas: vec![Vec3::ZERO; n_verts],
+            }
+        })
+        .collect()
 }

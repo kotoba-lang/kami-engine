@@ -168,7 +168,10 @@ pub mod constraint {
         }
 
         fn find_point(&self, id: u64) -> Option<DVec2> {
-            self.points.iter().find(|(pid, _)| *pid == id).map(|(_, p)| *p)
+            self.points
+                .iter()
+                .find(|(pid, _)| *pid == id)
+                .map(|(_, p)| *p)
         }
 
         pub fn points(&self) -> &[(u64, DVec2)] {
@@ -220,13 +223,20 @@ pub mod parameter {
         }
 
         pub fn set(&mut self, name: &str, value: f64) -> Result<(), String> {
-            let p = self.params.iter_mut().find(|p| p.name == name)
+            let p = self
+                .params
+                .iter_mut()
+                .find(|p| p.name == name)
                 .ok_or_else(|| format!("parameter '{}' not found", name))?;
             if let Some(min) = p.min_value {
-                if value < min { return Err(format!("{} below minimum {}", value, min)); }
+                if value < min {
+                    return Err(format!("{} below minimum {}", value, min));
+                }
             }
             if let Some(max) = p.max_value {
-                if value > max { return Err(format!("{} above maximum {}", value, max)); }
+                if value > max {
+                    return Err(format!("{} above maximum {}", value, max));
+                }
             }
             p.value = value;
             Ok(())
@@ -390,7 +400,10 @@ pub mod selection {
 
     impl SelectionSet {
         pub fn new() -> Self {
-            Self { items: Vec::new(), mode: SelectionMode::Single }
+            Self {
+                items: Vec::new(),
+                mode: SelectionMode::Single,
+            }
         }
 
         pub fn set_mode(&mut self, mode: SelectionMode) {
@@ -404,7 +417,11 @@ pub mod selection {
                     self.items.push(sel);
                 }
                 SelectionMode::Multi | SelectionMode::Chain | SelectionMode::Box => {
-                    if !self.items.iter().any(|s| s.id == sel.id && s.kind == sel.kind) {
+                    if !self
+                        .items
+                        .iter()
+                        .any(|s| s.id == sel.id && s.kind == sel.kind)
+                    {
                         self.items.push(sel);
                     }
                 }
@@ -558,8 +575,8 @@ pub mod grid {
 }
 
 pub mod snap {
-    use glam::DVec2;
     use super::grid::GridConfig;
+    use glam::DVec2;
 
     pub fn snap_to_grid(point: DVec2, grid: &GridConfig) -> DVec2 {
         if !grid.snap_enabled {
@@ -596,7 +613,9 @@ pub mod drc {
 
     impl RuleEngine {
         pub fn new() -> Self {
-            Self { violations: Vec::new() }
+            Self {
+                violations: Vec::new(),
+            }
         }
 
         pub fn report(&mut self, violation: Violation) {
@@ -612,11 +631,17 @@ pub mod drc {
         }
 
         pub fn error_count(&self) -> usize {
-            self.violations.iter().filter(|v| v.severity == Severity::Error).count()
+            self.violations
+                .iter()
+                .filter(|v| v.severity == Severity::Error)
+                .count()
         }
 
         pub fn warning_count(&self) -> usize {
-            self.violations.iter().filter(|v| v.severity == Severity::Warning).count()
+            self.violations
+                .iter()
+                .filter(|v| v.severity == Severity::Warning)
+                .count()
         }
 
         pub fn has_errors(&self) -> bool {
@@ -701,12 +726,21 @@ mod tests {
     #[test]
     fn selection_set() {
         let mut sel = selection::SelectionSet::new();
-        sel.select(selection::Selection { id: 1, kind: selection::SelectionKind::Face });
+        sel.select(selection::Selection {
+            id: 1,
+            kind: selection::SelectionKind::Face,
+        });
         assert_eq!(sel.count(), 1);
-        sel.select(selection::Selection { id: 2, kind: selection::SelectionKind::Face });
+        sel.select(selection::Selection {
+            id: 2,
+            kind: selection::SelectionKind::Face,
+        });
         assert_eq!(sel.count(), 1); // single mode replaces
         sel.set_mode(selection::SelectionMode::Multi);
-        sel.select(selection::Selection { id: 3, kind: selection::SelectionKind::Edge });
+        sel.select(selection::Selection {
+            id: 3,
+            kind: selection::SelectionKind::Edge,
+        });
         assert_eq!(sel.count(), 2);
     }
 

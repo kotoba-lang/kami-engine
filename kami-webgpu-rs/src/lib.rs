@@ -256,7 +256,11 @@ fn mat4_from_flat(v: &[EdnValue]) -> [[f32; 4]; 4] {
 fn parse_mesh(m: &std::collections::BTreeMap<EdnValue, EdnValue>) -> Mesh {
     let rot = {
         let s = mget(m, "rot").and_then(|x| x.as_vector()).unwrap_or(&[]);
-        let g = |i: usize| s.get(i).map(|x| num(Some(x))).unwrap_or(if i == 3 { 1.0 } else { 0.0 });
+        let g = |i: usize| {
+            s.get(i)
+                .map(|x| num(Some(x)))
+                .unwrap_or(if i == 3 { 1.0 } else { 0.0 })
+        };
         [g(0), g(1), g(2), g(3)]
     };
     let joints = mget(m, "joints")
@@ -283,7 +287,10 @@ fn parse_mesh(m: &std::collections::BTreeMap<EdnValue, EdnValue>) -> Mesh {
         .unwrap_or_default();
     Mesh {
         id: ident(mget(m, "id")).unwrap_or_default(),
-        url: mget(m, "url").and_then(|v| v.as_string()).unwrap_or("").to_string(),
+        url: mget(m, "url")
+            .and_then(|v| v.as_string())
+            .unwrap_or("")
+            .to_string(),
         pos: opt_vec3(mget(m, "pos")).unwrap_or([0.0, 0.0, 0.0]),
         rot,
         scale: num_or(mget(m, "scale"), 1.0),
@@ -291,7 +298,9 @@ fn parse_mesh(m: &std::collections::BTreeMap<EdnValue, EdnValue>) -> Mesh {
         skin: ident(mget(m, "skin")),
         joints,
         morphs,
-        cast_shadow: mget(m, "cast-shadow").and_then(|v| v.as_bool()).unwrap_or(true),
+        cast_shadow: mget(m, "cast-shadow")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(true),
     }
 }
 
@@ -312,7 +321,9 @@ fn parse_material(m: &std::collections::BTreeMap<EdnValue, EdnValue>) -> Materia
         alpha_cutoff: num_or(mget(m, "alpha-cutoff"), 0.5),
         outline: num_or(mget(m, "outline"), 0.0),
         rim: num_or(mget(m, "rim"), 0.0),
-        matcap: mget(m, "matcap").and_then(|v| v.as_string()).map(|s| s.to_string()),
+        matcap: mget(m, "matcap")
+            .and_then(|v| v.as_string())
+            .map(|s| s.to_string()),
     }
 }
 
@@ -329,7 +340,9 @@ fn parse_light(m: &std::collections::BTreeMap<EdnValue, EdnValue>) -> Light {
         range: num_or(mget(m, "range"), 0.0),
         spot_inner: num_or(mget(m, "inner"), 0.0),
         spot_outer: num_or(mget(m, "outer"), 0.0),
-        cast_shadow: mget(m, "cast-shadow").and_then(|v| v.as_bool()).unwrap_or(false),
+        cast_shadow: mget(m, "cast-shadow")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false),
     }
 }
 
@@ -347,18 +360,34 @@ pub fn parse_render_ir(edn: &str) -> RenderIr {
 
     if let Some(root) = root_map(edn) {
         if let Some(ls) = mget(&root, "lights").and_then(|x| x.as_vector()) {
-            lights = ls.iter().filter_map(|l| l.as_map()).map(parse_light).collect();
+            lights = ls
+                .iter()
+                .filter_map(|l| l.as_map())
+                .map(parse_light)
+                .collect();
         }
         if let Some(ms) = mget(&root, "materials").and_then(|x| x.as_vector()) {
-            materials = ms.iter().filter_map(|m| m.as_map()).map(parse_material).collect();
+            materials = ms
+                .iter()
+                .filter_map(|m| m.as_map())
+                .map(parse_material)
+                .collect();
         }
         if let Some(ms) = mget(&root, "meshes").and_then(|x| x.as_vector()) {
-            meshes = ms.iter().filter_map(|m| m.as_map()).map(parse_mesh).collect();
+            meshes = ms
+                .iter()
+                .filter_map(|m| m.as_map())
+                .map(parse_mesh)
+                .collect();
         }
         if let Some(cam) = mget(&root, "camera").and_then(|x| x.as_map().cloned()) {
             camera = Some(Camera {
-                eye: opt_vec3(mget(&cam, "eye")).or(globals.eye).unwrap_or([5.0, 3.0, 8.0]),
-                target: opt_vec3(mget(&cam, "target")).or(globals.target).unwrap_or([0.0, 1.0, 0.0]),
+                eye: opt_vec3(mget(&cam, "eye"))
+                    .or(globals.eye)
+                    .unwrap_or([5.0, 3.0, 8.0]),
+                target: opt_vec3(mget(&cam, "target"))
+                    .or(globals.target)
+                    .unwrap_or([0.0, 1.0, 0.0]),
                 fov_y: num_or(mget(&cam, "fov"), 0.9),
                 near: num_or(mget(&cam, "near"), 0.1),
                 far: num_or(mget(&cam, "far"), 1000.0),
@@ -373,11 +402,21 @@ pub fn parse_render_ir(edn: &str) -> RenderIr {
             }
             if let Some(ibl) = mget(&e, "ibl").and_then(|x| x.as_map().cloned()) {
                 env.ibl_intensity = num_or(mget(&ibl, "intensity"), 1.0);
-                env.ibl_url = mget(&ibl, "url").and_then(|v| v.as_string()).map(|s| s.to_string());
+                env.ibl_url = mget(&ibl, "url")
+                    .and_then(|v| v.as_string())
+                    .map(|s| s.to_string());
             }
         }
     }
-    RenderIr { globals, instances, lights, camera, env, materials, meshes }
+    RenderIr {
+        globals,
+        instances,
+        lights,
+        camera,
+        env,
+        materials,
+        meshes,
+    }
 }
 
 impl RenderIr {
@@ -394,7 +433,11 @@ impl RenderIr {
 impl Mesh {
     /// Resolve a morph weight by target name (0.0 when absent).
     pub fn morph(&self, name: &str) -> f32 {
-        self.morphs.iter().find(|w| w.name == name).map(|w| w.weight).unwrap_or(0.0)
+        self.morphs
+            .iter()
+            .find(|w| w.name == name)
+            .map(|w| w.weight)
+            .unwrap_or(0.0)
     }
 }
 
@@ -411,7 +454,11 @@ mod render_ir_ext_tests {
         assert_eq!(ir.instances.len(), 1);
         assert!(ir.lights.is_empty());
         assert!(ir.camera.is_none());
-        assert_eq!(ir.env.ambient, [0.7, 0.8, 0.9], "env ambient inherits sky horizon");
+        assert_eq!(
+            ir.env.ambient,
+            [0.7, 0.8, 0.9],
+            "env ambient inherits sky horizon"
+        );
         assert_eq!(ir.env.ibl_intensity, 0.0);
     }
 
@@ -491,8 +538,14 @@ mod render_ir_ext_tests {
     #[test]
     fn v1_scene_has_empty_material_table() {
         let ir = parse_render_ir("{:instances [{:pos [0 0 0] :color [1 0 0]}]}");
-        assert!(ir.materials.is_empty(), "no :materials → empty table, backward compatible");
-        assert!(ir.meshes.is_empty(), "no :meshes → empty, backward compatible");
+        assert!(
+            ir.materials.is_empty(),
+            "no :materials → empty table, backward compatible"
+        );
+        assert!(
+            ir.meshes.is_empty(),
+            "no :meshes → empty, backward compatible"
+        );
     }
 
     #[test]
@@ -519,7 +572,10 @@ mod render_ir_ext_tests {
         assert!((a.morph("blink") - 1.0).abs() < 1e-6);
         assert_eq!(a.morph("angry"), 0.0, "absent morph → 0");
         // the mesh resolves its material in the table.
-        assert_eq!(ir.material(a.material.as_deref().unwrap()).unwrap().model, MaterialModel::Mtoon);
+        assert_eq!(
+            ir.material(a.material.as_deref().unwrap()).unwrap().model,
+            MaterialModel::Mtoon
+        );
     }
 
     #[test]
@@ -533,7 +589,15 @@ mod render_ir_ext_tests {
         );
         let m = ir.mesh("rigged").unwrap();
         assert_eq!(m.joints.len(), 2);
-        assert_eq!(m.joints[0], [[1.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0],[0.0,0.0,1.0,0.0],[0.0,0.0,0.0,1.0]]);
+        assert_eq!(
+            m.joints[0],
+            [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0]
+            ]
+        );
         assert_eq!(m.joints[1][3], [2.0, 3.0, 4.0, 1.0], "translation row");
     }
 
@@ -586,52 +650,111 @@ pub fn parse_ir(edn: &str) -> (Globals, Vec<Instance>) {
 /// mirroring the web's deterministic scatter. This is what play3d feeds the data-driven
 /// Renderer (ADR-0041 step 2). Live entities (player/bots) are appended by the caller.
 pub fn scene_to_ir(scene_src: &str) -> (Globals, Vec<Instance>) {
-    let root = match root_map(scene_src) { Some(m) => m, None => return (Globals::default(), vec![]) };
+    let root = match root_map(scene_src) {
+        Some(m) => m,
+        None => return (Globals::default(), vec![]),
+    };
     let mut g = Globals::default();
     let mut ground_color = [0.34, 0.52, 0.30];
     if let Some(sky) = mget(&root, "render/sky").and_then(|x| x.as_map().cloned()) {
         g.horizon = vec3(mget(&sky, "horizon"));
         g.sun_dir = vec3(mget(&sky, "sun-dir"));
         g.sun = vec3(mget(&sky, "sun"));
-        if mget(&sky, "ground").is_some() { ground_color = vec3(mget(&sky, "ground")); }
+        if mget(&sky, "ground").is_some() {
+            ground_color = vec3(mget(&sky, "ground"));
+        }
     }
     // camera rig (optional) → eye/target at origin
     if let Some(cam) = mget(&root, "camera").and_then(|x| x.as_map().cloned()) {
-        let dist = num(mget(&cam, "distance")); let h = num(mget(&cam, "height"));
-        let az = num(mget(&cam, "azimuth")); let lh = num(mget(&cam, "look-height"));
+        let dist = num(mget(&cam, "distance"));
+        let h = num(mget(&cam, "height"));
+        let az = num(mget(&cam, "azimuth"));
+        let lh = num(mget(&cam, "look-height"));
         g.eye = Some([dist * az.cos(), h, dist * az.sin()]);
         g.target = Some([0.0, lh, 0.0]);
     }
-    let mut insts = vec![Instance { pos: [0.0, -0.5, 0.0], color: ground_color, size: [400.0, 1.0], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0 }];
+    let mut insts = vec![Instance {
+        pos: [0.0, -0.5, 0.0],
+        color: ground_color,
+        size: [400.0, 1.0],
+        yaw: 0.0,
+        metallic: 0.0,
+        roughness: 0.95,
+        emissive: 0.0,
+    }];
 
     if let Some(props) = mget(&root, "render/props").and_then(|x| x.as_map().cloned()) {
         let count = num(mget(&props, "count")) as i32;
-        let spread = { let s = num(mget(&props, "spread")); if s == 0.0 { 140.0 } else { s } };
-        let buildings: Vec<_> = mget(&props, "buildings").and_then(|x| x.as_vector())
-            .map(|v| v.iter().filter_map(|b| b.as_map().cloned()).collect()).unwrap_or_default();
+        let spread = {
+            let s = num(mget(&props, "spread"));
+            if s == 0.0 { 140.0 } else { s }
+        };
+        let buildings: Vec<_> = mget(&props, "buildings")
+            .and_then(|x| x.as_vector())
+            .map(|v| v.iter().filter_map(|b| b.as_map().cloned()).collect())
+            .unwrap_or_default();
         let trees = mget(&props, "trees").and_then(|x| x.as_map().cloned());
         let tratio = trees.as_ref().map(|t| num(mget(t, "ratio"))).unwrap_or(0.0);
         let mut seed: u32 = 2654435769;
-        let mut rnd = || { seed ^= seed << 13; seed ^= seed >> 17; seed ^= seed << 5; (seed & 0x7fffffff) as f32 / 2147483647.0 };
+        let mut rnd = || {
+            seed ^= seed << 13;
+            seed ^= seed >> 17;
+            seed ^= seed << 5;
+            (seed & 0x7fffffff) as f32 / 2147483647.0
+        };
         let mut i = 0;
         while i < count {
             i += 1;
             let x = (rnd() * 2.0 - 1.0) * spread;
             let z = (rnd() * 2.0 - 1.0) * spread;
-            if (x * x + z * z).sqrt() < 11.0 { continue; }
+            if (x * x + z * z).sqrt() < 11.0 {
+                continue;
+            }
             if rnd() < tratio {
                 if let Some(t) = &trees {
-                    let tw = num(mget(t, "w")); let th = num(mget(t, "h"));
-                    let (tm, tr) = (num(mget(t, "metallic")), { let r = num(mget(t, "roughness")); if r == 0.0 { 0.95 } else { r } });
-                    insts.push(Instance { pos: [x, 0.0, z], color: [0.45, 0.32, 0.2], size: [tw * 0.3, th * 0.5], yaw: 0.0, metallic: 0.0, roughness: 0.9, emissive: 0.0 });
-                    insts.push(Instance { pos: [x, th * 0.5, z], color: vec3(mget(t, "color")), size: [tw, th * 0.6], yaw: 0.0, metallic: tm, roughness: tr, emissive: 0.0 });
+                    let tw = num(mget(t, "w"));
+                    let th = num(mget(t, "h"));
+                    let (tm, tr) = (num(mget(t, "metallic")), {
+                        let r = num(mget(t, "roughness"));
+                        if r == 0.0 { 0.95 } else { r }
+                    });
+                    insts.push(Instance {
+                        pos: [x, 0.0, z],
+                        color: [0.45, 0.32, 0.2],
+                        size: [tw * 0.3, th * 0.5],
+                        yaw: 0.0,
+                        metallic: 0.0,
+                        roughness: 0.9,
+                        emissive: 0.0,
+                    });
+                    insts.push(Instance {
+                        pos: [x, th * 0.5, z],
+                        color: vec3(mget(t, "color")),
+                        size: [tw, th * 0.6],
+                        yaw: 0.0,
+                        metallic: tm,
+                        roughness: tr,
+                        emissive: 0.0,
+                    });
                 }
             } else if !buildings.is_empty() {
                 let b = &buildings[(rnd() * buildings.len() as f32) as usize % buildings.len()];
-                let mn = num(mget(b, "min-h")); let mx = num(mget(b, "max-h"));
+                let mn = num(mget(b, "min-h"));
+                let mx = num(mget(b, "max-h"));
                 let h = mn + rnd() * (mx - mn);
-                let rgh = { let r = num(mget(b, "roughness")); if r == 0.0 { 0.7 } else { r } };
-                insts.push(Instance { pos: [x, 0.0, z], color: vec3(mget(b, "color")), size: [num(mget(b, "w")), h], yaw: 0.0, metallic: num(mget(b, "metallic")), roughness: rgh, emissive: 0.0 });
+                let rgh = {
+                    let r = num(mget(b, "roughness"));
+                    if r == 0.0 { 0.7 } else { r }
+                };
+                insts.push(Instance {
+                    pos: [x, 0.0, z],
+                    color: vec3(mget(b, "color")),
+                    size: [num(mget(b, "w")), h],
+                    yaw: 0.0,
+                    metallic: num(mget(b, "metallic")),
+                    roughness: rgh,
+                    emissive: 0.0,
+                });
             }
         }
     }
@@ -642,12 +765,60 @@ pub fn scene_to_ir(scene_src: &str) -> (Globals, Vec<Instance>) {
 
 fn cube() -> (Vec<f32>, Vec<u16>) {
     let faces: [([f32; 3], [[f32; 3]; 4]); 6] = [
-        ([0.0, 0.0, 1.0], [[-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [0.5, 0.5, 0.5], [-0.5, 0.5, 0.5]]),
-        ([0.0, 0.0, -1.0], [[0.5, -0.5, -0.5], [-0.5, -0.5, -0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5]]),
-        ([1.0, 0.0, 0.0], [[0.5, -0.5, 0.5], [0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [0.5, 0.5, 0.5]]),
-        ([-1.0, 0.0, 0.0], [[-0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [-0.5, 0.5, 0.5], [-0.5, 0.5, -0.5]]),
-        ([0.0, 1.0, 0.0], [[-0.5, 0.5, 0.5], [0.5, 0.5, 0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, -0.5]]),
-        ([0.0, -1.0, 0.0], [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [0.5, -0.5, 0.5], [-0.5, -0.5, 0.5]]),
+        (
+            [0.0, 0.0, 1.0],
+            [
+                [-0.5, -0.5, 0.5],
+                [0.5, -0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+            ],
+        ),
+        (
+            [0.0, 0.0, -1.0],
+            [
+                [0.5, -0.5, -0.5],
+                [-0.5, -0.5, -0.5],
+                [-0.5, 0.5, -0.5],
+                [0.5, 0.5, -0.5],
+            ],
+        ),
+        (
+            [1.0, 0.0, 0.0],
+            [
+                [0.5, -0.5, 0.5],
+                [0.5, -0.5, -0.5],
+                [0.5, 0.5, -0.5],
+                [0.5, 0.5, 0.5],
+            ],
+        ),
+        (
+            [-1.0, 0.0, 0.0],
+            [
+                [-0.5, -0.5, -0.5],
+                [-0.5, -0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+                [-0.5, 0.5, -0.5],
+            ],
+        ),
+        (
+            [0.0, 1.0, 0.0],
+            [
+                [-0.5, 0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [0.5, 0.5, -0.5],
+                [-0.5, 0.5, -0.5],
+            ],
+        ),
+        (
+            [0.0, -1.0, 0.0],
+            [
+                [-0.5, -0.5, -0.5],
+                [0.5, -0.5, -0.5],
+                [0.5, -0.5, 0.5],
+                [-0.5, -0.5, 0.5],
+            ],
+        ),
     ];
     let mut v = Vec::new();
     let mut idx = Vec::new();
@@ -683,25 +854,82 @@ const MAX_INST: u32 = 16384;
 /// PNG and live-window examples so both render the same world.
 pub fn demo_city() -> (Globals, Vec<Instance>) {
     let mut insts: Vec<Instance> = Vec::new();
-    insts.push(Instance { pos: [0.0, -0.5, 0.0], color: [0.34, 0.52, 0.30], size: [400.0, 1.0], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0 });
+    insts.push(Instance {
+        pos: [0.0, -0.5, 0.0],
+        color: [0.34, 0.52, 0.30],
+        size: [400.0, 1.0],
+        yaw: 0.0,
+        metallic: 0.0,
+        roughness: 0.95,
+        emissive: 0.0,
+    });
     let mut seed: u32 = 2654435769;
-    let mut rnd = || { seed ^= seed << 13; seed ^= seed >> 17; seed ^= seed << 5; (seed & 0x7fffffff) as f32 / 2147483647.0 };
+    let mut rnd = || {
+        seed ^= seed << 13;
+        seed ^= seed >> 17;
+        seed ^= seed << 5;
+        (seed & 0x7fffffff) as f32 / 2147483647.0
+    };
     let spread = 90.0;
     for _ in 0..170 {
         let x = (rnd() * 2.0 - 1.0) * spread;
         let z = (rnd() * 2.0 - 1.0) * spread;
-        if (x * x + z * z).sqrt() < 8.0 { continue; }
+        if (x * x + z * z).sqrt() < 8.0 {
+            continue;
+        }
         if rnd() < 0.4 {
-            insts.push(Instance { pos: [x, 0.0, z], color: [0.45, 0.32, 0.2], size: [0.33, 1.3], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0 });
-            insts.push(Instance { pos: [x, 1.3, z], color: [0.28, 0.55, 0.30], size: [1.1, 1.6], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0 });
+            insts.push(Instance {
+                pos: [x, 0.0, z],
+                color: [0.45, 0.32, 0.2],
+                size: [0.33, 1.3],
+                yaw: 0.0,
+                metallic: 0.0,
+                roughness: 0.95,
+                emissive: 0.0,
+            });
+            insts.push(Instance {
+                pos: [x, 1.3, z],
+                color: [0.28, 0.55, 0.30],
+                size: [1.1, 1.6],
+                yaw: 0.0,
+                metallic: 0.0,
+                roughness: 0.95,
+                emissive: 0.0,
+            });
         } else {
             let h = 2.0 + rnd() * 5.0;
-            let (color, metallic, roughness) = if rnd() < 0.5 { ([0.62, 0.60, 0.66], 0.8, 0.25) } else { ([0.70, 0.66, 0.55], 0.05, 0.85) };
-            insts.push(Instance { pos: [x, 0.0, z], color, size: [2.0, h], yaw: 0.0, metallic, roughness, emissive: 0.0 });
+            let (color, metallic, roughness) = if rnd() < 0.5 {
+                ([0.62, 0.60, 0.66], 0.8, 0.25)
+            } else {
+                ([0.70, 0.66, 0.55], 0.05, 0.85)
+            };
+            insts.push(Instance {
+                pos: [x, 0.0, z],
+                color,
+                size: [2.0, h],
+                yaw: 0.0,
+                metallic,
+                roughness,
+                emissive: 0.0,
+            });
         }
     }
-    insts.push(Instance { pos: [0.0, 0.0, 0.0], color: [0.30, 0.62, 1.0], size: [0.9, 1.9], yaw: 0.0, metallic: 0.2, roughness: 0.35, emissive: 0.5 });
-    let g = Globals { horizon: [0.74, 0.84, 0.95], sun_dir: [-0.4, -0.85, -0.35], sun: [1.0, 0.96, 0.85], eye: Some([45.0, 40.0, 45.0]), target: Some([0.0, 0.0, 0.0]) };
+    insts.push(Instance {
+        pos: [0.0, 0.0, 0.0],
+        color: [0.30, 0.62, 1.0],
+        size: [0.9, 1.9],
+        yaw: 0.0,
+        metallic: 0.2,
+        roughness: 0.35,
+        emissive: 0.5,
+    });
+    let g = Globals {
+        horizon: [0.74, 0.84, 0.95],
+        sun_dir: [-0.4, -0.85, -0.35],
+        sun: [1.0, 0.96, 0.85],
+        eye: Some([45.0, 40.0, 45.0]),
+        target: Some([0.0, 0.0, 0.0]),
+    };
     (g, insts)
 }
 
@@ -744,100 +972,253 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn device(&self) -> &wgpu::Device { &self.device }
-    pub fn queue(&self) -> &wgpu::Queue { &self.queue }
+    pub fn device(&self) -> &wgpu::Device {
+        &self.device
+    }
+    pub fn queue(&self) -> &wgpu::Queue {
+        &self.queue
+    }
 
     /// Resize the (screen) depth target to match a new surface size.
     pub fn resize(&mut self, w: u32, h: u32) {
-        self.w = w; self.h = h;
+        self.w = w;
+        self.h = h;
         let depth = self.device.create_texture(&wgpu::TextureDescriptor {
-            label: None, size: wgpu::Extent3d { width: w.max(1), height: h.max(1), depth_or_array_layers: 1 },
-            mip_level_count: 1, sample_count: 1, dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::Depth24Plus, usage: wgpu::TextureUsages::RENDER_ATTACHMENT, view_formats: &[],
+            label: None,
+            size: wgpu::Extent3d {
+                width: w.max(1),
+                height: h.max(1),
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Depth24Plus,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[],
         });
         self.depth_view = depth.create_view(&Default::default());
     }
 
     /// Build the executor for a target of `color_format` at `w`×`h`.
-    pub fn new(device: wgpu::Device, queue: wgpu::Queue, color_format: wgpu::TextureFormat, w: u32, h: u32) -> Self {
+    pub fn new(
+        device: wgpu::Device,
+        queue: wgpu::Queue,
+        color_format: wgpu::TextureFormat,
+        w: u32,
+        h: u32,
+    ) -> Self {
         let depth = device.create_texture(&wgpu::TextureDescriptor {
-            label: None, size: wgpu::Extent3d { width: w.max(1), height: h.max(1), depth_or_array_layers: 1 },
-            mip_level_count: 1, sample_count: 1, dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::Depth24Plus, usage: wgpu::TextureUsages::RENDER_ATTACHMENT, view_formats: &[],
+            label: None,
+            size: wgpu::Extent3d {
+                width: w.max(1),
+                height: h.max(1),
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Depth24Plus,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[],
         });
         let depth_view = depth.create_view(&Default::default());
 
         let (verts, idx) = cube();
-        let vbuf = make_buf(&device, &queue, bytemuck::cast_slice(&verts), wgpu::BufferUsages::VERTEX);
-        let ibuf = make_buf(&device, &queue, bytemuck::cast_slice(&idx), wgpu::BufferUsages::INDEX);
+        let vbuf = make_buf(
+            &device,
+            &queue,
+            bytemuck::cast_slice(&verts),
+            wgpu::BufferUsages::VERTEX,
+        );
+        let ibuf = make_buf(
+            &device,
+            &queue,
+            bytemuck::cast_slice(&idx),
+            wgpu::BufferUsages::INDEX,
+        );
         let inst = device.create_buffer(&wgpu::BufferDescriptor {
-            label: None, size: (MAX_INST * 96) as u64,
-            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST, mapped_at_creation: false,
+            label: None,
+            size: (MAX_INST * 96) as u64,
+            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
         });
         let gbuf = device.create_buffer(&wgpu::BufferDescriptor {
-            label: None, size: 240, usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST, mapped_at_creation: false,
+            label: None,
+            size: 240,
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
         });
 
-        let module = device.create_shader_module(wgpu::ShaderModuleDescriptor { label: None, source: wgpu::ShaderSource::Wgsl(SHADER.into()) });
-        let shadow_module = device.create_shader_module(wgpu::ShaderModuleDescriptor { label: None, source: wgpu::ShaderSource::Wgsl(SHADOW_WGSL.into()) });
-        let va = |fmt, off, loc| wgpu::VertexAttribute { format: fmt, offset: off, shader_location: loc };
-        let cube_attrs = [va(wgpu::VertexFormat::Float32x3, 0, 0), va(wgpu::VertexFormat::Float32x3, 12, 1)];
+        let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: None,
+            source: wgpu::ShaderSource::Wgsl(SHADER.into()),
+        });
+        let shadow_module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+            label: None,
+            source: wgpu::ShaderSource::Wgsl(SHADOW_WGSL.into()),
+        });
+        let va = |fmt, off, loc| wgpu::VertexAttribute {
+            format: fmt,
+            offset: off,
+            shader_location: loc,
+        };
+        let cube_attrs = [
+            va(wgpu::VertexFormat::Float32x3, 0, 0),
+            va(wgpu::VertexFormat::Float32x3, 12, 1),
+        ];
         let inst_attrs = [
-            va(wgpu::VertexFormat::Float32x4, 0, 2), va(wgpu::VertexFormat::Float32x4, 16, 3),
-            va(wgpu::VertexFormat::Float32x4, 32, 4), va(wgpu::VertexFormat::Float32x4, 48, 5),
-            va(wgpu::VertexFormat::Float32x4, 64, 6), va(wgpu::VertexFormat::Float32x4, 80, 7),
+            va(wgpu::VertexFormat::Float32x4, 0, 2),
+            va(wgpu::VertexFormat::Float32x4, 16, 3),
+            va(wgpu::VertexFormat::Float32x4, 32, 4),
+            va(wgpu::VertexFormat::Float32x4, 48, 5),
+            va(wgpu::VertexFormat::Float32x4, 64, 6),
+            va(wgpu::VertexFormat::Float32x4, 80, 7),
         ];
         let vlayout = [
-            wgpu::VertexBufferLayout { array_stride: 24, step_mode: wgpu::VertexStepMode::Vertex, attributes: &cube_attrs },
-            wgpu::VertexBufferLayout { array_stride: 96, step_mode: wgpu::VertexStepMode::Instance, attributes: &inst_attrs },
+            wgpu::VertexBufferLayout {
+                array_stride: 24,
+                step_mode: wgpu::VertexStepMode::Vertex,
+                attributes: &cube_attrs,
+            },
+            wgpu::VertexBufferLayout {
+                array_stride: 96,
+                step_mode: wgpu::VertexStepMode::Instance,
+                attributes: &inst_attrs,
+            },
         ];
         let shadow_tex = device.create_texture(&wgpu::TextureDescriptor {
-            label: None, size: wgpu::Extent3d { width: 2048, height: 2048, depth_or_array_layers: 1 },
-            mip_level_count: 1, sample_count: 1, dimension: wgpu::TextureDimension::D2,
+            label: None,
+            size: wgpu::Extent3d {
+                width: 2048,
+                height: 2048,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
             format: wgpu::TextureFormat::Depth32Float,
-            usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::TEXTURE_BINDING, view_formats: &[],
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::TEXTURE_BINDING,
+            view_formats: &[],
         });
         let shadow_view = shadow_tex.create_view(&Default::default());
         let shadow_samp = device.create_sampler(&wgpu::SamplerDescriptor {
             compare: Some(wgpu::CompareFunction::LessEqual),
-            mag_filter: wgpu::FilterMode::Linear, min_filter: wgpu::FilterMode::Linear, ..Default::default()
+            mag_filter: wgpu::FilterMode::Linear,
+            min_filter: wgpu::FilterMode::Linear,
+            ..Default::default()
         });
         let shadow_pipe = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: None, layout: None,
-            vertex: wgpu::VertexState { module: &shadow_module, entry_point: Some("vs"), compilation_options: Default::default(), buffers: &vlayout },
+            label: None,
+            layout: None,
+            vertex: wgpu::VertexState {
+                module: &shadow_module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
+                buffers: &vlayout,
+            },
             fragment: None,
-            primitive: wgpu::PrimitiveState { cull_mode: Some(wgpu::Face::Back), ..Default::default() },
-            depth_stencil: Some(wgpu::DepthStencilState { format: wgpu::TextureFormat::Depth32Float, depth_write_enabled: true, depth_compare: wgpu::CompareFunction::Less, stencil: Default::default(), bias: Default::default() }),
-            multisample: Default::default(), multiview: None, cache: None,
+            primitive: wgpu::PrimitiveState {
+                cull_mode: Some(wgpu::Face::Back),
+                ..Default::default()
+            },
+            depth_stencil: Some(wgpu::DepthStencilState {
+                format: wgpu::TextureFormat::Depth32Float,
+                depth_write_enabled: true,
+                depth_compare: wgpu::CompareFunction::Less,
+                stencil: Default::default(),
+                bias: Default::default(),
+            }),
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: None, layout: None,
-            vertex: wgpu::VertexState { module: &module, entry_point: Some("vs"), compilation_options: Default::default(), buffers: &vlayout },
-            fragment: Some(wgpu::FragmentState { module: &module, entry_point: Some("fs"), compilation_options: Default::default(), targets: &[Some(wgpu::ColorTargetState { format: color_format, blend: None, write_mask: wgpu::ColorWrites::ALL })] }),
-            primitive: wgpu::PrimitiveState { cull_mode: Some(wgpu::Face::Back), ..Default::default() },
-            depth_stencil: Some(wgpu::DepthStencilState { format: wgpu::TextureFormat::Depth24Plus, depth_write_enabled: true, depth_compare: wgpu::CompareFunction::LessEqual, stencil: Default::default(), bias: Default::default() }),
-            multisample: Default::default(), multiview: None, cache: None,
+            label: None,
+            layout: None,
+            vertex: wgpu::VertexState {
+                module: &module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
+                buffers: &vlayout,
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &module,
+                entry_point: Some("fs"),
+                compilation_options: Default::default(),
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: color_format,
+                    blend: None,
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
+            }),
+            primitive: wgpu::PrimitiveState {
+                cull_mode: Some(wgpu::Face::Back),
+                ..Default::default()
+            },
+            depth_stencil: Some(wgpu::DepthStencilState {
+                format: wgpu::TextureFormat::Depth24Plus,
+                depth_write_enabled: true,
+                depth_compare: wgpu::CompareFunction::LessEqual,
+                stencil: Default::default(),
+                bias: Default::default(),
+            }),
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
         let shadow_bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: None, layout: &shadow_pipe.get_bind_group_layout(0),
-            entries: &[wgpu::BindGroupEntry { binding: 0, resource: gbuf.as_entire_binding() }],
+            label: None,
+            layout: &shadow_pipe.get_bind_group_layout(0),
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: gbuf.as_entire_binding(),
+            }],
         });
         let bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: None, layout: &pipeline.get_bind_group_layout(0),
+            label: None,
+            layout: &pipeline.get_bind_group_layout(0),
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: gbuf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 1, resource: wgpu::BindingResource::TextureView(&shadow_view) },
-                wgpu::BindGroupEntry { binding: 2, resource: wgpu::BindingResource::Sampler(&shadow_samp) },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: gbuf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(&shadow_view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::Sampler(&shadow_samp),
+                },
             ],
         });
-        Renderer { device, queue, depth_view, shadow_view, shadow_pipe, shadow_bind, pipeline, bind, vbuf, ibuf, gbuf, inst, idx_count: idx.len() as u32, w, h }
+        Renderer {
+            device,
+            queue,
+            depth_view,
+            shadow_view,
+            shadow_pipe,
+            shadow_bind,
+            pipeline,
+            bind,
+            vbuf,
+            ibuf,
+            gbuf,
+            inst,
+            idx_count: idx.len() as u32,
+            w,
+            h,
+        }
     }
 
     /// Upload the frame's uniforms + instances and record the shadow + main passes into
     /// `color_view`, then submit. The same two :passes the web runs.
     pub fn draw(&self, color_view: &wgpu::TextureView, g: &Globals, insts: &[Instance]) {
         let (w, h) = (self.w, self.h);
-        let centroid = insts.iter().fold([0.0f32, 0.0], |a, i| [a[0] + i.pos[0], a[1] + i.pos[2]]);
+        let centroid = insts
+            .iter()
+            .fold([0.0f32, 0.0], |a, i| [a[0] + i.pos[0], a[1] + i.pos[2]]);
         let n = insts.len().max(1) as f32;
         let (cx, cz) = (centroid[0] / n, centroid[1] / n);
         let eye = g.eye.unwrap_or([cx + 60.0, 80.0, cz + 60.0]);
@@ -847,7 +1228,8 @@ impl Renderer {
         let sd = Vec3::from(g.sun_dir).normalize_or_zero();
         let ltgt = Vec3::new(cx, 0.0, cz);
         let leye = ltgt - sd * 200.0;
-        let light_vp = Mat4::orthographic_rh(-130.0, 130.0, -130.0, 130.0, 1.0, 420.0) * Mat4::look_at_rh(leye, ltgt, Vec3::Y);
+        let light_vp = Mat4::orthographic_rh(-130.0, 130.0, -130.0, 130.0, 1.0, 420.0)
+            * Mat4::look_at_rh(leye, ltgt, Vec3::Y);
 
         let mut gf = [0f32; 60];
         gf[0..16].copy_from_slice(&vp.to_cols_array());
@@ -857,11 +1239,12 @@ impl Renderer {
         gf[28..44].copy_from_slice(&light_vp.to_cols_array());
         // tunable lighting — recovered from the previously-hardcoded fragment, now fed as data so the
         // generated shader (g.light_a..d) renders identically. Matches the web kami.webgpu defaults.
-        gf[44..48].copy_from_slice(&[0.20, 0.22, 0.26, 0.65]);          // light_a: ambient rgb, sky-mix weight
-        gf[48..52].copy_from_slice(&[0.25, 0.9, 0.25, 3.0]);           // light_b: specStr lo/hi, rim scale/pow
-        gf[52..56].copy_from_slice(&[4.0, 256.0, 0.9, 0.7]);          // light_c: shininess lo/hi, sun scale, metal factor
+        gf[44..48].copy_from_slice(&[0.20, 0.22, 0.26, 0.65]); // light_a: ambient rgb, sky-mix weight
+        gf[48..52].copy_from_slice(&[0.25, 0.9, 0.25, 3.0]); // light_b: specStr lo/hi, rim scale/pow
+        gf[52..56].copy_from_slice(&[4.0, 256.0, 0.9, 0.7]); // light_c: shininess lo/hi, sun scale, metal factor
         gf[56..60].copy_from_slice(&[2.2, 0.0025, 0.0006, 1.0 / 2048.0]); // light_d: gamma, shadow bias factor/min, texel
-        self.queue.write_buffer(&self.gbuf, 0, bytemuck::cast_slice(&gf));
+        self.queue
+            .write_buffer(&self.gbuf, 0, bytemuck::cast_slice(&gf));
 
         let n_inst = insts.len().min(MAX_INST as usize);
         let mut idata: Vec<f32> = Vec::with_capacity(n_inst * 24);
@@ -870,29 +1253,38 @@ impl Renderer {
             idata.extend_from_slice(&[i.color[0], i.color[1], i.color[2], 1.0]);
             idata.extend_from_slice(&[i.metallic, i.roughness, i.emissive, 0.0]);
         }
-        if !idata.is_empty() { self.queue.write_buffer(&self.inst, 0, bytemuck::cast_slice(&idata)); }
+        if !idata.is_empty() {
+            self.queue
+                .write_buffer(&self.inst, 0, bytemuck::cast_slice(&idata));
+        }
 
         let mut enc = self.device.create_command_encoder(&Default::default());
-        let geom = |rp: &mut wgpu::RenderPass, pipe: &wgpu::RenderPipeline, bnd: &wgpu::BindGroup| {
-            if n_inst > 0 {
-                rp.set_pipeline(pipe);
-                rp.set_bind_group(0, bnd, &[]);
-                rp.set_vertex_buffer(0, self.vbuf.slice(..));
-                rp.set_vertex_buffer(1, self.inst.slice(..));
-                rp.set_index_buffer(self.ibuf.slice(..), wgpu::IndexFormat::Uint16);
-                rp.draw_indexed(0..self.idx_count, 0, 0..n_inst as u32);
-            }
-        };
+        let geom =
+            |rp: &mut wgpu::RenderPass, pipe: &wgpu::RenderPipeline, bnd: &wgpu::BindGroup| {
+                if n_inst > 0 {
+                    rp.set_pipeline(pipe);
+                    rp.set_bind_group(0, bnd, &[]);
+                    rp.set_vertex_buffer(0, self.vbuf.slice(..));
+                    rp.set_vertex_buffer(1, self.inst.slice(..));
+                    rp.set_index_buffer(self.ibuf.slice(..), wgpu::IndexFormat::Uint16);
+                    rp.draw_indexed(0..self.idx_count, 0, 0..n_inst as u32);
+                }
+            };
         // PASS 1 — shadow map
         {
             let mut sp = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: None, color_attachments: &[],
+                label: None,
+                color_attachments: &[],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: &self.shadow_view,
-                    depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Clear(1.0), store: wgpu::StoreOp::Store }),
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(1.0),
+                        store: wgpu::StoreOp::Store,
+                    }),
                     stencil_ops: None,
                 }),
-                timestamp_writes: None, occlusion_query_set: None,
+                timestamp_writes: None,
+                occlusion_query_set: None,
             });
             geom(&mut sp, &self.shadow_pipe, &self.shadow_bind);
         }
@@ -901,18 +1293,28 @@ impl Renderer {
             let mut rp = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: None,
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: color_view, resolve_target: None,
+                    view: color_view,
+                    resolve_target: None,
                     ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color { r: g.horizon[0] as f64, g: g.horizon[1] as f64, b: g.horizon[2] as f64, a: 1.0 }),
+                        load: wgpu::LoadOp::Clear(wgpu::Color {
+                            r: g.horizon[0] as f64,
+                            g: g.horizon[1] as f64,
+                            b: g.horizon[2] as f64,
+                            a: 1.0,
+                        }),
                         store: wgpu::StoreOp::Store,
                     },
                 })],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                     view: &self.depth_view,
-                    depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Clear(1.0), store: wgpu::StoreOp::Store }),
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(1.0),
+                        store: wgpu::StoreOp::Store,
+                    }),
                     stencil_ops: None,
                 }),
-                timestamp_writes: None, occlusion_query_set: None,
+                timestamp_writes: None,
+                occlusion_query_set: None,
             });
             geom(&mut rp, &self.pipeline, &self.bind);
         }
@@ -922,14 +1324,29 @@ impl Renderer {
 
 async fn render_async(g: &Globals, insts: &[Instance], w: u32, h: u32) -> Vec<u8> {
     let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor::default());
-    let adapter = instance.request_adapter(&wgpu::RequestAdapterOptions::default()).await.expect("no GPU adapter");
-    let (device, queue) = adapter.request_device(&wgpu::DeviceDescriptor::default(), None).await.expect("no device");
+    let adapter = instance
+        .request_adapter(&wgpu::RequestAdapterOptions::default())
+        .await
+        .expect("no GPU adapter");
+    let (device, queue) = adapter
+        .request_device(&wgpu::DeviceDescriptor::default(), None)
+        .await
+        .expect("no device");
     let fmt = wgpu::TextureFormat::Rgba8Unorm;
     let r = Renderer::new(device, queue, fmt, w, h);
     let color = r.device().create_texture(&wgpu::TextureDescriptor {
-        label: None, size: wgpu::Extent3d { width: w, height: h, depth_or_array_layers: 1 },
-        mip_level_count: 1, sample_count: 1, dimension: wgpu::TextureDimension::D2,
-        format: fmt, usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC, view_formats: &[],
+        label: None,
+        size: wgpu::Extent3d {
+            width: w,
+            height: h,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: fmt,
+        usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
+        view_formats: &[],
     });
     let color_view = color.create_view(&Default::default());
     r.draw(&color_view, g, insts);
@@ -937,14 +1354,32 @@ async fn render_async(g: &Globals, insts: &[Instance], w: u32, h: u32) -> Vec<u8
     // copy color → readback buffer (bytes_per_row 256-aligned)
     let bpr = align256(w * 4);
     let rb = r.device().create_buffer(&wgpu::BufferDescriptor {
-        label: None, size: (bpr * h) as u64,
-        usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ, mapped_at_creation: false,
+        label: None,
+        size: (bpr * h) as u64,
+        usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ,
+        mapped_at_creation: false,
     });
     let mut enc = r.device().create_command_encoder(&Default::default());
     enc.copy_texture_to_buffer(
-        wgpu::TexelCopyTextureInfo { texture: &color, mip_level: 0, origin: wgpu::Origin3d::ZERO, aspect: wgpu::TextureAspect::All },
-        wgpu::TexelCopyBufferInfo { buffer: &rb, layout: wgpu::TexelCopyBufferLayout { offset: 0, bytes_per_row: Some(bpr), rows_per_image: Some(h) } },
-        wgpu::Extent3d { width: w, height: h, depth_or_array_layers: 1 },
+        wgpu::TexelCopyTextureInfo {
+            texture: &color,
+            mip_level: 0,
+            origin: wgpu::Origin3d::ZERO,
+            aspect: wgpu::TextureAspect::All,
+        },
+        wgpu::TexelCopyBufferInfo {
+            buffer: &rb,
+            layout: wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(bpr),
+                rows_per_image: Some(h),
+            },
+        },
+        wgpu::Extent3d {
+            width: w,
+            height: h,
+            depth_or_array_layers: 1,
+        },
     );
     r.queue().submit([enc.finish()]);
 
@@ -960,9 +1395,15 @@ async fn render_async(g: &Globals, insts: &[Instance], w: u32, h: u32) -> Vec<u8
     out
 }
 
-fn make_buf(device: &wgpu::Device, queue: &wgpu::Queue, data: &[u8], usage: wgpu::BufferUsages) -> wgpu::Buffer {
+fn make_buf(
+    device: &wgpu::Device,
+    queue: &wgpu::Queue,
+    data: &[u8],
+    usage: wgpu::BufferUsages,
+) -> wgpu::Buffer {
     let b = device.create_buffer(&wgpu::BufferDescriptor {
-        label: None, size: data.len() as u64,
+        label: None,
+        size: data.len() as u64,
         usage: usage | wgpu::BufferUsages::COPY_DST, // COPY_DST or writes silently no-op
         mapped_at_creation: false,
     });
@@ -976,7 +1417,14 @@ mod tests {
 
     // --- ports of kami.webgpu.geometry (sphere/cylinder) for cross-platform parity tests ----
     fn push_v6(v: &mut Vec<f32>, p: [f64; 3], n: [f64; 3]) {
-        v.extend_from_slice(&[p[0] as f32, p[1] as f32, p[2] as f32, n[0] as f32, n[1] as f32, n[2] as f32]);
+        v.extend_from_slice(&[
+            p[0] as f32,
+            p[1] as f32,
+            p[2] as f32,
+            n[0] as f32,
+            n[1] as f32,
+            n[2] as f32,
+        ]);
     }
     fn geo_sphere(r: f32, rings: usize, sectors: usize) -> (Vec<f32>, Vec<u16>) {
         let pi = std::f64::consts::PI;
@@ -986,7 +1434,11 @@ mod tests {
                 let phi = pi * i as f64 / rings as f64;
                 let th = 2.0 * pi * j as f64 / sectors as f64;
                 let n = [phi.sin() * th.cos(), phi.cos(), phi.sin() * th.sin()];
-                push_v6(&mut v, [r as f64 * n[0], r as f64 * n[1], r as f64 * n[2]], n);
+                push_v6(
+                    &mut v,
+                    [r as f64 * n[0], r as f64 * n[1], r as f64 * n[2]],
+                    n,
+                );
             }
         }
         let stride = (sectors + 1) as u16;
@@ -1001,10 +1453,12 @@ mod tests {
     }
     fn cyl_ring(r: f32, sectors: usize, y: f64) -> Vec<[f64; 3]> {
         let pi = std::f64::consts::PI;
-        (0..=sectors).map(|j| {
-            let th = 2.0 * pi * j as f64 / sectors as f64;
-            [r as f64 * th.cos(), y, r as f64 * th.sin()]
-        }).collect()
+        (0..=sectors)
+            .map(|j| {
+                let th = 2.0 * pi * j as f64 / sectors as f64;
+                [r as f64 * th.cos(), y, r as f64 * th.sin()]
+            })
+            .collect()
     }
     fn geo_cylinder(r: f32, h: f32, sectors: usize) -> (Vec<f32>, Vec<u16>) {
         let hy = h as f64 / 2.0;
@@ -1022,56 +1476,106 @@ mod tests {
             let a = (2 * j) as u16;
             idx.extend_from_slice(&[a, a + 1, a + 3, a, a + 3, a + 2]);
         }
-        let mut cap = |v: &mut Vec<f32>, idx: &mut Vec<u16>, y: f64, ny: [f64; 3], dir: i32, base: u16| {
-            push_v6(v, [0.0, y, 0.0], ny);
-            for p in cyl_ring(r, sectors, y) { push_v6(v, p, ny); }
-            for j in 0..sectors as u16 {
-                if dir > 0 { idx.extend_from_slice(&[base, base + 1 + j, base + 2 + j]); }
-                else { idx.extend_from_slice(&[base, base + 2 + j, base + 1 + j]); }
-            }
-        };
+        let mut cap =
+            |v: &mut Vec<f32>, idx: &mut Vec<u16>, y: f64, ny: [f64; 3], dir: i32, base: u16| {
+                push_v6(v, [0.0, y, 0.0], ny);
+                for p in cyl_ring(r, sectors, y) {
+                    push_v6(v, p, ny);
+                }
+                for j in 0..sectors as u16 {
+                    if dir > 0 {
+                        idx.extend_from_slice(&[base, base + 1 + j, base + 2 + j]);
+                    } else {
+                        idx.extend_from_slice(&[base, base + 2 + j, base + 1 + j]);
+                    }
+                }
+            };
         let nv = (2 * top.len()) as u16;
         cap(&mut v, &mut idx, hy, [0.0, 1.0, 0.0], 1, nv);
-        cap(&mut v, &mut idx, -hy, [0.0, -1.0, 0.0], -1, nv + (1 + top.len()) as u16);
+        cap(
+            &mut v,
+            &mut idx,
+            -hy,
+            [0.0, -1.0, 0.0],
+            -1,
+            nv + (1 + top.len()) as u16,
+        );
         (v, idx)
     }
     // The shaders are generated from kami.shaders/lit-shader (bb gen-wgsl). Assert the include_str'd
     // WGSL matches the cljc canonical fixture token-for-token, so native can't drift from the web
     // shader. Skips if kami-webgpu isn't co-located (same policy as the geometry goldens).
     fn shader_canon(s: &str) -> String {
-        s.chars().filter(|c| !c.is_whitespace() && *c != '(' && *c != ')').collect()
+        s.chars()
+            .filter(|c| !c.is_whitespace() && *c != '(' && *c != ')')
+            .collect()
     }
     fn assert_shader_parity(fixture: &str, native: &str) {
-        let path = format!("{}/../../kami-webgpu/fixtures/{}", env!("CARGO_MANIFEST_DIR"), fixture);
+        let path = format!(
+            "{}/../../kami-webgpu/fixtures/{}",
+            env!("CARGO_MANIFEST_DIR"),
+            fixture
+        );
         let Ok(golden) = std::fs::read_to_string(&path) else {
-            eprintln!("skip: {fixture} not found (kami-webgpu not co-located)"); return;
+            eprintln!("skip: {fixture} not found (kami-webgpu not co-located)");
+            return;
         };
-        assert_eq!(shader_canon(native), shader_canon(&golden),
-                   "native shader must be token-equivalent to the kami.shaders canonical (run bb gen-wgsl)");
+        assert_eq!(
+            shader_canon(native),
+            shader_canon(&golden),
+            "native shader must be token-equivalent to the kami.shaders canonical (run bb gen-wgsl)"
+        );
     }
     #[test]
-    fn lit_shader_matches_cljc_canonical() { assert_shader_parity("lit-shader.wgsl", SHADER); }
+    fn lit_shader_matches_cljc_canonical() {
+        assert_shader_parity("lit-shader.wgsl", SHADER);
+    }
     #[test]
-    fn shadow_shader_matches_cljc_canonical() { assert_shader_parity("shadow-shader.wgsl", SHADOW_WGSL); }
+    fn shadow_shader_matches_cljc_canonical() {
+        assert_shader_parity("shadow-shader.wgsl", SHADOW_WGSL);
+    }
 
     fn load_golden(name: &str) -> Option<(Vec<f32>, Vec<u16>)> {
-        let path = format!("{}/../../kami-webgpu/fixtures/{}-golden.json", env!("CARGO_MANIFEST_DIR"), name);
+        let path = format!(
+            "{}/../../kami-webgpu/fixtures/{}-golden.json",
+            env!("CARGO_MANIFEST_DIR"),
+            name
+        );
         let json = std::fs::read_to_string(&path).ok()?;
         let v: serde_json::Value = serde_json::from_str(&json).expect("valid golden json");
-        let gv = v["verts"].as_array().unwrap().iter().map(|x| x.as_f64().unwrap() as f32).collect();
-        let gi = v["indices"].as_array().unwrap().iter().map(|x| x.as_u64().unwrap() as u16).collect();
+        let gv = v["verts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|x| x.as_f64().unwrap() as f32)
+            .collect();
+        let gi = v["indices"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|x| x.as_u64().unwrap() as u16)
+            .collect();
         Some((gv, gi))
     }
     fn assert_parity(name: &str, got: (Vec<f32>, Vec<u16>)) {
         let (gv, gi) = match load_golden(name) {
             Some(g) => g,
-            None => { eprintln!("skip: {name} golden not found (kami-webgpu not co-located)"); return; }
+            None => {
+                eprintln!("skip: {name} golden not found (kami-webgpu not co-located)");
+                return;
+            }
         };
-        assert_eq!(got.1, gi, "{name} indices must match the CLJC geometry golden exactly");
+        assert_eq!(
+            got.1, gi,
+            "{name} indices must match the CLJC geometry golden exactly"
+        );
         assert_eq!(got.0.len(), gv.len(), "{name} vertex count");
         // verts go through f64 transcendentals → match to f32 precision (JVM/Rust libm may differ in ulps)
         for (a, b) in got.0.iter().zip(gv.iter()) {
-            assert!((a - b).abs() < 1e-4, "{name} vertex parity within f32 precision: {a} vs {b}");
+            assert!(
+                (a - b).abs() < 1e-4,
+                "{name} vertex parity within f32 precision: {a} vs {b}"
+            );
         }
     }
 
@@ -1113,8 +1617,16 @@ mod tests {
                         :trees {:color [0.28 0.55 0.30] :h 2.6 :w 1.1 :ratio 0.4 :roughness 0.95}}}";
         let (g, insts) = scene_to_ir(scene);
         assert_eq!(g.horizon, [0.74, 0.84, 0.95], "sky parsed");
-        assert_eq!(insts[0].size, [400.0, 1.0], "first instance is the ground plane");
-        assert!(insts.len() > 20, "ground + scattered props: {}", insts.len());
+        assert_eq!(
+            insts[0].size,
+            [400.0, 1.0],
+            "first instance is the ground plane"
+        );
+        assert!(
+            insts.len() > 20,
+            "ground + scattered props: {}",
+            insts.len()
+        );
     }
 
     #[test]
@@ -1126,7 +1638,11 @@ mod tests {
         let (g, _) = scene_to_ir(scene);
         let eye = g.eye.expect("camera rig sets eye");
         // azimuth 0 → eye.x = distance*cos(0) = 70, eye.y = height = 48
-        assert!((eye[0] - 70.0).abs() < 0.01, "eye.x from distance/azimuth: {}", eye[0]);
+        assert!(
+            (eye[0] - 70.0).abs() < 0.01,
+            "eye.x from distance/azimuth: {}",
+            eye[0]
+        );
         assert_eq!(eye[1], 48.0, "eye.y = height");
         assert_eq!(g.target.unwrap()[1], 1.0, "target.y = look-height");
     }
@@ -1136,7 +1652,10 @@ mod tests {
         let (verts, idx) = cube();
         assert_eq!(verts.len(), 24 * 6, "24 verts × (pos3 + normal3)");
         assert_eq!(idx.len(), 36, "6 faces × 2 tris × 3 indices");
-        assert!(idx.iter().all(|&i| i < 24), "all indices reference a real vertex");
+        assert!(
+            idx.iter().all(|&i| i < 24),
+            "all indices reference a real vertex"
+        );
         assert_eq!(*idx.iter().max().unwrap(), 23);
     }
 
@@ -1146,7 +1665,10 @@ mod tests {
     /// hand-mirrored copies that can drift. Skips gracefully if kami-webgpu isn't co-located.
     #[test]
     fn cube_matches_cljc_geometry_golden() {
-        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../kami-webgpu/fixtures/box-golden.json");
+        let path = concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../kami-webgpu/fixtures/box-golden.json"
+        );
         let json = match std::fs::read_to_string(path) {
             Ok(s) => s,
             Err(_) => {
@@ -1155,13 +1677,27 @@ mod tests {
             }
         };
         let v: serde_json::Value = serde_json::from_str(&json).expect("valid golden json");
-        let gv: Vec<f32> = v["verts"].as_array().unwrap().iter()
-            .map(|x| x.as_f64().unwrap() as f32).collect();
-        let gi: Vec<u16> = v["indices"].as_array().unwrap().iter()
-            .map(|x| x.as_u64().unwrap() as u16).collect();
+        let gv: Vec<f32> = v["verts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|x| x.as_f64().unwrap() as f32)
+            .collect();
+        let gi: Vec<u16> = v["indices"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|x| x.as_u64().unwrap() as u16)
+            .collect();
         let (verts, idx) = cube();
-        assert_eq!(verts, gv, "native cube vertices must match the CLJC geometry golden");
-        assert_eq!(idx, gi, "native cube indices must match the CLJC geometry golden");
+        assert_eq!(
+            verts, gv,
+            "native cube vertices must match the CLJC geometry golden"
+        );
+        assert_eq!(
+            idx, gi,
+            "native cube indices must match the CLJC geometry golden"
+        );
     }
 
     #[test]
@@ -1177,13 +1713,21 @@ mod tests {
     #[test]
     fn model_mat_translates_lifts_and_scales() {
         let i = Instance {
-            pos: [10.0, 0.0, 20.0], color: [1.0, 1.0, 1.0], size: [2.0, 4.0],
-            yaw: 0.0, metallic: 0.0, roughness: 0.5, emissive: 0.0,
+            pos: [10.0, 0.0, 20.0],
+            color: [1.0, 1.0, 1.0],
+            size: [2.0, 4.0],
+            yaw: 0.0,
+            metallic: 0.0,
+            roughness: 0.5,
+            emissive: 0.0,
         };
         let m = model_mat(&i);
         // local origin → world: x,z from pos; y lifted by h/2 so the box sits on the ground
         let p = m.transform_point3(Vec3::ZERO);
-        assert!((p.x - 10.0).abs() < 1e-4 && (p.z - 20.0).abs() < 1e-4, "xz from pos: {p:?}");
+        assert!(
+            (p.x - 10.0).abs() < 1e-4 && (p.z - 20.0).abs() < 1e-4,
+            "xz from pos: {p:?}"
+        );
         assert!((p.y - 2.0).abs() < 1e-4, "y lifted by h/2: {}", p.y);
         // +0.5 local-x corner scales by w=2 → +1 world half-extent
         let c = m.transform_point3(Vec3::new(0.5, 0.0, 0.0));
@@ -1214,7 +1758,8 @@ mod tests {
 
     #[test]
     fn scene_to_ir_empty_props_is_just_ground() {
-        let (g, insts) = scene_to_ir("{:render/sky {:horizon [0.7 0.8 0.9] :sun-dir [0 -1 0] :sun [1 1 1]}}");
+        let (g, insts) =
+            scene_to_ir("{:render/sky {:horizon [0.7 0.8 0.9] :sun-dir [0 -1 0] :sun [1 1 1]}}");
         assert_eq!(insts.len(), 1, "no props → only the ground plane");
         assert_eq!(insts[0].size, [400.0, 1.0]);
         assert_eq!(g.horizon, [0.7, 0.8, 0.9]);
@@ -1222,8 +1767,14 @@ mod tests {
 
     #[test]
     fn scene_to_ir_ground_color_from_sky() {
-        let (_, insts) = scene_to_ir("{:render/sky {:horizon [0.7 0.8 0.9] :sun-dir [0 -1 0] :sun [1 1 1] :ground [0.2 0.5 0.3]}}");
-        assert_eq!(insts[0].color, [0.2, 0.5, 0.3], "ground plane uses sky :ground");
+        let (_, insts) = scene_to_ir(
+            "{:render/sky {:horizon [0.7 0.8 0.9] :sun-dir [0 -1 0] :sun [1 1 1] :ground [0.2 0.5 0.3]}}",
+        );
+        assert_eq!(
+            insts[0].color,
+            [0.2, 0.5, 0.3],
+            "ground plane uses sky :ground"
+        );
     }
 
     #[test]
@@ -1243,7 +1794,10 @@ mod tests {
         let expected = [0.633187f32, 0.751414, 0.9666, 0.01183, 0.798444];
         for e in expected {
             let g = rnd();
-            assert!((g - e).abs() < 1e-4, "native rng diverged from web: got {g}, web {e}");
+            assert!(
+                (g - e).abs() < 1e-4,
+                "native rng diverged from web: got {g}, web {e}"
+            );
         }
     }
 
@@ -1261,7 +1815,10 @@ mod tests {
         let is_sky = (r as i32 - sky.0 as i32).abs() < 12
             && (gc as i32 - sky.1 as i32).abs() < 12
             && (b as i32 - sky.2 as i32).abs() < 12;
-        assert!(!is_sky, "centre should be the lit building, not sky: got {r},{gc},{b}");
+        assert!(
+            !is_sky,
+            "centre should be the lit building, not sky: got {r},{gc},{b}"
+        );
         assert!(r > gc && r > b, "building is reddish: got {r},{gc},{b}");
     }
 
@@ -1273,13 +1830,20 @@ mod tests {
         let ground = "{:pos [0 -0.5 0] :color [0.7 0.7 0.7] :size [200 1] :roughness 0.95}";
         let caster = "{:pos [0 0 0] :color [0.5 0.5 0.5] :size [5 16] :roughness 0.95}";
         let lit_only = format!("{{:globals {{:sky {{{sky}}} {cam}}} :instances [{ground}]}}");
-        let shadowed = format!("{{:globals {{:sky {{{sky}}} {cam}}} :instances [{ground} {caster}]}}");
+        let shadowed =
+            format!("{{:globals {{:sky {{{sky}}} {cam}}} :instances [{ground} {caster}]}}");
         // darkest luminance anywhere in the frame
-        let darkest = |px: &[u8]| px.chunks(4)
-            .map(|c| (c[0] as i32 * 30 + c[1] as i32 * 59 + c[2] as i32 * 11) / 100)
-            .min().unwrap_or(0);
+        let darkest = |px: &[u8]| {
+            px.chunks(4)
+                .map(|c| (c[0] as i32 * 30 + c[1] as i32 * 59 + c[2] as i32 * 11) / 100)
+                .min()
+                .unwrap_or(0)
+        };
         let la = darkest(&render_to_pixels(&lit_only, 96, 96));
         let lb = darkest(&render_to_pixels(&shadowed, 96, 96));
-        assert!(lb + 12 < la, "the caster should darken the ground via shadow: lit min={la}, shadowed min={lb}");
+        assert!(
+            lb + 12 < la,
+            "the caster should darken the ground via shadow: lit min={la}, shadowed min={lb}"
+        );
     }
 }

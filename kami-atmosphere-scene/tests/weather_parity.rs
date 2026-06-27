@@ -11,8 +11,8 @@
 
 use kami_atmosphere::Weather;
 use kami_atmosphere_scene::{
-    builtin_preset, preset_to_weather, presets_from_edn, shipped_presets, WeatherPreset,
-    ALL_PRESET_NAMES, WEATHER_EDN,
+    ALL_PRESET_NAMES, WEATHER_EDN, WeatherPreset, builtin_preset, preset_to_weather,
+    presets_from_edn, shipped_presets,
 };
 
 const EPS: f32 = 1e-6;
@@ -31,10 +31,7 @@ fn assert_preset_eq(name: &str, edn: &WeatherPreset, oracle: &Weather) {
         ("time", edn.time, o.time),
     ];
     for (field, a, b) in pairs {
-        assert!(
-            (a - b).abs() < EPS,
-            "{name}: {field} {a} != {b} (oracle)"
-        );
+        assert!((a - b).abs() < EPS, "{name}: {field} {a} != {b} (oracle)");
     }
     // And the whole spec equals the oracle-derived spec (exact f32 equality).
     assert_eq!(*edn, o, "{name}: full WeatherPreset parity");
@@ -69,20 +66,41 @@ fn weather_edn_matches_builtin() {
 /// hardcoded preset's — the real engine struct, behaviourally identical.
 #[test]
 fn preset_to_weather_matches_hardcoded() {
-    for (name, oracle) in [("overcast", Weather::overcast()), ("clear", Weather::clear())] {
+    for (name, oracle) in [
+        ("overcast", Weather::overcast()),
+        ("clear", Weather::clear()),
+    ] {
         let loaded = presets_from_edn(WEATHER_EDN).unwrap();
         let w = preset_to_weather(&loaded[name]);
 
-        assert!((w.clouds.coverage - oracle.clouds.coverage).abs() < EPS, "{name}: coverage");
-        assert!((w.clouds.density - oracle.clouds.density).abs() < EPS, "{name}: density");
-        assert!((w.clouds.altitude - oracle.clouds.altitude).abs() < EPS, "{name}: altitude");
-        assert!((w.clouds.sharpness - oracle.clouds.sharpness).abs() < EPS, "{name}: sharpness");
-        assert!((w.wind.speed - oracle.wind.speed).abs() < EPS, "{name}: wind speed");
+        assert!(
+            (w.clouds.coverage - oracle.clouds.coverage).abs() < EPS,
+            "{name}: coverage"
+        );
+        assert!(
+            (w.clouds.density - oracle.clouds.density).abs() < EPS,
+            "{name}: density"
+        );
+        assert!(
+            (w.clouds.altitude - oracle.clouds.altitude).abs() < EPS,
+            "{name}: altitude"
+        );
+        assert!(
+            (w.clouds.sharpness - oracle.clouds.sharpness).abs() < EPS,
+            "{name}: sharpness"
+        );
+        assert!(
+            (w.wind.speed - oracle.wind.speed).abs() < EPS,
+            "{name}: wind speed"
+        );
         assert!(
             (w.wind.gust_intensity - oracle.wind.gust_intensity).abs() < EPS,
             "{name}: gust"
         );
-        assert!((w.day_night.time - oracle.day_night.time).abs() < EPS, "{name}: time");
+        assert!(
+            (w.day_night.time - oracle.day_night.time).abs() < EPS,
+            "{name}: time"
+        );
     }
 }
 
@@ -96,8 +114,14 @@ fn clear_omitted_fields_inherit_defaults() {
     let d = WeatherPreset::defaults();
 
     // These three are NOT set by Weather::clear() — they must equal the engine default.
-    assert_eq!(clear.cloud_altitude, d.cloud_altitude, "clear altitude = default");
-    assert_eq!(clear.cloud_sharpness, d.cloud_sharpness, "clear sharpness = default");
+    assert_eq!(
+        clear.cloud_altitude, d.cloud_altitude,
+        "clear altitude = default"
+    );
+    assert_eq!(
+        clear.cloud_sharpness, d.cloud_sharpness,
+        "clear sharpness = default"
+    );
     assert_eq!(clear.wind_gust, d.wind_gust, "clear gust = default");
 
     // Cross-check the oracle agrees the hardcoded clear() left them at default.

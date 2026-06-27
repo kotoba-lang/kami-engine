@@ -62,8 +62,8 @@ impl RayTracePipeline {
         let layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("rt_bind_layout"),
             entries: &[
-                storage(0, true),  // nodes
-                storage(1, true),  // tris
+                storage(0, true), // nodes
+                storage(1, true), // tris
                 wgpu::BindGroupLayoutEntry {
                     binding: 2,
                     visibility: wgpu::ShaderStages::COMPUTE,
@@ -143,10 +143,22 @@ impl RayTracePipeline {
             label: Some("rt_bind"),
             layout: &self.layout,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: nodes_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 1, resource: tris_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 2, resource: globals_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 3, resource: out_buf.as_entire_binding() },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: nodes_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: tris_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: globals_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 3,
+                    resource: out_buf.as_entire_binding(),
+                },
             ],
         });
 

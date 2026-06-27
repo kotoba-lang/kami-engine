@@ -67,7 +67,11 @@ fn forward_camera(pose: Pose2) -> Camera {
     let mut cam = Camera::new("front", "/cam", intr);
     let eye = Vec3::new(pose.x, pose.y, 1.0);
     let fwd = pose.forward();
-    cam.look_at(eye, eye + Vec3::new(fwd.x, fwd.y, 0.0) * 10.0, Vec3::new(0.0, 0.0, 1.0));
+    cam.look_at(
+        eye,
+        eye + Vec3::new(fwd.x, fwd.y, 0.0) * 10.0,
+        Vec3::new(0.0, 0.0, 1.0),
+    );
     cam
 }
 
