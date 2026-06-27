@@ -83,14 +83,58 @@
              (aset (js/Float32Array. b) 0 x)
              (aget (js/Uint32Array. b) 0))))
 
+(defn- f16-bits
+  "f32 number → IEEE-754 binary16 as a 16-bit value (0-0xffff), round-to-nearest-even.
+  Port of the `half` crate's `f32_to_f16` fallback. The KAMI host transports these
+  raw (no Rust-side decode — wgpu reads them as `Float16`/`Float16x4`), so the only
+  contract is 'valid little-endian binary16'. Drives both :f16 and :quat columns."
+  ^long [x]
+  (let [b         (f32-bits x)                                  ; unsigned 32-bit float bits
+        half-sign (bit-and (unsigned-bit-shift-right b 16) 0x8000)
+        exp       (bit-and b 0x7F800000)
+        man       (bit-and b 0x007FFFFF)]
+    (if (= exp 0x7F800000)
+      ;; Inf (man=0) / NaN (man≠0, force a quiet-NaN bit so it survives the truncation)
+      (bit-or half-sign 0x7C00
+              (if (zero? man) 0 0x0200)
+              (unsigned-bit-shift-right man 13))
+      (let [half-exp (+ (- (unsigned-bit-shift-right exp 23) 127) 15)] ; unbias f32, rebias f16
+        (cond
+          ;; exponent overflow → ±Inf
+          (>= half-exp 0x1F)
+          (bit-or half-sign 0x7C00)
+
+          ;; subnormal / underflow (half-exp <= 0)
+          (<= half-exp 0)
+          (if (> (- 14 half-exp) 24)
+            half-sign                                            ; full underflow → signed zero
+            (let [man*  (bit-or man 0x00800000)                 ; restore hidden leading 1
+                  hm    (unsigned-bit-shift-right man* (- 14 half-exp))
+                  round (bit-shift-left 1 (- 13 half-exp))]
+              (if (and (not (zero? (bit-and man* round)))
+                       (not (zero? (bit-and man* (dec (* 3 round))))))
+                (bit-or half-sign (inc hm))
+                (bit-or half-sign hm))))
+
+          ;; normal
+          :else
+          (let [he    (bit-shift-left half-exp 10)
+                hm    (unsigned-bit-shift-right man 13)
+                round 0x1000]
+            (if (and (not (zero? (bit-and man round)))
+                     (not (zero? (bit-and man (dec (* 3 round))))))
+              (inc (bit-or half-sign he hm))                    ; round up may carry into exp
+              (bit-or half-sign he hm))))))))
+
 (defn- u8s-of-element [dt x]
   (case dt
     (:f32 :mat4) (u8s-of-u32 (f32-bits x))   ; mat4 payload is a stream of f32
     :u32         (u8s-of-u32 (long x))
     (:u16 :i16)  (u8s-of-u16 (long x))
     :u8          [(bit-and (long x) 0xff)]
-    ;; f16 / quat smallest-3 packing TODO — see ADR; placeholder raw f16-less path
-    (throw (ex-info "u8s-of-element: unsupported dtype for byte emit" {:dtype dt}))))
+    ;; f16 column = one half per element; quat = 4×f16 (already flattened to 4 comps
+    ;; per item by `column`), so per-element emit is identical — both → 1 half / 2 LE bytes.
+    (:f16 :quat) (u8s-of-u16 (f16-bits x))))
 
 (defn- pad-to [bytes ^long target]
   (into bytes (repeat (- target (count bytes)) 0)))
@@ -182,3 +226,89 @@
               (map vector cols layout))]
     {:buffer (pad-to buf total) :len total :ncols ncols
      :columns cols :layout layout :meta (frame->meta frame)}))
+
+;; ---------------------------------------------------------------------------
+;; unpack — KamiFrame columnar byte vector → frame header + decoded columns
+;; (clj mirror of kami-core/src/ipc.rs's KamiFrame reader; inverse of `pack`).
+;; ---------------------------------------------------------------------------
+
+(def ^:private enum->dtype
+  "Inverse of the `dtype` table: Dtype enum byte → keyword tag."
+  (into {} (map (fn [[k v]] [(:enum v) k])) dtype))
+
+(defn- rd-u16 ^long [buf ^long off]
+  (+ (long (nth buf off)) (* 256 (long (nth buf (inc off))))))
+
+(defn- rd-u32 ^long [buf ^long off]
+  (+ (long (nth buf off))
+     (* 256       (long (nth buf (+ off 1))))
+     (* 65536     (long (nth buf (+ off 2))))
+     (* 16777216  (long (nth buf (+ off 3))))))
+
+(defn- rd-f32 [buf ^long off]
+  (let [bits (rd-u32 buf off)]
+    #?(:clj  (Float/intBitsToFloat (unchecked-int bits))
+       :cljs (let [b (js/ArrayBuffer. 4)]
+               (aset (js/Uint32Array. b) 0 bits)
+               (aget (js/Float32Array. b) 0)))))
+
+(defn- pow2 [n] #?(:clj (Math/pow 2.0 n) :cljs (js/Math.pow 2.0 n)))
+
+(defn- f16->f32
+  "Decode IEEE-754 binary16 bits (0-0xffff) → a number. Inverse of `f16-bits`."
+  [^long h]
+  (let [sign (if (zero? (bit-and h 0x8000)) 1.0 -1.0)
+        exp  (bit-and (unsigned-bit-shift-right h 10) 0x1F)
+        man  (bit-and h 0x3FF)]
+    (cond
+      (= exp 0x1F) (if (zero? man)
+                     (* sign #?(:clj Double/POSITIVE_INFINITY :cljs js/Infinity))
+                     #?(:clj Double/NaN :cljs js/NaN))
+      (zero? exp)  (* sign (pow2 -14) (/ man 1024.0))            ; subnormal (man=0 → ±0)
+      :else        (* sign (pow2 (- exp 15)) (+ 1.0 (/ man 1024.0))))))
+
+(defn- decode-element [dt buf ^long off]
+  (case dt
+    (:f32 :mat4) (rd-f32 buf off)
+    :u32         (rd-u32 buf off)
+    :u16         (rd-u16 buf off)
+    :i16         (let [v (rd-u16 buf off)] (if (>= v 0x8000) (- v 0x10000) v))
+    :u8          (long (nth buf off))
+    (:f16 :quat) (f16->f32 (rd-u16 buf off))))
+
+(defn unpack
+  "Inverse of `pack`: parse a KAMI columnar buffer back into
+  `{:n :version :ncols :columns [{:dtype :stride :len :offset :data} …]}`, where
+  each `:data` is a flat vector of decoded numbers (f32/mat4 → f32; f16/quat → f32
+  via `f16->f32`; integer dtypes → ints), in the same order `pack` wrote them.
+  Verifies the 'KAMI' magic and reads the little-endian headers exactly as the
+  Rust `KamiFrame` reader does. Pure; round-trips `pack`."
+  [buffer]
+  (let [buf (vec buffer)]
+    (when (< (count buf) header-bytes)
+      (throw (ex-info "unpack: buffer shorter than 16-byte header" {:len (count buf)})))
+    (let [magic* (rd-u32 buf 0)]
+      (when-not (= magic* magic)
+        (throw (ex-info "unpack: bad magic (not a KAMI frame)"
+                        {:got magic* :want magic}))))
+    (let [version* (rd-u16 buf 4)
+          ncols    (rd-u16 buf 6)
+          frame-n  (rd-u32 buf 8)
+          columns
+          (mapv
+           (fn [i]
+             (let [base   (+ header-bytes (* (long i) column-header-bytes))
+                   enum   (long (nth buf base))
+                   stride (long (nth buf (inc base)))
+                   len    (rd-u32 buf (+ base 4))
+                   off    (rd-u32 buf (+ base 8))
+                   dt     (or (enum->dtype enum)
+                              (throw (ex-info "unpack: unknown dtype enum" {:enum enum})))
+                   per    (case dt :mat4 16 :quat 4 1)
+                   esz    (long (/ (long (:elsize (dtype dt))) per)) ; bytes per flat element
+                   n-el   (* len per stride)
+                   data   (mapv #(decode-element dt buf (+ off (* (long %) esz)))
+                                (range n-el))]
+               {:dtype dt :stride stride :len len :offset off :data data}))
+           (range ncols))]
+      {:n frame-n :version version* :ncols ncols :columns columns})))

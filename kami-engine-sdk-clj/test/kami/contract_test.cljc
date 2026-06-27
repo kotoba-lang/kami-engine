@@ -140,7 +140,65 @@
 (deftest ipc-byte-len
   (is (= 64  (ipc/byte-len :mat4 1 1)))   ; one mat4 = 64B
   (is (= 128 (ipc/byte-len :mat4 2 1)))
-  (is (= 16  (ipc/byte-len :f32 4 1))))
+  (is (= 16  (ipc/byte-len :f32 4 1)))
+  (testing "half-precision dtypes"
+    (is (= 2  (ipc/byte-len :f16 1 1)))   ; one half = 2B
+    (is (= 8  (ipc/byte-len :f16 4 1)))
+    (is (= 8  (ipc/byte-len :quat 1 1)))  ; one quat = 4×f16 = 8B
+    (is (= 16 (ipc/byte-len :quat 2 1)))))
+
+(deftest ipc-f16-encoding
+  (let [f16 @#'ipc/f16-bits
+        u8  @#'ipc/u8s-of-element]
+    (testing "exact-representable f32 → known binary16 bit patterns"
+      (is (= 0x0000 (f16 0.0)))
+      (is (= 0x3C00 (f16 1.0)))
+      (is (= 0x4000 (f16 2.0)))
+      (is (= 0x3800 (f16 0.5)))
+      (is (= 0xBC00 (f16 -1.0)))
+      (is (= 0x7BFF (f16 65504.0))))            ; largest finite half
+    (testing "exponent overflow saturates to ±Inf (not NaN)"
+      (is (= 0x7C00 (f16 1.0e5)))
+      (is (= 0xFC00 (f16 -1.0e5))))
+    (testing "round-to-nearest-even at the half-way point (both directions)"
+      (is (= 0x3C00 (f16 (+ 1.0 (/ 1.0 2048.0)))))   ; tie → down to even mantissa 0
+      (is (= 0x3C02 (f16 (+ 1.0 (/ 3.0 2048.0))))))   ; tie → up   to even mantissa 2
+    (testing "byte emit is little-endian 2 bytes, shared by :f16 and :quat"
+      (is (= [0x00 0x3C] (u8 :f16  1.0)))
+      (is (= [0x00 0x3C] (u8 :quat 1.0)))           ; quat comps emit one half each
+      (is (= [0xFF 0x7B] (u8 :f16  65504.0))))))
+
+(deftest ipc-unpack-roundtrip
+  (let [w      (ecs/load-snapshot snap)
+        fr     (render/frame w {:n 7 :aspect 1.0})
+        packed (ipc/pack fr)
+        back   (ipc/unpack (:buffer packed))]
+    (testing "header: magic verified, version + frame-n + ncols recovered"
+      (is (= 1 (:version back)))
+      (is (= 7 (:n back)))
+      (is (= (:ncols packed) (:ncols back))))
+    (testing "column descriptors (dtype/stride/len/offset) survive the round trip"
+      (is (= (mapv #(select-keys % [:dtype :len :stride :offset]) (:layout packed))
+             (mapv #(select-keys % [:dtype :len :stride :offset]) (:columns back)))))
+    (testing "mat4/f32 payloads decode bit-exactly back to the source numbers"
+      (is (= (mapv #(mapv float (:data %)) (:columns packed))
+             (mapv :data (:columns back)))))
+    (testing "rejects a buffer whose magic isn't 'KAMI'"
+      (is (thrown? #?(:clj Exception :cljs js/Error)
+                   (ipc/unpack (assoc (:buffer packed) 0 0)))))))
+
+(deftest ipc-f16-roundtrip
+  (let [f16  @#'ipc/f16-bits
+        f16' @#'ipc/f16->f32
+        abs* (fn [v] (if (neg? v) (- v) v))]
+    (testing "encode→decode stays within half-precision relative error"
+      (doseq [x [0.0 1.0 -1.0 0.5 -2.5 100.0 -0.001 65504.0 0.333]]
+        (let [y   (f16' (f16 x))
+              tol (* 1.0e-3 (+ 1.0 (abs* (double x))))]
+          (is (< (abs* (- (double x) (double y))) tol) (str x " → " y)))))
+    (testing "±Inf survive the half round trip"
+      (is (= #?(:clj Double/POSITIVE_INFINITY :cljs js/Infinity) (f16' (f16 1.0e9))))
+      (is (= #?(:clj Double/NEGATIVE_INFINITY :cljs (- js/Infinity)) (f16' (f16 -1.0e9)))))))
 
 ;; --- WGSL emission ----------------------------------------------------------
 
