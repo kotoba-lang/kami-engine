@@ -20,6 +20,21 @@ use wasm_bindgen::prelude::*;
 
 use kami_script_runtime::{KamiScriptRuntime, Tag};
 
+/// Browser GPU display (wgpu, never Canvas2D) — wasm32 only.
+#[cfg(target_arch = "wasm32")]
+mod gpu;
+
+/// Step 1 of the GPU visual: bring up a wgpu surface over the `<canvas id=…>` and
+/// clear/present it (proves the compliant wgpu path is live in-page). The
+/// render-IR pixel blit layers onto this next.
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub async fn gpu_clear(canvas_id: String, w: u32, h: u32) -> Result<(), JsValue> {
+    let g = gpu::Gpu::new(&canvas_id, w, h).await.map_err(|e| JsValue::from_str(&e))?;
+    g.present_clear().map_err(|e| JsValue::from_str(&e))?;
+    Ok(())
+}
+
 /// The shipped dance artifacts — choreography as data, behaviour as Clojure.
 const DANCE_SCENE: &str = include_str!("../../kami-clj-play3d/games/dance/scene.edn");
 const DANCE_LOGIC: &str = include_str!("../../kami-clj-play3d/games/dance/logic.clj");

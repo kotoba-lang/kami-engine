@@ -14,3 +14,16 @@ kami-live = { path = "../kami-live" }
 kami-script-runtime = { path = "../kami-script-runtime", default-features = false, features = ["backend-wasmi"] }
 hecs = { workspace = true }
 wasm-bindgen = "0.2"
+# CPU render-IR rasterizer (parse_ir + render → pixels); builds for wasm32.
+kami-webgpu-rs = { path = "../kami-webgpu-rs" }
+
+# Browser GPU display (compliant: wgpu, never Canvas2D). wasm-only — the host
+# build of the harness (CI workspace) skips these.
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+kami-render = { path = "../kami-render" }
+wgpu = "24"
+web-sys = { version = "0.3", features = ["Window", "Document", "Element", "HtmlCanvasElement"] }
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+bytemuck = { workspace = true }
+console_error_panic_hook = "0.1"
