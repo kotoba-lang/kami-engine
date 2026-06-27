@@ -19,9 +19,10 @@
   "routes": [
     { "pattern": "sip.etzhayyim.com/*", "zone_name": "etzhayyim.com" }
   ],
+  // assets-only Worker (no script) — a binding is only for a Worker that reads
+  // assets in code, which this static site has none of.
   "assets": {
     "directory": "./public",
-    "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "single-page-application"
   }
