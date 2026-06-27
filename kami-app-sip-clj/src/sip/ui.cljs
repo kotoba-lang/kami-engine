@@ -9,14 +9,20 @@
   of the app. Works standalone without WebGPU; when the 3D scene boots it sits
   behind this overlay. `^:export mount` is called from index.html."
   (:require [sip.session :as ses]
-            [clojure.string :as str]))
+            [sip.kotoba :as kotoba]
+            [clojure.string :as str]
+            [cljs.core.async :refer [<!]])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
 
 ;; --- state -----------------------------------------------------------------
 
-(defonce ^:private !state (atom nil))   ; current session map (sip.session)
-(defonce ^:private !root  (atom nil))   ; the overlay root element
-(defonce ^:private !raf   (atom nil))   ; resonate breathing rAF handle
-(defonce ^:private !t0    (atom 0))     ; breathing clock origin
+(defonce ^:private !state   (atom nil))   ; current session map (sip.session)
+(defonce ^:private !root    (atom nil))   ; the overlay root element
+(defonce ^:private !raf     (atom nil))   ; resonate breathing rAF handle
+(defonce ^:private !t0      (atom 0))     ; breathing clock origin
+(defonce ^:private !letters (atom nil))   ; loaded 瓶詞 inbox (vector) or nil
+(defonce ^:private !lidx    (atom 0))     ; which letter is shown
+(defonce ^:private !posted  (atom nil))   ; cid of the 瓶詞 we just floated
 
 ;; Story-bible would supply the client + emotion via a session picker; P1 seeds
 ;; one representative Ghost-space so the loop is playable end-to-end today.
@@ -94,8 +100,52 @@
     (advance! #(ses/resonate % closeness))))
 
 (defn- restart! []
+  (reset! !posted nil)
+  (reset! !letters nil)
   (reset! !state (ses/begin seed-client seed-emotion))
   (render!))
+
+;; --- 瓶詞 (bottle-letter) actions ------------------------------------------
+
+(defn- float-letter! [textarea]
+  (let [t (.-value textarea)]
+    (when-not (str/blank? t)
+      (go (let [cid (<! (kotoba/post-letter! {:from seed-client :text t :season :spring}))]
+            (reset! !posted cid)
+            (reset! !letters nil)        ; force re-load so our own bottle is included
+            (render!))))))
+
+(defn- load-inbox! []
+  (go (let [ls (<! (kotoba/inbox :spring))]
+        (reset! !letters (vec ls))
+        (reset! !lidx 0)
+        (render!))))
+
+(defn- letter-section
+  "瓶詞 compose + pick-up, shown on the completion screen — the non-toxic async
+  multiplayer: float a one-line letter into the canal, pick up someone else's."
+  []
+  (let [ta (el :textarea {:placeholder "運河に流す一言…（いつか誰かが拾う）" :maxlength "80"
+                          :style (str "font:inherit;font-size:14px;padding:8px 10px;border-radius:12px;"
+                                      "border:1px solid #d8cdee;outline:none;width:100%;height:46px;"
+                                      "resize:none;color:#6b5b95;box-sizing:border-box")})]
+    (el :div {:style "margin-top:16px;border-top:1px solid #ece6f7;padding-top:12px"}
+        (el :div {:style "font-size:12px;color:#9a8fb5;letter-spacing:.08em;margin-bottom:6px"
+                  :text "瓶詞 — 運河の手紙"})
+        ta
+        (el :div {:style "margin-top:4px"}
+            (btn "流す" #(float-letter! ta))
+            (btn "運河の瓶詞を拾う" load-inbox!))
+        (when @!posted
+          (el :p {:style "font-size:11px;color:#8fa08f;margin-top:6px"
+                  :text (str "瓶詞を流した（" (subs (str @!posted) 0 (min 12 (count (str @!posted)))) "…）")}))
+        (when (seq @!letters)
+          (let [l (nth @!letters (mod @!lidx (count @!letters)))]
+            (el :div {:style "margin-top:10px;background:#f3eefb;border-radius:14px;padding:12px 14px"}
+                (el :div {:style "font-size:14px;color:#6b5b95;line-height:1.7" :text (:text l)})
+                (el :div {:style "display:flex;justify-content:space-between;align-items:center;margin-top:8px"}
+                    (el :span {:style "font-size:11px;color:#b3a9c9" :text (str "— " (:from l))})
+                    (btn "次の瓶詞" #(do (swap! !lidx inc) (render!))))))))))
 
 ;; --- breathing animation (resonate only) -----------------------------------
 
@@ -164,7 +214,8 @@
           (el :p {:style "color:#9a8fb5;font-size:13px;margin-top:6px"
                   :text (str "寄り添い grace " (pct grace) " · 絆 bond " bond
                              " · 気づき " (count insights))})
-          (btn "もう一度" restart!)))
+          (btn "もう一度" restart!)
+          (letter-section)))
 
     (el :div {})))
 
@@ -208,5 +259,6 @@
                          :style "position:fixed;left:0;right:0;bottom:0;z-index:40;padding:0 10px"})]
       (.appendChild js/document.body root)
       (reset! !root root)))
+  (kotoba/seed!)        ; float a few example 瓶詞 once, so the canal isn't empty
   (restart!)
   @!root)
