@@ -211,10 +211,10 @@ impl ToastLevel {
     /// Get the fill color for this toast level (Nintendo-style pastels).
     pub fn color(&self) -> [f32; 4] {
         match self {
-            ToastLevel::Info => [0.36, 0.58, 0.95, 0.95],    // soft blue
-            ToastLevel::Success => [0.42, 0.82, 0.52, 0.95],  // soft green
-            ToastLevel::Warning => [0.98, 0.82, 0.28, 0.95],  // soft yellow
-            ToastLevel::Error => [0.95, 0.42, 0.42, 0.95],    // soft red
+            ToastLevel::Info => [0.36, 0.58, 0.95, 0.95], // soft blue
+            ToastLevel::Success => [0.42, 0.82, 0.52, 0.95], // soft green
+            ToastLevel::Warning => [0.98, 0.82, 0.28, 0.95], // soft yellow
+            ToastLevel::Error => [0.95, 0.42, 0.42, 0.95], // soft red
         }
     }
 }
@@ -268,13 +268,16 @@ impl ToastStack {
 
     /// Push a new toast. Auto-trims if exceeding max_visible.
     pub fn push(&mut self, title: String, body: String, level: ToastLevel, duration_ms: u64) {
-        self.toasts.insert(0, Toast {
-            title,
-            body,
-            level,
-            remaining_ms: duration_ms,
-            anim_offset_y: -self.toast_height,
-        });
+        self.toasts.insert(
+            0,
+            Toast {
+                title,
+                body,
+                level,
+                remaining_ms: duration_ms,
+                anim_offset_y: -self.toast_height,
+            },
+        );
         if self.toasts.len() > self.max_visible {
             self.toasts.truncate(self.max_visible);
         }
@@ -301,9 +304,17 @@ impl ToastStack {
     pub fn render(&self, layer: &mut UiLayer) {
         let x = layer.screen_width - self.toast_width - self.margin_right;
         for (i, toast) in self.toasts.iter().enumerate() {
-            let y = self.margin_top + (i as f32) * (self.toast_height + self.gap) + toast.anim_offset_y;
+            let y =
+                self.margin_top + (i as f32) * (self.toast_height + self.gap) + toast.anim_offset_y;
             // Background rounded rect
-            layer.rounded_rect(x, y, self.toast_width, self.toast_height, toast.level.color(), 12.0);
+            layer.rounded_rect(
+                x,
+                y,
+                self.toast_width,
+                self.toast_height,
+                toast.level.color(),
+                12.0,
+            );
         }
     }
 }

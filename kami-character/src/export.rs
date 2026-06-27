@@ -1,22 +1,30 @@
 //! GLB export — CharacterMesh → binary glTF 2.0 (.glb).
 
-use crate::{CharacterMesh, MaterialId, Vertex};
 use crate::material::PbrMaterial;
 use crate::params::CharacterDef;
+use crate::{CharacterMesh, MaterialId, Vertex};
 use std::collections::HashMap;
 
 /// Export CharacterMesh to GLB binary (Vec<u8>).
 pub fn export_glb(mesh: &CharacterMesh, def: &CharacterDef) -> Vec<u8> {
     let mat_order = [
-        MaterialId::Skin, MaterialId::EyeWhite, MaterialId::Iris, MaterialId::Pupil,
-        MaterialId::Lip, MaterialId::Eyebrow, MaterialId::Hair, MaterialId::Clothing,
+        MaterialId::Skin,
+        MaterialId::EyeWhite,
+        MaterialId::Iris,
+        MaterialId::Pupil,
+        MaterialId::Lip,
+        MaterialId::Eyebrow,
+        MaterialId::Hair,
+        MaterialId::Clothing,
         MaterialId::Eyelash,
     ];
 
     // Group parts by material
     let mut groups: HashMap<MaterialId, (Vec<Vertex>, Vec<u32>)> = HashMap::new();
     for part in &mesh.parts {
-        let entry = groups.entry(part.material).or_insert_with(|| (Vec::new(), Vec::new()));
+        let entry = groups
+            .entry(part.material)
+            .or_insert_with(|| (Vec::new(), Vec::new()));
         let offset = entry.0.len() as u32;
         entry.0.extend_from_slice(&part.vertices);
         for &idx in &part.indices {
@@ -41,7 +49,14 @@ pub fn export_glb(mesh: &CharacterMesh, def: &CharacterDef) -> Vec<u8> {
         let mat_idx = materials_json.len();
         mat_index_map.insert(mid, mat_idx);
 
-        let pbr = PbrMaterial::for_part(mid, &def.skin, &def.eyes, &def.mouth, &def.hair, &def.clothing);
+        let pbr = PbrMaterial::for_part(
+            mid,
+            &def.skin,
+            &def.eyes,
+            &def.mouth,
+            &def.hair,
+            &def.clothing,
+        );
         materials_json.push(format!(
             r#"{{"name":"{}","pbrMetallicRoughness":{{"baseColorFactor":[{},{},{},{}],"metallicFactor":{},"roughnessFactor":{}}},"doubleSided":true}}"#,
             pbr.name, pbr.base_color[0], pbr.base_color[1], pbr.base_color[2], pbr.base_color[3],
@@ -54,7 +69,10 @@ pub fn export_glb(mesh: &CharacterMesh, def: &CharacterDef) -> Vec<u8> {
         let mut v_max = [f32::MIN; 3];
         for v in verts {
             let p = [v.position.x, v.position.y, v.position.z];
-            for k in 0..3 { v_min[k] = v_min[k].min(p[k]); v_max[k] = v_max[k].max(p[k]); }
+            for k in 0..3 {
+                v_min[k] = v_min[k].min(p[k]);
+                v_max[k] = v_max[k].max(p[k]);
+            }
             vdata.extend_from_slice(bytemuck::bytes_of(&p));
             vdata.extend_from_slice(bytemuck::bytes_of(&[v.normal.x, v.normal.y, v.normal.z]));
             vdata.extend_from_slice(bytemuck::bytes_of(&v.uv));
@@ -66,7 +84,8 @@ pub fn export_glb(mesh: &CharacterMesh, def: &CharacterDef) -> Vec<u8> {
         buf.extend_from_slice(&vdata);
         buffer_views.push(format!(
             r#"{{"buffer":0,"byteOffset":{},"byteLength":{},"byteStride":32,"target":34962}}"#,
-            v_off, vdata.len()
+            v_off,
+            vdata.len()
         ));
 
         // Index data (u32)
@@ -79,7 +98,8 @@ pub fn export_glb(mesh: &CharacterMesh, def: &CharacterDef) -> Vec<u8> {
         buf.extend_from_slice(&idata_padded);
         buffer_views.push(format!(
             r#"{{"buffer":0,"byteOffset":{},"byteLength":{},"target":34963}}"#,
-            i_off, idata.len()
+            i_off,
+            idata.len()
         ));
 
         let pos_a = accessors.len();
@@ -90,17 +110,20 @@ pub fn export_glb(mesh: &CharacterMesh, def: &CharacterDef) -> Vec<u8> {
         let norm_a = accessors.len();
         accessors.push(format!(
             r#"{{"bufferView":{},"componentType":5126,"count":{},"type":"VEC3","byteOffset":12}}"#,
-            v_bv, verts.len()
+            v_bv,
+            verts.len()
         ));
         let uv_a = accessors.len();
         accessors.push(format!(
             r#"{{"bufferView":{},"componentType":5126,"count":{},"type":"VEC2","byteOffset":24}}"#,
-            v_bv, verts.len()
+            v_bv,
+            verts.len()
         ));
         let idx_a = accessors.len();
         accessors.push(format!(
             r#"{{"bufferView":{},"componentType":5125,"count":{},"type":"SCALAR"}}"#,
-            i_bv, indices.len()
+            i_bv,
+            indices.len()
         ));
 
         primitives.push(format!(
@@ -120,7 +143,9 @@ pub fn export_glb(mesh: &CharacterMesh, def: &CharacterDef) -> Vec<u8> {
     );
 
     let mut json_bytes = json.into_bytes();
-    while json_bytes.len() % 4 != 0 { json_bytes.push(b' '); }
+    while json_bytes.len() % 4 != 0 {
+        json_bytes.push(b' ');
+    }
 
     // GLB container
     let glb_len = 12 + 8 + json_bytes.len() + 8 + buf.len();
@@ -128,7 +153,7 @@ pub fn export_glb(mesh: &CharacterMesh, def: &CharacterDef) -> Vec<u8> {
 
     // Header
     out.extend_from_slice(&0x46546C67u32.to_le_bytes()); // magic
-    out.extend_from_slice(&2u32.to_le_bytes());          // version
+    out.extend_from_slice(&2u32.to_le_bytes()); // version
     out.extend_from_slice(&(glb_len as u32).to_le_bytes());
 
     // JSON chunk
@@ -145,7 +170,9 @@ pub fn export_glb(mesh: &CharacterMesh, def: &CharacterDef) -> Vec<u8> {
 }
 
 fn pad4(v: &mut Vec<u8>) {
-    while v.len() % 4 != 0 { v.push(0); }
+    while v.len() % 4 != 0 {
+        v.push(0);
+    }
 }
 
 #[cfg(test)]

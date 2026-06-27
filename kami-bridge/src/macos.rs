@@ -13,9 +13,9 @@ use core_graphics::event::{
 use core_graphics::event_source::CGEventSource;
 use core_graphics::event_source::CGEventSourceStateID;
 use std::ffi::c_void;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, Sender};
-use std::sync::Arc;
 
 // Raw FFI for CGEventTap (the `core-graphics` crate marks these private).
 mod ffi {
@@ -30,9 +30,9 @@ mod ffi {
 
     unsafe extern "C" {
         pub fn CGEventTapCreate(
-            tap: u32,         // CGEventTapLocation
-            place: u32,       // CGEventTapPlacement
-            options: u32,     // CGEventTapOptions
+            tap: u32,     // CGEventTapLocation
+            place: u32,   // CGEventTapPlacement
+            options: u32, // CGEventTapOptions
             events_of_interest: u64,
             callback: CGEventTapCallBack,
             user_info: *mut c_void,
@@ -46,11 +46,7 @@ mod ffi {
             order: i64,
         ) -> *mut c_void; // CFRunLoopSourceRef
 
-        pub fn CFRunLoopAddSource(
-            rl: *mut c_void,
-            source: *mut c_void,
-            mode: *const c_void,
-        );
+        pub fn CFRunLoopAddSource(rl: *mut c_void, source: *mut c_void, mode: *const c_void);
 
         pub fn CFRunLoopGetCurrent() -> *mut c_void;
         pub fn CFRunLoopRun();
@@ -154,11 +150,9 @@ unsafe extern "C" fn tap_callback(
     let bridge_event = match event_type {
         K_CG_EVENT_MOUSE_MOVED | K_CG_EVENT_OTHER_MOUSE_DRAGGED => {
             let dx =
-                unsafe { ffi::CGEventGetIntegerValueField(event, K_CG_MOUSE_EVENT_DELTA_X) }
-                    as f64;
+                unsafe { ffi::CGEventGetIntegerValueField(event, K_CG_MOUSE_EVENT_DELTA_X) } as f64;
             let dy =
-                unsafe { ffi::CGEventGetIntegerValueField(event, K_CG_MOUSE_EVENT_DELTA_Y) }
-                    as f64;
+                unsafe { ffi::CGEventGetIntegerValueField(event, K_CG_MOUSE_EVENT_DELTA_Y) } as f64;
             Some(BridgeEvent::MouseMove { dx, dy })
         }
         K_CG_EVENT_LEFT_MOUSE_DOWN => Some(BridgeEvent::MouseButton {
@@ -187,18 +181,18 @@ unsafe extern "C" fn tap_callback(
             Some(BridgeEvent::Scroll { dx, dy })
         }
         K_CG_EVENT_KEY_DOWN => {
-            let keycode = unsafe {
-                ffi::CGEventGetIntegerValueField(event, K_CG_KEYBOARD_EVENT_KEYCODE)
-            } as u32;
+            let keycode =
+                unsafe { ffi::CGEventGetIntegerValueField(event, K_CG_KEYBOARD_EVENT_KEYCODE) }
+                    as u32;
             Some(BridgeEvent::KeyDown {
                 keycode,
                 modifiers: mods,
             })
         }
         K_CG_EVENT_KEY_UP => {
-            let keycode = unsafe {
-                ffi::CGEventGetIntegerValueField(event, K_CG_KEYBOARD_EVENT_KEYCODE)
-            } as u32;
+            let keycode =
+                unsafe { ffi::CGEventGetIntegerValueField(event, K_CG_KEYBOARD_EVENT_KEYCODE) }
+                    as u32;
             Some(BridgeEvent::KeyUp {
                 keycode,
                 modifiers: mods,

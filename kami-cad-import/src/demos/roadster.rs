@@ -5,7 +5,9 @@
 //! proportions are roughly NA-Miata, but the dimensions are tuneable
 //! parameters at the top of the function.
 
-use crate::ingest::scad::{AnnotatedEntity, ScadAnnotation, ScadPrim, ScadTransform, from_annotated};
+use crate::ingest::scad::{
+    AnnotatedEntity, ScadAnnotation, ScadPrim, ScadTransform, from_annotated,
+};
 use crate::part::{
     Hardpoint, HardpointKind, Material, PartKind, ProvenanceSource, Supplier, VehicleAssembly,
 };
@@ -39,7 +41,9 @@ pub fn roadster_na() -> VehicleAssembly {
     let mut entities = Vec::<AnnotatedEntity>::new();
 
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [track_f, chassis_h, wheelbase + 0.6] },
+        primitive: ScadPrim::Cube {
+            size: [track_f, chassis_h, wheelbase + 0.6],
+        },
         transform: ScadTransform::default().translate(0.0, 0.30, 0.0),
         annotation: ScadAnnotation {
             part_id: "chassis".into(),
@@ -55,7 +59,9 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [track_f, 0.05, 0.08] },
+        primitive: ScadPrim::Cube {
+            size: [track_f, 0.05, 0.08],
+        },
         transform: ScadTransform::default().translate(0.0, roof_y, 0.20),
         annotation: ScadAnnotation {
             part_id: "windshield_header".into(),
@@ -71,7 +77,9 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [track_f - 0.1, 0.04, 0.95] },
+        primitive: ScadPrim::Cube {
+            size: [track_f - 0.1, 0.04, 0.95],
+        },
         transform: ScadTransform::default().translate(0.0, belt_y + 0.18, wheelbase * 0.5 - 0.2),
         annotation: ScadAnnotation {
             part_id: "hood".into(),
@@ -87,7 +95,9 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [track_f - 0.1, 0.05, 0.85] },
+        primitive: ScadPrim::Cube {
+            size: [track_f - 0.1, 0.05, 0.85],
+        },
         transform: ScadTransform::default().translate(0.0, belt_y + 0.20, -(wheelbase * 0.5)),
         annotation: ScadAnnotation {
             part_id: "trunk".into(),
@@ -107,7 +117,9 @@ pub fn roadster_na() -> VehicleAssembly {
         ("door_r", track_f * 0.5 - 0.05, "Door (passenger)", "door_r"),
     ] {
         entities.push(AnnotatedEntity {
-            primitive: ScadPrim::Cube { size: [0.05, 0.55, 0.95] },
+            primitive: ScadPrim::Cube {
+                size: [0.05, 0.55, 0.95],
+            },
             transform: ScadTransform::default().translate(x, belt_y - 0.10, 0.0),
             annotation: ScadAnnotation {
                 part_id: id.into(),
@@ -129,9 +141,15 @@ pub fn roadster_na() -> VehicleAssembly {
         ("fender_rl", -track_f * 0.5, "Rear fender L"),
         ("fender_rr", track_f * 0.5, "Rear fender R"),
     ] {
-        let z = if id.contains("_f") { wheelbase * 0.5 } else { -(wheelbase * 0.5) };
+        let z = if id.contains("_f") {
+            wheelbase * 0.5
+        } else {
+            -(wheelbase * 0.5)
+        };
         entities.push(AnnotatedEntity {
-            primitive: ScadPrim::Cube { size: [0.06, 0.30, 0.45] },
+            primitive: ScadPrim::Cube {
+                size: [0.06, 0.30, 0.45],
+            },
             transform: ScadTransform::default().translate(x, belt_y - 0.05, z),
             annotation: ScadAnnotation {
                 part_id: id.into(),
@@ -148,7 +166,9 @@ pub fn roadster_na() -> VehicleAssembly {
         });
     }
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [track_f - 0.1, 0.55, 0.05] },
+        primitive: ScadPrim::Cube {
+            size: [track_f - 0.1, 0.55, 0.05],
+        },
         transform: ScadTransform::default().translate(0.0, belt_y + 0.30, 0.45),
         annotation: ScadAnnotation {
             part_id: "windshield".into(),
@@ -168,7 +188,9 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [0.55, 0.55, 0.65] },
+        primitive: ScadPrim::Cube {
+            size: [0.55, 0.55, 0.65],
+        },
         transform: ScadTransform::default().translate(0.0, 0.55, 0.95),
         annotation: ScadAnnotation {
             part_id: "engine".into(),
@@ -188,7 +210,9 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [0.30, 0.30, 0.85] },
+        primitive: ScadPrim::Cube {
+            size: [0.30, 0.30, 0.85],
+        },
         transform: ScadTransform::default().translate(0.0, 0.45, 0.20),
         annotation: ScadAnnotation {
             part_id: "transmission".into(),
@@ -208,7 +232,9 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [0.40, 0.25, 0.40] },
+        primitive: ScadPrim::Cube {
+            size: [0.40, 0.25, 0.40],
+        },
         transform: ScadTransform::default().translate(0.0, 0.40, -wheelbase * 0.5 + 0.15),
         annotation: ScadAnnotation {
             part_id: "diff".into(),
@@ -224,10 +250,19 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cylinder { h: 1.40, r1: 0.04, r2: 0.04 },
+        primitive: ScadPrim::Cylinder {
+            h: 1.40,
+            r1: 0.04,
+            r2: 0.04,
+        },
         transform: ScadTransform::default()
             .translate(0.0, 0.30, -0.40)
-            .rotate_xyzw(std::f32::consts::FRAC_1_SQRT_2, 0.0, 0.0, std::f32::consts::FRAC_1_SQRT_2),
+            .rotate_xyzw(
+                std::f32::consts::FRAC_1_SQRT_2,
+                0.0,
+                0.0,
+                std::f32::consts::FRAC_1_SQRT_2,
+            ),
         annotation: ScadAnnotation {
             part_id: "driveshaft".into(),
             display_name: Some("Propeller shaft".into()),
@@ -242,7 +277,9 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [0.35, 0.20, 0.50] },
+        primitive: ScadPrim::Cube {
+            size: [0.35, 0.20, 0.50],
+        },
         transform: ScadTransform::default().translate(0.40, 0.42, 1.30),
         annotation: ScadAnnotation {
             part_id: "battery".into(),
@@ -262,7 +299,9 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [0.55, 0.30, 0.35] },
+        primitive: ScadPrim::Cube {
+            size: [0.55, 0.30, 0.35],
+        },
         transform: ScadTransform::default().translate(0.0, 0.40, 1.50),
         annotation: ScadAnnotation {
             part_id: "radiator".into(),
@@ -282,7 +321,9 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [0.55, 0.20, 0.45] },
+        primitive: ScadPrim::Cube {
+            size: [0.55, 0.20, 0.45],
+        },
         transform: ScadTransform::default().translate(0.0, 0.30, -wheelbase * 0.5),
         annotation: ScadAnnotation {
             part_id: "fuel_tank".into(),
@@ -298,13 +339,37 @@ pub fn roadster_na() -> VehicleAssembly {
         },
     });
     for (id, x, z, name) in [
-        ("strut_fl", -track_f * 0.5 + 0.05, wheelbase * 0.5, "Strut FL"),
-        ("strut_fr", track_f * 0.5 - 0.05, wheelbase * 0.5, "Strut FR"),
-        ("strut_rl", -track_r * 0.5 + 0.05, -wheelbase * 0.5, "Strut RL"),
-        ("strut_rr", track_r * 0.5 - 0.05, -wheelbase * 0.5, "Strut RR"),
+        (
+            "strut_fl",
+            -track_f * 0.5 + 0.05,
+            wheelbase * 0.5,
+            "Strut FL",
+        ),
+        (
+            "strut_fr",
+            track_f * 0.5 - 0.05,
+            wheelbase * 0.5,
+            "Strut FR",
+        ),
+        (
+            "strut_rl",
+            -track_r * 0.5 + 0.05,
+            -wheelbase * 0.5,
+            "Strut RL",
+        ),
+        (
+            "strut_rr",
+            track_r * 0.5 - 0.05,
+            -wheelbase * 0.5,
+            "Strut RR",
+        ),
     ] {
         entities.push(AnnotatedEntity {
-            primitive: ScadPrim::Cylinder { h: 0.40, r1: 0.04, r2: 0.04 },
+            primitive: ScadPrim::Cylinder {
+                h: 0.40,
+                r1: 0.04,
+                r2: 0.04,
+            },
             transform: ScadTransform::default().translate(x, 0.40, z),
             annotation: ScadAnnotation {
                 part_id: id.into(),
@@ -327,10 +392,17 @@ pub fn roadster_na() -> VehicleAssembly {
         ("brake_rr", track_r * 0.5, -wheelbase * 0.5),
     ] {
         entities.push(AnnotatedEntity {
-            primitive: ScadPrim::Cylinder { h: 0.025, r1: 0.135, r2: 0.135 },
-            transform: ScadTransform::default()
-                .translate(x, 0.30, z)
-                .rotate_xyzw(0.0, 0.0, std::f32::consts::FRAC_1_SQRT_2, std::f32::consts::FRAC_1_SQRT_2),
+            primitive: ScadPrim::Cylinder {
+                h: 0.025,
+                r1: 0.135,
+                r2: 0.135,
+            },
+            transform: ScadTransform::default().translate(x, 0.30, z).rotate_xyzw(
+                0.0,
+                0.0,
+                std::f32::consts::FRAC_1_SQRT_2,
+                std::f32::consts::FRAC_1_SQRT_2,
+            ),
             annotation: ScadAnnotation {
                 part_id: id.into(),
                 display_name: Some(format!("Brake disc {}", id.split('_').last().unwrap())),
@@ -356,10 +428,17 @@ pub fn roadster_na() -> VehicleAssembly {
         ("wheel_rr", track_r * 0.5, -wheelbase * 0.5),
     ] {
         entities.push(AnnotatedEntity {
-            primitive: ScadPrim::Cylinder { h: 0.18, r1: 0.30, r2: 0.30 },
-            transform: ScadTransform::default()
-                .translate(x, 0.30, z)
-                .rotate_xyzw(0.0, 0.0, std::f32::consts::FRAC_1_SQRT_2, std::f32::consts::FRAC_1_SQRT_2),
+            primitive: ScadPrim::Cylinder {
+                h: 0.18,
+                r1: 0.30,
+                r2: 0.30,
+            },
+            transform: ScadTransform::default().translate(x, 0.30, z).rotate_xyzw(
+                0.0,
+                0.0,
+                std::f32::consts::FRAC_1_SQRT_2,
+                std::f32::consts::FRAC_1_SQRT_2,
+            ),
             annotation: ScadAnnotation {
                 part_id: id.into(),
                 display_name: Some(format!("Wheel + tire {}", id)),
@@ -383,7 +462,9 @@ pub fn roadster_na() -> VehicleAssembly {
         ("seat_r", 0.30, "Seat (passenger)"),
     ] {
         entities.push(AnnotatedEntity {
-            primitive: ScadPrim::Cube { size: [0.50, 0.95, 0.55] },
+            primitive: ScadPrim::Cube {
+                size: [0.50, 0.95, 0.55],
+            },
             transform: ScadTransform::default().translate(x, 0.65, -0.10),
             annotation: ScadAnnotation {
                 part_id: id.into(),
@@ -400,7 +481,9 @@ pub fn roadster_na() -> VehicleAssembly {
         });
     }
     entities.push(AnnotatedEntity {
-        primitive: ScadPrim::Cube { size: [track_f - 0.1, 0.18, 0.30] },
+        primitive: ScadPrim::Cube {
+            size: [track_f - 0.1, 0.18, 0.30],
+        },
         transform: ScadTransform::default().translate(0.0, belt_y + 0.05, 0.50),
         annotation: ScadAnnotation {
             part_id: "dashboard".into(),
@@ -424,23 +507,113 @@ pub fn roadster_na() -> VehicleAssembly {
         position: pos,
         kind,
     };
-    hps.push(hp("hp_header", "chassis", "windshield_header", [0.0, roof_y, 0.20], HardpointKind::Weld));
-    hps.push(hp("hp_hood", "chassis", "hood", [0.0, belt_y + 0.20, 1.55], HardpointKind::Hinge));
-    hps.push(hp("hp_trunk", "chassis", "trunk", [0.0, belt_y + 0.22, -0.95], HardpointKind::Hinge));
-    hps.push(hp("hp_door_l", "chassis", "door_l", [-track_f * 0.5 + 0.05, 0.50, 0.30], HardpointKind::Hinge));
-    hps.push(hp("hp_door_r", "chassis", "door_r", [track_f * 0.5 - 0.05, 0.50, 0.30], HardpointKind::Hinge));
+    hps.push(hp(
+        "hp_header",
+        "chassis",
+        "windshield_header",
+        [0.0, roof_y, 0.20],
+        HardpointKind::Weld,
+    ));
+    hps.push(hp(
+        "hp_hood",
+        "chassis",
+        "hood",
+        [0.0, belt_y + 0.20, 1.55],
+        HardpointKind::Hinge,
+    ));
+    hps.push(hp(
+        "hp_trunk",
+        "chassis",
+        "trunk",
+        [0.0, belt_y + 0.22, -0.95],
+        HardpointKind::Hinge,
+    ));
+    hps.push(hp(
+        "hp_door_l",
+        "chassis",
+        "door_l",
+        [-track_f * 0.5 + 0.05, 0.50, 0.30],
+        HardpointKind::Hinge,
+    ));
+    hps.push(hp(
+        "hp_door_r",
+        "chassis",
+        "door_r",
+        [track_f * 0.5 - 0.05, 0.50, 0.30],
+        HardpointKind::Hinge,
+    ));
     for fid in ["fender_fl", "fender_fr", "fender_rl", "fender_rr"] {
-        hps.push(hp(&format!("hp_{fid}"), "chassis", fid, [0.0, belt_y - 0.05, 0.0], HardpointKind::Bolt));
+        hps.push(hp(
+            &format!("hp_{fid}"),
+            "chassis",
+            fid,
+            [0.0, belt_y - 0.05, 0.0],
+            HardpointKind::Bolt,
+        ));
     }
-    hps.push(hp("hp_windshield", "windshield_header", "windshield", [0.0, roof_y - 0.05, 0.40], HardpointKind::Adhesive));
-    hps.push(hp("hp_engine_l", "chassis", "engine", [-0.20, 0.45, 0.95], HardpointKind::Bolt));
-    hps.push(hp("hp_engine_r", "chassis", "engine", [0.20, 0.45, 0.95], HardpointKind::Bolt));
-    hps.push(hp("hp_trans", "engine", "transmission", [0.0, 0.45, 0.55], HardpointKind::Bolt));
-    hps.push(hp("hp_driveshaft_f", "transmission", "driveshaft", [0.0, 0.30, 0.20], HardpointKind::Bolt));
-    hps.push(hp("hp_driveshaft_r", "driveshaft", "diff", [0.0, 0.30, -0.95], HardpointKind::Bolt));
-    hps.push(hp("hp_radiator", "chassis", "radiator", [0.0, 0.40, 1.50], HardpointKind::Bolt));
-    hps.push(hp("hp_battery", "chassis", "battery", [0.40, 0.42, 1.30], HardpointKind::Bolt));
-    hps.push(hp("hp_fuel_tank", "chassis", "fuel_tank", [0.0, 0.35, -wheelbase * 0.5], HardpointKind::Bolt));
+    hps.push(hp(
+        "hp_windshield",
+        "windshield_header",
+        "windshield",
+        [0.0, roof_y - 0.05, 0.40],
+        HardpointKind::Adhesive,
+    ));
+    hps.push(hp(
+        "hp_engine_l",
+        "chassis",
+        "engine",
+        [-0.20, 0.45, 0.95],
+        HardpointKind::Bolt,
+    ));
+    hps.push(hp(
+        "hp_engine_r",
+        "chassis",
+        "engine",
+        [0.20, 0.45, 0.95],
+        HardpointKind::Bolt,
+    ));
+    hps.push(hp(
+        "hp_trans",
+        "engine",
+        "transmission",
+        [0.0, 0.45, 0.55],
+        HardpointKind::Bolt,
+    ));
+    hps.push(hp(
+        "hp_driveshaft_f",
+        "transmission",
+        "driveshaft",
+        [0.0, 0.30, 0.20],
+        HardpointKind::Bolt,
+    ));
+    hps.push(hp(
+        "hp_driveshaft_r",
+        "driveshaft",
+        "diff",
+        [0.0, 0.30, -0.95],
+        HardpointKind::Bolt,
+    ));
+    hps.push(hp(
+        "hp_radiator",
+        "chassis",
+        "radiator",
+        [0.0, 0.40, 1.50],
+        HardpointKind::Bolt,
+    ));
+    hps.push(hp(
+        "hp_battery",
+        "chassis",
+        "battery",
+        [0.40, 0.42, 1.30],
+        HardpointKind::Bolt,
+    ));
+    hps.push(hp(
+        "hp_fuel_tank",
+        "chassis",
+        "fuel_tank",
+        [0.0, 0.35, -wheelbase * 0.5],
+        HardpointKind::Bolt,
+    ));
     for w in ["wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr"] {
         let strut = match w {
             "wheel_fl" => "strut_fl",
@@ -456,16 +629,59 @@ pub fn roadster_na() -> VehicleAssembly {
             "wheel_rr" => "brake_rr",
             _ => unreachable!(),
         };
-        hps.push(hp(&format!("hp_strut_{w}"), strut, w, [0.0, 0.30, 0.0], HardpointKind::Press));
-        hps.push(hp(&format!("hp_strut_{strut}_chassis"), "chassis", strut, [0.0, 0.55, 0.0], HardpointKind::Bolt));
-        hps.push(hp(&format!("hp_brake_{w}"), brake, w, [0.0, 0.30, 0.0], HardpointKind::Bolt));
+        hps.push(hp(
+            &format!("hp_strut_{w}"),
+            strut,
+            w,
+            [0.0, 0.30, 0.0],
+            HardpointKind::Press,
+        ));
+        hps.push(hp(
+            &format!("hp_strut_{strut}_chassis"),
+            "chassis",
+            strut,
+            [0.0, 0.55, 0.0],
+            HardpointKind::Bolt,
+        ));
+        hps.push(hp(
+            &format!("hp_brake_{w}"),
+            brake,
+            w,
+            [0.0, 0.30, 0.0],
+            HardpointKind::Bolt,
+        ));
     }
-    hps.push(hp("hp_seat_l", "chassis", "seat_l", [-0.30, 0.30, -0.10], HardpointKind::Bolt));
-    hps.push(hp("hp_seat_r", "chassis", "seat_r", [0.30, 0.30, -0.10], HardpointKind::Bolt));
-    hps.push(hp("hp_dashboard", "chassis", "dashboard", [0.0, belt_y, 0.55], HardpointKind::Bolt));
+    hps.push(hp(
+        "hp_seat_l",
+        "chassis",
+        "seat_l",
+        [-0.30, 0.30, -0.10],
+        HardpointKind::Bolt,
+    ));
+    hps.push(hp(
+        "hp_seat_r",
+        "chassis",
+        "seat_r",
+        [0.30, 0.30, -0.10],
+        HardpointKind::Bolt,
+    ));
+    hps.push(hp(
+        "hp_dashboard",
+        "chassis",
+        "dashboard",
+        [0.0, belt_y, 0.55],
+        HardpointKind::Bolt,
+    ));
 
-    from_annotated("scad-roadster-na", "etzhayyim SCAD Roadster NA", "0.1.0", prov, &entities, hps)
-        .expect("assembly validates")
+    from_annotated(
+        "scad-roadster-na",
+        "etzhayyim SCAD Roadster NA",
+        "0.1.0",
+        prov,
+        &entities,
+        hps,
+    )
+    .expect("assembly validates")
 }
 
 #[cfg(test)]

@@ -207,8 +207,14 @@ mod tests {
         let mut scene = Scene::new();
         scene
             .add(Primitive::GroundPlane { height: -0.5 })
-            .add(Primitive::Sphere { center: Vec3::new(0.3, 0.0, 0.0), radius: 0.5 })
-            .add(Primitive::Sphere { center: Vec3::new(10.0, 0.0, 0.0), radius: 0.5 });
+            .add(Primitive::Sphere {
+                center: Vec3::new(0.3, 0.0, 0.0),
+                radius: 0.5,
+            })
+            .add(Primitive::Sphere {
+                center: Vec3::new(10.0, 0.0, 0.0),
+                radius: 0.5,
+            });
 
         let all = sensor.sample_all(Vec3::ZERO, &scene, 1.0);
         assert_eq!(all.len(), 2, "should report exactly the two overlaps");
@@ -265,7 +271,10 @@ mod tests {
     fn sphere_vs_sphere_no_contact() {
         let sensor = sensor_radius_1();
         let mut scene = Scene::new();
-        scene.add(Primitive::Sphere { center: Vec3::new(5.0, 0.0, 0.0), radius: 1.0 });
+        scene.add(Primitive::Sphere {
+            center: Vec3::new(5.0, 0.0, 0.0),
+            radius: 1.0,
+        });
         let r = sensor.sample(Vec3::ZERO, &scene, 0.0);
         // centers 5 apart, two radii of 1 → 3m gap
         assert!(!r.in_contact);
@@ -276,7 +285,10 @@ mod tests {
     fn sphere_vs_sphere_overlap() {
         let sensor = sensor_radius_1();
         let mut scene = Scene::new();
-        scene.add(Primitive::Sphere { center: Vec3::new(1.0, 0.0, 0.0), radius: 1.0 });
+        scene.add(Primitive::Sphere {
+            center: Vec3::new(1.0, 0.0, 0.0),
+            radius: 1.0,
+        });
         let r = sensor.sample(Vec3::ZERO, &scene, 0.0);
         // centers 1 apart, two radii of 1 → 1m overlap → 1m penetration
         assert!(r.in_contact);
@@ -337,8 +349,14 @@ mod tests {
         let sensor = sensor_radius_1();
         let mut scene = Scene::new();
         scene
-            .add(Primitive::Sphere { center: Vec3::new(10.0, 0.0, 0.0), radius: 1.0 })
-            .add(Primitive::Sphere { center: Vec3::new(3.0, 0.0, 0.0), radius: 0.5 }) // nearest
+            .add(Primitive::Sphere {
+                center: Vec3::new(10.0, 0.0, 0.0),
+                radius: 1.0,
+            })
+            .add(Primitive::Sphere {
+                center: Vec3::new(3.0, 0.0, 0.0),
+                radius: 0.5,
+            }) // nearest
             .add(Primitive::GroundPlane { height: -10.0 });
         let r = sensor.sample(Vec3::ZERO, &scene, 0.0);
         // Sensor at origin, radius 1. Nearest = sphere idx 1 at (3,0,0) r=0.5.

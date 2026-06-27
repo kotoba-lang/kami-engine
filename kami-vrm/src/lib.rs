@@ -29,28 +29,28 @@
 //! let output = kami_vrm::export_glb(&composed)?;
 //! ```
 
-pub mod glb;
-pub mod gltf_types;
-pub mod vrm_types;
-pub mod parse;
 pub mod compat;
-pub mod humanoid;
-pub mod part;
 pub mod compose;
-pub mod export;
-pub mod convert;
-pub mod spring;
 pub mod constraint;
+pub mod convert;
+pub mod export;
 pub mod expression;
 pub mod firstperson;
+pub mod glb;
+pub mod gltf_types;
+pub mod humanoid;
+pub mod parse;
+pub mod part;
+pub mod spring;
+pub mod vrm_types;
 
 // Re-exports for convenience.
 pub use compose::{ComposeConfig, PartSource};
-pub use expression::{ColorOverride, ExpressionManager, ResolvedExpression, UvOverride};
-pub use firstperson::{node_visible, FirstPersonResolver, FirstPersonView};
-pub use part::{decompose, PartCategory, VrmPart};
-pub use parse::parse_vrm;
 pub use export::export_glb;
+pub use expression::{ColorOverride, ExpressionManager, ResolvedExpression, UvOverride};
+pub use firstperson::{FirstPersonResolver, FirstPersonView, node_visible};
+pub use parse::parse_vrm;
+pub use part::{PartCategory, VrmPart, decompose};
 pub use vrm_types::*;
 
 use thiserror::Error;
@@ -171,12 +171,18 @@ mod tests {
         // Inverse bind matrices (3 × 64 bytes = 192 bytes)
         // Add accessor for IBM
         let mut json_val: serde_json::Value = json.clone();
-        json_val["accessors"].as_array_mut().unwrap().push(serde_json::json!({
-            "bufferView": 4, "componentType": 5126, "count": 3, "type": "MAT4"
-        }));
-        json_val["bufferViews"].as_array_mut().unwrap().push(serde_json::json!({
-            "buffer": 0, "byteOffset": 96, "byteLength": 192
-        }));
+        json_val["accessors"]
+            .as_array_mut()
+            .unwrap()
+            .push(serde_json::json!({
+                "bufferView": 4, "componentType": 5126, "count": 3, "type": "MAT4"
+            }));
+        json_val["bufferViews"]
+            .as_array_mut()
+            .unwrap()
+            .push(serde_json::json!({
+                "buffer": 0, "byteOffset": 96, "byteLength": 192
+            }));
 
         let identity = glam::Mat4::IDENTITY;
         for _ in 0..3 {

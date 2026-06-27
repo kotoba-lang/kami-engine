@@ -191,7 +191,12 @@ pub mod schematic {
         /// Route a wire between two points, optionally assigning it to a net.
         pub fn route_wire(&mut self, start: Vec2, end: Vec2, net_id: Option<NetId>) -> EntityId {
             let id = self.alloc_id();
-            self.wires.push(Wire { id, start, end, net_id });
+            self.wires.push(Wire {
+                id,
+                start,
+                end,
+                net_id,
+            });
             id
         }
 
@@ -475,7 +480,13 @@ pub mod pcb {
             layer: Layer,
         ) -> EntityId {
             let id = self.alloc_id();
-            self.traces.push(Trace { id, net_id, points, width, layer });
+            self.traces.push(Trace {
+                id,
+                net_id,
+                points,
+                width,
+                layer,
+            });
             id
         }
 
@@ -489,7 +500,14 @@ pub mod pcb {
             net_id: NetId,
         ) -> EntityId {
             let id = self.alloc_id();
-            self.vias.push(Via { id, x, y, drill, outer_diameter, net_id });
+            self.vias.push(Via {
+                id,
+                x,
+                y,
+                drill,
+                outer_diameter,
+                net_id,
+            });
             id
         }
 
@@ -502,7 +520,13 @@ pub mod pcb {
             fill: ZoneFill,
         ) -> EntityId {
             let id = self.alloc_id();
-            self.zones.push(Zone { id, net_id, boundary, layer, fill });
+            self.zones.push(Zone {
+                id,
+                net_id,
+                boundary,
+                layer,
+                fill,
+            });
             id
         }
 
@@ -630,7 +654,10 @@ pub mod netlist {
                 .entry(key.clone())
                 .and_modify(|(_, q)| *q += 1)
                 .or_insert((sym.library_ref.clone(), 1));
-            designators.entry(key).or_default().push(sym.designator.clone());
+            designators
+                .entry(key)
+                .or_default()
+                .push(sym.designator.clone());
         }
 
         let mut bom: Vec<BomEntry> = groups
@@ -669,7 +696,11 @@ pub mod netlist {
                     let net_name = self
                         .nets
                         .values()
-                        .find(|n| n.pins.iter().any(|(sid, pn)| *sid == sym.id && *pn == pin.number))
+                        .find(|n| {
+                            n.pins
+                                .iter()
+                                .any(|(sid, pn)| *sid == sym.id && *pn == pin.number)
+                        })
                         .map(|n| n.name.as_str())
                         .unwrap_or("?");
                     let _ = write!(out, "{net_name} ");
@@ -709,7 +740,11 @@ pub mod netlist {
                 let _ = writeln!(out, "  (edifLevel 0)");
                 let _ = writeln!(out, "  (keywordMap (keywordLevel 0))");
                 for sym in symbols {
-                    let _ = writeln!(out, "  (instance {} (viewRef {}))", sym.designator, sym.library_ref);
+                    let _ = writeln!(
+                        out,
+                        "  (instance {} (viewRef {}))",
+                        sym.designator, sym.library_ref
+                    );
                 }
                 let _ = writeln!(out, ")");
                 out
@@ -749,9 +784,10 @@ pub mod erc {
                     continue;
                 }
                 let abs_pos = sym.position + pin.position;
-                let connected = sch.wires.iter().any(|w| {
-                    abs_pos.distance(w.start) < eps || abs_pos.distance(w.end) < eps
-                });
+                let connected = sch
+                    .wires
+                    .iter()
+                    .any(|w| abs_pos.distance(w.start) < eps || abs_pos.distance(w.end) < eps);
                 if !connected {
                     out.push(drc::Violation {
                         rule_id: "ERC_UNCONNECTED_PIN".to_string(),
@@ -869,11 +905,7 @@ pub mod erc {
                 out.push(drc::Violation {
                     rule_id: "ERC_DUPLICATE_DESIGNATOR".to_string(),
                     severity: drc::Severity::Error,
-                    message: format!(
-                        "Designator '{}' used by {} symbols",
-                        desig,
-                        ids.len()
-                    ),
+                    message: format!("Designator '{}' used by {} symbols", desig, ids.len()),
                     entity_ids: ids.clone(),
                     location: None,
                 });
@@ -917,8 +949,24 @@ mod tests {
             position: Vec2::new(-1.0, 0.0),
             orientation: Orientation::Left,
         };
-        sch.place_symbol("R_0402", "R1", "10k", Vec2::new(0.0, 0.0), 0.0, false, vec![pin_a]);
-        sch.place_symbol("R_0402", "R2", "4.7k", Vec2::new(4.0, 0.0), 0.0, false, vec![pin_b]);
+        sch.place_symbol(
+            "R_0402",
+            "R1",
+            "10k",
+            Vec2::new(0.0, 0.0),
+            0.0,
+            false,
+            vec![pin_a],
+        );
+        sch.place_symbol(
+            "R_0402",
+            "R2",
+            "4.7k",
+            Vec2::new(4.0, 0.0),
+            0.0,
+            false,
+            vec![pin_b],
+        );
         sch.route_wire(Vec2::new(1.0, 0.0), Vec2::new(3.0, 0.0), Some(1));
 
         let netlist = sch.generate_netlist();
@@ -930,14 +978,32 @@ mod tests {
     #[test]
     fn pcb_drc_trace_width() {
         let board = pcb::PcbBoard {
-            outline: vec![Vec2::ZERO, Vec2::new(100.0, 0.0), Vec2::new(100.0, 100.0), Vec2::new(0.0, 100.0)],
-            layer_stack: vec![pcb::LayerDef { layer: Layer::Front, name: "F.Cu".into(), thickness_mm: 0.035 }],
+            outline: vec![
+                Vec2::ZERO,
+                Vec2::new(100.0, 0.0),
+                Vec2::new(100.0, 100.0),
+                Vec2::new(0.0, 100.0),
+            ],
+            layer_stack: vec![pcb::LayerDef {
+                layer: Layer::Front,
+                name: "F.Cu".into(),
+                thickness_mm: 0.035,
+            }],
         };
         let mut layout = pcb::PcbLayout::new(board);
-        layout.route_trace(1, vec![Vec2::ZERO, Vec2::new(10.0, 0.0)], 0.05, Layer::Front);
+        layout.route_trace(
+            1,
+            vec![Vec2::ZERO, Vec2::new(10.0, 0.0)],
+            0.05,
+            Layer::Front,
+        );
 
         let violations = layout.run_drc();
-        assert!(violations.iter().any(|v| v.rule_id == "PCB_MIN_TRACE_WIDTH"));
+        assert!(
+            violations
+                .iter()
+                .any(|v| v.rule_id == "PCB_MIN_TRACE_WIDTH")
+        );
     }
 
     #[test]
@@ -952,17 +1018,33 @@ mod tests {
 
         let violations = layout.run_drc();
         assert!(violations.iter().any(|v| v.rule_id == "PCB_MIN_VIA_DRILL"));
-        assert!(violations.iter().any(|v| v.rule_id == "PCB_MIN_ANNULAR_RING"));
+        assert!(
+            violations
+                .iter()
+                .any(|v| v.rule_id == "PCB_MIN_ANNULAR_RING")
+        );
     }
 
     #[test]
     fn erc_duplicate_designator() {
         let mut sch = schematic::Schematic::new();
         sch.place_symbol("R_0402", "R1", "10k", Vec2::ZERO, 0.0, false, vec![]);
-        sch.place_symbol("C_0402", "R1", "100n", Vec2::new(5.0, 0.0), 0.0, false, vec![]);
+        sch.place_symbol(
+            "C_0402",
+            "R1",
+            "100n",
+            Vec2::new(5.0, 0.0),
+            0.0,
+            false,
+            vec![],
+        );
 
         let violations = erc::run_erc(&sch);
-        assert!(violations.iter().any(|v| v.rule_id == "ERC_DUPLICATE_DESIGNATOR"));
+        assert!(
+            violations
+                .iter()
+                .any(|v| v.rule_id == "ERC_DUPLICATE_DESIGNATOR")
+        );
     }
 
     #[test]
@@ -1017,11 +1099,14 @@ mod tests {
             pins: vec![pin],
         };
         let mut nets = HashMap::new();
-        nets.insert(1, schematic::Net {
-            id: 1,
-            name: "VCC".into(),
-            pins: vec![(1, "1".into())],
-        });
+        nets.insert(
+            1,
+            schematic::Net {
+                id: 1,
+                name: "VCC".into(),
+                pins: vec![(1, "1".into())],
+            },
+        );
 
         let spice = netlist::export_netlist(netlist::NetlistFormat::Spice, &[sym], &nets);
         assert!(spice.contains("R1"));

@@ -22,7 +22,12 @@ impl SpeciesMesh {
     fn finalize(vertices: Vec<f32>, indices: Vec<u32>) -> Self {
         let vc = (vertices.len() / 5) as u32;
         let ic = indices.len() as u32;
-        Self { vertices, indices, vertex_count: vc, index_count: ic }
+        Self {
+            vertices,
+            indices,
+            vertex_count: vc,
+            index_count: ic,
+        }
     }
 }
 
@@ -32,39 +37,76 @@ fn rot_xz(p: [f32; 3], c: f32, s: f32) -> [f32; 3] {
     [c * p[0] - s * p[2], p[1], s * p[0] + c * p[2]]
 }
 
-fn push_quad(v: &mut Vec<f32>, i: &mut Vec<u32>, corners: [[f32; 3]; 4], uv_min: [f32; 2], uv_max: [f32; 2]) {
+fn push_quad(
+    v: &mut Vec<f32>,
+    i: &mut Vec<u32>,
+    corners: [[f32; 3]; 4],
+    uv_min: [f32; 2],
+    uv_max: [f32; 2],
+) {
     let base = (v.len() / 5) as u32;
-    let uvs = [[uv_min[0], uv_max[1]], [uv_max[0], uv_max[1]], [uv_min[0], uv_min[1]], [uv_max[0], uv_min[1]]];
+    let uvs = [
+        [uv_min[0], uv_max[1]],
+        [uv_max[0], uv_max[1]],
+        [uv_min[0], uv_min[1]],
+        [uv_max[0], uv_min[1]],
+    ];
     for (c, uv) in corners.iter().zip(uvs.iter()) {
         v.extend_from_slice(&[c[0], c[1], c[2], uv[0], uv[1]]);
     }
-    i.extend_from_slice(&[base, base+1, base+2, base+2, base+1, base+3]);
+    i.extend_from_slice(&[base, base + 1, base + 2, base + 2, base + 1, base + 3]);
 }
 
-fn push_tapered_blade(v: &mut Vec<f32>, i: &mut Vec<u32>, angle: f32, width: f32, height: f32, curve: f32) {
-    let c = angle.cos(); let s = angle.sin();
+fn push_tapered_blade(
+    v: &mut Vec<f32>,
+    i: &mut Vec<u32>,
+    angle: f32,
+    width: f32,
+    height: f32,
+    curve: f32,
+) {
+    let c = angle.cos();
+    let s = angle.sin();
     let hw = width * 0.5;
     let tip_narrow = 0.15;
     let bl = rot_xz([-hw, 0.0, 0.0], c, s);
-    let br = rot_xz([ hw, 0.0, 0.0], c, s);
+    let br = rot_xz([hw, 0.0, 0.0], c, s);
     let tl = rot_xz([-hw * tip_narrow, height, curve], c, s);
-    let tr = rot_xz([ hw * tip_narrow, height, curve], c, s);
+    let tr = rot_xz([hw * tip_narrow, height, curve], c, s);
     let base = (v.len() / 5) as u32;
     v.extend_from_slice(&[bl[0], bl[1], bl[2], 0.0, 1.0]);
     v.extend_from_slice(&[br[0], br[1], br[2], 1.0, 1.0]);
     v.extend_from_slice(&[tl[0], tl[1], tl[2], 0.1, 0.0]);
     v.extend_from_slice(&[tr[0], tr[1], tr[2], 0.9, 0.0]);
-    i.extend_from_slice(&[base, base+1, base+2, base+2, base+1, base+3]);
+    i.extend_from_slice(&[base, base + 1, base + 2, base + 2, base + 1, base + 3]);
 }
 
 fn push_trunk_cross(v: &mut Vec<f32>, i: &mut Vec<u32>, r_base: f32, r_top: f32, h: f32) {
     // Two perpendicular thin quads forming a cross-section trunk.
-    push_quad(v, i,
-        [[-r_base, 0.0, 0.0], [r_base, 0.0, 0.0], [-r_top, h, 0.0], [r_top, h, 0.0]],
-        [0.3, 1.0], [0.5, 0.5]);
-    push_quad(v, i,
-        [[0.0, 0.0, -r_base], [0.0, 0.0, r_base], [0.0, h, -r_top], [0.0, h, r_top]],
-        [0.3, 1.0], [0.5, 0.5]);
+    push_quad(
+        v,
+        i,
+        [
+            [-r_base, 0.0, 0.0],
+            [r_base, 0.0, 0.0],
+            [-r_top, h, 0.0],
+            [r_top, h, 0.0],
+        ],
+        [0.3, 1.0],
+        [0.5, 0.5],
+    );
+    push_quad(
+        v,
+        i,
+        [
+            [0.0, 0.0, -r_base],
+            [0.0, 0.0, r_base],
+            [0.0, h, -r_top],
+            [0.0, h, r_top],
+        ],
+        [0.3, 1.0],
+        [0.5, 0.5],
+    );
 }
 
 // ── CanopyShape generators ──
@@ -87,9 +129,13 @@ fn gen_fan(p: &TaxonomicProfile) -> SpeciesMesh {
     let mut i = Vec::new();
     // Stem
     let r = p.stem_radius_base.max(0.02);
-    push_quad(&mut v, &mut i,
+    push_quad(
+        &mut v,
+        &mut i,
         [[-r, 0.0, 0.0], [r, 0.0, 0.0], [-r, 1.0, 0.0], [r, 1.0, 0.0]],
-        [0.45, 1.0], [0.55, 0.0]);
+        [0.45, 1.0],
+        [0.55, 0.0],
+    );
     // Leaflets (paired)
     let n = p.leaf_count.max(1);
     for k in 0..n {
@@ -97,7 +143,9 @@ fn gen_fan(p: &TaxonomicProfile) -> SpeciesMesh {
         let size = p.leaf_size * (1.0 - k as f32 * 0.1);
         let tilt = 0.05;
         for &sign in &[-1.0f32, 1.0] {
-            push_quad(&mut v, &mut i,
+            push_quad(
+                &mut v,
+                &mut i,
                 [
                     [0.0, y, 0.0],
                     [sign * size, y + tilt, 0.0],
@@ -105,7 +153,8 @@ fn gen_fan(p: &TaxonomicProfile) -> SpeciesMesh {
                     [sign * size, y + size * 0.3 + tilt, 0.0],
                 ],
                 if sign < 0.0 { [0.0, 0.8] } else { [0.5, 0.8] },
-                if sign < 0.0 { [0.5, 0.0] } else { [1.0, 0.0] });
+                if sign < 0.0 { [0.5, 0.0] } else { [1.0, 0.0] },
+            );
         }
     }
     SpeciesMesh::finalize(v, i)
@@ -116,7 +165,13 @@ fn gen_radial(p: &TaxonomicProfile) -> SpeciesMesh {
     let mut v = Vec::new();
     let mut i = Vec::new();
     let trunk_h = 0.85;
-    push_trunk_cross(&mut v, &mut i, p.stem_radius_base, p.stem_radius_top, trunk_h);
+    push_trunk_cross(
+        &mut v,
+        &mut i,
+        p.stem_radius_base,
+        p.stem_radius_top,
+        trunk_h,
+    );
     let n = p.leaf_count.max(1);
     let frond_len = p.leaf_size;
     let droop = 0.15;
@@ -124,16 +179,21 @@ fn gen_radial(p: &TaxonomicProfile) -> SpeciesMesh {
     let tip_w = 0.04;
     for k in 0..n {
         let angle = (k as f32 / n as f32) * std::f32::consts::TAU;
-        let c = angle.cos(); let s = angle.sin();
+        let c = angle.cos();
+        let s = angle.sin();
         let rot = |q: [f32; 3]| rot_xz(q, c, s);
-        push_quad(&mut v, &mut i,
+        push_quad(
+            &mut v,
+            &mut i,
             [
                 rot([-base_w, trunk_h, 0.0]),
-                rot([ base_w, trunk_h, 0.0]),
+                rot([base_w, trunk_h, 0.0]),
                 rot([-tip_w * 0.5, trunk_h + 0.05 - droop, frond_len]),
-                rot([ tip_w * 0.5, trunk_h + 0.05 - droop, frond_len]),
+                rot([tip_w * 0.5, trunk_h + 0.05 - droop, frond_len]),
             ],
-            [0.0, 1.0], [1.0, 0.0]);
+            [0.0, 1.0],
+            [1.0, 0.0],
+        );
     }
     SpeciesMesh::finalize(v, i)
 }
@@ -165,7 +225,7 @@ fn gen_cone(p: &TaxonomicProfile) -> SpeciesMesh {
             v.extend_from_slice(&[p0[0], p0[1], p0[2], 0.0, 1.0]);
             v.extend_from_slice(&[p1[0], p1[1], p1[2], 1.0, 1.0]);
             v.extend_from_slice(&[apex[0], apex[1], apex[2], 0.5, 0.0]);
-            i.extend_from_slice(&[base, base+1, base+2]);
+            i.extend_from_slice(&[base, base + 1, base + 2]);
         }
     }
     SpeciesMesh::finalize(v, i)
@@ -182,16 +242,21 @@ fn gen_dome(p: &TaxonomicProfile) -> SpeciesMesh {
         let angle = t * std::f32::consts::PI;
         let y_c = 0.4 + 0.3 * (t + (k as f32 * 0.37).sin() * 0.3);
         let rad = r * (0.7 + 0.3 * (k as f32 * 0.61).cos());
-        let c = angle.cos(); let s = angle.sin();
+        let c = angle.cos();
+        let s = angle.sin();
         let rot = |q: [f32; 3]| rot_xz(q, c, s);
-        push_quad(&mut v, &mut i,
+        push_quad(
+            &mut v,
+            &mut i,
             [
                 rot([-rad, y_c - rad * 0.5, 0.0]),
-                rot([ rad, y_c - rad * 0.5, 0.0]),
+                rot([rad, y_c - rad * 0.5, 0.0]),
                 rot([-rad, y_c + rad * 0.5, 0.0]),
-                rot([ rad, y_c + rad * 0.5, 0.0]),
+                rot([rad, y_c + rad * 0.5, 0.0]),
             ],
-            [0.0, 1.0], [1.0, 0.0]);
+            [0.0, 1.0],
+            [1.0, 0.0],
+        );
     }
     SpeciesMesh::finalize(v, i)
 }
@@ -211,9 +276,13 @@ fn gen_column(p: &TaxonomicProfile) -> SpeciesMesh {
         let p1_b = [r_b * a1.cos(), 0.0, r_b * a1.sin()];
         let p0_t = [r_t * a0.cos(), h, r_t * a0.sin()];
         let p1_t = [r_t * a1.cos(), h, r_t * a1.sin()];
-        push_quad(&mut v, &mut i,
+        push_quad(
+            &mut v,
+            &mut i,
             [p0_b, p1_b, p0_t, p1_t],
-            [s as f32 / sides as f32, 1.0], [(s + 1) as f32 / sides as f32, 0.0]);
+            [s as f32 / sides as f32, 1.0],
+            [(s + 1) as f32 / sides as f32, 0.0],
+        );
     }
     // Top cap (flat polygon approximated as triangle fan)
     let center_top = [0.0, h, 0.0];
@@ -242,18 +311,24 @@ fn gen_carpet(p: &TaxonomicProfile) -> SpeciesMesh {
     for k in 0..patches {
         let t = k as f32 / patches as f32;
         let angle = t * std::f32::consts::TAU;
-        let c = angle.cos(); let s = angle.sin();
-        let cx = 0.15 * c; let cz = 0.15 * s;
+        let c = angle.cos();
+        let s = angle.sin();
+        let cx = 0.15 * c;
+        let cz = 0.15 * s;
         let y = 0.05 + 0.05 * (t * 4.0 + 0.7).sin().abs();
         let rot = |q: [f32; 3]| rot_xz([q[0] + cx, q[1], q[2] + cz], c, s);
-        push_quad(&mut v, &mut i,
+        push_quad(
+            &mut v,
+            &mut i,
             [
                 rot([-r * 0.5, y, -r * 0.5]),
-                rot([ r * 0.5, y, -r * 0.5]),
-                rot([-r * 0.5, y,  r * 0.5]),
-                rot([ r * 0.5, y,  r * 0.5]),
+                rot([r * 0.5, y, -r * 0.5]),
+                rot([-r * 0.5, y, r * 0.5]),
+                rot([r * 0.5, y, r * 0.5]),
             ],
-            [0.0, 1.0], [1.0, 0.0]);
+            [0.0, 1.0],
+            [1.0, 0.0],
+        );
     }
     SpeciesMesh::finalize(v, i)
 }
@@ -296,7 +371,8 @@ pub fn species_mesh_library() -> Vec<(SpeciesId, SpeciesMesh)> {
 
 /// 7-species library including Cactus and Moss (new taxonomic extensions).
 pub fn extended_mesh_library() -> Vec<(String, SpeciesMesh)> {
-    crate::taxonomy::default_catalog().into_iter()
+    crate::taxonomy::default_catalog()
+        .into_iter()
         .map(|p| (p.common_name.to_string(), mesh_from_profile(&p)))
         .collect()
 }
@@ -350,7 +426,11 @@ mod tests {
     fn moss_is_flat() {
         let p = moss();
         let m = mesh_from_profile(&p);
-        let max_y = m.vertices.chunks_exact(5).map(|c| c[1]).fold(0.0f32, f32::max);
+        let max_y = m
+            .vertices
+            .chunks_exact(5)
+            .map(|c| c[1])
+            .fold(0.0f32, f32::max);
         // Moss should be quite flat — max_y < 0.2 (in unit mesh space)
         assert!(max_y < 0.2, "moss should be flat, got max_y={}", max_y);
     }

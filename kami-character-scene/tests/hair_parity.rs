@@ -19,8 +19,8 @@
 
 use kami_character::HairStyle;
 use kami_character_scene::{
-    builtin_hair_style, hair_style_from_edn, hair_styles_from_edn, shipped_hair_style,
-    shipped_hair_styles, Error, HairStyleSpec, ALL_HAIR_STYLE_NAMES, HAIR_EDN,
+    ALL_HAIR_STYLE_NAMES, Error, HAIR_EDN, HairStyleSpec, builtin_hair_style, hair_style_from_edn,
+    hair_styles_from_edn, shipped_hair_style, shipped_hair_styles,
 };
 
 /// Map a style name to the REAL Rust builder result (the oracle source).
@@ -129,15 +129,20 @@ fn blonde_long_is_default() {
 #[test]
 fn missing_key_falls_back_to_default() {
     // Only :style given; every other field must resolve to the Default.
-    let loaded =
-        hair_style_from_edn("{:character/hair-styles {:partial {:style :wavy}}}", "partial")
-            .expect("partial");
+    let loaded = hair_style_from_edn(
+        "{:character/hair-styles {:partial {:style :wavy}}}",
+        "partial",
+    )
+    .expect("partial");
     let d = HairStyle::default();
     let got = HairStyleSpec::from_hair_style(&loaded);
     assert_eq!(got.style, kami_character::HairType::Wavy, "explicit :style");
     assert_eq!(got.length, d.length, "missing :length → default");
     assert_eq!(got.color, d.color, "missing :color → default");
-    assert_eq!(got.head_radius, d.head_radius, "missing :head-radius → default");
+    assert_eq!(
+        got.head_radius, d.head_radius,
+        "missing :head-radius → default"
+    );
     assert_eq!(
         got.head_center_y, d.head_center_y,
         "missing :head-center-y → default"
@@ -160,5 +165,8 @@ fn tolerant_parse_errors() {
         Err(Error::StyleNotFound(_))
     ));
     assert!(matches!(hair_styles_from_edn("123"), Err(Error::NotAMap)));
-    assert!(matches!(hair_styles_from_edn("{:x 1}"), Err(Error::NoTable)));
+    assert!(matches!(
+        hair_styles_from_edn("{:x 1}"),
+        Err(Error::NoTable)
+    ));
 }

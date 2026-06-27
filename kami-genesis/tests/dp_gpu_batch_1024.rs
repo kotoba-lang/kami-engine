@@ -53,13 +53,17 @@ fn dp_1024_env_gpu_batch_throughput_and_topology_switch() {
     // Measure 1-step vs 200-step wall-clock; marginal cost per step = (T200 - T1) / 199.
     let mut s1 = states.clone();
     let t = Instant::now();
-    backend.step_double_pendulum(&mut s1, &torques, &cfg).unwrap();
+    backend
+        .step_double_pendulum(&mut s1, &torques, &cfg)
+        .unwrap();
     let t_1step = t.elapsed();
 
     let mut s200 = states.clone();
     let t = Instant::now();
     for _ in 0..200 {
-        backend.step_double_pendulum(&mut s200, &torques, &cfg).unwrap();
+        backend
+            .step_double_pendulum(&mut s200, &torques, &cfg)
+            .unwrap();
     }
     let t_200steps = t.elapsed();
 
@@ -79,10 +83,17 @@ fn dp_1024_env_gpu_batch_throughput_and_topology_switch() {
     println!("envs              : {N_ENVS}");
     println!("1-step wall       : {:?}", t_1step);
     println!("200-step wall     : {:?}", t_200steps);
-    println!("fixed-overhead/disp : {fixed_overhead_ns:>8.0} ns  (first-step incl. pipeline cache)");
-    println!("marginal step cost  : {marginal_per_step_ns:>8.1} ns  (per dispatch, amortized over 199 steps)");
+    println!(
+        "fixed-overhead/disp : {fixed_overhead_ns:>8.0} ns  (first-step incl. pipeline cache)"
+    );
+    println!(
+        "marginal step cost  : {marginal_per_step_ns:>8.1} ns  (per dispatch, amortized over 199 steps)"
+    );
     println!("total per-step cost : {total_per_step_ns:>8.1} ns  (avg over 200)");
-    println!("DP throughput     : {:.2}M env-steps/sec", 1e3 * N_ENVS as f64 / total_per_step_ns);
+    println!(
+        "DP throughput     : {:.2}M env-steps/sec",
+        1e3 * N_ENVS as f64 / total_per_step_ns
+    );
     println!("final θ₁ range    : [{q1_min:.3}, {q1_max:.3}] rad");
     println!("final θ₁ std      : {std_q1:.4} rad");
     println!("====================================================================");

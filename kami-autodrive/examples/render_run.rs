@@ -8,7 +8,9 @@
 //! path, the actual trajectory, and start/goal markers as SVG to stdout.
 
 use glam::{Affine3A, Quat, Vec2, Vec3};
-use kami_autodrive::{Autopilot, AutopilotConfig, BicycleModel, DriveState, Plant, Pose2, VehicleClass};
+use kami_autodrive::{
+    Autopilot, AutopilotConfig, BicycleModel, DriveState, Plant, Pose2, VehicleClass,
+};
 use kami_sensor_sim::{Lidar, LidarIntrinsics, LidarReturn, Primitive, Scene};
 
 const BLDG_HALF: f32 = 4.0;
@@ -93,7 +95,9 @@ fn main() {
         "<svg xmlns='http://www.w3.org/2000/svg' width='{w:.0}' height='{w:.0}' \
          viewBox='0 0 {w:.0} {w:.0}'>\n"
     ));
-    out.push_str(&format!("<rect width='{w:.0}' height='{w:.0}' fill='#f0ead6'/>\n"));
+    out.push_str(&format!(
+        "<rect width='{w:.0}' height='{w:.0}' fill='#f0ead6'/>\n"
+    ));
 
     // Buildings.
     for c in &bldgs {

@@ -336,10 +336,10 @@ mesh/material/pipeline each column maps to) travel as JSON. The Rust decoder
 | `kami.render` | cljc | ✅ impl | render-IR builder from ECS (instancing + camera) | `frame` `camera-ir` `draws-for` `merge-instances` `nintendo-cream` |
 | `kami.math` | cljc | ✅ impl | column-major 4×4 matrix math | `mul` `from-trs` `perspective` `invert-rigid` `identity4` |
 | `kami.wgsl` | cljc | ✅ impl | WGSL-as-data emitter (subset) | `emit` `emit-struct` `emit-stage` `builtin?` |
-| `kami.ipc` | cljc | ✅ impl | render-IR → KAMI columnar buffer | `pack` `column` `dtype` `byte-len` |
+| `kami.ipc` | cljc | ✅ impl | render-IR → KAMI columnar buffer (+ reader) | `pack` `unpack` `column` `dtype` `byte-len` |
 | `kami.gpu` | cljc | ✅ impl | `IGpuBackend` protocol + frontend (`submit!`/`ensure-assets!`) | `IGpuBackend` `backend` `register-mesh!` `register-shader!` `submit!` `ensure-assets!` |
-| `kami.backend.browser` | cljs | 🚧 stub | WASM/WebGPU backend via `kami-render` (needs §8b WIT) | `make` (impls IGpuBackend) |
-| `kami.backend.host` | clj | 🚧 stub | optional headless backend (FFI/wasmtime) | `make` |
+| `kami.backend.browser` | cljs | ✅ impl | WASM/WebGPU backend: forwards register/submit/resize to the `kami-clj-host` wasm-bindgen exports (decodes v1+v2 columnar layouts → kami-render) | `make` (Promise→IGpuBackend) |
+| `kami.backend.host` | clj | ✅ decode-verify (FFI/wasmtime render still TODO) | optional headless backend: `ipc/unpack`-based frame verification + asset/frame recording (no GPU) | `make` / `state` |
 
 Public entry (browser): `kami.sim/run!` with a `{:snapshot … :backend … :systems …}`
 map. Public entry (authoring): `kami.db/transact!` + `kami.db/snapshot`. The pure

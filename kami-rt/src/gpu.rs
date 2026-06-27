@@ -92,7 +92,12 @@ mod tests {
         let tris = (0..5)
             .map(|i| {
                 let x = i as f32;
-                Tri { v0: Vec3::new(x, 0.0, 0.0), v1: Vec3::new(x + 0.5, 0.0, 0.0), v2: Vec3::new(x, 0.5, 0.0), id: i }
+                Tri {
+                    v0: Vec3::new(x, 0.0, 0.0),
+                    v1: Vec3::new(x + 0.5, 0.0, 0.0),
+                    v2: Vec3::new(x, 0.5, 0.0),
+                    id: i,
+                }
             })
             .collect::<Vec<_>>();
         let bvh = Bvh::build(tris);

@@ -14,7 +14,8 @@ pub fn eda_create_schematic() -> String {
         "name": "Main",
         "symbols": sch.symbols.len(),
         "wires": sch.wires.len(),
-    }).to_string()
+    })
+    .to_string()
 }
 
 #[wasm_bindgen]
@@ -39,9 +40,7 @@ pub fn eda_run_drc(pcb_json: &str) -> String {
 #[wasm_bindgen]
 pub fn eda_export_gerber(pcb_json: &str) -> String {
     let _ = pcb_json;
-    let apertures = vec![
-        (10, kami_eng_io::gerber::Aperture::Circle { diameter: 0.2 }),
-    ];
+    let apertures = vec![(10, kami_eng_io::gerber::Aperture::Circle { diameter: 0.2 })];
     kami_eng_io::gerber::generate(&apertures, &[])
 }
 
@@ -58,7 +57,8 @@ pub fn cad_create_box(width: f64, height: f64, depth: f64) -> String {
         "vertices": solid.vertex_count(&edges),
         "volume": solid.volume(&edges, &vertices),
         "surface_area": solid.surface_area(&edges, &vertices),
-    }).to_string()
+    })
+    .to_string()
 }
 
 #[wasm_bindgen]
@@ -67,7 +67,10 @@ pub fn cad_tessellate_box(width: f64, height: f64, depth: f64, _tolerance: f64) 
     let max = glam::DVec3::new(width, height, depth);
     let (solid, edges, vertices) = kami_cad::brep::make_box(1, min, max);
     let (positions, _indices) = kami_cad::tessellate::tessellate_solid(&solid, &edges, &vertices);
-    positions.iter().flat_map(|v| [v.x as f32, v.y as f32, v.z as f32]).collect()
+    positions
+        .iter()
+        .flat_map(|v| [v.x as f32, v.y as f32, v.z as f32])
+        .collect()
 }
 
 #[wasm_bindgen]
@@ -89,9 +92,9 @@ pub fn cam_generate_gcode(
     spindle_rpm: f64,
 ) -> String {
     use kami_cam::gcode;
+    use kami_cam::stock::*;
     use kami_cam::tool::*;
     use kami_cam::toolpath::*;
-    use kami_cam::stock::*;
 
     let mut lib = ToolLibrary::new();
     let tool = Tool {
@@ -156,7 +159,8 @@ pub fn rtl_parse_verilog(source: &str) -> String {
         Ok((name, ports)) => serde_json::json!({
             "name": name,
             "port_count": ports.len(),
-        }).to_string(),
+        })
+        .to_string(),
         Err(e) => serde_json::json!({ "error": e }).to_string(),
     }
 }
@@ -184,23 +188,31 @@ pub fn rtl_simulate(top_module: &str, duration: u64) -> String {
     serde_json::json!({
         "time": sim.time,
         "clk_transitions": clk_history.map_or(0, |h| h.len()),
-    }).to_string()
+    })
+    .to_string()
 }
 
 #[wasm_bindgen]
 pub fn rtl_export_vcd(duration: u64) -> String {
-    let signals = vec![
-        kami_rtl::waveform::WaveformSignal {
-            name: "clk".to_string(),
-            width: 1,
-            transitions: (0..duration)
-                .step_by(5)
-                .map(|t| (t, if (t / 5) % 2 == 0 { "1".to_string() } else { "0".to_string() }))
-                .collect(),
-            display_format: kami_rtl::waveform::DisplayFormat::Binary,
-            color: "#00ff00".to_string(),
-        },
-    ];
+    let signals = vec![kami_rtl::waveform::WaveformSignal {
+        name: "clk".to_string(),
+        width: 1,
+        transitions: (0..duration)
+            .step_by(5)
+            .map(|t| {
+                (
+                    t,
+                    if (t / 5) % 2 == 0 {
+                        "1".to_string()
+                    } else {
+                        "0".to_string()
+                    },
+                )
+            })
+            .collect(),
+        display_format: kami_rtl::waveform::DisplayFormat::Binary,
+        color: "#00ff00".to_string(),
+    }];
     kami_rtl::waveform::export_vcd(&signals)
 }
 
@@ -215,7 +227,8 @@ pub fn cae_generate_box_mesh(width: f64, height: f64, depth: f64, divisions: u32
         "element_count": stats.element_count,
         "min_quality": stats.min_quality,
         "avg_quality": stats.avg_quality,
-    }).to_string()
+    })
+    .to_string()
 }
 
 #[wasm_bindgen]
@@ -267,7 +280,8 @@ pub fn spice_solve_dc_op(netlist: &str) -> String {
                 "branch_currents": result.branch_currents,
                 "element_count": circuit.element_count(),
                 "node_count": circuit.node_count(),
-            }).to_string()
+            })
+            .to_string()
         }
         Err(e) => serde_json::json!({ "error": e.to_string() }).to_string(),
     }
@@ -280,19 +294,19 @@ fn parse_tech_node(node: &str) -> Option<kami_pdk::TechNode> {
     match node.to_uppercase().as_str() {
         "N180" => Some(kami_pdk::TechNode::N180),
         "N130" => Some(kami_pdk::TechNode::N130),
-        "N90"  => Some(kami_pdk::TechNode::N90),
-        "N65"  => Some(kami_pdk::TechNode::N65),
-        "N45"  => Some(kami_pdk::TechNode::N45),
-        "N28"  => Some(kami_pdk::TechNode::N28),
-        "N22"  => Some(kami_pdk::TechNode::N22),
-        "N16"  => Some(kami_pdk::TechNode::N16),
-        "N14"  => Some(kami_pdk::TechNode::N14),
-        "N10"  => Some(kami_pdk::TechNode::N10),
-        "N7"   => Some(kami_pdk::TechNode::N7),
-        "N5"   => Some(kami_pdk::TechNode::N5),
-        "N3"   => Some(kami_pdk::TechNode::N3),
-        "N2"   => Some(kami_pdk::TechNode::N2),
-        _      => None,
+        "N90" => Some(kami_pdk::TechNode::N90),
+        "N65" => Some(kami_pdk::TechNode::N65),
+        "N45" => Some(kami_pdk::TechNode::N45),
+        "N28" => Some(kami_pdk::TechNode::N28),
+        "N22" => Some(kami_pdk::TechNode::N22),
+        "N16" => Some(kami_pdk::TechNode::N16),
+        "N14" => Some(kami_pdk::TechNode::N14),
+        "N10" => Some(kami_pdk::TechNode::N10),
+        "N7" => Some(kami_pdk::TechNode::N7),
+        "N5" => Some(kami_pdk::TechNode::N5),
+        "N3" => Some(kami_pdk::TechNode::N3),
+        "N2" => Some(kami_pdk::TechNode::N2),
+        _ => None,
     }
 }
 
@@ -310,7 +324,8 @@ pub fn pdk_tech_info(node: &str) -> String {
                 "min_width": tf.min_width,
                 "min_spacing": tf.min_spacing,
                 "layer_count": tf.layer_map.len(),
-            }).to_string()
+            })
+            .to_string()
         }
         None => serde_json::json!({ "error": format!("Unknown tech node: {}", node) }).to_string(),
     }
@@ -322,22 +337,27 @@ pub fn pdk_stdcell_library(node: &str) -> String {
     match parse_tech_node(node) {
         Some(tech) => {
             let lib = kami_pdk::stdcell::create_generic_lib(tech);
-            let cells: Vec<serde_json::Value> = lib.cells.iter().map(|c| {
-                serde_json::json!({
-                    "name": c.name,
-                    "function": format!("{:?}", c.function),
-                    "drive_strength": c.drive_strength,
-                    "area": c.area,
-                    "input_pins": c.input_pins,
-                    "output_pins": c.output_pins,
+            let cells: Vec<serde_json::Value> = lib
+                .cells
+                .iter()
+                .map(|c| {
+                    serde_json::json!({
+                        "name": c.name,
+                        "function": format!("{:?}", c.function),
+                        "drive_strength": c.drive_strength,
+                        "area": c.area,
+                        "input_pins": c.input_pins,
+                        "output_pins": c.output_pins,
+                    })
                 })
-            }).collect();
+                .collect();
             serde_json::json!({
                 "library_name": lib.name,
                 "tech_node": format!("{:?}", lib.tech_node),
                 "cell_count": lib.cells.len(),
                 "cells": cells,
-            }).to_string()
+            })
+            .to_string()
         }
         None => serde_json::json!({ "error": format!("Unknown tech node: {}", node) }).to_string(),
     }
@@ -363,7 +383,8 @@ pub fn pdk_compile_memory(words: u32, bits: u32, tech: &str) -> String {
                 "write_time_ns": result.write_time_ns,
                 "leakage_uw": result.leakage_uw,
                 "pins": result.pins,
-            }).to_string()
+            })
+            .to_string()
         }
         None => serde_json::json!({ "error": format!("Unknown tech node: {}", tech) }).to_string(),
     }
@@ -378,38 +399,46 @@ pub fn pnr_auto_floorplan(blocks_json: &str) -> String {
     let parsed: Result<Vec<serde_json::Value>, _> = serde_json::from_str(blocks_json);
     match parsed {
         Ok(arr) => {
-            let blocks: Vec<kami_pnr::FloorplanBlock> = arr.iter().map(|v| {
-                let w = v["width"].as_f64().unwrap_or(100.0);
-                let h = v["height"].as_f64().unwrap_or(100.0);
-                kami_pnr::FloorplanBlock {
-                    name: v["name"].as_str().unwrap_or("block").to_string(),
-                    block_type: kami_pnr::BlockType::StdCellRegion,
-                    x: 0.0,
-                    y: 0.0,
-                    width: w,
-                    height: h,
-                    fixed: false,
-                }
-            }).collect();
+            let blocks: Vec<kami_pnr::FloorplanBlock> = arr
+                .iter()
+                .map(|v| {
+                    let w = v["width"].as_f64().unwrap_or(100.0);
+                    let h = v["height"].as_f64().unwrap_or(100.0);
+                    kami_pnr::FloorplanBlock {
+                        name: v["name"].as_str().unwrap_or("block").to_string(),
+                        block_type: kami_pnr::BlockType::StdCellRegion,
+                        x: 0.0,
+                        y: 0.0,
+                        width: w,
+                        height: h,
+                        fixed: false,
+                    }
+                })
+                .collect();
             let total_area: f64 = blocks.iter().map(|b| b.width * b.height).sum();
             let die_side = (total_area * 1.5).sqrt();
             let fp = kami_pnr::floorplan::auto_floorplan(blocks, die_side, die_side);
-            let block_info: Vec<serde_json::Value> = fp.blocks.iter().map(|b| {
-                serde_json::json!({
-                    "name": b.name,
-                    "x": b.x,
-                    "y": b.y,
-                    "width": b.width,
-                    "height": b.height,
+            let block_info: Vec<serde_json::Value> = fp
+                .blocks
+                .iter()
+                .map(|b| {
+                    serde_json::json!({
+                        "name": b.name,
+                        "x": b.x,
+                        "y": b.y,
+                        "width": b.width,
+                        "height": b.height,
+                    })
                 })
-            }).collect();
+                .collect();
             serde_json::json!({
                 "die_width": fp.die_width,
                 "die_height": fp.die_height,
                 "utilization": fp.utilization(),
                 "block_count": fp.blocks.len(),
                 "blocks": block_info,
-            }).to_string()
+            })
+            .to_string()
         }
         Err(e) => serde_json::json!({ "error": e.to_string() }).to_string(),
     }
@@ -420,13 +449,11 @@ pub fn pnr_auto_floorplan(blocks_json: &str) -> String {
 pub fn pnr_export_gdsii() -> Vec<u8> {
     let structure = kami_pnr::GdsiiStructure {
         name: "KAMI_TEST".to_string(),
-        elements: vec![
-            kami_pnr::GdsiiElement::Boundary {
-                layer: 1,
-                datatype: 0,
-                xy: vec![(0, 0), (1000, 0), (1000, 1000), (0, 1000), (0, 0)],
-            },
-        ],
+        elements: vec![kami_pnr::GdsiiElement::Boundary {
+            layer: 1,
+            datatype: 0,
+            xy: vec![(0, 0), (1000, 0), (1000, 1000), (0, 1000), (0, 0)],
+        }],
     };
     kami_pnr::gdsii::export_gdsii(&[structure])
 }
@@ -459,14 +486,15 @@ pub fn dft_insert_scan(ff_count: u32, chain_count: u32) -> String {
             "scan_in": c.scan_in_port,
             "scan_out": c.scan_out_port,
         })).collect::<Vec<_>>(),
-    }).to_string()
+    })
+    .to_string()
 }
 
 /// Generate ATPG test patterns for `fault_count` stuck-at faults across `gate_count` gates.
 #[wasm_bindgen]
 pub fn dft_generate_atpg(fault_count: u32, gate_count: u32) -> String {
-    let faults: Vec<kami_dft::atpg::Fault> = (0..fault_count).map(|i| {
-        kami_dft::atpg::Fault {
+    let faults: Vec<kami_dft::atpg::Fault> = (0..fault_count)
+        .map(|i| kami_dft::atpg::Fault {
             net_name: format!("net_{}", i),
             fault_type: if i % 2 == 0 {
                 kami_dft::atpg::FaultType::StuckAt0
@@ -474,8 +502,8 @@ pub fn dft_generate_atpg(fault_count: u32, gate_count: u32) -> String {
                 kami_dft::atpg::FaultType::StuckAt1
             },
             detected: false,
-        }
-    }).collect();
+        })
+        .collect();
     let result = kami_dft::atpg::generate_patterns(faults, gate_count);
     serde_json::json!({
         "pattern_count": result.patterns.len(),
@@ -483,7 +511,8 @@ pub fn dft_generate_atpg(fault_count: u32, gate_count: u32) -> String {
         "detected_faults": result.detected_faults,
         "total_faults": result.total_faults,
         "aborted_faults": result.aborted_faults,
-    }).to_string()
+    })
+    .to_string()
 }
 
 // ── Verify: Formal Verification & Coverage ──
@@ -542,14 +571,14 @@ pub fn verify_check_equivalence(golden_json: &str, revised_json: &str) -> String
 /// Generate a coverage report given total coverage points and hit count.
 #[wasm_bindgen]
 pub fn verify_coverage_report(total: u32, hit: u32) -> String {
-    let points: Vec<kami_verify::coverage::CoveragePoint> = (0..total).map(|i| {
-        kami_verify::coverage::CoveragePoint {
+    let points: Vec<kami_verify::coverage::CoveragePoint> = (0..total)
+        .map(|i| kami_verify::coverage::CoveragePoint {
             name: format!("cp_{}", i),
             cov_type: kami_verify::coverage::CoverageType::Line,
             hit: i < hit,
             hit_count: if i < hit { 1 } else { 0 },
-        }
-    }).collect();
+        })
+        .collect();
     let report = kami_verify::coverage::CoverageReport {
         groups: vec![kami_verify::coverage::CoverageGroup {
             name: "default".to_string(),
@@ -562,7 +591,8 @@ pub fn verify_coverage_report(total: u32, hit: u32) -> String {
         "total_points": total,
         "hit_points": hit,
         "uncovered_count": report.uncovered_points().len(),
-    }).to_string()
+    })
+    .to_string()
 }
 
 // ── Power: Power Analysis ──
@@ -573,7 +603,11 @@ pub fn verify_coverage_report(total: u32, hit: u32) -> String {
 pub fn power_estimate_dynamic(cells: u32, toggle: f64, freq_mhz: f64, voltage: f64) -> String {
     let load_cap_pf = 0.01; // typical average load capacitance
     let dynamic_uw = kami_power::estimation::estimate_dynamic_power(
-        cells, toggle, freq_mhz, voltage, load_cap_pf,
+        cells,
+        toggle,
+        freq_mhz,
+        voltage,
+        load_cap_pf,
     );
     serde_json::json!({
         "dynamic_power_uw": dynamic_uw,
@@ -582,7 +616,8 @@ pub fn power_estimate_dynamic(cells: u32, toggle: f64, freq_mhz: f64, voltage: f
         "toggle_rate": toggle,
         "freq_mhz": freq_mhz,
         "voltage": voltage,
-    }).to_string()
+    })
+    .to_string()
 }
 
 /// Analyze IR drop on a uniform grid. Returns JSON with max/avg drop and hotspots.
@@ -606,7 +641,8 @@ pub fn power_analyze_ir_drop(rows: u32, cols: u32, supply_v: f64) -> String {
         "grid_rows": rows,
         "grid_cols": cols,
         "supply_v": supply_v,
-    }).to_string()
+    })
+    .to_string()
 }
 
 // ── SI: Signal Integrity ──
@@ -629,7 +665,8 @@ pub fn si_calculate_z0(width_mm: f64, height_mm: f64, er: f64) -> String {
         "width_mm": width_mm,
         "height_mm": height_mm,
         "er": er,
-    }).to_string()
+    })
+    .to_string()
 }
 
 /// Generate eye diagram data for a serial link at given data rate and amplitude.
@@ -652,7 +689,8 @@ pub fn si_eye_diagram(rate_gbps: f64, amplitude_mv: f64) -> String {
         "sample_count": data.samples.len(),
         "rate_gbps": rate_gbps,
         "amplitude_mv": amplitude_mv,
-    }).to_string()
+    })
+    .to_string()
 }
 
 // ── PKG: Packaging ──
@@ -662,11 +700,29 @@ pub fn si_eye_diagram(rate_gbps: f64, amplitude_mv: f64) -> String {
 #[wasm_bindgen]
 pub fn pkg_estimate(pkg_type: &str, die_w: f64, die_h: f64) -> String {
     let pt = match pkg_type.to_uppercase().as_str() {
-        "QFP" => kami_pkg::PackageType::QFP { pin_count: 144, pitch_mm: 0.5 },
-        "BGA" => kami_pkg::PackageType::BGA { rows: 20, cols: 20, pitch_mm: 0.8 },
-        "CSP" => kami_pkg::PackageType::CSP { rows: 10, cols: 10, pitch_mm: 0.5 },
-        "WLCSP" => kami_pkg::PackageType::WLCSP { bump_rows: 8, bump_cols: 8, bump_pitch_um: 400.0 },
-        _ => return serde_json::json!({ "error": format!("Unknown package type: {}", pkg_type) }).to_string(),
+        "QFP" => kami_pkg::PackageType::QFP {
+            pin_count: 144,
+            pitch_mm: 0.5,
+        },
+        "BGA" => kami_pkg::PackageType::BGA {
+            rows: 20,
+            cols: 20,
+            pitch_mm: 0.8,
+        },
+        "CSP" => kami_pkg::PackageType::CSP {
+            rows: 10,
+            cols: 10,
+            pitch_mm: 0.5,
+        },
+        "WLCSP" => kami_pkg::PackageType::WLCSP {
+            bump_rows: 8,
+            bump_cols: 8,
+            bump_pitch_um: 400.0,
+        },
+        _ => {
+            return serde_json::json!({ "error": format!("Unknown package type: {}", pkg_type) })
+                .to_string();
+        }
     };
     let pkg = kami_pkg::package::estimate_package(pt, (die_w, die_h));
     serde_json::json!({
@@ -696,7 +752,8 @@ pub fn pkg_thermal(power_w: f64, ambient_c: f64) -> String {
         "power_w": result.power_w,
         "ambient_c": result.ambient_c,
         "theta_ja": result.theta_ja,
-    }).to_string()
+    })
+    .to_string()
 }
 
 // ── Yield: Yield & Reliability ──
@@ -729,21 +786,25 @@ pub fn yield_monte_carlo(nominal: f64, sigma: f64, runs: u32) -> String {
         "max": output.max,
         "yield_pass": output.yield_pass,
         "num_runs": runs,
-    }).to_string()
+    })
+    .to_string()
 }
 
 /// Return the 5 standard PVT corners (TT/FF/SS/FS/SF) as JSON.
 #[wasm_bindgen]
 pub fn yield_standard_corners() -> String {
     let corners = kami_yield::corner::standard_corners();
-    let arr: Vec<serde_json::Value> = corners.iter().map(|c| {
-        serde_json::json!({
-            "name": c.name,
-            "process": format!("{:?}", c.process),
-            "voltage": c.voltage,
-            "temperature_c": c.temperature_c,
+    let arr: Vec<serde_json::Value> = corners
+        .iter()
+        .map(|c| {
+            serde_json::json!({
+                "name": c.name,
+                "process": format!("{:?}", c.process),
+                "voltage": c.voltage,
+                "temperature_c": c.temperature_c,
+            })
         })
-    }).collect();
+        .collect();
     serde_json::json!({ "corners": arr, "count": corners.len() }).to_string()
 }
 
@@ -756,7 +817,10 @@ pub fn ip_generate_noc(topology: &str, rows: u32, cols: u32) -> String {
         "mesh" => kami_ip::NocTopology::Mesh { rows, cols },
         "ring" => kami_ip::NocTopology::Ring { nodes: rows * cols },
         "crossbar" => kami_ip::NocTopology::Crossbar { ports: rows * cols },
-        _ => return serde_json::json!({ "error": format!("Unknown topology: {}", topology) }).to_string(),
+        _ => {
+            return serde_json::json!({ "error": format!("Unknown topology: {}", topology) })
+                .to_string();
+        }
     };
     let config = kami_ip::NocConfig {
         topology: topo,
@@ -771,7 +835,8 @@ pub fn ip_generate_noc(topology: &str, rows: u32, cols: u32) -> String {
         "total_area_um2": design.total_area_um2,
         "estimated_latency_cycles": design.estimated_latency_cycles,
         "topology": topology,
-    }).to_string()
+    })
+    .to_string()
 }
 
 /// Analyze clock domain crossings from a JSON signal list.
@@ -781,25 +846,30 @@ pub fn ip_analyze_cdc(signals_json: &str) -> String {
     let parsed: Result<Vec<serde_json::Value>, _> = serde_json::from_str(signals_json);
     match parsed {
         Ok(arr) => {
-            let signals: Vec<kami_ip::cdc::CdcSignal> = arr.iter().map(|v| {
-                kami_ip::cdc::CdcSignal {
+            let signals: Vec<kami_ip::cdc::CdcSignal> = arr
+                .iter()
+                .map(|v| kami_ip::cdc::CdcSignal {
                     name: v["name"].as_str().unwrap_or("sig").to_string(),
                     source_clock: v["source_clock"].as_str().unwrap_or("clk_a").to_string(),
                     dest_clock: v["dest_clock"].as_str().unwrap_or("clk_b").to_string(),
                     width: v["width"].as_u64().unwrap_or(1) as u32,
                     has_synchronizer: v["has_synchronizer"].as_bool().unwrap_or(false),
                     synchronizer: None,
-                }
-            }).collect();
+                })
+                .collect();
             // Collect unique clock domains from signals.
             let mut clock_set = std::collections::HashSet::new();
             for s in &signals {
                 clock_set.insert(s.source_clock.clone());
                 clock_set.insert(s.dest_clock.clone());
             }
-            let clocks: Vec<kami_ip::cdc::ClockDomain> = clock_set.into_iter().map(|name| {
-                kami_ip::cdc::ClockDomain { name, freq_mhz: 100.0 }
-            }).collect();
+            let clocks: Vec<kami_ip::cdc::ClockDomain> = clock_set
+                .into_iter()
+                .map(|name| kami_ip::cdc::ClockDomain {
+                    name,
+                    freq_mhz: 100.0,
+                })
+                .collect();
             let report = kami_ip::cdc::analyze_cdc(&signals, &clocks);
             serde_json::json!({
                 "crossing_count": report.crossings.len(),
@@ -808,7 +878,8 @@ pub fn ip_analyze_cdc(signals_json: &str) -> String {
                     "signal": v.signal,
                     "issue": format!("{:?}", v.issue),
                 })).collect::<Vec<_>>(),
-            }).to_string()
+            })
+            .to_string()
         }
         Err(e) => serde_json::json!({ "error": e.to_string() }).to_string(),
     }
@@ -866,31 +937,75 @@ pub fn flow_run_signoff(input_json: &str) -> String {
         let parsed: Result<FlowRunSignoffInput, _> = serde_json::from_str(input_json);
         match parsed {
             Ok(v) => {
-                if let Some(x) = v.rtl_source { input.rtl_source = x; }
-                if let Some(x) = v.top_module_hint { input.top_module_hint = Some(x); }
-                if let Some(x) = v.die_width_um { input.die_width_um = x; }
-                if let Some(x) = v.die_height_um { input.die_height_um = x; }
-                if let Some(x) = v.clock_freq_mhz { input.clock_freq_mhz = x; }
-                if let Some(x) = v.supply_v { input.supply_v = x; }
-                if let Some(x) = v.cell_count_estimate { input.cell_count_estimate = x; }
-                if let Some(x) = v.policy_version { input.policy_version = x; }
-                if let Some(x) = v.policy_profile { input.policy_profile = x; }
+                if let Some(x) = v.rtl_source {
+                    input.rtl_source = x;
+                }
+                if let Some(x) = v.top_module_hint {
+                    input.top_module_hint = Some(x);
+                }
+                if let Some(x) = v.die_width_um {
+                    input.die_width_um = x;
+                }
+                if let Some(x) = v.die_height_um {
+                    input.die_height_um = x;
+                }
+                if let Some(x) = v.clock_freq_mhz {
+                    input.clock_freq_mhz = x;
+                }
+                if let Some(x) = v.supply_v {
+                    input.supply_v = x;
+                }
+                if let Some(x) = v.cell_count_estimate {
+                    input.cell_count_estimate = x;
+                }
+                if let Some(x) = v.policy_version {
+                    input.policy_version = x;
+                }
+                if let Some(x) = v.policy_profile {
+                    input.policy_profile = x;
+                }
                 if let Some(t) = v.thresholds {
-                    if let Some(x) = t.max_ir_drop_mv { input.thresholds.max_ir_drop_mv = x; }
-                    if let Some(x) = t.min_dft_atpg_coverage { input.thresholds.min_dft_atpg_coverage = x; }
-                    if let Some(x) = t.si_z0_min_ohm { input.thresholds.si_z0_min_ohm = x; }
-                    if let Some(x) = t.si_z0_max_ohm { input.thresholds.si_z0_max_ohm = x; }
-                    if let Some(x) = t.min_yield_pass_ratio { input.thresholds.min_yield_pass_ratio = x; }
-                    if let Some(x) = t.min_setup_slack_ps { input.thresholds.min_setup_slack_ps = x; }
-                    if let Some(x) = t.min_hold_slack_ps { input.thresholds.min_hold_slack_ps = x; }
-                    if let Some(x) = t.max_drc_violations { input.thresholds.max_drc_violations = x; }
-                    if let Some(x) = t.max_lvs_mismatches { input.thresholds.max_lvs_mismatches = x; }
+                    if let Some(x) = t.max_ir_drop_mv {
+                        input.thresholds.max_ir_drop_mv = x;
+                    }
+                    if let Some(x) = t.min_dft_atpg_coverage {
+                        input.thresholds.min_dft_atpg_coverage = x;
+                    }
+                    if let Some(x) = t.si_z0_min_ohm {
+                        input.thresholds.si_z0_min_ohm = x;
+                    }
+                    if let Some(x) = t.si_z0_max_ohm {
+                        input.thresholds.si_z0_max_ohm = x;
+                    }
+                    if let Some(x) = t.min_yield_pass_ratio {
+                        input.thresholds.min_yield_pass_ratio = x;
+                    }
+                    if let Some(x) = t.min_setup_slack_ps {
+                        input.thresholds.min_setup_slack_ps = x;
+                    }
+                    if let Some(x) = t.min_hold_slack_ps {
+                        input.thresholds.min_hold_slack_ps = x;
+                    }
+                    if let Some(x) = t.max_drc_violations {
+                        input.thresholds.max_drc_violations = x;
+                    }
+                    if let Some(x) = t.max_lvs_mismatches {
+                        input.thresholds.max_lvs_mismatches = x;
+                    }
                 }
                 if let Some(c) = v.drc_lvs {
-                    if let Some(x) = c.run_drc { input.drc_lvs.run_drc = x; }
-                    if let Some(x) = c.run_lvs { input.drc_lvs.run_lvs = x; }
-                    if let Some(x) = c.drc_rule_deck { input.drc_lvs.drc_rule_deck = x; }
-                    if let Some(x) = c.lvs_rule_deck { input.drc_lvs.lvs_rule_deck = x; }
+                    if let Some(x) = c.run_drc {
+                        input.drc_lvs.run_drc = x;
+                    }
+                    if let Some(x) = c.run_lvs {
+                        input.drc_lvs.run_lvs = x;
+                    }
+                    if let Some(x) = c.drc_rule_deck {
+                        input.drc_lvs.drc_rule_deck = x;
+                    }
+                    if let Some(x) = c.lvs_rule_deck {
+                        input.drc_lvs.lvs_rule_deck = x;
+                    }
                 }
             }
             Err(e) => return serde_json::json!({ "error": e.to_string() }).to_string(),

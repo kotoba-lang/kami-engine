@@ -4,7 +4,7 @@
 
 use kami_vehicle::{MapGround, SurfaceKind};
 use kami_vehicle_scene::{
-    map_from_edn, shipped_demo_circuit, SurfaceParams, SurfaceTable, ALL_SURFACE_KINDS, GROUND_EDN,
+    ALL_SURFACE_KINDS, GROUND_EDN, SurfaceParams, SurfaceTable, map_from_edn, shipped_demo_circuit,
 };
 
 /// For every `SurfaceKind`, the EDN-loaded params must equal the hardcoded
@@ -86,11 +86,11 @@ fn demo_circuit_edn_matches_builtin() {
     // Behavioural spot-check: surface_at() agrees at several probe points
     // (the actual point of the data — same physics regions).
     for &(x, z) in &[
-        (0.0, 0.0),    // main asphalt
-        (0.0, 35.0),   // ice patch
-        (20.0, 0.0),   // sand
-        (-20.0, 0.0),  // mud
-        (0.0, 200.0),  // off-map → default grass
+        (0.0, 0.0),   // main asphalt
+        (0.0, 35.0),  // ice patch
+        (20.0, 0.0),  // sand
+        (-20.0, 0.0), // mud
+        (0.0, 200.0), // off-map → default grass
     ] {
         assert_eq!(
             edn.surface_at(x, z),

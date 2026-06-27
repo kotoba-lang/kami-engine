@@ -11,12 +11,12 @@ pub struct PoseSpec {
     pub root_xform: Transform,
     pub bones: Vec<BoneRotation>,
     pub ik_targets: Vec<IkTarget>,
-    pub label: Option<String>,   // semantic preset name (e.g. "action.dash")
+    pub label: Option<String>, // semantic preset name (e.g. "action.dash")
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BoneRotation {
-    pub bone: String,            // VRM humanoid bone name (hips, spine, leftUpperArm, ...)
+    pub bone: String, // VRM humanoid bone name (hips, spine, leftUpperArm, ...)
     pub rotation: Quat,
 }
 
@@ -24,7 +24,7 @@ pub struct BoneRotation {
 pub struct IkTarget {
     pub end_bone: String,
     pub target: Vec3,
-    pub weight: f32,             // 0.0..1.0 blend
+    pub weight: f32, // 0.0..1.0 blend
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]

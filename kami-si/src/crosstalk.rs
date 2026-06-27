@@ -1,7 +1,6 @@
-/// Crosstalk analysis between adjacent transmission lines.
-
-use serde::{Deserialize, Serialize};
 use crate::transmission_line::TLineParams;
+/// Crosstalk analysis between adjacent transmission lines.
+use serde::{Deserialize, Serialize};
 
 /// Type of electromagnetic coupling.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -92,19 +91,43 @@ mod tests {
 
     #[test]
     fn crosstalk_coupling_decreases_with_spacing() {
-        let victim = TLineParams { z0_ohm: 50.0, delay_ps_per_mm: 7.0, loss_db_per_mm: 0.001, length_mm: 20.0 };
-        let aggressor = TLineParams { z0_ohm: 50.0, delay_ps_per_mm: 7.0, loss_db_per_mm: 0.001, length_mm: 20.0 };
+        let victim = TLineParams {
+            z0_ohm: 50.0,
+            delay_ps_per_mm: 7.0,
+            loss_db_per_mm: 0.001,
+            length_mm: 20.0,
+        };
+        let aggressor = TLineParams {
+            z0_ohm: 50.0,
+            delay_ps_per_mm: 7.0,
+            loss_db_per_mm: 0.001,
+            length_mm: 20.0,
+        };
 
         let close = analyze_crosstalk(&victim, &aggressor, 10.0, 0.15, 50.0);
         let far = analyze_crosstalk(&victim, &aggressor, 10.0, 0.50, 50.0);
-        assert!(close.peak_mv > far.peak_mv,
-            "Closer spacing should have more crosstalk: close={} > far={}", close.peak_mv, far.peak_mv);
+        assert!(
+            close.peak_mv > far.peak_mv,
+            "Closer spacing should have more crosstalk: close={} > far={}",
+            close.peak_mv,
+            far.peak_mv
+        );
     }
 
     #[test]
     fn crosstalk_has_positive_peak() {
-        let victim = TLineParams { z0_ohm: 50.0, delay_ps_per_mm: 7.0, loss_db_per_mm: 0.001, length_mm: 20.0 };
-        let aggressor = TLineParams { z0_ohm: 50.0, delay_ps_per_mm: 7.0, loss_db_per_mm: 0.001, length_mm: 20.0 };
+        let victim = TLineParams {
+            z0_ohm: 50.0,
+            delay_ps_per_mm: 7.0,
+            loss_db_per_mm: 0.001,
+            length_mm: 20.0,
+        };
+        let aggressor = TLineParams {
+            z0_ohm: 50.0,
+            delay_ps_per_mm: 7.0,
+            loss_db_per_mm: 0.001,
+            length_mm: 20.0,
+        };
         let result = analyze_crosstalk(&victim, &aggressor, 10.0, 0.2, 50.0);
         assert!(result.peak_mv > 0.0);
     }

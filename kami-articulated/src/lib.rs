@@ -16,6 +16,4 @@ pub const SUPPORTED_FORMATS: &[&str] = &["urdf"];
 
 mod urdf;
 
-pub use urdf::{
-    ArticulatedSystem, Inertia, Joint, JointKind, Link, ParseError, Pose, parse_urdf,
-};
+pub use urdf::{ArticulatedSystem, Inertia, Joint, JointKind, Link, ParseError, Pose, parse_urdf};

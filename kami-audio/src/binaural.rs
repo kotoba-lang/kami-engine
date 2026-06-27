@@ -31,7 +31,10 @@ pub struct Hrtf {
 
 impl Default for Hrtf {
     fn default() -> Self {
-        Self { head_radius: DEFAULT_HEAD_RADIUS, max_ild_db: 12.0 }
+        Self {
+            head_radius: DEFAULT_HEAD_RADIUS,
+            max_ild_db: 12.0,
+        }
     }
 }
 
@@ -54,7 +57,12 @@ pub enum RolloffKind {
 
 impl Default for Rolloff {
     fn default() -> Self {
-        Self { kind: RolloffKind::Inverse, reference: 1.0, max: 100.0, factor: 1.0 }
+        Self {
+            kind: RolloffKind::Inverse,
+            reference: 1.0,
+            max: 100.0,
+            factor: 1.0,
+        }
     }
 }
 
@@ -64,11 +72,12 @@ impl Rolloff {
         let d = dist.clamp(self.reference, self.max);
         match self.kind {
             RolloffKind::None => 1.0,
-            RolloffKind::Inverse => self.reference / (self.reference + self.factor * (d - self.reference)),
-            RolloffKind::Linear => {
-                (1.0 - self.factor * (d - self.reference) / (self.max - self.reference).max(1e-6))
-                    .clamp(0.0, 1.0)
+            RolloffKind::Inverse => {
+                self.reference / (self.reference + self.factor * (d - self.reference))
             }
+            RolloffKind::Linear => (1.0
+                - self.factor * (d - self.reference) / (self.max - self.reference).max(1e-6))
+            .clamp(0.0, 1.0),
             RolloffKind::Exponential => (d / self.reference).powf(-self.factor),
         }
     }
@@ -116,7 +125,11 @@ pub fn spatialize(
 
     let rel = source_pos - listener.position;
     let distance = rel.length();
-    let dir = if distance > 1e-6 { rel / distance } else { Vec3::ZERO };
+    let dir = if distance > 1e-6 {
+        rel / distance
+    } else {
+        Vec3::ZERO
+    };
 
     let lateral = dir.dot(right).clamp(-1.0, 1.0); // +right
     let front = dir.dot(forward);
@@ -199,7 +212,10 @@ mod tests {
             Vec3::new(5.0, 0.0, 0.0),
             1.0,
         );
-        assert!(p.itd_s > 0.0, "right source → right ear leads (positive ITD)");
+        assert!(
+            p.itd_s > 0.0,
+            "right source → right ear leads (positive ITD)"
+        );
         assert!(p.delay_l_s > 0.0 && p.delay_r_s == 0.0, "left ear delayed");
         assert!(p.ild_db > 0.0 && p.gain_r > p.gain_l, "right louder");
         assert!((p.azimuth - std::f32::consts::FRAC_PI_2).abs() < 1e-4);
@@ -208,8 +224,20 @@ mod tests {
     #[test]
     fn left_mirrors_right() {
         let l = default_listener();
-        let r = spatialize(&l, &Hrtf::default(), &Rolloff::default(), Vec3::new(5.0, 0.0, 0.0), 1.0);
-        let lft = spatialize(&l, &Hrtf::default(), &Rolloff::default(), Vec3::new(-5.0, 0.0, 0.0), 1.0);
+        let r = spatialize(
+            &l,
+            &Hrtf::default(),
+            &Rolloff::default(),
+            Vec3::new(5.0, 0.0, 0.0),
+            1.0,
+        );
+        let lft = spatialize(
+            &l,
+            &Hrtf::default(),
+            &Rolloff::default(),
+            Vec3::new(-5.0, 0.0, 0.0),
+            1.0,
+        );
         assert!((lft.itd_s + r.itd_s).abs() < 1e-6);
         assert!((lft.gain_l - r.gain_r).abs() < 1e-6);
         assert!((lft.gain_r - r.gain_l).abs() < 1e-6);
@@ -268,7 +296,14 @@ mod tests {
         assert!(dl > 0 && dr == 0);
 
         let impulse = [1.0f32];
-        let out = mix_stereo(&[Voice { params: p, mono: &impulse }], 48_000, 64);
+        let out = mix_stereo(
+            &[Voice {
+                params: p,
+                mono: &impulse,
+            }],
+            48_000,
+            64,
+        );
 
         // Right channel: impulse at frame 0 scaled by gain_r.
         assert!((out[1] - p.gain_r).abs() < 1e-6);
@@ -280,12 +315,26 @@ mod tests {
 
     #[test]
     fn mix_sums_multiple_voices() {
-        let p = spatialize(&default_listener(), &Hrtf::default(), &Rolloff::default(),
-                           Vec3::new(0.0, 0.0, -5.0), 1.0); // dead ahead, centered, no delay
+        let p = spatialize(
+            &default_listener(),
+            &Hrtf::default(),
+            &Rolloff::default(),
+            Vec3::new(0.0, 0.0, -5.0),
+            1.0,
+        ); // dead ahead, centered, no delay
         let a = [0.5f32];
         let b = [0.25f32];
         let out = mix_stereo(
-            &[Voice { params: p, mono: &a }, Voice { params: p, mono: &b }],
+            &[
+                Voice {
+                    params: p,
+                    mono: &a,
+                },
+                Voice {
+                    params: p,
+                    mono: &b,
+                },
+            ],
             48_000,
             8,
         );
@@ -295,11 +344,27 @@ mod tests {
 
     #[test]
     fn rolloff_is_unit_at_reference_and_decreasing() {
-        for kind in [RolloffKind::Inverse, RolloffKind::Linear, RolloffKind::Exponential] {
-            let r = Rolloff { kind, ..Default::default() };
+        for kind in [
+            RolloffKind::Inverse,
+            RolloffKind::Linear,
+            RolloffKind::Exponential,
+        ] {
+            let r = Rolloff {
+                kind,
+                ..Default::default()
+            };
             assert!((r.gain(1.0) - 1.0).abs() < 1e-6);
             assert!(r.gain(1.0) > r.gain(10.0));
         }
-        assert!((Rolloff { kind: RolloffKind::None, ..Default::default() }.gain(99.0) - 1.0).abs() < 1e-6);
+        assert!(
+            (Rolloff {
+                kind: RolloffKind::None,
+                ..Default::default()
+            }
+            .gain(99.0)
+                - 1.0)
+                .abs()
+                < 1e-6
+        );
     }
 }

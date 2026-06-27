@@ -15,10 +15,10 @@ use kami_app::pipeline::RenderPipeline;
 use kami_app::{Camera, CameraMode, InputMode, KamiApp};
 use kami_render::RenderContext;
 use kami_vehicle::{
-    ground::{FlatGround, MapGround, SurfaceKind},
-    models::garage::{build, VehicleKind},
-    triangle::TriangleGroup,
     IntegratorMode, Vehicle,
+    ground::{FlatGround, MapGround, SurfaceKind},
+    models::garage::{VehicleKind, build},
+    triangle::TriangleGroup,
 };
 #[cfg(target_family = "wasm")]
 use log::Level;
@@ -98,7 +98,12 @@ struct CarSimPipeline {
 }
 
 impl CarSimPipeline {
-    fn new(ctx: &RenderContext, vehicle: Rc<RefCell<Vehicle>>, paint: [f32; 3], map: MapGround) -> Self {
+    fn new(
+        ctx: &RenderContext,
+        vehicle: Rc<RefCell<Vehicle>>,
+        paint: [f32; 3],
+        map: MapGround,
+    ) -> Self {
         let device = &ctx.device;
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("car-sim/shader"),
@@ -155,7 +160,10 @@ impl CarSimPipeline {
             label: Some("car-sim/bg"),
             layout: &bgl,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: uniform_buf.as_entire_binding() },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: uniform_buf.as_entire_binding(),
+                },
                 wgpu::BindGroupEntry {
                     binding: 1,
                     resource: wgpu::BindingResource::TextureView(&sky.view),
@@ -191,8 +199,16 @@ impl CarSimPipeline {
                     array_stride: std::mem::size_of::<LineVertex>() as u64,
                     step_mode: wgpu::VertexStepMode::Vertex,
                     attributes: &[
-                        wgpu::VertexAttribute { offset: 0,  shader_location: 0, format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { offset: 12, shader_location: 1, format: wgpu::VertexFormat::Float32x3 },
+                        wgpu::VertexAttribute {
+                            offset: 0,
+                            shader_location: 0,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            offset: 12,
+                            shader_location: 1,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
                     ],
                 }],
             },
@@ -228,9 +244,21 @@ impl CarSimPipeline {
                     array_stride: std::mem::size_of::<TriVertex>() as u64,
                     step_mode: wgpu::VertexStepMode::Vertex,
                     attributes: &[
-                        wgpu::VertexAttribute { offset: 0,  shader_location: 0, format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { offset: 12, shader_location: 1, format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { offset: 24, shader_location: 2, format: wgpu::VertexFormat::Float32x4 },
+                        wgpu::VertexAttribute {
+                            offset: 0,
+                            shader_location: 0,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            offset: 12,
+                            shader_location: 1,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            offset: 24,
+                            shader_location: 2,
+                            format: wgpu::VertexFormat::Float32x4,
+                        },
                     ],
                 }],
             },
@@ -267,9 +295,21 @@ impl CarSimPipeline {
                     array_stride: std::mem::size_of::<GroundVertex>() as u64,
                     step_mode: wgpu::VertexStepMode::Vertex,
                     attributes: &[
-                        wgpu::VertexAttribute { offset: 0,  shader_location: 0, format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { offset: 12, shader_location: 1, format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { offset: 24, shader_location: 2, format: wgpu::VertexFormat::Float32 },
+                        wgpu::VertexAttribute {
+                            offset: 0,
+                            shader_location: 0,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            offset: 12,
+                            shader_location: 1,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            offset: 24,
+                            shader_location: 2,
+                            format: wgpu::VertexFormat::Float32,
+                        },
                     ],
                 }],
             },
@@ -351,8 +391,12 @@ impl CarSimPipeline {
         let bg_col = bg.tint();
         let bg_size = 200.0;
         for &(x, z) in &[
-            (-bg_size, -bg_size), (bg_size, -bg_size), (bg_size, bg_size),
-            (-bg_size, -bg_size), (bg_size, bg_size), (-bg_size, bg_size),
+            (-bg_size, -bg_size),
+            (bg_size, -bg_size),
+            (bg_size, bg_size),
+            (-bg_size, -bg_size),
+            (bg_size, bg_size),
+            (-bg_size, bg_size),
         ] {
             verts.push(GroundVertex {
                 pos: [x, 0.0, z],
@@ -367,10 +411,7 @@ impl CarSimPipeline {
             // Slightly above the background so it draws on top.
             let y = 0.001;
             let (x0, x1, z0, z1) = (zone.x_min, zone.x_max, zone.z_min, zone.z_max);
-            for &(x, z) in &[
-                (x0, z0), (x1, z0), (x1, z1),
-                (x0, z0), (x1, z1), (x0, z1),
-            ] {
+            for &(x, z) in &[(x0, z0), (x1, z0), (x1, z1), (x0, z0), (x1, z1), (x0, z1)] {
                 verts.push(GroundVertex {
                     pos: [x, y, z],
                     col,
@@ -379,7 +420,8 @@ impl CarSimPipeline {
             }
         }
         self.ground_count = (verts.len() / 3) as u32;
-        ctx.queue.write_buffer(&self.ground_buf, 0, bytemuck::cast_slice(&verts));
+        ctx.queue
+            .write_buffer(&self.ground_buf, 0, bytemuck::cast_slice(&verts));
     }
 
     fn rebuild_geometry(&mut self, ctx: &RenderContext) {
@@ -390,20 +432,34 @@ impl CarSimPipeline {
         let grid_col = [0.16, 0.20, 0.26];
         for i in -25..=25 {
             let f = i as f32 * 2.0;
-            lines.push(LineVertex { pos: [-50.0, 0.0, f], col: grid_col });
-            lines.push(LineVertex { pos: [ 50.0, 0.0, f], col: grid_col });
-            lines.push(LineVertex { pos: [f, 0.0, -50.0], col: grid_col });
-            lines.push(LineVertex { pos: [f, 0.0,  50.0], col: grid_col });
+            lines.push(LineVertex {
+                pos: [-50.0, 0.0, f],
+                col: grid_col,
+            });
+            lines.push(LineVertex {
+                pos: [50.0, 0.0, f],
+                col: grid_col,
+            });
+            lines.push(LineVertex {
+                pos: [f, 0.0, -50.0],
+                col: grid_col,
+            });
+            lines.push(LineVertex {
+                pos: [f, 0.0, 50.0],
+                col: grid_col,
+            });
         }
         for b in v.beams.iter() {
             if b.broken {
                 continue;
             }
             let n1 = match v.nodes.iter().find(|n| n.id == b.n1) {
-                Some(n) => n, None => continue,
+                Some(n) => n,
+                None => continue,
             };
             let n2 = match v.nodes.iter().find(|n| n.id == b.n2) {
-                Some(n) => n, None => continue,
+                Some(n) => n,
+                None => continue,
             };
             // Colour beams by node group: tire ring = bright rubber-grey,
             // hub spokes = silver, structural = stress-tinted.
@@ -420,17 +476,28 @@ impl CarSimPipeline {
                     let l0 = b.effective_length.max(1e-3);
                     let strain = (l / l0 - 1.0).abs();
                     let stress = (strain / b.deform.break_limit.max(1e-3)).clamp(0.0, 1.0);
-                    [0.30 + stress * 0.7, 0.40 - stress * 0.3, 0.30 - stress * 0.3]
+                    [
+                        0.30 + stress * 0.7,
+                        0.40 - stress * 0.3,
+                        0.30 - stress * 0.3,
+                    ]
                 }
             };
-            lines.push(LineVertex { pos: n1.position.into(), col });
-            lines.push(LineVertex { pos: n2.position.into(), col });
+            lines.push(LineVertex {
+                pos: n1.position.into(),
+                col,
+            });
+            lines.push(LineVertex {
+                pos: n2.position.into(),
+                col,
+            });
             if lines.len() >= MAX_LINES * 2 - 2 {
                 break;
             }
         }
         self.line_count = (lines.len() / 2) as u32;
-        ctx.queue.write_buffer(&self.line_buf, 0, bytemuck::cast_slice(&lines));
+        ctx.queue
+            .write_buffer(&self.line_buf, 0, bytemuck::cast_slice(&lines));
 
         // ── Triangles: filled body panels with per-group colouring ──
         let mut tris: Vec<TriVertex> = Vec::with_capacity(v.triangles.len() * 3);
@@ -439,13 +506,16 @@ impl CarSimPipeline {
                 break;
             }
             let p1 = match v.nodes.iter().find(|n| n.id == t.n1) {
-                Some(n) => n.position, None => continue,
+                Some(n) => n.position,
+                None => continue,
             };
             let p2 = match v.nodes.iter().find(|n| n.id == t.n2) {
-                Some(n) => n.position, None => continue,
+                Some(n) => n.position,
+                None => continue,
             };
             let p3 = match v.nodes.iter().find(|n| n.id == t.n3) {
-                Some(n) => n.position, None => continue,
+                Some(n) => n.position,
+                None => continue,
             };
             let normal = (p2 - p1).cross(p3 - p1).normalize_or_zero();
             let (rgb, alpha) = match t.group {
@@ -473,10 +543,12 @@ impl CarSimPipeline {
                 break;
             }
             let n_axle1 = match v.nodes.iter().find(|n| n.id == w.axle_n1) {
-                Some(n) => n, None => continue,
+                Some(n) => n,
+                None => continue,
             };
             let n_axle2 = match v.nodes.iter().find(|n| n.id == w.axle_n2) {
-                Some(n) => n, None => continue,
+                Some(n) => n,
+                None => continue,
             };
             // Tire side colour — dark rubber.
             let tire_rgb = [0.16, 0.16, 0.18];
@@ -485,13 +557,21 @@ impl CarSimPipeline {
             let count = w.tire_nodes.len();
             for i in 0..count {
                 let a = match v.nodes.iter().find(|n| n.id == w.tire_nodes[i]) {
-                    Some(n) => n.position, None => continue,
+                    Some(n) => n.position,
+                    None => continue,
                 };
-                let b = match v.nodes.iter().find(|n| n.id == w.tire_nodes[(i + 1) % count]) {
-                    Some(n) => n.position, None => continue,
+                let b = match v
+                    .nodes
+                    .iter()
+                    .find(|n| n.id == w.tire_nodes[(i + 1) % count])
+                {
+                    Some(n) => n.position,
+                    None => continue,
                 };
                 // Inner sidewall (around axle_n1).
-                let normal = (a - n_axle1.position).cross(b - n_axle1.position).normalize_or_zero();
+                let normal = (a - n_axle1.position)
+                    .cross(b - n_axle1.position)
+                    .normalize_or_zero();
                 for &p in &[n_axle1.position, a, b] {
                     tris.push(TriVertex {
                         pos: p.into(),
@@ -500,7 +580,9 @@ impl CarSimPipeline {
                     });
                 }
                 // Outer sidewall (around axle_n2).
-                let normal = (b - n_axle2.position).cross(a - n_axle2.position).normalize_or_zero();
+                let normal = (b - n_axle2.position)
+                    .cross(a - n_axle2.position)
+                    .normalize_or_zero();
                 for &p in &[n_axle2.position, b, a] {
                     tris.push(TriVertex {
                         pos: p.into(),
@@ -537,7 +619,8 @@ impl CarSimPipeline {
         }
 
         self.tri_count = (tris.len() / 3) as u32;
-        ctx.queue.write_buffer(&self.tri_buf, 0, bytemuck::cast_slice(&tris));
+        ctx.queue
+            .write_buffer(&self.tri_buf, 0, bytemuck::cast_slice(&tris));
     }
 
     fn upload_uniforms(&self, ctx: &RenderContext, camera: &Camera, time_s: f32) {
@@ -557,17 +640,13 @@ impl CarSimPipeline {
             light_dir: [light_dir.x, light_dir.y, light_dir.z, 0.0],
             params: [time_s, flake_density, flake_scale, clearcoat],
         };
-        ctx.queue.write_buffer(&self.uniform_buf, 0, bytemuck::bytes_of(&u));
+        ctx.queue
+            .write_buffer(&self.uniform_buf, 0, bytemuck::bytes_of(&u));
     }
 }
 
 impl RenderPipeline for CarSimPipeline {
-    fn prepare(
-        &mut self,
-        ctx: &RenderContext,
-        camera: &Camera,
-        _world: &hecs::World,
-    ) {
+    fn prepare(&mut self, ctx: &RenderContext, camera: &Camera, _world: &hecs::World) {
         // Cheap per-frame check — `bake_sky_data` is a no-op when neither
         // time-of-day nor weather changed. JS clients can drive these via
         // `window.__carsim_time_of_day` (0..1) and `window.__carsim_weather`
@@ -596,7 +675,10 @@ impl RenderPipeline for CarSimPipeline {
                 resolve_target: None,
                 ops: wgpu::Operations {
                     load: wgpu::LoadOp::Clear(wgpu::Color {
-                        r: 0.04, g: 0.05, b: 0.08, a: 1.0,
+                        r: 0.04,
+                        g: 0.05,
+                        b: 0.08,
+                        a: 1.0,
                     }),
                     store: wgpu::StoreOp::Store,
                 },
@@ -728,7 +810,10 @@ fn bake_sky_data(ctx: &RenderContext, state: &mut SkyState, time: f32, overcast:
     state.last_time = time;
     state.last_overcast = overcast;
 
-    let cycle = kami_atmosphere::DayNightCycle { time, period: 600.0 };
+    let cycle = kami_atmosphere::DayNightCycle {
+        time,
+        period: 600.0,
+    };
     let sun_dir = cycle.sun_direction();
     let sun_col = cycle.sun_color();
 
@@ -774,7 +859,11 @@ fn bake_sky_data(ctx: &RenderContext, state: &mut SkyState, time: f32, overcast:
             wgpu::TexelCopyTextureInfo {
                 texture: &state.texture,
                 mip_level: 0,
-                origin: wgpu::Origin3d { x: 0, y: 0, z: face },
+                origin: wgpu::Origin3d {
+                    x: 0,
+                    y: 0,
+                    z: face,
+                },
                 aspect: wgpu::TextureAspect::All,
             },
             &buf,
@@ -838,7 +927,11 @@ mod f16_tests {
         }
         if exp == 0x1f {
             return if mant == 0 {
-                if sign == 1 { f32::NEG_INFINITY } else { f32::INFINITY }
+                if sign == 1 {
+                    f32::NEG_INFINITY
+                } else {
+                    f32::INFINITY
+                }
             } else {
                 f32::NAN
             };
@@ -867,7 +960,8 @@ mod f16_tests {
 #[cfg(target_family = "wasm")]
 fn js_get_f32(name: &str) -> f32 {
     let win = match web_sys::window() {
-        Some(w) => w, None => return 0.0,
+        Some(w) => w,
+        None => return 0.0,
     };
     js_sys::Reflect::get(&win, &JsValue::from_str(name))
         .unwrap_or(JsValue::from_f64(0.0))
@@ -878,10 +972,10 @@ fn js_get_f32(name: &str) -> f32 {
 #[cfg(target_family = "wasm")]
 fn js_get_f32_or(name: &str, default: f32) -> f32 {
     let win = match web_sys::window() {
-        Some(w) => w, None => return default,
+        Some(w) => w,
+        None => return default,
     };
-    let v = js_sys::Reflect::get(&win, &JsValue::from_str(name))
-        .unwrap_or(JsValue::UNDEFINED);
+    let v = js_sys::Reflect::get(&win, &JsValue::from_str(name)).unwrap_or(JsValue::UNDEFINED);
     if v.is_undefined() || v.is_null() {
         return default;
     }
@@ -895,7 +989,9 @@ fn js_get_f32_or(_name: &str, default: f32) -> f32 {
 
 #[cfg(target_family = "wasm")]
 fn js_weather_is_overcast() -> bool {
-    js_get_str("__carsim_weather").trim().eq_ignore_ascii_case("overcast")
+    js_get_str("__carsim_weather")
+        .trim()
+        .eq_ignore_ascii_case("overcast")
 }
 
 #[cfg(not(target_family = "wasm"))]
@@ -919,7 +1015,8 @@ fn now_seconds() -> f32 {
 #[cfg(target_family = "wasm")]
 fn js_get_str(name: &str) -> String {
     let win = match web_sys::window() {
-        Some(w) => w, None => return String::new(),
+        Some(w) => w,
+        None => return String::new(),
     };
     js_sys::Reflect::get(&win, &JsValue::from_str(name))
         .ok()
@@ -930,7 +1027,8 @@ fn js_get_str(name: &str) -> String {
 #[cfg(target_family = "wasm")]
 fn js_set_str(name: &str, value: &str) {
     let win = match web_sys::window() {
-        Some(w) => w, None => return,
+        Some(w) => w,
+        None => return,
     };
     let _ = js_sys::Reflect::set(&win, &JsValue::from_str(name), &JsValue::from_str(value));
 }
@@ -938,7 +1036,8 @@ fn js_set_str(name: &str, value: &str) {
 #[cfg(target_family = "wasm")]
 fn js_set_obj(name: &str, props: &[(&str, f64)]) {
     let win = match web_sys::window() {
-        Some(w) => w, None => return,
+        Some(w) => w,
+        None => return,
     };
     let obj = js_sys::Object::new();
     for (k, v) in props {
@@ -983,7 +1082,10 @@ pub async fn run_car_sim(canvas_id: &str) -> Result<(), JsValue> {
     // build_vehicle(kind)). Fall back to the compiled-in builder only if the
     // shipped EDN ever fails to parse / resolve.
     let mut car = kami_vehicle_scene::build_from_edn(kind.id()).unwrap_or_else(|e| {
-        log::warn!("[car-sim] garage.edn build failed ({e}); using builtin build({})", kind.id());
+        log::warn!(
+            "[car-sim] garage.edn build failed ({e}); using builtin build({})",
+            kind.id()
+        );
         build(kind)
     });
     // Force XPBD — Implicit mode is still being stabilised (its
@@ -1021,77 +1123,79 @@ pub async fn run_car_sim(canvas_id: &str) -> Result<(), JsValue> {
     let pipeline = CarSimPipeline::new(app.render_context(), vehicle.clone(), paint, map.clone());
 
     let vh = vehicle.clone();
-    let app = app.with_pipeline(pipeline).on_update(move |_world, cam, dt| {
-        let mut v = vh.borrow_mut();
-        v.controls.throttle = js_get_f32("__carsim_throttle").clamp(0.0, 1.0);
-        v.controls.brake = js_get_f32("__carsim_brake").clamp(0.0, 1.0);
-        v.controls.handbrake = js_get_f32("__carsim_handbrake").clamp(0.0, 1.0);
-        v.controls.steer = js_get_f32("__carsim_steer").clamp(-1.0, 1.0);
-        let req = js_get_f32("__carsim_gear");
-        if req != 0.0 {
-            let g = req as i32;
-            if g != v.powertrain.gearbox.current_gear {
-                v.powertrain.gearbox.current_gear = g;
-                v.powertrain.gearbox.shift_progress = 1.0;
+    let app = app
+        .with_pipeline(pipeline)
+        .on_update(move |_world, cam, dt| {
+            let mut v = vh.borrow_mut();
+            v.controls.throttle = js_get_f32("__carsim_throttle").clamp(0.0, 1.0);
+            v.controls.brake = js_get_f32("__carsim_brake").clamp(0.0, 1.0);
+            v.controls.handbrake = js_get_f32("__carsim_handbrake").clamp(0.0, 1.0);
+            v.controls.steer = js_get_f32("__carsim_steer").clamp(-1.0, 1.0);
+            let req = js_get_f32("__carsim_gear");
+            if req != 0.0 {
+                let g = req as i32;
+                if g != v.powertrain.gearbox.current_gear {
+                    v.powertrain.gearbox.current_gear = g;
+                    v.powertrain.gearbox.shift_progress = 1.0;
+                }
             }
-        }
 
-        // Multi-surface map provides per-position grip / friction. The
-        // car automatically experiences different surfaces as it drives
-        // over them.
-        let ground = map.clone();
+            // Multi-surface map provides per-position grip / friction. The
+            // car automatically experiences different surfaces as it drives
+            // over them.
+            let ground = map.clone();
 
-        // One-shot detach / repair commands. JS sets the integer to a
-        // break-group ID; we consume it (set back to 0).
-        let detach_req = js_get_f32("__carsim_detach") as i32;
-        if detach_req > 0 {
-            v.break_group(detach_req as u32);
-            js_set_obj("__carsim_detach", &[]);
-            // (clearing is best-effort — JS resets to 0 after reading)
-        }
-        let repair_req = js_get_f32("__carsim_repair");
-        if repair_req as i32 > 0 {
-            if repair_req as i32 == 999 {
-                v.repair_all();
-            } else {
-                v.repair_group(repair_req as u32);
+            // One-shot detach / repair commands. JS sets the integer to a
+            // break-group ID; we consume it (set back to 0).
+            let detach_req = js_get_f32("__carsim_detach") as i32;
+            if detach_req > 0 {
+                v.break_group(detach_req as u32);
+                js_set_obj("__carsim_detach", &[]);
+                // (clearing is best-effort — JS resets to 0 after reading)
             }
-        }
+            let repair_req = js_get_f32("__carsim_repair");
+            if repair_req as i32 > 0 {
+                if repair_req as i32 == 999 {
+                    v.repair_all();
+                } else {
+                    v.repair_group(repair_req as u32);
+                }
+            }
 
-        v.step(dt.min(1.0 / 30.0), &ground);
+            v.step(dt.min(1.0 / 30.0), &ground);
 
-        let com = v.center_of_mass();
-        let speed_kmh = v.speed() * 3.6;
-        let rpm = v.engine_rpm();
-        let broken = v.beams.iter().filter(|b| b.broken).count() as f64;
-        let grounded = v.wheels.iter().filter(|w| w.grounded).count() as f64;
-        let surface_under_car = map.surface_at(com.x, com.z);
+            let com = v.center_of_mass();
+            let speed_kmh = v.speed() * 3.6;
+            let rpm = v.engine_rpm();
+            let broken = v.beams.iter().filter(|b| b.broken).count() as f64;
+            let grounded = v.wheels.iter().filter(|w| w.grounded).count() as f64;
+            let surface_under_car = map.surface_at(com.x, com.z);
 
-        cam.as_render_mut().target = com + Vec3::Y * 0.7;
+            cam.as_render_mut().target = com + Vec3::Y * 0.7;
 
-        js_set_obj(
-            "__carsim_hud",
-            &[
-                ("speed_kmh", speed_kmh as f64),
-                ("rpm", rpm as f64),
-                ("gear", v.powertrain.gearbox.current_gear as f64),
-                ("throttle", v.controls.throttle as f64),
-                ("brake", v.controls.brake as f64),
-                ("steer", v.controls.steer as f64),
-                ("com_x", com.x as f64),
-                ("com_y", com.y as f64),
-                ("com_z", com.z as f64),
-                ("broken_beams", broken),
-                ("grounded_wheels", grounded),
-                ("nodes", v.nodes.len() as f64),
-                ("beams", v.beams.len() as f64),
-                ("triangles", v.triangles.len() as f64),
-                ("surface_id", surface_id(surface_under_car) as f64),
-            ],
-        );
-        // Push the current surface NAME via a dedicated string global.
-        js_set_str("__carsim_current_surface", surface_under_car.id());
-    });
+            js_set_obj(
+                "__carsim_hud",
+                &[
+                    ("speed_kmh", speed_kmh as f64),
+                    ("rpm", rpm as f64),
+                    ("gear", v.powertrain.gearbox.current_gear as f64),
+                    ("throttle", v.controls.throttle as f64),
+                    ("brake", v.controls.brake as f64),
+                    ("steer", v.controls.steer as f64),
+                    ("com_x", com.x as f64),
+                    ("com_y", com.y as f64),
+                    ("com_z", com.z as f64),
+                    ("broken_beams", broken),
+                    ("grounded_wheels", grounded),
+                    ("nodes", v.nodes.len() as f64),
+                    ("beams", v.beams.len() as f64),
+                    ("triangles", v.triangles.len() as f64),
+                    ("surface_id", surface_id(surface_under_car) as f64),
+                ],
+            );
+            // Push the current surface NAME via a dedicated string global.
+            js_set_str("__carsim_current_surface", surface_under_car.id());
+        });
 
     log::info!("[car-sim] backend={:?}", app.backend());
     app.run()

@@ -179,7 +179,11 @@ pub struct Lidar {
 }
 
 impl Lidar {
-    pub fn new(name: impl Into<String>, prim_path: impl Into<String>, intr: LidarIntrinsics) -> Self {
+    pub fn new(
+        name: impl Into<String>,
+        prim_path: impl Into<String>,
+        intr: LidarIntrinsics,
+    ) -> Self {
         Lidar {
             name: name.into(),
             prim_path: prim_path.into(),
@@ -203,8 +207,16 @@ impl Lidar {
         let i = self.intrinsics;
         let az_min = -i.hfov * 0.5;
         let el_min = -i.vfov * 0.5;
-        let az_step = if i.h_beams > 1 { i.hfov / i.h_beams as f32 } else { 0.0 };
-        let el_step = if i.v_beams > 1 { i.vfov / i.v_beams as f32 } else { 0.0 };
+        let az_step = if i.h_beams > 1 {
+            i.hfov / i.h_beams as f32
+        } else {
+            0.0
+        };
+        let el_step = if i.v_beams > 1 {
+            i.vfov / i.v_beams as f32
+        } else {
+            0.0
+        };
         let az = az_min + (i_h as f32 + 0.5) * az_step;
         let el = el_min + (i_v as f32 + 0.5) * el_step;
         let (sa, ca) = (az.sin(), az.cos());
@@ -226,8 +238,7 @@ impl Lidar {
                 let hit = scene.nearest_hit(origin_world, dir_world);
                 let item = match hit {
                     Some((t, idx))
-                        if t >= self.intrinsics.range_min
-                            && t <= self.intrinsics.range_max =>
+                        if t >= self.intrinsics.range_min && t <= self.intrinsics.range_max =>
                     {
                         LidarReturn {
                             range: t,
@@ -274,14 +285,20 @@ mod tests {
     #[test]
     fn sphere_intersection_picks_nearest_root() {
         // Sphere at (0,0,10) radius 1, ray origin at zero forward → hits at t=9.
-        let p = Primitive::Sphere { center: Vec3::new(0.0, 0.0, 10.0), radius: 1.0 };
+        let p = Primitive::Sphere {
+            center: Vec3::new(0.0, 0.0, 10.0),
+            radius: 1.0,
+        };
         let t = p.intersect(Vec3::ZERO, Vec3::Z).unwrap();
         assert!((t - 9.0).abs() < 1e-4, "t={t}");
     }
 
     #[test]
     fn sphere_miss_returns_none() {
-        let p = Primitive::Sphere { center: Vec3::new(10.0, 0.0, 10.0), radius: 0.5 };
+        let p = Primitive::Sphere {
+            center: Vec3::new(10.0, 0.0, 10.0),
+            radius: 0.5,
+        };
         assert!(p.intersect(Vec3::ZERO, Vec3::Z).is_none());
     }
 
@@ -301,8 +318,14 @@ mod tests {
         let mut scene = Scene::new();
         scene
             .add(Primitive::GroundPlane { height: -2.0 })
-            .add(Primitive::Sphere { center: Vec3::new(0.0, 0.0, 10.0), radius: 0.3 })
-            .add(Primitive::Sphere { center: Vec3::new(0.0, 0.0, 5.0), radius: 0.3 });
+            .add(Primitive::Sphere {
+                center: Vec3::new(0.0, 0.0, 10.0),
+                radius: 0.3,
+            })
+            .add(Primitive::Sphere {
+                center: Vec3::new(0.0, 0.0, 5.0),
+                radius: 0.3,
+            });
         let (t, idx) = scene.nearest_hit(Vec3::ZERO, Vec3::Z).unwrap();
         assert!((t - 4.7).abs() < 1e-3, "t={t}");
         assert_eq!(idx, 2);
@@ -313,7 +336,10 @@ mod tests {
         let l = lidar_at_origin();
         let scene = Scene::new(); // empty scene → all misses
         let returns = l.acquire_data(&scene);
-        assert_eq!(returns.len(), (l.intrinsics.h_beams * l.intrinsics.v_beams) as usize);
+        assert_eq!(
+            returns.len(),
+            (l.intrinsics.h_beams * l.intrinsics.v_beams) as usize
+        );
         assert!(returns.iter().all(|r| r.range.is_infinite()));
     }
 
@@ -330,7 +356,10 @@ mod tests {
         // Beams in the lower half of the VFOV (negative elevation) should hit
         // the ground plane.
         let hits = returns.iter().filter(|r| r.range.is_finite()).count();
-        assert!(hits > 0, "expected at least one beam to strike the ground plane");
+        assert!(
+            hits > 0,
+            "expected at least one beam to strike the ground plane"
+        );
         // Steepest downward beam at el = -hfov/2 + (hfov / v_beams / 2) for
         // v_beams=4, vfov=30°: el ≈ -15° + 3.75° = -11.25°.
         // Range = 1 / sin(11.25°) ≈ 5.13 m.
@@ -351,19 +380,28 @@ mod tests {
         let mut scene = Scene::new();
         scene
             .add(Primitive::GroundPlane { height: -100.0 }) // way out of range
-            .add(Primitive::Sphere { center: Vec3::new(5.0, 0.0, 0.0), radius: 1.0 });
+            .add(Primitive::Sphere {
+                center: Vec3::new(5.0, 0.0, 0.0),
+                radius: 1.0,
+            });
         let returns = l.acquire_data(&scene);
         // At least one beam in the centre column should strike the sphere.
         let hits_on_sphere: Vec<_> = returns
             .iter()
             .filter(|r| r.range.is_finite() && r.prim_index == 1)
             .collect();
-        assert!(!hits_on_sphere.is_empty(), "expected at least one beam to strike the sphere");
+        assert!(
+            !hits_on_sphere.is_empty(),
+            "expected at least one beam to strike the sphere"
+        );
         // Nearest hit on sphere surface ≈ 4.0 m (5 m - radius 1 m).
         let r_min = hits_on_sphere
             .iter()
             .map(|r| r.range)
             .fold(f32::INFINITY, f32::min);
-        assert!(r_min > 3.5 && r_min < 4.5, "expected ~4.0 m sphere range, got {r_min}");
+        assert!(
+            r_min > 3.5 && r_min < 4.5,
+            "expected ~4.0 m sphere range, got {r_min}"
+        );
     }
 }

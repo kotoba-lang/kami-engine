@@ -19,19 +19,34 @@
 use kami_articulated::{JointKind, parse_urdf};
 use kami_genesis::World;
 
-const HIZUKUE_URDF: &str =
-    include_str!("../../kami-articulated/urdf/hizukue.urdf");
+const HIZUKUE_URDF: &str = include_str!("../../kami-articulated/urdf/hizukue.urdf");
 
 #[test]
 fn hizukue_urdf_parses_with_expected_topology() {
     let sys = parse_urdf(HIZUKUE_URDF).expect("hizukue.urdf must parse");
 
     assert_eq!(sys.name, "hizukue", "robot name");
-    assert_eq!(sys.links.len(), 7, "world + 3 base + upper_arm + lower_arm + end_effector");
-    assert_eq!(sys.joints.len(), 6, "3 prismatic mobile base + 3 revolute arm");
+    assert_eq!(
+        sys.links.len(),
+        7,
+        "world + 3 base + upper_arm + lower_arm + end_effector"
+    );
+    assert_eq!(
+        sys.joints.len(),
+        6,
+        "3 prismatic mobile base + 3 revolute arm"
+    );
 
-    let prismatic_count = sys.joints.iter().filter(|j| j.kind == JointKind::Prismatic).count();
-    let revolute_count = sys.joints.iter().filter(|j| j.kind == JointKind::Revolute).count();
+    let prismatic_count = sys
+        .joints
+        .iter()
+        .filter(|j| j.kind == JointKind::Prismatic)
+        .count();
+    let revolute_count = sys
+        .joints
+        .iter()
+        .filter(|j| j.kind == JointKind::Revolute)
+        .count();
 
     assert_eq!(prismatic_count, 3, "mobile base XYZ");
     assert_eq!(revolute_count, 3, "shoulder + elbow + wrist");
@@ -82,7 +97,12 @@ fn hizukue_world_loads_as_spatial3d_and_steps() {
         world.step();
     }
     assert!(
-        world.get(h).unwrap().joint_positions().iter().all(|v| v.is_finite()),
+        world
+            .get(h)
+            .unwrap()
+            .joint_positions()
+            .iter()
+            .all(|v| v.is_finite()),
         "hizukue state went non-finite"
     );
 }

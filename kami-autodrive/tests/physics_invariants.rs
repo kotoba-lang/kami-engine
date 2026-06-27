@@ -7,7 +7,13 @@ use kami_autodrive::{Command, FixedWing, Multirotor, Plant, Pose2, ShipHydro, Ve
 const G: f32 = 9.81;
 
 fn cmd(throttle: f32, steer: f32) -> Command {
-    Command { throttle, brake: 0.0, steer, handbrake: 0.0, reverse: false }
+    Command {
+        throttle,
+        brake: 0.0,
+        steer,
+        handbrake: 0.0,
+        reverse: false,
+    }
 }
 
 #[test]
@@ -32,9 +38,16 @@ fn ship_settles_into_a_steady_turning_circle() {
         "yaw rate should reach a steady value ({r1:.4} → {r2:.4})"
     );
     // Coriolis coupling: a turn induces outward sway.
-    assert!(ship.v.abs() > 0.01, "steady turn should carry sway (v = {:.3})", ship.v);
+    assert!(
+        ship.v.abs() > 0.01,
+        "steady turn should carry sway (v = {:.3})",
+        ship.v
+    );
     let radius = ship.u / r2;
-    assert!(radius.is_finite() && radius.abs() > 5.0, "turning radius {radius:.1} m");
+    assert!(
+        radius.is_finite() && radius.abs() > 5.0,
+        "turning radius {radius:.1} m"
+    );
 }
 
 #[test]
@@ -55,7 +68,10 @@ fn fixed_wing_obeys_the_coordinated_turn_rate() {
     let psi_dot = (yaw_b - yaw_a) / dt;
     let v = plane.airspeed;
 
-    assert!(!plane.stalled, "should be a sustained coordinated turn, not stalled");
+    assert!(
+        !plane.stalled,
+        "should be a sustained coordinated turn, not stalled"
+    );
     let expected = G * bank_max.tan() / v; // ψ̇ = g·tanφ / V
     assert!(
         (psi_dot - expected).abs() < 0.15 * expected,
@@ -81,7 +97,10 @@ fn multirotor_coasts_to_rest_under_drag() {
         drone.step(Command::coast(), dt);
     }
     let v_rest = drone.speed();
-    assert!(v_rest < 0.35 * v_moving, "drag should decelerate it ({v_moving:.1} → {v_rest:.2})");
+    assert!(
+        v_rest < 0.35 * v_moving,
+        "drag should decelerate it ({v_moving:.1} → {v_rest:.2})"
+    );
 }
 
 #[test]
@@ -95,9 +114,19 @@ fn ship_reverse_thrust_decelerates_then_backs_up() {
     assert!(u_fwd > 1.0, "ship should be making way ({u_fwd:.1} m/s)");
 
     // Full astern (brake channel = reverse propeller in the surge model).
-    let astern = Command { throttle: 0.0, brake: 1.0, steer: 0.0, handbrake: 0.0, reverse: false };
+    let astern = Command {
+        throttle: 0.0,
+        brake: 1.0,
+        steer: 0.0,
+        handbrake: 0.0,
+        reverse: false,
+    };
     for _ in 0..600 {
         ship.step(astern, dt);
     }
-    assert!(ship.u < u_fwd, "astern thrust must slow the ship ({u_fwd:.1} → {:.1})", ship.u);
+    assert!(
+        ship.u < u_fwd,
+        "astern thrust must slow the ship ({u_fwd:.1} → {:.1})",
+        ship.u
+    );
 }

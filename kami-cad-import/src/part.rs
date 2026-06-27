@@ -258,7 +258,8 @@ impl VehiclePart {
             .unwrap_or_else(|| self.aabb_volume_m3() * self.material.density_kg_m3())
     }
     pub fn effective_break_group(&self) -> u32 {
-        self.break_group.unwrap_or_else(|| self.kind.default_break_group())
+        self.break_group
+            .unwrap_or_else(|| self.kind.default_break_group())
     }
     /// 8 AABB corners, used by the JBeam emitter as the part's mass-node
     /// scaffolding.
@@ -417,7 +418,10 @@ mod tests {
     #[test]
     fn break_group_inherits_kind() {
         let p = synth_part("hood", PartKind::Body);
-        assert_eq!(p.effective_break_group(), PartKind::Body.default_break_group());
+        assert_eq!(
+            p.effective_break_group(),
+            PartKind::Body.default_break_group()
+        );
         let mut p2 = synth_part("strut", PartKind::Suspension);
         p2.break_group = Some(99);
         assert_eq!(p2.effective_break_group(), 99);
@@ -427,7 +431,11 @@ mod tests {
     fn validate_rejects_missing_provenance() {
         let mut a = VehicleAssembly::new(
             "v1",
-            ProvenanceSource { uri: "x".into(), sha256: "z".into(), license: "MIT".into() },
+            ProvenanceSource {
+                uri: "x".into(),
+                sha256: "z".into(),
+                license: "MIT".into(),
+            },
         );
         let mut bad = synth_part("rail", PartKind::Chassis);
         bad.source.sha256 = String::new();

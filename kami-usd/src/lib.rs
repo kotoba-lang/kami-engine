@@ -208,7 +208,10 @@ fn parse_body(
         // Skip any number of leading modifiers; consume the type token;
         // the next token is the key.
         let mut lhs_iter = lhs.split_whitespace().peekable();
-        while matches!(lhs_iter.peek().copied(), Some("custom") | Some("uniform") | Some("varying")) {
+        while matches!(
+            lhs_iter.peek().copied(),
+            Some("custom") | Some("uniform") | Some("varying")
+        ) {
             lhs_iter.next();
         }
         let _typetok = lhs_iter.next();
@@ -262,7 +265,8 @@ fn parse_body(
             "physics:gravityMagnitude" => {
                 let mag = rhs.parse::<f32>().unwrap_or(9.81);
                 if let PrimKind::PhysicsScene { gravity } = kind {
-                    let norm = (gravity[0].powi(2) + gravity[1].powi(2) + gravity[2].powi(2)).sqrt();
+                    let norm =
+                        (gravity[0].powi(2) + gravity[1].powi(2) + gravity[2].powi(2)).sqrt();
                     let dir = if norm > 1e-6 {
                         [gravity[0] / norm, gravity[1] / norm, gravity[2] / norm]
                     } else {
@@ -325,7 +329,10 @@ pub fn to_usda(stage: &Stage) -> String {
     let mut out = String::new();
     out.push_str("#usda 1.0\n(\n");
     out.push_str(&format!("    upAxis = \"{up}\"\n"));
-    out.push_str(&format!("    metersPerUnit = {}\n", fnum(stage.meters_per_unit)));
+    out.push_str(&format!(
+        "    metersPerUnit = {}\n",
+        fnum(stage.meters_per_unit)
+    ));
     out.push_str(")\n");
 
     for prim in &stage.prims {

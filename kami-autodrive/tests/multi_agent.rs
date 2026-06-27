@@ -46,8 +46,14 @@ fn perpendicular_crossing_stays_collision_free() {
     let mut fleet = Fleet::new(vec![a, b]);
     let min_sep = run(&mut fleet, 3000);
 
-    assert!(fleet.all_arrived(), "both crossing agents should reach their goals");
-    assert!(min_sep > 0.0, "crossing agents collided (min separation {min_sep:.2} m)");
+    assert!(
+        fleet.all_arrived(),
+        "both crossing agents should reach their goals"
+    );
+    assert!(
+        min_sep > 0.0,
+        "crossing agents collided (min separation {min_sep:.2} m)"
+    );
 }
 
 #[test]
@@ -56,12 +62,22 @@ fn head_on_lane_discipline_passes_without_collision() {
     // previously collided). Lane discipline makes both bias right, so they pass
     // right-to-right and both reach their goals.
     let a = car_agent(Pose2::new(0.0, 0.0, 0.0), Vec2::new(40.0, 0.0), 0);
-    let b = car_agent(Pose2::new(40.0, 0.0, std::f32::consts::PI), Vec2::new(0.0, 0.0), 0);
+    let b = car_agent(
+        Pose2::new(40.0, 0.0, std::f32::consts::PI),
+        Vec2::new(0.0, 0.0),
+        0,
+    );
     let mut fleet = Fleet::new(vec![a, b]);
     let min_sep = run(&mut fleet, 3000);
 
-    assert!(fleet.all_arrived(), "both head-on agents should pass and arrive");
-    assert!(min_sep > 0.0, "lane discipline should avoid the collision (min sep {min_sep:.2} m)");
+    assert!(
+        fleet.all_arrived(),
+        "both head-on agents should pass and arrive"
+    );
+    assert!(
+        min_sep > 0.0,
+        "lane discipline should avoid the collision (min sep {min_sep:.2} m)"
+    );
 }
 
 #[test]
@@ -80,8 +96,14 @@ fn four_way_intersection_resolves_collision_free() {
     let mut fleet = Fleet::new(agents);
     let min_sep = run(&mut fleet, 4000);
 
-    assert!(fleet.all_arrived(), "all four should clear the intersection");
-    assert!(min_sep > 0.0, "4-way must stay collision-free (min sep {min_sep:.2} m)");
+    assert!(
+        fleet.all_arrived(),
+        "all four should clear the intersection"
+    );
+    assert!(
+        min_sep > 0.0,
+        "4-way must stay collision-free (min sep {min_sep:.2} m)"
+    );
 }
 
 #[test]
@@ -93,10 +115,20 @@ fn overtakes_a_parked_agent_on_the_path() {
     let mut fleet = Fleet::new(vec![b, a]);
     let min_sep = run(&mut fleet, 2000);
 
-    assert!(fleet.all_arrived(), "the moving agent should route past the parked one");
-    assert!(min_sep > 0.0, "agents overlapped (min separation {min_sep:.2} m)");
+    assert!(
+        fleet.all_arrived(),
+        "the moving agent should route past the parked one"
+    );
+    assert!(
+        min_sep > 0.0,
+        "agents overlapped (min separation {min_sep:.2} m)"
+    );
     // Proof it detoured rather than stopping short: the mover passed the parked
     // agent's x with a lateral offset.
     let mover = fleet.agents[1].pose();
-    assert!(mover.x > 30.0, "mover should have passed the parked agent (x={:.1})", mover.x);
+    assert!(
+        mover.x > 30.0,
+        "mover should have passed the parked agent (x={:.1})",
+        mover.x
+    );
 }

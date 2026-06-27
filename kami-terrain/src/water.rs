@@ -65,7 +65,9 @@ impl Default for WaterConfig {
 /// `gust`: gust multiplier [1.0, 2.0] — amplifies amplitude only.
 pub fn waves_from_wind(wind_dir: [f32; 2], wind_speed: f32, gust: f32) -> Vec<GerstnerWave> {
     // Normalize wind direction
-    let len = (wind_dir[0] * wind_dir[0] + wind_dir[1] * wind_dir[1]).sqrt().max(1e-6);
+    let len = (wind_dir[0] * wind_dir[0] + wind_dir[1] * wind_dir[1])
+        .sqrt()
+        .max(1e-6);
     let wd = [wind_dir[0] / len, wind_dir[1] / len];
 
     // Wind perpendicular (for rotating cone)
@@ -103,7 +105,7 @@ pub fn waves_from_wind(wind_dir: [f32; 2], wind_speed: f32, gust: f32) -> Vec<Ge
     // Wave 2: +30° spread, 0.5x wavelength
     let wl2 = base_wavelength * 0.5;
     let w2 = GerstnerWave {
-        direction: rot(wd, 0.52),  // ~30°
+        direction: rot(wd, 0.52), // ~30°
         amplitude: base_amp * 0.55 * gust,
         wavelength: wl2,
         speed: speed_for(wl2),
@@ -114,7 +116,7 @@ pub fn waves_from_wind(wind_dir: [f32; 2], wind_speed: f32, gust: f32) -> Vec<Ge
     // Wave 3: -15° spread, 0.25x wavelength (ripple)
     let wl3 = base_wavelength * 0.25;
     let w3 = GerstnerWave {
-        direction: rot(wd, -0.26),  // ~-15°
+        direction: rot(wd, -0.26), // ~-15°
         amplitude: base_amp * 0.3 * gust,
         wavelength: wl3,
         speed: speed_for(wl3),
@@ -126,7 +128,7 @@ pub fn waves_from_wind(wind_dir: [f32; 2], wind_speed: f32, gust: f32) -> Vec<Ge
     let wl4 = base_wavelength * 0.12;
     let _ = perp; // kept for reference
     let w4 = GerstnerWave {
-        direction: rot(wd, 1.05),  // ~60°
+        direction: rot(wd, 1.05), // ~60°
         amplitude: base_amp * 0.15 * gust,
         wavelength: wl4,
         speed: speed_for(wl4),
@@ -222,7 +224,10 @@ mod tests {
 
     #[test]
     fn water_mesh_size() {
-        let cfg = WaterConfig { resolution: 64, ..Default::default() };
+        let cfg = WaterConfig {
+            resolution: 64,
+            ..Default::default()
+        };
         let (verts, idxs) = generate_water_mesh(&cfg);
         assert_eq!(verts.len(), 65 * 65);
         assert_eq!(idxs.len(), 64 * 64 * 6);
@@ -244,12 +249,18 @@ mod tests {
         let calm = waves_from_wind([1.0, 0.0], 1.0, 1.0);
         // Stormy (20 m/s) should produce large amplitude
         let storm = waves_from_wind([1.0, 0.0], 20.0, 1.0);
-        assert!(storm[0].amplitude > calm[0].amplitude * 5.0,
+        assert!(
+            storm[0].amplitude > calm[0].amplitude * 5.0,
             "storm amp {} should be much larger than calm {}",
-            storm[0].amplitude, calm[0].amplitude);
-        assert!(storm[0].wavelength > calm[0].wavelength * 3.0,
+            storm[0].amplitude,
+            calm[0].amplitude
+        );
+        assert!(
+            storm[0].wavelength > calm[0].wavelength * 3.0,
             "storm wavelength {} should be longer than calm {}",
-            storm[0].wavelength, calm[0].wavelength);
+            storm[0].wavelength,
+            calm[0].wavelength
+        );
     }
 
     #[test]
@@ -264,8 +275,11 @@ mod tests {
     fn wind_waves_gust_amplifies() {
         let calm = waves_from_wind([1.0, 0.0], 5.0, 1.0);
         let gusty = waves_from_wind([1.0, 0.0], 5.0, 1.8);
-        assert!(gusty[0].amplitude > calm[0].amplitude * 1.7,
+        assert!(
+            gusty[0].amplitude > calm[0].amplitude * 1.7,
             "gust should amplify: calm={} gusty={}",
-            calm[0].amplitude, gusty[0].amplitude);
+            calm[0].amplitude,
+            gusty[0].amplitude
+        );
     }
 }

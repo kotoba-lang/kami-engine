@@ -21,12 +21,19 @@ pub struct Episode {
 
 impl Episode {
     pub fn new(embodiment: impl Into<String>) -> Self {
-        Episode { embodiment: embodiment.into(), steps: Vec::new() }
+        Episode {
+            embodiment: embodiment.into(),
+            steps: Vec::new(),
+        }
     }
 
     /// Append a recorded step.
     pub fn push(&mut self, state: Vec<f32>, action: Vec<f32>, language: Option<String>) {
-        self.steps.push(EpisodeStep { state, action, language });
+        self.steps.push(EpisodeStep {
+            state,
+            action,
+            language,
+        });
     }
 
     pub fn len(&self) -> usize {

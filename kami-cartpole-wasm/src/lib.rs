@@ -9,12 +9,8 @@ use wasm_bindgen::prelude::*;
 
 use kami_shugyo::{CartpoleEnv, RLEnv, load_scene_yaml};
 
-const URDF: &str = include_str!(
-    "../../fixtures/cartpole/cartpole.urdf"
-);
-const SCENE: &str = include_str!(
-    "../../fixtures/cartpole/scene.yaml"
-);
+const URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
+const SCENE: &str = include_str!("../../fixtures/cartpole/scene.yaml");
 
 /// JS-callable handle around a single Cartpole env.
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]

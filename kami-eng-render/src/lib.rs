@@ -200,7 +200,9 @@ pub struct EngDrawList {
 
 impl EngDrawList {
     pub fn new() -> Self {
-        Self { commands: Vec::new() }
+        Self {
+            commands: Vec::new(),
+        }
     }
 
     pub fn push(&mut self, cmd: EngDrawCmd) {

@@ -18,7 +18,7 @@
 
 use std::collections::BTreeMap;
 
-use kami_scene::{mget, EdnValue};
+use kami_scene::{EdnValue, mget};
 
 use crate::beat::BeatEvent;
 use crate::setlist::CueKind;
@@ -102,10 +102,7 @@ impl Director {
 
     /// Resolve the action maps that fire for `event`, in author order.
     pub fn resolve(&self, event: &ShowEvent) -> Vec<&Trigger> {
-        self.triggers
-            .iter()
-            .filter(|t| t.matches(event))
-            .collect()
+        self.triggers.iter().filter(|t| t.matches(event)).collect()
     }
 }
 
@@ -154,7 +151,9 @@ fn parse_trigger(m: &BTreeMap<EdnValue, EdnValue>) -> Option<Trigger> {
     let on = mget(m, "on")
         .and_then(|v| v.as_keyword().map(|k| k.0.name.clone()))
         .and_then(|n| TriggerOn::by_name(&n))?;
-    let tag = mget(m, "tag").and_then(|v| v.as_string()).map(|s| s.to_string());
+    let tag = mget(m, "tag")
+        .and_then(|v| v.as_string())
+        .map(|s| s.to_string());
     let every = mget(m, "every").and_then(|v| {
         v.as_integer()
             .or_else(|| v.as_float().map(|f| f as i64))
@@ -247,10 +246,12 @@ mod tests {
     #[test]
     fn every_filter_gates_periodic_bars() {
         let sc = DanceScene::from_edn(SCENE).expect("scene");
-        let bar = |i: u32| ShowEvent::Beat(BeatEvent::Bar {
-            time: 0.0,
-            bar_index: i,
-        });
+        let bar = |i: u32| {
+            ShowEvent::Beat(BeatEvent::Bar {
+                time: 0.0,
+                bar_index: i,
+            })
+        };
         // :every 8 → fires on bar 8/16, not 7.
         assert_eq!(sc.director.resolve(&bar(8)).len(), 1);
         assert_eq!(sc.director.resolve(&bar(7)).len(), 0);

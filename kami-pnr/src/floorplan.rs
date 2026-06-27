@@ -1,5 +1,4 @@
 /// Chip floorplanning — block placement, IO pin assignment, and utilization analysis.
-
 use serde::{Deserialize, Serialize};
 
 /// Block functional type within the floorplan.
@@ -89,7 +88,11 @@ impl Floorplan {
         for i in 0..self.blocks.len() {
             let a = &self.blocks[i];
             // Check die boundary
-            if a.x < 0.0 || a.y < 0.0 || a.x + a.width > self.die_width || a.y + a.height > self.die_height {
+            if a.x < 0.0
+                || a.y < 0.0
+                || a.x + a.width > self.die_width
+                || a.y + a.height > self.die_height
+            {
                 violations.push(format!("Block '{}' extends outside die boundary", a.name));
             }
             for j in (i + 1)..self.blocks.len() {
@@ -100,10 +103,7 @@ impl Floorplan {
                     && a.y < b.y + b.height
                     && a.y + a.height > b.y
                 {
-                    violations.push(format!(
-                        "Overlap between '{}' and '{}'",
-                        a.name, b.name
-                    ));
+                    violations.push(format!("Overlap between '{}' and '{}'", a.name, b.name));
                 }
             }
         }
@@ -144,15 +144,19 @@ mod tests {
         fp.add_block(FloorplanBlock {
             name: "ram".into(),
             block_type: BlockType::Macro,
-            x: 0.0, y: 0.0,
-            width: 50.0, height: 50.0,
+            x: 0.0,
+            y: 0.0,
+            width: 50.0,
+            height: 50.0,
             fixed: true,
         });
         fp.add_block(FloorplanBlock {
             name: "logic".into(),
             block_type: BlockType::StdCellRegion,
-            x: 50.0, y: 0.0,
-            width: 50.0, height: 50.0,
+            x: 50.0,
+            y: 0.0,
+            width: 50.0,
+            height: 50.0,
             fixed: false,
         });
         // Two 50x50 blocks = 5000 area, die = 10000
@@ -164,12 +168,22 @@ mod tests {
     fn overlap_detection() {
         let mut fp = Floorplan::new(100.0, 100.0);
         fp.add_block(FloorplanBlock {
-            name: "a".into(), block_type: BlockType::Macro,
-            x: 0.0, y: 0.0, width: 60.0, height: 60.0, fixed: false,
+            name: "a".into(),
+            block_type: BlockType::Macro,
+            x: 0.0,
+            y: 0.0,
+            width: 60.0,
+            height: 60.0,
+            fixed: false,
         });
         fp.add_block(FloorplanBlock {
-            name: "b".into(), block_type: BlockType::Macro,
-            x: 50.0, y: 50.0, width: 40.0, height: 40.0, fixed: false,
+            name: "b".into(),
+            block_type: BlockType::Macro,
+            x: 50.0,
+            y: 50.0,
+            width: 40.0,
+            height: 40.0,
+            fixed: false,
         });
         let v = fp.validate();
         assert!(v.iter().any(|s| s.contains("Overlap")));
@@ -178,9 +192,33 @@ mod tests {
     #[test]
     fn auto_floorplan_row_packing() {
         let blocks = vec![
-            FloorplanBlock { name: "a".into(), block_type: BlockType::StdCellRegion, x: 0.0, y: 0.0, width: 40.0, height: 20.0, fixed: false },
-            FloorplanBlock { name: "b".into(), block_type: BlockType::StdCellRegion, x: 0.0, y: 0.0, width: 40.0, height: 20.0, fixed: false },
-            FloorplanBlock { name: "c".into(), block_type: BlockType::StdCellRegion, x: 0.0, y: 0.0, width: 40.0, height: 20.0, fixed: false },
+            FloorplanBlock {
+                name: "a".into(),
+                block_type: BlockType::StdCellRegion,
+                x: 0.0,
+                y: 0.0,
+                width: 40.0,
+                height: 20.0,
+                fixed: false,
+            },
+            FloorplanBlock {
+                name: "b".into(),
+                block_type: BlockType::StdCellRegion,
+                x: 0.0,
+                y: 0.0,
+                width: 40.0,
+                height: 20.0,
+                fixed: false,
+            },
+            FloorplanBlock {
+                name: "c".into(),
+                block_type: BlockType::StdCellRegion,
+                x: 0.0,
+                y: 0.0,
+                width: 40.0,
+                height: 20.0,
+                fixed: false,
+            },
         ];
         let fp = auto_floorplan(blocks, 100.0, 100.0);
         // a at (0,0), b at (40,0), c wraps to (80,0) — still fits since 80+40>100 → next row

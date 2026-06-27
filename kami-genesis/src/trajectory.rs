@@ -63,7 +63,14 @@ impl CubicPolynomialTrajectory {
                 [a0, a1, a2, a3]
             })
             .collect();
-        CubicPolynomialTrajectory { q0, qf, qd0, qdf, duration, coeffs }
+        CubicPolynomialTrajectory {
+            q0,
+            qf,
+            qd0,
+            qdf,
+            duration,
+            coeffs,
+        }
     }
 
     /// Stop-to-stop cubic: start and end velocities both zero.
@@ -132,8 +139,9 @@ impl QuinticPolynomialTrajectory {
         duration: f32,
     ) -> Self {
         let n = q0.len();
-        assert!(n == qf.len() && n == qd0.len() && n == qdf.len()
-                && n == qdd0.len() && n == qddf.len());
+        assert!(
+            n == qf.len() && n == qd0.len() && n == qdf.len() && n == qdd0.len() && n == qddf.len()
+        );
         assert!(duration > 0.0);
         let t = duration;
         let t2 = t * t;
@@ -160,7 +168,16 @@ impl QuinticPolynomialTrajectory {
                 [a0, a1, a2, a3, a4, a5]
             })
             .collect();
-        QuinticPolynomialTrajectory { q0, qf, qd0, qdf, qdd0, qddf, duration, coeffs }
+        QuinticPolynomialTrajectory {
+            q0,
+            qf,
+            qd0,
+            qdf,
+            qdd0,
+            qddf,
+            duration,
+            coeffs,
+        }
     }
 
     /// Min-jerk trajectory (Flash & Hogan 1985): quintic with all boundary
@@ -214,10 +231,7 @@ pub struct WaypointTrajectory {
 }
 
 impl WaypointTrajectory {
-    pub fn from_waypoints(
-        waypoints: Vec<Vec<f32>>,
-        segment_durations: Vec<f32>,
-    ) -> Self {
+    pub fn from_waypoints(waypoints: Vec<Vec<f32>>, segment_durations: Vec<f32>) -> Self {
         assert!(waypoints.len() >= 2, "need at least 2 waypoints");
         assert_eq!(segment_durations.len(), waypoints.len() - 1);
         let dof = waypoints[0].len();
@@ -231,8 +245,7 @@ impl WaypointTrajectory {
             let dt_left = segment_durations[k - 1];
             let dt_right = segment_durations[k];
             for j in 0..dof {
-                vels[k][j] =
-                    (waypoints[k + 1][j] - waypoints[k - 1][j]) / (dt_left + dt_right);
+                vels[k][j] = (waypoints[k + 1][j] - waypoints[k - 1][j]) / (dt_left + dt_right);
             }
         }
         // Endpoint velocities = 0 (stop-to-stop overall).
@@ -255,7 +268,11 @@ impl WaypointTrajectory {
             cum_t.push(acc);
         }
 
-        WaypointTrajectory { segments, cum_t, dof }
+        WaypointTrajectory {
+            segments,
+            cum_t,
+            dof,
+        }
     }
 }
 
@@ -295,7 +312,9 @@ mod tests {
     fn cubic_boundary_conditions_exact() {
         // q from 0 → π/2 over 2 s, zero boundary velocities.
         let t = CubicPolynomialTrajectory::stop_to_stop(
-            vec![0.0], vec![std::f32::consts::FRAC_PI_2], 2.0,
+            vec![0.0],
+            vec![std::f32::consts::FRAC_PI_2],
+            2.0,
         );
         let (q0, qd0, _) = t.sample(0.0);
         let (qf, qdf, _) = t.sample(2.0);
@@ -323,15 +342,18 @@ mod tests {
             let (q_p, qd_a, _) = t.sample(tt);
             let (q_p2, _, _) = t.sample(tt + dt);
             let fd = (q_p2[0] - q_p[0]) / dt;
-            assert!(approx(qd_a[0], fd, 1e-2), "t={tt}: analytic={}, fd={}", qd_a[0], fd);
+            assert!(
+                approx(qd_a[0], fd, 1e-2),
+                "t={tt}: analytic={}, fd={}",
+                qd_a[0],
+                fd
+            );
         }
     }
 
     #[test]
     fn cubic_with_nonzero_boundary_velocity() {
-        let t = CubicPolynomialTrajectory::new(
-            vec![0.0], vec![1.0], vec![0.5], vec![-0.3], 1.0,
-        );
+        let t = CubicPolynomialTrajectory::new(vec![0.0], vec![1.0], vec![0.5], vec![-0.3], 1.0);
         let (_, qd0, _) = t.sample(0.0);
         let (_, qdf, _) = t.sample(1.0);
         assert!(approx(qd0[0], 0.5, 1e-5));
@@ -343,9 +365,12 @@ mod tests {
     #[test]
     fn quintic_boundary_pos_vel_acc_exact() {
         let t = QuinticPolynomialTrajectory::new(
-            vec![0.0], vec![1.0],
-            vec![0.2], vec![-0.1],
-            vec![0.3], vec![-0.4],
+            vec![0.0],
+            vec![1.0],
+            vec![0.2],
+            vec![-0.1],
+            vec![0.3],
+            vec![-0.4],
             2.0,
         );
         let (q0, qd0, qdd0) = t.sample(0.0);
@@ -385,7 +410,12 @@ mod tests {
             let (q_p, qd_a, _) = t.sample(tt);
             let (q_p2, _, _) = t.sample(tt + dt);
             let fd = (q_p2[0] - q_p[0]) / dt;
-            assert!(approx(qd_a[0], fd, 1e-2), "t={tt}: analytic={}, fd={}", qd_a[0], fd);
+            assert!(
+                approx(qd_a[0], fd, 1e-2),
+                "t={tt}: analytic={}, fd={}",
+                qd_a[0],
+                fd
+            );
         }
     }
 
@@ -409,7 +439,8 @@ mod tests {
                 assert!(
                     approx(q[j], waypoints[k][j], 1e-3),
                     "k={k}, j={j}: got {}, expected {}",
-                    q[j], waypoints[k][j]
+                    q[j],
+                    waypoints[k][j]
                 );
             }
         }
@@ -434,8 +465,7 @@ mod tests {
         use crate::controllers::{ArticulationAction, ArticulationController};
         use crate::world::World;
         use kami_articulated::parse_urdf;
-        const CARTPOLE_URDF: &str =
-            include_str!("../../fixtures/cartpole/cartpole.urdf");
+        const CARTPOLE_URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
 
         let sys = parse_urdf(CARTPOLE_URDF).unwrap();
         let mut w = World::default();
@@ -461,6 +491,10 @@ mod tests {
         }
         let q = w.get(h).unwrap().joint_positions();
         // Cart reaches the goal within 0.05 m.
-        assert!((q[0] - 1.0).abs() < 0.05, "cart at trajectory end: x={}", q[0]);
+        assert!(
+            (q[0] - 1.0).abs() < 0.05,
+            "cart at trajectory end: x={}",
+            q[0]
+        );
     }
 }

@@ -11,21 +11,32 @@
 use std::cell::RefCell;
 
 use glam::{Mat4, Vec3};
-use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use wasm_bindgen::prelude::*;
 use wgpu::util::DeviceExt;
 
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
-struct Vertex { pos: [f32; 3], normal: [f32; 3] }
+struct Vertex {
+    pos: [f32; 3],
+    normal: [f32; 3],
+}
 
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
-struct Instance { model: [[f32; 4]; 4], color: [f32; 4] }
+struct Instance {
+    model: [[f32; 4]; 4],
+    color: [f32; 4],
+}
 
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
-struct Globals { view_proj: [[f32; 4]; 4], sun_dir: [f32; 4], sun_col: [f32; 4], sky: [f32; 4] }
+struct Globals {
+    view_proj: [[f32; 4]; 4],
+    sun_dir: [f32; 4],
+    sun_col: [f32; 4],
+    sky: [f32; 4],
+}
 
 struct State {
     device: wgpu::Device,
@@ -51,17 +62,67 @@ thread_local! {
 
 fn cube() -> (Vec<Vertex>, Vec<u16>) {
     let faces: [([f32; 3], [[f32; 3]; 4]); 6] = [
-        ([0.0, 0.0, 1.0], [[-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [0.5, 0.5, 0.5], [-0.5, 0.5, 0.5]]),
-        ([0.0, 0.0, -1.0], [[0.5, -0.5, -0.5], [-0.5, -0.5, -0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5]]),
-        ([1.0, 0.0, 0.0], [[0.5, -0.5, 0.5], [0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [0.5, 0.5, 0.5]]),
-        ([-1.0, 0.0, 0.0], [[-0.5, -0.5, -0.5], [-0.5, -0.5, 0.5], [-0.5, 0.5, 0.5], [-0.5, 0.5, -0.5]]),
-        ([0.0, 1.0, 0.0], [[-0.5, 0.5, 0.5], [0.5, 0.5, 0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, -0.5]]),
-        ([0.0, -1.0, 0.0], [[-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [0.5, -0.5, 0.5], [-0.5, -0.5, 0.5]]),
+        (
+            [0.0, 0.0, 1.0],
+            [
+                [-0.5, -0.5, 0.5],
+                [0.5, -0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+            ],
+        ),
+        (
+            [0.0, 0.0, -1.0],
+            [
+                [0.5, -0.5, -0.5],
+                [-0.5, -0.5, -0.5],
+                [-0.5, 0.5, -0.5],
+                [0.5, 0.5, -0.5],
+            ],
+        ),
+        (
+            [1.0, 0.0, 0.0],
+            [
+                [0.5, -0.5, 0.5],
+                [0.5, -0.5, -0.5],
+                [0.5, 0.5, -0.5],
+                [0.5, 0.5, 0.5],
+            ],
+        ),
+        (
+            [-1.0, 0.0, 0.0],
+            [
+                [-0.5, -0.5, -0.5],
+                [-0.5, -0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+                [-0.5, 0.5, -0.5],
+            ],
+        ),
+        (
+            [0.0, 1.0, 0.0],
+            [
+                [-0.5, 0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [0.5, 0.5, -0.5],
+                [-0.5, 0.5, -0.5],
+            ],
+        ),
+        (
+            [0.0, -1.0, 0.0],
+            [
+                [-0.5, -0.5, -0.5],
+                [0.5, -0.5, -0.5],
+                [0.5, -0.5, 0.5],
+                [-0.5, -0.5, 0.5],
+            ],
+        ),
     ];
     let (mut v, mut idx) = (Vec::new(), Vec::new());
     for (n, quad) in faces {
         let b = v.len() as u16;
-        for p in quad { v.push(Vertex { pos: p, normal: n }); }
+        for p in quad {
+            v.push(Vertex { pos: p, normal: n });
+        }
         idx.extend_from_slice(&[b, b + 1, b + 2, b, b + 2, b + 3]);
     }
     (v, idx)
@@ -69,12 +130,17 @@ fn cube() -> (Vec<Vertex>, Vec<u16>) {
 
 fn arr3(v: &serde_json::Value, k: &str) -> [f32; 3] {
     let a = &v[k];
-    [a.get(0).and_then(|x| x.as_f64()).unwrap_or(0.0) as f32,
-     a.get(1).and_then(|x| x.as_f64()).unwrap_or(0.0) as f32,
-     a.get(2).and_then(|x| x.as_f64()).unwrap_or(0.0) as f32]
+    [
+        a.get(0).and_then(|x| x.as_f64()).unwrap_or(0.0) as f32,
+        a.get(1).and_then(|x| x.as_f64()).unwrap_or(0.0) as f32,
+        a.get(2).and_then(|x| x.as_f64()).unwrap_or(0.0) as f32,
+    ]
 }
 fn fnum(v: &serde_json::Value, k: &str, d: f32) -> f32 {
-    v.get(k).and_then(|x| x.as_f64()).map(|x| x as f32).unwrap_or(d)
+    v.get(k)
+        .and_then(|x| x.as_f64())
+        .map(|x| x as f32)
+        .unwrap_or(d)
 }
 
 /// Draw one frame from a render-IR (renderer already initialised).
@@ -91,21 +157,35 @@ fn draw(st: &State, ir: &serde_json::Value) -> Result<(), JsValue> {
             let p = arr3(it, "pos");
             let c = arr3(it, "color");
             let sz = it.get("size");
-            let bw = sz.and_then(|s| s.get(0)).and_then(|x| x.as_f64()).unwrap_or(1.0) as f32;
-            let bh = sz.and_then(|s| s.get(1)).and_then(|x| x.as_f64()).unwrap_or(1.0) as f32;
+            let bw = sz
+                .and_then(|s| s.get(0))
+                .and_then(|x| x.as_f64())
+                .unwrap_or(1.0) as f32;
+            let bh = sz
+                .and_then(|s| s.get(1))
+                .and_then(|x| x.as_f64())
+                .unwrap_or(1.0) as f32;
             let pos = Vec3::new(p[0], p[1], p[2]);
             centroid += pos;
             let m = Mat4::from_translation(pos + Vec3::new(0.0, bh * 0.5, 0.0))
                 * Mat4::from_rotation_y(fnum(it, "yaw", 0.0))
                 * Mat4::from_scale(Vec3::new(bw, bh, bw));
-            insts.push(Instance { model: m.to_cols_array_2d(), color: [c[0], c[1], c[2], 1.0] });
+            insts.push(Instance {
+                model: m.to_cols_array_2d(),
+                color: [c[0], c[1], c[2], 1.0],
+            });
         }
     }
-    if !insts.is_empty() { centroid /= insts.len() as f32; }
+    if !insts.is_empty() {
+        centroid /= insts.len() as f32;
+    }
     let (eye, target) = if g.get("eye").is_some() {
         (arr3(g, "eye"), arr3(g, "target"))
     } else {
-        ([centroid.x + 60.0, 80.0, centroid.z + 60.0], [centroid.x, 0.0, centroid.z])
+        (
+            [centroid.x + 60.0, 80.0, centroid.z + 60.0],
+            [centroid.x, 0.0, centroid.z],
+        )
     };
     let aspect = st.w as f32 / st.h.max(1) as f32;
     let vp = Mat4::perspective_rh(60f32.to_radians(), aspect.max(0.1), 0.5, 4000.0)
@@ -116,24 +196,51 @@ fn draw(st: &State, ir: &serde_json::Value) -> Result<(), JsValue> {
         sun_col: [sun_col[0], sun_col[1], sun_col[2], 1.0],
         sky: [sky_h[0], sky_h[1], sky_h[2], 1.0],
     };
-    st.queue.write_buffer(&st.gbuf, 0, bytemuck::bytes_of(&globals));
+    st.queue
+        .write_buffer(&st.gbuf, 0, bytemuck::bytes_of(&globals));
     // reuse the persistent instance buffer (cap-bounded) — no per-frame allocation
     insts.truncate(st.inst_cap as usize);
-    st.queue.write_buffer(&st.inst_buf, 0, bytemuck::cast_slice(&insts));
+    st.queue
+        .write_buffer(&st.inst_buf, 0, bytemuck::cast_slice(&insts));
     let draw_n = insts.len() as u32;
 
-    let frame = st.surface.get_current_texture().map_err(|e| JsValue::from_str(&format!("{e:?}")))?;
-    let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
-    let mut enc = st.device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+    let frame = st
+        .surface
+        .get_current_texture()
+        .map_err(|e| JsValue::from_str(&format!("{e:?}")))?;
+    let view = frame
+        .texture
+        .create_view(&wgpu::TextureViewDescriptor::default());
+    let mut enc = st
+        .device
+        .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
     {
         let mut rp = enc.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("scene"),
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                view: &view, resolve_target: None,
-                ops: wgpu::Operations { load: wgpu::LoadOp::Clear(wgpu::Color { r: sky_h[0] as f64, g: sky_h[1] as f64, b: sky_h[2] as f64, a: 1.0 }), store: wgpu::StoreOp::Store } })],
+                view: &view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: sky_h[0] as f64,
+                        g: sky_h[1] as f64,
+                        b: sky_h[2] as f64,
+                        a: 1.0,
+                    }),
+                    store: wgpu::StoreOp::Store,
+                },
+            })],
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                view: &st.depth, depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Clear(1.0), store: wgpu::StoreOp::Store }), stencil_ops: None }),
-            timestamp_writes: None, occlusion_query_set: None });
+                view: &st.depth,
+                depth_ops: Some(wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(1.0),
+                    store: wgpu::StoreOp::Store,
+                }),
+                stencil_ops: None,
+            }),
+            timestamp_writes: None,
+            occlusion_query_set: None,
+        });
         if draw_n > 0 {
             rp.set_pipeline(&st.pipeline);
             rp.set_bind_group(0, &st.bind, &[]);
@@ -149,59 +256,186 @@ fn draw(st: &State, ir: &serde_json::Value) -> Result<(), JsValue> {
 }
 
 async fn ensure_init(canvas_id: &str) -> Result<(), JsValue> {
-    if STATE.with(|s| s.borrow().is_some()) { return Ok(()); }
-    let document = web_sys::window().ok_or("no window")?.document().ok_or("no document")?;
-    let canvas = document.get_element_by_id(canvas_id).ok_or("canvas not found")?
+    if STATE.with(|s| s.borrow().is_some()) {
+        return Ok(());
+    }
+    let document = web_sys::window()
+        .ok_or("no window")?
+        .document()
+        .ok_or("no document")?;
+    let canvas = document
+        .get_element_by_id(canvas_id)
+        .ok_or("canvas not found")?
         .dyn_into::<web_sys::HtmlCanvasElement>()?;
     let (device, queue, surface, _config, format, w, h) = crate::init_gpu(&canvas).await?;
 
     let (verts, indices) = cube();
     let vbuf = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("v"), contents: bytemuck::cast_slice(&verts), usage: wgpu::BufferUsages::VERTEX });
+        label: Some("v"),
+        contents: bytemuck::cast_slice(&verts),
+        usage: wgpu::BufferUsages::VERTEX,
+    });
     let ibuf = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("i"), contents: bytemuck::cast_slice(&indices), usage: wgpu::BufferUsages::INDEX });
+        label: Some("i"),
+        contents: bytemuck::cast_slice(&indices),
+        usage: wgpu::BufferUsages::INDEX,
+    });
     let gbuf = device.create_buffer(&wgpu::BufferDescriptor {
-        label: Some("g"), size: std::mem::size_of::<Globals>() as u64,
-        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST, mapped_at_creation: false });
+        label: Some("g"),
+        size: std::mem::size_of::<Globals>() as u64,
+        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        mapped_at_creation: false,
+    });
     let inst_cap = 16384u32;
     let inst_buf = device.create_buffer(&wgpu::BufferDescriptor {
-        label: Some("inst"), size: (inst_cap as usize * std::mem::size_of::<Instance>()) as u64,
-        usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST, mapped_at_creation: false });
+        label: Some("inst"),
+        size: (inst_cap as usize * std::mem::size_of::<Instance>()) as u64,
+        usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+        mapped_at_creation: false,
+    });
     let bgl = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-        label: None, entries: &[wgpu::BindGroupLayoutEntry {
-            binding: 0, visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
-            ty: wgpu::BindingType::Buffer { ty: wgpu::BufferBindingType::Uniform, has_dynamic_offset: false, min_binding_size: None }, count: None }] });
+        label: None,
+        entries: &[wgpu::BindGroupLayoutEntry {
+            binding: 0,
+            visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
+            ty: wgpu::BindingType::Buffer {
+                ty: wgpu::BufferBindingType::Uniform,
+                has_dynamic_offset: false,
+                min_binding_size: None,
+            },
+            count: None,
+        }],
+    });
     let bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
-        label: None, layout: &bgl, entries: &[wgpu::BindGroupEntry { binding: 0, resource: gbuf.as_entire_binding() }] });
-    let pll = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor { label: None, bind_group_layouts: &[&bgl], push_constant_ranges: &[] });
-    let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor { label: Some("render-ir"), source: wgpu::ShaderSource::Wgsl(SHADER.into()) });
-    let depth = device.create_texture(&wgpu::TextureDescriptor {
-        label: Some("depth"), size: wgpu::Extent3d { width: w.max(1), height: h.max(1), depth_or_array_layers: 1 },
-        mip_level_count: 1, sample_count: 1, dimension: wgpu::TextureDimension::D2,
-        format: wgpu::TextureFormat::Depth32Float, usage: wgpu::TextureUsages::RENDER_ATTACHMENT, view_formats: &[] })
+        label: None,
+        layout: &bgl,
+        entries: &[wgpu::BindGroupEntry {
+            binding: 0,
+            resource: gbuf.as_entire_binding(),
+        }],
+    });
+    let pll = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        label: None,
+        bind_group_layouts: &[&bgl],
+        push_constant_ranges: &[],
+    });
+    let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+        label: Some("render-ir"),
+        source: wgpu::ShaderSource::Wgsl(SHADER.into()),
+    });
+    let depth = device
+        .create_texture(&wgpu::TextureDescriptor {
+            label: Some("depth"),
+            size: wgpu::Extent3d {
+                width: w.max(1),
+                height: h.max(1),
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Depth32Float,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[],
+        })
         .create_view(&wgpu::TextureViewDescriptor::default());
     let vbl = wgpu::VertexBufferLayout {
-        array_stride: std::mem::size_of::<Vertex>() as u64, step_mode: wgpu::VertexStepMode::Vertex,
-        attributes: &[wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x3, offset: 0, shader_location: 0 },
-                      wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x3, offset: 12, shader_location: 1 }] };
+        array_stride: std::mem::size_of::<Vertex>() as u64,
+        step_mode: wgpu::VertexStepMode::Vertex,
+        attributes: &[
+            wgpu::VertexAttribute {
+                format: wgpu::VertexFormat::Float32x3,
+                offset: 0,
+                shader_location: 0,
+            },
+            wgpu::VertexAttribute {
+                format: wgpu::VertexFormat::Float32x3,
+                offset: 12,
+                shader_location: 1,
+            },
+        ],
+    };
     let ibl = wgpu::VertexBufferLayout {
-        array_stride: std::mem::size_of::<Instance>() as u64, step_mode: wgpu::VertexStepMode::Instance,
-        attributes: &[wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 0, shader_location: 2 },
-                      wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 16, shader_location: 3 },
-                      wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 32, shader_location: 4 },
-                      wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 48, shader_location: 5 },
-                      wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 64, shader_location: 6 }] };
+        array_stride: std::mem::size_of::<Instance>() as u64,
+        step_mode: wgpu::VertexStepMode::Instance,
+        attributes: &[
+            wgpu::VertexAttribute {
+                format: wgpu::VertexFormat::Float32x4,
+                offset: 0,
+                shader_location: 2,
+            },
+            wgpu::VertexAttribute {
+                format: wgpu::VertexFormat::Float32x4,
+                offset: 16,
+                shader_location: 3,
+            },
+            wgpu::VertexAttribute {
+                format: wgpu::VertexFormat::Float32x4,
+                offset: 32,
+                shader_location: 4,
+            },
+            wgpu::VertexAttribute {
+                format: wgpu::VertexFormat::Float32x4,
+                offset: 48,
+                shader_location: 5,
+            },
+            wgpu::VertexAttribute {
+                format: wgpu::VertexFormat::Float32x4,
+                offset: 64,
+                shader_location: 6,
+            },
+        ],
+    };
     let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-        label: Some("render-ir"), layout: Some(&pll),
-        vertex: wgpu::VertexState { module: &shader, entry_point: Some("vs"), buffers: &[vbl, ibl], compilation_options: Default::default() },
-        fragment: Some(wgpu::FragmentState { module: &shader, entry_point: Some("fs"), targets: &[Some(format.into())], compilation_options: Default::default() }),
-        primitive: wgpu::PrimitiveState { cull_mode: Some(wgpu::Face::Back), ..Default::default() },
-        depth_stencil: Some(wgpu::DepthStencilState { format: wgpu::TextureFormat::Depth32Float, depth_write_enabled: true, depth_compare: wgpu::CompareFunction::LessEqual, stencil: Default::default(), bias: Default::default() }),
-        multisample: Default::default(), multiview: None, cache: None });
+        label: Some("render-ir"),
+        layout: Some(&pll),
+        vertex: wgpu::VertexState {
+            module: &shader,
+            entry_point: Some("vs"),
+            buffers: &[vbl, ibl],
+            compilation_options: Default::default(),
+        },
+        fragment: Some(wgpu::FragmentState {
+            module: &shader,
+            entry_point: Some("fs"),
+            targets: &[Some(format.into())],
+            compilation_options: Default::default(),
+        }),
+        primitive: wgpu::PrimitiveState {
+            cull_mode: Some(wgpu::Face::Back),
+            ..Default::default()
+        },
+        depth_stencil: Some(wgpu::DepthStencilState {
+            format: wgpu::TextureFormat::Depth32Float,
+            depth_write_enabled: true,
+            depth_compare: wgpu::CompareFunction::LessEqual,
+            stencil: Default::default(),
+            bias: Default::default(),
+        }),
+        multisample: Default::default(),
+        multiview: None,
+        cache: None,
+    });
 
-    STATE.with(|s| *s.borrow_mut() = Some(State {
-        device, queue, surface, format, depth, pipeline, vbuf, ibuf, idx: indices.len() as u32,
-        gbuf, inst_buf, inst_cap, bind, w, h }));
+    STATE.with(|s| {
+        *s.borrow_mut() = Some(State {
+            device,
+            queue,
+            surface,
+            format,
+            depth,
+            pipeline,
+            vbuf,
+            ibuf,
+            idx: indices.len() as u32,
+            gbuf,
+            inst_buf,
+            inst_cap,
+            bind,
+            w,
+            h,
+        })
+    });
     Ok(())
 }
 
@@ -222,10 +456,13 @@ pub async fn render_ir_init(canvas_id: &str) -> Result<(), JsValue> {
 /// a tight requestAnimationFrame loop can't re-enter the wasm allocator mid-flight).
 #[wasm_bindgen]
 pub fn render_ir_draw(ir_json: &str) -> Result<(), JsValue> {
-    let ir: serde_json::Value = serde_json::from_str(ir_json).map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let ir: serde_json::Value =
+        serde_json::from_str(ir_json).map_err(|e| JsValue::from_str(&e.to_string()))?;
     STATE.with(|s| {
         let b = s.borrow();
-        let st = b.as_ref().ok_or("renderer not initialised — call render_ir_init first")?;
+        let st = b
+            .as_ref()
+            .ok_or("renderer not initialised — call render_ir_init first")?;
         draw(st, &ir)
     })
 }

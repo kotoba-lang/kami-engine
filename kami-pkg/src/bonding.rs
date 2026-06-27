@@ -1,5 +1,4 @@
 /// Wire bond and flip chip bonding diagram generation.
-
 use serde::{Deserialize, Serialize};
 
 /// Bond interconnect type.
@@ -89,16 +88,43 @@ mod tests {
     #[test]
     fn wire_bond_diagram_generation() {
         let die_pads = vec![
-            PadLocation { name: "VDD".to_string(), x: 0.1, y: 0.1 },
-            PadLocation { name: "GND".to_string(), x: 0.2, y: 0.1 },
-            PadLocation { name: "IO0".to_string(), x: 0.3, y: 0.1 },
+            PadLocation {
+                name: "VDD".to_string(),
+                x: 0.1,
+                y: 0.1,
+            },
+            PadLocation {
+                name: "GND".to_string(),
+                x: 0.2,
+                y: 0.1,
+            },
+            PadLocation {
+                name: "IO0".to_string(),
+                x: 0.3,
+                y: 0.1,
+            },
         ];
         let pkg_pads = vec![
-            PadLocation { name: "P1".to_string(), x: 1.0, y: 0.5 },
-            PadLocation { name: "P2".to_string(), x: 2.0, y: 0.5 },
-            PadLocation { name: "P3".to_string(), x: 3.0, y: 0.5 },
+            PadLocation {
+                name: "P1".to_string(),
+                x: 1.0,
+                y: 0.5,
+            },
+            PadLocation {
+                name: "P2".to_string(),
+                x: 2.0,
+                y: 0.5,
+            },
+            PadLocation {
+                name: "P3".to_string(),
+                x: 3.0,
+                y: 0.5,
+            },
         ];
-        let bond_type = BondType::WireBond { wire_diameter_um: 25.0, loop_height_um: 150.0 };
+        let bond_type = BondType::WireBond {
+            wire_diameter_um: 25.0,
+            loop_height_um: 150.0,
+        };
         let diagram = generate_bond_diagram(&die_pads, &pkg_pads, bond_type);
         assert_eq!(diagram.bonds.len(), 3);
         assert_eq!(diagram.bonds[0].pad_name, "VDD");

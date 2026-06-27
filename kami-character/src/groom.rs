@@ -245,12 +245,7 @@ impl GroomAsset {
         };
         let target = (self.strands.len() as f32 * ratio).max(1.0) as usize;
         let step = (self.strands.len() as f32 / target as f32).ceil() as usize;
-        let strands: Vec<Strand> = self
-            .strands
-            .iter()
-            .step_by(step.max(1))
-            .cloned()
-            .collect();
+        let strands: Vec<Strand> = self.strands.iter().step_by(step.max(1)).cloned().collect();
         let total_points = strands.iter().map(|s| s.points.len()).sum();
         let guide_indices = (0..strands.len()).step_by(4).collect();
         Self {
@@ -326,7 +321,14 @@ impl GroomAsset {
 
                 if i > 0 {
                     let base = (i as u32 - 1) * 2;
-                    indices.extend_from_slice(&[base, base + 2, base + 1, base + 1, base + 2, base + 3]);
+                    indices.extend_from_slice(&[
+                        base,
+                        base + 2,
+                        base + 1,
+                        base + 1,
+                        base + 2,
+                        base + 3,
+                    ]);
                 }
             }
 
@@ -400,7 +402,9 @@ mod tests {
                 let points: Vec<Vec3> = (0..n)
                     .map(|j| Vec3::new(i as f32 * 0.01, -(j as f32 * 0.02), 0.0))
                     .collect();
-                let widths = (0..n).map(|j| 0.002 * (1.0 - j as f32 / n as f32)).collect();
+                let widths = (0..n)
+                    .map(|j| 0.002 * (1.0 - j as f32 / n as f32))
+                    .collect();
                 Strand {
                     points,
                     widths,

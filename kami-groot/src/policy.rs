@@ -32,7 +32,11 @@ impl Gr00tPolicy {
             embodiment.name,
             path
         );
-        Gr00tPolicy { embodiment, backend: Box::new(head), loaded_checkpoint: None }
+        Gr00tPolicy {
+            embodiment,
+            backend: Box::new(head),
+            loaded_checkpoint: None,
+        }
     }
 
     /// Explicit native seat (`from_pretrained` with an empty path).
@@ -47,7 +51,11 @@ impl Gr00tPolicy {
         backend: Box<dyn EmbodimentHead + Send>,
         checkpoint: Option<String>,
     ) -> Self {
-        Gr00tPolicy { embodiment, backend, loaded_checkpoint: checkpoint }
+        Gr00tPolicy {
+            embodiment,
+            backend,
+            loaded_checkpoint: checkpoint,
+        }
     }
 
     /// Reset per-episode policy state. The native backend is stateless, so this
@@ -70,7 +78,11 @@ impl Gr00tPolicy {
         for _ in 0..horizon {
             joint_targets.extend_from_slice(&one);
         }
-        Action { horizon, n_dof, joint_targets }
+        Action {
+            horizon,
+            n_dof,
+            joint_targets,
+        }
     }
 
     /// The provenance of the loaded checkpoint, or `None` for the native seat.

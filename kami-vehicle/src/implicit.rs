@@ -100,7 +100,10 @@ fn apply_system_matrix(
         // For Bounded / Support beams that are idle, skip.
         let rest = b.live_rest_length(0.0);
         match b.beam_type {
-            BeamType::Bounded { min_ratio, max_ratio } => {
+            BeamType::Bounded {
+                min_ratio,
+                max_ratio,
+            } => {
                 let ratio = len / rest.max(1e-6);
                 if ratio >= min_ratio && ratio <= max_ratio {
                     continue;
@@ -257,8 +260,12 @@ mod tests {
         // remain bounded even with zero damping (unlike explicit Euler
         // which would oscillate or diverge for very stiff k / dt).
         let mut nodes = vec![
-            Node::new(0, Vec3::ZERO, 1.0).with_drag(0.0).with_friction(0.0),
-            Node::new(1, Vec3::new(1.10, 0.0, 0.0), 1.0).with_drag(0.0).with_friction(0.0),
+            Node::new(0, Vec3::ZERO, 1.0)
+                .with_drag(0.0)
+                .with_friction(0.0),
+            Node::new(1, Vec3::new(1.10, 0.0, 0.0), 1.0)
+                .with_drag(0.0)
+                .with_friction(0.0),
         ];
         let mut beam = Beam::new(0, 0, 1, 1.0, 5_000.0, 50.0);
         beam.deform = DeformParams {

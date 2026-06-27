@@ -119,6 +119,19 @@ impl Target {
         }
     }
 
+    /// Whether this target can be packaged for **Valve Steam** (ADR-0048).
+    ///
+    /// Steam is a *distribution channel*, not an OS, so it is not its own
+    /// `Target` — it rides the three desktop OS hosts (each ships its own Steam
+    /// depot). A Steam build reuses the OS host as-is (JIT/wasmtime + wgpu) and
+    /// adds: the `kami:engine/steam` services seam (`steam::SteamBackend`), a
+    /// `steam_appid.txt`, and the depot layout. Mobile/console/web are excluded
+    /// (no-JIT consoles ship through their own stores; web is the browser path).
+    pub fn steam_distributable(self) -> bool {
+        use Target::*;
+        matches!(self, Mac | Linux | Windows)
+    }
+
     /// The packaging decision for this target — the ADR-0037 matrix, in code.
     pub fn spec(self) -> PlatformSpec {
         use InputDefault::*;
@@ -209,7 +222,10 @@ impl Target {
     /// truth (not re-built by hand in the bin), and round-trip-tested below.
     pub fn spec_edn(self) -> String {
         let s = self.spec();
-        let q = |o: Option<&str>| o.map(|v| format!("\"{v}\"")).unwrap_or_else(|| "nil".into());
+        let q = |o: Option<&str>| {
+            o.map(|v| format!("\"{v}\""))
+                .unwrap_or_else(|| "nil".into())
+        };
         format!(
             "{{:target \"{}\" :jit {} :host \"{}\" :feature {} :tex \"{}\" :render \"{}\" :input \"{}\" :triple {} :console-seam {}}}",
             self.tag(),
@@ -283,6 +299,21 @@ mod tests {
     }
 
     #[test]
+    fn steam_only_on_desktop() {
+        // Steam rides the desktop OS hosts; never mobile/console/web (ADR-0048).
+        for t in Target::all() {
+            let expected = matches!(t, Target::Mac | Target::Linux | Target::Windows);
+            assert_eq!(t.steam_distributable(), expected, "{:?} steam", t);
+        }
+        // Steam targets keep the desktop host contract: JIT + wasmtime.
+        for t in Target::all().into_iter().filter(|t| t.steam_distributable()) {
+            let s = t.spec();
+            assert!(s.jit_allowed, "{:?} steam build must allow JIT", t);
+            assert_eq!(s.logic, LogicHost::Wasmtime);
+        }
+    }
+
+    #[test]
     fn tag_roundtrips() {
         for t in Target::all() {
             assert_eq!(Target::from_tag(t.tag()), Some(t));
@@ -302,15 +333,29 @@ mod tests {
             let s = t.spec();
             assert_eq!(get("target").and_then(|v| v.as_string()), Some(t.tag()));
             assert_eq!(get("jit").and_then(|v| v.as_bool()), Some(s.jit_allowed));
-            assert_eq!(get("console-seam").and_then(|v| v.as_bool()), Some(s.console_seam));
-            assert_eq!(get("host").and_then(|v| v.as_string()), Some(s.logic.label()));
+            assert_eq!(
+                get("console-seam").and_then(|v| v.as_bool()),
+                Some(s.console_seam)
+            );
+            assert_eq!(
+                get("host").and_then(|v| v.as_string()),
+                Some(s.logic.label())
+            );
             match s.host_feature() {
                 Some(f) => assert_eq!(get("feature").and_then(|v| v.as_string()), Some(f)),
-                None => assert!(get("feature").map_or(false, |v| v.is_nil()), "{} feature nil", t.tag()),
+                None => assert!(
+                    get("feature").map_or(false, |v| v.is_nil()),
+                    "{} feature nil",
+                    t.tag()
+                ),
             }
             match t.triple() {
                 Some(tr) => assert_eq!(get("triple").and_then(|v| v.as_string()), Some(tr)),
-                None => assert!(get("triple").map_or(false, |v| v.is_nil()), "{} triple nil", t.tag()),
+                None => assert!(
+                    get("triple").map_or(false, |v| v.is_nil()),
+                    "{} triple nil",
+                    t.tag()
+                ),
             }
         }
     }

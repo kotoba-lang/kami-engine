@@ -5,7 +5,7 @@
 //! for per-position ripple dynamics.
 
 pub mod wind_field;
-pub use wind_field::{WindFieldConfig, sample_wind, sample_gust_scalar};
+pub use wind_field::{WindFieldConfig, sample_gust_scalar, sample_wind};
 
 use bytemuck::{Pod, Zeroable};
 use glam::Vec3;
@@ -155,8 +155,8 @@ pub struct WindSystem {
 impl Default for WindSystem {
     fn default() -> Self {
         Self {
-            angle: 0.8,       // ~46° from east
-            speed: 5.0,       // gentle breeze (Beaufort 3)
+            angle: 0.8, // ~46° from east
+            speed: 5.0, // gentle breeze (Beaufort 3)
             gust_intensity: 0.3,
             phase: 0.0,
         }

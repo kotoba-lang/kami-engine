@@ -6,9 +6,7 @@
 //! debug helpers; re-exports the shared adapters for ergonomic
 //! `use pipelines::{SkyAdapter, TerrainAdapter}` on the game side.
 
-pub use kami_pipelines::{
-    fog_from_sun, sun_from_time, SkyAdapter, TerrainAdapter,
-};
+pub use kami_pipelines::{SkyAdapter, TerrainAdapter, fog_from_sun, sun_from_time};
 
 use hecs::World;
 use kami_app::{Camera, RenderPipeline};

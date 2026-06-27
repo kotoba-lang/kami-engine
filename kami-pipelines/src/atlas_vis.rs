@@ -12,8 +12,8 @@
 use glam::{Mat4, Vec3};
 use hecs::World;
 use kami_app::{Camera, RenderPipeline};
-use kami_render::scene_pipelines::{AtlasInstance, AtlasPipeline, AtlasUniform};
 use kami_render::RenderContext;
+use kami_render::scene_pipelines::{AtlasInstance, AtlasPipeline, AtlasUniform};
 use std::cell::RefCell;
 use std::rc::Rc;
 use wgpu::util::DeviceExt;
@@ -22,31 +22,31 @@ pub use kami_render::scene_pipelines::atlas_slot;
 
 #[derive(Debug, Clone, Copy)]
 pub struct AtlasSprite {
-    pub pos:   Vec3,
-    pub vel:   Vec3,
-    pub tint:  [f32; 3],
-    pub size:  f32,
-    pub slot:  u32,
-    pub rot:   f32,
+    pub pos: Vec3,
+    pub vel: Vec3,
+    pub tint: [f32; 3],
+    pub size: f32,
+    pub slot: u32,
+    pub rot: f32,
     pub rot_vel: f32,
-    pub age:   f32,
-    pub life:  f32,
+    pub age: f32,
+    pub life: f32,
     /// When true, integrate gravity (9.8 m/s² downward).
     pub gravity: bool,
     /// Vertical bob amplitude (m) — sin wobble on Y.
     pub bob_amp: f32,
     /// Bob angular frequency (rad/s).
-    pub bob_w:   f32,
+    pub bob_w: f32,
     /// Phase — desync a cluster so flames don't pulse in lock-step.
     pub bob_phase: f32,
     /// Scale pulse amplitude (fraction of `size`). 0.0 = off.
     pub pulse_amp: f32,
     /// Scale pulse angular frequency.
-    pub pulse_w:   f32,
+    pub pulse_w: f32,
     /// Rotation wiggle amplitude (rad).
     pub wiggle_amp: f32,
     /// Rotation wiggle angular frequency.
-    pub wiggle_w:   f32,
+    pub wiggle_w: f32,
     /// "Pop in" flag: scale eases 0 → 1.2 → 1.0 over `pop_ease_t`
     /// seconds (Splatoon / Switch bounce). 0.0 = off.
     pub pop_ease_t: f32,
@@ -99,31 +99,65 @@ impl AtlasVisAdapter {
     /// Emit a sprite with full control.
     pub fn emit(&self, s: AtlasSprite) {
         let mut v = self.inner.sprites.borrow_mut();
-        if v.len() as u32 >= self.inner.capacity { return; }
+        if v.len() as u32 >= self.inner.capacity {
+            return;
+        }
         v.push(s);
     }
 
     /// Convenience: static (no velocity, no gravity) sprite.
     pub fn emit_static(&self, pos: Vec3, slot: u32, tint: [f32; 3], size: f32, life: f32) {
         self.emit(AtlasSprite {
-            pos, vel: Vec3::ZERO, tint, size, slot, rot: 0.0, rot_vel: 0.0,
-            age: 0.0, life, gravity: false,
-            bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0,
-            pulse_amp: 0.0, pulse_w: 0.0,
-            wiggle_amp: 0.0, wiggle_w: 0.0,
+            pos,
+            vel: Vec3::ZERO,
+            tint,
+            size,
+            slot,
+            rot: 0.0,
+            rot_vel: 0.0,
+            age: 0.0,
+            life,
+            gravity: false,
+            bob_amp: 0.0,
+            bob_w: 0.0,
+            bob_phase: 0.0,
+            pulse_amp: 0.0,
+            pulse_w: 0.0,
+            wiggle_amp: 0.0,
+            wiggle_w: 0.0,
             pop_ease_t: 0.0,
         });
     }
 
     /// Convenience: flame / plume with Nintendo wobble (bob + scale
     /// pulse + rotation wiggle). Per-instance phase avoids lock-step.
-    pub fn emit_bobbing(&self, pos: Vec3, slot: u32, tint: [f32; 3], size: f32, life: f32, phase: f32) {
+    pub fn emit_bobbing(
+        &self,
+        pos: Vec3,
+        slot: u32,
+        tint: [f32; 3],
+        size: f32,
+        life: f32,
+        phase: f32,
+    ) {
         self.emit(AtlasSprite {
-            pos, vel: Vec3::ZERO, tint, size, slot, rot: 0.0, rot_vel: 0.0,
-            age: 0.0, life, gravity: false,
-            bob_amp: size * 0.12, bob_w: 5.0, bob_phase: phase,
-            pulse_amp: 0.15, pulse_w: 7.0,
-            wiggle_amp: 0.05, wiggle_w: 6.0,
+            pos,
+            vel: Vec3::ZERO,
+            tint,
+            size,
+            slot,
+            rot: 0.0,
+            rot_vel: 0.0,
+            age: 0.0,
+            life,
+            gravity: false,
+            bob_amp: size * 0.12,
+            bob_w: 5.0,
+            bob_phase: phase,
+            pulse_amp: 0.15,
+            pulse_w: 7.0,
+            wiggle_amp: 0.05,
+            wiggle_w: 6.0,
             pop_ease_t: 0.0,
         });
     }
@@ -132,13 +166,33 @@ impl AtlasVisAdapter {
     /// and settles at 1.0×size over the first `ease_t` seconds
     /// (Nintendo "item get" / Switch pop feel). After that it fades
     /// out via alpha. Use for sparkle bursts, splash rings, etc.
-    pub fn emit_pop(&self, pos: Vec3, slot: u32, tint: [f32; 3], size: f32, life: f32, ease_t: f32) {
+    pub fn emit_pop(
+        &self,
+        pos: Vec3,
+        slot: u32,
+        tint: [f32; 3],
+        size: f32,
+        life: f32,
+        ease_t: f32,
+    ) {
         self.emit(AtlasSprite {
-            pos, vel: Vec3::ZERO, tint, size, slot, rot: 0.0, rot_vel: 0.0,
-            age: 0.0, life, gravity: false,
-            bob_amp: 0.0, bob_w: 0.0, bob_phase: 0.0,
-            pulse_amp: 0.0, pulse_w: 0.0,
-            wiggle_amp: 0.0, wiggle_w: 0.0,
+            pos,
+            vel: Vec3::ZERO,
+            tint,
+            size,
+            slot,
+            rot: 0.0,
+            rot_vel: 0.0,
+            age: 0.0,
+            life,
+            gravity: false,
+            bob_amp: 0.0,
+            bob_w: 0.0,
+            bob_phase: 0.0,
+            pulse_amp: 0.0,
+            pulse_w: 0.0,
+            wiggle_amp: 0.0,
+            wiggle_w: 0.0,
             pop_ease_t: ease_t,
         });
     }
@@ -153,8 +207,12 @@ impl AtlasVisAdapter {
         let mut sprites = self.inner.sprites.borrow_mut();
         sprites.retain_mut(|s| {
             s.age += dt;
-            if s.age >= s.life { return false; }
-            if s.gravity { s.vel.y -= GRAVITY * dt; }
+            if s.age >= s.life {
+                return false;
+            }
+            if s.gravity {
+                s.vel.y -= GRAVITY * dt;
+            }
             s.pos += s.vel * dt;
             s.rot += s.rot_vel * dt;
             true
@@ -174,8 +232,10 @@ impl AtlasVisAdapter {
                 let dx = s.pos.x - cam[0];
                 let dy = s.pos.y - cam[1];
                 let dz = s.pos.z - cam[2];
-                let d2 = dx*dx + dy*dy + dz*dz;
-                if d2 > cull2 { return None; }
+                let d2 = dx * dx + dy * dy + dz * dz;
+                if d2 > cull2 {
+                    return None;
+                }
                 let far_slot = d2 > sparkle2;
                 Some((s, far_slot))
             })
@@ -183,11 +243,15 @@ impl AtlasVisAdapter {
             .map(|(s, far_slot)| {
                 let bob = if s.bob_amp > 1e-4 {
                     s.bob_amp * (t * s.bob_w + s.bob_phase).sin()
-                } else { 0.0 };
+                } else {
+                    0.0
+                };
                 // Scale pulse (breathing / throb) around base size.
                 let pulse = if s.pulse_amp > 1e-4 {
                     1.0 + s.pulse_amp * (t * s.pulse_w + s.bob_phase).sin()
-                } else { 1.0 };
+                } else {
+                    1.0
+                };
                 // Pop-in ease: scale 0 → 1.2 → 1.0 over pop_ease_t.
                 // Uses cubic overshoot (Nintendo Switch button pop).
                 let pop_scale = if s.pop_ease_t > 1e-4 {
@@ -195,44 +259,57 @@ impl AtlasVisAdapter {
                     // easeOutBack-like: 2.7·k - 1.7·k² (peak ~1.2)
                     let e = 2.7 * k - 1.7 * k * k;
                     e.max(0.01)
-                } else { 1.0 };
+                } else {
+                    1.0
+                };
                 let size = s.size * pulse * pop_scale;
                 // Rotation wiggle + per-sprite phase keeps sparkles
                 // from rotating in unison.
                 let wiggle = if s.wiggle_amp > 1e-4 {
                     s.wiggle_amp * (t * s.wiggle_w + s.bob_phase).sin()
-                } else { 0.0 };
+                } else {
+                    0.0
+                };
                 let rot = s.rot + wiggle;
                 // Alpha fade with pop-in gate: during pop_ease_t the
                 // sprite is fully opaque; after that linear fade.
                 let raw_fade = (1.0 - s.age / s.life.max(1e-3)).clamp(0.0, 1.0);
                 let alpha = if s.pop_ease_t > 1e-4 && s.age < s.pop_ease_t {
                     1.0
-                } else { raw_fade };
+                } else {
+                    raw_fade
+                };
                 // Far sprites collapse to SPARKLE_STAR so distant
                 // activity reads as ambient "twinkle" rather than
                 // illegible pixel noise. Tint shifts warmer so the
                 // sparkle still carries fire-vs-water cue.
                 let (out_slot, out_size) = if far_slot {
-                    (kami_render::scene_pipelines::atlas_slot::SPARKLE_STAR,
-                     size * 0.6)
+                    (
+                        kami_render::scene_pipelines::atlas_slot::SPARKLE_STAR,
+                        size * 0.6,
+                    )
                 } else {
                     (s.slot, size)
                 };
                 AtlasInstance {
                     pos: [s.pos.x, s.pos.y + bob, s.pos.z],
-                    tint: s.tint, size: out_size, slot: out_slot, rot, alpha,
+                    tint: s.tint,
+                    size: out_size,
+                    slot: out_slot,
+                    rot,
+                    alpha,
                 }
             })
             .collect();
         *self.inner.instance_count.borrow_mut() = instances.len() as u32;
-        let buf = self.inner.device.create_buffer_init(
-            &wgpu::util::BufferInitDescriptor {
+        let buf = self
+            .inner
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
                 label: Some("atlas_vis.instances"),
                 contents: bytemuck::cast_slice(&instances),
                 usage: wgpu::BufferUsages::VERTEX,
-            },
-        );
+            });
         *self.inner.instance_vb.borrow_mut() = buf;
         instances.len() as u32
     }
@@ -254,7 +331,9 @@ impl RenderPipeline for AtlasVisAdapter {
         _world: &World,
     ) {
         let count = *self.inner.instance_count.borrow();
-        if count == 0 { return; }
+        if count == 0 {
+            return;
+        }
         let u = camera.as_render().uniform();
         let view_m = Mat4::from_cols_array_2d(&u.view);
         let proj = Mat4::from_cols_array_2d(&u.projection);
@@ -268,17 +347,25 @@ impl RenderPipeline for AtlasVisAdapter {
             cam_up: up.to_array(),
             _p1: 0.0,
         };
-        ctx.queue.write_buffer(&self.inner.pipeline.uniform, 0, bytemuck::bytes_of(&au));
+        ctx.queue
+            .write_buffer(&self.inner.pipeline.uniform, 0, bytemuck::bytes_of(&au));
 
         let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("atlas_vis.pass"),
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                view, resolve_target: None,
-                ops: wgpu::Operations { load: wgpu::LoadOp::Load, store: wgpu::StoreOp::Store },
+                view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Load,
+                    store: wgpu::StoreOp::Store,
+                },
             })],
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                 view: depth_view,
-                depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Load, store: wgpu::StoreOp::Store }),
+                depth_ops: Some(wgpu::Operations {
+                    load: wgpu::LoadOp::Load,
+                    store: wgpu::StoreOp::Store,
+                }),
                 stencil_ops: None,
             }),
             timestamp_writes: None,
@@ -289,7 +376,10 @@ impl RenderPipeline for AtlasVisAdapter {
         pass.set_vertex_buffer(0, self.inner.pipeline.quad_vb.slice(..));
         let vb = self.inner.instance_vb.borrow();
         pass.set_vertex_buffer(1, vb.slice(..));
-        pass.set_index_buffer(self.inner.pipeline.quad_ib.slice(..), wgpu::IndexFormat::Uint32);
+        pass.set_index_buffer(
+            self.inner.pipeline.quad_ib.slice(..),
+            wgpu::IndexFormat::Uint32,
+        );
         pass.draw_indexed(0..6, 0, 0..count);
     }
 }

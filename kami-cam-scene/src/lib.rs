@@ -31,7 +31,7 @@
 use std::collections::BTreeMap;
 
 use kami_cam::CamMaterial;
-use kami_scene::{kw_key, mget, root_map, EdnValue};
+use kami_scene::{EdnValue, kw_key, mget, root_map};
 
 /// The canonical stock-material CONFIG shipped with this crate (the preset table).
 /// This is the source of truth; the compiled-in presets are the parity-tested mirror.

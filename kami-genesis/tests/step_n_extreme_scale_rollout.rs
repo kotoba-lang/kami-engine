@@ -35,7 +35,12 @@ fn cartpole_512k_env_steps_canonical_api_throughput() {
     let mut states: Vec<CartpoleState> = (0..N_ENVS)
         .map(|i| {
             let theta0 = ((i as f32 / N_ENVS as f32) - 0.5) * 0.1;
-            CartpoleState { x: 0.0, x_dot: 0.0, theta: theta0, theta_dot: 0.0 }
+            CartpoleState {
+                x: 0.0,
+                x_dot: 0.0,
+                theta: theta0,
+                theta_dot: 0.0,
+            }
         })
         .collect();
 
@@ -57,7 +62,10 @@ fn cartpole_512k_env_steps_canonical_api_throughput() {
 
     // Final-state diagnostics.
     let theta_min = states.iter().map(|s| s.theta).fold(f32::INFINITY, f32::min);
-    let theta_max = states.iter().map(|s| s.theta).fold(f32::NEG_INFINITY, f32::max);
+    let theta_max = states
+        .iter()
+        .map(|s| s.theta)
+        .fold(f32::NEG_INFINITY, f32::max);
     let mut env_count_past_pi = 0;
     for s in &states {
         if s.theta.abs() > std::f32::consts::PI {
@@ -71,15 +79,37 @@ fn cartpole_512k_env_steps_canonical_api_throughput() {
     println!("║   = 512 K env-steps via canonical step() API on Metal GPU         ║");
     println!("║   ADR-2605261800 §G7 PhysX NEVER constitutional invariant         ║");
     println!("╠═══════════════════════════════════════════════════════════════════╣");
-    println!("║ total env-steps     : {:>12}                                ║", total_env_steps);
-    println!("║ wall clock          : {:>10}                              ║", format!("{:?}", wall));
-    println!("║ μs per dispatch     : {:>10.1}                                ║", us_per_dispatch);
-    println!("║ ns per env-step     : {:>10.1}                                ║", ns_per_env_step);
-    println!("║ throughput          : {:>10.2} M env-steps/sec                ║", throughput_m_per_sec);
+    println!(
+        "║ total env-steps     : {:>12}                                ║",
+        total_env_steps
+    );
+    println!(
+        "║ wall clock          : {:>10}                              ║",
+        format!("{:?}", wall)
+    );
+    println!(
+        "║ μs per dispatch     : {:>10.1}                                ║",
+        us_per_dispatch
+    );
+    println!(
+        "║ ns per env-step     : {:>10.1}                                ║",
+        ns_per_env_step
+    );
+    println!(
+        "║ throughput          : {:>10.2} M env-steps/sec                ║",
+        throughput_m_per_sec
+    );
     println!("╠═══════════════════════════════════════════════════════════════════╣");
-    println!("║ θ range             : [{:>7.2}, {:>7.2}] rad                  ║", theta_min, theta_max);
-    println!("║ envs past ±π        : {:>5} / {} ({:.1}%)                       ║",
-             env_count_past_pi, N_ENVS, frac_past_pi * 100.0);
+    println!(
+        "║ θ range             : [{:>7.2}, {:>7.2}] rad                  ║",
+        theta_min, theta_max
+    );
+    println!(
+        "║ envs past ±π        : {:>5} / {} ({:.1}%)                       ║",
+        env_count_past_pi,
+        N_ENVS,
+        frac_past_pi * 100.0
+    );
     println!("╚═══════════════════════════════════════════════════════════════════╝");
 
     // Acceptance gates:
@@ -100,6 +130,9 @@ fn cartpole_512k_env_steps_canonical_api_throughput() {
     // 3. No NaN/inf at extreme scale.
     for s in &states {
         assert!(s.x.is_finite(), "x went non-finite at extreme scale");
-        assert!(s.theta.is_finite(), "theta went non-finite at extreme scale");
+        assert!(
+            s.theta.is_finite(),
+            "theta went non-finite at extreme scale"
+        );
     }
 }

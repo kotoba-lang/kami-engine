@@ -48,7 +48,12 @@ fn r1_2_scorecard_aggregate_all_paths() {
         let initial: Vec<CartpoleState> = (0..N_ENVS)
             .map(|i| {
                 let theta0 = ((i as f32 / N_ENVS as f32) - 0.5) * 0.1;
-                CartpoleState { x: 0.0, x_dot: 0.0, theta: theta0, theta_dot: 0.0 }
+                CartpoleState {
+                    x: 0.0,
+                    x_dot: 0.0,
+                    theta: theta0,
+                    theta_dot: 0.0,
+                }
             })
             .collect();
 
@@ -67,7 +72,9 @@ fn r1_2_scorecard_aggregate_all_paths() {
         // Batched path.
         let mut batched_s = initial.clone();
         let t = Instant::now();
-        backend.step_n(&mut batched_s, &actions, &cfg, N_STEPS).unwrap();
+        backend
+            .step_n(&mut batched_s, &actions, &cfg, N_STEPS)
+            .unwrap();
         let batched_wall = t.elapsed();
 
         let mut max_d = 0.0f32;
@@ -103,12 +110,16 @@ fn r1_2_scorecard_aggregate_all_paths() {
             .collect();
 
         let mut warm = initial.clone();
-        backend.step_double_pendulum(&mut warm, &torques, &cfg).unwrap();
+        backend
+            .step_double_pendulum(&mut warm, &torques, &cfg)
+            .unwrap();
 
         let mut loop_s = initial.clone();
         let t = Instant::now();
         for _ in 0..N_STEPS {
-            backend.step_double_pendulum(&mut loop_s, &torques, &cfg).unwrap();
+            backend
+                .step_double_pendulum(&mut loop_s, &torques, &cfg)
+                .unwrap();
         }
         let loop_wall = t.elapsed();
 
@@ -141,8 +152,10 @@ fn r1_2_scorecard_aggregate_all_paths() {
     println!("║       ADR-2605261800 §G7 PhysX-NEVER constitutional invariant      ║");
     println!("║       Apache-2.0 Genesis-5-solver → WGSL → Apple M4 Metal/...      ║");
     println!("╠═══════════════════════════════════════════════════════════════════╣");
-    println!("║ {:^16} {:>12} {:>14} {:>10} {:>9} ║",
-             "topology", "loop wall", "step_n wall", "speedup", "max |Δ|");
+    println!(
+        "║ {:^16} {:>12} {:>14} {:>10} {:>9} ║",
+        "topology", "loop wall", "step_n wall", "speedup", "max |Δ|"
+    );
     println!("╠═══════════════════════════════════════════════════════════════════╣");
     for r in &results {
         println!(
@@ -158,8 +171,14 @@ fn r1_2_scorecard_aggregate_all_paths() {
 
     let avg_speedup: f64 = results.iter().map(|r| r.speedup).sum::<f64>() / results.len() as f64;
     println!("║ aggregate avg speedup: {avg_speedup:>5.2}× (target ≥10×)                       ║");
-    println!("║ aggregate bit-identical: {}                                       ║",
-             if results.iter().all(|r| r.max_delta < 1e-5) { "✅ yes" } else { "❌ no " });
+    println!(
+        "║ aggregate bit-identical: {}                                       ║",
+        if results.iter().all(|r| r.max_delta < 1e-5) {
+            "✅ yes"
+        } else {
+            "❌ no "
+        }
+    );
     println!("╚═══════════════════════════════════════════════════════════════════╝");
 
     // ─── Acceptance gates ───────────────────────────────────────────────────
@@ -167,12 +186,14 @@ fn r1_2_scorecard_aggregate_all_paths() {
         assert!(
             r.max_delta < 1e-5,
             "{} bit-identity: max |Δ| {:.3e} > 1e-5",
-            r.name, r.max_delta,
+            r.name,
+            r.max_delta,
         );
         assert!(
             r.speedup >= 10.0,
             "{} R1.2 speedup: {:.2}× < 10× floor (iter 11/12 baseline was 13/12×)",
-            r.name, r.speedup,
+            r.name,
+            r.speedup,
         );
     }
     assert!(

@@ -1212,7 +1212,11 @@ mod tests {
         // Checked on the real 6-DOF URDF at several configs (off-axis joints).
         let urdf = include_str!("../../fixtures/giemon_arm6/giemon_arm6.urdf");
         let sys = kami_articulated::parse_urdf(urdf).unwrap();
-        let cfg = Articulation3dConfig::from_articulated_system(&sys, Vec3::new(0.0, 0.0, -9.81), 1.0 / 240.0);
+        let cfg = Articulation3dConfig::from_articulated_system(
+            &sys,
+            Vec3::new(0.0, 0.0, -9.81),
+            1.0 / 240.0,
+        );
         let n = cfg.ndof;
         let configs = [
             vec![0.0_f32; 6],
@@ -1224,7 +1228,10 @@ mod tests {
             // Symmetric.
             for i in 0..n {
                 for j in 0..n {
-                    assert!((m[i][j] - m[j][i]).abs() < 1e-4, "M not symmetric at ({i},{j})");
+                    assert!(
+                        (m[i][j] - m[j][i]).abs() < 1e-4,
+                        "M not symmetric at ({i},{j})"
+                    );
                 }
             }
             // Positive-definite: kinetic energy ½·q̇ᵀM·q̇ > 0 for several nonzero q̇.
@@ -1276,7 +1283,11 @@ mod tests {
             emax = emax.max(e);
         }
         // No secular drift: the energy stays within a few % of the initial KE.
-        assert!((emax - emin) < 0.05 * e0, "KE not conserved: span {} vs e0 {e0}", emax - emin);
+        assert!(
+            (emax - emin) < 0.05 * e0,
+            "KE not conserved: span {} vs e0 {e0}",
+            emax - emin
+        );
     }
 
     #[test]
@@ -1299,7 +1310,10 @@ mod tests {
         let qdd_des = vec![1.0_f32, -1.5, 0.8, -0.6, 1.2, -0.9];
 
         let tau = cfg.inverse_dynamics(&q, &qd, &qdd_des);
-        let st = Articulation3dState { q: q.clone(), qdot: qd.clone() };
+        let st = Articulation3dState {
+            q: q.clone(),
+            qdot: qd.clone(),
+        };
         let (qdd, _m) = cfg.forward_dynamics(&st, &tau);
         for d in 0..cfg.ndof {
             assert!(

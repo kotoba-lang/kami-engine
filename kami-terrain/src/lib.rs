@@ -5,16 +5,18 @@
 //!
 //! Design reference: Guerrilla Games Decima Engine (Horizon Zero Dawn).
 
-pub mod heightmap;
+pub mod biome;
 pub mod chunk;
+pub mod heightmap;
 pub mod noise;
 pub mod splatmap;
 pub mod water;
-pub mod biome;
 
-pub use heightmap::{Heightmap, HeightmapConfig};
+pub use biome::{BiomePreset, MaterialPalette, SplatThresholds};
 pub use chunk::{TerrainChunk, TerrainVertex, generate_chunk_mesh};
+pub use heightmap::{Heightmap, HeightmapConfig};
 pub use noise::fbm_noise;
 pub use splatmap::Splatmap;
-pub use water::{WaterConfig, WaterVertex, GerstnerWave, generate_water_mesh, default_waves, waves_from_wind};
-pub use biome::{BiomePreset, SplatThresholds, MaterialPalette};
+pub use water::{
+    GerstnerWave, WaterConfig, WaterVertex, default_waves, generate_water_mesh, waves_from_wind,
+};

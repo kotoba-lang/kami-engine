@@ -9,8 +9,8 @@
 
 use kami_cam::CamMaterial;
 use kami_cam_scene::{
-    builtin_material, materials_from_edn, shipped_materials, spec_to_cam_material,
-    CamMaterialSpec, ALL_MATERIAL_IDS, MATERIALS_EDN,
+    ALL_MATERIAL_IDS, CamMaterialSpec, MATERIALS_EDN, builtin_material, materials_from_edn,
+    shipped_materials, spec_to_cam_material,
 };
 
 /// The hardcoded `CamMaterial` for an id — the parity oracle (real Rust, not copied).

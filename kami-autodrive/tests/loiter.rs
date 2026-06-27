@@ -37,7 +37,10 @@ fn fixed_wing_loiters_over_a_distant_waypoint() {
         plane.step(cmd, dt);
     }
     assert!(arrived, "aircraft should reach the loiter station");
-    assert!(min_airspeed > stall, "must stay above stall ({stall:.0} m/s), dipped to {min_airspeed:.0}");
+    assert!(
+        min_airspeed > stall,
+        "must stay above stall ({stall:.0} m/s), dipped to {min_airspeed:.0}"
+    );
 
     // Hold station: keep flying and confirm it ORBITS the goal (stays within a
     // couple of turn radii) rather than drifting off to infinity.

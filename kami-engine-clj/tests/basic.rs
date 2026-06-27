@@ -16,17 +16,17 @@ fn empty_defn_compiles() {
 #[test]
 fn compiler_rejects_malformed_input() {
     let bad = [
-        "(defn)",                       // defn: too few forms
-        "(defn f)",                     // defn: missing params + body
-        "(def x)",                      // def: needs exactly (def name value)
-        "(defn f [1] 0)",               // param list must be symbols
-        "(defn f [] (f32))",            // f32 takes exactly one arg
-        "(defn f [] (f32 1 2))",        // f32 takes exactly one arg
-        "(defn f [] (let [a] a))",      // let binding vector must be even
-        "(defn f [] (+))",             // + needs at least one arg
-        "(weird-top-level-form 1 2)",   // unsupported top-level form
-        "(123 456)",                    // list head must be a symbol
-        "(defn f [] (",                 // unterminated — reader error
+        "(defn)",                     // defn: too few forms
+        "(defn f)",                   // defn: missing params + body
+        "(def x)",                    // def: needs exactly (def name value)
+        "(defn f [1] 0)",             // param list must be symbols
+        "(defn f [] (f32))",          // f32 takes exactly one arg
+        "(defn f [] (f32 1 2))",      // f32 takes exactly one arg
+        "(defn f [] (let [a] a))",    // let binding vector must be even
+        "(defn f [] (+))",            // + needs at least one arg
+        "(weird-top-level-form 1 2)", // unsupported top-level form
+        "(123 456)",                  // list head must be a symbol
+        "(defn f [] (",               // unterminated — reader error
     ];
     for src in bad {
         assert!(
@@ -42,13 +42,13 @@ fn compiler_rejects_malformed_input() {
 #[test]
 fn f32_arithmetic_is_rejected() {
     let bad = [
-        "(defn f [e] (+ (get-x e) 1))",         // integer-add of a position's bits
+        "(defn f [e] (+ (get-x e) 1))", // integer-add of a position's bits
         "(defn f [e] (- (get-y e) (get-x e)))", // subtract two f32 positions
-        "(defn f [e] (* (get-vx e) 2))",        // scale a velocity in-guest
-        "(defn f [] (< (get-x 0) (get-y 0)))",  // signed-compare f32 bits (wrong for negatives)
-        "(defn f [] (inc (get-x 0)))",          // inc an f32
-        "(defn f [] (+ (f32 1.0) (f32 2.0)))",  // add two float literals
-        "(defn f [] (* (axis \"MoveX\") 3))",   // scale an axis reading
+        "(defn f [e] (* (get-vx e) 2))", // scale a velocity in-guest
+        "(defn f [] (< (get-x 0) (get-y 0)))", // signed-compare f32 bits (wrong for negatives)
+        "(defn f [] (inc (get-x 0)))",  // inc an f32
+        "(defn f [] (+ (f32 1.0) (f32 2.0)))", // add two float literals
+        "(defn f [] (* (axis \"MoveX\") 3))", // scale an axis reading
     ];
     for src in bad {
         assert!(
@@ -63,7 +63,10 @@ fn f32_arithmetic_is_rejected() {
 #[test]
 fn f32_passthrough_to_host_still_compiles() {
     let ok = "(defn move [e] (set-position! e (get-x e) (get-y e) (f32 0.0)))";
-    assert!(compile_str(ok).is_ok(), "passing f32 to a host primitive must compile");
+    assert!(
+        compile_str(ok).is_ok(),
+        "passing f32 to a host primitive must compile"
+    );
 }
 
 #[test]
@@ -198,8 +201,10 @@ fn rand_int_compiles() {
 
 #[test]
 fn count_tagged_compiles() {
-    let wasm = kami_engine_clj::compile_str(r#"(defsystem s [dt] (when (< (count-tagged "enemy") 400) 1))"#)
-        .expect("count-tagged compile");
+    let wasm = kami_engine_clj::compile_str(
+        r#"(defsystem s [dt] (when (< (count-tagged "enemy") 400) 1))"#,
+    )
+    .expect("count-tagged compile");
     assert!(wasm.starts_with(b"\0asm"));
 }
 
@@ -256,4 +261,26 @@ fn survivors_core_loop_compiles() {
     let wasm = kami_engine_clj::compile_str(src).expect("survivors core loop compile");
     assert!(wasm.starts_with(b"\0asm"), "missing WASM magic");
     assert!(wasm.len() > 200, "suspiciously small module");
+}
+
+/// Valve Steamworks builtins (ADR-0048) compile and import `kami:engine/steam`.
+/// The import module name is stored UTF-8 in the WASM import section, so a build
+/// that references the steam seam carries the string verbatim.
+#[test]
+fn steam_builtins_compile_and_import_steam_interface() {
+    let src = r#"
+        (defn init []
+          (steam-rich-presence! "status" "menu"))
+        (defsystem boss-kill [dt]
+          (when (zero? (mod (tick-n) 10))
+            (steam-unlock! "FIRST_BOSS")
+            (steam-set-stat! "bosses" 1)))
+    "#;
+    let wasm = compile_str(src).expect("steam builtins compile");
+    assert!(wasm.starts_with(b"\0asm"), "missing WASM magic");
+    let needle = b"kami:engine/steam@1.0.0";
+    assert!(
+        wasm.windows(needle.len()).any(|w| w == needle),
+        "compiled module must import the kami:engine/steam interface"
+    );
 }

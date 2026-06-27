@@ -2,8 +2,8 @@
 
 use std::collections::HashSet;
 
-use crate::vrm_types::VrmDocument;
 use crate::VrmError;
+use crate::vrm_types::VrmDocument;
 
 /// Category tag for avatar parts.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -53,7 +53,11 @@ pub fn classify_mesh(mesh_name: &str, material_names: &[&str], node_name: &str) 
 
     if combined.contains("hair") || combined.contains("bangs") {
         PartCategory::Hair
-    } else if combined.contains("face") || combined.contains("eye") || combined.contains("mouth") || combined.contains("brow") {
+    } else if combined.contains("face")
+        || combined.contains("eye")
+        || combined.contains("mouth")
+        || combined.contains("brow")
+    {
         PartCategory::Face
     } else if combined.contains("body") || combined.contains("skin") {
         PartCategory::Body
@@ -97,7 +101,9 @@ pub fn decompose(doc: &VrmDocument) -> Result<Vec<VrmPart>, VrmError> {
             continue;
         };
         let mesh = doc.gltf.meshes.get(mesh_idx).ok_or_else(|| {
-            VrmError::Part(format!("node {node_idx} references missing mesh {mesh_idx}"))
+            VrmError::Part(format!(
+                "node {node_idx} references missing mesh {mesh_idx}"
+            ))
         })?;
 
         let mesh_name = mesh.name.as_deref().unwrap_or("");
@@ -115,7 +121,10 @@ pub fn decompose(doc: &VrmDocument) -> Result<Vec<VrmPart>, VrmError> {
         let category = classify_mesh(mesh_name, &mat_names, node_name);
 
         // Try to merge with existing group of same category
-        if let Some(group) = category_meshes.iter_mut().find(|(c, _, _, _)| *c == category) {
+        if let Some(group) = category_meshes
+            .iter_mut()
+            .find(|(c, _, _, _)| *c == category)
+        {
             group.2.push(mesh_idx);
             group.3.push(node_idx);
         } else {
@@ -205,8 +214,13 @@ pub fn decompose(doc: &VrmDocument) -> Result<Vec<VrmPart>, VrmError> {
             .iter()
             .enumerate()
             .filter(|(_, expr)| {
-                expr.morph_target_binds.iter().any(|b| mesh_set.contains(&b.mesh_index))
-                    || expr.material_color_binds.iter().any(|b| material_indices.contains(&b.material_index))
+                expr.morph_target_binds
+                    .iter()
+                    .any(|b| mesh_set.contains(&b.mesh_index))
+                    || expr
+                        .material_color_binds
+                        .iter()
+                        .any(|b| material_indices.contains(&b.material_index))
             })
             .map(|(i, _)| i)
             .collect();
@@ -229,10 +243,7 @@ pub fn decompose(doc: &VrmDocument) -> Result<Vec<VrmPart>, VrmError> {
 }
 
 /// Collect texture indices referenced by a material.
-fn collect_material_textures(
-    mat: &crate::gltf_types::Material,
-    textures: &mut Vec<usize>,
-) {
+fn collect_material_textures(mat: &crate::gltf_types::Material, textures: &mut Vec<usize>) {
     if let Some(pbr) = &mat.pbr_metallic_roughness {
         if let Some(tex) = &pbr.base_color_texture {
             if !textures.contains(&tex.index) {
@@ -261,7 +272,10 @@ mod tests {
     #[test]
     fn classify_body() {
         assert_eq!(classify_mesh("Body", &[], ""), PartCategory::Body);
-        assert_eq!(classify_mesh("mesh", &["skin_material"], ""), PartCategory::Body);
+        assert_eq!(
+            classify_mesh("mesh", &["skin_material"], ""),
+            PartCategory::Body
+        );
     }
 
     #[test]

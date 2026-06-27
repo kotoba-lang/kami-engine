@@ -50,69 +50,104 @@ impl FieldIconMap {
     /// - `WATER_DROP` for cold-wet (gravity wins)
     /// - `EMBER` for hot remnant after water extinguish
     pub fn nintendo_default() -> Self {
-        let dry = 0.12;  // "effectively dry" moisture threshold
-        let wet = 0.10;  // "effectively wet" threshold
+        let dry = 0.12; // "effectively dry" moisture threshold
+        let wet = 0.10; // "effectively wet" threshold
         let flame_tint = [1.0, 0.5, 0.1];
         Self {
             rules: vec![
                 FieldIconRule {
-                    min_heat: 50.0, max_heat: f32::INFINITY,
-                    min_moist: 0.0, max_moist: dry,
+                    min_heat: 50.0,
+                    max_heat: f32::INFINITY,
+                    min_moist: 0.0,
+                    max_moist: dry,
                     icon: FieldIcon {
-                        slot: atlas_slot::FLAME_LARGE, tint: flame_tint,
-                        size: 1.8, bobbing: true, life: 0.35,
+                        slot: atlas_slot::FLAME_LARGE,
+                        tint: flame_tint,
+                        size: 1.8,
+                        bobbing: true,
+                        life: 0.35,
                     },
                 },
                 FieldIconRule {
-                    min_heat: 22.0, max_heat: f32::INFINITY,
-                    min_moist: 0.0, max_moist: dry,
+                    min_heat: 22.0,
+                    max_heat: f32::INFINITY,
+                    min_moist: 0.0,
+                    max_moist: dry,
                     icon: FieldIcon {
-                        slot: atlas_slot::FLAME_MEDIUM, tint: flame_tint,
-                        size: 1.3, bobbing: true, life: 0.32,
+                        slot: atlas_slot::FLAME_MEDIUM,
+                        tint: flame_tint,
+                        size: 1.3,
+                        bobbing: true,
+                        life: 0.32,
                     },
                 },
                 FieldIconRule {
-                    min_heat: 8.0, max_heat: f32::INFINITY,
-                    min_moist: 0.0, max_moist: dry,
+                    min_heat: 8.0,
+                    max_heat: f32::INFINITY,
+                    min_moist: 0.0,
+                    max_moist: dry,
                     icon: FieldIcon {
-                        slot: atlas_slot::FLAME_SMALL, tint: flame_tint,
-                        size: 0.95, bobbing: true, life: 0.30,
+                        slot: atlas_slot::FLAME_SMALL,
+                        tint: flame_tint,
+                        size: 0.95,
+                        bobbing: true,
+                        life: 0.30,
                     },
                 },
                 // Hot + wet → steam. Light blue-white drift.
                 FieldIconRule {
-                    min_heat: 5.0, max_heat: f32::INFINITY,
-                    min_moist: wet, max_moist: f32::INFINITY,
+                    min_heat: 5.0,
+                    max_heat: f32::INFINITY,
+                    min_moist: wet,
+                    max_moist: f32::INFINITY,
                     icon: FieldIcon {
-                        slot: atlas_slot::STEAM_PUFF, tint: [0.92, 0.95, 1.0],
-                        size: 1.1, bobbing: false, life: 1.4,
+                        slot: atlas_slot::STEAM_PUFF,
+                        tint: [0.92, 0.95, 1.0],
+                        size: 1.1,
+                        bobbing: false,
+                        life: 1.4,
                     },
                 },
                 // Cold + wet → gravity-loaded droplet.
                 FieldIconRule {
-                    min_heat: 0.0, max_heat: 4.0,
-                    min_moist: 0.25, max_moist: f32::INFINITY,
+                    min_heat: 0.0,
+                    max_heat: 4.0,
+                    min_moist: 0.25,
+                    max_moist: f32::INFINITY,
                     icon: FieldIcon {
-                        slot: atlas_slot::WATER_DROP, tint: [0.45, 0.7, 1.0],
-                        size: 0.7, bobbing: false, life: 1.0,
+                        slot: atlas_slot::WATER_DROP,
+                        tint: [0.45, 0.7, 1.0],
+                        size: 0.7,
+                        bobbing: false,
+                        life: 1.0,
                     },
                 },
                 // Lukewarm + damp → bubble (paper-soaked).
                 FieldIconRule {
-                    min_heat: 0.0, max_heat: 8.0,
-                    min_moist: 0.12, max_moist: f32::INFINITY,
+                    min_heat: 0.0,
+                    max_heat: 8.0,
+                    min_moist: 0.12,
+                    max_moist: f32::INFINITY,
                     icon: FieldIcon {
-                        slot: atlas_slot::BUBBLE, tint: [0.55, 0.8, 1.0],
-                        size: 0.8, bobbing: true, life: 0.6,
+                        slot: atlas_slot::BUBBLE,
+                        tint: [0.55, 0.8, 1.0],
+                        size: 0.8,
+                        bobbing: true,
+                        life: 0.6,
                     },
                 },
                 // Dying heat, dry → ember.
                 FieldIconRule {
-                    min_heat: 2.0, max_heat: 8.0,
-                    min_moist: 0.0, max_moist: dry,
+                    min_heat: 2.0,
+                    max_heat: 8.0,
+                    min_moist: 0.0,
+                    max_moist: dry,
                     icon: FieldIcon {
-                        slot: atlas_slot::EMBER, tint: [1.0, 0.6, 0.3],
-                        size: 0.5, bobbing: false, life: 0.6,
+                        slot: atlas_slot::EMBER,
+                        tint: [1.0, 0.6, 0.3],
+                        size: 0.5,
+                        bobbing: false,
+                        life: 0.6,
                     },
                 },
             ],
@@ -120,9 +155,14 @@ impl FieldIconMap {
     }
 
     pub fn pick(&self, heat: f32, moist: f32) -> Option<FieldIcon> {
-        self.rules.iter()
-            .find(|r| heat >= r.min_heat && heat <= r.max_heat
-                   && moist >= r.min_moist && moist <= r.max_moist)
+        self.rules
+            .iter()
+            .find(|r| {
+                heat >= r.min_heat
+                    && heat <= r.max_heat
+                    && moist >= r.min_moist
+                    && moist <= r.max_moist
+            })
             .map(|r| r.icon)
     }
 }

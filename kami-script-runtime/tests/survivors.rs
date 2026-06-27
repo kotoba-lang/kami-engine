@@ -53,7 +53,10 @@ fn survivors_core_loop_evolves() {
         }
     }
     assert!(enemies > 0, "wave spawning produced enemies");
-    assert!(enemies < 200, "alive count stays under the cap (got {enemies})");
+    assert!(
+        enemies < 200,
+        "alive count stays under the cap (got {enemies})"
+    );
     // AI (move-toward over doseq-entities) + integration marched an enemy in
     // from the 300px spawn ring toward the player at the origin.
     assert!(
@@ -86,8 +89,16 @@ fn weapon_culls_enemies_in_range() {
 
     assert_eq!(count_tag(&w.lock().unwrap(), "enemy"), 3);
     rt.call_systems("g", 16).unwrap();
-    assert_eq!(count_tag(&w.lock().unwrap(), "enemy"), 2, "one culled per fire");
+    assert_eq!(
+        count_tag(&w.lock().unwrap(), "enemy"),
+        2,
+        "one culled per fire"
+    );
     rt.call_systems("g", 16).unwrap();
     rt.call_systems("g", 16).unwrap();
-    assert_eq!(count_tag(&w.lock().unwrap(), "enemy"), 0, "all enemies culled");
+    assert_eq!(
+        count_tag(&w.lock().unwrap(), "enemy"),
+        0,
+        "all enemies culled"
+    );
 }

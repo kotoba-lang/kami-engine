@@ -176,8 +176,8 @@ pub fn flat_tile_patch_from_dem(
 
     let (_, south, _, north) = coord.lng_lat_bounds();
     let mid_lat = ((south + north) * 0.5).to_radians();
-    let meters_per_px = (156_543.033_92_f64 * mid_lat.cos() / 2.0_f64.powi(coord.z as i32))
-        .max(0.05) as f32;
+    let meters_per_px =
+        (156_543.033_92_f64 * mid_lat.cos() / 2.0_f64.powi(coord.z as i32)).max(0.05) as f32;
     let meters_to_world_px = vertical_exaggeration.max(0.0) / meters_per_px;
     let segs = segments.clamp(2, 64);
     let stride = segs + 1;
@@ -223,9 +223,7 @@ pub fn flat_tile_patch_from_dem(
         let normal = normalize3(normals[idx]);
         let uv = uvs[idx];
         vertices.extend_from_slice(&[
-            pos[0], pos[1], pos[2],
-            normal[0], normal[1], normal[2],
-            uv[0], uv[1],
+            pos[0], pos[1], pos[2], normal[0], normal[1], normal[2], uv[0], uv[1],
         ]);
     }
 
@@ -328,14 +326,7 @@ fn globe_tile_patch_from_heights(
         let normal = normalize3(normals[idx]);
         let uv = uvs[idx];
         vertices.extend_from_slice(&[
-            pos[0],
-            pos[1],
-            pos[2],
-            normal[0],
-            normal[1],
-            normal[2],
-            uv[0],
-            uv[1],
+            pos[0], pos[1], pos[2], normal[0], normal[1], normal[2], uv[0], uv[1],
         ]);
     }
 
@@ -370,7 +361,11 @@ fn globe_relief_height(lng: f64, lat: f64) -> f32 {
     let lat_band = 1.0 - (lat.abs() as f32 / 90.0).powf(1.35);
     let continent = fbm2(x * 1.15 + 13.7, y * 1.15 - 5.4, 4, 2.0, 0.52);
     let shelf = fbm2(x * 2.6 - 8.1, y * 2.6 + 4.7, 3, 2.1, 0.5);
-    let land_mask = smoothstep(-0.08, 0.22, continent * 0.9 + shelf * 0.35 + lat_band * 0.14);
+    let land_mask = smoothstep(
+        -0.08,
+        0.22,
+        continent * 0.9 + shelf * 0.35 + lat_band * 0.14,
+    );
     let ridges = ridged_fbm2(x * 6.5 + 1.9, y * 6.5 - 3.7, 5, 2.05, 0.56);
     let hills = fbm2(x * 9.0 - 12.3, y * 9.0 + 2.8, 4, 2.0, 0.5);
     let ocean = fbm2(x * 4.2 + 6.6, y * 4.2 - 1.1, 3, 2.2, 0.45);
@@ -597,20 +592,34 @@ pub fn globe_points_to_circles(
     for p in points_lng_lat {
         let center = sphere_position(p[0], p[1], radius + elevation);
         let normal = sphere_normal(p[0], p[1]);
-        let east_seed = if normal[1].abs() > 0.98 { [0.0, 0.0, 1.0] } else { [0.0, 1.0, 0.0] };
+        let east_seed = if normal[1].abs() > 0.98 {
+            [0.0, 0.0, 1.0]
+        } else {
+            [0.0, 1.0, 0.0]
+        };
         let east = normalize3(cross3(east_seed, normal));
         let north = normalize3(cross3(normal, east));
         let base = (vertices.len() / 8) as u32;
 
-        vertices.extend_from_slice(&[center[0], center[1], center[2], normal[0], normal[1], normal[2], 0.5, 0.5]);
+        vertices.extend_from_slice(&[
+            center[0], center[1], center[2], normal[0], normal[1], normal[2], 0.5, 0.5,
+        ]);
         for i in 0..seg {
             let theta = (i as f32 / seg as f32) * std::f32::consts::TAU;
             let rim = add3(
                 center,
-                add3(mul3(east, theta.cos() * disc_radius), mul3(north, theta.sin() * disc_radius)),
+                add3(
+                    mul3(east, theta.cos() * disc_radius),
+                    mul3(north, theta.sin() * disc_radius),
+                ),
             );
             vertices.extend_from_slice(&[
-                rim[0], rim[1], rim[2], normal[0], normal[1], normal[2],
+                rim[0],
+                rim[1],
+                rim[2],
+                normal[0],
+                normal[1],
+                normal[2],
                 0.5 + 0.5 * theta.cos(),
                 0.5 + 0.5 * theta.sin(),
             ]);
@@ -960,7 +969,10 @@ fn segment_tangent(points: &[[f32; 3]], i: usize) -> [f32; 3] {
     } else if i == points.len() - 1 {
         sub3(points[i], points[i - 1])
     } else {
-        add3(sub3(points[i + 1], points[i]), sub3(points[i], points[i - 1]))
+        add3(
+            sub3(points[i + 1], points[i]),
+            sub3(points[i], points[i - 1]),
+        )
     };
     normalize3(delta)
 }

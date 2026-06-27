@@ -69,7 +69,12 @@ impl BimSceneAdapter {
         let mut cpu = self.inner.cpu.borrow_mut();
         for item in &scene.items {
             let world = daffine_to_mat4(&item.world_transform);
-            if let SceneGeom::Triangles { positions, indices, normals } = &item.geom {
+            if let SceneGeom::Triangles {
+                positions,
+                indices,
+                normals,
+            } = &item.geom
+            {
                 let world_positions: Vec<[f32; 3]> = positions
                     .iter()
                     .map(|p| {
@@ -81,7 +86,9 @@ impl BimSceneAdapter {
                 let world_normals: Vec<[f32; 3]> = normals
                     .iter()
                     .map(|n| {
-                        let wn = normal_mat.transform_vector3(Vec3::new(n[0], n[1], n[2])).normalize_or_zero();
+                        let wn = normal_mat
+                            .transform_vector3(Vec3::new(n[0], n[1], n[2]))
+                            .normalize_or_zero();
                         [wn.x, wn.y, wn.z]
                     })
                     .collect();
@@ -175,7 +182,14 @@ impl BimSceneAdapter {
         let Some(batch) = cpu.get(idx) else { return };
         let color = override_color.unwrap_or(batch.base_color);
         let mut core = self.inner.core.borrow_mut();
-        core.replace_batch_color(&self.inner.device, idx, &batch.positions, &batch.normals, &batch.indices, color);
+        core.replace_batch_color(
+            &self.inner.device,
+            idx,
+            &batch.positions,
+            &batch.normals,
+            &batch.indices,
+            color,
+        );
     }
 }
 

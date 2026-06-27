@@ -15,8 +15,8 @@
 
 use kami_input::InputMap;
 use kami_input_scene::{
-    builtin_input_map, input_map_from_edn, input_maps_from_edn, shipped_input_map,
-    shipped_input_maps, Error, ALL_MAP_NAMES, INPUT_EDN,
+    ALL_MAP_NAMES, Error, INPUT_EDN, builtin_input_map, input_map_from_edn, input_maps_from_edn,
+    shipped_input_map, shipped_input_maps,
 };
 
 /// Map a map name to the REAL Rust builder result (the oracle source).
@@ -94,8 +94,14 @@ fn shipped_maps_have_expected_counts_and_resolve() {
 
     // Resolve (first-match) behaves identically to the oracle.
     assert_eq!(fps.resolve("KeyW"), InputMap::default_fps().resolve("KeyW"));
-    assert_eq!(fps.resolve("Escape"), InputMap::default_fps().resolve("Escape"));
-    assert_eq!(graph.resolve("Equal"), InputMap::default_graph().resolve("Equal"));
+    assert_eq!(
+        fps.resolve("Escape"),
+        InputMap::default_fps().resolve("Escape")
+    );
+    assert_eq!(
+        graph.resolve("Equal"),
+        InputMap::default_graph().resolve("Equal")
+    );
     assert_eq!(
         graph.resolve("NumpadSubtract"),
         InputMap::default_graph().resolve("NumpadSubtract")

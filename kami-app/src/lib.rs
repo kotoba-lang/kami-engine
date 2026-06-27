@@ -295,8 +295,8 @@ impl KamiApp {
     ///   5. submit + present
     #[cfg(target_family = "wasm")]
     pub async fn run(mut self) -> Result<(), RuntimeError> {
-        use wasm_bindgen::closure::Closure;
         use wasm_bindgen::JsCast;
+        use wasm_bindgen::closure::Closure;
 
         log::info!(
             "[{label}] running on backend={:?}",
@@ -323,7 +323,9 @@ impl KamiApp {
             let resize_cb = Closure::wrap(Box::new(move |_e: web_sys::Event| {
                 let Some(w) = web_sys::window() else { return };
                 let dpr = w.device_pixel_ratio().max(1.0) as f32;
-                let Ok(app) = state_rs.try_borrow_mut() else { return };
+                let Ok(app) = state_rs.try_borrow_mut() else {
+                    return;
+                };
                 // `KamiApp::resize` needs mutable self; the canvas is
                 // stored on the app itself, so we read client dims
                 // through it.
@@ -352,7 +354,10 @@ impl KamiApp {
         let window_inner = window.clone();
 
         *cb.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-            let now = web_sys::window().and_then(|w| w.performance()).map(|p| p.now()).unwrap_or(0.0);
+            let now = web_sys::window()
+                .and_then(|w| w.performance())
+                .map(|p| p.now())
+                .unwrap_or(0.0);
             let mut last = last_ts.borrow_mut();
             let dt = ((now - *last) as f32 / 1000.0).clamp(0.0, 0.1);
             *last = now;
@@ -425,7 +430,7 @@ impl KamiApp {
                 let try_axis = |pos: glam::Vec3, delta: glam::Vec3| -> glam::Vec3 {
                     let cand = pos + delta;
                     let min = glam::Vec3::new(cand.x - r, cand.y - eye, cand.z - r);
-                    let max = glam::Vec3::new(cand.x + r, cand.y,       cand.z + r);
+                    let max = glam::Vec3::new(cand.x + r, cand.y, cand.z + r);
                     if probe(min, max) { pos } else { cand }
                 };
                 pos = try_axis(pos, glam::Vec3::new(mv.x, 0.0, 0.0));
@@ -500,9 +505,19 @@ impl KamiApp {
         // garbage / opaque grey on Chrome's default WebGPU swap chain.
         {
             let clear_color = if self.pipelines.is_empty() {
-                wgpu::Color { r: 0.05, g: 0.06, b: 0.10, a: 1.0 }
+                wgpu::Color {
+                    r: 0.05,
+                    g: 0.06,
+                    b: 0.10,
+                    a: 1.0,
+                }
             } else {
-                wgpu::Color { r: 0.55, g: 0.70, b: 0.86, a: 1.0 } // sky blue fallback
+                wgpu::Color {
+                    r: 0.55,
+                    g: 0.70,
+                    b: 0.86,
+                    a: 1.0,
+                } // sky blue fallback
             };
             let _clear = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("kami-app.preclear"),
@@ -551,7 +566,9 @@ impl KamiApp {
     /// Called each frame when `hud_publish` is on.
     #[cfg(target_family = "wasm")]
     fn publish_hud(&self) {
-        let Some(window) = web_sys::window() else { return };
+        let Some(window) = web_sys::window() else {
+            return;
+        };
         let u = self.camera.as_render().uniform();
         let obj = js_sys::Object::new();
         let _ = js_sys::Reflect::set(&obj, &"x".into(), &(u.position[0] as f64).into());

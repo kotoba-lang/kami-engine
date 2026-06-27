@@ -66,7 +66,11 @@ pub struct BoneTrack {
 impl BoneTrack {
     /// A linear-interpolated track (the common case).
     pub fn new(bone_index: usize, keyframes: Vec<Keyframe>) -> Self {
-        Self { bone_index, keyframes, interpolation: Interpolation::Linear }
+        Self {
+            bone_index,
+            keyframes,
+            interpolation: Interpolation::Linear,
+        }
     }
     /// Set the interpolation mode (builder style).
     pub fn with_interpolation(mut self, i: Interpolation) -> Self {
@@ -267,10 +271,21 @@ impl Skeleton {
         if chain.len() < 2 || chain.iter().any(|&b| b >= n) {
             return Vec::new();
         }
-        let pos: Vec<Vec3> = self.bones.iter().map(|b| Vec3::from(b.local_position)).collect();
-        let scl: Vec<Vec3> = self.bones.iter().map(|b| Vec3::from(b.local_scale)).collect();
-        let mut local_rot: Vec<Quat> =
-            self.bones.iter().map(|b| Quat::from_array(b.local_rotation)).collect();
+        let pos: Vec<Vec3> = self
+            .bones
+            .iter()
+            .map(|b| Vec3::from(b.local_position))
+            .collect();
+        let scl: Vec<Vec3> = self
+            .bones
+            .iter()
+            .map(|b| Vec3::from(b.local_scale))
+            .collect();
+        let mut local_rot: Vec<Quat> = self
+            .bones
+            .iter()
+            .map(|b| Quat::from_array(b.local_rotation))
+            .collect();
 
         let world_of = |local_rot: &[Quat]| -> Vec<Mat4> {
             let mut w = vec![Mat4::IDENTITY; n];
@@ -309,7 +324,10 @@ impl Skeleton {
                 local_rot[bone] = (parent_rot.inverse() * new_world_rot).normalize();
             }
         }
-        chain[..chain.len() - 1].iter().map(|&b| (b, local_rot[b])).collect()
+        chain[..chain.len() - 1]
+            .iter()
+            .map(|&b| (b, local_rot[b]))
+            .collect()
     }
 
     /// World matrices of the unanimated rest pose.
@@ -354,12 +372,12 @@ impl Skeleton {
             let rot = Quat::from_array(bone.local_rotation);
             let scl = Vec3::from(bone.local_scale);
 
-            let (p, mut r, s) =
-                if let Some(track) = clip.tracks.iter().find(|t| t.bone_index == i) {
-                    interpolate_track(track, time)
-                } else {
-                    (pos, rot, scl)
-                };
+            let (p, mut r, s) = if let Some(track) = clip.tracks.iter().find(|t| t.bone_index == i)
+            {
+                interpolate_track(track, time)
+            } else {
+                (pos, rot, scl)
+            };
 
             // Apply joint constraint if present for this bone
             if let Some((_, constraint)) = constraints.iter().find(|(idx, _)| *idx == i) {
@@ -466,19 +484,97 @@ impl JointConstraint {
 pub fn default_humanoid_constraints() -> Vec<(&'static str, JointConstraint)> {
     let d = std::f32::consts::PI / 180.0;
     vec![
-        ("head", JointConstraint { min: [-60.0 * d, -80.0 * d, -40.0 * d], max: [60.0 * d, 80.0 * d, 40.0 * d] }),
-        ("neck", JointConstraint { min: [-30.0 * d, -45.0 * d, -30.0 * d], max: [30.0 * d, 45.0 * d, 30.0 * d] }),
-        ("spine", JointConstraint { min: [-30.0 * d, -30.0 * d, -20.0 * d], max: [30.0 * d, 30.0 * d, 20.0 * d] }),
-        ("chest", JointConstraint { min: [-15.0 * d, -15.0 * d, -10.0 * d], max: [15.0 * d, 15.0 * d, 10.0 * d] }),
-        ("hips", JointConstraint { min: [-30.0 * d, -30.0 * d, -15.0 * d], max: [30.0 * d, 30.0 * d, 15.0 * d] }),
-        ("leftUpperArm", JointConstraint { min: [-60.0 * d, -45.0 * d, -30.0 * d], max: [90.0 * d, 90.0 * d, 180.0 * d] }),
-        ("rightUpperArm", JointConstraint { min: [-60.0 * d, -90.0 * d, -180.0 * d], max: [90.0 * d, 45.0 * d, 30.0 * d] }),
-        ("leftLowerArm", JointConstraint { min: [-5.0 * d, 0.0, -5.0 * d], max: [5.0 * d, 145.0 * d, 5.0 * d] }),
-        ("rightLowerArm", JointConstraint { min: [-5.0 * d, -145.0 * d, -5.0 * d], max: [5.0 * d, 0.0, 5.0 * d] }),
-        ("leftUpperLeg", JointConstraint { min: [-30.0 * d, -45.0 * d, -20.0 * d], max: [120.0 * d, 30.0 * d, 45.0 * d] }),
-        ("rightUpperLeg", JointConstraint { min: [-30.0 * d, -30.0 * d, -45.0 * d], max: [120.0 * d, 45.0 * d, 20.0 * d] }),
-        ("leftLowerLeg", JointConstraint { min: [-140.0 * d, -5.0 * d, -5.0 * d], max: [0.0, 5.0 * d, 5.0 * d] }),
-        ("rightLowerLeg", JointConstraint { min: [-140.0 * d, -5.0 * d, -5.0 * d], max: [0.0, 5.0 * d, 5.0 * d] }),
+        (
+            "head",
+            JointConstraint {
+                min: [-60.0 * d, -80.0 * d, -40.0 * d],
+                max: [60.0 * d, 80.0 * d, 40.0 * d],
+            },
+        ),
+        (
+            "neck",
+            JointConstraint {
+                min: [-30.0 * d, -45.0 * d, -30.0 * d],
+                max: [30.0 * d, 45.0 * d, 30.0 * d],
+            },
+        ),
+        (
+            "spine",
+            JointConstraint {
+                min: [-30.0 * d, -30.0 * d, -20.0 * d],
+                max: [30.0 * d, 30.0 * d, 20.0 * d],
+            },
+        ),
+        (
+            "chest",
+            JointConstraint {
+                min: [-15.0 * d, -15.0 * d, -10.0 * d],
+                max: [15.0 * d, 15.0 * d, 10.0 * d],
+            },
+        ),
+        (
+            "hips",
+            JointConstraint {
+                min: [-30.0 * d, -30.0 * d, -15.0 * d],
+                max: [30.0 * d, 30.0 * d, 15.0 * d],
+            },
+        ),
+        (
+            "leftUpperArm",
+            JointConstraint {
+                min: [-60.0 * d, -45.0 * d, -30.0 * d],
+                max: [90.0 * d, 90.0 * d, 180.0 * d],
+            },
+        ),
+        (
+            "rightUpperArm",
+            JointConstraint {
+                min: [-60.0 * d, -90.0 * d, -180.0 * d],
+                max: [90.0 * d, 45.0 * d, 30.0 * d],
+            },
+        ),
+        (
+            "leftLowerArm",
+            JointConstraint {
+                min: [-5.0 * d, 0.0, -5.0 * d],
+                max: [5.0 * d, 145.0 * d, 5.0 * d],
+            },
+        ),
+        (
+            "rightLowerArm",
+            JointConstraint {
+                min: [-5.0 * d, -145.0 * d, -5.0 * d],
+                max: [5.0 * d, 0.0, 5.0 * d],
+            },
+        ),
+        (
+            "leftUpperLeg",
+            JointConstraint {
+                min: [-30.0 * d, -45.0 * d, -20.0 * d],
+                max: [120.0 * d, 30.0 * d, 45.0 * d],
+            },
+        ),
+        (
+            "rightUpperLeg",
+            JointConstraint {
+                min: [-30.0 * d, -30.0 * d, -45.0 * d],
+                max: [120.0 * d, 45.0 * d, 20.0 * d],
+            },
+        ),
+        (
+            "leftLowerLeg",
+            JointConstraint {
+                min: [-140.0 * d, -5.0 * d, -5.0 * d],
+                max: [0.0, 5.0 * d, 5.0 * d],
+            },
+        ),
+        (
+            "rightLowerLeg",
+            JointConstraint {
+                min: [-140.0 * d, -5.0 * d, -5.0 * d],
+                max: [0.0, 5.0 * d, 5.0 * d],
+            },
+        ),
     ]
 }
 
@@ -543,22 +639,54 @@ fn interpolate_track(track: &BoneTrack, time: f32) -> (Vec3, Quat, Vec3) {
             a.scale.unwrap_or(Vec3::ONE),
         ),
         Interpolation::Linear => {
-            let pos = a.position.unwrap_or(Vec3::ZERO).lerp(b.position.unwrap_or(Vec3::ZERO), t);
-            let rot = a.rotation.unwrap_or(Quat::IDENTITY).slerp(b.rotation.unwrap_or(Quat::IDENTITY), t);
-            let scl = a.scale.unwrap_or(Vec3::ONE).lerp(b.scale.unwrap_or(Vec3::ONE), t);
+            let pos = a
+                .position
+                .unwrap_or(Vec3::ZERO)
+                .lerp(b.position.unwrap_or(Vec3::ZERO), t);
+            let rot = a
+                .rotation
+                .unwrap_or(Quat::IDENTITY)
+                .slerp(b.rotation.unwrap_or(Quat::IDENTITY), t);
+            let scl = a
+                .scale
+                .unwrap_or(Vec3::ONE)
+                .lerp(b.scale.unwrap_or(Vec3::ONE), t);
             (pos, rot, scl)
         }
         Interpolation::CubicSpline => {
             // Catmull-Rom with clamped neighbours for translation/scale.
-            let p0p = kfs[i.saturating_sub(1)].position.unwrap_or_else(|| a.position.unwrap_or(Vec3::ZERO));
-            let p3p = kfs[(i + 2).min(kfs.len() - 1)].position.unwrap_or_else(|| b.position.unwrap_or(Vec3::ZERO));
-            let pos = catmull_rom(p0p, a.position.unwrap_or(Vec3::ZERO), b.position.unwrap_or(Vec3::ZERO), p3p, t);
-            let p0s = kfs[i.saturating_sub(1)].scale.unwrap_or_else(|| a.scale.unwrap_or(Vec3::ONE));
-            let p3s = kfs[(i + 2).min(kfs.len() - 1)].scale.unwrap_or_else(|| b.scale.unwrap_or(Vec3::ONE));
-            let scl = catmull_rom(p0s, a.scale.unwrap_or(Vec3::ONE), b.scale.unwrap_or(Vec3::ONE), p3s, t);
+            let p0p = kfs[i.saturating_sub(1)]
+                .position
+                .unwrap_or_else(|| a.position.unwrap_or(Vec3::ZERO));
+            let p3p = kfs[(i + 2).min(kfs.len() - 1)]
+                .position
+                .unwrap_or_else(|| b.position.unwrap_or(Vec3::ZERO));
+            let pos = catmull_rom(
+                p0p,
+                a.position.unwrap_or(Vec3::ZERO),
+                b.position.unwrap_or(Vec3::ZERO),
+                p3p,
+                t,
+            );
+            let p0s = kfs[i.saturating_sub(1)]
+                .scale
+                .unwrap_or_else(|| a.scale.unwrap_or(Vec3::ONE));
+            let p3s = kfs[(i + 2).min(kfs.len() - 1)]
+                .scale
+                .unwrap_or_else(|| b.scale.unwrap_or(Vec3::ONE));
+            let scl = catmull_rom(
+                p0s,
+                a.scale.unwrap_or(Vec3::ONE),
+                b.scale.unwrap_or(Vec3::ONE),
+                p3s,
+                t,
+            );
             // smoothstep-eased slerp for rotation (C1 at the keyframes).
             let te = t * t * (3.0 - 2.0 * t);
-            let rot = a.rotation.unwrap_or(Quat::IDENTITY).slerp(b.rotation.unwrap_or(Quat::IDENTITY), te);
+            let rot = a
+                .rotation
+                .unwrap_or(Quat::IDENTITY)
+                .slerp(b.rotation.unwrap_or(Quat::IDENTITY), te);
             (pos, rot, scl)
         }
     }
@@ -747,7 +875,10 @@ mod tests {
         let lin = pos_clip(Interpolation::Linear, &pts);
         let cubic_mid = x_of(&sk.evaluate(&cubic, 1.5));
         let lin_mid = x_of(&sk.evaluate(&lin, 1.5));
-        assert!((cubic_mid - lin_mid).abs() > 1e-3, "cubic {cubic_mid} vs linear {lin_mid}");
+        assert!(
+            (cubic_mid - lin_mid).abs() > 1e-3,
+            "cubic {cubic_mid} vs linear {lin_mid}"
+        );
     }
 
     #[test]
@@ -777,7 +908,10 @@ mod tests {
         let sk = one_bone();
         let a = pos_clip(Interpolation::Step, &[(0.0, 99.0)]);
         let rest = sk.evaluate_blend(&[(&a, 0.0, 0.0)]);
-        assert!((x_of(&rest) - 0.0).abs() < 1e-5, "rest pose, no animation applied");
+        assert!(
+            (x_of(&rest) - 0.0).abs() < 1e-5,
+            "rest pose, no animation applied"
+        );
     }
 
     fn chain3() -> Skeleton {
@@ -790,20 +924,37 @@ mod tests {
             local_scale: [1.0, 1.0, 1.0],
             inverse_bind: Mat4::IDENTITY.to_cols_array_2d(),
         };
-        Skeleton { bones: vec![bone("root", None, 0.0), bone("mid", Some(0), 1.0), bone("tip", Some(1), 1.0)] }
+        Skeleton {
+            bones: vec![
+                bone("root", None, 0.0),
+                bone("mid", Some(0), 1.0),
+                bone("tip", Some(1), 1.0),
+            ],
+        }
     }
 
     fn effector_pos(sk: &Skeleton, overrides: &[(usize, Quat)]) -> Vec3 {
         // apply local-rotation overrides, then FK to the tip.
-        let mut local_rot: Vec<Quat> = sk.bones.iter().map(|b| Quat::from_array(b.local_rotation)).collect();
+        let mut local_rot: Vec<Quat> = sk
+            .bones
+            .iter()
+            .map(|b| Quat::from_array(b.local_rotation))
+            .collect();
         for (i, q) in overrides {
             local_rot[*i] = *q;
         }
         let mut world = vec![Mat4::IDENTITY; sk.bones.len()];
         for i in 0..sk.bones.len() {
             let b = &sk.bones[i];
-            let l = Mat4::from_scale_rotation_translation(Vec3::from(b.local_scale), local_rot[i], Vec3::from(b.local_position));
-            world[i] = match b.parent { Some(p) => world[p] * l, None => l };
+            let l = Mat4::from_scale_rotation_translation(
+                Vec3::from(b.local_scale),
+                local_rot[i],
+                Vec3::from(b.local_position),
+            );
+            world[i] = match b.parent {
+                Some(p) => world[p] * l,
+                None => l,
+            };
         }
         world[2].to_scale_rotation_translation().2
     }
@@ -814,9 +965,16 @@ mod tests {
         // straight up, distance 2 from origin — within the chain's reach.
         let target = Vec3::new(0.0, 2.0, 0.0);
         let solved = sk.solve_ik_ccd(&[0, 1, 2], target, 32, 1e-3);
-        assert_eq!(solved.len(), 2, "two joints adjusted (root + mid, not the tip)");
+        assert_eq!(
+            solved.len(),
+            2,
+            "two joints adjusted (root + mid, not the tip)"
+        );
         let eff = effector_pos(&sk, &solved);
-        assert!(eff.distance(target) < 0.05, "effector at {eff:?}, target {target:?}");
+        assert!(
+            eff.distance(target) < 0.05,
+            "effector at {eff:?}, target {target:?}"
+        );
     }
 
     #[test]
@@ -855,11 +1013,35 @@ mod tests {
             name: "dance".into(),
             duration: 1.0,
             tracks: vec![
-                BoneTrack::new(0, vec![Keyframe { time: 0.0, position: Some(Vec3::new(1.0, 2.0, 3.0)), rotation: None, scale: None }])
-                    .with_interpolation(Interpolation::CubicSpline),
-                BoneTrack::new(1, vec![Keyframe { time: 0.0, position: Some(Vec3::Y), rotation: None, scale: None }]),
+                BoneTrack::new(
+                    0,
+                    vec![Keyframe {
+                        time: 0.0,
+                        position: Some(Vec3::new(1.0, 2.0, 3.0)),
+                        rotation: None,
+                        scale: None,
+                    }],
+                )
+                .with_interpolation(Interpolation::CubicSpline),
+                BoneTrack::new(
+                    1,
+                    vec![Keyframe {
+                        time: 0.0,
+                        position: Some(Vec3::Y),
+                        rotation: None,
+                        scale: None,
+                    }],
+                ),
                 // a track for a bone the target lacks → dropped.
-                BoneTrack::new(99, vec![Keyframe { time: 0.0, position: Some(Vec3::ZERO), rotation: None, scale: None }]),
+                BoneTrack::new(
+                    99,
+                    vec![Keyframe {
+                        time: 0.0,
+                        position: Some(Vec3::ZERO),
+                        rotation: None,
+                        scale: None,
+                    }],
+                ),
             ],
             looping: true,
         };
@@ -868,7 +1050,11 @@ mod tests {
         assert!(rt.looping);
         assert_eq!(rt.tracks.len(), 2, "two matched bones, one dropped");
         // hips: source idx 0 → target idx 2; keyframes + interp preserved.
-        let hips = rt.tracks.iter().find(|t| t.bone_index == 2).expect("hips remapped");
+        let hips = rt
+            .tracks
+            .iter()
+            .find(|t| t.bone_index == 2)
+            .expect("hips remapped");
         assert_eq!(hips.interpolation, Interpolation::CubicSpline);
         assert_eq!(hips.keyframes[0].position, Some(Vec3::new(1.0, 2.0, 3.0)));
         // spine: source idx 1 → target idx 1 (same name, coincidentally same index).
@@ -878,15 +1064,24 @@ mod tests {
     #[test]
     fn ccd_ik_rejects_degenerate_chains() {
         let sk = chain3();
-        assert!(sk.solve_ik_ccd(&[0], Vec3::ZERO, 8, 1e-3).is_empty(), "chain too short");
-        assert!(sk.solve_ik_ccd(&[0, 99], Vec3::ZERO, 8, 1e-3).is_empty(), "out-of-range bone");
+        assert!(
+            sk.solve_ik_ccd(&[0], Vec3::ZERO, 8, 1e-3).is_empty(),
+            "chain too short"
+        );
+        assert!(
+            sk.solve_ik_ccd(&[0, 99], Vec3::ZERO, 8, 1e-3).is_empty(),
+            "out-of-range bone"
+        );
     }
 
     #[test]
     fn interpolation_by_name() {
         assert_eq!(Interpolation::by_name("step"), Interpolation::Step);
         assert_eq!(Interpolation::by_name("cubic"), Interpolation::CubicSpline);
-        assert_eq!(Interpolation::by_name("cubic-spline"), Interpolation::CubicSpline);
+        assert_eq!(
+            Interpolation::by_name("cubic-spline"),
+            Interpolation::CubicSpline
+        );
         assert_eq!(Interpolation::by_name("whatever"), Interpolation::Linear);
     }
 }

@@ -1,5 +1,4 @@
 /// Cutting tool definitions and tool library management.
-
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 

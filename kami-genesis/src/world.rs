@@ -37,7 +37,9 @@ impl LinkState {
 
 #[derive(Debug, Error)]
 pub enum WorldError {
-    #[error("articulation topology not supported at R1.1: {0}. Cartpole (1 prismatic + 1 revolute) is the only supported topology.")]
+    #[error(
+        "articulation topology not supported at R1.1: {0}. Cartpole (1 prismatic + 1 revolute) is the only supported topology."
+    )]
     UnsupportedTopology(String),
     #[error("articulation handle {0} is invalid")]
     InvalidHandle(usize),
@@ -63,13 +65,21 @@ pub struct World {
 
 impl Default for World {
     fn default() -> Self {
-        World { gravity: 9.81, dt: 1.0 / 60.0, articulations: Vec::new() }
+        World {
+            gravity: 9.81,
+            dt: 1.0 / 60.0,
+            articulations: Vec::new(),
+        }
     }
 }
 
 impl World {
     pub fn new(gravity: f32, dt: f32) -> Self {
-        World { gravity, dt, articulations: Vec::new() }
+        World {
+            gravity,
+            dt,
+            articulations: Vec::new(),
+        }
     }
 
     /// Add an articulation, returning its handle. Equivalent to:
@@ -99,14 +109,15 @@ impl World {
     }
 
     pub fn get(&self, h: ArticulationHandle) -> Result<&Articulation, WorldError> {
-        self.articulations.get(h.0).ok_or(WorldError::InvalidHandle(h.0))
+        self.articulations
+            .get(h.0)
+            .ok_or(WorldError::InvalidHandle(h.0))
     }
 
-    pub fn get_mut(
-        &mut self,
-        h: ArticulationHandle,
-    ) -> Result<&mut Articulation, WorldError> {
-        self.articulations.get_mut(h.0).ok_or(WorldError::InvalidHandle(h.0))
+    pub fn get_mut(&mut self, h: ArticulationHandle) -> Result<&mut Articulation, WorldError> {
+        self.articulations
+            .get_mut(h.0)
+            .ok_or(WorldError::InvalidHandle(h.0))
     }
 
     pub fn articulation_count(&self) -> usize {
@@ -131,8 +142,14 @@ pub struct Articulation {
 
 #[derive(Debug)]
 enum ArticulationTopology {
-    Cartpole { state: CartpoleState, cfg: CartpoleConfig },
-    DoublePendulum { state: DoublePendulumState, cfg: DoublePendulumConfig },
+    Cartpole {
+        state: CartpoleState,
+        cfg: CartpoleConfig,
+    },
+    DoublePendulum {
+        state: DoublePendulumState,
+        cfg: DoublePendulumConfig,
+    },
     /// N≥3 serial revolute chain (planar reduced-coordinate). Generalizes
     /// DoublePendulum to arbitrary link counts via RNEA bias + CRBA mass
     /// matrix + LDLᵀ solve (see `planar_chain`). The ordered `links` are the
@@ -154,11 +171,7 @@ enum ArticulationTopology {
 }
 
 impl Articulation {
-    pub fn from_urdf(
-        sys: ArticulatedSystem,
-        gravity: f32,
-        dt: f32,
-    ) -> Result<Self, WorldError> {
+    pub fn from_urdf(sys: ArticulatedSystem, gravity: f32, dt: f32) -> Result<Self, WorldError> {
         let topology = detect_topology(&sys, gravity, dt)?;
         let name = sys.name.clone();
         // Pre-size the planar torque buffer to the joint count so callers can
@@ -590,11 +603,7 @@ fn cartpole_link_state(s: &CartpoleState, _cfg: &CartpoleConfig, link: &str) -> 
             let ct = s.theta.cos();
             let pos = Vec3::new(s.x + lc * st, 0.0, lc * ct);
             // d/dt of pos with respect to (x, theta) state:
-            let vel = Vec3::new(
-                s.x_dot + lc * ct * s.theta_dot,
-                0.0,
-                -lc * st * s.theta_dot,
-            );
+            let vel = Vec3::new(s.x_dot + lc * ct * s.theta_dot, 0.0, -lc * st * s.theta_dot);
             let orient = Quat::from_axis_angle(Vec3::Y, s.theta);
             Some(LinkState {
                 position: pos,
@@ -644,8 +653,7 @@ fn double_pendulum_link_state(
             // base_vel = derivative of base wrt q1: (l1*c1*q1_dot, 0, l1*s1*q1_dot)
             let base_vel = Vec3::new(cfg.l1 * c1 * s.q1_dot, 0.0, cfg.l1 * s1 * s.q1_dot);
             let q12_dot = s.q1_dot + s.q2_dot;
-            let vel = base_vel
-                + Vec3::new(lc2 * c12 * q12_dot, 0.0, lc2 * s12 * q12_dot);
+            let vel = base_vel + Vec3::new(lc2 * c12 * q12_dot, 0.0, lc2 * s12 * q12_dot);
             let orient = Quat::from_axis_angle(Vec3::Y, s.q1 + s.q2);
             Some(LinkState {
                 position: pos,
@@ -668,8 +676,12 @@ fn detect_topology(
         .joints
         .iter()
         .any(|j| j.kind == JointKind::Prismatic && j.parent == "world");
-    let has_one_revolute =
-        sys.joints.iter().filter(|j| j.kind == JointKind::Revolute).count() == 1;
+    let has_one_revolute = sys
+        .joints
+        .iter()
+        .filter(|j| j.kind == JointKind::Revolute)
+        .count()
+        == 1;
     let total_dofs = sys
         .joints
         .iter()
@@ -678,8 +690,11 @@ fn detect_topology(
 
     // Double pendulum signature: exactly 2 revolute joints, first parent=world,
     // second parent = first child (serial chain), no prismatic.
-    let revolutes: Vec<&kami_articulated::Joint> =
-        sys.joints.iter().filter(|j| j.kind == JointKind::Revolute).collect();
+    let revolutes: Vec<&kami_articulated::Joint> = sys
+        .joints
+        .iter()
+        .filter(|j| j.kind == JointKind::Revolute)
+        .collect();
     let no_prismatic = !sys.joints.iter().any(|j| j.kind == JointKind::Prismatic);
     let is_double_pendulum = revolutes.len() == 2
         && no_prismatic
@@ -724,16 +739,18 @@ fn detect_topology(
     // solver assumes a single shared rotation axis). Mixed-axis chains (e.g.
     // the 6-DOF giemon arm: z, y, y, z, y, z) fall through to the full 3-D
     // spatial solver below.
-    let axes_parallel = revolutes
-        .windows(2)
-        .all(|w| w[0].axis.normalize_or_zero().cross(w[1].axis.normalize_or_zero()).length() < 1e-3);
+    let axes_parallel = revolutes.windows(2).all(|w| {
+        w[0].axis
+            .normalize_or_zero()
+            .cross(w[1].axis.normalize_or_zero())
+            .length()
+            < 1e-3
+    });
     let is_serial_revolute_chain = no_prismatic
         && revolutes.len() >= 3
         && revolutes.len() == total_dofs
         && axes_parallel
-        && revolutes
-            .windows(2)
-            .all(|w| w[1].parent == w[0].child);
+        && revolutes.windows(2).all(|w| w[1].parent == w[0].child);
     if is_serial_revolute_chain {
         let n = revolutes.len();
         let mut masses = Vec::with_capacity(n);
@@ -791,9 +808,7 @@ fn detect_topology(
             .links
             .iter()
             .find(|l| l.name == "pole_link")
-            .ok_or_else(|| {
-                WorldError::UnsupportedTopology("missing `pole_link` link".into())
-            })?;
+            .ok_or_else(|| WorldError::UnsupportedTopology("missing `pole_link` link".into()))?;
         let slider = sys
             .joints
             .iter()
@@ -835,10 +850,8 @@ fn detect_topology(
 mod tests {
     use super::*;
 
-    const CARTPOLE_URDF: &str =
-        include_str!("../../fixtures/cartpole/cartpole.urdf");
-    const ARM3_URDF: &str =
-        include_str!("../../fixtures/arm3/arm3.urdf");
+    const CARTPOLE_URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
+    const ARM3_URDF: &str = include_str!("../../fixtures/arm3/arm3.urdf");
 
     fn cartpole_world() -> (World, ArticulationHandle) {
         let sys = kami_articulated::parse_urdf(CARTPOLE_URDF).unwrap();
@@ -885,9 +898,7 @@ mod tests {
         assert!(s.x > 0.0, "force should push cart in +x direction");
     }
 
-    const DP_URDF: &str = include_str!(
-        "../../fixtures/double_pendulum/double_pendulum.urdf"
-    );
+    const DP_URDF: &str = include_str!("../../fixtures/double_pendulum/double_pendulum.urdf");
 
     #[test]
     fn world_loads_double_pendulum_urdf() {
@@ -905,15 +916,21 @@ mod tests {
         let sys = kami_articulated::parse_urdf(DP_URDF).unwrap();
         let mut world = World::new(9.81, 1.0 / 240.0);
         let h = world.add_articulation(sys).unwrap();
-        world.get_mut(h).unwrap().set_double_pendulum_state(DoublePendulumState {
-            q1: std::f32::consts::FRAC_PI_2,
-            ..Default::default()
-        });
+        world
+            .get_mut(h)
+            .unwrap()
+            .set_double_pendulum_state(DoublePendulumState {
+                q1: std::f32::consts::FRAC_PI_2,
+                ..Default::default()
+            });
         for _ in 0..120 {
             world.step();
         }
         let s = world.get(h).unwrap().double_pendulum_state().unwrap();
-        assert!(s.q1 < std::f32::consts::FRAC_PI_2, "should swing toward 0 under gravity");
+        assert!(
+            s.q1 < std::f32::consts::FRAC_PI_2,
+            "should swing toward 0 under gravity"
+        );
     }
 
     #[test]
@@ -947,12 +964,15 @@ mod tests {
         let sys = kami_articulated::parse_urdf(DP_URDF).unwrap();
         let mut world = World::new(9.81, 1.0 / 240.0);
         let h = world.add_articulation(sys).unwrap();
-        world.get_mut(h).unwrap().set_double_pendulum_state(DoublePendulumState {
-            q1: std::f32::consts::FRAC_PI_2, // link1 horizontal
-            q2: 0.0,
-            q1_dot: 0.5,
-            q2_dot: 0.0,
-        });
+        world
+            .get_mut(h)
+            .unwrap()
+            .set_double_pendulum_state(DoublePendulumState {
+                q1: std::f32::consts::FRAC_PI_2, // link1 horizontal
+                q2: 0.0,
+                q1_dot: 0.5,
+                q2_dot: 0.0,
+            });
         let l1 = world.get(h).unwrap().link_state("link1").unwrap();
         // q1=π/2: lc1*sin(q1) = 0.5*1 = 0.5; -lc1*cos(q1) = 0
         assert!((l1.position.x - 0.5).abs() < 1e-5);
@@ -1042,7 +1062,9 @@ mod tests {
         let a = w.get(h).unwrap();
         let qdot = a.joint_velocities();
         for link in ["l1", "l2", "l3"] {
-            let j = a.jacobian(link).expect("planar-chain jacobian must be wired");
+            let j = a
+                .jacobian(link)
+                .expect("planar-chain jacobian must be wired");
             assert_eq!(j.cols(), 3);
             // jacobian.rs row layout: rows[0]=v_x, rows[2]=v_z.
             let vx: f32 = (0..3).map(|c| j.rows[0][c] * qdot[c]).sum();

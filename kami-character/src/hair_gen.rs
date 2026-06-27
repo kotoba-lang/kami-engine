@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use std::f32::consts::PI;
 
 use crate::groom::{GroomAsset, GroomGroup, HairCard, Strand};
-use crate::{MeshPart, MaterialId, Vertex};
+use crate::{MaterialId, MeshPart, Vertex};
 
 /// High-level hair style parameters. LLM outputs this from photo analysis.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -97,44 +97,98 @@ impl Default for HairStyle {
     fn default() -> Self {
         Self {
             style: HairType::Straight,
-            length: 0.7, density: 0.8, volume: 0.5, curl: 0.03,
-            part_side: 0.1, bangs_length: 0.3, bangs_width: 0.5,
-            color: [0.93, 0.86, 0.72], highlight_color: [0.97, 0.92, 0.82],
-            highlight_ratio: 0.35, root_darken: 0.7,
-            head_radius: 0.09, head_center_y: 1.43,
+            length: 0.7,
+            density: 0.8,
+            volume: 0.5,
+            curl: 0.03,
+            part_side: 0.1,
+            bangs_length: 0.3,
+            bangs_width: 0.5,
+            color: [0.93, 0.86, 0.72],
+            highlight_color: [0.97, 0.92, 0.82],
+            highlight_ratio: 0.35,
+            root_darken: 0.7,
+            head_radius: 0.09,
+            head_center_y: 1.43,
         }
     }
 }
 
 impl HairStyle {
-    pub fn blonde_long() -> Self { Self::default() }
+    pub fn blonde_long() -> Self {
+        Self::default()
+    }
 
     pub fn dark_short() -> Self {
-        Self { style: HairType::Straight, length: 0.2, density: 0.9, volume: 0.3, curl: 0.02,
-            part_side: 0.0, bangs_length: 0.15, bangs_width: 0.6,
-            color: [0.12, 0.08, 0.06], highlight_color: [0.20, 0.15, 0.12],
-            highlight_ratio: 0.15, root_darken: 0.5, ..Self::default() }
+        Self {
+            style: HairType::Straight,
+            length: 0.2,
+            density: 0.9,
+            volume: 0.3,
+            curl: 0.02,
+            part_side: 0.0,
+            bangs_length: 0.15,
+            bangs_width: 0.6,
+            color: [0.12, 0.08, 0.06],
+            highlight_color: [0.20, 0.15, 0.12],
+            highlight_ratio: 0.15,
+            root_darken: 0.5,
+            ..Self::default()
+        }
     }
 
     pub fn red_wavy() -> Self {
-        Self { style: HairType::Wavy, length: 0.6, density: 0.8, volume: 0.7, curl: 0.25,
-            part_side: -0.2, bangs_length: 0.35, bangs_width: 0.4,
-            color: [0.55, 0.18, 0.10], highlight_color: [0.70, 0.30, 0.18],
-            highlight_ratio: 0.25, root_darken: 0.6, ..Self::default() }
+        Self {
+            style: HairType::Wavy,
+            length: 0.6,
+            density: 0.8,
+            volume: 0.7,
+            curl: 0.25,
+            part_side: -0.2,
+            bangs_length: 0.35,
+            bangs_width: 0.4,
+            color: [0.55, 0.18, 0.10],
+            highlight_color: [0.70, 0.30, 0.18],
+            highlight_ratio: 0.25,
+            root_darken: 0.6,
+            ..Self::default()
+        }
     }
 
     pub fn brown_curly() -> Self {
-        Self { style: HairType::Curly, length: 0.5, density: 0.9, volume: 0.8, curl: 0.6,
-            part_side: 0.0, bangs_length: 0.2, bangs_width: 0.5,
-            color: [0.25, 0.15, 0.08], highlight_color: [0.35, 0.22, 0.12],
-            highlight_ratio: 0.2, root_darken: 0.5, ..Self::default() }
+        Self {
+            style: HairType::Curly,
+            length: 0.5,
+            density: 0.9,
+            volume: 0.8,
+            curl: 0.6,
+            part_side: 0.0,
+            bangs_length: 0.2,
+            bangs_width: 0.5,
+            color: [0.25, 0.15, 0.08],
+            highlight_color: [0.35, 0.22, 0.12],
+            highlight_ratio: 0.2,
+            root_darken: 0.5,
+            ..Self::default()
+        }
     }
 
     pub fn afro() -> Self {
-        Self { style: HairType::Afro, length: 0.3, density: 1.0, volume: 1.0, curl: 0.9,
-            part_side: 0.0, bangs_length: 0.0, bangs_width: 0.0,
-            color: [0.08, 0.05, 0.03], highlight_color: [0.15, 0.10, 0.06],
-            highlight_ratio: 0.1, root_darken: 0.4, ..Self::default() }
+        Self {
+            style: HairType::Afro,
+            length: 0.3,
+            density: 1.0,
+            volume: 1.0,
+            curl: 0.9,
+            part_side: 0.0,
+            bangs_length: 0.0,
+            bangs_width: 0.0,
+            color: [0.08, 0.05, 0.03],
+            highlight_color: [0.15, 0.10, 0.06],
+            highlight_ratio: 0.1,
+            root_darken: 0.4,
+            ..Self::default()
+        }
     }
 
     pub fn from_json(json: &str) -> Result<Self, String> {
@@ -147,7 +201,9 @@ impl HairStyle {
 }
 
 fn hash_f32(a: u32, b: u32) -> f32 {
-    let mut h = a.wrapping_mul(2654435761).wrapping_add(b.wrapping_mul(2246822519));
+    let mut h = a
+        .wrapping_mul(2654435761)
+        .wrapping_add(b.wrapping_mul(2246822519));
     h ^= h >> 16;
     h = h.wrapping_mul(0x85ebca6b);
     h ^= h >> 13;
@@ -155,9 +211,7 @@ fn hash_f32(a: u32, b: u32) -> f32 {
 }
 
 /// Compute strand root position on scalp + strand direction.
-fn strand_root(
-    si: usize, style: &HairStyle, is_bangs: bool, h1: f32, h2: f32,
-) -> (Vec3, f32) {
+fn strand_root(si: usize, style: &HairStyle, is_bangs: bool, h1: f32, h2: f32) -> (Vec3, f32) {
     let r = style.head_radius;
     let cy = style.head_center_y;
 
@@ -180,24 +234,45 @@ fn strand_root(
 
 /// Compute a point along a strand at parameter t (0=root, 1=tip).
 fn strand_point(
-    root: Vec3, theta: f32, t: f32, strand_len: f32, style: &HairStyle,
-    h3: f32, is_bangs: bool,
+    root: Vec3,
+    theta: f32,
+    t: f32,
+    strand_len: f32,
+    style: &HairStyle,
+    h3: f32,
+    is_bangs: bool,
 ) -> Vec3 {
     let curl_freq = match style.style {
-        HairType::Straight => 0.5, HairType::Wavy => 2.5,
-        HairType::Curly => 5.0, HairType::Afro => 8.0, HairType::Braided => 3.0,
+        HairType::Straight => 0.5,
+        HairType::Wavy => 2.5,
+        HairType::Curly => 5.0,
+        HairType::Afro => 8.0,
+        HairType::Braided => 3.0,
     };
     let curl_amp = style.curl * style.head_radius * 0.8;
-    let afro_vol = if style.style == HairType::Afro { style.volume * 0.15 } else { 0.0 };
-    let grav = if style.style == HairType::Afro { t * 0.3 } else { t * t };
+    let afro_vol = if style.style == HairType::Afro {
+        style.volume * 0.15
+    } else {
+        0.0
+    };
+    let grav = if style.style == HairType::Afro {
+        t * 0.3
+    } else {
+        t * t
+    };
     let curl = (t * curl_freq + h3 * 7.0).sin() * curl_amp * t;
     let outward = afro_vol * t + t * 0.2 * (1.0 - t);
     let r = style.head_radius;
 
     Vec3::new(
         root.x + outward * r * theta.cos() * 0.15 + curl,
-        root.y - strand_len * (t * if is_bangs { 0.6 } else { 0.15 } + grav * if is_bangs { 0.4 } else { 0.85 }),
-        root.z + outward * r * theta.sin() * 0.15 + if is_bangs { t * strand_len * 0.05 } else { 0.0 },
+        root.y
+            - strand_len
+                * (t * if is_bangs { 0.6 } else { 0.15 }
+                    + grav * if is_bangs { 0.4 } else { 0.85 }),
+        root.z
+            + outward * r * theta.sin() * 0.15
+            + if is_bangs { t * strand_len * 0.05 } else { 0.0 },
     )
 }
 
@@ -212,11 +287,19 @@ pub fn generate_groom(style: &HairStyle, points_per_strand: usize) -> GroomAsset
 }
 
 /// Generate groom with explicit strand count (e.g. 100_000 for cinematic quality).
-pub fn generate_groom_count(style: &HairStyle, points_per_strand: usize, strand_count: usize) -> GroomAsset {
+pub fn generate_groom_count(
+    style: &HairStyle,
+    points_per_strand: usize,
+    strand_count: usize,
+) -> GroomAsset {
     generate_groom_inner(style, points_per_strand, strand_count)
 }
 
-fn generate_groom_inner(style: &HairStyle, points_per_strand: usize, strand_count: usize) -> GroomAsset {
+fn generate_groom_inner(
+    style: &HairStyle,
+    points_per_strand: usize,
+    strand_count: usize,
+) -> GroomAsset {
     let base_length = style.head_radius * 2.0 * (0.3 + style.length * 2.5);
     let mut strands = Vec::with_capacity(strand_count);
 
@@ -237,24 +320,45 @@ fn generate_groom_inner(style: &HairStyle, points_per_strand: usize, strand_coun
         let mut widths = Vec::with_capacity(points_per_strand);
         for pi in 0..points_per_strand {
             let t = pi as f32 / (points_per_strand - 1) as f32;
-            points.push(strand_point(root, theta, t, strand_len, style, h3, is_bangs));
+            points.push(strand_point(
+                root, theta, t, strand_len, style, h3, is_bangs,
+            ));
             widths.push(0.0008 * (1.0 - t * 0.7) * (1.0 + style.volume * 0.5));
         }
 
         strands.push(Strand {
-            points, widths,
+            points,
+            widths,
             root_uv: [theta / (2.0 * PI), h1],
-            group: if h3 > (1.0 - style.highlight_ratio) { 1 } else { 0 },
+            group: if h3 > (1.0 - style.highlight_ratio) {
+                1
+            } else {
+                0
+            },
         });
     }
 
     let guide_indices = (0..strands.len()).step_by(4).collect();
     let total_points = strands.iter().map(|s| s.points.len()).sum();
     GroomAsset {
-        strands, guide_indices, total_points,
+        strands,
+        guide_indices,
+        total_points,
         groups: vec![
-            GroomGroup { name: "base".into(), strand_count, material_slot: 0, clump_scale: 0.5, clump_noise: 0.1 },
-            GroomGroup { name: "highlight".into(), strand_count: 0, material_slot: 1, clump_scale: 0.3, clump_noise: 0.05 },
+            GroomGroup {
+                name: "base".into(),
+                strand_count,
+                material_slot: 0,
+                clump_scale: 0.5,
+                clump_noise: 0.1,
+            },
+            GroomGroup {
+                name: "highlight".into(),
+                strand_count: 0,
+                material_slot: 1,
+                clump_scale: 0.3,
+                clump_noise: 0.05,
+            },
         ],
     }
 }
@@ -327,8 +431,16 @@ pub fn generate_hair_mesh(style: &HairStyle) -> HairMeshOutput {
                 // Normal: outward from head center
                 let n = Vec3::new(p.x - root.x, 0.2, p.z - root.z).normalize_or_zero();
 
-                vertices.push(Vertex { position: left, normal: n, uv: [0.0, t] });
-                vertices.push(Vertex { position: right, normal: n, uv: [1.0, t] });
+                vertices.push(Vertex {
+                    position: left,
+                    normal: n,
+                    uv: [0.0, t],
+                });
+                vertices.push(Vertex {
+                    position: right,
+                    normal: n,
+                    uv: [1.0, t],
+                });
 
                 if seg > 0 {
                     let i = base_idx as u32 + (seg as u32 - 1) * 2;
@@ -371,9 +483,14 @@ pub fn generate_hair_mesh_data(style: &HairStyle) -> HairMeshData {
     for part in &mesh.parts {
         for v in &part.vertices {
             vertices.extend_from_slice(&[
-                v.position.x, v.position.y, v.position.z,
-                v.normal.x, v.normal.y, v.normal.z,
-                v.uv[0], v.uv[1],
+                v.position.x,
+                v.position.y,
+                v.position.z,
+                v.normal.x,
+                v.normal.y,
+                v.normal.z,
+                v.uv[0],
+                v.uv[1],
             ]);
         }
         for &idx in &part.indices {
@@ -418,8 +535,11 @@ mod tests {
     #[test]
     fn test_presets() {
         for preset in [
-            HairStyle::blonde_long(), HairStyle::dark_short(),
-            HairStyle::red_wavy(), HairStyle::brown_curly(), HairStyle::afro(),
+            HairStyle::blonde_long(),
+            HairStyle::dark_short(),
+            HairStyle::red_wavy(),
+            HairStyle::brown_curly(),
+            HairStyle::afro(),
         ] {
             let groom = generate_groom(&preset, 6);
             assert!(!groom.strands.is_empty());
@@ -479,8 +599,20 @@ mod tests {
 
     #[test]
     fn test_density_affects_count() {
-        let low = generate_groom(&HairStyle { density: 0.3, ..HairStyle::default() }, 4);
-        let high = generate_groom(&HairStyle { density: 1.0, ..HairStyle::default() }, 4);
+        let low = generate_groom(
+            &HairStyle {
+                density: 0.3,
+                ..HairStyle::default()
+            },
+            4,
+        );
+        let high = generate_groom(
+            &HairStyle {
+                density: 1.0,
+                ..HairStyle::default()
+            },
+            4,
+        );
         assert!(high.strands.len() > low.strands.len() * 2);
     }
 
@@ -520,7 +652,12 @@ mod tests {
         let buf_time = t1.elapsed();
 
         eprintln!("100K strands generated in {:?}", gen_time);
-        eprintln!("Strand buffer: {} floats ({:.1} MB) in {:?}", buf.len(), buf.len() as f64 * 4.0 / 1048576.0, buf_time);
+        eprintln!(
+            "Strand buffer: {} floats ({:.1} MB) in {:?}",
+            buf.len(),
+            buf.len() as f64 * 4.0 / 1048576.0,
+            buf_time
+        );
         eprintln!("Offsets: {} entries", offsets.len());
         assert_eq!(buf.len(), 800_000 * 4); // xyz + width
         assert_eq!(offsets.len(), 100_001); // strand_count + 1
@@ -533,7 +670,11 @@ mod tests {
         // All non-bangs strand roots should have Z <= 0 (back hemisphere)
         let bangs_count = (groom.strands.len() as f32 * style.bangs_width * 0.05) as usize;
         for (i, s) in groom.strands.iter().enumerate().skip(bangs_count) {
-            assert!(s.points[0].z <= 0.01, "strand {i} root z={} should be <= 0", s.points[0].z);
+            assert!(
+                s.points[0].z <= 0.01,
+                "strand {i} root z={} should be <= 0",
+                s.points[0].z
+            );
         }
     }
 }

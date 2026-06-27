@@ -48,14 +48,9 @@ fn ship_hydrodynamics_turns_and_arrives() {
     // Goal off to port forces a real turn (and thus sway coupling).
     let goal = Vec2::new(80.0, 40.0);
     let mut max_sway = 0.0f32;
-    let (min_d, arrived, _steps) = drive(
-        &mut ship,
-        VehicleClass::Ship,
-        goal,
-        dt,
-        4000,
-        |s| max_sway = max_sway.max(s.v.abs()),
-    );
+    let (min_d, arrived, _steps) = drive(&mut ship, VehicleClass::Ship, goal, dt, 4000, |s| {
+        max_sway = max_sway.max(s.v.abs())
+    });
 
     assert!(arrived, "ship should arrive (closest {:.1} m)", min_d);
     // The surge↔yaw Coriolis coupling must induce measurable outward sway in
@@ -79,14 +74,9 @@ fn fixed_wing_flies_above_stall_to_goal() {
     // shallow enough to track and we count a fly-through.
     let goal = Vec2::new(600.0, 60.0);
     let mut min_airspeed = f32::INFINITY;
-    let (min_d, arrived, _steps) = drive(
-        &mut plane,
-        VehicleClass::Aircraft,
-        goal,
-        dt,
-        4000,
-        |p| min_airspeed = min_airspeed.min(p.airspeed),
-    );
+    let (min_d, arrived, _steps) = drive(&mut plane, VehicleClass::Aircraft, goal, dt, 4000, |p| {
+        min_airspeed = min_airspeed.min(p.airspeed)
+    });
 
     // Fixed-wing can't hover — count a fly-through within tolerance as success.
     assert!(
@@ -110,16 +100,15 @@ fn multirotor_tilts_to_translate_and_hovers_at_goal() {
 
     let goal = Vec2::new(30.0, 18.0);
     let mut max_tilt = 0.0f32;
-    let (min_d, arrived, _steps) = drive(
-        &mut drone,
-        VehicleClass::Drone,
-        goal,
-        dt,
-        4000,
-        |d| max_tilt = max_tilt.max(d.tilt.abs()),
-    );
+    let (min_d, arrived, _steps) = drive(&mut drone, VehicleClass::Drone, goal, dt, 4000, |d| {
+        max_tilt = max_tilt.max(d.tilt.abs())
+    });
 
-    assert!(arrived, "drone should reach and hold the goal (closest {:.1} m)", min_d);
+    assert!(
+        arrived,
+        "drone should reach and hold the goal (closest {:.1} m)",
+        min_d
+    );
     // Translation must come from real thrust-vector tilt.
     assert!(
         max_tilt > 0.05,
@@ -127,5 +116,9 @@ fn multirotor_tilts_to_translate_and_hovers_at_goal() {
         max_tilt
     );
     // It can decelerate to a near-hover at the goal (unlike the fixed-wing).
-    assert!(drone.speed() < 3.0, "should be near hover at arrival (v = {:.2})", drone.speed());
+    assert!(
+        drone.speed() < 3.0,
+        "should be near hover at arrival (v = {:.2})",
+        drone.speed()
+    );
 }

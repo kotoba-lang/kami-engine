@@ -43,7 +43,11 @@ impl DepthTarget {
         self.height = height;
     }
 
-    fn create(device: &wgpu::Device, width: u32, height: u32) -> (wgpu::Texture, wgpu::TextureView) {
+    fn create(
+        device: &wgpu::Device,
+        width: u32,
+        height: u32,
+    ) -> (wgpu::Texture, wgpu::TextureView) {
         let tex = device.create_texture(&wgpu::TextureDescriptor {
             label: Some("kami-app.depth"),
             size: wgpu::Extent3d {

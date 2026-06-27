@@ -44,18 +44,28 @@ pub fn interleave_skinned(
     let mut out = Vec::with_capacity(vertex_count * 56);
     for i in 0..vertex_count {
         // pos, normal, uv (f32)
-        for f in &positions[i * 3..i * 3 + 3] { out.extend_from_slice(&f.to_le_bytes()); }
-        for f in &normals[i * 3..i * 3 + 3] { out.extend_from_slice(&f.to_le_bytes()); }
-        for f in &uvs[i * 2..i * 2 + 2] { out.extend_from_slice(&f.to_le_bytes()); }
+        for f in &positions[i * 3..i * 3 + 3] {
+            out.extend_from_slice(&f.to_le_bytes());
+        }
+        for f in &normals[i * 3..i * 3 + 3] {
+            out.extend_from_slice(&f.to_le_bytes());
+        }
+        for f in &uvs[i * 2..i * 2 + 2] {
+            out.extend_from_slice(&f.to_le_bytes());
+        }
         // joints (u16 x 4)
         if has_skin {
-            for j in &joints[i * 4..i * 4 + 4] { out.extend_from_slice(&j.to_le_bytes()); }
+            for j in &joints[i * 4..i * 4 + 4] {
+                out.extend_from_slice(&j.to_le_bytes());
+            }
         } else {
             out.extend_from_slice(&[0u8; 8]);
         }
         // weights (f32 x 4)
         if has_skin {
-            for w in &weights[i * 4..i * 4 + 4] { out.extend_from_slice(&w.to_le_bytes()); }
+            for w in &weights[i * 4..i * 4 + 4] {
+                out.extend_from_slice(&w.to_le_bytes());
+            }
         } else {
             // weight (1,0,0,0) — but fallback branch in shader also handles all-zero
             out.extend_from_slice(&1.0f32.to_le_bytes());

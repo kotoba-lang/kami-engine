@@ -124,6 +124,26 @@ interface random {
 }
 
 // ---------------------------------------------------------------------------
+// kami:engine/steam — Valve Steamworks platform services (ADR-0048)
+//
+// An OUTPUT-ONLY effects sink, exactly like `audio`: the guest emits platform
+// events; nothing reads back into the sim. This keeps the all-i64 deterministic
+// run identical across wasmtime/wasmi (golden-frame parity) regardless of
+// whether Steam is connected. The host queues each call and a `SteamBackend`
+// (stub no-op off-Steam / `steamworks-rs` on a Steam desktop build) drains it.
+// Achievement/stat *ids* are authored as EDN (steam.edn) and baked at package
+// time; the guest only ever names them.
+// ---------------------------------------------------------------------------
+interface steam {
+    // Unlock an achievement by its Steamworks API name (idempotent host-side).
+    unlock-achievement: func(id-ptr: s32, id-len: s32);
+    // Set an integer stat to an absolute value.
+    set-stat: func(name-ptr: s32, name-len: s32, value: s64);
+    // Set a rich-presence key/value pair (both strings); empty value clears it.
+    set-rich-presence: func(key-ptr: s32, key-len: s32, val-ptr: s32, val-len: s32);
+}
+
+// ---------------------------------------------------------------------------
 // kami-game world — what a Clojure game-script component imports/exports
 //
 // Lifecycle:
@@ -139,6 +159,7 @@ world kami-game {
     import kami:engine/input@1.0.0;
     import kami:engine/render@1.0.0;
     import kami:engine/audio@1.0.0;
+    import kami:engine/steam@1.0.0;
     import kami:engine/time@1.0.0;
     import kami:engine/random@1.0.0;
 

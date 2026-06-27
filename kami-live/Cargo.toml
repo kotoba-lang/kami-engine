@@ -35,6 +35,7 @@ kotoba-edn = { path = "../../kotoba/crates/kotoba-edn" }
 # structs each crate owns (ADR-0044/0045) — proves the data→realizer pipeline.
 kami-webgpu-rs = { path = "../kami-webgpu-rs" }
 kami-skeleton-scene = { path = "../kami-skeleton-scene" }
+kami-skeleton = { path = "../kami-skeleton" }
 kami-postfx-scene = { path = "../kami-postfx-scene" }
 kami-postfx = { path = "../kami-postfx" }
 kami-vrm = { path = "../kami-vrm" }

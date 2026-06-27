@@ -269,8 +269,10 @@ impl OffscreenContext {
             // deadlock that hangs `request_adapter().await` on test
             // threads. We pick the first DiscreteGpu / IntegratedGpu and
             // fall back to whatever Metal returned first.
-            let mut adapters: Vec<wgpu::Adapter> =
-                instance.enumerate_adapters(wgpu::Backends::METAL).into_iter().collect();
+            let mut adapters: Vec<wgpu::Adapter> = instance
+                .enumerate_adapters(wgpu::Backends::METAL)
+                .into_iter()
+                .collect();
             if adapters.is_empty() {
                 return Err(BootstrapError::NoAdapter);
             }

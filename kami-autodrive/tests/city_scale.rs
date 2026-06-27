@@ -5,10 +5,10 @@
 //! single obstacle.
 
 use glam::{Affine3A, Quat, Vec2, Vec3};
+use kami_autodrive::Telemetry;
 use kami_autodrive::{
     Autopilot, AutopilotConfig, BicycleModel, DriveState, Plant, Pose2, VehicleClass,
 };
-use kami_autodrive::Telemetry;
 use kami_sensor_sim::{Lidar, LidarIntrinsics, LidarReturn, Primitive, Scene};
 
 const MOUNT_Z: f32 = 1.0;
@@ -59,8 +59,12 @@ fn min_clearance(p: Vec2, bldgs: &[Vec2]) -> f32 {
     bldgs
         .iter()
         .map(|c| {
-            let dx = (c.x - BLDG_HALF - p.x).max(p.x - (c.x + BLDG_HALF)).max(0.0);
-            let dy = (c.y - BLDG_HALF - p.y).max(p.y - (c.y + BLDG_HALF)).max(0.0);
+            let dx = (c.x - BLDG_HALF - p.x)
+                .max(p.x - (c.x + BLDG_HALF))
+                .max(0.0);
+            let dy = (c.y - BLDG_HALF - p.y)
+                .max(p.y - (c.y + BLDG_HALF))
+                .max(0.0);
             (dx * dx + dy * dy).sqrt()
         })
         .fold(f32::INFINITY, f32::min)
@@ -91,8 +95,14 @@ fn car_navigates_a_city_street_grid() {
         car.step(cmd, dt);
     }
 
-    assert!(arrived, "car should weave through the streets to the far corner");
-    assert!(min_clear > 0.3, "car clipped a building (min clearance {min_clear:.2} m)");
+    assert!(
+        arrived,
+        "car should weave through the streets to the far corner"
+    );
+    assert!(
+        min_clear > 0.3,
+        "car clipped a building (min clearance {min_clear:.2} m)"
+    );
 }
 
 #[test]
@@ -140,5 +150,8 @@ fn telemetry_tracks_progress_through_the_grid() {
     );
     assert!(last.target_speed >= 0.0 && last.path_waypoints >= 1);
     // The tracker should keep the car reasonably close to its planned path.
-    assert!(max_xte < 3.0, "cross-track error should stay bounded (max {max_xte:.2} m)");
+    assert!(
+        max_xte < 3.0,
+        "cross-track error should stay bounded (max {max_xte:.2} m)"
+    );
 }

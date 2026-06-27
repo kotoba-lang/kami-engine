@@ -6,19 +6,18 @@ use glam::{Mat4, Quat, Vec3};
 use hecs::World;
 use kami_skeleton::Skeleton;
 use kami_vrm::{
-    humanoid,
-    parse_vrm,
+    humanoid, parse_vrm,
     spring::SpringSimulator,
     vrm_types::{HumanBoneName, VrmDocument},
 };
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    CharacterId, PropId, Result, SceneError,
     camera::{CameraSpec, LightSpec},
     lexicon,
     pose::{Expression, PoseSpec},
     sim::FxKind,
-    CharacterId, PropId, Result, SceneError,
 };
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -110,8 +109,8 @@ impl MangakaScene {
 
     pub fn load_character(&mut self, vrm_bytes: &[u8], rkey: &str) -> Result<CharacterId> {
         let doc = parse_vrm(vrm_bytes).map_err(|e| SceneError::VrmDecode(e.to_string()))?;
-        let skeleton = humanoid::to_kami_skeleton(&doc)
-            .map_err(|e| SceneError::VrmDecode(e.to_string()))?;
+        let skeleton =
+            humanoid::to_kami_skeleton(&doc).map_err(|e| SceneError::VrmDecode(e.to_string()))?;
         let spring = SpringSimulator::new(&doc);
 
         let id = CharacterId(self.next_char);
@@ -229,7 +228,11 @@ impl MangakaScene {
                 })
             })
             .collect();
-        let props: Vec<_> = self.props.iter().map(|(id, _)| serde_json::json!({ "id": id.0 })).collect();
+        let props: Vec<_> = self
+            .props
+            .iter()
+            .map(|(id, _)| serde_json::json!({ "id": id.0 }))
+            .collect();
         serde_json::json!({
             "@context": "https://kami.etzhayyim.com/mangaka-scene/v1",
             "characters": chars,

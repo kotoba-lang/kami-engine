@@ -1,8 +1,8 @@
 //! VRM 0.x → 1.0 conversion layer.
 
+use crate::VrmError;
 use crate::gltf_types::GltfDocument;
 use crate::vrm_types::*;
-use crate::VrmError;
 
 /// Convert VRM 0.x extension JSON to VRM 1.0 types.
 ///
@@ -64,20 +64,44 @@ pub fn convert_v0x_to_v1(
 }
 
 fn convert_meta_v0x(vrm_ext: &serde_json::Value) -> Result<VrmMeta, VrmError> {
-    let meta = vrm_ext.get("meta").ok_or_else(|| VrmError::MissingExtension("VRM.meta".into()))?;
+    let meta = vrm_ext
+        .get("meta")
+        .ok_or_else(|| VrmError::MissingExtension("VRM.meta".into()))?;
     Ok(VrmMeta {
-        name: meta.get("title").and_then(|v| v.as_str()).unwrap_or("").to_string(),
-        version: meta.get("version").and_then(|v| v.as_str()).map(String::from),
+        name: meta
+            .get("title")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string(),
+        version: meta
+            .get("version")
+            .and_then(|v| v.as_str())
+            .map(String::from),
         authors: meta
             .get("author")
             .and_then(|v| v.as_str())
             .map(|a| vec![a.to_string()])
             .unwrap_or_default(),
-        license_url: meta.get("otherLicenseUrl").and_then(|v| v.as_str()).map(String::from),
-        allow_redistribution: meta.get("allowedUserName").and_then(|v| v.as_str()).map(|s| s == "Everyone"),
-        thumbnail_image: meta.get("texture").and_then(|v| v.as_u64()).map(|n| n as usize),
-        avatar_permission: meta.get("allowedUserName").and_then(|v| v.as_str()).map(String::from),
-        commercial_usage: meta.get("commercialUssageName").and_then(|v| v.as_str()).map(String::from),
+        license_url: meta
+            .get("otherLicenseUrl")
+            .and_then(|v| v.as_str())
+            .map(String::from),
+        allow_redistribution: meta
+            .get("allowedUserName")
+            .and_then(|v| v.as_str())
+            .map(|s| s == "Everyone"),
+        thumbnail_image: meta
+            .get("texture")
+            .and_then(|v| v.as_u64())
+            .map(|n| n as usize),
+        avatar_permission: meta
+            .get("allowedUserName")
+            .and_then(|v| v.as_str())
+            .map(String::from),
+        commercial_usage: meta
+            .get("commercialUssageName")
+            .and_then(|v| v.as_str())
+            .map(String::from),
     })
 }
 
@@ -97,7 +121,10 @@ fn convert_humanoid_v0x(vrm_ext: &serde_json::Value) -> Result<VrmHumanoid, VrmE
             let name = b.get("bone")?.as_str()?;
             let node = b.get("node")?.as_u64()? as usize;
             let bone_name = HumanBoneName::from_str(name)?;
-            Some(VrmHumanBone { bone: bone_name, node })
+            Some(VrmHumanBone {
+                bone: bone_name,
+                node,
+            })
         })
         .collect();
 
@@ -150,7 +177,9 @@ fn convert_expressions_v0x(vrm_ext: &serde_json::Value) -> Vec<VrmExpression> {
                                 mesh_index: b.get("mesh")?.as_u64()? as usize,
                                 morph_index: b.get("index")?.as_u64()? as usize,
                                 // VRM 0.x uses 0-100 weight range
-                                weight: b.get("weight").and_then(|v| v.as_f64()).unwrap_or(100.0) as f32 / 100.0,
+                                weight: b.get("weight").and_then(|v| v.as_f64()).unwrap_or(100.0)
+                                    as f32
+                                    / 100.0,
                             })
                         })
                         .collect()
@@ -165,7 +194,8 @@ fn convert_expressions_v0x(vrm_ext: &serde_json::Value) -> Vec<VrmExpression> {
                         .filter_map(|b| {
                             let tv = b.get("targetValue")?.as_array()?;
                             Some(MaterialColorBind {
-                                material_index: b.get("materialName")
+                                material_index: b
+                                    .get("materialName")
                                     .and_then(|_v| {
                                         // 0.x uses material name, not index. We map it to 0 as placeholder.
                                         Some(0usize)
@@ -201,7 +231,11 @@ fn convert_expressions_v0x(vrm_ext: &serde_json::Value) -> Vec<VrmExpression> {
 
 fn convert_spring_bones_v0x(
     vrm_ext: &serde_json::Value,
-) -> (Vec<VrmSpringBoneChain>, Vec<VrmCollider>, Vec<VrmColliderGroup>) {
+) -> (
+    Vec<VrmSpringBoneChain>,
+    Vec<VrmCollider>,
+    Vec<VrmColliderGroup>,
+) {
     let Some(sa) = vrm_ext.get("secondaryAnimation") else {
         return (vec![], vec![], vec![]);
     };
@@ -222,10 +256,15 @@ fn convert_spring_bones_v0x(
                             ca.iter()
                                 .filter_map(|c| {
                                     let offset = c.get("offset")?;
-                                    let ox = offset.get("x").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
-                                    let oy = offset.get("y").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
-                                    let oz = offset.get("z").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
-                                    let radius = c.get("radius").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
+                                    let ox = offset.get("x").and_then(|v| v.as_f64()).unwrap_or(0.0)
+                                        as f32;
+                                    let oy = offset.get("y").and_then(|v| v.as_f64()).unwrap_or(0.0)
+                                        as f32;
+                                    let oz = offset.get("z").and_then(|v| v.as_f64()).unwrap_or(0.0)
+                                        as f32;
+                                    let radius =
+                                        c.get("radius").and_then(|v| v.as_f64()).unwrap_or(0.0)
+                                            as f32;
                                     let idx = all_colliders.len();
                                     all_colliders.push(VrmCollider {
                                         node,
@@ -255,8 +294,12 @@ fn convert_spring_bones_v0x(
         .map(|arr| {
             arr.iter()
                 .filter_map(|bg| {
-                    let stiffness = bg.get("stiffiness").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32;
-                    let gravity_power = bg.get("gravityPower").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32;
+                    let stiffness =
+                        bg.get("stiffiness").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32;
+                    let gravity_power = bg
+                        .get("gravityPower")
+                        .and_then(|v| v.as_f64())
+                        .unwrap_or(0.0) as f32;
                     let gravity_dir_obj = bg.get("gravityDir");
                     let gravity_dir = gravity_dir_obj
                         .and_then(|d| {
@@ -267,8 +310,10 @@ fn convert_spring_bones_v0x(
                             ])
                         })
                         .unwrap_or([0.0, -1.0, 0.0]);
-                    let drag_force = bg.get("dragForce").and_then(|v| v.as_f64()).unwrap_or(0.4) as f32;
-                    let hit_radius = bg.get("hitRadius").and_then(|v| v.as_f64()).unwrap_or(0.02) as f32;
+                    let drag_force =
+                        bg.get("dragForce").and_then(|v| v.as_f64()).unwrap_or(0.4) as f32;
+                    let hit_radius =
+                        bg.get("hitRadius").and_then(|v| v.as_f64()).unwrap_or(0.02) as f32;
 
                     let bones = bg.get("bones")?.as_array()?;
                     let joints: Vec<SpringJoint> = bones
@@ -288,14 +333,21 @@ fn convert_spring_bones_v0x(
                     let cg = bg
                         .get("colliderGroups")
                         .and_then(|v| v.as_array())
-                        .map(|a| a.iter().filter_map(|v| v.as_u64().map(|n| n as usize)).collect())
+                        .map(|a| {
+                            a.iter()
+                                .filter_map(|v| v.as_u64().map(|n| n as usize))
+                                .collect()
+                        })
                         .unwrap_or_default();
 
                     Some(VrmSpringBoneChain {
                         name: bg.get("comment").and_then(|v| v.as_str()).map(String::from),
                         joints,
                         collider_groups: cg,
-                        center: bg.get("center").and_then(|v| v.as_u64()).map(|n| n as usize),
+                        center: bg
+                            .get("center")
+                            .and_then(|v| v.as_u64())
+                            .map(|n| n as usize),
                     })
                 })
                 .collect()
@@ -306,10 +358,7 @@ fn convert_spring_bones_v0x(
 }
 
 fn convert_mtoon_v0x(vrm_ext: &serde_json::Value) -> Vec<VrmMtoonMaterial> {
-    let Some(props) = vrm_ext
-        .get("materialProperties")
-        .and_then(|v| v.as_array())
-    else {
+    let Some(props) = vrm_ext.get("materialProperties").and_then(|v| v.as_array()) else {
         return vec![];
     };
 
@@ -368,7 +417,8 @@ fn convert_mtoon_v0x(vrm_ext: &serde_json::Value) -> Vec<VrmMtoonMaterial> {
                 uv_animation_scroll_x: fv("_UvAnimScrollX"),
                 uv_animation_scroll_y: fv("_UvAnimScrollY"),
                 uv_animation_rotation: fv("_UvAnimRotation"),
-                render_queue_offset: p.get("renderQueue").and_then(|v| v.as_i64()).unwrap_or(0) as i32,
+                render_queue_offset: p.get("renderQueue").and_then(|v| v.as_i64()).unwrap_or(0)
+                    as i32,
                 transparent_with_z_write: fv("_ZWrite") > 0.5,
             })
         })
@@ -379,7 +429,11 @@ fn convert_look_at_v0x(vrm_ext: &serde_json::Value) -> Option<VrmLookAt> {
     let fp = vrm_ext.get("firstPerson")?;
     let lat = fp.get("lookAtTypeName")?.as_str()?;
     Some(VrmLookAt {
-        look_at_type: if lat == "Bone" { LookAtType::Bone } else { LookAtType::Expression },
+        look_at_type: if lat == "Bone" {
+            LookAtType::Bone
+        } else {
+            LookAtType::Expression
+        },
         offset_from_head_bone: fp
             .get("lookAtHorizontalInner")
             .and_then(|_| {
@@ -400,7 +454,10 @@ fn convert_look_at_v0x(vrm_ext: &serde_json::Value) -> Option<VrmLookAt> {
 
 fn convert_range_map_v0x(v: Option<&serde_json::Value>) -> RangeMap {
     let Some(v) = v else {
-        return RangeMap { input_max_value: 90.0, output_scale: 10.0 };
+        return RangeMap {
+            input_max_value: 90.0,
+            output_scale: 10.0,
+        };
     };
     RangeMap {
         input_max_value: v.get("xRange").and_then(|v| v.as_f64()).unwrap_or(90.0) as f32,

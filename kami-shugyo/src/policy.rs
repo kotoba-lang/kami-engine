@@ -24,7 +24,12 @@ pub struct LinearPolicy {
 
 impl LinearPolicy {
     pub fn zeros(obs_dim: usize, act_dim: usize) -> Self {
-        LinearPolicy { obs_dim, act_dim, w: vec![0.0; obs_dim * act_dim], b: vec![0.0; act_dim] }
+        LinearPolicy {
+            obs_dim,
+            act_dim,
+            w: vec![0.0; obs_dim * act_dim],
+            b: vec![0.0; act_dim],
+        }
     }
 
     /// Map a `[num_envs, obs_dim]` observation tensor to a `[num_envs, act_dim]`
@@ -184,8 +189,14 @@ mod tests {
         // must dramatically out-return the do-nothing policy (which pays the full
         // ‖goal‖² every tick). Expect the oracle's cost well under 1/4 of zero's.
         assert!(zero < 0.0 && oracle < 0.0);
-        assert!(oracle > zero, "oracle {oracle} not better than zero-policy {zero}");
-        assert!(oracle > zero * 0.25, "oracle {oracle} not dramatically better than {zero}");
+        assert!(
+            oracle > zero,
+            "oracle {oracle} not better than zero-policy {zero}"
+        );
+        assert!(
+            oracle > zero * 0.25,
+            "oracle {oracle} not dramatically better than {zero}"
+        );
     }
 
     #[test]

@@ -101,8 +101,8 @@ pub fn load_ply(data: &[u8]) -> Result<SplatCloud, SplatLoadError> {
         .windows(SEP.len())
         .position(|w| w == SEP)
         .ok_or(SplatLoadError::InvalidHeader)?;
-    let header = std::str::from_utf8(&data[..header_end])
-        .map_err(|_| SplatLoadError::InvalidHeader)?;
+    let header =
+        std::str::from_utf8(&data[..header_end]).map_err(|_| SplatLoadError::InvalidHeader)?;
     let body_start = header_end + SEP.len();
 
     // Parse header
@@ -170,9 +170,9 @@ pub fn load_ply(data: &[u8]) -> Result<SplatCloud, SplatLoadError> {
     // (3, 8, 15 rest coefficients per channel respectively × 3 = 9, 24, 45).
     let (sh_degree_loaded, rest_per_splat) = match rest_indices.len() {
         0 => (0u8, 0usize),
-        9 => (1u8, 9usize),     // K=4,  K-1=3,  ×3 channels
-        24 => (2u8, 24usize),   // K=9,  K-1=8,  ×3 channels
-        45 => (3u8, 45usize),   // K=16, K-1=15, ×3 channels
+        9 => (1u8, 9usize),   // K=4,  K-1=3,  ×3 channels
+        24 => (2u8, 24usize), // K=9,  K-1=8,  ×3 channels
+        45 => (3u8, 45usize), // K=16, K-1=15, ×3 channels
         // Any other count → bail to DC-only rather than try to guess.
         _ => (0u8, 0usize),
     };
@@ -181,7 +181,9 @@ pub fn load_ply(data: &[u8]) -> Result<SplatCloud, SplatLoadError> {
     let mut cloud = SplatCloud::new();
     cloud.splats.reserve(vertex_count as usize);
     cloud.sh_degree = sh_degree_loaded;
-    cloud.sh_rest.reserve(vertex_count as usize * coefs_per_channel);
+    cloud
+        .sh_rest
+        .reserve(vertex_count as usize * coefs_per_channel);
 
     if format_binary {
         // Binary little-endian PLY: each property is f32 (4 bytes)
@@ -241,8 +243,8 @@ pub fn load_ply(data: &[u8]) -> Result<SplatCloud, SplatLoadError> {
         }
     } else {
         // ASCII PLY
-        let body_text = std::str::from_utf8(&data[body_start..])
-            .map_err(|_| SplatLoadError::InvalidHeader)?;
+        let body_text =
+            std::str::from_utf8(&data[body_start..]).map_err(|_| SplatLoadError::InvalidHeader)?;
         for line in body_text.lines().take(vertex_count as usize) {
             let vals: Vec<f32> = line
                 .split_whitespace()
@@ -364,9 +366,8 @@ pub fn load_spz(data: &[u8]) -> Result<SplatCloud, SplatLoadError> {
         return Err(SplatLoadError::UnexpectedEof);
     }
 
-    let u32_le = |b: &[u8], o: usize| -> u32 {
-        u32::from_le_bytes(b[o..o + 4].try_into().unwrap())
-    };
+    let u32_le =
+        |b: &[u8], o: usize| -> u32 { u32::from_le_bytes(b[o..o + 4].try_into().unwrap()) };
 
     let magic = u32_le(&raw, 0);
     if magic != SPZ_MAGIC {
@@ -434,7 +435,8 @@ pub fn load_spz(data: &[u8]) -> Result<SplatCloud, SplatLoadError> {
         } else {
             let b = pos_base + i * 9;
             let read24 = |o: usize| -> f32 {
-                let mut v = (raw[o] as i32) | ((raw[o + 1] as i32) << 8) | ((raw[o + 2] as i32) << 16);
+                let mut v =
+                    (raw[o] as i32) | ((raw[o + 1] as i32) << 8) | ((raw[o + 2] as i32) << 16);
                 if v & 0x0080_0000 != 0 {
                     v |= -0x0100_0000i32; // sign-extend bit 23
                 }
@@ -512,7 +514,8 @@ pub fn load_spz(data: &[u8]) -> Result<SplatCloud, SplatLoadError> {
 fn spz_unpack_quat_smallest_three(r: [u8; 4]) -> [f32; 4] {
     const SQRT1_2: f32 = std::f32::consts::FRAC_1_SQRT_2;
     const C_MASK: u32 = (1 << 9) - 1;
-    let mut comp = (r[0] as u32) | ((r[1] as u32) << 8) | ((r[2] as u32) << 16) | ((r[3] as u32) << 24);
+    let mut comp =
+        (r[0] as u32) | ((r[1] as u32) << 8) | ((r[2] as u32) << 16) | ((r[3] as u32) << 24);
     let i_largest = (comp >> 30) as usize;
     // rot indexed xyzw (0=x,1=y,2=z,3=w).
     let mut rot = [0.0f32; 4];
@@ -565,7 +568,13 @@ mod tests {
         raw.push(0); // flags
         raw.push(0); // reserved
         // position: x=1.0 (4096), y=2.0 (8192), z=0.0 — int24 LE
-        let p24 = |v: i32| [(v & 0xff) as u8, ((v >> 8) & 0xff) as u8, ((v >> 16) & 0xff) as u8];
+        let p24 = |v: i32| {
+            [
+                (v & 0xff) as u8,
+                ((v >> 8) & 0xff) as u8,
+                ((v >> 16) & 0xff) as u8,
+            ]
+        };
         raw.extend_from_slice(&p24(4096));
         raw.extend_from_slice(&p24(8192));
         raw.extend_from_slice(&p24(0));
@@ -586,7 +595,11 @@ mod tests {
         assert!((s.position[1] - 2.0).abs() < 0.01, "y={}", s.position[1]);
         assert!(s.position[2].abs() < 0.01, "z={}", s.position[2]);
         // log-scale 0
-        assert!(s.scale.iter().all(|v| v.abs() < 0.01), "scale={:?}", s.scale);
+        assert!(
+            s.scale.iter().all(|v| v.abs() < 0.01),
+            "scale={:?}",
+            s.scale
+        );
         // opacity logit for a≈0.902 is ≈ +2.2 (positive)
         assert!(s.opacity > 1.0, "opacity={}", s.opacity);
         // quaternion wxyz, w largest, x≈0.498
@@ -618,7 +631,11 @@ mod tests {
         assert_eq!(cloud.sh_degree, 1);
         assert_eq!(cloud.sh_rest.len(), 3); // 3 coefs/channel for 1 point
         // first coef R: (192-128)/128 = 0.5
-        assert!((cloud.sh_rest[0][0] - 0.5).abs() < 0.01, "{:?}", cloud.sh_rest[0]);
+        assert!(
+            (cloud.sh_rest[0][0] - 0.5).abs() < 0.01,
+            "{:?}",
+            cloud.sh_rest[0]
+        );
         assert!(cloud.sh_rest[0][1].abs() < 0.01);
     }
 
@@ -677,10 +694,8 @@ mod tests {
         // header slice as UTF-8.
         let mut hdr = String::from("ply\nformat binary_little_endian 1.0\nelement vertex 1\n");
         for p in [
-            "x", "y", "z", "opacity",
-            "scale_0", "scale_1", "scale_2",
-            "rot_0", "rot_1", "rot_2", "rot_3",
-            "f_dc_0", "f_dc_1", "f_dc_2",
+            "x", "y", "z", "opacity", "scale_0", "scale_1", "scale_2", "rot_0", "rot_1", "rot_2",
+            "rot_3", "f_dc_0", "f_dc_1", "f_dc_2",
         ] {
             hdr.push_str(&format!("property float {p}\n"));
         }
@@ -691,13 +706,11 @@ mod tests {
         // valid sequence).
         let body = [
             // x=1.0, y=2.0, z=3.0, opacity=0.5
-            0u8, 0, 128, 63,  0, 0, 0, 64,  0, 0, 64, 64,  0, 0, 0, 63,
-            // scale_0/1/2 = 0.1
-            0xCD, 0xCC, 0xCC, 0x3D,  0xCD, 0xCC, 0xCC, 0x3D,  0xCD, 0xCC, 0xCC, 0x3D,
+            0u8, 0, 128, 63, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 0, 63, // scale_0/1/2 = 0.1
+            0xCD, 0xCC, 0xCC, 0x3D, 0xCD, 0xCC, 0xCC, 0x3D, 0xCD, 0xCC, 0xCC, 0x3D,
             // rot_0/1/2/3 = 1, 0, 0, 0
-            0, 0, 128, 63,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,
-            // f_dc_0/1/2 = 0.5
-            0, 0, 0, 63,  0, 0, 0, 63,  0, 0, 0, 63,
+            0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // f_dc_0/1/2 = 0.5
+            0, 0, 0, 63, 0, 0, 0, 63, 0, 0, 0, 63,
         ];
         bytes.extend_from_slice(&body);
         let cloud = load_ply(&bytes).expect("binary PLY must parse");
@@ -706,7 +719,7 @@ mod tests {
         assert!((s.position[0] - 1.0).abs() < 1e-4);
         assert!((s.position[1] - 2.0).abs() < 1e-4);
         assert!((s.position[2] - 3.0).abs() < 1e-4);
-        assert!((s.opacity   - 0.5).abs() < 1e-4);
+        assert!((s.opacity - 0.5).abs() < 1e-4);
     }
 
     #[test]
@@ -715,10 +728,8 @@ mod tests {
         // Layout per splat (channel-major): R0..R2, G0..G2, B0..B2.
         let mut hdr = String::from("ply\nformat binary_little_endian 1.0\nelement vertex 1\n");
         for p in [
-            "x", "y", "z", "opacity",
-            "scale_0", "scale_1", "scale_2",
-            "rot_0", "rot_1", "rot_2", "rot_3",
-            "f_dc_0", "f_dc_1", "f_dc_2",
+            "x", "y", "z", "opacity", "scale_0", "scale_1", "scale_2", "rot_0", "rot_1", "rot_2",
+            "rot_3", "f_dc_0", "f_dc_1", "f_dc_2",
         ] {
             hdr.push_str(&format!("property float {p}\n"));
         }
@@ -731,19 +742,15 @@ mod tests {
         let mut body: Vec<u8> = Vec::with_capacity(23 * 4);
         // base 14 — geometry / DC, values irrelevant for this test.
         for v in [
-            1.0_f32, 2.0, 3.0, 0.5,           // pos + opacity
-            -2.0, -2.0, -2.0,                 // log scale
-            1.0, 0.0, 0.0, 0.0,               // quat
-            0.1, 0.2, 0.3,                    // f_dc
+            1.0_f32, 2.0, 3.0, 0.5, // pos + opacity
+            -2.0, -2.0, -2.0, // log scale
+            1.0, 0.0, 0.0, 0.0, // quat
+            0.1, 0.2, 0.3, // f_dc
         ] {
             body.extend_from_slice(&v.to_le_bytes());
         }
         // f_rest: R0..R2 = 1,2,3 / G0..G2 = 4,5,6 / B0..B2 = 7,8,9.
-        for v in [
-            1.0_f32, 2.0, 3.0,
-            4.0, 5.0, 6.0,
-            7.0, 8.0, 9.0,
-        ] {
+        for v in [1.0_f32, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0] {
             body.extend_from_slice(&v.to_le_bytes());
         }
         bytes.extend_from_slice(&body);
@@ -771,10 +778,8 @@ mod tests {
         // exactly 30 splats, no panic.
         let mut hdr = String::from("ply\nformat binary_little_endian 1.0\nelement vertex 100\n");
         for p in [
-            "x", "y", "z", "opacity",
-            "scale_0", "scale_1", "scale_2",
-            "rot_0", "rot_1", "rot_2", "rot_3",
-            "f_dc_0", "f_dc_1", "f_dc_2",
+            "x", "y", "z", "opacity", "scale_0", "scale_1", "scale_2", "rot_0", "rot_1", "rot_2",
+            "rot_3", "f_dc_0", "f_dc_1", "f_dc_2",
         ] {
             hdr.push_str(&format!("property float {p}\n"));
         }
@@ -784,18 +789,18 @@ mod tests {
         // distinct positions (i.e. 1.0..30.0 on x).
         for i in 0..30u32 {
             for v in [
-                i as f32, 0.0, 0.0, 0.5,
-                -2.0, -2.0, -2.0,
-                1.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0,
+                i as f32, 0.0, 0.0, 0.5, -2.0, -2.0, -2.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             ] {
                 bytes.extend_from_slice(&v.to_le_bytes());
             }
         }
         let cloud = load_ply(&bytes).expect("truncated PLY must parse");
-        assert_eq!(cloud.count(), 30,
-                   "loader must short-circuit on partial body, got {}",
-                   cloud.count());
+        assert_eq!(
+            cloud.count(),
+            30,
+            "loader must short-circuit on partial body, got {}",
+            cloud.count()
+        );
         assert!((cloud.splats[29].position[0] - 29.0).abs() < 1e-4);
     }
 

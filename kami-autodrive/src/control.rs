@@ -44,7 +44,10 @@ impl PurePursuit {
         let ld2 = local.length_squared().max(1e-3);
         // Curvature of the arc through the origin to `local`: kappa = 2*y / Ld^2.
         let curvature = 2.0 * local.y / ld2;
-        ((curvature * self.turn_radius_ref).clamp(-1.0, 1.0), target_idx)
+        (
+            (curvature * self.turn_radius_ref).clamp(-1.0, 1.0),
+            target_idx,
+        )
     }
 
     /// First waypoint at least `ld` ahead of `pos` along the path; falls back to
@@ -81,7 +84,13 @@ pub struct SpeedController {
 
 impl SpeedController {
     pub fn new(kp: f32, ki: f32, kd: f32) -> Self {
-        Self { kp, ki, kd, integral: 0.0, prev_err: 0.0 }
+        Self {
+            kp,
+            ki,
+            kd,
+            integral: 0.0,
+            prev_err: 0.0,
+        }
     }
 
     pub fn reset(&mut self) {
@@ -94,7 +103,11 @@ impl SpeedController {
     pub fn update(&mut self, target_speed: f32, current_speed: f32, dt: f32) -> (f32, f32) {
         let err = target_speed - current_speed;
         self.integral = (self.integral + err * dt).clamp(-5.0, 5.0);
-        let deriv = if dt > 0.0 { (err - self.prev_err) / dt } else { 0.0 };
+        let deriv = if dt > 0.0 {
+            (err - self.prev_err) / dt
+        } else {
+            0.0
+        };
         self.prev_err = err;
         let effort = self.kp * err + self.ki * self.integral + self.kd * deriv;
         if effort >= 0.0 {
@@ -137,7 +150,11 @@ mod tests {
     use super::*;
 
     fn pp() -> PurePursuit {
-        PurePursuit { lookahead: 3.0, lookahead_gain: 0.0, turn_radius_ref: 4.0 }
+        PurePursuit {
+            lookahead: 3.0,
+            lookahead_gain: 0.0,
+            turn_radius_ref: 4.0,
+        }
     }
 
     #[test]
@@ -145,7 +162,10 @@ mod tests {
         let pose = Pose2::new(0.0, 0.0, 0.0); // facing +x
         let path = [Vec2::new(0.0, 0.0), Vec2::new(5.0, 5.0)];
         let (steer, _) = pp().steer(pose, 0.0, &path);
-        assert!(steer > 0.0, "left target → positive (left) steer, got {steer}");
+        assert!(
+            steer > 0.0,
+            "left target → positive (left) steer, got {steer}"
+        );
     }
 
     #[test]
@@ -169,16 +189,28 @@ mod tests {
     #[test]
     fn menger_curvature_matches_known_values() {
         // Collinear → zero curvature.
-        let k0 = menger_curvature(Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(2.0, 0.0));
+        let k0 = menger_curvature(
+            Vec2::new(0.0, 0.0),
+            Vec2::new(1.0, 0.0),
+            Vec2::new(2.0, 0.0),
+        );
         assert!(k0 < 1e-6, "collinear curvature {k0}");
         // Three points on a radius-2 circle → curvature 0.5.
-        let k = menger_curvature(Vec2::new(2.0, 0.0), Vec2::new(0.0, 2.0), Vec2::new(-2.0, 0.0));
+        let k = menger_curvature(
+            Vec2::new(2.0, 0.0),
+            Vec2::new(0.0, 2.0),
+            Vec2::new(-2.0, 0.0),
+        );
         assert!((k - 0.5).abs() < 1e-5, "R=2 circle curvature {k}");
     }
 
     #[test]
     fn curvature_speed_limit_slows_in_a_bend() {
-        let path = [Vec2::new(2.0, 0.0), Vec2::new(0.0, 2.0), Vec2::new(-2.0, 0.0)];
+        let path = [
+            Vec2::new(2.0, 0.0),
+            Vec2::new(0.0, 2.0),
+            Vec2::new(-2.0, 0.0),
+        ];
         let v = curvature_speed_limit(&path, 1, 3.0); // a_lat=3, kappa=0.5
         assert!((v - (3.0f32 / 0.5).sqrt()).abs() < 1e-4, "v={v}");
         // A straight (degenerate) path imposes no limit.

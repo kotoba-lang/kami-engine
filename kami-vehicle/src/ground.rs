@@ -197,23 +197,77 @@ impl MapGround {
             default: SurfaceKind::Grass,
             zones: vec![
                 // Main asphalt road — long strip down the middle.
-                SurfaceZone { x_min: -4.0, x_max: 4.0, z_min: -100.0, z_max: 100.0, surface: SurfaceKind::AsphaltDry },
+                SurfaceZone {
+                    x_min: -4.0,
+                    x_max: 4.0,
+                    z_min: -100.0,
+                    z_max: 100.0,
+                    surface: SurfaceKind::AsphaltDry,
+                },
                 // Wet patch on the road (slippery start).
-                SurfaceZone { x_min: -4.0, x_max: 4.0, z_min: 8.0, z_max: 20.0, surface: SurfaceKind::AsphaltWet },
+                SurfaceZone {
+                    x_min: -4.0,
+                    x_max: 4.0,
+                    z_min: 8.0,
+                    z_max: 20.0,
+                    surface: SurfaceKind::AsphaltWet,
+                },
                 // Ice patch further down the road.
-                SurfaceZone { x_min: -4.0, x_max: 4.0, z_min: 30.0, z_max: 42.0, surface: SurfaceKind::Ice },
+                SurfaceZone {
+                    x_min: -4.0,
+                    x_max: 4.0,
+                    z_min: 30.0,
+                    z_max: 42.0,
+                    surface: SurfaceKind::Ice,
+                },
                 // Snow patch at the far end.
-                SurfaceZone { x_min: -4.0, x_max: 4.0, z_min: 55.0, z_max: 75.0, surface: SurfaceKind::Snow },
+                SurfaceZone {
+                    x_min: -4.0,
+                    x_max: 4.0,
+                    z_min: 55.0,
+                    z_max: 75.0,
+                    surface: SurfaceKind::Snow,
+                },
                 // Sand area to the right.
-                SurfaceZone { x_min: 8.0, x_max: 30.0, z_min: -20.0, z_max: 20.0, surface: SurfaceKind::Sand },
+                SurfaceZone {
+                    x_min: 8.0,
+                    x_max: 30.0,
+                    z_min: -20.0,
+                    z_max: 20.0,
+                    surface: SurfaceKind::Sand,
+                },
                 // Gravel area to the right, further forward.
-                SurfaceZone { x_min: 8.0, x_max: 30.0, z_min: 25.0, z_max: 60.0, surface: SurfaceKind::Gravel },
+                SurfaceZone {
+                    x_min: 8.0,
+                    x_max: 30.0,
+                    z_min: 25.0,
+                    z_max: 60.0,
+                    surface: SurfaceKind::Gravel,
+                },
                 // Mud area to the left.
-                SurfaceZone { x_min: -30.0, x_max: -8.0, z_min: -20.0, z_max: 20.0, surface: SurfaceKind::Mud },
+                SurfaceZone {
+                    x_min: -30.0,
+                    x_max: -8.0,
+                    z_min: -20.0,
+                    z_max: 20.0,
+                    surface: SurfaceKind::Mud,
+                },
                 // Snow area to the left, further forward.
-                SurfaceZone { x_min: -30.0, x_max: -8.0, z_min: 25.0, z_max: 60.0, surface: SurfaceKind::Snow },
+                SurfaceZone {
+                    x_min: -30.0,
+                    x_max: -8.0,
+                    z_min: 25.0,
+                    z_max: 60.0,
+                    surface: SurfaceKind::Snow,
+                },
                 // Reverse bay: ice patch behind.
-                SurfaceZone { x_min: -4.0, x_max: 4.0, z_min: -45.0, z_max: -30.0, surface: SurfaceKind::Mud },
+                SurfaceZone {
+                    x_min: -4.0,
+                    x_max: 4.0,
+                    z_min: -45.0,
+                    z_max: -30.0,
+                    surface: SurfaceKind::Mud,
+                },
             ],
         }
     }

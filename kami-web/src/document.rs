@@ -7,8 +7,8 @@
 
 use glam::Vec2;
 use serde::Deserialize;
-use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use wasm_bindgen::prelude::*;
 use web_sys::HtmlCanvasElement;
 
 /// EMU per inch (OOXML native unit).
@@ -91,19 +91,38 @@ fn hex_to_rgba(hex: &str) -> [f32; 4] {
 // ---------------------------------------------------------------------------
 
 /// Build a `kami_ui_gpu::UiLayer` from a slide definition.
-fn build_slide_layer(slide: &DocumentSlide, scale: f32, offset_x: f32, offset_y: f32) -> kami_ui_gpu::UiLayer {
+fn build_slide_layer(
+    slide: &DocumentSlide,
+    scale: f32,
+    offset_x: f32,
+    offset_y: f32,
+) -> kami_ui_gpu::UiLayer {
     let sw = emu_to_px(slide.width) * scale;
     let sh = emu_to_px(slide.height) * scale;
     let mut layer = kami_ui_gpu::UiLayer::new(sw + offset_x * 2.0, sh + offset_y * 2.0);
 
     // Slide background
-    let bg = slide.background.as_deref().map(hex_to_rgba).unwrap_or([1.0, 1.0, 1.0, 1.0]);
+    let bg = slide
+        .background
+        .as_deref()
+        .map(hex_to_rgba)
+        .unwrap_or([1.0, 1.0, 1.0, 1.0]);
     layer.rect(offset_x, offset_y, sw, sh, bg);
 
     // Slide border
-    layer.bordered_rect(offset_x, offset_y, sw, sh, [0.0; 4], [0.2, 0.2, 0.2, 1.0], 1.0, 0.0);
+    layer.bordered_rect(
+        offset_x,
+        offset_y,
+        sw,
+        sh,
+        [0.0; 4],
+        [0.2, 0.2, 0.2, 1.0],
+        1.0,
+        0.0,
+    );
 
-    let selected_set: std::collections::HashSet<&str> = slide.selected_ids.iter().map(|s| s.as_str()).collect();
+    let selected_set: std::collections::HashSet<&str> =
+        slide.selected_ids.iter().map(|s| s.as_str()).collect();
 
     for shape in &slide.shapes {
         if shape.visible == Some(false) {
@@ -132,7 +151,8 @@ fn build_slide_layer(slide: &DocumentSlide, scale: f32, offset_x: f32, offset_y:
                 }
             }
             "roundRect" => {
-                let r = shape.corner_radius
+                let r = shape
+                    .corner_radius
                     .map(|cr| emu_to_px(cr) * scale)
                     .unwrap_or(w.min(h) * 0.1);
                 if has_fill {
@@ -146,7 +166,11 @@ fn build_slide_layer(slide: &DocumentSlide, scale: f32, offset_x: f32, offset_y:
             }
             "line" => {
                 // Render line as a thin rect between (x,y) and (x+w, y+h)
-                let sc = shape.stroke.as_deref().map(hex_to_rgba).unwrap_or([0.0, 0.0, 0.0, 1.0]);
+                let sc = shape
+                    .stroke
+                    .as_deref()
+                    .map(hex_to_rgba)
+                    .unwrap_or([0.0, 0.0, 0.0, 1.0]);
                 let lw = (emu_to_px(shape.stroke_width) * scale).max(1.0);
                 // Approximate: horizontal line
                 layer.rect(x, y + h / 2.0 - lw / 2.0, w, lw, sc);
@@ -173,7 +197,16 @@ fn build_slide_layer(slide: &DocumentSlide, scale: f32, offset_x: f32, offset_y:
         // Selection indicator
         if selected_set.contains(shape.id.as_str()) {
             let sel_color = [0.29, 0.56, 0.85, 0.8]; // #4a90d9
-            layer.bordered_rect(x - 2.0, y - 2.0, w + 4.0, h + 4.0, [0.0; 4], sel_color, 2.0, 0.0);
+            layer.bordered_rect(
+                x - 2.0,
+                y - 2.0,
+                w + 4.0,
+                h + 4.0,
+                [0.0; 4],
+                sel_color,
+                2.0,
+                0.0,
+            );
 
             // 8 resize handles (small white squares with blue border)
             let hs: f32 = 8.0;
@@ -339,17 +372,41 @@ fn create_ui_pipeline(
                 step_mode: wgpu::VertexStepMode::Instance,
                 attributes: &[
                     // position
-                    wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x2, offset: 0, shader_location: 0 },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x2,
+                        offset: 0,
+                        shader_location: 0,
+                    },
                     // size
-                    wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x2, offset: 8, shader_location: 1 },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x2,
+                        offset: 8,
+                        shader_location: 1,
+                    },
                     // color
-                    wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 16, shader_location: 2 },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x4,
+                        offset: 16,
+                        shader_location: 2,
+                    },
                     // border_color
-                    wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32x4, offset: 32, shader_location: 3 },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x4,
+                        offset: 32,
+                        shader_location: 3,
+                    },
                     // corner_radius
-                    wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32, offset: 48, shader_location: 4 },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32,
+                        offset: 48,
+                        shader_location: 4,
+                    },
                     // border_width
-                    wgpu::VertexAttribute { format: wgpu::VertexFormat::Float32, offset: 52, shader_location: 5 },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32,
+                        offset: 52,
+                        shader_location: 5,
+                    },
                 ],
             }],
         },
@@ -390,10 +447,7 @@ fn create_ui_pipeline(
 /// # Returns
 /// Resolves when the frame is rendered. Call again for each frame update.
 #[wasm_bindgen]
-pub async fn render_document_frame(
-    canvas_id: &str,
-    slide_json: &str,
-) -> Result<(), JsValue> {
+pub async fn render_document_frame(canvas_id: &str, slide_json: &str) -> Result<(), JsValue> {
     console_error_panic_hook::set_once();
     let _ = console_log::init_with_level(log::Level::Warn);
 
@@ -466,7 +520,8 @@ pub async fn render_document_frame(
     });
 
     // Render frame
-    let output = surface.get_current_texture()
+    let output = surface
+        .get_current_texture()
         .map_err(|e| JsValue::from_str(&format!("surface texture: {e}")))?;
     let view = output.texture.create_view(&Default::default());
 
@@ -533,7 +588,10 @@ pub async fn document_gpu_info() -> Result<String, JsValue> {
         .await
         .ok_or("no adapter")?;
     let info = adapter.get_info();
-    Ok(format!("{} {} ({:?})", info.vendor, info.device, info.backend))
+    Ok(format!(
+        "{} {} ({:?})",
+        info.vendor, info.device, info.backend
+    ))
 }
 
 use wgpu::util::DeviceExt;

@@ -65,7 +65,12 @@ pub struct DoublePendulumState {
 
 impl Default for DoublePendulumState {
     fn default() -> Self {
-        DoublePendulumState { q1: 0.0, q2: 0.0, q1_dot: 0.0, q2_dot: 0.0 }
+        DoublePendulumState {
+            q1: 0.0,
+            q2: 0.0,
+            q1_dot: 0.0,
+            q2_dot: 0.0,
+        }
     }
 }
 
@@ -100,8 +105,8 @@ impl DoublePendulumState {
         let c_2 = -h * self.q1_dot * self.q1_dot;
 
         // Gravity bias:
-        let g1 = (cfg.m1 * lc1 + cfg.m2 * cfg.l1) * cfg.gravity * s1
-            + cfg.m2 * lc2 * cfg.gravity * s12;
+        let g1 =
+            (cfg.m1 * lc1 + cfg.m2 * cfg.l1) * cfg.gravity * s1 + cfg.m2 * lc2 * cfg.gravity * s12;
         let g2 = cfg.m2 * lc2 * cfg.gravity * s12;
 
         // Solve M qddot = tau - C qdot - g (2x2 system):
@@ -160,7 +165,10 @@ mod tests {
         // that small-angle behavior is sinusoidal with period close to
         // 2π√(I_eff / (M_eff g L_eff)).
         let cfg = DoublePendulumConfig::default();
-        let mut s = DoublePendulumState { q1: 0.05, ..Default::default() };
+        let mut s = DoublePendulumState {
+            q1: 0.05,
+            ..Default::default()
+        };
         let e0 = s.energy(&cfg);
         // Run 1 second of swing.
         let steps = (1.0 / cfg.dt) as usize;
@@ -181,7 +189,10 @@ mod tests {
         // q1 increases counterclockwise. Release at q1=π/2 (horizontal) with
         // link2 aligned (q2=0); gravity drives q1 to swing DOWN toward 0.
         let cfg = DoublePendulumConfig::default();
-        let mut s = DoublePendulumState { q1: std::f32::consts::FRAC_PI_2, ..Default::default() };
+        let mut s = DoublePendulumState {
+            q1: std::f32::consts::FRAC_PI_2,
+            ..Default::default()
+        };
         for _ in 0..(0.5 / cfg.dt) as usize {
             s.step([0.0, 0.0], &cfg);
         }
@@ -190,7 +201,10 @@ mod tests {
             "released horizontal pendulum should swing toward 0 (got q1={})",
             s.q1
         );
-        assert!(s.q1_dot < 0.0, "angular velocity should be negative (swinging down)");
+        assert!(
+            s.q1_dot < 0.0,
+            "angular velocity should be negative (swinging down)"
+        );
     }
 
     #[test]

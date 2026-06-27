@@ -1,5 +1,4 @@
 /// Network-on-Chip topology synthesis and router generation.
-
 use serde::{Deserialize, Serialize};
 
 /// NoC topology type.
@@ -117,21 +116,50 @@ pub fn generate_noc(config: &NocConfig) -> NocDesign {
                     }];
 
                     if r > 0 {
-                        ports.push(NocPort { direction: PortDirection::North, bandwidth_gbps: link_bw, latency_cycles: link_latency });
-                        links.push(NocLink { src_id: id, dst_id: (r - 1) * cols + c, bandwidth_gbps: link_bw });
+                        ports.push(NocPort {
+                            direction: PortDirection::North,
+                            bandwidth_gbps: link_bw,
+                            latency_cycles: link_latency,
+                        });
+                        links.push(NocLink {
+                            src_id: id,
+                            dst_id: (r - 1) * cols + c,
+                            bandwidth_gbps: link_bw,
+                        });
                     }
                     if r < rows - 1 {
-                        ports.push(NocPort { direction: PortDirection::South, bandwidth_gbps: link_bw, latency_cycles: link_latency });
+                        ports.push(NocPort {
+                            direction: PortDirection::South,
+                            bandwidth_gbps: link_bw,
+                            latency_cycles: link_latency,
+                        });
                     }
                     if c > 0 {
-                        ports.push(NocPort { direction: PortDirection::West, bandwidth_gbps: link_bw, latency_cycles: link_latency });
-                        links.push(NocLink { src_id: id, dst_id: r * cols + c - 1, bandwidth_gbps: link_bw });
+                        ports.push(NocPort {
+                            direction: PortDirection::West,
+                            bandwidth_gbps: link_bw,
+                            latency_cycles: link_latency,
+                        });
+                        links.push(NocLink {
+                            src_id: id,
+                            dst_id: r * cols + c - 1,
+                            bandwidth_gbps: link_bw,
+                        });
                     }
                     if c < cols - 1 {
-                        ports.push(NocPort { direction: PortDirection::East, bandwidth_gbps: link_bw, latency_cycles: link_latency });
+                        ports.push(NocPort {
+                            direction: PortDirection::East,
+                            bandwidth_gbps: link_bw,
+                            latency_cycles: link_latency,
+                        });
                     }
 
-                    routers.push(NocRouter { id, x: c, y: r, ports });
+                    routers.push(NocRouter {
+                        id,
+                        x: c,
+                        y: r,
+                        ports,
+                    });
                 }
             }
 
@@ -141,7 +169,12 @@ pub fn generate_noc(config: &NocConfig) -> NocDesign {
             // Worst-case latency: mesh diameter.
             let diameter = (rows - 1) + (cols - 1);
 
-            NocDesign { routers, links, total_area_um2: area, estimated_latency_cycles: diameter * link_latency + 1 }
+            NocDesign {
+                routers,
+                links,
+                total_area_um2: area,
+                estimated_latency_cycles: diameter * link_latency + 1,
+            }
         }
         NocTopology::Ring { nodes } => {
             let mut routers = Vec::with_capacity(*nodes as usize);
@@ -149,34 +182,78 @@ pub fn generate_noc(config: &NocConfig) -> NocDesign {
 
             for i in 0..*nodes {
                 let ports = vec![
-                    NocPort { direction: PortDirection::Local, bandwidth_gbps: link_bw, latency_cycles: 0 },
-                    NocPort { direction: PortDirection::East, bandwidth_gbps: link_bw, latency_cycles: link_latency },
-                    NocPort { direction: PortDirection::West, bandwidth_gbps: link_bw, latency_cycles: link_latency },
+                    NocPort {
+                        direction: PortDirection::Local,
+                        bandwidth_gbps: link_bw,
+                        latency_cycles: 0,
+                    },
+                    NocPort {
+                        direction: PortDirection::East,
+                        bandwidth_gbps: link_bw,
+                        latency_cycles: link_latency,
+                    },
+                    NocPort {
+                        direction: PortDirection::West,
+                        bandwidth_gbps: link_bw,
+                        latency_cycles: link_latency,
+                    },
                 ];
-                routers.push(NocRouter { id: i, x: i, y: 0, ports });
-                links.push(NocLink { src_id: i, dst_id: (i + 1) % nodes, bandwidth_gbps: link_bw });
+                routers.push(NocRouter {
+                    id: i,
+                    x: i,
+                    y: 0,
+                    ports,
+                });
+                links.push(NocLink {
+                    src_id: i,
+                    dst_id: (i + 1) % nodes,
+                    bandwidth_gbps: link_bw,
+                });
             }
 
             let area = *nodes as f64 * 3.0 * 5000.0 * (config.data_width as f64 / 32.0);
             let diameter = nodes / 2;
-            NocDesign { routers, links, total_area_um2: area, estimated_latency_cycles: diameter * link_latency + 1 }
+            NocDesign {
+                routers,
+                links,
+                total_area_um2: area,
+                estimated_latency_cycles: diameter * link_latency + 1,
+            }
         }
         NocTopology::Crossbar { ports } => {
             let mut routers = Vec::with_capacity(*ports as usize);
             let mut links = Vec::new();
 
             for i in 0..*ports {
-                let r_ports = vec![NocPort { direction: PortDirection::Local, bandwidth_gbps: link_bw, latency_cycles: 0 }];
-                routers.push(NocRouter { id: i, x: i, y: 0, ports: r_ports });
+                let r_ports = vec![NocPort {
+                    direction: PortDirection::Local,
+                    bandwidth_gbps: link_bw,
+                    latency_cycles: 0,
+                }];
+                routers.push(NocRouter {
+                    id: i,
+                    x: i,
+                    y: 0,
+                    ports: r_ports,
+                });
                 for j in 0..*ports {
                     if i != j {
-                        links.push(NocLink { src_id: i, dst_id: j, bandwidth_gbps: link_bw });
+                        links.push(NocLink {
+                            src_id: i,
+                            dst_id: j,
+                            bandwidth_gbps: link_bw,
+                        });
                     }
                 }
             }
 
             let area = (*ports as f64).powi(2) * 3000.0 * (config.data_width as f64 / 32.0);
-            NocDesign { routers, links, total_area_um2: area, estimated_latency_cycles: 2 }
+            NocDesign {
+                routers,
+                links,
+                total_area_um2: area,
+                estimated_latency_cycles: 2,
+            }
         }
         NocTopology::Tree { levels } => {
             let total_nodes = (1_u32 << levels) - 1;
@@ -186,18 +263,40 @@ pub fn generate_noc(config: &NocConfig) -> NocDesign {
             for i in 0..total_nodes {
                 let level = (i + 1).ilog2();
                 let ports = vec![
-                    NocPort { direction: PortDirection::Local, bandwidth_gbps: link_bw, latency_cycles: 0 },
-                    NocPort { direction: PortDirection::North, bandwidth_gbps: link_bw, latency_cycles: link_latency },
+                    NocPort {
+                        direction: PortDirection::Local,
+                        bandwidth_gbps: link_bw,
+                        latency_cycles: 0,
+                    },
+                    NocPort {
+                        direction: PortDirection::North,
+                        bandwidth_gbps: link_bw,
+                        latency_cycles: link_latency,
+                    },
                 ];
-                routers.push(NocRouter { id: i, x: i, y: level, ports });
+                routers.push(NocRouter {
+                    id: i,
+                    x: i,
+                    y: level,
+                    ports,
+                });
                 if i > 0 {
                     let parent = (i - 1) / 2;
-                    links.push(NocLink { src_id: i, dst_id: parent, bandwidth_gbps: link_bw });
+                    links.push(NocLink {
+                        src_id: i,
+                        dst_id: parent,
+                        bandwidth_gbps: link_bw,
+                    });
                 }
             }
 
             let area = total_nodes as f64 * 2.0 * 5000.0 * (config.data_width as f64 / 32.0);
-            NocDesign { routers, links, total_area_um2: area, estimated_latency_cycles: 2 * levels }
+            NocDesign {
+                routers,
+                links,
+                total_area_um2: area,
+                estimated_latency_cycles: 2 * levels,
+            }
         }
     }
 }

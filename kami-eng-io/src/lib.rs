@@ -178,8 +178,8 @@ pub mod gerber {
         let mut s = String::new();
         // Header
         s.push_str("%FSLAX36Y36*%\n"); // format: leading zeros, absolute, 3.6
-        s.push_str("%MOIN*%\n");        // units: mm
-        s.push_str("%IPPOS*%\n");       // image polarity: positive
+        s.push_str("%MOIN*%\n"); // units: mm
+        s.push_str("%IPPOS*%\n"); // image polarity: positive
 
         // Aperture definitions
         for (id, ap) in apertures {
@@ -212,11 +212,23 @@ pub mod gerber {
                 }
                 GerberCmd::ArcCW { x, y, i, j } => {
                     s.push_str("G02*\n");
-                    s.push_str(&format!("X{}Y{}I{}J{}D01*\n", coord(*x), coord(*y), coord(*i), coord(*j)));
+                    s.push_str(&format!(
+                        "X{}Y{}I{}J{}D01*\n",
+                        coord(*x),
+                        coord(*y),
+                        coord(*i),
+                        coord(*j)
+                    ));
                 }
                 GerberCmd::ArcCCW { x, y, i, j } => {
                     s.push_str("G03*\n");
-                    s.push_str(&format!("X{}Y{}I{}J{}D01*\n", coord(*x), coord(*y), coord(*i), coord(*j)));
+                    s.push_str(&format!(
+                        "X{}Y{}I{}J{}D01*\n",
+                        coord(*x),
+                        coord(*y),
+                        coord(*i),
+                        coord(*j)
+                    ));
                 }
             }
         }
@@ -252,9 +264,15 @@ mod tests {
 
     #[test]
     fn format_detection() {
-        assert_eq!(FileFormat::from_extension("step"), Some(FileFormat::StepAp214));
+        assert_eq!(
+            FileFormat::from_extension("step"),
+            Some(FileFormat::StepAp214)
+        );
         assert_eq!(FileFormat::from_extension("v"), Some(FileFormat::Verilog));
-        assert_eq!(FileFormat::from_extension("gbr"), Some(FileFormat::GerberRs274x));
+        assert_eq!(
+            FileFormat::from_extension("gbr"),
+            Some(FileFormat::GerberRs274x)
+        );
         assert_eq!(FileFormat::from_extension("nc"), Some(FileFormat::Gcode));
         assert!(FileFormat::from_extension("xyz").is_none());
     }
@@ -289,9 +307,7 @@ mod tests {
 
     #[test]
     fn gerber_generation() {
-        let apertures = vec![
-            (10, gerber::Aperture::Circle { diameter: 0.2 }),
-        ];
+        let apertures = vec![(10, gerber::Aperture::Circle { diameter: 0.2 })];
         let cmds = vec![
             gerber::GerberCmd::SelectAperture(10),
             gerber::GerberCmd::Flash { x: 1.0, y: 2.0 },

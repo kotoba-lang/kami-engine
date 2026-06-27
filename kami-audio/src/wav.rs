@@ -40,8 +40,8 @@ pub fn encode_pcm16_stereo(interleaved: &[f32], sample_rate: u32) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::binaural::{mix_stereo, spatialize, Hrtf, Rolloff, Voice};
     use crate::Listener;
+    use crate::binaural::{Hrtf, Rolloff, Voice, mix_stereo, spatialize};
     use glam::Vec3;
 
     #[test]
@@ -57,7 +57,10 @@ mod tests {
         // channels field = 2
         assert_eq!(u16::from_le_bytes([wav[22], wav[23]]), 2);
         // sample rate field
-        assert_eq!(u32::from_le_bytes([wav[24], wav[25], wav[26], wav[27]]), 48_000);
+        assert_eq!(
+            u32::from_le_bytes([wav[24], wav[25], wav[26], wav[27]]),
+            48_000
+        );
     }
 
     #[test]
@@ -71,7 +74,14 @@ mod tests {
             1.0,
         );
         let tone: Vec<f32> = (0..480).map(|i| (i as f32 * 0.1).sin() * 0.5).collect();
-        let stereo = mix_stereo(&[Voice { params: p, mono: &tone }], 48_000, 512);
+        let stereo = mix_stereo(
+            &[Voice {
+                params: p,
+                mono: &tone,
+            }],
+            48_000,
+            512,
+        );
         let wav = encode_pcm16_stereo(&stereo, 48_000);
         assert_eq!(&wav[0..4], b"RIFF");
         assert_eq!(wav.len(), 44 + 512 * 2 * 2); // 512 frames × 2 ch × 2 bytes
@@ -80,6 +90,9 @@ mod tests {
             .chunks_exact(2)
             .map(|b| i16::from_le_bytes([b[0], b[1]]))
             .collect();
-        assert!(pcm.iter().skip(1).step_by(2).any(|&s| s != 0), "right channel has signal");
+        assert!(
+            pcm.iter().skip(1).step_by(2).any(|&s| s != 0),
+            "right channel has signal"
+        );
     }
 }

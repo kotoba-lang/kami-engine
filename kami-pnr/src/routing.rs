@@ -1,5 +1,4 @@
 /// Maze routing — Lee/BFS algorithm on a multi-layer routing grid.
-
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 
@@ -63,12 +62,21 @@ impl Router {
     pub fn new(grid: RoutingGrid) -> Self {
         let num_layers = grid.layers.len();
         let occupied = vec![vec![vec![false; grid.num_x]; grid.num_y]; num_layers];
-        Self { grid, occupied, nets: Vec::new(), overflow_count: 0 }
+        Self {
+            grid,
+            occupied,
+            nets: Vec::new(),
+            overflow_count: 0,
+        }
     }
 
     /// Route a single net between the given pin grid coordinates using Lee (BFS) algorithm.
     /// `pins` are `(layer_idx, grid_x, grid_y)`.
-    pub fn route_net(&mut self, net_name: &str, pins: &[(usize, usize, usize)]) -> Option<RoutedNet> {
+    pub fn route_net(
+        &mut self,
+        net_name: &str,
+        pins: &[(usize, usize, usize)],
+    ) -> Option<RoutedNet> {
         if pins.len() < 2 {
             return None;
         }
@@ -87,7 +95,12 @@ impl Router {
                 }
                 None => {
                     self.overflow_count += 1;
-                    log::warn!("Failed to route net '{}' between {:?} and {:?}", net_name, src, dst);
+                    log::warn!(
+                        "Failed to route net '{}' between {:?} and {:?}",
+                        net_name,
+                        src,
+                        dst
+                    );
                 }
             }
         }
@@ -121,7 +134,9 @@ impl Router {
         queue.push_back(src);
 
         let found = loop {
-            let Some(cur) = queue.pop_front() else { break false };
+            let Some(cur) = queue.pop_front() else {
+                break false;
+            };
             if cur == dst {
                 break true;
             }
@@ -129,12 +144,24 @@ impl Router {
 
             // Neighbors: 4 cardinal on same layer + up/down layer
             let mut neighbors = Vec::new();
-            if cx > 0 { neighbors.push((cl, cx - 1, cy)); }
-            if cx + 1 < nx { neighbors.push((cl, cx + 1, cy)); }
-            if cy > 0 { neighbors.push((cl, cx, cy - 1)); }
-            if cy + 1 < ny { neighbors.push((cl, cx, cy + 1)); }
-            if cl > 0 { neighbors.push((cl - 1, cx, cy)); }
-            if cl + 1 < nl { neighbors.push((cl + 1, cx, cy)); }
+            if cx > 0 {
+                neighbors.push((cl, cx - 1, cy));
+            }
+            if cx + 1 < nx {
+                neighbors.push((cl, cx + 1, cy));
+            }
+            if cy > 0 {
+                neighbors.push((cl, cx, cy - 1));
+            }
+            if cy + 1 < ny {
+                neighbors.push((cl, cx, cy + 1));
+            }
+            if cl > 0 {
+                neighbors.push((cl - 1, cx, cy));
+            }
+            if cl + 1 < nl {
+                neighbors.push((cl + 1, cx, cy));
+            }
 
             for (nl2, nx2, ny2) in neighbors {
                 if !visited[nl2][ny2][nx2] && !self.occupied[nl2][ny2][nx2] {

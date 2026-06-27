@@ -52,7 +52,7 @@ pub mod anim_blueprint;
 use std::collections::BTreeMap;
 
 use kami_character::{HairStyle, HairType};
-use kami_scene::{mget, num, root_map, vec3, EdnValue};
+use kami_scene::{EdnValue, mget, num, root_map, vec3};
 
 /// The canonical hair-style preset CONFIG shipped with this crate. This is the source
 /// of truth; the compiled-in preset fns are the parity-tested mirror.
@@ -61,8 +61,13 @@ pub const HAIR_EDN: &str = include_str!("../data/hair.edn");
 /// Names of the hair styles shipped as the compiled-in oracle (iteration source for
 /// `builtin`/parity). Keeping this list here (not in `kami-character`) keeps the engine
 /// crate untouched. Order mirrors the `impl HairStyle` declaration order.
-pub const ALL_HAIR_STYLE_NAMES: [&str; 5] =
-    ["blonde-long", "dark-short", "red-wavy", "brown-curly", "afro"];
+pub const ALL_HAIR_STYLE_NAMES: [&str; 5] = [
+    "blonde-long",
+    "dark-short",
+    "red-wavy",
+    "brown-curly",
+    "afro",
+];
 
 /// Errors raised while loading hair-style preset CONFIG from EDN.
 #[derive(Debug, thiserror::Error)]
@@ -240,7 +245,9 @@ pub fn hair_styles_from_edn(src: &str) -> Result<BTreeMap<String, HairStyle>, Er
 
     let mut by_id = BTreeMap::new();
     for (k, v) in table.iter() {
-        let Some(id) = kami_scene::kw_key(k) else { continue };
+        let Some(id) = kami_scene::kw_key(k) else {
+            continue;
+        };
         let Some(map) = v.as_map() else { continue };
         by_id.insert(id, to_hair_style(map));
     }

@@ -54,7 +54,11 @@ pub struct Imu {
 }
 
 impl Imu {
-    pub fn new(name: impl Into<String>, prim_path: impl Into<String>, link_name: impl Into<String>) -> Self {
+    pub fn new(
+        name: impl Into<String>,
+        prim_path: impl Into<String>,
+        link_name: impl Into<String>,
+    ) -> Self {
         Imu {
             name: name.into(),
             prim_path: prim_path.into(),
@@ -154,7 +158,11 @@ mod tests {
         let v_fall = Vec3::new(0.0, 0.0, -9.81 * dt);
         let r = imu.sample(v_fall, Vec3::ZERO, Quat::IDENTITY, dt);
         // Proper accel = (v - 0) / dt - gravity = (0, 0, -9.81) - (0,0,-9.81) = 0
-        assert!(r.linear_acceleration.length() < 1e-2, "got {:?}", r.linear_acceleration);
+        assert!(
+            r.linear_acceleration.length() < 1e-2,
+            "got {:?}",
+            r.linear_acceleration
+        );
     }
 
     #[test]

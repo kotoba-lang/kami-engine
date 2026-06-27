@@ -28,7 +28,10 @@ pub struct NativeHead {
 impl NativeHead {
     /// A zero-initialized head (`state_dim → n_dof`).
     pub fn zeros(state_dim: usize, n_dof: usize) -> Self {
-        NativeHead { policy: LinearPolicy::zeros(state_dim, n_dof), n_dof }
+        NativeHead {
+            policy: LinearPolicy::zeros(state_dim, n_dof),
+            n_dof,
+        }
     }
 
     /// Wrap an already-built / already-trained `LinearPolicy`.

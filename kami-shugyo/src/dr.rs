@@ -17,10 +17,15 @@ use serde::{Deserialize, Serialize};
 struct Lcg(u64);
 impl Lcg {
     fn new(seed: u64) -> Self {
-        Lcg(seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407))
+        Lcg(seed
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407))
     }
     fn next_u01(&mut self) -> f32 {
-        self.0 = self.0.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.0 = self
+            .0
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         ((self.0 >> 33) as f32) / (1u64 << 31) as f32
     }
     fn next_uniform(&mut self, low: f32, high: f32) -> f32 {
@@ -66,7 +71,10 @@ impl DomainRandomizationCfg {
         DomainRandomizationCfg {
             cart_mass: Range::new(base.cart_mass * 0.8, base.cart_mass * 1.2),
             pole_mass: Range::new(base.pole_mass * 0.8, base.pole_mass * 1.2),
-            pole_half_length: Range::new(base.pole_half_length * 0.95, base.pole_half_length * 1.05),
+            pole_half_length: Range::new(
+                base.pole_half_length * 0.95,
+                base.pole_half_length * 1.05,
+            ),
             gravity: Range::new(base.gravity * 0.95, base.gravity * 1.05),
             force_mag: Range::fixed(base.force_mag),
             dt: Range::fixed(base.dt),
@@ -91,7 +99,8 @@ impl DomainRandomizationCfg {
         CartpoleConfig {
             cart_mass: rng.next_uniform(self.cart_mass.low, self.cart_mass.high),
             pole_mass: rng.next_uniform(self.pole_mass.low, self.pole_mass.high),
-            pole_half_length: rng.next_uniform(self.pole_half_length.low, self.pole_half_length.high),
+            pole_half_length: rng
+                .next_uniform(self.pole_half_length.low, self.pole_half_length.high),
             gravity: rng.next_uniform(self.gravity.low, self.gravity.high),
             force_mag: rng.next_uniform(self.force_mag.low, self.force_mag.high),
             dt: rng.next_uniform(self.dt.low, self.dt.high),

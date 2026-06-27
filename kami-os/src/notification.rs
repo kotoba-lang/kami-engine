@@ -56,7 +56,13 @@ impl NotificationQueue {
     }
 
     /// Push a toast notification (delegates to ToastStack).
-    pub fn push_toast(&mut self, title: String, body: String, level: NotificationLevel, duration_ms: u64) {
+    pub fn push_toast(
+        &mut self,
+        title: String,
+        body: String,
+        level: NotificationLevel,
+        duration_ms: u64,
+    ) {
         self.toasts.push(title, body, level, duration_ms);
     }
 

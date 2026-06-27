@@ -83,10 +83,17 @@ fn render_multi_emits_one_png_per_angle() {
         return;
     }
     let scene = MangakaScene::new();
-    let cams: Vec<CameraSpec> = [ShotGrammar::FullShot, ShotGrammar::Closeup, ShotGrammar::Dutch]
-        .iter()
-        .map(|s| CameraSpec { shot: *s, ..CameraSpec::default() })
-        .collect();
+    let cams: Vec<CameraSpec> = [
+        ShotGrammar::FullShot,
+        ShotGrammar::Closeup,
+        ShotGrammar::Dutch,
+    ]
+    .iter()
+    .map(|s| CameraSpec {
+        shot: *s,
+        ..CameraSpec::default()
+    })
+    .collect();
     let opts = RenderOpts {
         width: 128,
         height: 128,

@@ -80,5 +80,8 @@ fn car_drone_ship_share_a_world_collision_free() {
         fleet.agents[1].pose(),
         fleet.agents[2].pose(),
     );
-    assert!(min_sep > 0.0, "mixed fleet collided (min separation {min_sep:.2} m)");
+    assert!(
+        min_sep > 0.0,
+        "mixed fleet collided (min separation {min_sep:.2} m)"
+    );
 }

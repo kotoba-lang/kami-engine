@@ -36,11 +36,11 @@
 
 pub mod base_mesh;
 pub mod blendshape;
-pub mod hair;
 pub mod body;
+pub mod export;
+pub mod hair;
 pub mod material;
 pub mod params;
-pub mod export;
 
 // ─── MetaHuman Modules ───
 
@@ -67,14 +67,17 @@ pub mod anim_blueprint;
 
 // ─── Re-exports for SDK convenience ───
 
+pub use anim_blueprint::AnimBlueprint;
+pub use control_rig::ControlRig;
 pub use dna::DnaFile;
 pub use groom::{GroomAsset, HairCard, Strand};
-pub use hair_gen::{HairStyle, HairType, HairRenderMode, HairMeshOutput, HairMeshData,
-    generate_groom, generate_groom_count, generate_hair_cards, generate_hair_mesh, generate_hair_mesh_data, generate_hair_glb};
-pub use metahuman::{MetaHumanDna, MetaHumanLod, FacsActionUnit, generate_metahuman};
-pub use skeletal_mesh::{SkinnedVertex, SkeletalMeshAsset};
-pub use control_rig::ControlRig;
-pub use anim_blueprint::AnimBlueprint;
+pub use hair_gen::{
+    generate_groom, generate_groom_count, generate_hair_cards, generate_hair_glb,
+    generate_hair_mesh, generate_hair_mesh_data, HairMeshData, HairMeshOutput, HairRenderMode,
+    HairStyle, HairType,
+};
+pub use metahuman::{generate_metahuman, FacsActionUnit, MetaHumanDna, MetaHumanLod};
+pub use skeletal_mesh::{SkeletalMeshAsset, SkinnedVertex};
 
 // ─── Core Types ───
 
@@ -181,14 +184,22 @@ mod tests {
         assert!(mesh.parts.iter().any(|p| p.name == "head"));
         assert!(mesh.parts.iter().any(|p| p.material == MaterialId::Hair));
         let total_verts: usize = mesh.parts.iter().map(|p| p.vertices.len()).sum();
-        assert!(total_verts > 5000, "Expected 5K+ verts, got {}", total_verts);
+        assert!(
+            total_verts > 5000,
+            "Expected 5K+ verts, got {}",
+            total_verts
+        );
     }
 
     #[test]
     fn test_blendshape_targets() {
         let def = params::CharacterDef::default();
         let mesh = generate_character(&def);
-        assert_eq!(mesh.blendshape_targets.len(), 52, "Expected 52 ARKit targets");
+        assert_eq!(
+            mesh.blendshape_targets.len(),
+            52,
+            "Expected 52 ARKit targets"
+        );
     }
 
     #[test]

@@ -32,14 +32,26 @@ pub fn cache_heightmap(config_json: &str) -> u32 {
     use kami_terrain::{BiomePreset, Heightmap, HeightmapConfig};
     #[derive(serde::Deserialize)]
     struct Cfg {
-        width: Option<u32>, depth: Option<u32>, seed: Option<f32>,
-        max_height: Option<f32>, frequency: Option<f32>, octaves: Option<u32>,
-        origin_x: Option<f32>, origin_z: Option<f32>,
+        width: Option<u32>,
+        depth: Option<u32>,
+        seed: Option<f32>,
+        max_height: Option<f32>,
+        frequency: Option<f32>,
+        octaves: Option<u32>,
+        origin_x: Option<f32>,
+        origin_z: Option<f32>,
         biome: Option<String>,
     }
     let cfg: Cfg = serde_json::from_str(config_json).unwrap_or(Cfg {
-        width: None, depth: None, seed: None, max_height: None,
-        frequency: None, octaves: None, origin_x: None, origin_z: None, biome: None,
+        width: None,
+        depth: None,
+        seed: None,
+        max_height: None,
+        frequency: None,
+        octaves: None,
+        origin_x: None,
+        origin_z: None,
+        biome: None,
     });
     let biome = match cfg.biome.as_deref() {
         Some("quarry") => BiomePreset::Quarry,
@@ -49,9 +61,15 @@ pub fn cache_heightmap(config_json: &str) -> u32 {
     };
     let seed = cfg.seed.unwrap_or(42.0);
     let mut hm_cfg = biome.heightmap(seed);
-    if let Some(mh) = cfg.max_height { hm_cfg.max_height = mh; }
-    if let Some(f) = cfg.frequency { hm_cfg.frequency = f; }
-    if let Some(o) = cfg.octaves { hm_cfg.octaves = o; }
+    if let Some(mh) = cfg.max_height {
+        hm_cfg.max_height = mh;
+    }
+    if let Some(f) = cfg.frequency {
+        hm_cfg.frequency = f;
+    }
+    if let Some(o) = cfg.octaves {
+        hm_cfg.octaves = o;
+    }
     let w = cfg.width.unwrap_or(257);
     let d = cfg.depth.unwrap_or(257);
     let ox = cfg.origin_x.unwrap_or(-128.0);
@@ -60,7 +78,11 @@ pub fn cache_heightmap(config_json: &str) -> u32 {
 
     HEIGHTMAP.with(|c| {
         *c.borrow_mut() = HeightmapCache {
-            heights: hm.data, width: w, depth: d, origin_x: ox, origin_z: oz,
+            heights: hm.data,
+            width: w,
+            depth: d,
+            origin_x: ox,
+            origin_z: oz,
         };
     });
     w * d
@@ -72,7 +94,9 @@ pub fn cache_heightmap(config_json: &str) -> u32 {
 pub fn sample_terrain_height(x: f32, z: f32) -> f32 {
     HEIGHTMAP.with(|c| {
         let c = c.borrow();
-        if c.heights.is_empty() { return 0.0; }
+        if c.heights.is_empty() {
+            return 0.0;
+        }
         let fx = x - c.origin_x;
         let fz = z - c.origin_z;
         if fx < 0.0 || fz < 0.0 || fx >= (c.width - 1) as f32 || fz >= (c.depth - 1) as f32 {
@@ -124,9 +148,16 @@ pub fn invert_mat4(m: &[f32]) -> Vec<f32> {
 /// Build `viewProj = perspective * lookAt` in one call (saves one WASM boundary crossing).
 #[wasm_bindgen]
 pub fn view_projection(
-    eye_x: f32, eye_y: f32, eye_z: f32,
-    target_x: f32, target_y: f32, target_z: f32,
-    fov_y: f32, aspect: f32, near: f32, far: f32,
+    eye_x: f32,
+    eye_y: f32,
+    eye_z: f32,
+    target_x: f32,
+    target_y: f32,
+    target_z: f32,
+    fov_y: f32,
+    aspect: f32,
+    near: f32,
+    far: f32,
 ) -> Vec<f32> {
     let view = Mat4::look_at_rh(
         Vec3::new(eye_x, eye_y, eye_z),

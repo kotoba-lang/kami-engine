@@ -54,7 +54,13 @@ impl Heightmap {
                 let world_z = wz + z as f32;
                 let nx = world_x * config.frequency + config.seed;
                 let nz = world_z * config.frequency + config.seed * 0.7;
-                let h = fbm_noise(nx, nz, config.octaves, config.lacunarity, config.persistence);
+                let h = fbm_noise(
+                    nx,
+                    nz,
+                    config.octaves,
+                    config.lacunarity,
+                    config.persistence,
+                );
                 // Apply curve: flatten valleys, sharpen peaks (Decima-style)
                 let curved = h * h * (3.0 - 2.0 * h); // smoothstep
                 data.push(curved * config.max_height);

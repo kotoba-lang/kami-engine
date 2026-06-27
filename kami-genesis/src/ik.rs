@@ -86,8 +86,16 @@ struct CartpoleIkBackend<'a> {
 
 pub(crate) fn cartpole_pose(x: f32, theta: f32, link: &str) -> Option<TargetPose> {
     match link {
-        "world" => Some(TargetPose { x: 0.0, z: 0.0, theta_y: 0.0 }),
-        "cart" => Some(TargetPose { x, z: 0.0, theta_y: 0.0 }),
+        "world" => Some(TargetPose {
+            x: 0.0,
+            z: 0.0,
+            theta_y: 0.0,
+        }),
+        "cart" => Some(TargetPose {
+            x,
+            z: 0.0,
+            theta_y: 0.0,
+        }),
         "pole_link" => Some(TargetPose {
             x: x + 0.25 * theta.sin(),
             z: 0.25 * theta.cos(),
@@ -99,11 +107,15 @@ pub(crate) fn cartpole_pose(x: f32, theta: f32, link: &str) -> Option<TargetPose
 
 impl<'a> IkBackend for CartpoleIkBackend<'a> {
     fn link_pose(&self, q: &[f32]) -> Option<TargetPose> {
-        if q.len() != 2 { return None; }
+        if q.len() != 2 {
+            return None;
+        }
         cartpole_pose(q[0], q[1], self.link_name)
     }
     fn planar_jacobian(&self, q: &[f32]) -> Option<Vec<[f32; 3]>> {
-        if q.len() != 2 { return None; }
+        if q.len() != 2 {
+            return None;
+        }
         let j = cartpole_link_jacobian(q[1], self.link_name, self.cfg)?;
         // Compact 3×n: rows = (linear_x, linear_z, angular_y)
         let cols = j.cols();
@@ -113,7 +125,9 @@ impl<'a> IkBackend for CartpoleIkBackend<'a> {
         }
         Some(out)
     }
-    fn dof(&self) -> usize { 2 }
+    fn dof(&self) -> usize {
+        2
+    }
 }
 
 // ── Double pendulum backend ───────────────────────────────────────────────
@@ -123,9 +137,18 @@ struct DpIkBackend<'a> {
     link_name: &'a str,
 }
 
-pub(crate) fn dp_pose(q1: f32, q2: f32, cfg: &DoublePendulumConfig, link: &str) -> Option<TargetPose> {
+pub(crate) fn dp_pose(
+    q1: f32,
+    q2: f32,
+    cfg: &DoublePendulumConfig,
+    link: &str,
+) -> Option<TargetPose> {
     match link {
-        "world" => Some(TargetPose { x: 0.0, z: 0.0, theta_y: 0.0 }),
+        "world" => Some(TargetPose {
+            x: 0.0,
+            z: 0.0,
+            theta_y: 0.0,
+        }),
         "link1" => Some(TargetPose {
             x: (cfg.l1 * 0.5) * q1.sin(),
             z: -(cfg.l1 * 0.5) * q1.cos(),
@@ -148,11 +171,15 @@ pub(crate) fn dp_pose(q1: f32, q2: f32, cfg: &DoublePendulumConfig, link: &str) 
 
 impl<'a> IkBackend for DpIkBackend<'a> {
     fn link_pose(&self, q: &[f32]) -> Option<TargetPose> {
-        if q.len() != 2 { return None; }
+        if q.len() != 2 {
+            return None;
+        }
         dp_pose(q[0], q[1], self.cfg, self.link_name)
     }
     fn planar_jacobian(&self, q: &[f32]) -> Option<Vec<[f32; 3]>> {
-        if q.len() != 2 { return None; }
+        if q.len() != 2 {
+            return None;
+        }
         // For link2_tip we need a different Jacobian: derivative of tip
         // position. dp_link_jacobian returns the com Jacobian for link2; we
         // re-derive the tip case in-place.
@@ -171,7 +198,7 @@ impl<'a> IkBackend for DpIkBackend<'a> {
             let l2 = self.cfg.l2;
             return Some(vec![
                 [l1 * c1 + l2 * c12, l1 * s1 + l2 * s12, 1.0], // ∂/∂q1
-                [l2 * c12,           l2 * s12,           1.0], // ∂/∂q2
+                [l2 * c12, l2 * s12, 1.0],                     // ∂/∂q2
             ]);
         }
         let j = dp_link_jacobian(q[0], q[1], self.link_name, self.cfg)?;
@@ -182,7 +209,9 @@ impl<'a> IkBackend for DpIkBackend<'a> {
         }
         Some(out)
     }
-    fn dof(&self) -> usize { 2 }
+    fn dof(&self) -> usize {
+        2
+    }
 }
 
 // ── Planar chain backend ──────────────────────────────────────────────────
@@ -212,16 +241,24 @@ fn planar_chain_com_pose(q: &[f32], k: usize, cfg: &PlanarChainConfig) -> Target
         p_joint_x += l * theta_cum.sin();
         p_joint_z -= l * theta_cum.cos();
     }
-    TargetPose { x: p_joint_x, z: p_joint_z, theta_y: theta_cum }
+    TargetPose {
+        x: p_joint_x,
+        z: p_joint_z,
+        theta_y: theta_cum,
+    }
 }
 
 impl<'a> IkBackend for PlanarChainIkBackend<'a> {
     fn link_pose(&self, q: &[f32]) -> Option<TargetPose> {
-        if q.len() != self.cfg.n as usize { return None; }
+        if q.len() != self.cfg.n as usize {
+            return None;
+        }
         Some(planar_chain_com_pose(q, self.link_index, self.cfg))
     }
     fn planar_jacobian(&self, q: &[f32]) -> Option<Vec<[f32; 3]>> {
-        if q.len() != self.cfg.n as usize { return None; }
+        if q.len() != self.cfg.n as usize {
+            return None;
+        }
         let j = planar_chain_link_jacobian(q, self.link_index, self.cfg)?;
         let cols = j.cols();
         let mut out = Vec::with_capacity(cols);
@@ -230,7 +267,9 @@ impl<'a> IkBackend for PlanarChainIkBackend<'a> {
         }
         Some(out)
     }
-    fn dof(&self) -> usize { self.cfg.n as usize }
+    fn dof(&self) -> usize {
+        self.cfg.n as usize
+    }
 }
 
 // ── Solver core ───────────────────────────────────────────────────────────
@@ -349,7 +388,12 @@ fn run_dls<B: IkBackend>(
         }
         iters += 1;
     }
-    IkResult { q, converged, iters, final_error: final_err }
+    IkResult {
+        q,
+        converged,
+        iters,
+        final_error: final_err,
+    }
 }
 
 // ── Public entry points ───────────────────────────────────────────────────
@@ -411,9 +455,17 @@ mod tests {
     fn cartpole_cart_ik_to_target_x() {
         // Move the cart to x=1.5 (only the slider matters; pole stays put).
         let cfg = CartpoleConfig::default();
-        let target = TargetPose { x: 1.5, z: 0.0, theta_y: 0.0 };
+        let target = TargetPose {
+            x: 1.5,
+            z: 0.0,
+            theta_y: 0.0,
+        };
         let r = solve_ik_cartpole(&cfg, "cart", &[0.0, 0.0], target, IkOptions::default());
-        assert!(r.converged, "cart IK did not converge (err={})", r.final_error);
+        assert!(
+            r.converged,
+            "cart IK did not converge (err={})",
+            r.final_error
+        );
         assert!((r.q[0] - 1.5).abs() < 1e-2, "q[0]={}", r.q[0]);
     }
 
@@ -425,14 +477,17 @@ mod tests {
         // Aim slightly inside the workspace at (1.9, 0) — well within reach but
         // far enough from singularity that DLS converges cleanly.
         let cfg = DoublePendulumConfig::default();
-        let target = TargetPose { x: 1.9, z: 0.0, theta_y: 0.0 };
-        let r = solve_ik_dp(
-            &cfg, "link2_tip",
-            &[0.5, 0.5],
-            target,
-            IkOptions::default(),
+        let target = TargetPose {
+            x: 1.9,
+            z: 0.0,
+            theta_y: 0.0,
+        };
+        let r = solve_ik_dp(&cfg, "link2_tip", &[0.5, 0.5], target, IkOptions::default());
+        assert!(
+            r.converged,
+            "DP tip IK did not converge (err={:.6e})",
+            r.final_error
         );
-        assert!(r.converged, "DP tip IK did not converge (err={:.6e})", r.final_error);
         let pose = dp_pose(r.q[0], r.q[1], &cfg, "link2_tip").unwrap();
         assert!((pose.x - target.x).abs() < 1e-2, "x={}", pose.x);
         assert!((pose.z - target.z).abs() < 1e-2, "z={}", pose.z);
@@ -442,14 +497,17 @@ mod tests {
     fn dp_link2_tip_ik_reaches_diagonal_target() {
         // Reachable target at (1, -1) (inside workspace; outer reach = 2).
         let cfg = DoublePendulumConfig::default();
-        let target = TargetPose { x: 1.0, z: -1.0, theta_y: 0.0 };
-        let r = solve_ik_dp(
-            &cfg, "link2_tip",
-            &[0.1, 0.1],
-            target,
-            IkOptions::default(),
+        let target = TargetPose {
+            x: 1.0,
+            z: -1.0,
+            theta_y: 0.0,
+        };
+        let r = solve_ik_dp(&cfg, "link2_tip", &[0.1, 0.1], target, IkOptions::default());
+        assert!(
+            r.converged,
+            "diag IK didn't converge (err={:.6e})",
+            r.final_error
         );
-        assert!(r.converged, "diag IK didn't converge (err={:.6e})", r.final_error);
         let pose = dp_pose(r.q[0], r.q[1], &cfg, "link2_tip").unwrap();
         assert!((pose.x - 1.0).abs() < 1e-2);
         assert!((pose.z - (-1.0)).abs() < 1e-2);
@@ -459,11 +517,20 @@ mod tests {
     fn dp_unreachable_target_does_not_converge() {
         // Workspace outer radius = l1 + l2 = 2. (5, 0) is unreachable.
         let cfg = DoublePendulumConfig::default();
-        let target = TargetPose { x: 5.0, z: 0.0, theta_y: 0.0 };
+        let target = TargetPose {
+            x: 5.0,
+            z: 0.0,
+            theta_y: 0.0,
+        };
         let r = solve_ik_dp(
-            &cfg, "link2_tip",
-            &[0.1, 0.1], target,
-            IkOptions { max_iters: 50, ..IkOptions::default() },
+            &cfg,
+            "link2_tip",
+            &[0.1, 0.1],
+            target,
+            IkOptions {
+                max_iters: 50,
+                ..IkOptions::default()
+            },
         );
         // DLS will move toward the boundary but can't reach; not converged.
         assert!(!r.converged, "should NOT converge to an unreachable target");
@@ -476,25 +543,43 @@ mod tests {
     fn planar_chain_n3_reaches_target_position() {
         // Reach (1, -1) with N=3; redundant 1-DoF chain, should easily converge.
         let cfg = PlanarChainConfig::uniform(3);
-        let target = TargetPose { x: 1.0, z: -1.0, theta_y: 0.0 };
+        let target = TargetPose {
+            x: 1.0,
+            z: -1.0,
+            theta_y: 0.0,
+        };
         let r = solve_ik_planar_chain(
-            &cfg, 2, // target the tip-most link (link3, index 2)
+            &cfg,
+            2, // target the tip-most link (link3, index 2)
             &[0.1, 0.1, 0.1],
             target,
             IkOptions::default(),
         );
-        assert!(r.converged, "N=3 IK did not converge (err={:.6e})", r.final_error);
+        assert!(
+            r.converged,
+            "N=3 IK did not converge (err={:.6e})",
+            r.final_error
+        );
     }
 
     #[test]
     fn dp_ik_with_orientation_constraint() {
         let cfg = DoublePendulumConfig::default();
         // Want tip at (1.5, -0.5) AND total angle = π/4 (mostly horizontal).
-        let target = TargetPose { x: 1.5, z: -0.5, theta_y: std::f32::consts::FRAC_PI_4 };
+        let target = TargetPose {
+            x: 1.5,
+            z: -0.5,
+            theta_y: std::f32::consts::FRAC_PI_4,
+        };
         let r = solve_ik_dp(
-            &cfg, "link2_tip",
-            &[0.5, 0.5], target,
-            IkOptions { include_orientation: true, ..IkOptions::default() },
+            &cfg,
+            "link2_tip",
+            &[0.5, 0.5],
+            target,
+            IkOptions {
+                include_orientation: true,
+                ..IkOptions::default()
+            },
         );
         // With orientation in the residual, the problem is fully constrained
         // (2 DOF, 3 constraints — over-determined). Allow larger residual.

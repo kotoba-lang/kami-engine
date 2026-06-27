@@ -1,5 +1,4 @@
 /// Monte Carlo simulation engine with configurable parameter distributions.
-
 use serde::{Deserialize, Serialize};
 
 /// Monte Carlo simulation configuration.
@@ -66,7 +65,10 @@ impl Lcg {
 
     /// Return a uniform random f64 in [0, 1).
     fn next_f64(&mut self) -> f64 {
-        self.state = self.state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        self.state = self
+            .state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         (self.state >> 11) as f64 / (1u64 << 53) as f64
     }
 
@@ -81,15 +83,9 @@ impl Lcg {
 /// Sample a single value from a distribution.
 fn sample(rng: &mut Lcg, nominal: f64, dist: &Distribution) -> f64 {
     match dist {
-        Distribution::Gaussian { sigma } => {
-            nominal + sigma * rng.next_gaussian()
-        }
-        Distribution::Uniform { min, max } => {
-            min + (max - min) * rng.next_f64()
-        }
-        Distribution::LogNormal { mu, sigma } => {
-            (mu + sigma * rng.next_gaussian()).exp()
-        }
+        Distribution::Gaussian { sigma } => nominal + sigma * rng.next_gaussian(),
+        Distribution::Uniform { min, max } => min + (max - min) * rng.next_f64(),
+        Distribution::LogNormal { mu, sigma } => (mu + sigma * rng.next_gaussian()).exp(),
     }
 }
 
@@ -112,11 +108,16 @@ pub fn run_monte_carlo(
     let mut output_values: Vec<f64> = Vec::with_capacity(n);
 
     for _ in 0..n {
-        let inputs: Vec<f64> = config.parameters.iter().enumerate().map(|(i, p)| {
-            let v = sample(&mut rng, p.nominal, &p.distribution);
-            param_samples[i].push(v);
-            v
-        }).collect();
+        let inputs: Vec<f64> = config
+            .parameters
+            .iter()
+            .enumerate()
+            .map(|(i, p)| {
+                let v = sample(&mut rng, p.nominal, &p.distribution);
+                param_samples[i].push(v);
+                v
+            })
+            .collect();
         output_values.push(eval_fn(&inputs));
     }
 
@@ -124,7 +125,12 @@ pub fn run_monte_carlo(
     let mut results = Vec::with_capacity(np + 1);
 
     for (i, p) in config.parameters.iter().enumerate() {
-        results.push(compute_stats(&p.name, &param_samples[i], spec_min, spec_max));
+        results.push(compute_stats(
+            &p.name,
+            &param_samples[i],
+            spec_min,
+            spec_max,
+        ));
     }
 
     results.push(compute_stats("output", &output_values, spec_min, spec_max));
@@ -138,7 +144,10 @@ fn compute_stats(name: &str, values: &[f64], spec_min: f64, spec_max: f64) -> Mo
     let std_dev = variance.sqrt();
     let min = values.iter().cloned().fold(f64::INFINITY, f64::min);
     let max = values.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
-    let pass_count = values.iter().filter(|&&v| v >= spec_min && v <= spec_max).count();
+    let pass_count = values
+        .iter()
+        .filter(|&&v| v >= spec_min && v <= spec_max)
+        .count();
     let yield_pass = pass_count as f64 / n;
 
     MonteCarloResult {
@@ -169,10 +178,16 @@ mod tests {
         };
         let results = run_monte_carlo(&config, |p| p[0], 80.0, 120.0);
         let output = results.last().unwrap();
-        assert!((output.mean - 100.0).abs() < 2.0,
-            "Mean should be near 100, got {}", output.mean);
-        assert!(output.std_dev > 3.0 && output.std_dev < 8.0,
-            "Std dev should be near 5, got {}", output.std_dev);
+        assert!(
+            (output.mean - 100.0).abs() < 2.0,
+            "Mean should be near 100, got {}",
+            output.mean
+        );
+        assert!(
+            output.std_dev > 3.0 && output.std_dev < 8.0,
+            "Std dev should be near 5, got {}",
+            output.std_dev
+        );
     }
 
     #[test]
@@ -188,6 +203,10 @@ mod tests {
         };
         let results = run_monte_carlo(&config, |p| p[0], 0.35, 0.45);
         let output = results.last().unwrap();
-        assert!(output.yield_pass > 0.95, "Yield should be high for 2.5-sigma spec, got {}", output.yield_pass);
+        assert!(
+            output.yield_pass > 0.95,
+            "Yield should be high for 2.5-sigma spec, got {}",
+            output.yield_pass
+        );
     }
 }

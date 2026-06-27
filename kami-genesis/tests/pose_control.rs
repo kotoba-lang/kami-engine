@@ -17,8 +17,7 @@ fn pose_ik_then_computed_torque_drive_reaches_the_target_pose() {
     const NUM_ENVS: usize = 2;
     let dt = 1.0 / 240.0;
     let sys = parse_urdf(ARM6_URDF).expect("arm6 urdf");
-    let mut b =
-        ArticulationBatch::from_urdf(&sys, glam::Vec3::new(0.0, 0.0, -9.81), dt, NUM_ENVS);
+    let mut b = ArticulationBatch::from_urdf(&sys, glam::Vec3::new(0.0, 0.0, -9.81), dt, NUM_ENVS);
     assert_eq!(b.num_dof(), 6);
 
     // Reachable per-env pose targets = FK of two distinct known configs.

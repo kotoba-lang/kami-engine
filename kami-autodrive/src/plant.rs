@@ -31,7 +31,12 @@ pub struct BicycleModel {
 
 impl BicycleModel {
     pub fn new(pose: Pose2, limits: VehicleLimits) -> Self {
-        Self { pose, speed: 0.0, limits, drag: 0.05 }
+        Self {
+            pose,
+            speed: 0.0,
+            limits,
+            drag: 0.05,
+        }
     }
 }
 
@@ -58,7 +63,11 @@ impl Plant for BicycleModel {
         };
         // Braking stops at zero; only a reverse command allows negative speed
         // (a slow, controlled maneuver ≈12 % of forward top speed).
-        let min_speed = if cmd.reverse { -0.12 * l.max_speed } else { 0.0 };
+        let min_speed = if cmd.reverse {
+            -0.12 * l.max_speed
+        } else {
+            0.0
+        };
         self.speed = (self.speed + accel * dt).clamp(min_speed, l.max_speed);
         if cmd.handbrake > 0.5 {
             self.speed *= 1.0 - (0.9 * dt).min(1.0);
@@ -92,21 +101,39 @@ mod tests {
         for _ in 0..60 {
             c.step(Command::reverse_with(1.0, 0.0), 1.0 / 30.0);
         }
-        assert!(c.speed() < 0.0, "reverse → negative speed, got {}", c.speed());
-        assert!(c.pose().x < -0.5, "should move backward along −heading (x={})", c.pose().x);
+        assert!(
+            c.speed() < 0.0,
+            "reverse → negative speed, got {}",
+            c.speed()
+        );
+        assert!(
+            c.pose().x < -0.5,
+            "should move backward along −heading (x={})",
+            c.pose().x
+        );
     }
 
     #[test]
     fn braking_stops_at_zero_not_reverse() {
         let mut c = car();
         for _ in 0..30 {
-            c.step(Command { throttle: 1.0, ..Default::default() }, 1.0 / 30.0);
+            c.step(
+                Command {
+                    throttle: 1.0,
+                    ..Default::default()
+                },
+                1.0 / 30.0,
+            );
         }
         assert!(c.speed() > 0.0, "should be moving");
         for _ in 0..120 {
             c.step(Command::stop(), 1.0 / 30.0);
         }
-        assert!(c.speed() >= 0.0, "braking must never reverse; speed {}", c.speed());
+        assert!(
+            c.speed() >= 0.0,
+            "braking must never reverse; speed {}",
+            c.speed()
+        );
         assert!(c.speed() < 0.5, "should be ~stopped, speed {}", c.speed());
     }
 
@@ -117,6 +144,9 @@ mod tests {
         for _ in 0..60 {
             c.step(Command::reverse_with(1.0, 1.0), 1.0 / 30.0);
         }
-        assert!((c.pose().yaw - yaw0).abs() > 0.1, "reverse + steer should change heading");
+        assert!(
+            (c.pose().yaw - yaw0).abs() > 0.1,
+            "reverse + steer should change heading"
+        );
     }
 }

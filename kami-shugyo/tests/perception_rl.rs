@@ -19,7 +19,8 @@ const ARM2_URDF: &str = r#"<robot name="arm2">
 #[test]
 fn contact_sensor_perceives_ee_reach_success() {
     let num_envs = 4;
-    let mut env = VectorizedEeReachEnv::new(num_envs, ARM2_URDF, "fore", ReachCfg::default()).unwrap();
+    let mut env =
+        VectorizedEeReachEnv::new(num_envs, ARM2_URDF, "fore", ReachCfg::default()).unwrap();
     env.reset_all(Some(7));
     let ndof = env.action_dim_per_env();
     let od = env.observation_dim_per_env();
@@ -30,7 +31,10 @@ fn contact_sensor_perceives_ee_reach_success() {
     let sensor = ContactSensor::new("touch", "/World/fore/touch", "fore", 0.08);
     let goal_scene = |e: usize| {
         let mut s = Scene::new();
-        s.add(Primitive::Sphere { center: Vec3::new(goals[e * 3], goals[e * 3 + 1], goals[e * 3 + 2]), radius: 0.0 });
+        s.add(Primitive::Sphere {
+            center: Vec3::new(goals[e * 3], goals[e * 3 + 1], goals[e * 3 + 2]),
+            radius: 0.0,
+        });
         s
     };
     let ee_from_obs = |obs: &[f32], e: usize| {
@@ -41,9 +45,15 @@ fn contact_sensor_perceives_ee_reach_success() {
     // Before driving: the EE starts at the zero pose, away from the goal — at
     // least one env should read "no contact".
     let obs0 = env.observations_flat();
-    let any_clear = (0..num_envs)
-        .any(|e| !sensor.sample(ee_from_obs(&obs0, e), &goal_scene(e), 0.0).in_contact);
-    assert!(any_clear, "EE already at goal before any control — bad fixture");
+    let any_clear = (0..num_envs).any(|e| {
+        !sensor
+            .sample(ee_from_obs(&obs0, e), &goal_scene(e), 0.0)
+            .in_contact
+    });
+    assert!(
+        any_clear,
+        "EE already at goal before any control — bad fixture"
+    );
 
     // Drive every env to its goal with the reference (FK-derived) policy.
     let cmd = env.reference_joint_solution().to_vec();
@@ -52,14 +62,21 @@ fn contact_sensor_perceives_ee_reach_success() {
         last = env.step_all(&cmd);
     }
     // The RL env reports success…
-    assert!(last.iter().all(|s| s.terminated), "env did not reach goals: {last:?}");
+    assert!(
+        last.iter().all(|s| s.terminated),
+        "env did not reach goals: {last:?}"
+    );
 
     // …and the ContactSensor independently *perceives* it: every EE is now in
     // contact with its goal region, with a finite contact normal.
     let obs = env.observations_flat();
     for e in 0..num_envs {
         let r = sensor.sample(ee_from_obs(&obs, e), &goal_scene(e), 0.0);
-        assert!(r.in_contact, "env {e} EE not perceived at goal: {:?}", ee_from_obs(&obs, e));
+        assert!(
+            r.in_contact,
+            "env {e} EE not perceived at goal: {:?}",
+            ee_from_obs(&obs, e)
+        );
         assert!(r.contact_normal.is_finite());
     }
 }

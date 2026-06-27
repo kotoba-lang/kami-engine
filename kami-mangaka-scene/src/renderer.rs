@@ -17,10 +17,10 @@ use glam::{Mat4, Vec3};
 use kami_render::OffscreenContext;
 
 use crate::{
+    Result, SceneError,
     camera::CameraSpec,
     render::{RenderOpts, RenderPasses, RenderResult},
     scene::MangakaScene,
-    Result, SceneError,
 };
 
 const MAX_CHARS: usize = 16;
@@ -156,27 +156,28 @@ impl MangakaRenderer {
         });
 
         // ── Outline pass: sample base color, run Sobel ──
-        let outline_bind_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            label: Some("mangaka_outline_bind_layout"),
-            entries: &[
-                wgpu::BindGroupLayoutEntry {
-                    binding: 0,
-                    visibility: wgpu::ShaderStages::FRAGMENT,
-                    ty: wgpu::BindingType::Texture {
-                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
-                        view_dimension: wgpu::TextureViewDimension::D2,
-                        multisampled: false,
+        let outline_bind_layout =
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                label: Some("mangaka_outline_bind_layout"),
+                entries: &[
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 0,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Texture {
+                            sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                            view_dimension: wgpu::TextureViewDimension::D2,
+                            multisampled: false,
+                        },
+                        count: None,
                     },
-                    count: None,
-                },
-                wgpu::BindGroupLayoutEntry {
-                    binding: 1,
-                    visibility: wgpu::ShaderStages::FRAGMENT,
-                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
-                    count: None,
-                },
-            ],
-        });
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 1,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                        count: None,
+                    },
+                ],
+            });
         let outline_module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("mangaka_outline_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shaders/outline.wgsl").into()),
@@ -297,7 +298,11 @@ impl MangakaRenderer {
         // ── Render targets ──
         let base_tex = device.create_texture(&wgpu::TextureDescriptor {
             label: Some("mangaka_base_target"),
-            size: wgpu::Extent3d { width: w, height: h, depth_or_array_layers: 1 },
+            size: wgpu::Extent3d {
+                width: w,
+                height: h,
+                depth_or_array_layers: 1,
+            },
             mip_level_count: 1,
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
@@ -310,7 +315,11 @@ impl MangakaRenderer {
         let outline_tex = if opts.passes.contains(RenderPasses::OUTLINE) {
             Some(device.create_texture(&wgpu::TextureDescriptor {
                 label: Some("mangaka_outline_target"),
-                size: wgpu::Extent3d { width: w, height: h, depth_or_array_layers: 1 },
+                size: wgpu::Extent3d {
+                    width: w,
+                    height: h,
+                    depth_or_array_layers: 1,
+                },
                 mip_level_count: 1,
                 sample_count: 1,
                 dimension: wgpu::TextureDimension::D2,
@@ -392,7 +401,14 @@ impl MangakaRenderer {
         // ── Readback ──
         let base_png = read_texture_to_png(device, queue, &mut encoder, &base_tex, w, h)?;
         let outline_png = if let Some(out_tex) = &outline_tex {
-            Some(read_texture_to_png(device, queue, &mut encoder, out_tex, w, h)?)
+            Some(read_texture_to_png(
+                device,
+                queue,
+                &mut encoder,
+                out_tex,
+                w,
+                h,
+            )?)
         } else {
             None
         };
@@ -449,7 +465,8 @@ impl PendingPng {
     /// after this so the callback delivers — see comment in `MangakaRenderer::render`.
     fn queue_map(self, _device: &wgpu::Device) -> Result<MappedPng> {
         let slice = self.buffer.slice(..);
-        let (tx, rx) = std::sync::mpsc::channel::<std::result::Result<(), wgpu::BufferAsyncError>>();
+        let (tx, rx) =
+            std::sync::mpsc::channel::<std::result::Result<(), wgpu::BufferAsyncError>>();
         slice.map_async(wgpu::MapMode::Read, move |r| {
             let _ = tx.send(r);
         });
@@ -492,9 +509,8 @@ impl MappedPng {
 
         let slice = self.buffer.slice(..);
         let data = slice.get_mapped_range();
-        let mut rgba = Vec::with_capacity(
-            (self.unpadded_bytes_per_row as usize) * self.height as usize,
-        );
+        let mut rgba =
+            Vec::with_capacity((self.unpadded_bytes_per_row as usize) * self.height as usize);
         for row in 0..self.height as usize {
             let start = row * self.bytes_per_row as usize;
             let end = start + self.unpadded_bytes_per_row as usize;

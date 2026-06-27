@@ -18,9 +18,9 @@
 
 use kami_autodrive::{AutopilotConfig, VehicleClass, VehicleLimits};
 use kami_autodrive_scene::{
-    autopilot_from_edn, builtin_autopilot, builtin_limits, class_id, limits_from_edn,
-    shipped_autopilot, shipped_autopilot_for, shipped_limits, shipped_limits_for, AutopilotSpec,
-    Error, ALL_CLASS_NAMES, CLASSES_EDN,
+    ALL_CLASS_NAMES, AutopilotSpec, CLASSES_EDN, Error, autopilot_from_edn, builtin_autopilot,
+    builtin_limits, class_id, limits_from_edn, shipped_autopilot, shipped_autopilot_for,
+    shipped_limits, shipped_limits_for,
 };
 
 /// The four classes, paired with their id, as the iteration source.
@@ -38,8 +38,14 @@ fn assert_limits_eq(name: &str, got: &VehicleLimits, want: &VehicleLimits) {
     assert_eq!(got.max_decel, want.max_decel, "{name}: max_decel");
     assert_eq!(got.wheelbase, want.wheelbase, "{name}: wheelbase");
     assert_eq!(got.max_steer, want.max_steer, "{name}: max_steer");
-    assert_eq!(got.turn_radius_ref, want.turn_radius_ref, "{name}: turn_radius_ref");
-    assert_eq!(got.footprint_radius, want.footprint_radius, "{name}: footprint_radius");
+    assert_eq!(
+        got.turn_radius_ref, want.turn_radius_ref,
+        "{name}: turn_radius_ref"
+    );
+    assert_eq!(
+        got.footprint_radius, want.footprint_radius,
+        "{name}: footprint_radius"
+    );
     // And the whole struct (VehicleLimits derives PartialEq).
     assert_eq!(got, want, "{name}: full VehicleLimits parity");
 }
@@ -58,7 +64,11 @@ fn limits_edn_matches_builtin() {
         assert_limits_eq(id, got, &want);
 
         // The `builtin_limits` oracle helper agrees with the direct call.
-        assert_eq!(builtin_limits(class), want, "{id}: builtin_limits == limits()");
+        assert_eq!(
+            builtin_limits(class),
+            want,
+            "{id}: builtin_limits == limits()"
+        );
     }
 
     // The shipped-limits convenience loader yields the same thing.
@@ -90,13 +100,28 @@ fn assert_autopilot_eq(name: &str, got: &AutopilotConfig, want: &AutopilotConfig
     );
     // Spot-check the load-bearing derived fields explicitly for a clear failure.
     assert_eq!(got.goal_tol, want.goal_tol, "{name}: goal_tol");
-    assert_eq!(got.loiter_radius, want.loiter_radius, "{name}: loiter_radius");
-    assert_eq!(got.grid_half_extent, want.grid_half_extent, "{name}: grid_half_extent");
+    assert_eq!(
+        got.loiter_radius, want.loiter_radius,
+        "{name}: loiter_radius"
+    );
+    assert_eq!(
+        got.grid_half_extent, want.grid_half_extent,
+        "{name}: grid_half_extent"
+    );
     assert_eq!(got.z_band, want.z_band, "{name}: z_band");
-    assert_eq!(got.camera_z_band, want.camera_z_band, "{name}: camera_z_band");
-    assert_eq!(got.dynamic_obstacles, want.dynamic_obstacles, "{name}: dynamic_obstacles");
+    assert_eq!(
+        got.camera_z_band, want.camera_z_band,
+        "{name}: camera_z_band"
+    );
+    assert_eq!(
+        got.dynamic_obstacles, want.dynamic_obstacles,
+        "{name}: dynamic_obstacles"
+    );
     assert_eq!(got.stuck_limit, want.stuck_limit, "{name}: stuck_limit");
-    assert_eq!(got.recovery_ticks, want.recovery_ticks, "{name}: recovery_ticks");
+    assert_eq!(
+        got.recovery_ticks, want.recovery_ticks,
+        "{name}: recovery_ticks"
+    );
 }
 
 /// For each class, every `AutopilotConfig` field loaded from `classes.edn` equals
@@ -139,7 +164,10 @@ fn tolerant_parse_errors() {
     assert!(matches!(limits_from_edn("123"), Err(Error::NotAMap)));
     assert!(matches!(autopilot_from_edn("123"), Err(Error::NotAMap)));
     // Missing table.
-    assert!(matches!(limits_from_edn("{:x 1}"), Err(Error::NoTable("limits"))));
+    assert!(matches!(
+        limits_from_edn("{:x 1}"),
+        Err(Error::NoTable("limits"))
+    ));
     // `autopilot_from_edn` resolves the limits table first (to attach each
     // config's `limits`), so a fully-empty doc surfaces the limits table as
     // missing before the autopilot table.

@@ -119,9 +119,18 @@ fn hardpoint_break_strain(kind: HardpointKind, mat: Material) -> f32 {
 // ── helper geometry ─────────────────────────────────────────────────────
 
 const CUBE_EDGES: [(usize, usize); 12] = [
-    (0, 1), (1, 2), (2, 3), (3, 0),
-    (4, 5), (5, 6), (6, 7), (7, 4),
-    (0, 4), (1, 5), (2, 6), (3, 7),
+    (0, 1),
+    (1, 2),
+    (2, 3),
+    (3, 0),
+    (4, 5),
+    (5, 6),
+    (6, 7),
+    (7, 4),
+    (0, 4),
+    (1, 5),
+    (2, 6),
+    (3, 7),
 ];
 const CUBE_DIAGONALS: [(usize, usize); 4] = [(0, 6), (1, 7), (2, 4), (3, 5)];
 
@@ -163,7 +172,12 @@ fn emit_aabb_cube(
     let group = node_group(part.kind);
     let corners = aabb_corners(part);
     for (i, c) in corners.iter().enumerate() {
-        nodes.push(JBeamNodeOut { id: corner_id(&part.id, i), pos: [c.x, c.y, c.z], mass: per, group });
+        nodes.push(JBeamNodeOut {
+            id: corner_id(&part.id, i),
+            pos: [c.x, c.y, c.z],
+            mass: per,
+            group,
+        });
     }
     let spring = part.material.beam_spring_n_m();
     let damping = spring * 0.05;
@@ -267,7 +281,10 @@ fn emit_aabb_hull20(
     // 12 inter-mid bracing — each midpoint connects to the next midpoint
     // along the same face (i.e. same plane). Computed by closeness rather
     // than a hand-rolled adjacency table to keep the topology obvious.
-    let mids: Vec<Vec3> = CUBE_EDGES.iter().map(|(a, b)| 0.5 * (corners[*a] + corners[*b])).collect();
+    let mids: Vec<Vec3> = CUBE_EDGES
+        .iter()
+        .map(|(a, b)| 0.5 * (corners[*a] + corners[*b]))
+        .collect();
     let cen = centroid(&corners);
     let aabb_max_dim = (Vec3::from(part.aabb_max) - Vec3::from(part.aabb_min)).max_element();
     let near = aabb_max_dim * 0.55;
@@ -338,8 +355,18 @@ fn emit_wheel_ring(
     let axle_r = centre + axle_dir * (width * 0.5);
     let id_l = axle_id(&part.id, 'l');
     let id_r = axle_id(&part.id, 'r');
-    nodes.push(JBeamNodeOut { id: id_l.clone(), pos: axle_l.into(), mass: per_axle, group: "wheel_hub" });
-    nodes.push(JBeamNodeOut { id: id_r.clone(), pos: axle_r.into(), mass: per_axle, group: "wheel_hub" });
+    nodes.push(JBeamNodeOut {
+        id: id_l.clone(),
+        pos: axle_l.into(),
+        mass: per_axle,
+        group: "wheel_hub",
+    });
+    nodes.push(JBeamNodeOut {
+        id: id_r.clone(),
+        pos: axle_r.into(),
+        mass: per_axle,
+        group: "wheel_hub",
+    });
 
     // 12 ring nodes in the radial plane, evenly spaced.
     let mut ring_ids = Vec::with_capacity(RING_NODES);
@@ -521,7 +548,12 @@ pub fn emit(asm: &VehicleAssembly) -> Result<String, AssemblyError> {
         emit_hardpoint(hp, asm, &mut beams)?;
     }
 
-    let out = JBeamFileOut { name: asm.vehicle_id.clone(), nodes, beams, wheels };
+    let out = JBeamFileOut {
+        name: asm.vehicle_id.clone(),
+        nodes,
+        beams,
+        wheels,
+    };
     Ok(serde_json::to_string_pretty(&out).expect("JBeam structs are infallible to serialise"))
 }
 
@@ -559,7 +591,13 @@ mod tests {
     #[test]
     fn aabb_cube_strategy_unchanged_from_phase_1() {
         let mut a = VehicleAssembly::new("v1", provenance());
-        a.add_part(part("rail", PartKind::Chassis, Material::SteelHss, [0.0, 0.0, 0.0], [1.0, 0.2, 0.1]));
+        a.add_part(part(
+            "rail",
+            PartKind::Chassis,
+            Material::SteelHss,
+            [0.0, 0.0, 0.0],
+            [1.0, 0.2, 0.1],
+        ));
         let v: serde_json::Value = serde_json::from_str(&emit(&a).unwrap()).unwrap();
         assert_eq!(v["nodes"].as_array().unwrap().len(), 8);
         assert_eq!(v["beams"].as_array().unwrap().len(), 16);
@@ -568,9 +606,19 @@ mod tests {
     #[test]
     fn body_panel_uses_hull20() {
         let mut a = VehicleAssembly::new("v1", provenance());
-        a.add_part(part("hood", PartKind::Body, Material::AluminiumSheet, [0.0, 0.0, 0.0], [1.0, 0.05, 0.5]));
+        a.add_part(part(
+            "hood",
+            PartKind::Body,
+            Material::AluminiumSheet,
+            [0.0, 0.0, 0.0],
+            [1.0, 0.05, 0.5],
+        ));
         let v: serde_json::Value = serde_json::from_str(&emit(&a).unwrap()).unwrap();
-        assert_eq!(v["nodes"].as_array().unwrap().len(), 20, "8 corners + 12 mids");
+        assert_eq!(
+            v["nodes"].as_array().unwrap().len(),
+            20,
+            "8 corners + 12 mids"
+        );
         let beams = v["beams"].as_array().unwrap().len();
         // 12 edges + 4 diag + 24 corner-mid = 40 deterministic; the
         // inter-mid count depends on the AABB aspect ratio, so we only
@@ -591,11 +639,7 @@ mod tests {
             [0.09, 0.60, 0.30],
         ));
         let v: serde_json::Value = serde_json::from_str(&emit(&a).unwrap()).unwrap();
-        assert_eq!(
-            v["nodes"].as_array().unwrap().len(),
-            14,
-            "2 axle + 12 ring"
-        );
+        assert_eq!(v["nodes"].as_array().unwrap().len(), 14, "2 axle + 12 ring");
         // 12 tread + 24 sidewall + 6 spoke (RING/2)
         let beams = v["beams"].as_array().unwrap().len();
         assert_eq!(beams, 12 + 24 + 6, "got {beams}");
@@ -669,7 +713,13 @@ mod tests {
     #[test]
     fn round_trips_through_kami_vehicle_jbeam_shape() {
         let mut a = VehicleAssembly::new("v1", provenance());
-        a.add_part(part("rail", PartKind::Chassis, Material::SteelHss, [0.0, 0.0, 0.0], [1.0, 0.2, 0.1]));
+        a.add_part(part(
+            "rail",
+            PartKind::Chassis,
+            Material::SteelHss,
+            [0.0, 0.0, 0.0],
+            [1.0, 0.2, 0.1],
+        ));
         a.add_part(part(
             "wheel",
             PartKind::Wheel,

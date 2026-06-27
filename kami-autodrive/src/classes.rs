@@ -107,7 +107,10 @@ mod tests {
             let l = c.limits();
             assert!(l.max_speed > 0.0, "{c:?} max_speed");
             assert!(l.max_accel > 0.0 && l.max_decel > 0.0, "{c:?} accel/decel");
-            assert!(l.wheelbase > 0.0 && l.max_steer > 0.0, "{c:?} steering geometry");
+            assert!(
+                l.wheelbase > 0.0 && l.max_steer > 0.0,
+                "{c:?} steering geometry"
+            );
             assert!(l.turn_radius_ref > 0.0, "{c:?} turn_radius_ref");
             assert!(l.footprint_radius > 0.0, "{c:?} footprint");
         }

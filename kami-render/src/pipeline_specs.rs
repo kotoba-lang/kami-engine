@@ -3,10 +3,17 @@
 // Regenerate with `bb gen-pipeline-specs --write`; `bb gen-pipeline-specs --strict` gates drift.
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Cull { None, Back, Front }
+pub enum Cull {
+    None,
+    Back,
+    Front,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Blend { None, Alpha }
+pub enum Blend {
+    None,
+    Alpha,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PipelineSpec {
@@ -19,12 +26,68 @@ pub struct PipelineSpec {
 }
 
 pub const PIPELINE_SPECS: [PipelineSpec; 8] = [
-    PipelineSpec { name: "atlas", shader: "scene_atlas", cull: Cull::None, depth_write: false, depth_compare: "less", blend: Blend::Alpha },
-    PipelineSpec { name: "character", shader: "scene_character", cull: Cull::Back, depth_write: true, depth_compare: "less", blend: Blend::None },
-    PipelineSpec { name: "particle", shader: "scene_particle", cull: Cull::None, depth_write: false, depth_compare: "less", blend: Blend::Alpha },
-    PipelineSpec { name: "sky", shader: "scene_sky", cull: Cull::None, depth_write: false, depth_compare: "less-equal", blend: Blend::None },
-    PipelineSpec { name: "terrain", shader: "scene_terrain", cull: Cull::Back, depth_write: true, depth_compare: "less", blend: Blend::None },
-    PipelineSpec { name: "vegetation", shader: "scene_vegetation", cull: Cull::None, depth_write: true, depth_compare: "less", blend: Blend::Alpha },
-    PipelineSpec { name: "voxel", shader: "scene_voxel", cull: Cull::Back, depth_write: true, depth_compare: "less", blend: Blend::None },
-    PipelineSpec { name: "water", shader: "scene_water", cull: Cull::None, depth_write: false, depth_compare: "less", blend: Blend::Alpha },
+    PipelineSpec {
+        name: "atlas",
+        shader: "scene_atlas",
+        cull: Cull::None,
+        depth_write: false,
+        depth_compare: "less",
+        blend: Blend::Alpha,
+    },
+    PipelineSpec {
+        name: "character",
+        shader: "scene_character",
+        cull: Cull::Back,
+        depth_write: true,
+        depth_compare: "less",
+        blend: Blend::None,
+    },
+    PipelineSpec {
+        name: "particle",
+        shader: "scene_particle",
+        cull: Cull::None,
+        depth_write: false,
+        depth_compare: "less",
+        blend: Blend::Alpha,
+    },
+    PipelineSpec {
+        name: "sky",
+        shader: "scene_sky",
+        cull: Cull::None,
+        depth_write: false,
+        depth_compare: "less-equal",
+        blend: Blend::None,
+    },
+    PipelineSpec {
+        name: "terrain",
+        shader: "scene_terrain",
+        cull: Cull::Back,
+        depth_write: true,
+        depth_compare: "less",
+        blend: Blend::None,
+    },
+    PipelineSpec {
+        name: "vegetation",
+        shader: "scene_vegetation",
+        cull: Cull::None,
+        depth_write: true,
+        depth_compare: "less",
+        blend: Blend::Alpha,
+    },
+    PipelineSpec {
+        name: "voxel",
+        shader: "scene_voxel",
+        cull: Cull::Back,
+        depth_write: true,
+        depth_compare: "less",
+        blend: Blend::None,
+    },
+    PipelineSpec {
+        name: "water",
+        shader: "scene_water",
+        cull: Cull::None,
+        depth_write: false,
+        depth_compare: "less",
+        blend: Blend::Alpha,
+    },
 ];

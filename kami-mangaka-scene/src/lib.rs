@@ -5,12 +5,12 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-pub mod scene;
-pub mod pose;
 pub mod camera;
-pub mod render;
-pub mod sim;
 pub mod lexicon;
+pub mod pose;
+pub mod render;
+pub mod scene;
+pub mod sim;
 
 #[cfg(not(target_family = "wasm"))]
 pub mod renderer;

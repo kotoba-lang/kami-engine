@@ -5,8 +5,8 @@
 //! draws into a wgpu surface each frame. It's the renderer kami-clj-play3d can adopt to
 //! become data-driven. (Esc / close to quit.)
 
+use kami_webgpu_rs::{Globals, Instance, Renderer, demo_city};
 use std::sync::Arc;
-use kami_webgpu_rs::{demo_city, Globals, Instance, Renderer};
 use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
 use winit::event_loop::{ActiveEventLoop, EventLoop};
@@ -26,7 +26,9 @@ struct App {
 
 impl ApplicationHandler for App {
     fn resumed(&mut self, el: &ActiveEventLoop) {
-        if self.gpu.is_some() { return; }
+        if self.gpu.is_some() {
+            return;
+        }
         let window = Arc::new(
             el.create_window(Window::default_attributes().with_title("kami-webgpu-rs — native"))
                 .unwrap(),
@@ -37,19 +39,31 @@ impl ApplicationHandler for App {
         let surface = instance.create_surface(window.clone()).unwrap();
         let (device, queue, format) = pollster::block_on(async {
             let adapter = instance
-                .request_adapter(&wgpu::RequestAdapterOptions { compatible_surface: Some(&surface), ..Default::default() })
+                .request_adapter(&wgpu::RequestAdapterOptions {
+                    compatible_surface: Some(&surface),
+                    ..Default::default()
+                })
                 .await
                 .expect("no GPU adapter");
-            let (device, queue) = adapter.request_device(&wgpu::DeviceDescriptor::default(), None).await.expect("no device");
+            let (device, queue) = adapter
+                .request_device(&wgpu::DeviceDescriptor::default(), None)
+                .await
+                .expect("no device");
             let caps = surface.get_capabilities(&adapter);
             // prefer a non-sRGB format so the shader's manual gamma matches the offscreen path
-            let format = caps.formats.iter().copied().find(|f| !f.is_srgb()).unwrap_or(caps.formats[0]);
+            let format = caps
+                .formats
+                .iter()
+                .copied()
+                .find(|f| !f.is_srgb())
+                .unwrap_or(caps.formats[0]);
             (device, queue, format)
         });
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format,
-            width: w, height: h,
+            width: w,
+            height: h,
             present_mode: wgpu::PresentMode::Fifo,
             alpha_mode: wgpu::CompositeAlphaMode::Auto,
             view_formats: vec![],
@@ -58,7 +72,12 @@ impl ApplicationHandler for App {
         let renderer = Renderer::new(device, queue, format, w, h);
         surface.configure(renderer.device(), &config);
         window.request_redraw();
-        self.gpu = Some(Gpu { window, surface, config, renderer });
+        self.gpu = Some(Gpu {
+            window,
+            surface,
+            config,
+            renderer,
+        });
     }
 
     fn window_event(&mut self, el: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
@@ -88,6 +107,9 @@ impl ApplicationHandler for App {
 
 fn main() {
     let el = EventLoop::new().unwrap();
-    let mut app = App { scene: demo_city(), gpu: None };
+    let mut app = App {
+        scene: demo_city(),
+        gpu: None,
+    };
     el.run_app(&mut app).unwrap();
 }

@@ -1,5 +1,4 @@
 /// PVT (Process-Voltage-Temperature) corner analysis.
-
 use serde::{Deserialize, Serialize};
 
 /// Process corner classification.
@@ -44,11 +43,36 @@ pub struct CornerResult {
 /// Return the 5 standard PVT corners (TT/FF/SS/FS/SF at nominal, best, worst conditions).
 pub fn standard_corners() -> Vec<PvtCorner> {
     vec![
-        PvtCorner { name: "TT_0.9V_25C".to_string(), process: ProcessCorner::TT, voltage: 0.9, temperature_c: 25.0 },
-        PvtCorner { name: "FF_0.99V_-40C".to_string(), process: ProcessCorner::FF, voltage: 0.99, temperature_c: -40.0 },
-        PvtCorner { name: "SS_0.81V_125C".to_string(), process: ProcessCorner::SS, voltage: 0.81, temperature_c: 125.0 },
-        PvtCorner { name: "FS_0.9V_25C".to_string(), process: ProcessCorner::FS, voltage: 0.9, temperature_c: 25.0 },
-        PvtCorner { name: "SF_0.9V_25C".to_string(), process: ProcessCorner::SF, voltage: 0.9, temperature_c: 25.0 },
+        PvtCorner {
+            name: "TT_0.9V_25C".to_string(),
+            process: ProcessCorner::TT,
+            voltage: 0.9,
+            temperature_c: 25.0,
+        },
+        PvtCorner {
+            name: "FF_0.99V_-40C".to_string(),
+            process: ProcessCorner::FF,
+            voltage: 0.99,
+            temperature_c: -40.0,
+        },
+        PvtCorner {
+            name: "SS_0.81V_125C".to_string(),
+            process: ProcessCorner::SS,
+            voltage: 0.81,
+            temperature_c: 125.0,
+        },
+        PvtCorner {
+            name: "FS_0.9V_25C".to_string(),
+            process: ProcessCorner::FS,
+            voltage: 0.9,
+            temperature_c: 25.0,
+        },
+        PvtCorner {
+            name: "SF_0.9V_25C".to_string(),
+            process: ProcessCorner::SF,
+            voltage: 0.9,
+            temperature_c: 25.0,
+        },
     ]
 }
 
@@ -62,11 +86,18 @@ pub fn run_corners(
     spec_min: f64,
     spec_max: f64,
 ) -> Vec<CornerResult> {
-    corners.iter().map(|c| {
-        let value = eval_fn(c.voltage, c.temperature_c);
-        let pass = value >= spec_min && value <= spec_max;
-        CornerResult { corner_name: c.name.clone(), value, pass }
-    }).collect()
+    corners
+        .iter()
+        .map(|c| {
+            let value = eval_fn(c.voltage, c.temperature_c);
+            let pass = value >= spec_min && value <= spec_max;
+            CornerResult {
+                corner_name: c.name.clone(),
+                value,
+                pass,
+            }
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -86,6 +117,10 @@ mod tests {
         let results = run_corners(&corners, |v, t| 1.0 / (v * (1.0 - 0.002 * t)), 0.5, 2.0);
         assert_eq!(results.len(), 5);
         // TT corner at nominal should pass easily.
-        assert!(results[0].pass, "TT corner should pass: value={}", results[0].value);
+        assert!(
+            results[0].pass,
+            "TT corner should pass: value={}",
+            results[0].value
+        );
     }
 }

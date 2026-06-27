@@ -20,8 +20,8 @@ use bytemuck::{Pod, Zeroable};
 use glam::{Mat4, Vec3};
 use hecs::World;
 use kami_app::{Camera, RenderPipeline};
-use kami_render::scene_pipelines::{ParticlePipeline, ParticleUniform};
 use kami_render::RenderContext;
+use kami_render::scene_pipelines::{ParticlePipeline, ParticleUniform};
 use std::cell::RefCell;
 use std::rc::Rc;
 use wgpu::util::DeviceExt;
@@ -91,7 +91,13 @@ impl ParticleAdapter {
             return; // buffer full, drop
         }
         p.push(Particle {
-            pos, vel, col, size, age: 0.0, life, no_gravity: false,
+            pos,
+            vel,
+            col,
+            size,
+            age: 0.0,
+            life,
+            no_gravity: false,
         });
     }
 
@@ -100,9 +106,17 @@ impl ParticleAdapter {
     /// gravity) and fades over `life`.
     pub fn emit_flow(&self, pos: Vec3, col: [f32; 3], size: f32, life: f32) {
         let mut p = self.inner.particles.borrow_mut();
-        if p.len() as u32 >= self.inner.capacity { return; }
+        if p.len() as u32 >= self.inner.capacity {
+            return;
+        }
         p.push(Particle {
-            pos, vel: Vec3::ZERO, col, size, age: 0.0, life, no_gravity: true,
+            pos,
+            vel: Vec3::ZERO,
+            col,
+            size,
+            age: 0.0,
+            life,
+            no_gravity: true,
         });
     }
 
@@ -111,9 +125,8 @@ impl ParticleAdapter {
     /// block-break effects. RNG is deterministic per burst via a
     /// fnv-ish xorshift over pos; this keeps the API simple.
     pub fn burst(&self, pos: Vec3, count: u32, base_col: [f32; 3]) {
-        let mut seed = (pos.x * 73856093.0) as u32
-            ^ (pos.y * 19349663.0) as u32
-            ^ (pos.z * 83492791.0) as u32;
+        let mut seed =
+            (pos.x * 73856093.0) as u32 ^ (pos.y * 19349663.0) as u32 ^ (pos.z * 83492791.0) as u32;
         let mut next = || -> f32 {
             seed ^= seed << 13;
             seed ^= seed >> 17;
@@ -123,7 +136,7 @@ impl ParticleAdapter {
         for _ in 0..count {
             let theta = next() * std::f32::consts::TAU;
             let up = 2.0 + next() * 4.0; // 2-6 m/s upward
-            let r = 2.0 + next() * 3.0;  // 2-5 m/s horizontal
+            let r = 2.0 + next() * 3.0; // 2-5 m/s horizontal
             let vel = Vec3::new(theta.cos() * r, up, theta.sin() * r);
             let tint = 0.85 + next() * 0.3;
             let col = [base_col[0] * tint, base_col[1] * tint, base_col[2] * tint];
@@ -165,13 +178,14 @@ impl ParticleAdapter {
             })
             .collect();
         let bytes = bytemuck::cast_slice(&instances);
-        let buf = self.inner.device.create_buffer_init(
-            &wgpu::util::BufferInitDescriptor {
+        let buf = self
+            .inner
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
                 label: Some("particle.instances"),
                 contents: bytes,
                 usage: wgpu::BufferUsages::VERTEX,
-            },
-        );
+            });
         *self.inner.instance_vb.borrow_mut() = buf;
         instances.len() as u32
     }
@@ -215,7 +229,8 @@ impl RenderPipeline for ParticleAdapter {
             cam_up: up.to_array(),
             _p1: 0.0,
         };
-        ctx.queue.write_buffer(&self.inner.pipeline.uniform, 0, bytemuck::bytes_of(&pu));
+        ctx.queue
+            .write_buffer(&self.inner.pipeline.uniform, 0, bytemuck::bytes_of(&pu));
 
         let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("particle.pass"),
@@ -243,7 +258,10 @@ impl RenderPipeline for ParticleAdapter {
         pass.set_vertex_buffer(0, self.inner.pipeline.quad_vb.slice(..));
         let vb = self.inner.instance_vb.borrow();
         pass.set_vertex_buffer(1, vb.slice(..));
-        pass.set_index_buffer(self.inner.pipeline.quad_ib.slice(..), wgpu::IndexFormat::Uint32);
+        pass.set_index_buffer(
+            self.inner.pipeline.quad_ib.slice(..),
+            wgpu::IndexFormat::Uint32,
+        );
         pass.draw_indexed(0..6, 0, 0..count);
     }
 }

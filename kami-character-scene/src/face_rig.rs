@@ -18,7 +18,7 @@
 use std::collections::HashMap;
 
 use kami_character::control_rig::{ControlRig, RigNode, RigNodeType};
-use kami_scene::{mget, num, root_map, vec3, EdnValue};
+use kami_scene::{EdnValue, mget, num, root_map, vec3};
 
 /// The canonical FACS face-rig CONFIG shipped with this crate (the AU→bone table).
 pub const FACE_RIG_EDN: &str = include_str!("../data/face_rig.edn");
@@ -159,13 +159,20 @@ mod tests {
     #[test]
     fn rebuilt_rig_has_three_nodes_per_row() {
         let rig = shipped_face_rig().expect("face rig builds");
-        assert_eq!(rig.nodes.len(), 19 * 3, "control + multiply + rotation per AU");
+        assert_eq!(
+            rig.nodes.len(),
+            19 * 3,
+            "control + multiply + rotation per AU"
+        );
         assert_eq!(rig.eval_order.len(), rig.nodes.len());
     }
 
     #[test]
     fn non_map_root_is_an_error() {
-        assert!(matches!(au_bones_from_edn("42"), Err(FaceRigError::NotAMap)));
+        assert!(matches!(
+            au_bones_from_edn("42"),
+            Err(FaceRigError::NotAMap)
+        ));
     }
 
     #[test]
@@ -178,9 +185,10 @@ mod tests {
 
     #[test]
     fn int_bone_and_float_angle_coerce() {
-        let rows =
-            au_bones_from_edn("{:character/face-rig {:au-bones [{:au \"X\" :bone 5 :axis [1 0 0] :max-angle 1}]}}")
-                .unwrap();
+        let rows = au_bones_from_edn(
+            "{:character/face-rig {:au-bones [{:au \"X\" :bone 5 :axis [1 0 0] :max-angle 1}]}}",
+        )
+        .unwrap();
         assert_eq!(rows[0].bone, 5);
         assert_eq!(rows[0].axis, [1.0, 0.0, 0.0], "int vector coerces");
         assert_eq!(rows[0].max_angle, 1.0, "int angle coerces");

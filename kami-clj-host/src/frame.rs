@@ -19,9 +19,13 @@
 
 /// ASCII 'KAMI' read as a little-endian u32 (bytes 4B 41 4D 49).
 pub const MAGIC: u32 = 0x494D_414B;
+/// v1 layout: camera mat4 + one model mat4 column per draw.
 pub const VERSION: u16 = 1;
+/// v2 layout: camera mat4 + per draw a `[model mat4, tint f16×4]` column pair.
+pub const VERSION_TINT: u16 = 2;
 
 pub const DTYPE_F32: u8 = 0;
+pub const DTYPE_F16: u8 = 1;
 pub const DTYPE_U32: u8 = 2;
 pub const DTYPE_MAT4: u8 = 6;
 
@@ -33,8 +37,16 @@ pub enum DecodeError {
     /// A column header carries a Dtype tag this decoder does not know. We refuse
     /// the frame rather than silently dropping the column (the clj packer rejects
     /// unknown dtypes symmetrically), so a producer/consumer version skew is loud.
-    UnknownDtype { index: usize, dtype: u8 },
-    ColumnOutOfBounds { index: usize, offset: usize, end: usize, buf: usize },
+    UnknownDtype {
+        index: usize,
+        dtype: u8,
+    },
+    ColumnOutOfBounds {
+        index: usize,
+        offset: usize,
+        end: usize,
+        buf: usize,
+    },
 }
 
 /// Element size in bytes for a Dtype tag (mirrors `kami-core::ipc::Dtype`).
@@ -65,6 +77,26 @@ fn rd_f32(b: &[u8], o: usize) -> f32 {
     f32::from_le_bytes([b[o], b[o + 1], b[o + 2], b[o + 3]])
 }
 
+/// Decode an IEEE-754 binary16 (the dtype the clj packer emits for tint/quat
+/// columns) into f32. Inverse of `kami.ipc/f16-bits`.
+fn f16_to_f32(h: u16) -> f32 {
+    let sign = if h & 0x8000 != 0 { -1.0 } else { 1.0 };
+    let exp = (h >> 10) & 0x1f;
+    let man = (h & 0x3ff) as f32;
+    let val = match exp {
+        0 => man * 2f32.powi(-24),                         // subnormal (man=0 → 0)
+        0x1f => {
+            if man == 0.0 {
+                f32::INFINITY
+            } else {
+                f32::NAN
+            }
+        }
+        _ => (1.0 + man / 1024.0) * 2f32.powi(exp as i32 - 15),
+    };
+    sign * val
+}
+
 /// A borrowed view over one column's payload.
 #[derive(Debug)]
 pub struct ColumnView<'a> {
@@ -91,12 +123,30 @@ impl<'a> ColumnView<'a> {
             })
             .collect()
     }
+
+    /// Iterate this column as `[f32; 4]` RGBA tints (dtype must be f16, stride 4) —
+    /// the v2 per-instance tint, decoded from half precision. `len` tints total.
+    pub fn f16x4s(&self) -> Vec<[f32; 4]> {
+        debug_assert_eq!(self.dtype, DTYPE_F16);
+        let per = self.stride.max(1) as usize; // halves per item (4 for RGBA)
+        (0..self.len as usize)
+            .map(|i| {
+                let base = i * per * 2;
+                let mut out = [0.0f32; 4];
+                for (j, slot) in out.iter_mut().enumerate().take(per.min(4)) {
+                    *slot = f16_to_f32(rd_u16(self.data, base + j * 2));
+                }
+                out
+            })
+            .collect()
+    }
 }
 
-/// A decoded frame: the frame number + every column in order.
+/// A decoded frame: the frame number + layout version + every column in order.
 #[derive(Debug)]
 pub struct FrameView<'a> {
     pub frame_n: u32,
+    pub version: u16,
     pub columns: Vec<ColumnView<'a>>,
 }
 
@@ -108,12 +158,29 @@ impl<'a> FrameView<'a> {
         Some((*ms.first()?, *ms.get(1)?))
     }
 
-    /// The per-draw instance columns (columns 1..n), one entry per draw.
+    /// The per-draw instance columns (columns 1..n). In v1 each is a draw's model
+    /// matrix array; in v2 they interleave `[model, tint]` — prefer `draws()` there.
     pub fn draw_instances(&self) -> &[ColumnView<'a>] {
         if self.columns.is_empty() {
             &[]
         } else {
             &self.columns[1..]
+        }
+    }
+
+    /// Per-draw `(model, optional tint)` column blocks, version-aware: v1 yields one
+    /// model column per draw with `None` tint; v2 pairs each `[model, tint]` block.
+    pub fn draws(&self) -> Vec<(&ColumnView<'a>, Option<&ColumnView<'a>>)> {
+        if self.columns.len() <= 1 {
+            return Vec::new();
+        }
+        let body = &self.columns[1..];
+        if self.version >= VERSION_TINT {
+            body.chunks(2)
+                .filter_map(|c| c.first().map(|model| (model, c.get(1))))
+                .collect()
+        } else {
+            body.iter().map(|model| (model, None)).collect()
         }
     }
 }
@@ -129,7 +196,7 @@ pub fn decode(buf: &[u8]) -> Result<FrameView<'_>, DecodeError> {
         return Err(DecodeError::BadMagic(magic));
     }
     let version = rd_u16(buf, 4);
-    if version != VERSION {
+    if version != VERSION && version != VERSION_TINT {
         return Err(DecodeError::BadVersion(version));
     }
     let ncols = rd_u16(buf, 6) as usize;
@@ -166,7 +233,11 @@ pub fn decode(buf: &[u8]) -> Result<FrameView<'_>, DecodeError> {
             data: &buf[offset..end],
         });
     }
-    Ok(FrameView { frame_n, columns })
+    Ok(FrameView {
+        frame_n,
+        version,
+        columns,
+    })
 }
 
 #[cfg(test)]
@@ -184,7 +255,11 @@ mod tests {
 
         // header
         assert_eq!(f.frame_n, 42, "frame_n round-trips from clj");
-        assert_eq!(f.columns.len(), 2, "camera column + 1 instanced draw column");
+        assert_eq!(
+            f.columns.len(),
+            2,
+            "camera column + 1 instanced draw column"
+        );
 
         // camera column = 2 mat4 (view, proj)
         let cam = f.columns.first().unwrap();
@@ -195,7 +270,10 @@ mod tests {
         assert_eq!(view[14], -5.0, "view matrix z-translation");
         // perspective proj is right-handed wgpu (m[11] == -1, m[10] < 0).
         assert_eq!(proj[11], -1.0, "perspective w-row");
-        assert!(proj[10] < 0.0, "perspective z-scale negative (RH, depth 0..1)");
+        assert!(
+            proj[10] < 0.0,
+            "perspective z-scale negative (RH, depth 0..1)"
+        );
 
         // instance column = 2 mat4 (two trees), x-translations are ±2 (order-free).
         let inst = &f.draw_instances()[0];
@@ -210,6 +288,44 @@ mod tests {
             assert_eq!(m[0], 1.0);
             assert_eq!(m[15], 1.0);
         }
+    }
+
+    /// v2 fixture: same scene, packed with `(ipc/pack frame {:tint? true})` —
+    /// camera mat4 + a `[model mat4, tint f16×4]` block for the one instanced draw.
+    const FIXTURE_V2: &[u8] = include_bytes!("../tests/fixtures/frame_v2.bin");
+
+    #[test]
+    fn decodes_v2_tint_fixture() {
+        let f = decode(FIXTURE_V2).expect("v2 fixture decodes");
+        assert_eq!(f.version, VERSION_TINT, "v2 layout version");
+        assert_eq!(f.frame_n, 42);
+        assert_eq!(f.columns.len(), 3, "camera + (model + tint)");
+
+        let draws = f.draws();
+        assert_eq!(draws.len(), 1, "one draw block");
+        let (model, tint) = &draws[0];
+        assert_eq!(model.dtype, DTYPE_MAT4);
+        assert_eq!(model.len, 2, "two tree instances");
+
+        let tint = tint.expect("v2 draw carries a tint column");
+        assert_eq!(tint.dtype, DTYPE_F16);
+        assert_eq!(tint.len, 2, "one RGBA tint per instance");
+        let rgbas = tint.f16x4s();
+        assert_eq!(rgbas.len(), 2);
+        for c in &rgbas {
+            for ch in c {
+                assert!((ch - 1.0).abs() < 1e-3, "default tint is opaque white");
+            }
+        }
+    }
+
+    #[test]
+    fn v1_fixture_has_no_tint_block() {
+        let f = decode(FIXTURE).unwrap();
+        assert_eq!(f.version, VERSION);
+        let draws = f.draws();
+        assert_eq!(draws.len(), 1);
+        assert!(draws[0].1.is_none(), "v1 draws carry no tint column");
     }
 
     #[test]

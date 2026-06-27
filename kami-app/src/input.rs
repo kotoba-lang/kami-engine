@@ -26,10 +26,7 @@ impl InputMode {
     /// Web binding — receives the canvas so pointer-lock and mouse
     /// listeners target it correctly (keyboard stays on window).
     #[cfg(target_family = "wasm")]
-    pub fn into_handler_web(
-        self,
-        canvas: &web_sys::HtmlCanvasElement,
-    ) -> Box<dyn InputHandler> {
+    pub fn into_handler_web(self, canvas: &web_sys::HtmlCanvasElement) -> Box<dyn InputHandler> {
         match self {
             InputMode::WasdFps => Box::new(wasd::WasdFps::attach(canvas)),
             InputMode::OrbitMouse => Box::new(orbit::OrbitMouse::attach(canvas)),
@@ -54,8 +51,8 @@ mod wasd {
     use std::cell::Cell;
     use std::f32::consts::FRAC_PI_2;
     use std::rc::Rc;
-    use wasm_bindgen::closure::Closure;
     use wasm_bindgen::JsCast;
+    use wasm_bindgen::closure::Closure;
 
     #[derive(Default)]
     struct State {
@@ -136,17 +133,16 @@ mod wasd {
             let s_lock = state.clone();
             let doc_cl = document.clone();
             let canvas_cl2 = canvas.clone();
-            let lock_change =
-                Closure::wrap(Box::new(move |_e: web_sys::Event| {
-                    let locked = doc_cl
-                        .pointer_lock_element()
-                        .map(|el| {
-                            let target: &web_sys::Element = canvas_cl2.as_ref();
-                            el.is_same_node(Some(target))
-                        })
-                        .unwrap_or(false);
-                    s_lock.locked.set(locked);
-                }) as Box<dyn FnMut(_)>);
+            let lock_change = Closure::wrap(Box::new(move |_e: web_sys::Event| {
+                let locked = doc_cl
+                    .pointer_lock_element()
+                    .map(|el| {
+                        let target: &web_sys::Element = canvas_cl2.as_ref();
+                        el.is_same_node(Some(target))
+                    })
+                    .unwrap_or(false);
+                s_lock.locked.set(locked);
+            }) as Box<dyn FnMut(_)>);
             document
                 .add_event_listener_with_callback(
                     "pointerlockchange",
@@ -159,10 +155,12 @@ mod wasd {
             // mining by accident) ──
             let s_md = state.clone();
             let mouse_down = Closure::wrap(Box::new(move |e: web_sys::MouseEvent| {
-                if !s_md.locked.get() { return }
+                if !s_md.locked.get() {
+                    return;
+                }
                 match e.button() {
-                    0 => s_md.action_pending.set(true),   // left = mine
-                    2 => s_md.action2_pending.set(true),  // right = place
+                    0 => s_md.action_pending.set(true),  // left = mine
+                    2 => s_md.action2_pending.set(true), // right = place
                     _ => {}
                 }
             }) as Box<dyn FnMut(_)>);
@@ -238,8 +236,8 @@ mod wasd {
             let dy = self.state.mdy.replace(0.0);
             if dx != 0.0 || dy != 0.0 {
                 camera.yaw += dx * SENSITIVITY;
-                camera.pitch = (camera.pitch - dy * SENSITIVITY)
-                    .clamp(-FRAC_PI_2 + 0.05, FRAC_PI_2 - 0.05);
+                camera.pitch =
+                    (camera.pitch - dy * SENSITIVITY).clamp(-FRAC_PI_2 + 0.05, FRAC_PI_2 - 0.05);
             }
 
             // Yaw-relative horizontal forward/right.
@@ -290,8 +288,8 @@ mod orbit {
     use std::cell::Cell;
     use std::f32::consts::FRAC_PI_2;
     use std::rc::Rc;
-    use wasm_bindgen::closure::Closure;
     use wasm_bindgen::JsCast;
+    use wasm_bindgen::closure::Closure;
 
     #[derive(Default)]
     struct State {
@@ -319,19 +317,20 @@ mod orbit {
         pub fn attach(canvas: &web_sys::HtmlCanvasElement) -> Self {
             let state = Rc::new(State::default());
 
-            let to_ndc = |e: &web_sys::MouseEvent, canvas: &web_sys::HtmlCanvasElement| -> (f32, f32) {
-                let rect = canvas.get_bounding_client_rect();
-                let w = rect.width() as f32;
-                let h = rect.height() as f32;
-                if w <= 0.0 || h <= 0.0 {
-                    return (0.0, 0.0);
-                }
-                let cx = (e.client_x() as f32) - rect.left() as f32;
-                let cy = (e.client_y() as f32) - rect.top() as f32;
-                let x = (cx / w) * 2.0 - 1.0;
-                let y = 1.0 - (cy / h) * 2.0;
-                (x, y)
-            };
+            let to_ndc =
+                |e: &web_sys::MouseEvent, canvas: &web_sys::HtmlCanvasElement| -> (f32, f32) {
+                    let rect = canvas.get_bounding_client_rect();
+                    let w = rect.width() as f32;
+                    let h = rect.height() as f32;
+                    if w <= 0.0 || h <= 0.0 {
+                        return (0.0, 0.0);
+                    }
+                    let cx = (e.client_x() as f32) - rect.left() as f32;
+                    let cy = (e.client_y() as f32) - rect.top() as f32;
+                    let x = (cx / w) * 2.0 - 1.0;
+                    let y = 1.0 - (cy / h) * 2.0;
+                    (x, y)
+                };
 
             // mousemove — track NDC always; accumulate drag delta when button held.
             let s_mm = state.clone();
@@ -345,7 +344,8 @@ mod orbit {
                     let dy = e.movement_y() as f32;
                     s_mm.dx.set(s_mm.dx.get() + dx);
                     s_mm.dy.set(s_mm.dy.get() + dy);
-                    s_mm.drag_distance.set(s_mm.drag_distance.get() + dx.abs() + dy.abs());
+                    s_mm.drag_distance
+                        .set(s_mm.drag_distance.get() + dx.abs() + dy.abs());
                 }
             }) as Box<dyn FnMut(_)>);
             canvas
@@ -391,7 +391,10 @@ mod orbit {
                 e.prevent_default();
             }) as Box<dyn FnMut(_)>);
             canvas
-                .add_event_listener_with_callback("contextmenu", context_menu.as_ref().unchecked_ref())
+                .add_event_listener_with_callback(
+                    "contextmenu",
+                    context_menu.as_ref().unchecked_ref(),
+                )
                 .ok();
 
             // wheel — zoom; suppress page scroll.

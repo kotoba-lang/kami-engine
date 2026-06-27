@@ -67,18 +67,33 @@ fn cartpole_gpu_dispatch_overhead_breakdown() {
     println!("backend           : wgpu (Metal/Vulkan/DX12/WebGPU universal)");
     println!("envs per dispatch : {N_ENVS}");
     println!("------------------------------------------------------");
-    println!("{:>8} {:>14} {:>14} {:>14}", "N_steps", "wall (ms)", "per-step (μs)", "per-env-step (ns)");
+    println!(
+        "{:>8} {:>14} {:>14} {:>14}",
+        "N_steps", "wall (ms)", "per-step (μs)", "per-env-step (ns)"
+    );
     for (i, &n_steps) in n_step_grid.iter().enumerate() {
         let wall_ms = wall_times_ns[i] / 1e6;
         let per_step_us = wall_times_ns[i] / 1e3 / n_steps as f64;
         let per_env_step_ns = wall_times_ns[i] / (n_steps * N_ENVS) as f64;
-        println!("{:>8} {:>14.2} {:>14.2} {:>14.1}", n_steps, wall_ms, per_step_us, per_env_step_ns);
+        println!(
+            "{:>8} {:>14.2} {:>14.2} {:>14.1}",
+            n_steps, wall_ms, per_step_us, per_env_step_ns
+        );
     }
     println!("------------------------------------------------------");
     println!("Linear extrapolation (last 2 points):");
-    println!("  intercept (post-warmup fixed)  : {:>10.1} μs", intercept_ns / 1e3);
-    println!("  slope (marginal per dispatch)  : {:>10.1} μs", marginal_ns / 1e3);
-    println!("  marginal per env-step          : {:>10.1} ns", marginal_ns / N_ENVS as f64);
+    println!(
+        "  intercept (post-warmup fixed)  : {:>10.1} μs",
+        intercept_ns / 1e3
+    );
+    println!(
+        "  slope (marginal per dispatch)  : {:>10.1} μs",
+        marginal_ns / 1e3
+    );
+    println!(
+        "  marginal per env-step          : {:>10.1} ns",
+        marginal_ns / N_ENVS as f64
+    );
     println!();
     println!("R1.2 target: collapse N dispatches into 1 (persistent state).");
     println!("  Theoretical floor = single submit + N kernels + 1 readback.");
@@ -116,7 +131,12 @@ fn make_states() -> Vec<CartpoleState> {
     (0..N_ENVS)
         .map(|i| {
             let theta0 = ((i as f32 / N_ENVS as f32) - 0.5) * 0.1;
-            CartpoleState { x: 0.0, x_dot: 0.0, theta: theta0, theta_dot: 0.0 }
+            CartpoleState {
+                x: 0.0,
+                x_dot: 0.0,
+                theta: theta0,
+                theta_dot: 0.0,
+            }
         })
         .collect()
 }

@@ -21,8 +21,8 @@
 use bytemuck::{Pod, Zeroable};
 use glam::{Mat4, Vec3, Vec4Swizzles};
 use kami_app::Camera;
-use kami_render::scene_pipelines::{VoxelPipeline, VoxelUniform};
 use kami_render::RenderContext;
+use kami_render::scene_pipelines::{VoxelPipeline, VoxelUniform};
 use wgpu::util::DeviceExt;
 
 use crate::{fog_from_sun, sun_from_time};
@@ -72,33 +72,51 @@ impl SceneMeshCore {
         base_color: [f32; 3],
         world: Mat4,
     ) {
-        assert_eq!(positions.len(), normals.len(), "positions / normals length mismatch");
+        assert_eq!(
+            positions.len(),
+            normals.len(),
+            "positions / normals length mismatch"
+        );
         if positions.is_empty() || indices.is_empty() {
             return;
         }
         // Bake the world transform into the vertices so the GPU pipeline
         // doesn't need a per-batch model matrix binding.
         let normal_mat = world.inverse().transpose();
-        let verts: Vec<MeshVertex> = positions.iter().zip(normals.iter()).map(|(p, n)| {
-            let wp = (world * glam::Vec4::new(p[0], p[1], p[2], 1.0)).xyz();
-            let wn = (normal_mat * glam::Vec4::new(n[0], n[1], n[2], 0.0)).xyz().normalize_or_zero();
-            MeshVertex {
-                pos: [wp.x, wp.y, wp.z],
-                norm: [wn.x, wn.y, wn.z],
-                col: base_color,
-            }
-        }).collect();
-        let vb = ctx.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some(self.label),
-            contents: bytemuck::cast_slice(&verts),
-            usage: wgpu::BufferUsages::VERTEX,
+        let verts: Vec<MeshVertex> = positions
+            .iter()
+            .zip(normals.iter())
+            .map(|(p, n)| {
+                let wp = (world * glam::Vec4::new(p[0], p[1], p[2], 1.0)).xyz();
+                let wn = (normal_mat * glam::Vec4::new(n[0], n[1], n[2], 0.0))
+                    .xyz()
+                    .normalize_or_zero();
+                MeshVertex {
+                    pos: [wp.x, wp.y, wp.z],
+                    norm: [wn.x, wn.y, wn.z],
+                    col: base_color,
+                }
+            })
+            .collect();
+        let vb = ctx
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some(self.label),
+                contents: bytemuck::cast_slice(&verts),
+                usage: wgpu::BufferUsages::VERTEX,
+            });
+        let ib = ctx
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some(self.label),
+                contents: bytemuck::cast_slice(indices),
+                usage: wgpu::BufferUsages::INDEX,
+            });
+        self.batches.push(MeshBatch {
+            vb,
+            ib,
+            index_count: indices.len() as u32,
         });
-        let ib = ctx.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some(self.label),
-            contents: bytemuck::cast_slice(indices),
-            usage: wgpu::BufferUsages::INDEX,
-        });
-        self.batches.push(MeshBatch { vb, ib, index_count: indices.len() as u32 });
     }
 
     /// Re-bake a previously-pushed batch from model-local geometry with a new
@@ -119,15 +137,21 @@ impl SceneMeshCore {
             return;
         }
         let normal_mat = world.inverse().transpose();
-        let verts: Vec<MeshVertex> = positions.iter().zip(normals.iter()).map(|(p, n)| {
-            let wp = (world * glam::Vec4::new(p[0], p[1], p[2], 1.0)).xyz();
-            let wn = (normal_mat * glam::Vec4::new(n[0], n[1], n[2], 0.0)).xyz().normalize_or_zero();
-            MeshVertex {
-                pos: [wp.x, wp.y, wp.z],
-                norm: [wn.x, wn.y, wn.z],
-                col: base_color,
-            }
-        }).collect();
+        let verts: Vec<MeshVertex> = positions
+            .iter()
+            .zip(normals.iter())
+            .map(|(p, n)| {
+                let wp = (world * glam::Vec4::new(p[0], p[1], p[2], 1.0)).xyz();
+                let wn = (normal_mat * glam::Vec4::new(n[0], n[1], n[2], 0.0))
+                    .xyz()
+                    .normalize_or_zero();
+                MeshVertex {
+                    pos: [wp.x, wp.y, wp.z],
+                    norm: [wn.x, wn.y, wn.z],
+                    col: base_color,
+                }
+            })
+            .collect();
         let vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some(self.label),
             contents: bytemuck::cast_slice(&verts),
@@ -138,7 +162,11 @@ impl SceneMeshCore {
             contents: bytemuck::cast_slice(indices),
             usage: wgpu::BufferUsages::INDEX,
         });
-        self.batches[index] = MeshBatch { vb, ib, index_count: indices.len() as u32 };
+        self.batches[index] = MeshBatch {
+            vb,
+            ib,
+            index_count: indices.len() as u32,
+        };
     }
 
     /// Re-upload a previously-pushed batch with a new colour. Used by
@@ -156,11 +184,15 @@ impl SceneMeshCore {
         if index >= self.batches.len() {
             return;
         }
-        let verts: Vec<MeshVertex> = positions.iter().zip(normals.iter()).map(|(p, n)| MeshVertex {
-            pos: *p,
-            norm: *n,
-            col: color,
-        }).collect();
+        let verts: Vec<MeshVertex> = positions
+            .iter()
+            .zip(normals.iter())
+            .map(|(p, n)| MeshVertex {
+                pos: *p,
+                norm: *n,
+                col: color,
+            })
+            .collect();
         let vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some(self.label),
             contents: bytemuck::cast_slice(&verts),
@@ -171,7 +203,11 @@ impl SceneMeshCore {
             contents: bytemuck::cast_slice(indices),
             usage: wgpu::BufferUsages::INDEX,
         });
-        self.batches[index] = MeshBatch { vb, ib, index_count: indices.len() as u32 };
+        self.batches[index] = MeshBatch {
+            vb,
+            ib,
+            index_count: indices.len() as u32,
+        };
     }
 
     pub(crate) fn record(
@@ -246,17 +282,65 @@ pub fn unit_box() -> (Vec<[f32; 3]>, Vec<[f32; 3]>, Vec<u32>) {
     // normal. 12 triangles.
     let faces: [([f32; 3], [[f32; 3]; 4]); 6] = [
         // +X
-        ([1.0, 0.0, 0.0], [[0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [0.5, 0.5, 0.5], [0.5, -0.5, 0.5]]),
+        (
+            [1.0, 0.0, 0.0],
+            [
+                [0.5, -0.5, -0.5],
+                [0.5, 0.5, -0.5],
+                [0.5, 0.5, 0.5],
+                [0.5, -0.5, 0.5],
+            ],
+        ),
         // -X
-        ([-1.0, 0.0, 0.0], [[-0.5, -0.5, 0.5], [-0.5, 0.5, 0.5], [-0.5, 0.5, -0.5], [-0.5, -0.5, -0.5]]),
+        (
+            [-1.0, 0.0, 0.0],
+            [
+                [-0.5, -0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+                [-0.5, 0.5, -0.5],
+                [-0.5, -0.5, -0.5],
+            ],
+        ),
         // +Y
-        ([0.0, 1.0, 0.0], [[-0.5, 0.5, -0.5], [-0.5, 0.5, 0.5], [0.5, 0.5, 0.5], [0.5, 0.5, -0.5]]),
+        (
+            [0.0, 1.0, 0.0],
+            [
+                [-0.5, 0.5, -0.5],
+                [-0.5, 0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [0.5, 0.5, -0.5],
+            ],
+        ),
         // -Y
-        ([0.0, -1.0, 0.0], [[-0.5, -0.5, 0.5], [-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [0.5, -0.5, 0.5]]),
+        (
+            [0.0, -1.0, 0.0],
+            [
+                [-0.5, -0.5, 0.5],
+                [-0.5, -0.5, -0.5],
+                [0.5, -0.5, -0.5],
+                [0.5, -0.5, 0.5],
+            ],
+        ),
         // +Z
-        ([0.0, 0.0, 1.0], [[-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [0.5, 0.5, 0.5], [-0.5, 0.5, 0.5]]),
+        (
+            [0.0, 0.0, 1.0],
+            [
+                [-0.5, -0.5, 0.5],
+                [0.5, -0.5, 0.5],
+                [0.5, 0.5, 0.5],
+                [-0.5, 0.5, 0.5],
+            ],
+        ),
         // -Z
-        ([0.0, 0.0, -1.0], [[0.5, -0.5, -0.5], [-0.5, -0.5, -0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5]]),
+        (
+            [0.0, 0.0, -1.0],
+            [
+                [0.5, -0.5, -0.5],
+                [-0.5, -0.5, -0.5],
+                [-0.5, 0.5, -0.5],
+                [0.5, 0.5, -0.5],
+            ],
+        ),
     ];
     let mut positions = Vec::with_capacity(24);
     let mut normals = Vec::with_capacity(24);
@@ -293,8 +377,8 @@ pub fn unit_cylinder(segments: u32) -> (Vec<[f32; 3]>, Vec<[f32; 3]>, Vec<u32>) 
         let base = positions.len() as u32;
         // v0 bottom-0, v1 top-0, v2 top-1, v3 bottom-1
         positions.push([c0 * r, -h, s0 * r]);
-        positions.push([c0 * r,  h, s0 * r]);
-        positions.push([c1 * r,  h, s1 * r]);
+        positions.push([c0 * r, h, s0 * r]);
+        positions.push([c1 * r, h, s1 * r]);
         positions.push([c1 * r, -h, s1 * r]);
         normals.push([c0, 0.0, s0]);
         normals.push([c0, 0.0, s0]);

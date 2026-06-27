@@ -34,11 +34,16 @@ fn cartpole_1024_cpu_gpu_cross_validation_200_steps() {
     let initial: Vec<CartpoleState> = (0..N_ENVS)
         .map(|i| {
             let theta0 = ((i as f32 / N_ENVS as f32) - 0.5) * 0.1;
-            CartpoleState { x: 0.0, x_dot: 0.0, theta: theta0, theta_dot: 0.0 }
+            CartpoleState {
+                x: 0.0,
+                x_dot: 0.0,
+                theta: theta0,
+                theta_dot: 0.0,
+            }
         })
         .collect();
     let actions: Vec<f32> = (0..N_ENVS)
-        .map(|i| ((i as f32 / N_ENVS as f32) - 0.5) * 2.0)  // Per-env action ±1.0
+        .map(|i| ((i as f32 / N_ENVS as f32) - 0.5) * 2.0) // Per-env action ±1.0
         .collect();
     let cfg = CartpoleConfig::default();
 
@@ -80,7 +85,9 @@ fn cartpole_1024_cpu_gpu_cross_validation_200_steps() {
     println!("max |Δθ|                 : {max_dtheta:.3e}");
     println!("max |Δθ_dot|             : {max_dtheta_dot:.3e}");
     println!("envs with |Δ| > {divergence_threshold:>5}  : {div_env_count} / {N_ENVS}");
-    println!("KAMI-physx invariant     : Apache-2.0 Genesis-5-solver via WGSL on Metal ≡ CPU vectorized");
+    println!(
+        "KAMI-physx invariant     : Apache-2.0 Genesis-5-solver via WGSL on Metal ≡ CPU vectorized"
+    );
     println!("===================================================================");
 
     // Tolerance: 1e-2 = f32 accumulated round-off bound at 200 steps of

@@ -35,7 +35,8 @@ impl VehicleBuilder {
     pub fn node(&mut self, position: Vec3, mass: f32, group: NodeGroup) -> NodeId {
         let id = self.next_node;
         self.next_node += 1;
-        self.vehicle.add_node(Node::new(id, position, mass).with_group(group));
+        self.vehicle
+            .add_node(Node::new(id, position, mass).with_group(group));
         id
     }
 
@@ -47,8 +48,20 @@ impl VehicleBuilder {
     }
 
     pub fn beam(&mut self, n1: NodeId, n2: NodeId, spring: f32, damping: f32) -> BeamId {
-        let p1 = self.vehicle.nodes.iter().find(|n| n.id == n1).unwrap().position;
-        let p2 = self.vehicle.nodes.iter().find(|n| n.id == n2).unwrap().position;
+        let p1 = self
+            .vehicle
+            .nodes
+            .iter()
+            .find(|n| n.id == n1)
+            .unwrap()
+            .position;
+        let p2 = self
+            .vehicle
+            .nodes
+            .iter()
+            .find(|n| n.id == n2)
+            .unwrap()
+            .position;
         let rest = (p2 - p1).length().max(1e-3);
         let id = self.next_beam;
         self.next_beam += 1;
@@ -75,7 +88,13 @@ impl VehicleBuilder {
         id
     }
 
-    pub fn triangle(&mut self, n1: NodeId, n2: NodeId, n3: NodeId, group: TriangleGroup) -> TriangleId {
+    pub fn triangle(
+        &mut self,
+        n1: NodeId,
+        n2: NodeId,
+        n3: NodeId,
+        group: TriangleGroup,
+    ) -> TriangleId {
         let id = self.next_tri;
         self.next_tri += 1;
         self.vehicle
@@ -197,12 +216,7 @@ impl VehicleBuilder {
         }
 
         // Add the ring to the wheel definition.
-        if let Some(w) = self
-            .vehicle
-            .wheels
-            .iter_mut()
-            .find(|w| w.id == wheel_id)
-        {
+        if let Some(w) = self.vehicle.wheels.iter_mut().find(|w| w.id == wheel_id) {
             w.tire_nodes.extend(ids.iter().copied());
         }
 

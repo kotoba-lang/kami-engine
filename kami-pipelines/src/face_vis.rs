@@ -7,8 +7,8 @@ use glam::{Mat4, Vec3};
 use hecs::World;
 use kami_app::{Camera, RenderPipeline};
 use kami_dec::FaceField;
-use kami_render::scene_pipelines::{ParticlePipeline, ParticleUniform};
 use kami_render::RenderContext;
+use kami_render::scene_pipelines::{ParticlePipeline, ParticleUniform};
 use std::cell::RefCell;
 use std::rc::Rc;
 use wgpu::util::DeviceExt;
@@ -80,20 +80,34 @@ impl FaceVisAdapter {
             let cx = bx as f32 + kami_dec::CHUNK_SIZE as f32 * 0.5;
             let cy = by as f32 + kami_dec::CHUNK_SIZE as f32 * 0.5;
             let cz = bz as f32 + kami_dec::CHUNK_SIZE as f32 * 0.5;
-            let dx = cx - cam[0]; let dy = cy - cam[1]; let dz = cz - cam[2];
-            let d2 = dx*dx + dy*dy + dz*dz;
-            let stride = if d2 < near2 { self.stride as usize }
-                else if d2 < far2 { (self.stride as usize).max(1) * 2 }
-                else { (self.stride as usize).max(1) * 4 };
-            if stride == 0 { continue; }
+            let dx = cx - cam[0];
+            let dy = cy - cam[1];
+            let dz = cz - cam[2];
+            let d2 = dx * dx + dy * dy + dz * dz;
+            let stride = if d2 < near2 {
+                self.stride as usize
+            } else if d2 < far2 {
+                (self.stride as usize).max(1) * 2
+            } else {
+                (self.stride as usize).max(1) * 4
+            };
+            if stride == 0 {
+                continue;
+            }
             for lz in (0..kami_dec::CHUNK_SIZE).step_by(stride) {
                 for ly in (0..kami_dec::CHUNK_SIZE).step_by(stride) {
                     for lx in (0..kami_dec::CHUNK_SIZE).step_by(stride) {
-                        if instances.len() as u32 >= self.capacity { break; }
-                        let i = lx + ly * kami_dec::CHUNK_SIZE + lz * kami_dec::CHUNK_SIZE * kami_dec::CHUNK_SIZE;
+                        if instances.len() as u32 >= self.capacity {
+                            break;
+                        }
+                        let i = lx
+                            + ly * kami_dec::CHUNK_SIZE
+                            + lz * kami_dec::CHUNK_SIZE * kami_dec::CHUNK_SIZE;
                         let v = Vec3::new(cells[i][0], cells[i][1], cells[i][2]);
                         let m = v.length();
-                        if m < self.min_mag { continue; }
+                        if m < self.min_mag {
+                            continue;
+                        }
                         let intensity = (m * inv_max).clamp(0.0, 1.0);
                         let col = [
                             self.base_color[0] * intensity,
@@ -117,12 +131,16 @@ impl FaceVisAdapter {
             }
         }
         *self.instance_count.borrow_mut() = instances.len() as u32;
-        if instances.is_empty() { return; }
-        let buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("face_vis.instances"),
-            contents: bytemuck::cast_slice(&instances),
-            usage: wgpu::BufferUsages::VERTEX,
-        });
+        if instances.is_empty() {
+            return;
+        }
+        let buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("face_vis.instances"),
+                contents: bytemuck::cast_slice(&instances),
+                usage: wgpu::BufferUsages::VERTEX,
+            });
         *self.instance_vb.borrow_mut() = buf;
     }
 }
@@ -143,7 +161,9 @@ impl RenderPipeline for FaceVisAdapter {
         _world: &World,
     ) {
         let count = *self.instance_count.borrow();
-        if count == 0 { return; }
+        if count == 0 {
+            return;
+        }
         let u = camera.as_render().uniform();
         let view_m = Mat4::from_cols_array_2d(&u.view);
         let proj = Mat4::from_cols_array_2d(&u.projection);
@@ -157,18 +177,25 @@ impl RenderPipeline for FaceVisAdapter {
             cam_up: up.to_array(),
             _p1: 0.0,
         };
-        ctx.queue.write_buffer(&self.pipeline.uniform, 0, bytemuck::bytes_of(&pu));
+        ctx.queue
+            .write_buffer(&self.pipeline.uniform, 0, bytemuck::bytes_of(&pu));
 
         let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("face_vis.pass"),
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                 view,
                 resolve_target: None,
-                ops: wgpu::Operations { load: wgpu::LoadOp::Load, store: wgpu::StoreOp::Store },
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Load,
+                    store: wgpu::StoreOp::Store,
+                },
             })],
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                 view: depth_view,
-                depth_ops: Some(wgpu::Operations { load: wgpu::LoadOp::Load, store: wgpu::StoreOp::Store }),
+                depth_ops: Some(wgpu::Operations {
+                    load: wgpu::LoadOp::Load,
+                    store: wgpu::StoreOp::Store,
+                }),
                 stencil_ops: None,
             }),
             timestamp_writes: None,

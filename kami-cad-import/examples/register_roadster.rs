@@ -9,7 +9,7 @@
 //! Or `--no-auth` to print the envelope only (for diffing).
 
 use kami_cad_import::demos::roadster_na;
-use kami_cad_import::register::{curl_command, register_request, RegisterOptions};
+use kami_cad_import::register::{RegisterOptions, curl_command, register_request};
 
 fn main() {
     let asm = roadster_na();
@@ -19,7 +19,11 @@ fn main() {
         let req = register_request(&asm, &RegisterOptions::default()).expect("envelope");
         eprintln!("[register] POST {}", req.url);
         eprintln!("[register] body bytes={}", req.body.len());
-        eprintln!("[register] vehicleId={} parts={}", asm.vehicle_id, asm.parts.len());
+        eprintln!(
+            "[register] vehicleId={} parts={}",
+            asm.vehicle_id,
+            asm.parts.len()
+        );
         return;
     }
 

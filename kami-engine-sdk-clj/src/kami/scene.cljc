@@ -31,6 +31,7 @@
    {:db/ident :mesh/asset       :db/valueType :db.type/ref    :db/cardinality :db.cardinality/one}
    {:db/ident :material/asset   :db/valueType :db.type/ref    :db/cardinality :db.cardinality/one}
    {:db/ident :material/params  :db/valueType :db.type/string :db/cardinality :db.cardinality/one} ; edn-encoded override map
+   {:db/ident :material/tint    :db/valueType :db.type/tuple  :db/tupleType :db.type/double :db/cardinality :db.cardinality/one} ; per-instance RGBA (→ v2 tint column)
    {:db/ident :shader/asset     :db/valueType :db.type/ref    :db/cardinality :db.cardinality/one}
    ;; --- camera / light ---
    {:db/ident :camera/fov     :db/valueType :db.type/double  :db/cardinality :db.cardinality/one}
@@ -56,7 +57,7 @@
   "The component attributes a renderable entity may carry. `kami.render` queries
   these to build the per-frame draw-list."
   #{:transform/translation :transform/rotation :transform/scale
-    :mesh/asset :material/asset :shader/asset})
+    :mesh/asset :material/asset :material/tint :shader/asset})
 
 ;; ---------------------------------------------------------------------------
 ;; Scene-graph helpers (pure, platform-neutral)

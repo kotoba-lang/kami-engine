@@ -3,11 +3,11 @@
 //! VRM-bound paths (load_character, pose, tick, settle) need a synthetic GLB
 //! fixture; those tests land in P2 alongside the headless render.
 
+use kami_mangaka_scene::CameraSpec;
 use kami_mangaka_scene::camera::{LightRole, LightSpec, ShotGrammar};
 use kami_mangaka_scene::lexicon::{expression_preset, pose_preset};
 use kami_mangaka_scene::pose::Expression;
 use kami_mangaka_scene::scene::{Anchor, EnvironmentSpec, MangakaScene, Transform};
-use kami_mangaka_scene::CameraSpec;
 
 #[test]
 fn pose_lexicon_covers_core_labels() {

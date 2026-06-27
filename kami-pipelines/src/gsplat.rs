@@ -18,9 +18,9 @@ use bytemuck::{Pod, Zeroable};
 use glam::{Mat4, Vec3};
 use hecs::World;
 use kami_app::{Camera, RenderPipeline};
+use kami_render::RenderContext;
 use kami_render::splat::SplatCloud;
 use kami_render::splat_loader;
-use kami_render::RenderContext;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -560,7 +560,9 @@ impl GsplatAdapter {
                     buf.push(c[1]);
                     buf.push(c[2]);
                 }
-                if buf.is_empty() { buf.push(0.0); }
+                if buf.is_empty() {
+                    buf.push(0.0);
+                }
                 (sh_degree, buf)
             };
         let sh_rest_stride = if sh_rest_used_degree == 0 {
@@ -626,10 +628,12 @@ impl GsplatAdapter {
         format: GsplatFormat,
     ) -> Result<usize, GsplatError> {
         let cloud = match format {
-            GsplatFormat::Ply => splat_loader::load_ply(bytes)
-                .map_err(|e| GsplatError::Loader(e.to_string()))?,
-            GsplatFormat::Splat => splat_loader::load_splat(bytes)
-                .map_err(|e| GsplatError::Loader(e.to_string()))?,
+            GsplatFormat::Ply => {
+                splat_loader::load_ply(bytes).map_err(|e| GsplatError::Loader(e.to_string()))?
+            }
+            GsplatFormat::Splat => {
+                splat_loader::load_splat(bytes).map_err(|e| GsplatError::Loader(e.to_string()))?
+            }
         };
         let n = cloud.splats.len();
         self.upsert(name, cloud)?;
@@ -686,9 +690,9 @@ impl RenderPipeline for GsplatAdapter {
                 let d = (p - cam_pos).length_squared();
                 *slot = (d, slot.1);
             }
-            cloud
-                .sort_scratch
-                .sort_unstable_by(|(da, _), (db, _)| db.partial_cmp(da).unwrap_or(std::cmp::Ordering::Equal));
+            cloud.sort_scratch.sort_unstable_by(|(da, _), (db, _)| {
+                db.partial_cmp(da).unwrap_or(std::cmp::Ordering::Equal)
+            });
             let sorted: Vec<u32> = cloud.sort_scratch.iter().map(|(_, i)| *i).collect();
             ctx.queue
                 .write_buffer(&cloud.indices_buf, 0, bytemuck::cast_slice(&sorted));
@@ -712,14 +716,16 @@ impl RenderPipeline for GsplatAdapter {
                 .last()
                 .map(|(d, _)| *d)
                 .unwrap_or(f32::INFINITY);
-            let effective_sh_degree =
-                if closest_dist_sq > FAR_SH_THRESHOLD_M * FAR_SH_THRESHOLD_M {
-                    0
-                } else {
-                    cloud.sh_degree
-                };
-            let effective_sh_rest_stride =
-                if effective_sh_degree == 0 { 0 } else { cloud.sh_rest_stride };
+            let effective_sh_degree = if closest_dist_sq > FAR_SH_THRESHOLD_M * FAR_SH_THRESHOLD_M {
+                0
+            } else {
+                cloud.sh_degree
+            };
+            let effective_sh_rest_stride = if effective_sh_degree == 0 {
+                0
+            } else {
+                cloud.sh_rest_stride
+            };
 
             let u = GsplatUniform {
                 view_proj: view_proj.to_cols_array_2d(),

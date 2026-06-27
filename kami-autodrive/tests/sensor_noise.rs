@@ -80,6 +80,12 @@ fn navigates_with_noisy_lidar() {
         car.step(cmd, dt);
     }
 
-    assert!(arrived, "car should still reach the goal under noisy sensing");
-    assert!(!collided, "car must not drive into the wall despite sensor noise");
+    assert!(
+        arrived,
+        "car should still reach the goal under noisy sensing"
+    );
+    assert!(
+        !collided,
+        "car must not drive into the wall despite sensor noise"
+    );
 }

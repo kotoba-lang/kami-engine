@@ -15,10 +15,10 @@
 //! factor (`std::f32::consts::PI / 180.0`) and the SAME `<deg> * d` arithmetic as the
 //! Rust source, so each angle reproduces bit-for-bit. `kami-skeleton` is untouched.
 
-use kami_skeleton::{default_humanoid_constraints, JointConstraint};
+use kami_skeleton::{JointConstraint, default_humanoid_constraints};
 use kami_skeleton_scene::{
-    builtin_humanoid_constraints, constraint_from_map, humanoid_constraints_from_edn, limits_eq,
-    shipped_humanoid_constraints, Error, ALL_JOINT_NAMES, HUMANOID_EDN,
+    ALL_JOINT_NAMES, Error, HUMANOID_EDN, builtin_humanoid_constraints, constraint_from_map,
+    humanoid_constraints_from_edn, limits_eq, shipped_humanoid_constraints,
 };
 
 /// Assert two `JointConstraint`s are EXACTLY (bit-for-bit f32) equal. No
@@ -34,8 +34,14 @@ fn assert_constraint_eq(name: &str, loaded: &JointConstraint, want: &JointConstr
             "{name}: max[{axis}] exact f32"
         );
     }
-    assert!(limits_eq(&loaded.min, &want.min), "{name}: full min [f32;3]");
-    assert!(limits_eq(&loaded.max, &want.max), "{name}: full max [f32;3]");
+    assert!(
+        limits_eq(&loaded.min, &want.min),
+        "{name}: full min [f32;3]"
+    );
+    assert!(
+        limits_eq(&loaded.max, &want.max),
+        "{name}: full max [f32;3]"
+    );
 }
 
 /// The shipped EDN table == the real Rust `default_humanoid_constraints()` —
@@ -55,7 +61,10 @@ fn humanoid_edn_matches_builtin() {
         let (lname, lc) = loaded_pair;
         let (oname, oc) = oracle_pair;
         assert_eq!(lname, oname, "joint[{i}] name in order");
-        assert_eq!(lname, ALL_JOINT_NAMES[i], "joint[{i}] name == ALL_JOINT_NAMES");
+        assert_eq!(
+            lname, ALL_JOINT_NAMES[i],
+            "joint[{i}] name == ALL_JOINT_NAMES"
+        );
         assert_constraint_eq(lname, lc, oc);
     }
 
@@ -84,7 +93,10 @@ fn exact_f32_degree_conversion() {
     let loaded = shipped_humanoid_constraints().expect("parse");
 
     // leftLowerArm: min.y is `0.0`, max.y is `145.0 * d`.
-    let (_, lla) = loaded.iter().find(|(n, _)| n == "leftLowerArm").expect("leftLowerArm");
+    let (_, lla) = loaded
+        .iter()
+        .find(|(n, _)| n == "leftLowerArm")
+        .expect("leftLowerArm");
     assert_eq!(lla.min[1], 0.0f32, "0.0 deg → exactly 0.0 rad");
     assert_eq!(lla.max[1], 145.0f32 * d, "145.0 * d bit-for-bit");
 
@@ -96,11 +108,12 @@ fn exact_f32_degree_conversion() {
 /// `constraint_from_map` rebuilds a single constraint from a limits map.
 #[test]
 fn single_constraint_from_map() {
-    let root = kami_scene::root_map(
-        "{:m {:min-deg [-30.0 -45.0 -30.0] :max-deg [30.0 45.0 30.0]}}",
-    )
-    .expect("map");
-    let m = kami_scene::mget(&root, "m").and_then(|v| v.as_map()).expect("inner map");
+    let root =
+        kami_scene::root_map("{:m {:min-deg [-30.0 -45.0 -30.0] :max-deg [30.0 45.0 30.0]}}")
+            .expect("map");
+    let m = kami_scene::mget(&root, "m")
+        .and_then(|v| v.as_map())
+        .expect("inner map");
     let c = constraint_from_map(m);
     let d = std::f32::consts::PI / 180.0;
     // == the `neck` row of the Rust oracle.

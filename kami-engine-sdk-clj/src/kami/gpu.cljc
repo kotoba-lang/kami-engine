@@ -57,6 +57,10 @@
    (:snapshot/assets snapshot)))
 
 (defn submit!
-  "Convenience: `kami.ipc/pack` a render-IR frame and `submit-frame!` it."
-  [backend frame]
-  (submit-frame! backend (ipc/pack frame)))
+  "Convenience: `kami.ipc/pack` a render-IR frame and `submit-frame!` it.
+  `pack-opts` is forwarded to `kami.ipc/pack` — e.g. `{:tint? true}` packs the
+  version-2 layout with per-draw tint columns (the browser backend forwards the
+  bytes version-agnostically; the Rust host renders v1 or v2 alike)."
+  ([backend frame] (submit! backend frame nil))
+  ([backend frame pack-opts]
+   (submit-frame! backend (ipc/pack frame pack-opts))))

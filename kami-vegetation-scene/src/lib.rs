@@ -39,10 +39,10 @@
 
 use std::collections::BTreeMap;
 
-use kami_scene::{mget, num, root_map, vec3, EdnValue};
+use kami_scene::{EdnValue, mget, num, root_map, vec3};
 use kami_vegetation::taxonomy::{
-    bush, cactus, conifer, fern, grass, moss, palm, CanopyShape, Division, GrowthHabit,
-    LeafArrangement, LeafShape, TaxonomicProfile,
+    CanopyShape, Division, GrowthHabit, LeafArrangement, LeafShape, TaxonomicProfile, bush, cactus,
+    conifer, fern, grass, moss, palm,
 };
 
 /// The canonical taxonomic-profile CONFIG shipped with this crate (the preset table).
@@ -260,10 +260,7 @@ impl ProfileSpec {
                 None => d.canopy,
             },
             height_range: match mget(m, "height-range").and_then(|v| v.as_vector()) {
-                Some(rows) => [
-                    num(rows.get(0)),
-                    num(rows.get(1)),
-                ],
+                Some(rows) => [num(rows.get(0)), num(rows.get(1))],
                 None => d.height_range,
             },
             stem_radius_base: or_f("stem-radius-base", d.stem_radius_base),
@@ -399,7 +396,10 @@ mod tests {
 
     #[test]
     fn missing_profiles_table_is_an_error() {
-        assert!(matches!(profiles_from_edn("{:other 1}"), Err(Error::NoProfiles)));
+        assert!(matches!(
+            profiles_from_edn("{:other 1}"),
+            Err(Error::NoProfiles)
+        ));
     }
 
     #[test]
@@ -412,7 +412,10 @@ mod tests {
         assert_eq!(spec.leaf_count, 9);
         assert_eq!(spec.leaf_size, d.leaf_size, "absent → default leaf_size");
         assert_eq!(spec.canopy, d.canopy, "absent → default canopy");
-        assert_eq!(spec.stem_radius_base, d.stem_radius_base, "absent → default stem");
+        assert_eq!(
+            spec.stem_radius_base, d.stem_radius_base,
+            "absent → default stem"
+        );
     }
 
     #[test]

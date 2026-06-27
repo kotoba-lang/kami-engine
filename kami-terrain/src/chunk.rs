@@ -3,9 +3,9 @@
 //! Generates triangle mesh with per-vertex normals and material weights.
 //! LOD support via stride (skip vertices for coarser mesh).
 
-use bytemuck::{Pod, Zeroable};
 use crate::heightmap::Heightmap;
 use crate::splatmap::Splatmap;
+use bytemuck::{Pod, Zeroable};
 
 /// Terrain vertex: position (3) + normal (3) + uv (2) + splat weights (4) = 12 floats.
 #[repr(C)]

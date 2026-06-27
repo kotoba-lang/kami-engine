@@ -264,7 +264,7 @@ pub struct MaterialUniform {
     pub tex_flags: u32, // 4B
     /// Parallax depth for eye iris refraction (0=flat, 0.02=subtle, 0.05=deep).
     pub parallax_depth: f32, // 4B  (offset 120)
-    pub _pad: f32,           // 4B  (offset 124) — total 128B
+    pub _pad: f32, // 4B  (offset 124) — total 128B
 }
 
 impl Default for MaterialUniform {

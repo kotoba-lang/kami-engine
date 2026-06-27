@@ -188,7 +188,9 @@ impl Mat3Ext for Mat3 {
         self.x_axis.is_finite() && self.y_axis.is_finite() && self.z_axis.is_finite()
     }
     fn abs_diff(&self) -> f32 {
-        self.x_axis.abs().max_element()
+        self.x_axis
+            .abs()
+            .max_element()
             .max(self.y_axis.abs().max_element())
             .max(self.z_axis.abs().max_element())
     }

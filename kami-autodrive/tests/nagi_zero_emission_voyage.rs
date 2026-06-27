@@ -10,7 +10,9 @@
 //! `examples/nagi_voyage.rs`; this keeps the regression surface small.
 
 use glam::Vec2;
-use kami_autodrive::{Autopilot, AutopilotConfig, DriveState, Plant, Pose2, ShipHydro, VehicleClass};
+use kami_autodrive::{
+    Autopilot, AutopilotConfig, DriveState, Plant, Pose2, ShipHydro, VehicleClass,
+};
 
 #[test]
 fn ship_gnc_reaches_goal() {
@@ -33,12 +35,21 @@ fn ship_gnc_reaches_goal() {
         let cmd = ap.step(pose, ship.speed(), &[], pose, dt);
         ship.step(cmd, dt);
     }
-    assert!(arrived, "ship GNC should reach the goal (closest {min_d:.1} m)");
+    assert!(
+        arrived,
+        "ship GNC should reach the goal (closest {min_d:.1} m)"
+    );
 }
 
 /// Minimal zero-emission dispatch: solar first, then hydrogen, then battery;
 /// wind-assist offsets propulsion thrust. Mirrors the example's `Powertrain`.
-fn dispatch_shares(load_kw: f32, wind_kw: f32, solar_kw: f32, h2_max_kw: f32, steps: u32) -> (f32, f32, f32, f32) {
+fn dispatch_shares(
+    load_kw: f32,
+    wind_kw: f32,
+    solar_kw: f32,
+    h2_max_kw: f32,
+    steps: u32,
+) -> (f32, f32, f32, f32) {
     let (mut e_wind, mut e_solar, mut e_h2, mut e_fossil) = (0.0f32, 0.0f32, 0.0f32, 0.0f32);
     let h = 0.5 / 3600.0; // half-second steps in hours
     for _ in 0..steps {
@@ -65,9 +76,15 @@ fn zero_emission_dispatch_has_no_fossil_and_hydrogen_prime() {
     let (wind, solar, h2, fossil) = dispatch_shares(9.0, 2.0, 1.0, 90.0, 200);
     let total = wind + solar + h2;
 
-    assert_eq!(fossil, 0.0, "zero-emission powertrain must never burn fossil (G13/N5)");
+    assert_eq!(
+        fossil, 0.0,
+        "zero-emission powertrain must never burn fossil (G13/N5)"
+    );
     assert!(total > 0.0, "powertrain delivered no energy");
-    assert!(h2 > solar && h2 > wind, "hydrogen fuel cell should be the prime mover");
+    assert!(
+        h2 > solar && h2 > wind,
+        "hydrogen fuel cell should be the prime mover"
+    );
     assert!(wind > 0.0, "wind-assist should contribute");
     assert!(solar > 0.0, "solar should contribute");
     // Shares are well-formed (sum to 1 over the three green sources).

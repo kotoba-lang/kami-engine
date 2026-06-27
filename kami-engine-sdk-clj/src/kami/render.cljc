@@ -62,9 +62,14 @@
                                #(asset-id (:mesh/asset %))
                                #(asset-id (:material/asset %)))
                          renderable)]
+    ;; NOTE: :tint is assembled per-instance from each entity's :material/tint RGBA
+    ;; (default opaque white). `kami.ipc/pack` emits it as a per-draw f16 column only
+    ;; under the opt-in v2 layout `(pack frame {:tint? true})`; the default v1 layout
+    ;; (camera-mat4 + per-draw model-mat4, the contract the kami-clj-host Rust
+    ;; decoder/fixture pins) omits it, so default output stays byte-identical.
     (for [[[pipeline mesh material] ents] (sort-by (comp str first) groups)
           :let [models (vec (mapcat model-of ents))
-                tints  (vec (mapcat #(get-in % [:material/params :tint] [1.0 1.0 1.0 1.0]) ents))]]
+                tints  (vec (mapcat #(:material/tint % [1.0 1.0 1.0 1.0]) ents))]]
       {:draw/pipeline pipeline
        :draw/mesh     mesh
        :draw/material material

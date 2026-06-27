@@ -546,7 +546,11 @@ fn apply_wrinkle_displacement(verts: &mut [Vec3], wrinkles: &WrinkleRegions, lod
 }
 
 /// Generate body mesh with LOD-appropriate resolution.
-fn generate_metahuman_body(params: &crate::params::BodyParams, n_rings: u32, n_seg: u32) -> MeshPart {
+fn generate_metahuman_body(
+    params: &crate::params::BodyParams,
+    n_rings: u32,
+    n_seg: u32,
+) -> MeshPart {
     use std::f32::consts::PI;
 
     let neck_thick = 0.035 + params.neck_thickness * 0.02;
@@ -684,11 +688,7 @@ fn generate_teeth(upper: bool) -> MeshPart {
         ]);
     }
 
-    let name = if upper {
-        "teeth_upper"
-    } else {
-        "teeth_lower"
-    };
+    let name = if upper { "teeth_upper" } else { "teeth_lower" };
     MeshPart {
         name: name.into(),
         vertices,
@@ -750,62 +750,377 @@ pub fn generate_metahuman_skeleton(dna: &MetaHumanDna) -> Skeleton {
     // Start with VRM humanoid base (first 13 from body.rs, extended here)
     let mut bones = vec![
         // --- VRM humanoid base ---
-        Bone { name: "hips".into(), parent: None, local_position: [0.0, -0.2, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "spine".into(), parent: Some(0), local_position: [0.0, 0.08, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "chest".into(), parent: Some(1), local_position: [0.0, 0.08, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "upperChest".into(), parent: Some(2), local_position: [0.0, 0.06, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "neck".into(), parent: Some(3), local_position: [0.0, 0.06, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "head".into(), parent: Some(4), local_position: [0.0, 0.06, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "hips".into(),
+            parent: None,
+            local_position: [0.0, -0.2, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "spine".into(),
+            parent: Some(0),
+            local_position: [0.0, 0.08, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "chest".into(),
+            parent: Some(1),
+            local_position: [0.0, 0.08, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "upperChest".into(),
+            parent: Some(2),
+            local_position: [0.0, 0.06, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "neck".into(),
+            parent: Some(3),
+            local_position: [0.0, 0.06, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "head".into(),
+            parent: Some(4),
+            local_position: [0.0, 0.06, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // Eyes
-        Bone { name: "leftEye".into(), parent: Some(5), local_position: [-0.03, 0.04, 0.06], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightEye".into(), parent: Some(5), local_position: [0.03, 0.04, 0.06], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "jaw".into(), parent: Some(5), local_position: [0.0, -0.02, 0.04], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "leftEye".into(),
+            parent: Some(5),
+            local_position: [-0.03, 0.04, 0.06],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightEye".into(),
+            parent: Some(5),
+            local_position: [0.03, 0.04, 0.06],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "jaw".into(),
+            parent: Some(5),
+            local_position: [0.0, -0.02, 0.04],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // Arms
-        Bone { name: "leftShoulder".into(), parent: Some(3), local_position: [-0.04, 0.04, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "leftUpperArm".into(), parent: Some(9), local_position: [-0.06, 0.0, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightShoulder".into(), parent: Some(3), local_position: [0.04, 0.04, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightUpperArm".into(), parent: Some(11), local_position: [0.06, 0.0, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "leftShoulder".into(),
+            parent: Some(3),
+            local_position: [-0.04, 0.04, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "leftUpperArm".into(),
+            parent: Some(9),
+            local_position: [-0.06, 0.0, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightShoulder".into(),
+            parent: Some(3),
+            local_position: [0.04, 0.04, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightUpperArm".into(),
+            parent: Some(11),
+            local_position: [0.06, 0.0, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // --- MetaHuman face rig extensions (parent = head, index 5) ---
         // Eyelids (4 bones)
-        Bone { name: "leftUpperEyelid".into(), parent: Some(6), local_position: [0.0, 0.005, 0.005], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "leftLowerEyelid".into(), parent: Some(6), local_position: [0.0, -0.004, 0.005], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightUpperEyelid".into(), parent: Some(7), local_position: [0.0, 0.005, 0.005], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightLowerEyelid".into(), parent: Some(7), local_position: [0.0, -0.004, 0.005], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "leftUpperEyelid".into(),
+            parent: Some(6),
+            local_position: [0.0, 0.005, 0.005],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "leftLowerEyelid".into(),
+            parent: Some(6),
+            local_position: [0.0, -0.004, 0.005],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightUpperEyelid".into(),
+            parent: Some(7),
+            local_position: [0.0, 0.005, 0.005],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightLowerEyelid".into(),
+            parent: Some(7),
+            local_position: [0.0, -0.004, 0.005],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // Brows (6 bones: inner/mid/outer x2)
-        Bone { name: "leftBrowInner".into(), parent: Some(5), local_position: [-0.015, 0.065, 0.07], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "leftBrowMid".into(), parent: Some(5), local_position: [-0.03, 0.068, 0.065], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "leftBrowOuter".into(), parent: Some(5), local_position: [-0.045, 0.063, 0.055], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightBrowInner".into(), parent: Some(5), local_position: [0.015, 0.065, 0.07], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightBrowMid".into(), parent: Some(5), local_position: [0.03, 0.068, 0.065], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightBrowOuter".into(), parent: Some(5), local_position: [0.045, 0.063, 0.055], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "leftBrowInner".into(),
+            parent: Some(5),
+            local_position: [-0.015, 0.065, 0.07],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "leftBrowMid".into(),
+            parent: Some(5),
+            local_position: [-0.03, 0.068, 0.065],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "leftBrowOuter".into(),
+            parent: Some(5),
+            local_position: [-0.045, 0.063, 0.055],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightBrowInner".into(),
+            parent: Some(5),
+            local_position: [0.015, 0.065, 0.07],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightBrowMid".into(),
+            parent: Some(5),
+            local_position: [0.03, 0.068, 0.065],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightBrowOuter".into(),
+            parent: Some(5),
+            local_position: [0.045, 0.063, 0.055],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // Nose (3 bones)
-        Bone { name: "noseBridge".into(), parent: Some(5), local_position: [0.0, 0.035, 0.085], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "leftNostril".into(), parent: Some(5), local_position: [-0.008, 0.005, 0.08], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightNostril".into(), parent: Some(5), local_position: [0.008, 0.005, 0.08], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "noseBridge".into(),
+            parent: Some(5),
+            local_position: [0.0, 0.035, 0.085],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "leftNostril".into(),
+            parent: Some(5),
+            local_position: [-0.008, 0.005, 0.08],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightNostril".into(),
+            parent: Some(5),
+            local_position: [0.008, 0.005, 0.08],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // Lips (8 bones: upper/lower x left/mid/right + corners)
-        Bone { name: "upperLipLeft".into(), parent: Some(5), local_position: [-0.012, -0.03, 0.075], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "upperLipMid".into(), parent: Some(5), local_position: [0.0, -0.028, 0.078], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "upperLipRight".into(), parent: Some(5), local_position: [0.012, -0.03, 0.075], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "lowerLipLeft".into(), parent: Some(8), local_position: [-0.012, -0.005, 0.035], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "lowerLipMid".into(), parent: Some(8), local_position: [0.0, -0.007, 0.038], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "lowerLipRight".into(), parent: Some(8), local_position: [0.012, -0.005, 0.035], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "leftLipCorner".into(), parent: Some(5), local_position: [-0.022, -0.032, 0.068], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightLipCorner".into(), parent: Some(5), local_position: [0.022, -0.032, 0.068], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "upperLipLeft".into(),
+            parent: Some(5),
+            local_position: [-0.012, -0.03, 0.075],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "upperLipMid".into(),
+            parent: Some(5),
+            local_position: [0.0, -0.028, 0.078],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "upperLipRight".into(),
+            parent: Some(5),
+            local_position: [0.012, -0.03, 0.075],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "lowerLipLeft".into(),
+            parent: Some(8),
+            local_position: [-0.012, -0.005, 0.035],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "lowerLipMid".into(),
+            parent: Some(8),
+            local_position: [0.0, -0.007, 0.038],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "lowerLipRight".into(),
+            parent: Some(8),
+            local_position: [0.012, -0.005, 0.035],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "leftLipCorner".into(),
+            parent: Some(5),
+            local_position: [-0.022, -0.032, 0.068],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightLipCorner".into(),
+            parent: Some(5),
+            local_position: [0.022, -0.032, 0.068],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // Cheeks (4 bones)
-        Bone { name: "leftCheek".into(), parent: Some(5), local_position: [-0.04, 0.01, 0.06], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightCheek".into(), parent: Some(5), local_position: [0.04, 0.01, 0.06], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "leftNasolabial".into(), parent: Some(5), local_position: [-0.025, -0.01, 0.07], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightNasolabial".into(), parent: Some(5), local_position: [0.025, -0.01, 0.07], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "leftCheek".into(),
+            parent: Some(5),
+            local_position: [-0.04, 0.01, 0.06],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightCheek".into(),
+            parent: Some(5),
+            local_position: [0.04, 0.01, 0.06],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "leftNasolabial".into(),
+            parent: Some(5),
+            local_position: [-0.025, -0.01, 0.07],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightNasolabial".into(),
+            parent: Some(5),
+            local_position: [0.025, -0.01, 0.07],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // Chin (2 bones)
-        Bone { name: "chinTip".into(), parent: Some(8), local_position: [0.0, -0.02, 0.03], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "mentalis".into(), parent: Some(8), local_position: [0.0, -0.012, 0.035], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "chinTip".into(),
+            parent: Some(8),
+            local_position: [0.0, -0.02, 0.03],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "mentalis".into(),
+            parent: Some(8),
+            local_position: [0.0, -0.012, 0.035],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // Tongue (3 bones: root/mid/tip)
-        Bone { name: "tongueRoot".into(), parent: Some(8), local_position: [0.0, 0.0, 0.01], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "tongueMid".into(), parent: Some(42), local_position: [0.0, 0.0, 0.008], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "tongueTip".into(), parent: Some(43), local_position: [0.0, 0.0, 0.008], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "tongueRoot".into(),
+            parent: Some(8),
+            local_position: [0.0, 0.0, 0.01],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "tongueMid".into(),
+            parent: Some(42),
+            local_position: [0.0, 0.0, 0.008],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "tongueTip".into(),
+            parent: Some(43),
+            local_position: [0.0, 0.0, 0.008],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
         // Ear (2 bones)
-        Bone { name: "leftEar".into(), parent: Some(5), local_position: [-0.07, 0.03, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
-        Bone { name: "rightEar".into(), parent: Some(5), local_position: [0.07, 0.03, 0.0], local_rotation: [0.0, 0.0, 0.0, 1.0], local_scale: [1.0; 3], inverse_bind: id },
+        Bone {
+            name: "leftEar".into(),
+            parent: Some(5),
+            local_position: [-0.07, 0.03, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
+        Bone {
+            name: "rightEar".into(),
+            parent: Some(5),
+            local_position: [0.07, 0.03, 0.0],
+            local_rotation: [0.0, 0.0, 0.0, 1.0],
+            local_scale: [1.0; 3],
+            inverse_bind: id,
+        },
     ];
 
     // Apply DNA joint deltas
@@ -1012,27 +1327,27 @@ pub fn facs_to_arkit(au: FacsActionUnit, intensity: f32) -> Vec<(usize, f32)> {
         Au1InnerBrowRaise => vec![(43, intensity)], // browInnerUp
         Au2OuterBrowRaise => vec![(44, intensity), (45, intensity)], // browOuterUpLeft/Right
         Au4BrowLower => vec![(42, intensity * 0.7), (43, -intensity * 0.5)], // browDownLeft + inverse browInnerUp
-        Au5UpperLidRaise => vec![(12, intensity), (13, intensity)], // eyeWideLeft/Right
+        Au5UpperLidRaise => vec![(12, intensity), (13, intensity)],          // eyeWideLeft/Right
         Au6CheekRaise => vec![(47, intensity), (48, intensity)], // cheekSquintLeft/Right
         Au7LidTighten => vec![(10, intensity * 0.6), (11, intensity * 0.6)], // eyeSquintLeft/Right
         Au9NoseWrinkle => vec![(49, intensity), (50, intensity)], // noseSneerLeft/Right
         Au10UpperLipRaise => vec![(40, intensity), (41, intensity)], // mouthUpperUpLeft/Right
         Au12LipCornerPull => vec![(23, intensity), (24, intensity)], // mouthSmileLeft/Right
-        Au14Dimple => vec![(27, intensity), (28, intensity)], // mouthDimpleLeft/Right
+        Au14Dimple => vec![(27, intensity), (28, intensity)],    // mouthDimpleLeft/Right
         Au15LipCornerDepress => vec![(25, intensity), (26, intensity)], // mouthFrownLeft/Right
         Au16LowerLipDepress => vec![(37, intensity), (38, intensity)], // mouthLowerDownLeft/Right
-        Au17ChinRaise => vec![(33, intensity)], // mouthShrugLower
-        Au18LipPucker => vec![(20, intensity)], // mouthPucker
+        Au17ChinRaise => vec![(33, intensity)],                  // mouthShrugLower
+        Au18LipPucker => vec![(20, intensity)],                  // mouthPucker
         Au20LipStretch => vec![(29, intensity), (30, intensity)], // mouthStretchLeft/Right
-        Au22LipFunnel => vec![(19, intensity)], // mouthFunnel
-        Au25LipsPart => vec![(18, intensity * 0.3)], // mouthClose (inverse)
-        Au26JawDrop => vec![(17, intensity)], // jawOpen
-        Au34CheekPuff => vec![(46, intensity)], // cheekPuff
+        Au22LipFunnel => vec![(19, intensity)],                  // mouthFunnel
+        Au25LipsPart => vec![(18, intensity * 0.3)],             // mouthClose (inverse)
+        Au26JawDrop => vec![(17, intensity)],                    // jawOpen
+        Au34CheekPuff => vec![(46, intensity)],                  // cheekPuff
         Au43EyesClosed | Au45Blink => vec![(0, intensity), (1, intensity)], // eyeBlinkLeft/Right
         Au51HeadTurnLeft => vec![(15, intensity)], // jawLeft (head bones via skeleton, this is approximate)
         Au52HeadTurnRight => vec![(16, intensity)], // jawRight
-        Au36TongueBulge => vec![(51, intensity)], // tongueOut
-        _ => Vec::new(), // No direct ARKit mapping for remaining AUs
+        Au36TongueBulge => vec![(51, intensity)],  // tongueOut
+        _ => Vec::new(),                           // No direct ARKit mapping for remaining AUs
     }
 }
 

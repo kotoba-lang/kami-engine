@@ -13,11 +13,13 @@ use wgpu::util::DeviceExt;
 // source for each pipeline's cull / depth-write / depth-compare. These map a spec to the wgpu
 // values the pipelines below build with; `specs_map_to_the_renderer_values` locks every pipeline's
 // mapped value to what the hand-written descriptors use, so the EDN and the renderer can't diverge.
-use crate::pipeline_specs::{PIPELINE_SPECS, PipelineSpec, Cull};
+use crate::pipeline_specs::{Cull, PIPELINE_SPECS, PipelineSpec};
 
 /// Look up a generated pipeline spec by name.
 pub fn spec(name: &str) -> &'static PipelineSpec {
-    PIPELINE_SPECS.iter().find(|s| s.name == name)
+    PIPELINE_SPECS
+        .iter()
+        .find(|s| s.name == name)
         .unwrap_or_else(|| panic!("no pipeline spec for {name}"))
 }
 
@@ -33,36 +35,36 @@ pub fn wgpu_cull(c: Cull) -> Option<wgpu::Face> {
 /// Map a spec depth-compare string to wgpu's `CompareFunction`.
 pub fn wgpu_compare(s: &str) -> wgpu::CompareFunction {
     match s {
-        "less"          => wgpu::CompareFunction::Less,
-        "less-equal"    => wgpu::CompareFunction::LessEqual,
-        "greater"       => wgpu::CompareFunction::Greater,
+        "less" => wgpu::CompareFunction::Less,
+        "less-equal" => wgpu::CompareFunction::LessEqual,
+        "greater" => wgpu::CompareFunction::Greater,
         "greater-equal" => wgpu::CompareFunction::GreaterEqual,
-        "equal"         => wgpu::CompareFunction::Equal,
-        "always"        => wgpu::CompareFunction::Always,
-        "never"         => wgpu::CompareFunction::Never,
-        _               => wgpu::CompareFunction::Less,
+        "equal" => wgpu::CompareFunction::Equal,
+        "always" => wgpu::CompareFunction::Always,
+        "never" => wgpu::CompareFunction::Never,
+        _ => wgpu::CompareFunction::Less,
     }
 }
 
 #[cfg(test)]
 mod spec_consumption_tests {
-    use super::{spec, wgpu_cull, wgpu_compare};
+    use super::{spec, wgpu_compare, wgpu_cull};
 
     #[test]
     fn specs_map_to_the_renderer_values() {
         // (name, cull, depth_write, depth_compare) the hand-written pipelines use — the EDN spec,
         // mapped through the helpers, must reproduce each one exactly (a Rust-side oracle complementing
         // the bb parse-rust parity gate). Wiring the descriptors to read these is then provably safe.
-        use wgpu::{Face, CompareFunction as CF};
+        use wgpu::{CompareFunction as CF, Face};
         let expect: &[(&str, Option<Face>, bool, CF)] = &[
-            ("terrain",    Some(Face::Back), true,  CF::Less),
-            ("sky",        None,             false, CF::LessEqual),
-            ("vegetation", None,             true,  CF::Less),
-            ("character",  Some(Face::Back), true,  CF::Less),
-            ("water",      None,             false, CF::Less),
-            ("voxel",      Some(Face::Back), true,  CF::Less),
-            ("particle",   None,             false, CF::Less),
-            ("atlas",      None,             false, CF::Less),
+            ("terrain", Some(Face::Back), true, CF::Less),
+            ("sky", None, false, CF::LessEqual),
+            ("vegetation", None, true, CF::Less),
+            ("character", Some(Face::Back), true, CF::Less),
+            ("water", None, false, CF::Less),
+            ("voxel", Some(Face::Back), true, CF::Less),
+            ("particle", None, false, CF::Less),
+            ("atlas", None, false, CF::Less),
         ];
         for &(name, cull, dw, cmp) in expect {
             let s = spec(name);
@@ -79,10 +81,14 @@ mod spec_consumption_tests {
 #[derive(Debug, Clone, Copy, Pod, Zeroable)]
 pub struct TerrainUniform {
     pub view_proj: [f32; 16],
-    pub cam_pos: [f32; 3], pub _p0: f32,
-    pub sun_dir: [f32; 3], pub _p1: f32,
-    pub sun_color: [f32; 3], pub fog_density: f32,
-    pub fog_color: [f32; 3], pub _p2: f32,
+    pub cam_pos: [f32; 3],
+    pub _p0: f32,
+    pub sun_dir: [f32; 3],
+    pub _p1: f32,
+    pub sun_color: [f32; 3],
+    pub fog_density: f32,
+    pub fog_color: [f32; 3],
+    pub _p2: f32,
     /// 4 materials × vec4 (base RGB + pad)
     pub base_col: [[f32; 4]; 4],
     pub tip_col: [[f32; 4]; 4],
@@ -92,20 +98,31 @@ pub struct TerrainUniform {
 #[derive(Debug, Clone, Copy, Pod, Zeroable)]
 pub struct SkyUniform {
     pub inv_vp: [f32; 16],
-    pub cam_pos: [f32; 3], pub _p0: f32,
-    pub sun_dir: [f32; 3], pub _p1: f32,
-    pub fog_color: [f32; 3], pub overcast: f32,
-    pub scroll_x: f32, pub scroll_z: f32, pub altitude: f32, pub _p2: f32,
+    pub cam_pos: [f32; 3],
+    pub _p0: f32,
+    pub sun_dir: [f32; 3],
+    pub _p1: f32,
+    pub fog_color: [f32; 3],
+    pub overcast: f32,
+    pub scroll_x: f32,
+    pub scroll_z: f32,
+    pub altitude: f32,
+    pub _p2: f32,
 }
 
 #[repr(C, align(16))]
 #[derive(Debug, Clone, Copy, Pod, Zeroable)]
 pub struct VegetationUniform {
     pub view_proj: [f32; 16],
-    pub cam_pos: [f32; 3], pub time: f32,
-    pub sun_dir: [f32; 3], pub wind_speed: f32,
-    pub fog_color: [f32; 3], pub fog_density: f32,
-    pub wind_dir: [f32; 2], pub gust_mul: f32, pub biome_dry: f32,
+    pub cam_pos: [f32; 3],
+    pub time: f32,
+    pub sun_dir: [f32; 3],
+    pub wind_speed: f32,
+    pub fog_color: [f32; 3],
+    pub fog_density: f32,
+    pub wind_dir: [f32; 2],
+    pub gust_mul: f32,
+    pub biome_dry: f32,
 }
 
 #[repr(C, align(16))]
@@ -113,10 +130,14 @@ pub struct VegetationUniform {
 pub struct CharacterUniform {
     pub view_proj: [f32; 16],
     pub model: [f32; 16],
-    pub cam_pos: [f32; 3], pub _p0: f32,
-    pub sun_dir: [f32; 3], pub _p1: f32,
-    pub sun_color: [f32; 3], pub fog_density: f32,
-    pub fog_color: [f32; 3], pub _p2: f32,
+    pub cam_pos: [f32; 3],
+    pub _p0: f32,
+    pub sun_dir: [f32; 3],
+    pub _p1: f32,
+    pub sun_color: [f32; 3],
+    pub fog_density: f32,
+    pub fog_color: [f32; 3],
+    pub _p2: f32,
 }
 
 // ── Helper: create uniform buffer + bind group + layout ──
@@ -169,33 +190,62 @@ pub struct TerrainPipeline {
 impl TerrainPipeline {
     pub fn new(device: &wgpu::Device, color_format: wgpu::TextureFormat) -> Self {
         let (uniform, layout, bind_group) = make_uniform_bind(
-            device, std::mem::size_of::<TerrainUniform>() as u64, "terrain_uniform");
+            device,
+            std::mem::size_of::<TerrainUniform>() as u64,
+            "terrain_uniform",
+        );
         let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("terrain_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shaders/scene_terrain.wgsl").into()),
         });
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("terrain_pl"), bind_group_layouts: &[&layout], push_constant_ranges: &[],
+            label: Some("terrain_pl"),
+            bind_group_layouts: &[&layout],
+            push_constant_ranges: &[],
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("terrain_pipeline"),
             layout: Some(&pipeline_layout),
             vertex: wgpu::VertexState {
-                module: &module, entry_point: Some("vs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
                 buffers: &[wgpu::VertexBufferLayout {
                     array_stride: 48,
                     step_mode: wgpu::VertexStepMode::Vertex,
                     attributes: &[
-                        wgpu::VertexAttribute { shader_location: 0, offset: 0,  format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { shader_location: 1, offset: 12, format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { shader_location: 2, offset: 24, format: wgpu::VertexFormat::Float32x2 },
-                        wgpu::VertexAttribute { shader_location: 3, offset: 32, format: wgpu::VertexFormat::Float32x4 },
+                        wgpu::VertexAttribute {
+                            shader_location: 0,
+                            offset: 0,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            shader_location: 1,
+                            offset: 12,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            shader_location: 2,
+                            offset: 24,
+                            format: wgpu::VertexFormat::Float32x2,
+                        },
+                        wgpu::VertexAttribute {
+                            shader_location: 3,
+                            offset: 32,
+                            format: wgpu::VertexFormat::Float32x4,
+                        },
                     ],
                 }],
             },
             fragment: Some(wgpu::FragmentState {
-                module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
-                targets: &[Some(wgpu::ColorTargetState { format: color_format, blend: None, write_mask: wgpu::ColorWrites::ALL })],
+                module: &module,
+                entry_point: Some("fs"),
+                compilation_options: Default::default(),
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: color_format,
+                    blend: None,
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
             }),
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
@@ -206,11 +256,18 @@ impl TerrainPipeline {
                 format: wgpu::TextureFormat::Depth24Plus,
                 depth_write_enabled: spec("terrain").depth_write,
                 depth_compare: wgpu_compare(spec("terrain").depth_compare),
-                stencil: Default::default(), bias: Default::default(),
+                stencil: Default::default(),
+                bias: Default::default(),
             }),
-            multisample: Default::default(), multiview: None, cache: None,
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
-        Self { pipeline, uniform, bind_group }
+        Self {
+            pipeline,
+            uniform,
+            bind_group,
+        }
     }
 }
 
@@ -227,21 +284,37 @@ pub struct SkyPipeline {
 impl SkyPipeline {
     pub fn new(device: &wgpu::Device, color_format: wgpu::TextureFormat) -> Self {
         let (uniform, layout, bind_group) = make_uniform_bind(
-            device, std::mem::size_of::<SkyUniform>() as u64, "sky_uniform");
+            device,
+            std::mem::size_of::<SkyUniform>() as u64,
+            "sky_uniform",
+        );
         let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("sky_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shaders/scene_sky.wgsl").into()),
         });
         let pl = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("sky_pl"), bind_group_layouts: &[&layout], push_constant_ranges: &[],
+            label: Some("sky_pl"),
+            bind_group_layouts: &[&layout],
+            push_constant_ranges: &[],
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("sky_pipeline"),
             layout: Some(&pl),
-            vertex: wgpu::VertexState { module: &module, entry_point: Some("vs"), compilation_options: Default::default(), buffers: &[] },
+            vertex: wgpu::VertexState {
+                module: &module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
+                buffers: &[],
+            },
             fragment: Some(wgpu::FragmentState {
-                module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
-                targets: &[Some(wgpu::ColorTargetState { format: color_format, blend: None, write_mask: wgpu::ColorWrites::ALL })],
+                module: &module,
+                entry_point: Some("fs"),
+                compilation_options: Default::default(),
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: color_format,
+                    blend: None,
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
             }),
             primitive: wgpu::PrimitiveState {
                 topology: wgpu::PrimitiveTopology::TriangleList,
@@ -251,11 +324,18 @@ impl SkyPipeline {
                 format: wgpu::TextureFormat::Depth24Plus,
                 depth_write_enabled: spec("sky").depth_write,
                 depth_compare: wgpu_compare(spec("sky").depth_compare),
-                stencil: Default::default(), bias: Default::default(),
+                stencil: Default::default(),
+                bias: Default::default(),
             }),
-            multisample: Default::default(), multiview: None, cache: None,
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
-        Self { pipeline, uniform, bind_group }
+        Self {
+            pipeline,
+            uniform,
+            bind_group,
+        }
     }
 }
 
@@ -287,38 +367,52 @@ impl VegetationPipeline {
     pub fn upload_species_meshes(
         &mut self,
         device: &wgpu::Device,
-        meshes: &[(u32, Vec<f32>, Vec<u32>)],  // (species_id, vertices flat, indices)
+        meshes: &[(u32, Vec<f32>, Vec<u32>)], // (species_id, vertices flat, indices)
     ) {
-        self.species_meshes = meshes.iter().map(|(_, verts, idxs)| {
-            let vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                label: Some("veg_species_vb"),
-                contents: bytemuck::cast_slice(verts),
-                usage: wgpu::BufferUsages::VERTEX,
-            });
-            let ib = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                label: Some("veg_species_ib"),
-                contents: bytemuck::cast_slice(idxs),
-                usage: wgpu::BufferUsages::INDEX,
-            });
-            SpeciesMeshGpu { vb, ib, index_count: idxs.len() as u32 }
-        }).collect();
+        self.species_meshes = meshes
+            .iter()
+            .map(|(_, verts, idxs)| {
+                let vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                    label: Some("veg_species_vb"),
+                    contents: bytemuck::cast_slice(verts),
+                    usage: wgpu::BufferUsages::VERTEX,
+                });
+                let ib = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                    label: Some("veg_species_ib"),
+                    contents: bytemuck::cast_slice(idxs),
+                    usage: wgpu::BufferUsages::INDEX,
+                });
+                SpeciesMeshGpu {
+                    vb,
+                    ib,
+                    index_count: idxs.len() as u32,
+                }
+            })
+            .collect();
     }
 }
 
 impl VegetationPipeline {
-    pub fn new(device: &wgpu::Device, color_format: wgpu::TextureFormat, instance_capacity: u32) -> Self {
+    pub fn new(
+        device: &wgpu::Device,
+        color_format: wgpu::TextureFormat,
+        instance_capacity: u32,
+    ) -> Self {
         let (uniform, layout, bind_group) = make_uniform_bind(
-            device, std::mem::size_of::<VegetationUniform>() as u64, "veg_uniform");
+            device,
+            std::mem::size_of::<VegetationUniform>() as u64,
+            "veg_uniform",
+        );
         let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("veg_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shaders/scene_vegetation.wgsl").into()),
         });
         // Cross-quad vertex data (2 quads perpendicular for billboard-like volume)
         let quad: [f32; 60] = [
-            -0.5,0.0,0.0, 0.0,1.0,  0.5,0.0,0.0, 1.0,1.0,  0.5,1.0,0.0, 1.0,0.0,
-            -0.5,0.0,0.0, 0.0,1.0,  0.5,1.0,0.0, 1.0,0.0, -0.5,1.0,0.0, 0.0,0.0,
-             0.0,0.0,-0.5, 0.0,1.0,  0.0,0.0,0.5, 1.0,1.0,  0.0,1.0,0.5, 1.0,0.0,
-             0.0,0.0,-0.5, 0.0,1.0,  0.0,1.0,0.5, 1.0,0.0,  0.0,1.0,-0.5, 0.0,0.0,
+            -0.5, 0.0, 0.0, 0.0, 1.0, 0.5, 0.0, 0.0, 1.0, 1.0, 0.5, 1.0, 0.0, 1.0, 0.0, -0.5, 0.0,
+            0.0, 0.0, 1.0, 0.5, 1.0, 0.0, 1.0, 0.0, -0.5, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5, 0.0,
+            1.0, 0.0, 0.0, 0.5, 1.0, 1.0, 0.0, 1.0, 0.5, 1.0, 0.0, 0.0, 0.0, -0.5, 0.0, 1.0, 0.0,
+            1.0, 0.5, 1.0, 0.0, 0.0, 1.0, -0.5, 0.0, 0.0,
         ];
         let quad_vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("veg_quad"),
@@ -332,36 +426,76 @@ impl VegetationPipeline {
             mapped_at_creation: false,
         });
         let pl = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("veg_pl"), bind_group_layouts: &[&layout], push_constant_ranges: &[],
+            label: Some("veg_pl"),
+            bind_group_layouts: &[&layout],
+            push_constant_ranges: &[],
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("veg_pipeline"),
             layout: Some(&pl),
             vertex: wgpu::VertexState {
-                module: &module, entry_point: Some("vs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
                 buffers: &[
                     wgpu::VertexBufferLayout {
-                        array_stride: 20, step_mode: wgpu::VertexStepMode::Vertex,
+                        array_stride: 20,
+                        step_mode: wgpu::VertexStepMode::Vertex,
                         attributes: &[
-                            wgpu::VertexAttribute { shader_location: 0, offset: 0,  format: wgpu::VertexFormat::Float32x3 },
-                            wgpu::VertexAttribute { shader_location: 1, offset: 12, format: wgpu::VertexFormat::Float32x2 },
+                            wgpu::VertexAttribute {
+                                shader_location: 0,
+                                offset: 0,
+                                format: wgpu::VertexFormat::Float32x3,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 1,
+                                offset: 12,
+                                format: wgpu::VertexFormat::Float32x2,
+                            },
                         ],
                     },
                     wgpu::VertexBufferLayout {
-                        array_stride: 32, step_mode: wgpu::VertexStepMode::Instance,
+                        array_stride: 32,
+                        step_mode: wgpu::VertexStepMode::Instance,
                         attributes: &[
-                            wgpu::VertexAttribute { shader_location: 2, offset: 0,  format: wgpu::VertexFormat::Float32x3 },
-                            wgpu::VertexAttribute { shader_location: 3, offset: 12, format: wgpu::VertexFormat::Float32 },
-                            wgpu::VertexAttribute { shader_location: 4, offset: 16, format: wgpu::VertexFormat::Float32 },
-                            wgpu::VertexAttribute { shader_location: 5, offset: 20, format: wgpu::VertexFormat::Float32 },
-                            wgpu::VertexAttribute { shader_location: 6, offset: 24, format: wgpu::VertexFormat::Float32 },
-                            wgpu::VertexAttribute { shader_location: 7, offset: 28, format: wgpu::VertexFormat::Float32 },
+                            wgpu::VertexAttribute {
+                                shader_location: 2,
+                                offset: 0,
+                                format: wgpu::VertexFormat::Float32x3,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 3,
+                                offset: 12,
+                                format: wgpu::VertexFormat::Float32,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 4,
+                                offset: 16,
+                                format: wgpu::VertexFormat::Float32,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 5,
+                                offset: 20,
+                                format: wgpu::VertexFormat::Float32,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 6,
+                                offset: 24,
+                                format: wgpu::VertexFormat::Float32,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 7,
+                                offset: 28,
+                                format: wgpu::VertexFormat::Float32,
+                            },
                         ],
                     },
                 ],
             },
             fragment: Some(wgpu::FragmentState {
-                module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("fs"),
+                compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: color_format,
                     blend: Some(wgpu::BlendState {
@@ -379,16 +513,31 @@ impl VegetationPipeline {
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
             }),
-            primitive: wgpu::PrimitiveState { topology: wgpu::PrimitiveTopology::TriangleList, cull_mode: wgpu_cull(spec("vegetation").cull), ..Default::default() },
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::TriangleList,
+                cull_mode: wgpu_cull(spec("vegetation").cull),
+                ..Default::default()
+            },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
                 depth_write_enabled: spec("vegetation").depth_write,
                 depth_compare: wgpu_compare(spec("vegetation").depth_compare),
-                stencil: Default::default(), bias: Default::default(),
+                stencil: Default::default(),
+                bias: Default::default(),
             }),
-            multisample: Default::default(), multiview: None, cache: None,
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
-        Self { pipeline, uniform, bind_group, quad_vb, instance_vb, instance_capacity, species_meshes: Vec::new() }
+        Self {
+            pipeline,
+            uniform,
+            bind_group,
+            quad_vb,
+            instance_vb,
+            instance_capacity,
+            species_meshes: Vec::new(),
+        }
     }
 }
 
@@ -405,42 +554,79 @@ pub struct CharacterPipeline {
 impl CharacterPipeline {
     pub fn new(device: &wgpu::Device, color_format: wgpu::TextureFormat) -> Self {
         let (uniform, layout, bind_group) = make_uniform_bind(
-            device, std::mem::size_of::<CharacterUniform>() as u64, "char_uniform");
+            device,
+            std::mem::size_of::<CharacterUniform>() as u64,
+            "char_uniform",
+        );
         let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("char_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shaders/scene_character.wgsl").into()),
         });
         let pl = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("char_pl"), bind_group_layouts: &[&layout], push_constant_ranges: &[],
+            label: Some("char_pl"),
+            bind_group_layouts: &[&layout],
+            push_constant_ranges: &[],
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("char_pipeline"),
             layout: Some(&pl),
             vertex: wgpu::VertexState {
-                module: &module, entry_point: Some("vs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
                 buffers: &[wgpu::VertexBufferLayout {
-                    array_stride: 36, step_mode: wgpu::VertexStepMode::Vertex,
+                    array_stride: 36,
+                    step_mode: wgpu::VertexStepMode::Vertex,
                     attributes: &[
-                        wgpu::VertexAttribute { shader_location: 0, offset: 0,  format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { shader_location: 1, offset: 12, format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { shader_location: 2, offset: 24, format: wgpu::VertexFormat::Float32x3 },
+                        wgpu::VertexAttribute {
+                            shader_location: 0,
+                            offset: 0,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            shader_location: 1,
+                            offset: 12,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            shader_location: 2,
+                            offset: 24,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
                     ],
                 }],
             },
             fragment: Some(wgpu::FragmentState {
-                module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
-                targets: &[Some(wgpu::ColorTargetState { format: color_format, blend: None, write_mask: wgpu::ColorWrites::ALL })],
+                module: &module,
+                entry_point: Some("fs"),
+                compilation_options: Default::default(),
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: color_format,
+                    blend: None,
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
             }),
-            primitive: wgpu::PrimitiveState { topology: wgpu::PrimitiveTopology::TriangleList, cull_mode: wgpu_cull(spec("character").cull), ..Default::default() },
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::TriangleList,
+                cull_mode: wgpu_cull(spec("character").cull),
+                ..Default::default()
+            },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
                 depth_write_enabled: spec("character").depth_write,
                 depth_compare: wgpu_compare(spec("character").depth_compare),
-                stencil: Default::default(), bias: Default::default(),
+                stencil: Default::default(),
+                bias: Default::default(),
             }),
-            multisample: Default::default(), multiview: None, cache: None,
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
-        Self { pipeline, uniform, bind_group }
+        Self {
+            pipeline,
+            uniform,
+            bind_group,
+        }
     }
 }
 
@@ -471,30 +657,47 @@ pub struct WaterPipeline {
 impl WaterPipeline {
     pub fn new(device: &wgpu::Device, color_format: wgpu::TextureFormat) -> Self {
         let (uniform, layout, bind_group) = make_uniform_bind(
-            device, std::mem::size_of::<WaterUniform>() as u64, "water_uniform");
+            device,
+            std::mem::size_of::<WaterUniform>() as u64,
+            "water_uniform",
+        );
         let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("water_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shaders/scene_water.wgsl").into()),
         });
         let pl = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("water_pl"), bind_group_layouts: &[&layout], push_constant_ranges: &[],
+            label: Some("water_pl"),
+            bind_group_layouts: &[&layout],
+            push_constant_ranges: &[],
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("water_pipeline"),
             layout: Some(&pl),
             vertex: wgpu::VertexState {
-                module: &module, entry_point: Some("vs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
                 buffers: &[wgpu::VertexBufferLayout {
                     array_stride: 20,
                     step_mode: wgpu::VertexStepMode::Vertex,
                     attributes: &[
-                        wgpu::VertexAttribute { shader_location: 0, offset: 0,  format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { shader_location: 1, offset: 12, format: wgpu::VertexFormat::Float32x2 },
+                        wgpu::VertexAttribute {
+                            shader_location: 0,
+                            offset: 0,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            shader_location: 1,
+                            offset: 12,
+                            format: wgpu::VertexFormat::Float32x2,
+                        },
                     ],
                 }],
             },
             fragment: Some(wgpu::FragmentState {
-                module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("fs"),
+                compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: color_format,
                     blend: Some(wgpu::BlendState::ALPHA_BLENDING),
@@ -508,13 +711,20 @@ impl WaterPipeline {
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: spec("water").depth_write,  // alpha blend — let terrain show through
+                depth_write_enabled: spec("water").depth_write, // alpha blend — let terrain show through
                 depth_compare: wgpu_compare(spec("water").depth_compare),
-                stencil: Default::default(), bias: Default::default(),
+                stencil: Default::default(),
+                bias: Default::default(),
             }),
-            multisample: Default::default(), multiview: None, cache: None,
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
-        Self { pipeline, uniform, bind_group }
+        Self {
+            pipeline,
+            uniform,
+            bind_group,
+        }
     }
 }
 
@@ -545,34 +755,57 @@ pub struct VoxelPipeline {
 impl VoxelPipeline {
     pub fn new(device: &wgpu::Device, color_format: wgpu::TextureFormat) -> Self {
         let (uniform, layout, bind_group) = make_uniform_bind(
-            device, std::mem::size_of::<VoxelUniform>() as u64, "voxel_uniform");
+            device,
+            std::mem::size_of::<VoxelUniform>() as u64,
+            "voxel_uniform",
+        );
         let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("voxel_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shaders/scene_voxel.wgsl").into()),
         });
         let pl = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("voxel_pl"), bind_group_layouts: &[&layout], push_constant_ranges: &[],
+            label: Some("voxel_pl"),
+            bind_group_layouts: &[&layout],
+            push_constant_ranges: &[],
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("voxel_pipeline"),
             layout: Some(&pl),
             vertex: wgpu::VertexState {
-                module: &module, entry_point: Some("vs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
                 // pos3 + norm3 + col3 = 36 B per vertex
                 buffers: &[wgpu::VertexBufferLayout {
                     array_stride: 36,
                     step_mode: wgpu::VertexStepMode::Vertex,
                     attributes: &[
-                        wgpu::VertexAttribute { shader_location: 0, offset: 0,  format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { shader_location: 1, offset: 12, format: wgpu::VertexFormat::Float32x3 },
-                        wgpu::VertexAttribute { shader_location: 2, offset: 24, format: wgpu::VertexFormat::Float32x3 },
+                        wgpu::VertexAttribute {
+                            shader_location: 0,
+                            offset: 0,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            shader_location: 1,
+                            offset: 12,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
+                        wgpu::VertexAttribute {
+                            shader_location: 2,
+                            offset: 24,
+                            format: wgpu::VertexFormat::Float32x3,
+                        },
                     ],
                 }],
             },
             fragment: Some(wgpu::FragmentState {
-                module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("fs"),
+                compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState {
-                    format: color_format, blend: None, write_mask: wgpu::ColorWrites::ALL,
+                    format: color_format,
+                    blend: None,
+                    write_mask: wgpu::ColorWrites::ALL,
                 })],
             }),
             primitive: wgpu::PrimitiveState {
@@ -584,11 +817,18 @@ impl VoxelPipeline {
                 format: wgpu::TextureFormat::Depth24Plus,
                 depth_write_enabled: spec("voxel").depth_write,
                 depth_compare: wgpu_compare(spec("voxel").depth_compare),
-                stencil: Default::default(), bias: Default::default(),
+                stencil: Default::default(),
+                bias: Default::default(),
             }),
-            multisample: Default::default(), multiview: None, cache: None,
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
-        Self { pipeline, uniform, bind_group }
+        Self {
+            pipeline,
+            uniform,
+            bind_group,
+        }
     }
 }
 
@@ -600,8 +840,10 @@ impl VoxelPipeline {
 #[derive(Debug, Clone, Copy, Pod, Zeroable)]
 pub struct ParticleUniform {
     pub view_proj: [f32; 16],
-    pub cam_right: [f32; 3], pub _p0: f32,
-    pub cam_up:    [f32; 3], pub _p1: f32,
+    pub cam_right: [f32; 3],
+    pub _p0: f32,
+    pub cam_up: [f32; 3],
+    pub _p1: f32,
 }
 
 pub struct ParticlePipeline {
@@ -616,13 +858,16 @@ pub struct ParticlePipeline {
 impl ParticlePipeline {
     pub fn new(device: &wgpu::Device, color_format: wgpu::TextureFormat) -> Self {
         let (uniform, layout, bind_group) = make_uniform_bind(
-            device, std::mem::size_of::<ParticleUniform>() as u64, "particle_uniform");
+            device,
+            std::mem::size_of::<ParticleUniform>() as u64,
+            "particle_uniform",
+        );
         let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("particle_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shaders/scene_particle.wgsl").into()),
         });
         // Unit quad: pos2 (4 vertices), indexed as 2 triangles.
-        let quad: [f32; 8] = [-0.5, -0.5,  0.5, -0.5,  0.5, 0.5,  -0.5, 0.5];
+        let quad: [f32; 8] = [-0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5];
         let idx: [u32; 6] = [0, 1, 2, 0, 2, 3];
         let quad_vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("particle_quad_vb"),
@@ -635,35 +880,65 @@ impl ParticlePipeline {
             usage: wgpu::BufferUsages::INDEX,
         });
         let pl = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("particle_pl"), bind_group_layouts: &[&layout], push_constant_ranges: &[],
+            label: Some("particle_pl"),
+            bind_group_layouts: &[&layout],
+            push_constant_ranges: &[],
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("particle_pipeline"),
             layout: Some(&pl),
             vertex: wgpu::VertexState {
-                module: &module, entry_point: Some("vs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
                 buffers: &[
                     wgpu::VertexBufferLayout {
-                        array_stride: 8, step_mode: wgpu::VertexStepMode::Vertex,
-                        attributes: &[
-                            wgpu::VertexAttribute { shader_location: 0, offset: 0, format: wgpu::VertexFormat::Float32x2 },
-                        ],
+                        array_stride: 8,
+                        step_mode: wgpu::VertexStepMode::Vertex,
+                        attributes: &[wgpu::VertexAttribute {
+                            shader_location: 0,
+                            offset: 0,
+                            format: wgpu::VertexFormat::Float32x2,
+                        }],
                     },
                     wgpu::VertexBufferLayout {
                         // pos3 + col3 + size1 + age1 + life1 = 9 f32 = 36 B
-                        array_stride: 36, step_mode: wgpu::VertexStepMode::Instance,
+                        array_stride: 36,
+                        step_mode: wgpu::VertexStepMode::Instance,
                         attributes: &[
-                            wgpu::VertexAttribute { shader_location: 1, offset: 0,  format: wgpu::VertexFormat::Float32x3 },
-                            wgpu::VertexAttribute { shader_location: 2, offset: 12, format: wgpu::VertexFormat::Float32x3 },
-                            wgpu::VertexAttribute { shader_location: 3, offset: 24, format: wgpu::VertexFormat::Float32 },
-                            wgpu::VertexAttribute { shader_location: 4, offset: 28, format: wgpu::VertexFormat::Float32 },
-                            wgpu::VertexAttribute { shader_location: 5, offset: 32, format: wgpu::VertexFormat::Float32 },
+                            wgpu::VertexAttribute {
+                                shader_location: 1,
+                                offset: 0,
+                                format: wgpu::VertexFormat::Float32x3,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 2,
+                                offset: 12,
+                                format: wgpu::VertexFormat::Float32x3,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 3,
+                                offset: 24,
+                                format: wgpu::VertexFormat::Float32,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 4,
+                                offset: 28,
+                                format: wgpu::VertexFormat::Float32,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 5,
+                                offset: 32,
+                                format: wgpu::VertexFormat::Float32,
+                            },
                         ],
                     },
                 ],
             },
             fragment: Some(wgpu::FragmentState {
-                module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("fs"),
+                compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: color_format,
                     blend: Some(wgpu::BlendState::ALPHA_BLENDING),
@@ -677,13 +952,22 @@ impl ParticlePipeline {
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: wgpu::TextureFormat::Depth24Plus,
-                depth_write_enabled: spec("particle").depth_write,  // alpha blend — let scene show through
+                depth_write_enabled: spec("particle").depth_write, // alpha blend — let scene show through
                 depth_compare: wgpu_compare(spec("particle").depth_compare),
-                stencil: Default::default(), bias: Default::default(),
+                stencil: Default::default(),
+                bias: Default::default(),
             }),
-            multisample: Default::default(), multiview: None, cache: None,
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
-        Self { pipeline, uniform, bind_group, quad_vb, quad_ib }
+        Self {
+            pipeline,
+            uniform,
+            bind_group,
+            quad_vb,
+            quad_ib,
+        }
     }
 }
 
@@ -700,11 +984,11 @@ pub use ParticleUniform as AtlasUniform;
 #[repr(C, align(4))]
 #[derive(Debug, Clone, Copy, Pod, Zeroable)]
 pub struct AtlasInstance {
-    pub pos:   [f32; 3],
-    pub tint:  [f32; 3],
-    pub size:  f32,
-    pub slot:  u32,
-    pub rot:   f32,
+    pub pos: [f32; 3],
+    pub tint: [f32; 3],
+    pub size: f32,
+    pub slot: u32,
+    pub rot: f32,
     pub alpha: f32,
 }
 
@@ -719,12 +1003,15 @@ pub struct AtlasPipeline {
 impl AtlasPipeline {
     pub fn new(device: &wgpu::Device, color_format: wgpu::TextureFormat) -> Self {
         let (uniform, layout, bind_group) = make_uniform_bind(
-            device, std::mem::size_of::<AtlasUniform>() as u64, "atlas_uniform");
+            device,
+            std::mem::size_of::<AtlasUniform>() as u64,
+            "atlas_uniform",
+        );
         let module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("atlas_shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shaders/scene_atlas.wgsl").into()),
         });
-        let quad: [f32; 8] = [-0.5, -0.5,  0.5, -0.5,  0.5, 0.5,  -0.5, 0.5];
+        let quad: [f32; 8] = [-0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5];
         let idx: [u32; 6] = [0, 1, 2, 0, 2, 3];
         let quad_vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("atlas_quad_vb"),
@@ -737,36 +1024,70 @@ impl AtlasPipeline {
             usage: wgpu::BufferUsages::INDEX,
         });
         let pl = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-            label: Some("atlas_pl"), bind_group_layouts: &[&layout], push_constant_ranges: &[],
+            label: Some("atlas_pl"),
+            bind_group_layouts: &[&layout],
+            push_constant_ranges: &[],
         });
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("atlas_pipeline"),
             layout: Some(&pl),
             vertex: wgpu::VertexState {
-                module: &module, entry_point: Some("vs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("vs"),
+                compilation_options: Default::default(),
                 buffers: &[
                     wgpu::VertexBufferLayout {
-                        array_stride: 8, step_mode: wgpu::VertexStepMode::Vertex,
-                        attributes: &[
-                            wgpu::VertexAttribute { shader_location: 0, offset: 0, format: wgpu::VertexFormat::Float32x2 },
-                        ],
+                        array_stride: 8,
+                        step_mode: wgpu::VertexStepMode::Vertex,
+                        attributes: &[wgpu::VertexAttribute {
+                            shader_location: 0,
+                            offset: 0,
+                            format: wgpu::VertexFormat::Float32x2,
+                        }],
                     },
                     wgpu::VertexBufferLayout {
                         // pos3(12) + tint3(12) + size(4) + slot_u32(4) + rot(4) + alpha(4) = 40
-                        array_stride: 40, step_mode: wgpu::VertexStepMode::Instance,
+                        array_stride: 40,
+                        step_mode: wgpu::VertexStepMode::Instance,
                         attributes: &[
-                            wgpu::VertexAttribute { shader_location: 1, offset: 0,  format: wgpu::VertexFormat::Float32x3 },
-                            wgpu::VertexAttribute { shader_location: 2, offset: 12, format: wgpu::VertexFormat::Float32x3 },
-                            wgpu::VertexAttribute { shader_location: 3, offset: 24, format: wgpu::VertexFormat::Float32 },
-                            wgpu::VertexAttribute { shader_location: 4, offset: 28, format: wgpu::VertexFormat::Uint32 },
-                            wgpu::VertexAttribute { shader_location: 5, offset: 32, format: wgpu::VertexFormat::Float32 },
-                            wgpu::VertexAttribute { shader_location: 6, offset: 36, format: wgpu::VertexFormat::Float32 },
+                            wgpu::VertexAttribute {
+                                shader_location: 1,
+                                offset: 0,
+                                format: wgpu::VertexFormat::Float32x3,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 2,
+                                offset: 12,
+                                format: wgpu::VertexFormat::Float32x3,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 3,
+                                offset: 24,
+                                format: wgpu::VertexFormat::Float32,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 4,
+                                offset: 28,
+                                format: wgpu::VertexFormat::Uint32,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 5,
+                                offset: 32,
+                                format: wgpu::VertexFormat::Float32,
+                            },
+                            wgpu::VertexAttribute {
+                                shader_location: 6,
+                                offset: 36,
+                                format: wgpu::VertexFormat::Float32,
+                            },
                         ],
                     },
                 ],
             },
             fragment: Some(wgpu::FragmentState {
-                module: &module, entry_point: Some("fs"), compilation_options: Default::default(),
+                module: &module,
+                entry_point: Some("fs"),
+                compilation_options: Default::default(),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: color_format,
                     blend: Some(wgpu::BlendState::ALPHA_BLENDING),
@@ -782,11 +1103,20 @@ impl AtlasPipeline {
                 format: wgpu::TextureFormat::Depth24Plus,
                 depth_write_enabled: spec("atlas").depth_write,
                 depth_compare: wgpu_compare(spec("atlas").depth_compare),
-                stencil: Default::default(), bias: Default::default(),
+                stencil: Default::default(),
+                bias: Default::default(),
             }),
-            multisample: Default::default(), multiview: None, cache: None,
+            multisample: Default::default(),
+            multiview: None,
+            cache: None,
         });
-        Self { pipeline, uniform, bind_group, quad_vb, quad_ib }
+        Self {
+            pipeline,
+            uniform,
+            bind_group,
+            quad_vb,
+            quad_ib,
+        }
     }
 }
 

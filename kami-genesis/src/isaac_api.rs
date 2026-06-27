@@ -149,19 +149,22 @@ impl IsaacWorld {
 
     /// Borrow an Isaac-shaped `ArticulationView` for one prim.
     pub fn articulation(&self, h: ArticulationHandle) -> Option<ArticulationView<'_>> {
-        self.inner.get(h).ok().map(|_| ArticulationView { world: &self.inner, h })
+        self.inner.get(h).ok().map(|_| ArticulationView {
+            world: &self.inner,
+            h,
+        })
     }
 
     /// Mutable view (needed for `set_joint_efforts`).
-    pub fn articulation_mut(
-        &mut self,
-        h: ArticulationHandle,
-    ) -> Option<ArticulationViewMut<'_>> {
+    pub fn articulation_mut(&mut self, h: ArticulationHandle) -> Option<ArticulationViewMut<'_>> {
         // Validate handle first to keep the Option contract honest.
         if self.inner.get(h).is_err() {
             return None;
         }
-        Some(ArticulationViewMut { world: &mut self.inner, h })
+        Some(ArticulationViewMut {
+            world: &mut self.inner,
+            h,
+        })
     }
 
     /// Escape hatch: the underlying kami-genesis world (non-Isaac surface).
@@ -180,12 +183,18 @@ pub struct ArticulationView<'a> {
 impl ArticulationView<'_> {
     /// `articulation.get_joint_positions()` → `[n_dof]`.
     pub fn get_joint_positions(&self) -> Vec<f32> {
-        self.world.get(self.h).map(|a| a.joint_positions()).unwrap_or_default()
+        self.world
+            .get(self.h)
+            .map(|a| a.joint_positions())
+            .unwrap_or_default()
     }
 
     /// `articulation.get_joint_velocities()` → `[n_dof]`.
     pub fn get_joint_velocities(&self) -> Vec<f32> {
-        self.world.get(self.h).map(|a| a.joint_velocities()).unwrap_or_default()
+        self.world
+            .get(self.h)
+            .map(|a| a.joint_velocities())
+            .unwrap_or_default()
     }
 
     /// `articulation.num_dof` (property).
@@ -196,13 +205,19 @@ impl ArticulationView<'_> {
     /// `articulation.dof_names` (property) — ordered actuated-joint names, one
     /// per DOF, aligned with `get_joint_positions()`.
     pub fn dof_names(&self) -> Vec<String> {
-        self.world.get(self.h).map(|a| a.dof_names()).unwrap_or_default()
+        self.world
+            .get(self.h)
+            .map(|a| a.dof_names())
+            .unwrap_or_default()
     }
 
     /// `articulation.get_dof_index(dof_name)` — DOF index for a joint name, or
     /// None if it is not an actuated joint of this articulation.
     pub fn get_dof_index(&self, dof_name: &str) -> Option<usize> {
-        self.world.get(self.h).ok().and_then(|a| a.dof_index(dof_name))
+        self.world
+            .get(self.h)
+            .ok()
+            .and_then(|a| a.dof_index(dof_name))
     }
 
     /// `articulation.get_dof_limits()` — per-DOF position limits `[lower, upper]`
@@ -218,7 +233,10 @@ impl ArticulationView<'_> {
     /// Isaac returns `[num_envs, num_links, 6, n_dof]`; this is one link, one
     /// env. None if the link is not part of the articulation.
     pub fn get_jacobian(&self, link_name: &str) -> Option<Jacobian> {
-        self.world.get(self.h).ok().and_then(|a| a.jacobian(link_name))
+        self.world
+            .get(self.h)
+            .ok()
+            .and_then(|a| a.jacobian(link_name))
     }
 
     /// `RigidPrimView.get_world_poses(link)` → `(position[3], quat_wxyz[4])`.
@@ -342,12 +360,9 @@ impl ArticulationControllerView<'_> {
 mod tests {
     use super::*;
 
-    const CARTPOLE_URDF: &str =
-        include_str!("../../fixtures/cartpole/cartpole.urdf");
-    const ARM3_URDF: &str =
-        include_str!("../../fixtures/arm3/arm3.urdf");
-    const ARM6_URDF: &str =
-        include_str!("../../fixtures/giemon_arm6/giemon_arm6.urdf");
+    const CARTPOLE_URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
+    const ARM3_URDF: &str = include_str!("../../fixtures/arm3/arm3.urdf");
+    const ARM6_URDF: &str = include_str!("../../fixtures/giemon_arm6/giemon_arm6.urdf");
 
     #[test]
     fn isaac_world_cartpole_lifecycle() {
@@ -365,7 +380,10 @@ mod tests {
 
         let q0 = world.articulation(h).unwrap().get_joint_positions();
         for _ in 0..30 {
-            world.articulation_mut(h).unwrap().set_joint_efforts(&[10.0, 0.0]);
+            world
+                .articulation_mut(h)
+                .unwrap()
+                .set_joint_efforts(&[10.0, 0.0]);
             world.step();
         }
         let q1 = world.articulation(h).unwrap().get_joint_positions();
@@ -386,8 +404,8 @@ mod tests {
 
         // get_world_pose returns (pos[3], quat_wxyz[4]); quat is unit-norm.
         let (pos, quat) = view.get_world_pose("l1").expect("l1 pose");
-        let qn = (quat[0] * quat[0] + quat[1] * quat[1] + quat[2] * quat[2] + quat[3] * quat[3])
-            .sqrt();
+        let qn =
+            (quat[0] * quat[0] + quat[1] * quat[1] + quat[2] * quat[2] + quat[3] * quat[3]).sqrt();
         assert!((qn - 1.0).abs() < 1e-4, "quat not unit: {quat:?}");
         // At rest the first link hangs down (-z); x≈0.
         assert!(pos[0].abs() < 1e-4);
@@ -418,12 +436,18 @@ mod tests {
         // Drive joint 1 (base yaw) with a steady effort; it must rotate.
         let q0 = world.articulation(h).unwrap().get_joint_positions();
         for _ in 0..60 {
-            world.articulation_mut(h).unwrap().set_joint_efforts(&[5.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
+            world
+                .articulation_mut(h)
+                .unwrap()
+                .set_joint_efforts(&[5.0, 0.0, 0.0, 0.0, 0.0, 0.0]);
             world.step();
         }
         let q1 = world.articulation(h).unwrap().get_joint_positions();
         assert!(q1.iter().all(|v| v.is_finite()));
-        assert!((q1[0] - q0[0]).abs() > 1e-3, "base joint did not move: {q0:?} -> {q1:?}");
+        assert!(
+            (q1[0] - q0[0]).abs() > 1e-3,
+            "base joint did not move: {q0:?} -> {q1:?}"
+        );
 
         // Isaac-shaped accessors on a named link.
         let view = world.articulation(h).unwrap();
@@ -444,18 +468,38 @@ mod tests {
         let mut world = IsaacWorld::new(1.0 / 60.0);
         let h = world.add_articulation(sys).unwrap();
 
-        let (v0, _w0) = world.articulation(h).unwrap().get_world_velocity("cart").expect("cart vel");
+        let (v0, _w0) = world
+            .articulation(h)
+            .unwrap()
+            .get_world_velocity("cart")
+            .expect("cart vel");
         assert!(v0[0].abs() < 1e-6, "cart should start at rest: {v0:?}");
 
         for _ in 0..20 {
-            world.articulation_mut(h).unwrap().set_joint_efforts(&[8.0, 0.0]);
+            world
+                .articulation_mut(h)
+                .unwrap()
+                .set_joint_efforts(&[8.0, 0.0]);
             world.step();
         }
-        let (v1, _w1) = world.articulation(h).unwrap().get_world_velocity("cart").unwrap();
-        assert!(v1[0] > 0.01, "cart linear velocity should grow under +x force: {v1:?}");
+        let (v1, _w1) = world
+            .articulation(h)
+            .unwrap()
+            .get_world_velocity("cart")
+            .unwrap();
+        assert!(
+            v1[0] > 0.01,
+            "cart linear velocity should grow under +x force: {v1:?}"
+        );
         assert!(v1.iter().all(|c| c.is_finite()));
         // Unknown link → None, matching get_world_pose.
-        assert!(world.articulation(h).unwrap().get_world_velocity("nope").is_none());
+        assert!(
+            world
+                .articulation(h)
+                .unwrap()
+                .get_world_velocity("nope")
+                .is_none()
+        );
     }
 
     #[test]
@@ -465,7 +509,10 @@ mod tests {
         let h = world.add_articulation(sys).unwrap();
         // Drive away from zero, then reset must restore the zero pose.
         for _ in 0..20 {
-            world.articulation_mut(h).unwrap().set_joint_efforts(&[5.0, 0.0, 0.0]);
+            world
+                .articulation_mut(h)
+                .unwrap()
+                .set_joint_efforts(&[5.0, 0.0, 0.0]);
             world.step();
         }
         assert!(world.articulation(h).unwrap().get_joint_positions()[0].abs() > 1e-3);
@@ -473,7 +520,10 @@ mod tests {
         let q = world.articulation(h).unwrap().get_joint_positions();
         let qd = world.articulation(h).unwrap().get_joint_velocities();
         assert!(q.iter().all(|v| v.abs() < 1e-6), "reset q not zero: {q:?}");
-        assert!(qd.iter().all(|v| v.abs() < 1e-6), "reset qdot not zero: {qd:?}");
+        assert!(
+            qd.iter().all(|v| v.abs() < 1e-6),
+            "reset qdot not zero: {qd:?}"
+        );
     }
 
     #[test]
@@ -485,23 +535,44 @@ mod tests {
         let h = world.add_articulation(sys).unwrap();
 
         // Seed an off-zero pole angle and a cart velocity.
-        world.articulation_mut(h).unwrap().set_joint_positions(&[0.2, 0.15]);
-        world.articulation_mut(h).unwrap().set_joint_velocities(&[0.5, 0.0]);
+        world
+            .articulation_mut(h)
+            .unwrap()
+            .set_joint_positions(&[0.2, 0.15]);
+        world
+            .articulation_mut(h)
+            .unwrap()
+            .set_joint_velocities(&[0.5, 0.0]);
 
         let q = world.articulation(h).unwrap().get_joint_positions();
         let qd = world.articulation(h).unwrap().get_joint_velocities();
-        assert!((q[0] - 0.2).abs() < 1e-6 && (q[1] - 0.15).abs() < 1e-6, "pose not set: {q:?}");
+        assert!(
+            (q[0] - 0.2).abs() < 1e-6 && (q[1] - 0.15).abs() < 1e-6,
+            "pose not set: {q:?}"
+        );
         assert!((qd[0] - 0.5).abs() < 1e-6, "vel not set: {qd:?}");
 
         // set_joint_positions must NOT clobber the velocity we just set.
-        world.articulation_mut(h).unwrap().set_joint_positions(&[0.3, 0.0]);
+        world
+            .articulation_mut(h)
+            .unwrap()
+            .set_joint_positions(&[0.3, 0.0]);
         let qd2 = world.articulation(h).unwrap().get_joint_velocities();
-        assert!((qd2[0] - 0.5).abs() < 1e-6, "set_joint_positions clobbered velocity: {qd2:?}");
+        assert!(
+            (qd2[0] - 0.5).abs() < 1e-6,
+            "set_joint_positions clobbered velocity: {qd2:?}"
+        );
 
         // A short/empty array leaves the missing DOFs unchanged.
-        world.articulation_mut(h).unwrap().set_joint_positions(&[0.9]);
+        world
+            .articulation_mut(h)
+            .unwrap()
+            .set_joint_positions(&[0.9]);
         let q3 = world.articulation(h).unwrap().get_joint_positions();
-        assert!((q3[0] - 0.9).abs() < 1e-6 && (q3[1] - 0.0).abs() < 1e-6, "partial set wrong: {q3:?}");
+        assert!(
+            (q3[0] - 0.9).abs() < 1e-6 && (q3[1] - 0.0).abs() < 1e-6,
+            "partial set wrong: {q3:?}"
+        );
     }
 
     #[test]
@@ -512,7 +583,10 @@ mod tests {
         let h = world.add_articulation(sys).unwrap();
 
         let target = [0.1, -0.2, 0.3, -0.4, 0.5, -0.6];
-        world.articulation_mut(h).unwrap().set_joint_positions(&target);
+        world
+            .articulation_mut(h)
+            .unwrap()
+            .set_joint_positions(&target);
         let q = world.articulation(h).unwrap().get_joint_positions();
         for (got, want) in q.iter().zip(target.iter()) {
             assert!((got - want).abs() < 1e-6, "arm pose not set: {q:?}");
@@ -532,11 +606,18 @@ mod tests {
         assert!(world.current_time().abs() < 1e-9);
 
         for _ in 0..10 {
-            world.articulation_mut(h).unwrap().set_joint_efforts(&[1.0, 0.0]);
+            world
+                .articulation_mut(h)
+                .unwrap()
+                .set_joint_efforts(&[1.0, 0.0]);
             world.step();
         }
         assert_eq!(world.current_time_step_index(), 10);
-        assert!((world.current_time() - 10.0 * dt).abs() < 1e-6, "time: {}", world.current_time());
+        assert!(
+            (world.current_time() - 10.0 * dt).abs() < 1e-6,
+            "time: {}",
+            world.current_time()
+        );
 
         // reset() rewinds the clock to zero, matching Isaac.
         world.reset();
@@ -565,7 +646,10 @@ mod tests {
             world.step();
         }
         let q = world.articulation(h).unwrap().get_joint_positions();
-        assert!((q[0] - 0.5).abs() < 0.05, "PD did not reach target x: {q:?}");
+        assert!(
+            (q[0] - 0.5).abs() < 0.05,
+            "PD did not reach target x: {q:?}"
+        );
     }
 
     #[test]
@@ -593,7 +677,11 @@ mod tests {
     #[test]
     fn isaac_controller_unknown_handle_is_none() {
         let mut world = IsaacWorld::new(1.0 / 60.0);
-        assert!(world.get_articulation_controller(ArticulationHandle(99)).is_none());
+        assert!(
+            world
+                .get_articulation_controller(ArticulationHandle(99))
+                .is_none()
+        );
     }
 
     #[test]
@@ -606,7 +694,10 @@ mod tests {
         let view = world.articulation(h).unwrap();
 
         let names = view.dof_names();
-        assert_eq!(names, vec!["slider_to_cart".to_string(), "cart_to_pole".to_string()]);
+        assert_eq!(
+            names,
+            vec!["slider_to_cart".to_string(), "cart_to_pole".to_string()]
+        );
         // dof_names length must equal num_dof / the joint-position array length.
         assert_eq!(names.len(), view.num_dof());
         assert_eq!(names.len(), view.get_joint_positions().len());
@@ -625,8 +716,16 @@ mod tests {
         let h = world.add_articulation(sys).unwrap();
         let lim = world.articulation(h).unwrap().get_dof_limits();
         assert_eq!(lim.len(), 2);
-        assert!((lim[0][0] + 2.4).abs() < 1e-3 && (lim[0][1] - 2.4).abs() < 1e-3, "slider: {:?}", lim[0]);
-        assert!((lim[1][0] + 3.14159).abs() < 1e-3 && (lim[1][1] - 3.14159).abs() < 1e-3, "pole: {:?}", lim[1]);
+        assert!(
+            (lim[0][0] + 2.4).abs() < 1e-3 && (lim[0][1] - 2.4).abs() < 1e-3,
+            "slider: {:?}",
+            lim[0]
+        );
+        assert!(
+            (lim[1][0] + 3.14159).abs() < 1e-3 && (lim[1][1] - 3.14159).abs() < 1e-3,
+            "pole: {:?}",
+            lim[1]
+        );
     }
 
     #[test]
@@ -640,7 +739,11 @@ mod tests {
         let names = world.articulation(h).unwrap().dof_names();
         assert_eq!(names, vec!["j1", "j2", "j3", "j4", "j5", "j6"]);
 
-        let j4 = world.articulation(h).unwrap().get_dof_index("j4").expect("j4 exists");
+        let j4 = world
+            .articulation(h)
+            .unwrap()
+            .get_dof_index("j4")
+            .expect("j4 exists");
         assert_eq!(j4, 3);
 
         // Build an effort vector that actuates only the named joint.
@@ -649,11 +752,17 @@ mod tests {
         efforts[j4] = 4.0;
         let q0 = world.articulation(h).unwrap().get_joint_positions();
         for _ in 0..60 {
-            world.articulation_mut(h).unwrap().set_joint_efforts(&efforts);
+            world
+                .articulation_mut(h)
+                .unwrap()
+                .set_joint_efforts(&efforts);
             world.step();
         }
         let q1 = world.articulation(h).unwrap().get_joint_positions();
-        assert!((q1[j4] - q0[j4]).abs() > 1e-3, "named joint j4 did not move: {q0:?} -> {q1:?}");
+        assert!(
+            (q1[j4] - q0[j4]).abs() > 1e-3,
+            "named joint j4 did not move: {q0:?} -> {q1:?}"
+        );
     }
 
     #[test]
@@ -668,8 +777,14 @@ mod tests {
 
         let ctrl = world.get_articulation_controller(h).unwrap();
         let max_efforts = ctrl.get_max_efforts();
-        assert!((max_efforts[0] - 100.0).abs() < 1e-3, "slider effort limit: {max_efforts:?}");
-        assert!(max_efforts[1].is_infinite() || max_efforts[1] > 1e30, "pole = unspecified → no clamp");
+        assert!(
+            (max_efforts[0] - 100.0).abs() < 1e-3,
+            "slider effort limit: {max_efforts:?}"
+        );
+        assert!(
+            max_efforts[1].is_infinite() || max_efforts[1] > 1e30,
+            "pole = unspecified → no clamp"
+        );
     }
 
     #[test]

@@ -23,7 +23,10 @@ pub enum CameraMode {
         pitch: f32,
     },
     /// Side-scroller: camera follows an entity tagged `Player`, orthographic.
-    SideScroll { follow_entity: Option<hecs::Entity>, height: f32 },
+    SideScroll {
+        follow_entity: Option<hecs::Entity>,
+        height: f32,
+    },
     /// 2D orthographic (graph / map). Pan + zoom handled by input.
     Ortho2D { center: Vec3, extent: f32 },
 }
@@ -150,11 +153,7 @@ impl Camera {
     /// Forward unit vector (yaw-relative, pitch-aware).
     pub fn forward(&self) -> Vec3 {
         let cp = self.pitch.cos();
-        Vec3::new(
-            cp * self.yaw.sin(),
-            self.pitch.sin(),
-            -cp * self.yaw.cos(),
-        )
+        Vec3::new(cp * self.yaw.sin(), self.pitch.sin(), -cp * self.yaw.cos())
     }
 
     pub fn configure(&mut self, mode: CameraMode) {
@@ -191,21 +190,14 @@ impl Camera {
 
     fn update_first_person_target(&mut self) {
         let cp = self.pitch.cos();
-        let forward = Vec3::new(
-            cp * self.yaw.sin(),
-            self.pitch.sin(),
-            -cp * self.yaw.cos(),
-        );
+        let forward = Vec3::new(cp * self.yaw.sin(), self.pitch.sin(), -cp * self.yaw.cos());
         self.inner.target = self.inner.position + forward;
     }
 
     fn update_orbit_position(&mut self, distance: f32) {
         let cp = self.pitch.cos();
-        let offset = Vec3::new(
-            cp * self.yaw.sin(),
-            self.pitch.sin(),
-            cp * self.yaw.cos(),
-        ) * distance;
+        let offset =
+            Vec3::new(cp * self.yaw.sin(), self.pitch.sin(), cp * self.yaw.cos()) * distance;
         self.inner.position = self.inner.target + offset;
     }
 

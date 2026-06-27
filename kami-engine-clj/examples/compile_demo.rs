@@ -18,8 +18,7 @@ fn main() {
   (delta-ms))
 "#;
 
-    let wasm = kami_engine_clj::compile_str_with_prelude(src)
-        .expect("compile failed");
+    let wasm = kami_engine_clj::compile_str_with_prelude(src).expect("compile failed");
 
     let out = "kami-web/clj-demo.wasm";
     std::fs::write(out, &wasm).expect("write failed");
@@ -40,12 +39,18 @@ fn main() {
             let (count, c) = leb128_u32(&wasm[i..]);
             let mut j = i + c;
             for _ in 0..count {
-                let (mlen, c) = leb128_u32(&wasm[j..]); j += c;
-                let module = std::str::from_utf8(&wasm[j..j+mlen as usize]).unwrap_or("?"); j += mlen as usize;
-                let (nlen, c) = leb128_u32(&wasm[j..]); j += c;
-                let name   = std::str::from_utf8(&wasm[j..j+nlen as usize]).unwrap_or("?"); j += nlen as usize;
-                let _desc_kind = wasm[j]; j += 1; // 0=func, 1=table, 2=mem, 3=global
-                let (_type_idx, c) = leb128_u32(&wasm[j..]); j += c;
+                let (mlen, c) = leb128_u32(&wasm[j..]);
+                j += c;
+                let module = std::str::from_utf8(&wasm[j..j + mlen as usize]).unwrap_or("?");
+                j += mlen as usize;
+                let (nlen, c) = leb128_u32(&wasm[j..]);
+                j += c;
+                let name = std::str::from_utf8(&wasm[j..j + nlen as usize]).unwrap_or("?");
+                j += nlen as usize;
+                let _desc_kind = wasm[j];
+                j += 1; // 0=func, 1=table, 2=mem, 3=global
+                let (_type_idx, c) = leb128_u32(&wasm[j..]);
+                j += c;
                 println!("  [{module}] :: {name}");
             }
             break;
@@ -57,13 +62,16 @@ fn main() {
 
 fn leb128_u32(buf: &[u8]) -> (u32, usize) {
     let mut result = 0u32;
-    let mut shift  = 0u32;
+    let mut shift = 0u32;
     let mut i = 0;
     loop {
-        let byte = buf[i]; i += 1;
+        let byte = buf[i];
+        i += 1;
         result |= ((byte & 0x7f) as u32) << shift;
         shift += 7;
-        if byte & 0x80 == 0 { break; }
+        if byte & 0x80 == 0 {
+            break;
+        }
     }
     (result, i)
 }

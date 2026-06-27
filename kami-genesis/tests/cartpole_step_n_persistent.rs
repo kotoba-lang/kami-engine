@@ -45,7 +45,9 @@ fn step_n_persistent_matches_step_loop_within_round_off() {
 
     // Path B: single batched dispatch via new `step_n()`.
     let mut states_batched = initial.clone();
-    backend.step_n(&mut states_batched, &actions, &cfg, N_STEPS).unwrap();
+    backend
+        .step_n(&mut states_batched, &actions, &cfg, N_STEPS)
+        .unwrap();
 
     // Compare.
     let mut max_dx = 0.0f32;
@@ -99,7 +101,9 @@ fn step_n_persistent_beats_step_loop_by_5x_or_more() {
     // Path B: single batched dispatch.
     let mut states_batched = make_states();
     let t = Instant::now();
-    backend.step_n(&mut states_batched, &actions, &cfg, N_STEPS).unwrap();
+    backend
+        .step_n(&mut states_batched, &actions, &cfg, N_STEPS)
+        .unwrap();
     let elapsed_batched = t.elapsed();
 
     let speedup = elapsed_loop.as_nanos() as f64 / elapsed_batched.as_nanos() as f64;
@@ -130,7 +134,12 @@ fn make_states() -> Vec<CartpoleState> {
     (0..N_ENVS)
         .map(|i| {
             let theta0 = ((i as f32 / N_ENVS as f32) - 0.5) * 0.1;
-            CartpoleState { x: 0.0, x_dot: 0.0, theta: theta0, theta_dot: 0.0 }
+            CartpoleState {
+                x: 0.0,
+                x_dot: 0.0,
+                theta: theta0,
+                theta_dot: 0.0,
+            }
         })
         .collect()
 }

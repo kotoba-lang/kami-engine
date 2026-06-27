@@ -18,8 +18,8 @@ use glam::{Mat4, Vec3};
 use hecs::World;
 use kami_app::{Camera, RenderPipeline};
 use kami_dec::ScalarField;
-use kami_render::scene_pipelines::{ParticlePipeline, ParticleUniform};
 use kami_render::RenderContext;
+use kami_render::scene_pipelines::{ParticlePipeline, ParticleUniform};
 use std::cell::RefCell;
 use std::rc::Rc;
 use wgpu::util::DeviceExt;
@@ -106,7 +106,7 @@ impl FieldVisAdapter {
                 let dx = (x as f32 + 0.5) - cam[0];
                 let dy = (y as f32 + 0.5) - cam[1];
                 let dz = (z as f32 + 0.5) - cam[2];
-                let d2 = dx*dx + dy*dy + dz*dz;
+                let d2 = dx * dx + dy * dy + dz * dz;
                 let (stride, size_boost) = if d2 < near2 {
                     (1, 1.0)
                 } else if d2 < far2 {
@@ -115,8 +115,11 @@ impl FieldVisAdapter {
                     (4, 2.5)
                 };
                 if stride > 1 {
-                    let parity = ((x & (stride - 1)) + (y & (stride - 1)) + (z & (stride - 1))) & (stride - 1);
-                    if parity != 0 { return; }
+                    let parity = ((x & (stride - 1)) + (y & (stride - 1)) + (z & (stride - 1)))
+                        & (stride - 1);
+                    if parity != 0 {
+                        return;
+                    }
                 }
                 let intensity = (v / max).clamp(0.0, 1.0);
                 instances.push(FieldInstance {

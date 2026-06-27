@@ -78,34 +78,130 @@ pub fn sedan(spec: &SedanSpec) -> Vehicle {
     let chassis_node_mass = spec.mass_chassis / 24.0;
     let cabin_node_mass = spec.mass_cabin / 8.0;
 
-    let f_rl = b.node(Vec3::new(-half_w, h_floor, z_rear), chassis_node_mass, NodeGroup::Body);
-    let f_rr = b.node(Vec3::new( half_w, h_floor, z_rear), chassis_node_mass, NodeGroup::Body);
-    let f_rxl = b.node(Vec3::new(-half_w, h_floor, z_rear_axle), chassis_node_mass, NodeGroup::Body);
-    let f_rxr = b.node(Vec3::new( half_w, h_floor, z_rear_axle), chassis_node_mass, NodeGroup::Body);
-    let f_fxl = b.node(Vec3::new(-half_w, h_floor, z_front_axle), chassis_node_mass, NodeGroup::Body);
-    let f_fxr = b.node(Vec3::new( half_w, h_floor, z_front_axle), chassis_node_mass, NodeGroup::Body);
-    let f_fl = b.node(Vec3::new(-half_w, h_floor, z_front), chassis_node_mass, NodeGroup::Body);
-    let f_fr = b.node(Vec3::new( half_w, h_floor, z_front), chassis_node_mass, NodeGroup::Body);
+    let f_rl = b.node(
+        Vec3::new(-half_w, h_floor, z_rear),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let f_rr = b.node(
+        Vec3::new(half_w, h_floor, z_rear),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let f_rxl = b.node(
+        Vec3::new(-half_w, h_floor, z_rear_axle),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let f_rxr = b.node(
+        Vec3::new(half_w, h_floor, z_rear_axle),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let f_fxl = b.node(
+        Vec3::new(-half_w, h_floor, z_front_axle),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let f_fxr = b.node(
+        Vec3::new(half_w, h_floor, z_front_axle),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let f_fl = b.node(
+        Vec3::new(-half_w, h_floor, z_front),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let f_fr = b.node(
+        Vec3::new(half_w, h_floor, z_front),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
 
     // ── Belt-line (8 nodes) ──
-    let g_rl = b.node(Vec3::new(-half_w, h_belt, z_rear), cabin_node_mass, NodeGroup::Body);
-    let g_rr = b.node(Vec3::new( half_w, h_belt, z_rear), cabin_node_mass, NodeGroup::Body);
-    let g_rxl = b.node(Vec3::new(-half_w, h_belt, z_rear_axle), cabin_node_mass, NodeGroup::Body);
-    let g_rxr = b.node(Vec3::new( half_w, h_belt, z_rear_axle), cabin_node_mass, NodeGroup::Body);
-    let g_fxl = b.node(Vec3::new(-half_w, h_belt, z_front_axle), cabin_node_mass, NodeGroup::Body);
-    let g_fxr = b.node(Vec3::new( half_w, h_belt, z_front_axle), cabin_node_mass, NodeGroup::Body);
-    let g_fl = b.node(Vec3::new(-half_w, h_belt, z_front), cabin_node_mass, NodeGroup::Body);
-    let g_fr = b.node(Vec3::new( half_w, h_belt, z_front), cabin_node_mass, NodeGroup::Body);
+    let g_rl = b.node(
+        Vec3::new(-half_w, h_belt, z_rear),
+        cabin_node_mass,
+        NodeGroup::Body,
+    );
+    let g_rr = b.node(
+        Vec3::new(half_w, h_belt, z_rear),
+        cabin_node_mass,
+        NodeGroup::Body,
+    );
+    let g_rxl = b.node(
+        Vec3::new(-half_w, h_belt, z_rear_axle),
+        cabin_node_mass,
+        NodeGroup::Body,
+    );
+    let g_rxr = b.node(
+        Vec3::new(half_w, h_belt, z_rear_axle),
+        cabin_node_mass,
+        NodeGroup::Body,
+    );
+    let g_fxl = b.node(
+        Vec3::new(-half_w, h_belt, z_front_axle),
+        cabin_node_mass,
+        NodeGroup::Body,
+    );
+    let g_fxr = b.node(
+        Vec3::new(half_w, h_belt, z_front_axle),
+        cabin_node_mass,
+        NodeGroup::Body,
+    );
+    let g_fl = b.node(
+        Vec3::new(-half_w, h_belt, z_front),
+        cabin_node_mass,
+        NodeGroup::Body,
+    );
+    let g_fr = b.node(
+        Vec3::new(half_w, h_belt, z_front),
+        cabin_node_mass,
+        NodeGroup::Body,
+    );
 
     // ── Roof (8 nodes) ──
-    let r_rl = b.node(Vec3::new(-half_w * 0.85, h_roof, z_rear + 0.10), chassis_node_mass, NodeGroup::Body);
-    let r_rr = b.node(Vec3::new( half_w * 0.85, h_roof, z_rear + 0.10), chassis_node_mass, NodeGroup::Body);
-    let r_rxl = b.node(Vec3::new(-half_w * 0.85, h_roof, z_rear_axle + 0.30), chassis_node_mass, NodeGroup::Body);
-    let r_rxr = b.node(Vec3::new( half_w * 0.85, h_roof, z_rear_axle + 0.30), chassis_node_mass, NodeGroup::Body);
-    let r_fxl = b.node(Vec3::new(-half_w * 0.85, h_roof, z_front_axle - 0.30), chassis_node_mass, NodeGroup::Body);
-    let r_fxr = b.node(Vec3::new( half_w * 0.85, h_roof, z_front_axle - 0.30), chassis_node_mass, NodeGroup::Body);
-    let r_fl = b.node(Vec3::new(-half_w * 0.85, h_roof - 0.10, z_front_axle + 0.20), chassis_node_mass, NodeGroup::Body);
-    let r_fr = b.node(Vec3::new( half_w * 0.85, h_roof - 0.10, z_front_axle + 0.20), chassis_node_mass, NodeGroup::Body);
+    let r_rl = b.node(
+        Vec3::new(-half_w * 0.85, h_roof, z_rear + 0.10),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let r_rr = b.node(
+        Vec3::new(half_w * 0.85, h_roof, z_rear + 0.10),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let r_rxl = b.node(
+        Vec3::new(-half_w * 0.85, h_roof, z_rear_axle + 0.30),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let r_rxr = b.node(
+        Vec3::new(half_w * 0.85, h_roof, z_rear_axle + 0.30),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let r_fxl = b.node(
+        Vec3::new(-half_w * 0.85, h_roof, z_front_axle - 0.30),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let r_fxr = b.node(
+        Vec3::new(half_w * 0.85, h_roof, z_front_axle - 0.30),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let r_fl = b.node(
+        Vec3::new(-half_w * 0.85, h_roof - 0.10, z_front_axle + 0.20),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
+    let r_fr = b.node(
+        Vec3::new(half_w * 0.85, h_roof - 0.10, z_front_axle + 0.20),
+        chassis_node_mass,
+        NodeGroup::Body,
+    );
 
     // ── Cargo (engine block + battery + fuel tank, 4 nodes) ──
     let engine_mass = spec.mass_engine / 2.0;
@@ -144,57 +240,155 @@ pub fn sedan(spec: &SedanSpec) -> Vehicle {
     let frame_damping = 4_000.0 * mass_factor.sqrt();
     let cabin_spring = 5_000_000.0 * mass_factor;
     let cabin_damping = 2_000.0 * mass_factor.sqrt();
-    let crush_deform = DeformParams { deform_limit: 0.30, break_limit: 0.85, max_plastic_strain: 0.50 };
-    let panel_deform = DeformParams { deform_limit: 0.30, break_limit: 0.85, max_plastic_strain: 0.50 };
+    let crush_deform = DeformParams {
+        deform_limit: 0.30,
+        break_limit: 0.85,
+        max_plastic_strain: 0.50,
+    };
+    let panel_deform = DeformParams {
+        deform_limit: 0.30,
+        break_limit: 0.85,
+        max_plastic_strain: 0.50,
+    };
 
     // Floor longitudinals.
-    for (a, c) in [(f_rl, f_rxl), (f_rxl, f_fxl), (f_fxl, f_fl),
-                   (f_rr, f_rxr), (f_rxr, f_fxr), (f_fxr, f_fr)] {
-        b.beam_typed(a, c, frame_spring, frame_damping, BeamType::Normal, crush_deform, Some(1));
+    for (a, c) in [
+        (f_rl, f_rxl),
+        (f_rxl, f_fxl),
+        (f_fxl, f_fl),
+        (f_rr, f_rxr),
+        (f_rxr, f_fxr),
+        (f_fxr, f_fr),
+    ] {
+        b.beam_typed(
+            a,
+            c,
+            frame_spring,
+            frame_damping,
+            BeamType::Normal,
+            crush_deform,
+            Some(1),
+        );
     }
     // Floor cross-members.
     for (a, c) in [(f_rl, f_rr), (f_rxl, f_rxr), (f_fxl, f_fxr), (f_fl, f_fr)] {
-        b.beam_typed(a, c, frame_spring, frame_damping, BeamType::Normal, crush_deform, Some(1));
+        b.beam_typed(
+            a,
+            c,
+            frame_spring,
+            frame_damping,
+            BeamType::Normal,
+            crush_deform,
+            Some(1),
+        );
     }
     // Floor diagonals (for torsional stiffness).
     for (a, c) in [(f_rl, f_rxr), (f_rxl, f_fxr), (f_fxl, f_fr)] {
-        b.beam_typed(a, c, frame_spring * 0.6, frame_damping, BeamType::Normal, crush_deform, Some(1));
+        b.beam_typed(
+            a,
+            c,
+            frame_spring * 0.6,
+            frame_damping,
+            BeamType::Normal,
+            crush_deform,
+            Some(1),
+        );
     }
 
     // Cabin / pillar verticals (floor -> belt -> roof).
     for (low, mid, high) in [
-        (f_rl,  g_rl,  r_rl),
-        (f_rr,  g_rr,  r_rr),
+        (f_rl, g_rl, r_rl),
+        (f_rr, g_rr, r_rr),
         (f_rxl, g_rxl, r_rxl),
         (f_rxr, g_rxr, r_rxr),
         (f_fxl, g_fxl, r_fxl),
         (f_fxr, g_fxr, r_fxr),
-        (f_fl,  g_fl,  r_fl),
-        (f_fr,  g_fr,  r_fr),
+        (f_fl, g_fl, r_fl),
+        (f_fr, g_fr, r_fr),
     ] {
-        b.beam_typed(low, mid, cabin_spring, cabin_damping, BeamType::Normal, panel_deform, Some(2));
-        b.beam_typed(mid, high, cabin_spring, cabin_damping, BeamType::Normal, panel_deform, Some(2));
+        b.beam_typed(
+            low,
+            mid,
+            cabin_spring,
+            cabin_damping,
+            BeamType::Normal,
+            panel_deform,
+            Some(2),
+        );
+        b.beam_typed(
+            mid,
+            high,
+            cabin_spring,
+            cabin_damping,
+            BeamType::Normal,
+            panel_deform,
+            Some(2),
+        );
     }
 
     // Belt-line rectangle.
-    for (a, c) in [(g_rl, g_rxl), (g_rxl, g_fxl), (g_fxl, g_fl),
-                   (g_rr, g_rxr), (g_rxr, g_fxr), (g_fxr, g_fr),
-                   (g_rl, g_rr), (g_fl, g_fr)] {
-        b.beam_typed(a, c, cabin_spring, cabin_damping, BeamType::Normal, panel_deform, Some(2));
+    for (a, c) in [
+        (g_rl, g_rxl),
+        (g_rxl, g_fxl),
+        (g_fxl, g_fl),
+        (g_rr, g_rxr),
+        (g_rxr, g_fxr),
+        (g_fxr, g_fr),
+        (g_rl, g_rr),
+        (g_fl, g_fr),
+    ] {
+        b.beam_typed(
+            a,
+            c,
+            cabin_spring,
+            cabin_damping,
+            BeamType::Normal,
+            panel_deform,
+            Some(2),
+        );
     }
 
     // Roof rectangle.
-    for (a, c) in [(r_rl, r_rxl), (r_rxl, r_fxl), (r_fxl, r_fl),
-                   (r_rr, r_rxr), (r_rxr, r_fxr), (r_fxr, r_fr),
-                   (r_rl, r_rr), (r_fl, r_fr)] {
-        b.beam_typed(a, c, cabin_spring * 0.7, cabin_damping, BeamType::Normal, panel_deform, Some(3));
+    for (a, c) in [
+        (r_rl, r_rxl),
+        (r_rxl, r_fxl),
+        (r_fxl, r_fl),
+        (r_rr, r_rxr),
+        (r_rxr, r_fxr),
+        (r_fxr, r_fr),
+        (r_rl, r_rr),
+        (r_fl, r_fr),
+    ] {
+        b.beam_typed(
+            a,
+            c,
+            cabin_spring * 0.7,
+            cabin_damping,
+            BeamType::Normal,
+            panel_deform,
+            Some(3),
+        );
     }
 
     // Engine / cargo bracing.
-    for (a, c) in [(cargo_l, f_fxl), (cargo_l, f_fxr), (cargo_l, f_fl),
-                   (cargo_r, f_fxl), (cargo_r, f_fxr), (cargo_r, f_fr),
-                   (cargo_l, cargo_r)] {
-        b.beam_typed(a, c, frame_spring, frame_damping, BeamType::Normal, crush_deform, Some(4));
+    for (a, c) in [
+        (cargo_l, f_fxl),
+        (cargo_l, f_fxr),
+        (cargo_l, f_fl),
+        (cargo_r, f_fxl),
+        (cargo_r, f_fxr),
+        (cargo_r, f_fr),
+        (cargo_l, cargo_r),
+    ] {
+        b.beam_typed(
+            a,
+            c,
+            frame_spring,
+            frame_damping,
+            BeamType::Normal,
+            crush_deform,
+            Some(4),
+        );
     }
 
     // ── Subframe nodes (one per axle, chassis-centre, hub height) ──
@@ -234,15 +428,36 @@ pub fn sedan(spec: &SedanSpec) -> Vehicle {
     // kill any subframe vibration in <1 cycle.
     let strut_k = frame_spring * 1.5;
     let strut_d = 2.0 * 0.7 * (strut_k * subframe_mass).sqrt();
-    for (sub, n1, n2) in [
-        (sf_front, f_fxl, f_fxr),
-        (sf_rear, f_rxl, f_rxr),
-    ] {
-        b.beam_typed(sub, n1, strut_k, strut_d, BeamType::Normal, strut_deform, Some(5));
-        b.beam_typed(sub, n2, strut_k, strut_d, BeamType::Normal, strut_deform, Some(5));
+    for (sub, n1, n2) in [(sf_front, f_fxl, f_fxr), (sf_rear, f_rxl, f_rxr)] {
+        b.beam_typed(
+            sub,
+            n1,
+            strut_k,
+            strut_d,
+            BeamType::Normal,
+            strut_deform,
+            Some(5),
+        );
+        b.beam_typed(
+            sub,
+            n2,
+            strut_k,
+            strut_d,
+            BeamType::Normal,
+            strut_deform,
+            Some(5),
+        );
     }
     // Cross-brace front to rear subframe (longitudinal stiffness).
-    b.beam_typed(sf_front, sf_rear, frame_spring, strut_d, BeamType::Normal, strut_deform, Some(5));
+    b.beam_typed(
+        sf_front,
+        sf_rear,
+        frame_spring,
+        strut_d,
+        BeamType::Normal,
+        strut_deform,
+        Some(5),
+    );
 
     // ── Wheel hubs + suspension ──
     //
@@ -289,29 +504,43 @@ pub fn sedan(spec: &SedanSpec) -> Vehicle {
     //   3. subframe   → h_in : long horizontal arm (lateral + longitudinal)
     //   4. subframe   → h_out: long horizontal arm (axle yaw + camber)
     //   5. mount_high → h_out: short upper strut (caster + extra stability)
-    let make_wheel = |b: &mut VehicleBuilder,
-                      x: f32,
-                      z: f32,
-                      subframe: u32,
-                      mount_high: u32| {
+    let make_wheel = |b: &mut VehicleBuilder, x: f32, z: f32, subframe: u32, mount_high: u32| {
         let hub_y = spec.wheel_radius;
         let hub_x_in = x - 0.10;
         let hub_x_out = x + 0.10;
 
-        let h_in = b.node(Vec3::new(hub_x_in, hub_y, z), hub_mass * 0.5, NodeGroup::WheelHub);
-        let h_out = b.node(Vec3::new(hub_x_out, hub_y, z), hub_mass * 0.5, NodeGroup::WheelHub);
+        let h_in = b.node(
+            Vec3::new(hub_x_in, hub_y, z),
+            hub_mass * 0.5,
+            NodeGroup::WheelHub,
+        );
+        let h_out = b.node(
+            Vec3::new(hub_x_out, hub_y, z),
+            hub_mass * 0.5,
+            NodeGroup::WheelHub,
+        );
 
         // 1+2. Twin primary coils — one to each axle endpoint. Splits
         //      the vertical load symmetrically so neither side of the
         //      hub gets over- or under-loaded relative to the tire's
         //      50/50 fz distribution.
         b.beam_typed(
-            mount_high, h_in, spring_stiff * 0.5, spring_damping * 0.5,
-            BeamType::Normal, elastic, None,
+            mount_high,
+            h_in,
+            spring_stiff * 0.5,
+            spring_damping * 0.5,
+            BeamType::Normal,
+            elastic,
+            None,
         );
         b.beam_typed(
-            mount_high, h_out, spring_stiff * 0.5, spring_damping * 0.5,
-            BeamType::Normal, elastic, None,
+            mount_high,
+            h_out,
+            spring_stiff * 0.5,
+            spring_damping * 0.5,
+            BeamType::Normal,
+            elastic,
+            None,
         );
         // 3+4. Long horizontal arms subframe → h_in and h_out. The
         //      subframe is at chassis centre (x=0), hub at x=±0.875,
@@ -319,15 +548,31 @@ pub fn sedan(spec: &SedanSpec) -> Vehicle {
         //      ~5 cm of relative vertical motion → strain < 0.5 %
         //      under static load.
         b.beam_typed(
-            subframe, h_in, arm_spring * 4.0, arm_damping,
-            BeamType::Normal, arm_deform, None,
+            subframe,
+            h_in,
+            arm_spring * 4.0,
+            arm_damping,
+            BeamType::Normal,
+            arm_deform,
+            None,
         );
         b.beam_typed(
-            subframe, h_out, arm_spring * 4.0, arm_damping,
-            BeamType::Normal, arm_deform, None,
+            subframe,
+            h_out,
+            arm_spring * 4.0,
+            arm_damping,
+            BeamType::Normal,
+            arm_deform,
+            None,
         );
 
-        let wheel_id = b.wheel(h_in, h_out, spec.wheel_radius, spec.wheel_width, PacejkaParams::road_dry());
+        let wheel_id = b.wheel(
+            h_in,
+            h_out,
+            spec.wheel_radius,
+            spec.wheel_width,
+            PacejkaParams::road_dry(),
+        );
 
         // Tire ring (12 nodes, ~0.30 kg each).
         b.add_tire_ring(
@@ -346,23 +591,26 @@ pub fn sedan(spec: &SedanSpec) -> Vehicle {
 
     // FL, FR, RL, RR — order matters for the powertrain split [(FL,FR),(RL,RR)].
     let _wfl = make_wheel(&mut b, -half_w, z_front_axle, sf_front, g_fxl);
-    let _wfr = make_wheel(&mut b,  half_w, z_front_axle, sf_front, g_fxr);
-    let _wrl = make_wheel(&mut b, -half_w, z_rear_axle,  sf_rear,  g_rxl);
-    let _wrr = make_wheel(&mut b,  half_w, z_rear_axle,  sf_rear,  g_rxr);
+    let _wfr = make_wheel(&mut b, half_w, z_front_axle, sf_front, g_fxr);
+    let _wrl = make_wheel(&mut b, -half_w, z_rear_axle, sf_rear, g_rxl);
+    let _wrr = make_wheel(&mut b, half_w, z_rear_axle, sf_rear, g_rxr);
 
     // ── Body panel triangles (filled body shell — render layer reads these) ──
     use crate::triangle::TriangleGroup;
 
     // Floor (underbody, 6 triangles).
     for tri in [
-        (f_rl, f_rxl, f_rr), (f_rxl, f_rxr, f_rr),
-        (f_rxl, f_fxl, f_rxr), (f_fxl, f_fxr, f_rxr),
-        (f_fxl, f_fl, f_fxr), (f_fl, f_fr, f_fxr),
+        (f_rl, f_rxl, f_rr),
+        (f_rxl, f_rxr, f_rr),
+        (f_rxl, f_fxl, f_rxr),
+        (f_fxl, f_fxr, f_rxr),
+        (f_fxl, f_fl, f_fxr),
+        (f_fl, f_fr, f_fxr),
     ] {
         b.triangle(tri.0, tri.1, tri.2, TriangleGroup::Underbody);
     }
     // Belt-line (sills, 6 triangles per side).
-    let side_pairs_left  = [(f_rl, g_rl), (f_rxl, g_rxl), (f_fxl, g_fxl), (f_fl, g_fl)];
+    let side_pairs_left = [(f_rl, g_rl), (f_rxl, g_rxl), (f_fxl, g_fxl), (f_fl, g_fl)];
     let side_pairs_right = [(f_rr, g_rr), (f_rxr, g_rxr), (f_fxr, g_fxr), (f_fr, g_fr)];
     for w in side_pairs_left.windows(2) {
         let ((a_lo, a_hi), (b_lo, b_hi)) = (w[0], w[1]);
@@ -375,7 +623,7 @@ pub fn sedan(spec: &SedanSpec) -> Vehicle {
         b.triangle(a_lo, b_lo, b_hi, TriangleGroup::Body);
     }
     // Greenhouse (window glass — belt → roof, both sides).
-    let upper_left  = [(g_rl, r_rl), (g_rxl, r_rxl), (g_fxl, r_fxl), (g_fl, r_fl)];
+    let upper_left = [(g_rl, r_rl), (g_rxl, r_rxl), (g_fxl, r_fxl), (g_fl, r_fl)];
     let upper_right = [(g_rr, r_rr), (g_rxr, r_rxr), (g_fxr, r_fxr), (g_fr, r_fr)];
     for w in upper_left.windows(2) {
         let ((a_lo, a_hi), (b_lo, b_hi)) = (w[0], w[1]);
@@ -389,46 +637,37 @@ pub fn sedan(spec: &SedanSpec) -> Vehicle {
     }
     // Roof.
     for tri in [
-        (r_rl, r_rxl, r_rr), (r_rxl, r_rxr, r_rr),
-        (r_rxl, r_fxl, r_rxr), (r_fxl, r_fxr, r_rxr),
-        (r_fxl, r_fl, r_fxr), (r_fl, r_fr, r_fxr),
+        (r_rl, r_rxl, r_rr),
+        (r_rxl, r_rxr, r_rr),
+        (r_rxl, r_fxl, r_rxr),
+        (r_fxl, r_fxr, r_rxr),
+        (r_fxl, r_fl, r_fxr),
+        (r_fl, r_fr, r_fxr),
     ] {
         b.triangle(tri.0, tri.1, tri.2, TriangleGroup::Body);
     }
     // Hood (flat top: belt-front-axle → belt-front).
-    for tri in [
-        (g_fxl, g_fxr, g_fr), (g_fxl, g_fr, g_fl),
-    ] {
+    for tri in [(g_fxl, g_fxr, g_fr), (g_fxl, g_fr, g_fl)] {
         b.triangle(tri.0, tri.1, tri.2, TriangleGroup::Body);
     }
     // Trunk (flat top: belt-rear-axle → belt-rear).
-    for tri in [
-        (g_rxl, g_rxr, g_rr), (g_rxl, g_rr, g_rl),
-    ] {
+    for tri in [(g_rxl, g_rxr, g_rr), (g_rxl, g_rr, g_rl)] {
         b.triangle(tri.0, tri.1, tri.2, TriangleGroup::Body);
     }
     // Front fascia (vertical: floor-front to belt-front, full width).
-    for tri in [
-        (f_fl, f_fr, g_fr), (f_fl, g_fr, g_fl),
-    ] {
+    for tri in [(f_fl, f_fr, g_fr), (f_fl, g_fr, g_fl)] {
         b.triangle(tri.0, tri.1, tri.2, TriangleGroup::Body);
     }
     // Rear fascia.
-    for tri in [
-        (f_rl, f_rr, g_rr), (f_rl, g_rr, g_rl),
-    ] {
+    for tri in [(f_rl, f_rr, g_rr), (f_rl, g_rr, g_rl)] {
         b.triangle(tri.0, tri.1, tri.2, TriangleGroup::Body);
     }
     // Windshield (slant: belt-front-axle ↔ roof-front, proper quad split).
-    for tri in [
-        (g_fxl, g_fxr, r_fr), (g_fxl, r_fr, r_fl),
-    ] {
+    for tri in [(g_fxl, g_fxr, r_fr), (g_fxl, r_fr, r_fl)] {
         b.triangle(tri.0, tri.1, tri.2, TriangleGroup::Window);
     }
     // Rear window.
-    for tri in [
-        (g_rxl, g_rxr, r_rr), (g_rxl, r_rr, r_rl),
-    ] {
+    for tri in [(g_rxl, g_rxr, r_rr), (g_rxl, r_rr, r_rl)] {
         b.triangle(tri.0, tri.1, tri.2, TriangleGroup::Window);
     }
 

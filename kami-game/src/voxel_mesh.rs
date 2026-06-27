@@ -167,7 +167,14 @@ pub struct ChunkNeighbors {
 
 impl Default for ChunkNeighbors {
     fn default() -> Self {
-        Self { pos_x: None, neg_x: None, pos_y: None, neg_y: None, pos_z: None, neg_z: None }
+        Self {
+            pos_x: None,
+            neg_x: None,
+            pos_y: None,
+            neg_y: None,
+            pos_z: None,
+            neg_z: None,
+        }
     }
 }
 
@@ -179,7 +186,11 @@ pub fn greedy_mesh(chunk: &VoxelChunk, palette: &[[f32; 4]]) -> VoxelMesh {
 
 /// Greedy meshing with neighbor-aware boundary culling.
 /// Faces at chunk boundaries are only generated if the neighbor block is Air/transparent.
-pub fn greedy_mesh_with_neighbors(chunk: &VoxelChunk, palette: &[[f32; 4]], neighbors: &ChunkNeighbors) -> VoxelMesh {
+pub fn greedy_mesh_with_neighbors(
+    chunk: &VoxelChunk,
+    palette: &[[f32; 4]],
+    neighbors: &ChunkNeighbors,
+) -> VoxelMesh {
     let mut vertices = Vec::new();
     let mut indices = Vec::new();
     let s = CHUNK_SIZE;
@@ -435,11 +446,7 @@ fn downsample_majority(chunk: &VoxelChunk, factor: usize) -> (Vec<u8>, usize) {
                 for dy in 0..factor {
                     for dz in 0..factor {
                         for dx in 0..factor {
-                            let b = chunk.get(
-                                gx * factor + dx,
-                                gy * factor + dy,
-                                gz * factor + dz,
-                            );
+                            let b = chunk.get(gx * factor + dx, gy * factor + dy, gz * factor + dz);
                             if b.is_solid() {
                                 counts[b as usize] += 1;
                             }
@@ -465,12 +472,7 @@ fn downsample_majority(chunk: &VoxelChunk, factor: usize) -> (Vec<u8>, usize) {
 
 /// Greedy mesh a reduced grid (size < CHUNK_SIZE) packed into a flat array,
 /// then scale all vertex positions by `scale`.
-fn greedy_mesh_reduced(
-    data: &[u8],
-    size: usize,
-    palette: &[[f32; 4]],
-    scale: f32,
-) -> VoxelMesh {
+fn greedy_mesh_reduced(data: &[u8], size: usize, palette: &[[f32; 4]], scale: f32) -> VoxelMesh {
     let mut vertices = Vec::new();
     let mut indices = Vec::new();
 
@@ -554,8 +556,11 @@ fn greedy_mesh_reduced(
                         };
 
                         let mut origin = [0.0f32; 3];
-                        origin[axis] =
-                            if positive { (d as f32 + 1.0) * scale } else { d as f32 * scale };
+                        origin[axis] = if positive {
+                            (d as f32 + 1.0) * scale
+                        } else {
+                            d as f32 * scale
+                        };
                         origin[u_axis] = u as f32 * scale;
                         origin[v_axis] = v as f32 * scale;
 
@@ -844,7 +849,10 @@ mod tests {
         let mut nb = ChunkNeighbors::default();
         nb.pos_x = Some([BlockType::Dirt; CHUNK_SIZE * CHUNK_SIZE]);
         let mesh_with_nb = greedy_mesh_with_neighbors(&chunk_a, &palette, &nb);
-        assert_eq!(mesh_with_nb.vertex_count, 20, "5 faces — +X face culled by solid neighbor");
+        assert_eq!(
+            mesh_with_nb.vertex_count, 20,
+            "5 faces — +X face culled by solid neighbor"
+        );
     }
 
     #[test]
@@ -854,9 +862,12 @@ mod tests {
         let palette = default_palette();
         let solid = [BlockType::Stone; CHUNK_SIZE * CHUNK_SIZE];
         let nb = ChunkNeighbors {
-            pos_x: Some(solid), neg_x: Some(solid),
-            pos_y: Some(solid), neg_y: Some(solid),
-            pos_z: Some(solid), neg_z: Some(solid),
+            pos_x: Some(solid),
+            neg_x: Some(solid),
+            pos_y: Some(solid),
+            neg_y: Some(solid),
+            pos_z: Some(solid),
+            neg_z: Some(solid),
         };
         let mesh = greedy_mesh_with_neighbors(&chunk, &palette, &nb);
         assert_eq!(mesh.vertex_count, 0, "fully enclosed = 0 faces");
@@ -877,7 +888,10 @@ mod tests {
         nb.pos_z = Some(solid);
         nb.neg_z = Some(solid);
         let mesh = greedy_mesh_with_neighbors(&chunk, &palette, &nb);
-        assert_eq!(mesh.vertex_count, 4, "only +X face exposed (1 quad = 4 verts)");
+        assert_eq!(
+            mesh.vertex_count, 4,
+            "only +X face exposed (1 quad = 4 verts)"
+        );
     }
 
     #[test]
@@ -904,7 +918,10 @@ mod tests {
         let norm_y = mesh.vertices[4];
         let norm_z = mesh.vertices[5];
         let norm_mag = (norm_x * norm_x + norm_y * norm_y + norm_z * norm_z).sqrt();
-        assert!((norm_mag - 1.0).abs() < 1e-5, "normal should remain unit length");
+        assert!(
+            (norm_mag - 1.0).abs() < 1e-5,
+            "normal should remain unit length"
+        );
     }
 
     #[test]
@@ -954,8 +971,8 @@ mod tests {
         let mut mesh_b = greedy_mesh_with_neighbors(&chunk_b, &palette, &nb_b);
 
         // Apply world-space offsets (integer * CHUNK_SIZE)
-        mesh_a.offset_positions([0.0, 0.0, 0.0]);   // chunk [0,0,0]
-        mesh_b.offset_positions([16.0, 0.0, 0.0]);   // chunk [1,0,0]
+        mesh_a.offset_positions([0.0, 0.0, 0.0]); // chunk [0,0,0]
+        mesh_b.offset_positions([16.0, 0.0, 0.0]); // chunk [1,0,0]
 
         // Collect all X coordinates from each mesh
         let xs_a: Vec<f32> = mesh_a.vertices.chunks(12).map(|v| v[0]).collect();
@@ -969,27 +986,44 @@ mod tests {
         assert_eq!(max_a, 16.0, "chunk A +X boundary should be at x=16.0");
         assert_eq!(min_b, 16.0, "chunk B -X boundary should be at x=16.0");
         // Exact bit equality — no floating point gap
-        assert_eq!(max_a.to_bits(), min_b.to_bits(),
-            "boundary vertices must be bit-identical: A={} B={}", max_a, min_b);
+        assert_eq!(
+            max_a.to_bits(),
+            min_b.to_bits(),
+            "boundary vertices must be bit-identical: A={} B={}",
+            max_a,
+            min_b
+        );
     }
 
     /// Extract per-vertex color (RGBA) from vertex at given index.
     fn vertex_color(mesh: &VoxelMesh, vertex_idx: usize) -> [f32; 4] {
         let base = vertex_idx * 12;
-        [mesh.vertices[base + 8], mesh.vertices[base + 9],
-         mesh.vertices[base + 10], mesh.vertices[base + 11]]
+        [
+            mesh.vertices[base + 8],
+            mesh.vertices[base + 9],
+            mesh.vertices[base + 10],
+            mesh.vertices[base + 11],
+        ]
     }
 
     /// Extract per-vertex normal from vertex at given index.
     fn vertex_normal(mesh: &VoxelMesh, vertex_idx: usize) -> [f32; 3] {
         let base = vertex_idx * 12;
-        [mesh.vertices[base + 3], mesh.vertices[base + 4], mesh.vertices[base + 5]]
+        [
+            mesh.vertices[base + 3],
+            mesh.vertices[base + 4],
+            mesh.vertices[base + 5],
+        ]
     }
 
     /// Extract per-vertex position from vertex at given index.
     fn vertex_pos(mesh: &VoxelMesh, vertex_idx: usize) -> [f32; 3] {
         let base = vertex_idx * 12;
-        [mesh.vertices[base], mesh.vertices[base + 1], mesh.vertices[base + 2]]
+        [
+            mesh.vertices[base],
+            mesh.vertices[base + 1],
+            mesh.vertices[base + 2],
+        ]
     }
 
     /// All 15 solid block types (Air excluded) produce a valid single-block
@@ -998,11 +1032,21 @@ mod tests {
     fn all_block_types_single_block_geometry() {
         let palette = default_palette();
         let solid_types = [
-            BlockType::Dirt, BlockType::Grass, BlockType::Stone,
-            BlockType::Water, BlockType::Sand, BlockType::Wood,
-            BlockType::Leaf, BlockType::Ore, BlockType::Brick,
-            BlockType::Glass, BlockType::Metal, BlockType::Snow,
-            BlockType::Lava, BlockType::Ice, BlockType::Gravel,
+            BlockType::Dirt,
+            BlockType::Grass,
+            BlockType::Stone,
+            BlockType::Water,
+            BlockType::Sand,
+            BlockType::Wood,
+            BlockType::Leaf,
+            BlockType::Ore,
+            BlockType::Brick,
+            BlockType::Glass,
+            BlockType::Metal,
+            BlockType::Snow,
+            BlockType::Lava,
+            BlockType::Ice,
+            BlockType::Gravel,
         ];
 
         for block in &solid_types {
@@ -1011,31 +1055,49 @@ mod tests {
             let mesh = naive_mesh(&chunk, &palette);
 
             // Single block: 6 faces × 4 verts = 24, 6 faces × 6 idx = 36
-            assert_eq!(mesh.vertex_count, 24,
-                "block {:?}: expected 24 verts, got {}", block, mesh.vertex_count);
-            assert_eq!(mesh.index_count, 36,
-                "block {:?}: expected 36 indices, got {}", block, mesh.index_count);
+            assert_eq!(
+                mesh.vertex_count, 24,
+                "block {:?}: expected 24 verts, got {}",
+                block, mesh.vertex_count
+            );
+            assert_eq!(
+                mesh.index_count, 36,
+                "block {:?}: expected 36 indices, got {}",
+                block, mesh.index_count
+            );
 
             // Verify color matches palette
             let expected_color = palette[*block as usize];
             let actual_color = vertex_color(&mesh, 0);
-            assert_eq!(actual_color, expected_color,
+            assert_eq!(
+                actual_color, expected_color,
                 "block {:?}: color mismatch — expected {:?}, got {:?}",
-                block, expected_color, actual_color);
+                block, expected_color, actual_color
+            );
 
             // All vertices should have same color (single block type)
             for v in 0..24 {
-                assert_eq!(vertex_color(&mesh, v), expected_color,
-                    "block {:?}: vertex {} has wrong color", block, v);
+                assert_eq!(
+                    vertex_color(&mesh, v),
+                    expected_color,
+                    "block {:?}: vertex {} has wrong color",
+                    block,
+                    v
+                );
             }
 
             // All normals should be unit length
             for v in 0..24 {
                 let n = vertex_normal(&mesh, v);
-                let len = (n[0]*n[0] + n[1]*n[1] + n[2]*n[2]).sqrt();
-                assert!((len - 1.0).abs() < 1e-5,
+                let len = (n[0] * n[0] + n[1] * n[1] + n[2] * n[2]).sqrt();
+                assert!(
+                    (len - 1.0).abs() < 1e-5,
                     "block {:?}: vertex {} normal not unit: {:?} (len={})",
-                    block, v, n, len);
+                    block,
+                    v,
+                    n,
+                    len
+                );
             }
         }
     }
@@ -1061,7 +1123,12 @@ mod tests {
             normals.insert(key);
         }
 
-        assert_eq!(normals.len(), 6, "single block should have 6 unique face normals, got {:?}", normals);
+        assert_eq!(
+            normals.len(),
+            6,
+            "single block should have 6 unique face normals, got {:?}",
+            normals
+        );
         // Verify specific directions
         assert!(normals.contains(&(10, 0, 0)), "missing +X normal");
         assert!(normals.contains(&(-10, 0, 0)), "missing -X normal");
@@ -1081,12 +1148,24 @@ mod tests {
 
         for v in 0..mesh.vertex_count as usize {
             let p = vertex_pos(&mesh, v);
-            assert!(p[0] >= 3.0 && p[0] <= 4.0,
-                "vertex {} x={} not in [3,4]", v, p[0]);
-            assert!(p[1] >= 4.0 && p[1] <= 5.0,
-                "vertex {} y={} not in [4,5]", v, p[1]);
-            assert!(p[2] >= 5.0 && p[2] <= 6.0,
-                "vertex {} z={} not in [5,6]", v, p[2]);
+            assert!(
+                p[0] >= 3.0 && p[0] <= 4.0,
+                "vertex {} x={} not in [3,4]",
+                v,
+                p[0]
+            );
+            assert!(
+                p[1] >= 4.0 && p[1] <= 5.0,
+                "vertex {} y={} not in [4,5]",
+                v,
+                p[1]
+            );
+            assert!(
+                p[2] >= 5.0 && p[2] <= 6.0,
+                "vertex {} z={} not in [5,6]",
+                v,
+                p[2]
+            );
         }
     }
 
@@ -1105,8 +1184,11 @@ mod tests {
         // Stone keeps +X face (Water is transparent → visible through Water)
         // Water loses -X face (Stone is opaque → can't see Water's face behind Stone)
         // Stone: 6 faces = 24 verts, Water: 5 faces = 20 verts → 44 total
-        assert_eq!(mesh.vertex_count, 44,
-            "stone(6)+water(5): got {} verts", mesh.vertex_count);
+        assert_eq!(
+            mesh.vertex_count, 44,
+            "stone(6)+water(5): got {} verts",
+            mesh.vertex_count
+        );
     }
 
     /// Two adjacent transparent blocks both keep their shared faces.
@@ -1119,8 +1201,11 @@ mod tests {
         let mesh = naive_mesh(&chunk, &palette);
 
         // Both transparent: each keeps all 6 faces (neither culls the other)
-        assert_eq!(mesh.vertex_count, 48,
-            "water(6)+glass(6): got {} verts", mesh.vertex_count);
+        assert_eq!(
+            mesh.vertex_count, 48,
+            "water(6)+glass(6): got {} verts",
+            mesh.vertex_count
+        );
     }
 
     /// Greedy mesh preserves color per block type — mixed blocks don't merge.
@@ -1145,8 +1230,12 @@ mod tests {
             ));
         }
 
-        assert_eq!(colors.len(), 2,
-            "two different block types should produce 2 distinct colors, got {}", colors.len());
+        assert_eq!(
+            colors.len(),
+            2,
+            "two different block types should produce 2 distinct colors, got {}",
+            colors.len()
+        );
     }
 
     /// Air blocks produce zero geometry.
@@ -1174,32 +1263,47 @@ mod tests {
 
         // Chunk A at [99,0,0], expose +X
         let mut nb_a = ChunkNeighbors {
-            pos_x: Some(air), neg_x: Some(solid),
-            pos_y: Some(solid), neg_y: Some(solid),
-            pos_z: Some(solid), neg_z: Some(solid),
+            pos_x: Some(air),
+            neg_x: Some(solid),
+            pos_y: Some(solid),
+            neg_y: Some(solid),
+            pos_z: Some(solid),
+            neg_z: Some(solid),
         };
         // Chunk B at [100,0,0], expose -X
         let nb_b = ChunkNeighbors {
-            neg_x: Some(air), pos_x: Some(solid),
-            pos_y: Some(solid), neg_y: Some(solid),
-            pos_z: Some(solid), neg_z: Some(solid),
+            neg_x: Some(air),
+            pos_x: Some(solid),
+            pos_y: Some(solid),
+            neg_y: Some(solid),
+            pos_z: Some(solid),
+            neg_z: Some(solid),
         };
 
         let mut mesh_a = greedy_mesh_with_neighbors(&chunk, &palette, &nb_a);
         let mut mesh_b = greedy_mesh_with_neighbors(&chunk, &palette, &nb_b);
 
-        mesh_a.offset_positions([99.0 * 16.0, 0.0, 0.0]);  // 1584.0
-        mesh_b.offset_positions([100.0 * 16.0, 0.0, 0.0]);  // 1600.0
+        mesh_a.offset_positions([99.0 * 16.0, 0.0, 0.0]); // 1584.0
+        mesh_b.offset_positions([100.0 * 16.0, 0.0, 0.0]); // 1600.0
 
-        let max_a: f32 = mesh_a.vertices.chunks(12).map(|v| v[0])
+        let max_a: f32 = mesh_a
+            .vertices
+            .chunks(12)
+            .map(|v| v[0])
             .fold(f32::NEG_INFINITY, f32::max);
-        let min_b: f32 = mesh_b.vertices.chunks(12).map(|v| v[0])
+        let min_b: f32 = mesh_b
+            .vertices
+            .chunks(12)
+            .map(|v| v[0])
             .fold(f32::INFINITY, f32::min);
 
         // 1584 + 16 = 1600, 1600 + 0 = 1600 — both exact in f32
         assert_eq!(max_a, 1600.0);
         assert_eq!(min_b, 1600.0);
-        assert_eq!(max_a.to_bits(), min_b.to_bits(),
-            "far boundary must be bit-identical");
+        assert_eq!(
+            max_a.to_bits(),
+            min_b.to_bits(),
+            "far boundary must be bit-identical"
+        );
     }
 }

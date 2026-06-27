@@ -10,9 +10,9 @@
 
 #![cfg(feature = "wgpu-backend")]
 
-use kami_rt::bvh::{Bvh, Tri};
-use kami_render::raytrace::{RayTracePipeline, RtGlobals, HIT_STRIDE};
 use glam::Vec3;
+use kami_render::raytrace::{HIT_STRIDE, RayTracePipeline, RtGlobals};
+use kami_rt::bvh::{Bvh, Tri};
 
 fn headless_device() -> Option<(wgpu::Device, wgpu::Queue)> {
     let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
@@ -91,5 +91,9 @@ fn rt_compute_hits_a_triangle_on_real_gpu() {
 
     // A far-corner pixel's ray tilts away and must miss (t < 0 sentinel).
     let corner = 0usize * 4;
-    assert!(hits[corner] < 0.0, "corner pixel should miss (t={})", hits[corner]);
+    assert!(
+        hits[corner] < 0.0,
+        "corner pixel should miss (t={})",
+        hits[corner]
+    );
 }

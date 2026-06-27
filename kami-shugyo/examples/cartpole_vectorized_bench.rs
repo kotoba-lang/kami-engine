@@ -5,12 +5,8 @@
 
 use kami_shugyo::{VectorizedCartpoleEnv, load_scene_yaml};
 
-const URDF: &str = include_str!(
-    "../../fixtures/cartpole/cartpole.urdf"
-);
-const SCENE: &str = include_str!(
-    "../../fixtures/cartpole/scene.yaml"
-);
+const URDF: &str = include_str!("../../fixtures/cartpole/cartpole.urdf");
+const SCENE: &str = include_str!("../../fixtures/cartpole/scene.yaml");
 
 fn bench(num_envs: usize, steps: usize) -> (f64, f64) {
     let cfg = load_scene_yaml(SCENE).expect("scene.yaml");
@@ -34,7 +30,13 @@ fn main() {
     println!("=============================================");
     println!("Backend: kami_genesis::step_vectorized (CPU; WGSL fallback to wgpu in iter 1)");
     println!();
-    for &(n, steps) in &[(32usize, 1000), (256, 500), (1024, 200), (4096, 100), (16_384, 50)] {
+    for &(n, steps) in &[
+        (32usize, 1000),
+        (256, 500),
+        (1024, 200),
+        (4096, 100),
+        (16_384, 50),
+    ] {
         let (elapsed, eps) = bench(n, steps);
         println!(
             "  N={:6}  steps={:5}  elapsed={:.3}s  throughput={:>12.0} env-steps/s",

@@ -303,9 +303,15 @@ pub struct ShadowDef {
     pub bias: f32,
 }
 
-fn default_cascade_count() -> u32 { 2 }
-fn default_shadow_softness() -> f32 { 2.0 }
-fn default_shadow_bias() -> f32 { 0.005 }
+fn default_cascade_count() -> u32 {
+    2
+}
+fn default_shadow_softness() -> f32 {
+    2.0
+}
+fn default_shadow_bias() -> f32 {
+    0.005
+}
 
 /// Material override for a sub-mesh in a GLB/VRM model.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -348,9 +354,15 @@ pub struct SdfBodyPartDef {
     pub blend_radius: f32,
 }
 
-fn default_quat() -> [f32; 4] { [0.0, 0.0, 0.0, 1.0] }
-fn default_scale() -> [f32; 3] { [1.0, 1.0, 1.0] }
-fn default_blend() -> f32 { 0.1 }
+fn default_quat() -> [f32; 4] {
+    [0.0, 0.0, 0.0, 1.0]
+}
+fn default_scale() -> [f32; 3] {
+    [1.0, 1.0, 1.0]
+}
+fn default_blend() -> f32 {
+    0.1
+}
 
 fn default_parallax() -> f32 {
     1.0

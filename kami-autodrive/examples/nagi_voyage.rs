@@ -21,7 +21,9 @@
 //! ```
 
 use glam::Vec2;
-use kami_autodrive::{Autopilot, AutopilotConfig, DriveState, Plant, Pose2, ShipHydro, VehicleClass};
+use kami_autodrive::{
+    Autopilot, AutopilotConfig, DriveState, Plant, Pose2, ShipHydro, VehicleClass,
+};
 
 /// Reduced-order zero-emission powertrain (G13/N5: no fossil engine).
 struct Powertrain {
@@ -119,9 +121,11 @@ impl Powertrain {
 
         // Solar/wind surplus (when demand is low) trickle-charges the battery.
         let surplus = (self.solar_kw - solar).max(0.0);
-        let charge = surplus.min((self.batt_capacity_kwh - self.batt_soc_kwh) / h).max(0.0);
-        self.batt_soc_kwh = (self.batt_soc_kwh - batt * h + charge * h)
-            .clamp(0.0, self.batt_capacity_kwh);
+        let charge = surplus
+            .min((self.batt_capacity_kwh - self.batt_soc_kwh) / h)
+            .max(0.0);
+        self.batt_soc_kwh =
+            (self.batt_soc_kwh - batt * h + charge * h).clamp(0.0, self.batt_capacity_kwh);
 
         // Book energy (kWh). Wind energy = its propulsive contribution.
         let p_wind_kw = thrust_wind * surge.max(0.0) / 1000.0;
@@ -183,7 +187,10 @@ fn main() {
             leg += 1;
             if leg >= waypoints.len() {
                 arrived = true;
-                println!("ARRIVED final at step {step}: ({:.0}, {:.0})", pose.x, pose.y);
+                println!(
+                    "ARRIVED final at step {step}: ({:.0}, {:.0})",
+                    pose.x, pose.y
+                );
                 break;
             }
             ap.set_goal(waypoints[leg]);
@@ -213,17 +220,38 @@ fn main() {
 
     let tot = pt.total().max(1e-6);
     println!("\n# Energy split over the voyage (zero-emission, G13):");
-    println!("  wind-assist : {:6.1}%  ({:.2} kWh)", pt.e_wind / tot * 100.0, pt.e_wind);
-    println!("  solar       : {:6.1}%  ({:.2} kWh)", pt.e_solar / tot * 100.0, pt.e_solar);
-    println!("  hydrogen FC : {:6.1}%  ({:.2} kWh)", pt.e_h2 / tot * 100.0, pt.e_h2);
+    println!(
+        "  wind-assist : {:6.1}%  ({:.2} kWh)",
+        pt.e_wind / tot * 100.0,
+        pt.e_wind
+    );
+    println!(
+        "  solar       : {:6.1}%  ({:.2} kWh)",
+        pt.e_solar / tot * 100.0,
+        pt.e_solar
+    );
+    println!(
+        "  hydrogen FC : {:6.1}%  ({:.2} kWh)",
+        pt.e_h2 / tot * 100.0,
+        pt.e_h2
+    );
     println!("  fossil      : {:6.1}%  (0.00 kWh) — none (G13/N5)", 0.0);
     println!("  green-H2 consumed : {:.2} kg", pt.h2_kg);
-    println!("  battery SOC final : {:.0}%", pt.batt_soc_kwh / pt.batt_capacity_kwh * 100.0);
-    println!("  power-limited time: {:.0} s (green-only throttle clamp; never fossil)", pt.power_limited_s);
+    println!(
+        "  battery SOC final : {:.0}%",
+        pt.batt_soc_kwh / pt.batt_capacity_kwh * 100.0
+    );
+    println!(
+        "  power-limited time: {:.0} s (green-only throttle clamp; never fossil)",
+        pt.power_limited_s
+    );
 
     // Self-check (this example doubles as a smoke test).
     assert!(arrived, "Nagi failed to reach the final waypoint");
-    assert!(pt.e_wind > 0.0, "wind-assist contributed nothing — check apparent-wind model");
+    assert!(
+        pt.e_wind > 0.0,
+        "wind-assist contributed nothing — check apparent-wind model"
+    );
     assert!(pt.e_h2 > 0.0, "hydrogen fuel cell never dispatched");
     println!("\nOK: autonomous arrival under a zero-emission powertrain (fossil = 0).");
 }

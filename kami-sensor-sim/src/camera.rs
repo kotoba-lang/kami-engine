@@ -98,7 +98,11 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(name: impl Into<String>, prim_path: impl Into<String>, intr: CameraIntrinsics) -> Self {
+    pub fn new(
+        name: impl Into<String>,
+        prim_path: impl Into<String>,
+        intr: CameraIntrinsics,
+    ) -> Self {
         Camera {
             name: name.into(),
             prim_path: prim_path.into(),
@@ -152,7 +156,11 @@ impl Camera {
         if u >= self.intrinsics.width as i64 || v >= self.intrinsics.height as i64 {
             return None;
         }
-        Some(Projection { u: u as u32, v: v as u32, depth })
+        Some(Projection {
+            u: u as u32,
+            v: v as u32,
+            depth,
+        })
     }
 
     /// Rasterize a point cloud into a depth image (z-buffer, nearest wins).
@@ -218,7 +226,10 @@ mod tests {
     fn point_beyond_far_clip_returns_none() {
         let cam = cam_at_origin_facing_plus_z();
         // far = 1000.0 by default
-        assert!(cam.project_world_point(Vec3::new(0.0, 0.0, 1001.0)).is_none());
+        assert!(
+            cam.project_world_point(Vec3::new(0.0, 0.0, 1001.0))
+                .is_none()
+        );
     }
 
     #[test]
@@ -271,6 +282,9 @@ mod tests {
     fn off_screen_point_returns_none() {
         let cam = cam_at_origin_facing_plus_z();
         // 100 m off to the right at z=1: u = fx*(100/1) + cx = 32000+320 >> 640
-        assert!(cam.project_world_point(Vec3::new(100.0, 0.0, 1.0)).is_none());
+        assert!(
+            cam.project_world_point(Vec3::new(100.0, 0.0, 1.0))
+                .is_none()
+        );
     }
 }

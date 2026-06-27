@@ -133,7 +133,7 @@ pub fn grass() -> TaxonomicProfile {
         leaf_shape: LeafShape::Linear,
         canopy: CanopyShape::Blade,
         height_range: [0.7, 1.4],
-        stem_radius_base: 0.0,   // no distinct stem
+        stem_radius_base: 0.0, // no distinct stem
         stem_radius_top: 0.0,
         leaf_count: 3,
         leaf_size: 0.18,
@@ -154,7 +154,7 @@ pub fn fern() -> TaxonomicProfile {
         height_range: [0.8, 1.5],
         stem_radius_base: 0.04,
         stem_radius_top: 0.02,
-        leaf_count: 5,   // leaflet pairs
+        leaf_count: 5, // leaflet pairs
         leaf_size: 0.35,
         color_base: [0.12, 0.28, 0.04],
         color_tip: [0.3, 0.55, 0.12],
@@ -192,7 +192,7 @@ pub fn conifer() -> TaxonomicProfile {
         height_range: [0.7, 1.3],
         stem_radius_base: 0.09,
         stem_radius_top: 0.03,
-        leaf_count: 3,   // cone layers
+        leaf_count: 3, // cone layers
         leaf_size: 0.42,
         color_base: [0.25, 0.18, 0.08],
         color_tip: [0.12, 0.3, 0.08],
@@ -211,7 +211,7 @@ pub fn bush() -> TaxonomicProfile {
         height_range: [0.8, 1.4],
         stem_radius_base: 0.06,
         stem_radius_top: 0.04,
-        leaf_count: 6,   // layered leaf discs
+        leaf_count: 6, // layered leaf discs
         leaf_size: 0.33,
         color_base: [0.15, 0.28, 0.06],
         color_tip: [0.28, 0.48, 0.1],
@@ -282,15 +282,21 @@ pub struct OwnedTaxonomicProfile {
     pub leaf_shape: LeafShape,
     pub canopy: CanopyShape,
     pub height_range: [f32; 2],
-    #[serde(default)] pub stem_radius_base: f32,
-    #[serde(default)] pub stem_radius_top: f32,
-    #[serde(default)] pub leaf_count: u32,
-    #[serde(default)] pub leaf_size: f32,
+    #[serde(default)]
+    pub stem_radius_base: f32,
+    #[serde(default)]
+    pub stem_radius_top: f32,
+    #[serde(default)]
+    pub leaf_count: u32,
+    #[serde(default)]
+    pub leaf_size: f32,
     pub color_base: [f32; 3],
     pub color_tip: [f32; 3],
 }
 
-fn default_arrangement() -> LeafArrangement { LeafArrangement::None }
+fn default_arrangement() -> LeafArrangement {
+    LeafArrangement::None
+}
 
 impl OwnedTaxonomicProfile {
     /// Parse a single `seibutsu.renderProfile` response (camelCase JSON).
@@ -302,22 +308,28 @@ impl OwnedTaxonomicProfile {
         let take_u = |k: &str| v.get(k).and_then(|x| x.as_u64()).unwrap_or(0) as u32;
         let take_s = |k: &str| v.get(k).and_then(|x| x.as_str()).unwrap_or("").to_string();
         let arr3 = |k: &str| {
-            v.get(k).and_then(|x| x.as_array()).map(|a| {
-                let mut out = [0.0f32; 3];
-                for (i, n) in a.iter().take(3).enumerate() {
-                    out[i] = n.as_f64().unwrap_or(0.0) as f32;
-                }
-                out
-            }).unwrap_or([0.0; 3])
+            v.get(k)
+                .and_then(|x| x.as_array())
+                .map(|a| {
+                    let mut out = [0.0f32; 3];
+                    for (i, n) in a.iter().take(3).enumerate() {
+                        out[i] = n.as_f64().unwrap_or(0.0) as f32;
+                    }
+                    out
+                })
+                .unwrap_or([0.0; 3])
         };
         let arr2 = |k: &str| {
-            v.get(k).and_then(|x| x.as_array()).map(|a| {
-                let mut out = [0.0f32; 2];
-                for (i, n) in a.iter().take(2).enumerate() {
-                    out[i] = n.as_f64().unwrap_or(0.0) as f32;
-                }
-                out
-            }).unwrap_or([0.0, 1.0])
+            v.get(k)
+                .and_then(|x| x.as_array())
+                .map(|a| {
+                    let mut out = [0.0f32; 2];
+                    for (i, n) in a.iter().take(2).enumerate() {
+                        out[i] = n.as_f64().unwrap_or(0.0) as f32;
+                    }
+                    out
+                })
+                .unwrap_or([0.0, 1.0])
         };
         Ok(OwnedTaxonomicProfile {
             common_name: take_s("commonName"),
@@ -400,15 +412,26 @@ pub struct RemoteCatalog {
 
 impl RemoteCatalog {
     pub fn from_default() -> Self {
-        Self { profiles: default_catalog().into_iter().map(|p| OwnedTaxonomicProfile {
-            common_name: p.common_name.to_string(),
-            division: p.division, habit: p.habit, arrangement: p.arrangement,
-            leaf_shape: p.leaf_shape, canopy: p.canopy,
-            height_range: p.height_range,
-            stem_radius_base: p.stem_radius_base, stem_radius_top: p.stem_radius_top,
-            leaf_count: p.leaf_count, leaf_size: p.leaf_size,
-            color_base: p.color_base, color_tip: p.color_tip,
-        }).collect() }
+        Self {
+            profiles: default_catalog()
+                .into_iter()
+                .map(|p| OwnedTaxonomicProfile {
+                    common_name: p.common_name.to_string(),
+                    division: p.division,
+                    habit: p.habit,
+                    arrangement: p.arrangement,
+                    leaf_shape: p.leaf_shape,
+                    canopy: p.canopy,
+                    height_range: p.height_range,
+                    stem_radius_base: p.stem_radius_base,
+                    stem_radius_top: p.stem_radius_top,
+                    leaf_count: p.leaf_count,
+                    leaf_size: p.leaf_size,
+                    color_base: p.color_base,
+                    color_tip: p.color_tip,
+                })
+                .collect(),
+        }
     }
 
     /// Push one `renderProfile` response into the catalog.

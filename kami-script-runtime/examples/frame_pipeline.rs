@@ -17,10 +17,10 @@
 use std::sync::{Arc, Mutex};
 
 use glam::Vec3;
-use kami_audio::binaural::{mix_stereo, spatialize, Hrtf, Rolloff, Voice};
-use kami_audio::wav::encode_pcm16_stereo;
 use kami_audio::Listener;
-use kami_render::raytrace::{RayTracePipeline, RtGlobals, HIT_STRIDE};
+use kami_audio::binaural::{Hrtf, Rolloff, Voice, mix_stereo, spatialize};
+use kami_audio::wav::encode_pcm16_stereo;
+use kami_render::raytrace::{HIT_STRIDE, RayTracePipeline, RtGlobals};
 use kami_rt::bvh::{Bvh, Tri};
 use kami_script_runtime::KamiScriptRuntime;
 
@@ -61,8 +61,18 @@ fn scene_bvh() -> Bvh {
         let b = Vec3::new(hi, lo, z);
         let c = Vec3::new(lo, hi, z);
         let d = Vec3::new(hi, hi, z);
-        tris.push(Tri { v0: a, v1: b, v2: c, id: id0 });
-        tris.push(Tri { v0: b, v1: d, v2: c, id: id0 + 1 });
+        tris.push(Tri {
+            v0: a,
+            v1: b,
+            v2: c,
+            id: id0,
+        });
+        tris.push(Tri {
+            v0: b,
+            v1: d,
+            v2: c,
+            id: id0 + 1,
+        });
     };
     quad(6.0, -3.0, 3.0, 0); // far wall
     quad(4.0, -1.0, 1.0, 2); // near box
@@ -146,7 +156,10 @@ fn main() {
                 let out = pipeline.trace(dev, q, &bvh, globals, W, H);
                 rt_hits = count_hits(dev, q, &out);
                 rt_frames += 1;
-                println!("tick {tick}: traced recipe {recipe:?} → {rt_hits}/{} pixels hit", W * H);
+                println!(
+                    "tick {tick}: traced recipe {recipe:?} → {rt_hits}/{} pixels hit",
+                    W * H
+                );
             }
         }
 
@@ -154,7 +167,14 @@ fn main() {
         let base = tick * spt;
         for (_name, pos) in rt.drain_audio_queue() {
             let p = spatialize(&listener, &hrtf, &rolloff, Vec3::from(pos), 1.0);
-            let chunk = mix_stereo(&[Voice { params: p, mono: &blip }], sr, spt + 128);
+            let chunk = mix_stereo(
+                &[Voice {
+                    params: p,
+                    mono: &blip,
+                }],
+                sr,
+                spt + 128,
+            );
             for f in 0..spt {
                 master[(base + f) * 2] += chunk[f * 2];
                 master[(base + f) * 2 + 1] += chunk[f * 2 + 1];
@@ -166,7 +186,14 @@ fn main() {
         let angle = (tick as f32 / ticks as f32) * std::f32::consts::TAU;
         let amb = Vec3::new(angle.sin() * 3.0, 0.0, -angle.cos() * 3.0) + listener.position;
         let pa = spatialize(&listener, &hrtf, &rolloff, amb, 1.0);
-        let chunk = mix_stereo(&[Voice { params: pa, mono: &tone }], sr, spt + 128);
+        let chunk = mix_stereo(
+            &[Voice {
+                params: pa,
+                mono: &tone,
+            }],
+            sr,
+            spt + 128,
+        );
         for f in 0..spt {
             master[(base + f) * 2] += chunk[f * 2];
             master[(base + f) * 2 + 1] += chunk[f * 2 + 1];

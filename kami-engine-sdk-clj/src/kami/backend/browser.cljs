@@ -7,9 +7,13 @@
 
   `kami-clj-host` is the Rust crate `../../kami-clj-host` built with
   `wasm-pack build --target web --features host`; its JS glue exposes
-  `KamiCljHost.create(canvas) -> Promise<host>`."
-  (:require [kami.gpu :as gpu]
-            [cljs.core.async :refer [go]]))
+  `KamiCljHost.create(canvas) -> Promise<host>`.
+
+  Tint: the host decodes both the v1 (model-only) and v2 (model + per-draw tint)
+  columnar layouts, so this backend forwards `:buffer`/`:meta` unchanged. To draw
+  with per-instance tint, the caller packs v2 — `(kami.gpu/submit! be frame
+  {:tint? true})` — and the bytes flow through here untouched."
+  (:require [kami.gpu :as gpu]))
 
 (defn- ->u8 [buffer]
   "Convert the packed :buffer (a vector of 0-255 ints) to a Uint8Array for the
@@ -37,13 +41,11 @@
     (.resize host w h)))
 
 (defn make
-  "Create a browser GPU backend bound to canvas id `:canvas`. Returns a channel
-  that yields the backend once `KamiCljHost.create` resolves (async adapter/device
-  request). `:host-ctor` lets callers inject the wasm class (default
-  `js/KamiCljHost`)."
+  "Create a browser GPU backend bound to canvas id `:canvas`. Returns a Promise
+  that resolves to the backend once `KamiCljHost.create` settles (async
+  adapter/device request) — await it with `.then`. `:host-ctor` lets callers
+  inject the wasm class (default `js/KamiCljHost`)."
   [{:keys [canvas host-ctor]}]
-  (go
-    (let [el   (.getElementById js/document canvas)
-          ctor (or host-ctor js/KamiCljHost)
-          host (js/await (.create ctor el))]
-      (->BrowserBackend host))))
+  (let [el   (.getElementById js/document canvas)
+        ctor (or host-ctor js/KamiCljHost)]
+    (.then (.create ctor el) ->BrowserBackend)))

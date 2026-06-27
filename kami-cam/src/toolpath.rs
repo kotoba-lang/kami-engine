@@ -1,5 +1,4 @@
 /// Toolpath generation: CAM operations, segment types, and job execution.
-
 use glam::DVec3;
 use serde::{Deserialize, Serialize};
 
@@ -157,7 +156,11 @@ impl CamJob {
                     // X-direction passes with Y stepover.
                     let tool = self.tool_library.get(*tool_id);
                     let tool_radius = tool.map_or(0.0, |t| t.diameter / 2.0);
-                    let effective_stepover = if *stepover > 0.0 { *stepover } else { tool_radius };
+                    let effective_stepover = if *stepover > 0.0 {
+                        *stepover
+                    } else {
+                        tool_radius
+                    };
 
                     let x_min = pocket_min.x + tool_radius;
                     let x_max = pocket_max.x - tool_radius;
@@ -298,10 +301,26 @@ impl CamJob {
                     }
                 }
 
-                CamOperation::FaceMill { tool_id, feed_rate: _, .. }
-                | CamOperation::Contour { tool_id, feed_rate: _, .. }
-                | CamOperation::Surface3D { tool_id, feed_rate: _, .. }
-                | CamOperation::Turn { tool_id, feed_rate: _, .. } => {
+                CamOperation::FaceMill {
+                    tool_id,
+                    feed_rate: _,
+                    ..
+                }
+                | CamOperation::Contour {
+                    tool_id,
+                    feed_rate: _,
+                    ..
+                }
+                | CamOperation::Surface3D {
+                    tool_id,
+                    feed_rate: _,
+                    ..
+                }
+                | CamOperation::Turn {
+                    tool_id,
+                    feed_rate: _,
+                    ..
+                } => {
                     // Placeholder: rapid to origin, indicating tool change point.
                     let prev = last_end(&segments);
                     segments.push(ToolpathSegment {
@@ -322,8 +341,5 @@ impl CamJob {
 
 /// Helper: get the end position of the last segment, or origin if empty.
 fn last_end(segments: &[ToolpathSegment]) -> DVec3 {
-    segments
-        .last()
-        .map(|s| s.end)
-        .unwrap_or(DVec3::ZERO)
+    segments.last().map(|s| s.end).unwrap_or(DVec3::ZERO)
 }

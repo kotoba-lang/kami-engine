@@ -38,7 +38,11 @@ pub struct SplatCloud {
 
 impl SplatCloud {
     pub fn new() -> Self {
-        Self { splats: Vec::new(), sh_degree: 0, sh_rest: Vec::new() }
+        Self {
+            splats: Vec::new(),
+            sh_degree: 0,
+            sh_rest: Vec::new(),
+        }
     }
 
     pub fn count(&self) -> u32 {

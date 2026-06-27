@@ -1,7 +1,7 @@
 //! VRM GLB export: VrmDocument → GLB bytes.
 
-use crate::vrm_types::*;
 use crate::VrmError;
+use crate::vrm_types::*;
 
 /// Export a VrmDocument to GLB bytes with VRM 1.0 extensions.
 pub fn export_glb(doc: &VrmDocument) -> Result<Vec<u8>, VrmError> {
@@ -27,7 +27,9 @@ pub fn export_glb(doc: &VrmDocument) -> Result<Vec<u8>, VrmError> {
     for mtoon in &doc.mtoon_materials {
         if let Some(mat) = gltf.materials.get_mut(mtoon.material_index) {
             let mtoon_ext = build_mtoon_extension(mtoon);
-            let ext = mat.extensions.get_or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
+            let ext = mat
+                .extensions
+                .get_or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
             if let Some(obj) = ext.as_object_mut() {
                 obj.insert("VRMC_materials_mtoon".into(), mtoon_ext);
             }
@@ -38,7 +40,9 @@ pub fn export_glb(doc: &VrmDocument) -> Result<Vec<u8>, VrmError> {
     for nc in &doc.node_constraints {
         if let Some(node) = gltf.nodes.get_mut(nc.node) {
             let nc_ext = build_node_constraint(nc);
-            let ext = node.extensions.get_or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
+            let ext = node
+                .extensions
+                .get_or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
             if let Some(obj) = ext.as_object_mut() {
                 obj.insert("VRMC_node_constraint".into(), nc_ext);
             }
@@ -63,7 +67,12 @@ fn build_vrmc_vrm(doc: &VrmDocument) -> serde_json::Value {
     if !doc.meta.authors.is_empty() {
         meta.insert(
             "authors".into(),
-            doc.meta.authors.iter().map(|a| serde_json::Value::String(a.clone())).collect::<Vec<_>>().into(),
+            doc.meta
+                .authors
+                .iter()
+                .map(|a| serde_json::Value::String(a.clone()))
+                .collect::<Vec<_>>()
+                .into(),
         );
     }
     if let Some(ref url) = doc.meta.license_url {
@@ -82,7 +91,10 @@ fn build_vrmc_vrm(doc: &VrmDocument) -> serde_json::Value {
     for hb in &doc.humanoid.human_bones {
         let mut bone_obj = serde_json::Map::new();
         bone_obj.insert("node".into(), serde_json::Value::Number(hb.node.into()));
-        human_bones.insert(hb.bone.as_str().to_string(), serde_json::Value::Object(bone_obj));
+        human_bones.insert(
+            hb.bone.as_str().to_string(),
+            serde_json::Value::Object(bone_obj),
+        );
     }
     vrm.insert(
         "humanoid".into(),
@@ -127,18 +139,25 @@ fn build_vrmc_vrm(doc: &VrmDocument) -> serde_json::Value {
 
     // FirstPerson
     if let Some(ref fp) = doc.first_person {
-        let annotations: Vec<serde_json::Value> = fp.mesh_annotations.iter().map(|a| {
-            serde_json::json!({
-                "node": a.node,
-                "type": match a.annotation_type {
-                    FirstPersonFlag::Auto => "auto",
-                    FirstPersonFlag::Both => "both",
-                    FirstPersonFlag::ThirdPersonOnly => "thirdPersonOnly",
-                    FirstPersonFlag::FirstPersonOnly => "firstPersonOnly",
-                },
+        let annotations: Vec<serde_json::Value> = fp
+            .mesh_annotations
+            .iter()
+            .map(|a| {
+                serde_json::json!({
+                    "node": a.node,
+                    "type": match a.annotation_type {
+                        FirstPersonFlag::Auto => "auto",
+                        FirstPersonFlag::Both => "both",
+                        FirstPersonFlag::ThirdPersonOnly => "thirdPersonOnly",
+                        FirstPersonFlag::FirstPersonOnly => "firstPersonOnly",
+                    },
+                })
             })
-        }).collect();
-        vrm.insert("firstPerson".into(), serde_json::json!({ "meshAnnotations": annotations }));
+            .collect();
+        vrm.insert(
+            "firstPerson".into(),
+            serde_json::json!({ "meshAnnotations": annotations }),
+        );
     }
 
     serde_json::Value::Object(vrm)
@@ -153,35 +172,47 @@ fn build_expression(expr: &VrmExpression) -> serde_json::Value {
     }
 
     if !expr.morph_target_binds.is_empty() {
-        let binds: Vec<serde_json::Value> = expr.morph_target_binds.iter().map(|b| {
-            serde_json::json!({
-                "mesh": b.mesh_index,
-                "index": b.morph_index,
-                "weight": b.weight,
+        let binds: Vec<serde_json::Value> = expr
+            .morph_target_binds
+            .iter()
+            .map(|b| {
+                serde_json::json!({
+                    "mesh": b.mesh_index,
+                    "index": b.morph_index,
+                    "weight": b.weight,
+                })
             })
-        }).collect();
+            .collect();
         obj.insert("morphTargetBinds".into(), binds.into());
     }
 
     if !expr.material_color_binds.is_empty() {
-        let binds: Vec<serde_json::Value> = expr.material_color_binds.iter().map(|b| {
-            serde_json::json!({
-                "material": b.material_index,
-                "type": b.property,
-                "targetValue": b.target_value,
+        let binds: Vec<serde_json::Value> = expr
+            .material_color_binds
+            .iter()
+            .map(|b| {
+                serde_json::json!({
+                    "material": b.material_index,
+                    "type": b.property,
+                    "targetValue": b.target_value,
+                })
             })
-        }).collect();
+            .collect();
         obj.insert("materialColorBinds".into(), binds.into());
     }
 
     if !expr.texture_transform_binds.is_empty() {
-        let binds: Vec<serde_json::Value> = expr.texture_transform_binds.iter().map(|b| {
-            serde_json::json!({
-                "material": b.material_index,
-                "offset": b.offset,
-                "scale": b.scale,
+        let binds: Vec<serde_json::Value> = expr
+            .texture_transform_binds
+            .iter()
+            .map(|b| {
+                serde_json::json!({
+                    "material": b.material_index,
+                    "offset": b.offset,
+                    "scale": b.scale,
+                })
             })
-        }).collect();
+            .collect();
         obj.insert("textureTransformBinds".into(), binds.into());
     }
 
@@ -227,14 +258,25 @@ fn build_vrmc_spring_bone(doc: &VrmDocument) -> serde_json::Value {
 
     // Collider groups
     if !doc.spring_bone_collider_groups.is_empty() {
-        let groups: Vec<serde_json::Value> = doc.spring_bone_collider_groups.iter().map(|g| {
-            let mut obj = serde_json::Map::new();
-            if let Some(ref name) = g.name {
-                obj.insert("name".into(), name.clone().into());
-            }
-            obj.insert("colliders".into(), g.colliders.iter().map(|&c| serde_json::Value::Number(c.into())).collect::<Vec<_>>().into());
-            serde_json::Value::Object(obj)
-        }).collect();
+        let groups: Vec<serde_json::Value> = doc
+            .spring_bone_collider_groups
+            .iter()
+            .map(|g| {
+                let mut obj = serde_json::Map::new();
+                if let Some(ref name) = g.name {
+                    obj.insert("name".into(), name.clone().into());
+                }
+                obj.insert(
+                    "colliders".into(),
+                    g.colliders
+                        .iter()
+                        .map(|&c| serde_json::Value::Number(c.into()))
+                        .collect::<Vec<_>>()
+                        .into(),
+                );
+                serde_json::Value::Object(obj)
+            })
+            .collect();
         sb.insert("colliderGroups".into(), groups.into());
     }
 
@@ -274,14 +316,38 @@ fn build_vrmc_spring_bone(doc: &VrmDocument) -> serde_json::Value {
 fn build_mtoon_extension(mtoon: &VrmMtoonMaterial) -> serde_json::Value {
     let mut obj = serde_json::Map::new();
     obj.insert("specVersion".into(), "1.0".into());
-    obj.insert("shadeColorFactor".into(), mtoon.shade_color_factor.to_vec().into());
-    obj.insert("shadingShiftFactor".into(), mtoon.shading_shift_factor.into());
-    obj.insert("shadingToonyFactor".into(), mtoon.shading_toony_factor.into());
-    obj.insert("giEqualizationFactor".into(), mtoon.gi_equalization_factor.into());
-    obj.insert("parametricRimColorFactor".into(), mtoon.parametric_rim_color_factor.to_vec().into());
-    obj.insert("rimLightingMixFactor".into(), mtoon.rim_lighting_mix_factor.into());
-    obj.insert("parametricRimFresnelPowerFactor".into(), mtoon.rim_fresnel_power_factor.into());
-    obj.insert("parametricRimLiftFactor".into(), mtoon.rim_lift_factor.into());
+    obj.insert(
+        "shadeColorFactor".into(),
+        mtoon.shade_color_factor.to_vec().into(),
+    );
+    obj.insert(
+        "shadingShiftFactor".into(),
+        mtoon.shading_shift_factor.into(),
+    );
+    obj.insert(
+        "shadingToonyFactor".into(),
+        mtoon.shading_toony_factor.into(),
+    );
+    obj.insert(
+        "giEqualizationFactor".into(),
+        mtoon.gi_equalization_factor.into(),
+    );
+    obj.insert(
+        "parametricRimColorFactor".into(),
+        mtoon.parametric_rim_color_factor.to_vec().into(),
+    );
+    obj.insert(
+        "rimLightingMixFactor".into(),
+        mtoon.rim_lighting_mix_factor.into(),
+    );
+    obj.insert(
+        "parametricRimFresnelPowerFactor".into(),
+        mtoon.rim_fresnel_power_factor.into(),
+    );
+    obj.insert(
+        "parametricRimLiftFactor".into(),
+        mtoon.rim_lift_factor.into(),
+    );
 
     let owm = match mtoon.outline_width_mode {
         OutlineWidthMode::None => "none",
@@ -289,17 +355,38 @@ fn build_mtoon_extension(mtoon: &VrmMtoonMaterial) -> serde_json::Value {
         OutlineWidthMode::ScreenCoordinates => "screenCoordinates",
     };
     obj.insert("outlineWidthMode".into(), owm.into());
-    obj.insert("outlineWidthFactor".into(), mtoon.outline_width_factor.into());
-    obj.insert("outlineColorFactor".into(), mtoon.outline_color_factor.to_vec().into());
-    obj.insert("outlineLightingMixFactor".into(), mtoon.outline_lighting_mix_factor.into());
-    obj.insert("renderQueueOffsetNumber".into(), mtoon.render_queue_offset.into());
-    obj.insert("transparentWithZWrite".into(), mtoon.transparent_with_z_write.into());
+    obj.insert(
+        "outlineWidthFactor".into(),
+        mtoon.outline_width_factor.into(),
+    );
+    obj.insert(
+        "outlineColorFactor".into(),
+        mtoon.outline_color_factor.to_vec().into(),
+    );
+    obj.insert(
+        "outlineLightingMixFactor".into(),
+        mtoon.outline_lighting_mix_factor.into(),
+    );
+    obj.insert(
+        "renderQueueOffsetNumber".into(),
+        mtoon.render_queue_offset.into(),
+    );
+    obj.insert(
+        "transparentWithZWrite".into(),
+        mtoon.transparent_with_z_write.into(),
+    );
 
     if let Some(tex) = mtoon.shade_multiply_texture {
-        obj.insert("shadeMultiplyTexture".into(), serde_json::json!({ "index": tex }));
+        obj.insert(
+            "shadeMultiplyTexture".into(),
+            serde_json::json!({ "index": tex }),
+        );
     }
     if let Some(tex) = mtoon.rim_multiply_texture {
-        obj.insert("rimMultiplyTexture".into(), serde_json::json!({ "index": tex }));
+        obj.insert(
+            "rimMultiplyTexture".into(),
+            serde_json::json!({ "index": tex }),
+        );
     }
     if let Some(tex) = mtoon.matcap_texture {
         obj.insert("matcapTexture".into(), serde_json::json!({ "index": tex }));
@@ -311,13 +398,21 @@ fn build_mtoon_extension(mtoon: &VrmMtoonMaterial) -> serde_json::Value {
 /// Build per-node VRMC_node_constraint extension.
 fn build_node_constraint(nc: &VrmNodeConstraint) -> serde_json::Value {
     let constraint = match &nc.constraint {
-        ConstraintType::Aim { source, aim_axis, weight } => {
+        ConstraintType::Aim {
+            source,
+            aim_axis,
+            weight,
+        } => {
             serde_json::json!({ "aim": { "source": source, "aimAxis": aim_axis, "weight": weight } })
         }
         ConstraintType::Rotation { source, weight } => {
             serde_json::json!({ "rotation": { "source": source, "weight": weight } })
         }
-        ConstraintType::Roll { source, roll_axis, weight } => {
+        ConstraintType::Roll {
+            source,
+            roll_axis,
+            weight,
+        } => {
             serde_json::json!({ "roll": { "source": source, "rollAxis": roll_axis, "weight": weight } })
         }
     };

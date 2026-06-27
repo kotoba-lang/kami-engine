@@ -156,8 +156,12 @@ pub fn load_str(json: &str) -> Result<Vehicle, JBeamError> {
     }
 
     for (idx, b) in file.beams.iter().enumerate() {
-        let n1 = *id_map.get(&b.n1).ok_or_else(|| JBeamError::UnknownNode(b.n1.clone()))?;
-        let n2 = *id_map.get(&b.n2).ok_or_else(|| JBeamError::UnknownNode(b.n2.clone()))?;
+        let n1 = *id_map
+            .get(&b.n1)
+            .ok_or_else(|| JBeamError::UnknownNode(b.n1.clone()))?;
+        let n2 = *id_map
+            .get(&b.n2)
+            .ok_or_else(|| JBeamError::UnknownNode(b.n2.clone()))?;
         let p1 = vehicle.nodes.iter().find(|n| n.id == n1).unwrap().position;
         let p2 = vehicle.nodes.iter().find(|n| n.id == n2).unwrap().position;
         let rest = (p2 - p1).length().max(1e-3);
@@ -174,8 +178,12 @@ pub fn load_str(json: &str) -> Result<Vehicle, JBeamError> {
     }
 
     for (i, w) in file.wheels.iter().enumerate() {
-        let a1 = *id_map.get(&w.axle[0]).ok_or_else(|| JBeamError::UnknownNode(w.axle[0].clone()))?;
-        let a2 = *id_map.get(&w.axle[1]).ok_or_else(|| JBeamError::UnknownNode(w.axle[1].clone()))?;
+        let a1 = *id_map
+            .get(&w.axle[0])
+            .ok_or_else(|| JBeamError::UnknownNode(w.axle[0].clone()))?;
+        let a2 = *id_map
+            .get(&w.axle[1])
+            .ok_or_else(|| JBeamError::UnknownNode(w.axle[1].clone()))?;
         let mut wh = Wheel::new(i as u32, a1, a2, w.radius, w.width);
         wh.tire = parse_tire(&w.tire)?;
         if let Some(p) = w.pressure {

@@ -1,5 +1,4 @@
 /// IP-XACT component catalog and XML export.
-
 use serde::{Deserialize, Serialize};
 
 /// Standard bus protocol types.
@@ -111,7 +110,8 @@ pub struct IpCatalog {
 impl IpCatalog {
     /// Find components that expose a specific bus type.
     pub fn find_by_bus_type(&self, bus_type: &BusType) -> Vec<&IpXactComponent> {
-        self.components.iter()
+        self.components
+            .iter()
             .filter(|c| c.bus_interfaces.iter().any(|bi| bi.bus_type == *bus_type))
             .collect()
     }
@@ -121,11 +121,25 @@ impl IpCatalog {
 pub fn export_ip_xact_xml(component: &IpXactComponent) -> String {
     let mut xml = String::with_capacity(2048);
     xml.push_str("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    xml.push_str("<ipxact:component xmlns:ipxact=\"http://www.accellera.org/XMLSchema/IPXACT/1685-2014\">\n");
-    xml.push_str(&format!("  <ipxact:vendor>{}</ipxact:vendor>\n", component.vendor));
-    xml.push_str(&format!("  <ipxact:library>{}</ipxact:library>\n", component.library));
-    xml.push_str(&format!("  <ipxact:name>{}</ipxact:name>\n", component.name));
-    xml.push_str(&format!("  <ipxact:version>{}</ipxact:version>\n", component.version));
+    xml.push_str(
+        "<ipxact:component xmlns:ipxact=\"http://www.accellera.org/XMLSchema/IPXACT/1685-2014\">\n",
+    );
+    xml.push_str(&format!(
+        "  <ipxact:vendor>{}</ipxact:vendor>\n",
+        component.vendor
+    ));
+    xml.push_str(&format!(
+        "  <ipxact:library>{}</ipxact:library>\n",
+        component.library
+    ));
+    xml.push_str(&format!(
+        "  <ipxact:name>{}</ipxact:name>\n",
+        component.name
+    ));
+    xml.push_str(&format!(
+        "  <ipxact:version>{}</ipxact:version>\n",
+        component.version
+    ));
 
     if !component.bus_interfaces.is_empty() {
         xml.push_str("  <ipxact:busInterfaces>\n");
@@ -162,8 +176,13 @@ pub fn export_ip_xact_xml(component: &IpXactComponent) -> String {
                 PortDirection::Out => "out",
                 PortDirection::InOut => "inout",
             };
-            xml.push_str(&format!("      <ipxact:port>\n        <ipxact:name>{}</ipxact:name>\n", port.name));
-            xml.push_str(&format!("        <ipxact:wire><ipxact:direction>{dir}</ipxact:direction>\n"));
+            xml.push_str(&format!(
+                "      <ipxact:port>\n        <ipxact:name>{}</ipxact:name>\n",
+                port.name
+            ));
+            xml.push_str(&format!(
+                "        <ipxact:wire><ipxact:direction>{dir}</ipxact:direction>\n"
+            ));
             xml.push_str(&format!("          <ipxact:vectors><ipxact:vector><ipxact:left>{}</ipxact:left><ipxact:right>0</ipxact:right></ipxact:vector></ipxact:vectors>\n", port.width.saturating_sub(1)));
             xml.push_str("        </ipxact:wire>\n      </ipxact:port>\n");
         }
@@ -205,15 +224,37 @@ mod tests {
                 bus_type: BusType::Apb,
                 mode: InterfaceMode::Slave,
                 port_maps: vec![
-                    PortMap { logical: "PADDR".to_string(), physical: "apb_addr".to_string() },
-                    PortMap { logical: "PWDATA".to_string(), physical: "apb_wdata".to_string() },
+                    PortMap {
+                        logical: "PADDR".to_string(),
+                        physical: "apb_addr".to_string(),
+                    },
+                    PortMap {
+                        logical: "PWDATA".to_string(),
+                        physical: "apb_wdata".to_string(),
+                    },
                 ],
             }],
             ports: vec![
-                IpPort { name: "clk".to_string(), direction: PortDirection::In, width: 1 },
-                IpPort { name: "rst_n".to_string(), direction: PortDirection::In, width: 1 },
-                IpPort { name: "tx".to_string(), direction: PortDirection::Out, width: 1 },
-                IpPort { name: "rx".to_string(), direction: PortDirection::In, width: 1 },
+                IpPort {
+                    name: "clk".to_string(),
+                    direction: PortDirection::In,
+                    width: 1,
+                },
+                IpPort {
+                    name: "rst_n".to_string(),
+                    direction: PortDirection::In,
+                    width: 1,
+                },
+                IpPort {
+                    name: "tx".to_string(),
+                    direction: PortDirection::Out,
+                    width: 1,
+                },
+                IpPort {
+                    name: "rx".to_string(),
+                    direction: PortDirection::In,
+                    width: 1,
+                },
             ],
             parameters: vec![IpParam {
                 name: "BAUD_RATE".to_string(),
@@ -226,7 +267,10 @@ mod tests {
     #[test]
     fn ip_xact_xml_contains_component() {
         let xml = export_ip_xact_xml(&sample_component());
-        assert!(xml.contains("<ipxact:component"), "Should contain component element");
+        assert!(
+            xml.contains("<ipxact:component"),
+            "Should contain component element"
+        );
         assert!(xml.contains("<ipxact:vendor>gftd</ipxact:vendor>"));
         assert!(xml.contains("<ipxact:name>uart_controller</ipxact:name>"));
         assert!(xml.contains("PADDR"));

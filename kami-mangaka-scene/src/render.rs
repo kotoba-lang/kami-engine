@@ -3,9 +3,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::{camera::CameraSpec, scene::MangakaScene, Result};
 #[cfg(target_family = "wasm")]
 use crate::SceneError;
+use crate::{Result, camera::CameraSpec, scene::MangakaScene};
 
 bitflags::bitflags! {
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -65,7 +65,11 @@ impl MangakaScene {
         ))
     }
 
-    pub fn render_multi(&self, angles: &[CameraSpec], opts: RenderOpts) -> Result<Vec<RenderResult>> {
+    pub fn render_multi(
+        &self,
+        angles: &[CameraSpec],
+        opts: RenderOpts,
+    ) -> Result<Vec<RenderResult>> {
         #[cfg(not(target_family = "wasm"))]
         {
             let r = crate::renderer::MangakaRenderer::new()?;

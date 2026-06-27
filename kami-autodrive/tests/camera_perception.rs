@@ -73,7 +73,16 @@ fn car_routes_around_a_camera_seen_wall() {
         car.step(cmd, dt);
     }
 
-    assert!(arrived, "car should reach the goal using only the depth camera");
-    assert!(min_clear > 0.3, "car clipped the wall (min clearance {min_clear:.2} m)");
-    assert!(max_lateral > 3.0, "car should detour around the wall, max |y| {max_lateral:.1}");
+    assert!(
+        arrived,
+        "car should reach the goal using only the depth camera"
+    );
+    assert!(
+        min_clear > 0.3,
+        "car clipped the wall (min clearance {min_clear:.2} m)"
+    );
+    assert!(
+        max_lateral > 3.0,
+        "car should detour around the wall, max |y| {max_lateral:.1}"
+    );
 }

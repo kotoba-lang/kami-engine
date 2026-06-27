@@ -217,11 +217,7 @@ impl Gearbox {
     /// Combined gear * final-drive ratio. Output_omega = engine_omega / total.
     pub fn total_ratio(&self) -> f32 {
         let r = self.ratio();
-        if r == 0.0 {
-            0.0
-        } else {
-            r * self.final_drive
-        }
+        if r == 0.0 { 0.0 } else { r * self.final_drive }
     }
 
     pub fn shift_to(&mut self, gear: i32) {
@@ -246,7 +242,9 @@ pub enum DifferentialKind {
     Locked,
     /// Limited-slip differential. `lock_factor` in `[0, 1]` determines how
     /// strongly speed differences are penalised (1 = locked).
-    Lsd { lock_factor: f32 },
+    Lsd {
+        lock_factor: f32,
+    },
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -256,7 +254,9 @@ pub struct Differential {
 
 impl Differential {
     pub fn open() -> Self {
-        Self { kind: DifferentialKind::Open }
+        Self {
+            kind: DifferentialKind::Open,
+        }
     }
 
     pub fn lsd(lock_factor: f32) -> Self {
@@ -414,7 +414,9 @@ mod tests {
 
     #[test]
     fn locked_diff_clamps_speed_mismatch() {
-        let d = Differential { kind: DifferentialKind::Locked };
+        let d = Differential {
+            kind: DifferentialKind::Locked,
+        };
         let (l, r) = d.split(100.0, 10.0, 12.0);
         // Right wheel is spinning faster -> torque shifts to the left.
         assert!(l > r);

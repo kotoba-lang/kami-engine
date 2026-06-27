@@ -26,6 +26,14 @@ struct GpuMesh {
     index_count: u32,
 }
 
+/// Per-draw instance attribute buffers: model matrices (vbuf 1) + RGBA tint
+/// (vbuf 2). Both step per-instance; `count` instances are drawn.
+struct InstanceBuffers {
+    model: wgpu::Buffer,
+    tint: wgpu::Buffer,
+    count: u32,
+}
+
 #[derive(serde::Deserialize)]
 struct DrawMeta {
     pipeline: String,
@@ -66,9 +74,10 @@ impl KamiCljHost {
         let width = canvas.width().max(1);
         let height = canvas.height().max(1);
         let target = wgpu::SurfaceTarget::Canvas(canvas);
-        let ctx = kami_render::RenderContext::for_web_surface(target, width, height, "kami-clj-host")
-            .await
-            .map_err(|e| JsValue::from_str(&format!("bootstrap: {e}")))?;
+        let ctx =
+            kami_render::RenderContext::for_web_surface(target, width, height, "kami-clj-host")
+                .await
+                .map_err(|e| JsValue::from_str(&format!("bootstrap: {e}")))?;
 
         let camera_bgl = ctx
             .device
@@ -85,21 +94,21 @@ impl KamiCljHost {
                     count: None,
                 }],
             });
-        let material_bgl =
-            ctx.device
-                .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                    label: Some("material-bgl"),
-                    entries: &[wgpu::BindGroupLayoutEntry {
-                        binding: 0,
-                        visibility: wgpu::ShaderStages::FRAGMENT,
-                        ty: wgpu::BindingType::Buffer {
-                            ty: wgpu::BufferBindingType::Uniform,
-                            has_dynamic_offset: false,
-                            min_binding_size: None,
-                        },
-                        count: None,
-                    }],
-                });
+        let material_bgl = ctx
+            .device
+            .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                label: Some("material-bgl"),
+                entries: &[wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: None,
+                    },
+                    count: None,
+                }],
+            });
 
         let camera_buf = ctx.device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("camera-uniform"),
@@ -178,14 +187,17 @@ impl KamiCljHost {
                 contents: bytemuck_cast_f32(&albedo),
                 usage: wgpu::BufferUsages::UNIFORM,
             });
-        let bg = self.ctx.device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: Some("kami-clj-material-bg"),
-            layout: &self.material_bgl,
-            entries: &[wgpu::BindGroupEntry {
-                binding: 0,
-                resource: buf.as_entire_binding(),
-            }],
-        });
+        let bg = self
+            .ctx
+            .device
+            .create_bind_group(&wgpu::BindGroupDescriptor {
+                label: Some("kami-clj-material-bg"),
+                layout: &self.material_bgl,
+                entries: &[wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: buf.as_entire_binding(),
+                }],
+            });
         self.materials.insert(id, bg);
     }
 
@@ -211,8 +223,8 @@ impl KamiCljHost {
     /// Render one frame. `meta_json` is the `kami.ipc/pack` `:meta` draw-table;
     /// `data` is the KAMI columnar buffer (camera + instance matrices).
     pub fn submit_frame(&mut self, meta_json: &str, data: &[u8]) -> Result<(), JsValue> {
-        let meta: FrameMeta =
-            serde_json::from_str(meta_json).map_err(|e| JsValue::from_str(&format!("meta: {e}")))?;
+        let meta: FrameMeta = serde_json::from_str(meta_json)
+            .map_err(|e| JsValue::from_str(&format!("meta: {e}")))?;
         let fv = frame::decode(data).map_err(|e| JsValue::from_str(&format!("decode: {e:?}")))?;
 
         // camera: view_proj = proj · view (column-major)
@@ -223,21 +235,43 @@ impl KamiCljHost {
                 .write_buffer(&self.camera_buf, 0, bytemuck_cast_f32(&vp));
         }
 
-        // build one instance buffer per draw from its mat4 column
-        let inst_cols = fv.draw_instances();
-        let mut inst_bufs: Vec<(wgpu::Buffer, u32)> = Vec::with_capacity(inst_cols.len());
-        for col in inst_cols {
-            let mats = col.mat4s();
-            let flat: Vec<f32> = mats.iter().flat_map(|m| m.iter().copied()).collect();
-            let buf = self
+        // Build per-draw instance buffers (model mat4 + RGBA tint) from the decoded
+        // columns. `fv.draws()` is version-aware: v1 yields model-only blocks, v2
+        // pairs `[model, tint]`. A v1 frame (or any draw lacking tint) gets a default
+        // opaque-white tint so the pipeline's tint vertex buffer is always present —
+        // v1 stays visually identical, v2 modulates albedo by the per-instance tint.
+        let draws = fv.draws();
+        let mut inst_bufs: Vec<InstanceBuffers> = Vec::with_capacity(draws.len());
+        for (model_col, tint_col) in &draws {
+            let mats = model_col.mat4s();
+            let count = mats.len() as u32;
+            let model_flat: Vec<f32> = mats.iter().flat_map(|m| m.iter().copied()).collect();
+            let model = self
                 .ctx
                 .device
                 .create_buffer_init(&wgpu::util::BufferInitDescriptor {
                     label: Some("kami-clj-instances"),
-                    contents: bytemuck_cast_f32(&flat),
+                    contents: bytemuck_cast_f32(&model_flat),
                     usage: wgpu::BufferUsages::VERTEX,
                 });
-            inst_bufs.push((buf, mats.len() as u32));
+            let mut tint_flat: Vec<f32> = match tint_col {
+                Some(tc) => tc.f16x4s().iter().flat_map(|c| c.iter().copied()).collect(),
+                None => Vec::new(),
+            };
+            tint_flat.resize(4 * count as usize, 1.0); // pad/truncate to one RGBA per instance
+            let tint = self
+                .ctx
+                .device
+                .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                    label: Some("kami-clj-instance-tint"),
+                    contents: bytemuck_cast_f32(&tint_flat),
+                    usage: wgpu::BufferUsages::VERTEX,
+                });
+            inst_bufs.push(InstanceBuffers {
+                model,
+                tint,
+                count,
+            });
         }
 
         let surface = self
@@ -286,23 +320,21 @@ impl KamiCljHost {
             pass.set_bind_group(0, &self.camera_bg, &[]);
 
             for (i, draw) in meta.draws.iter().enumerate() {
-                let (Some(mesh), Some(mat_bg), Some((inst_buf, inst_n))) = (
+                let (Some(mesh), Some(mat_bg), Some(inst)) = (
                     self.meshes.get(&draw.mesh),
                     self.materials.get(&draw.material),
                     inst_bufs.get(i),
                 ) else {
                     continue; // unregistered asset or missing column — skip this draw
                 };
-                let pipe = self
-                    .shaders
-                    .get(&draw.pipeline)
-                    .unwrap_or(&self.pipeline);
+                let pipe = self.shaders.get(&draw.pipeline).unwrap_or(&self.pipeline);
                 pass.set_pipeline(pipe);
                 pass.set_bind_group(1, mat_bg, &[]);
                 pass.set_vertex_buffer(0, mesh.vertex.slice(..));
-                pass.set_vertex_buffer(1, inst_buf.slice(..));
+                pass.set_vertex_buffer(1, inst.model.slice(..));
+                pass.set_vertex_buffer(2, inst.tint.slice(..));
                 pass.set_index_buffer(mesh.index.slice(..), wgpu::IndexFormat::Uint32);
-                pass.draw_indexed(0..mesh.index_count, 0, 0..*inst_n);
+                pass.draw_indexed(0..mesh.index_count, 0, 0..inst.count);
             }
         }
         self.ctx.queue.submit(Some(encoder.finish()));
@@ -425,6 +457,16 @@ fn build_pipeline(
             },
         ],
     };
+    // vertex buffer 2: per-instance RGBA tint (vec4), step Instance
+    let tbuf = wgpu::VertexBufferLayout {
+        array_stride: 16,
+        step_mode: wgpu::VertexStepMode::Instance,
+        attributes: &[wgpu::VertexAttribute {
+            offset: 0,
+            shader_location: 7,
+            format: wgpu::VertexFormat::Float32x4,
+        }],
+    };
 
     ctx.device
         .create_render_pipeline(&wgpu::RenderPipelineDescriptor {
@@ -433,7 +475,7 @@ fn build_pipeline(
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: Some("vs_main"),
-                buffers: &[vbuf, ibuf],
+                buffers: &[vbuf, ibuf, tbuf],
                 compilation_options: Default::default(),
             },
             fragment: Some(wgpu::FragmentState {
@@ -479,10 +521,12 @@ struct VsIn {
   @location(4) m1: vec4<f32>,
   @location(5) m2: vec4<f32>,
   @location(6) m3: vec4<f32>,
+  @location(7) tint: vec4<f32>,
 };
 struct VsOut {
   @builtin(position) clip: vec4<f32>,
   @location(0) normal: vec3<f32>,
+  @location(1) tint: vec4<f32>,
 };
 
 @vertex
@@ -491,6 +535,7 @@ fn vs_main(in: VsIn) -> VsOut {
   var out: VsOut;
   out.clip = camera.view_proj * model * vec4<f32>(in.pos, 1.0);
   out.normal = (model * vec4<f32>(in.normal, 0.0)).xyz;
+  out.tint = in.tint;
   return out;
 }
 
@@ -498,6 +543,7 @@ fn vs_main(in: VsIn) -> VsOut {
 fn fs_main(in: VsOut) -> @location(0) vec4<f32> {
   let l = normalize(vec3<f32>(0.4, 1.0, 0.6));
   let diff = max(dot(normalize(in.normal), l), 0.0) * 0.7 + 0.3;
-  return vec4<f32>(material.albedo.rgb * diff, material.albedo.a);
+  let base = material.albedo * in.tint;
+  return vec4<f32>(base.rgb * diff, base.a);
 }
 "#;

@@ -140,7 +140,10 @@ fn roadster_ring_deforms_under_load() {
     // Tread band has at least 30 cm spread top-to-bottom — a rigid disc
     // would have ~60 cm so we just assert the ring isn't collapsed.
     let spread = tire_y_max - tire_y_min;
-    assert!(spread > 0.30, "tire ring spread {spread} m — ring collapsed?");
+    assert!(
+        spread > 0.30,
+        "tire ring spread {spread} m — ring collapsed?"
+    );
     eprintln!(
         "[ring] tire_y_min={:.3} tire_y_max={:.3} spread={:.3}",
         tire_y_min, tire_y_max, spread

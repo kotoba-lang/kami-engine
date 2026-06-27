@@ -1,5 +1,4 @@
 /// Eye diagram generation and metrics extraction for serial link analysis.
-
 use serde::{Deserialize, Serialize};
 
 /// Eye diagram quality metrics.
@@ -47,7 +46,9 @@ pub fn generate_eye_data(
 
     // Simple LCG for deterministic pseudo-random noise/jitter.
     let next_rand = |s: &mut u64| -> f64 {
-        *s = s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        *s = s
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         // Map to [-1, 1].
         (*s as f64 / u64::MAX as f64) * 2.0 - 1.0
     };
@@ -91,7 +92,8 @@ pub fn generate_eye_data(
     let center_start = bit_period_ps * 0.35;
     let center_end = bit_period_ps * 0.65;
 
-    let center_samples: Vec<f64> = samples.iter()
+    let center_samples: Vec<f64> = samples
+        .iter()
         .filter(|(t, _)| *t >= center_start && *t <= center_end)
         .map(|(_, v)| *v)
         .collect();
@@ -99,20 +101,38 @@ pub fn generate_eye_data(
     let (high_samples, low_samples): (Vec<f64>, Vec<f64>) =
         center_samples.iter().partition(|&&v| v > 0.0);
 
-    let high_mean = if high_samples.is_empty() { half_amp }
-        else { high_samples.iter().sum::<f64>() / high_samples.len() as f64 };
-    let low_mean = if low_samples.is_empty() { -half_amp }
-        else { low_samples.iter().sum::<f64>() / low_samples.len() as f64 };
+    let high_mean = if high_samples.is_empty() {
+        half_amp
+    } else {
+        high_samples.iter().sum::<f64>() / high_samples.len() as f64
+    };
+    let low_mean = if low_samples.is_empty() {
+        -half_amp
+    } else {
+        low_samples.iter().sum::<f64>() / low_samples.len() as f64
+    };
 
     let high_sigma = if high_samples.len() > 1 {
-        (high_samples.iter().map(|v| (v - high_mean).powi(2)).sum::<f64>()
-            / (high_samples.len() - 1) as f64).sqrt()
-    } else { noise_rms_mv };
+        (high_samples
+            .iter()
+            .map(|v| (v - high_mean).powi(2))
+            .sum::<f64>()
+            / (high_samples.len() - 1) as f64)
+            .sqrt()
+    } else {
+        noise_rms_mv
+    };
 
     let low_sigma = if low_samples.len() > 1 {
-        (low_samples.iter().map(|v| (v - low_mean).powi(2)).sum::<f64>()
-            / (low_samples.len() - 1) as f64).sqrt()
-    } else { noise_rms_mv };
+        (low_samples
+            .iter()
+            .map(|v| (v - low_mean).powi(2))
+            .sum::<f64>()
+            / (low_samples.len() - 1) as f64)
+            .sqrt()
+    } else {
+        noise_rms_mv
+    };
 
     let eye_height = (high_mean - 3.0 * high_sigma) - (low_mean + 3.0 * low_sigma);
     let eye_width = bit_period_ps - 6.0 * jitter_rms_ps;
@@ -144,8 +164,11 @@ mod tests {
     #[test]
     fn eye_height_positive() {
         let data = generate_eye_data(10.0, 800.0, 30.0, 10.0, 5.0, 100);
-        assert!(data.metrics.eye_height_mv > 0.0,
-            "Eye height should be positive, got {}", data.metrics.eye_height_mv);
+        assert!(
+            data.metrics.eye_height_mv > 0.0,
+            "Eye height should be positive, got {}",
+            data.metrics.eye_height_mv
+        );
         assert!(!data.samples.is_empty());
     }
 
@@ -154,7 +177,11 @@ mod tests {
         let bit_rate = 10.0;
         let data = generate_eye_data(bit_rate, 800.0, 30.0, 10.0, 5.0, 50);
         let bit_period = 1000.0 / bit_rate;
-        assert!(data.metrics.eye_width_ps <= bit_period,
-            "Eye width {} should not exceed bit period {}", data.metrics.eye_width_ps, bit_period);
+        assert!(
+            data.metrics.eye_width_ps <= bit_period,
+            "Eye width {} should not exceed bit period {}",
+            data.metrics.eye_width_ps,
+            bit_period
+        );
     }
 }

@@ -20,8 +20,8 @@ use bytemuck::{Pod, Zeroable};
 use glam::{Mat4, Vec3};
 use hecs::World;
 use kami_app::{Camera, RenderPipeline};
-use kami_render::scene_pipelines::{VoxelPipeline, VoxelUniform};
 use kami_render::RenderContext;
+use kami_render::scene_pipelines::{VoxelPipeline, VoxelUniform};
 use std::cell::RefCell;
 use std::collections::{HashMap, VecDeque};
 use std::rc::Rc;
@@ -60,7 +60,9 @@ impl VoxelChunk {
     }
 
     pub fn get(&self, x: i32, y: i32, z: i32) -> u8 {
-        if x < 0 || y < 0 || z < 0
+        if x < 0
+            || y < 0
+            || z < 0
             || x >= CHUNK_SIZE as i32
             || y >= CHUNK_SIZE as i32
             || z >= CHUNK_SIZE as i32
@@ -207,31 +209,59 @@ impl VoxelChunkAdapter {
     /// Amanatides & Woo DDA raycast across loaded chunks. Steps 1
     /// voxel cell at a time and returns the first solid cell hit + the
     /// face normal. `max_dist` is meters.
-    pub fn raycast(
-        &self,
-        origin: Vec3,
-        dir: Vec3,
-        max_dist: f32,
-    ) -> Option<(glam::IVec3, Vec3)> {
+    pub fn raycast(&self, origin: Vec3, dir: Vec3, max_dist: f32) -> Option<(glam::IVec3, Vec3)> {
         let d = dir.normalize();
         let mut x = origin.x.floor() as i32;
         let mut y = origin.y.floor() as i32;
         let mut z = origin.z.floor() as i32;
-        let step_x = if d.x > 0.0 { 1 } else if d.x < 0.0 { -1 } else { 0 };
-        let step_y = if d.y > 0.0 { 1 } else if d.y < 0.0 { -1 } else { 0 };
-        let step_z = if d.z > 0.0 { 1 } else if d.z < 0.0 { -1 } else { 0 };
-        let next_boundary = |v: f32, step: i32| -> f32 {
-            if step > 0 { v.floor() + 1.0 } else { v.floor() }
+        let step_x = if d.x > 0.0 {
+            1
+        } else if d.x < 0.0 {
+            -1
+        } else {
+            0
         };
+        let step_y = if d.y > 0.0 {
+            1
+        } else if d.y < 0.0 {
+            -1
+        } else {
+            0
+        };
+        let step_z = if d.z > 0.0 {
+            1
+        } else if d.z < 0.0 {
+            -1
+        } else {
+            0
+        };
+        let next_boundary =
+            |v: f32, step: i32| -> f32 { if step > 0 { v.floor() + 1.0 } else { v.floor() } };
         let t_for = |boundary: f32, start: f32, dir_c: f32| -> f32 {
-            if dir_c == 0.0 { f32::INFINITY } else { (boundary - start) / dir_c }
+            if dir_c == 0.0 {
+                f32::INFINITY
+            } else {
+                (boundary - start) / dir_c
+            }
         };
         let mut t_max_x = t_for(next_boundary(origin.x, step_x), origin.x, d.x);
         let mut t_max_y = t_for(next_boundary(origin.y, step_y), origin.y, d.y);
         let mut t_max_z = t_for(next_boundary(origin.z, step_z), origin.z, d.z);
-        let t_delta_x = if d.x != 0.0 { (1.0 / d.x).abs() } else { f32::INFINITY };
-        let t_delta_y = if d.y != 0.0 { (1.0 / d.y).abs() } else { f32::INFINITY };
-        let t_delta_z = if d.z != 0.0 { (1.0 / d.z).abs() } else { f32::INFINITY };
+        let t_delta_x = if d.x != 0.0 {
+            (1.0 / d.x).abs()
+        } else {
+            f32::INFINITY
+        };
+        let t_delta_y = if d.y != 0.0 {
+            (1.0 / d.y).abs()
+        } else {
+            f32::INFINITY
+        };
+        let t_delta_z = if d.z != 0.0 {
+            (1.0 / d.z).abs()
+        } else {
+            f32::INFINITY
+        };
 
         let mut normal = Vec3::ZERO;
         let mut t = 0.0_f32;
@@ -288,12 +318,24 @@ impl VoxelChunkAdapter {
             chunk.set(lx, ly, lz, material);
         }
         self.rebuild_chunk_gpu(cc);
-        if lx == 0 { self.rebuild_chunk_gpu((cc.0 - 1, cc.1, cc.2)); }
-        if lx == (cs - 1) as usize { self.rebuild_chunk_gpu((cc.0 + 1, cc.1, cc.2)); }
-        if ly == 0 { self.rebuild_chunk_gpu((cc.0, cc.1 - 1, cc.2)); }
-        if ly == (cs - 1) as usize { self.rebuild_chunk_gpu((cc.0, cc.1 + 1, cc.2)); }
-        if lz == 0 { self.rebuild_chunk_gpu((cc.0, cc.1, cc.2 - 1)); }
-        if lz == (cs - 1) as usize { self.rebuild_chunk_gpu((cc.0, cc.1, cc.2 + 1)); }
+        if lx == 0 {
+            self.rebuild_chunk_gpu((cc.0 - 1, cc.1, cc.2));
+        }
+        if lx == (cs - 1) as usize {
+            self.rebuild_chunk_gpu((cc.0 + 1, cc.1, cc.2));
+        }
+        if ly == 0 {
+            self.rebuild_chunk_gpu((cc.0, cc.1 - 1, cc.2));
+        }
+        if ly == (cs - 1) as usize {
+            self.rebuild_chunk_gpu((cc.0, cc.1 + 1, cc.2));
+        }
+        if lz == 0 {
+            self.rebuild_chunk_gpu((cc.0, cc.1, cc.2 - 1));
+        }
+        if lz == (cs - 1) as usize {
+            self.rebuild_chunk_gpu((cc.0, cc.1, cc.2 + 1));
+        }
     }
 
     /// Mine: remove voxel at block coord, regenerate that chunk's GPU
@@ -310,7 +352,9 @@ impl VoxelChunkAdapter {
         let lz = block.z.rem_euclid(cs) as usize;
         {
             let mut cpu = self.inner.cpu.borrow_mut();
-            let Some(chunk) = cpu.get_mut(&cc) else { return };
+            let Some(chunk) = cpu.get_mut(&cc) else {
+                return;
+            };
             if chunk.get(lx as i32, ly as i32, lz as i32) == 0 {
                 return;
             }
@@ -320,12 +364,24 @@ impl VoxelChunkAdapter {
         self.rebuild_chunk_gpu(cc);
         // Rebuild neighbours if the mined block sat on their boundary
         // (face exposure now changed).
-        if lx == 0 { self.rebuild_chunk_gpu((cc.0 - 1, cc.1, cc.2)); }
-        if lx == (cs - 1) as usize { self.rebuild_chunk_gpu((cc.0 + 1, cc.1, cc.2)); }
-        if ly == 0 { self.rebuild_chunk_gpu((cc.0, cc.1 - 1, cc.2)); }
-        if ly == (cs - 1) as usize { self.rebuild_chunk_gpu((cc.0, cc.1 + 1, cc.2)); }
-        if lz == 0 { self.rebuild_chunk_gpu((cc.0, cc.1, cc.2 - 1)); }
-        if lz == (cs - 1) as usize { self.rebuild_chunk_gpu((cc.0, cc.1, cc.2 + 1)); }
+        if lx == 0 {
+            self.rebuild_chunk_gpu((cc.0 - 1, cc.1, cc.2));
+        }
+        if lx == (cs - 1) as usize {
+            self.rebuild_chunk_gpu((cc.0 + 1, cc.1, cc.2));
+        }
+        if ly == 0 {
+            self.rebuild_chunk_gpu((cc.0, cc.1 - 1, cc.2));
+        }
+        if ly == (cs - 1) as usize {
+            self.rebuild_chunk_gpu((cc.0, cc.1 + 1, cc.2));
+        }
+        if lz == 0 {
+            self.rebuild_chunk_gpu((cc.0, cc.1, cc.2 - 1));
+        }
+        if lz == (cs - 1) as usize {
+            self.rebuild_chunk_gpu((cc.0, cc.1, cc.2 + 1));
+        }
     }
 
     fn rebuild_chunk_gpu(&self, cc: (i32, i32, i32)) {
@@ -335,8 +391,12 @@ impl VoxelChunkAdapter {
         drop(cpu);
         let mut gpu = self.inner.gpu.borrow_mut();
         match new_gpu {
-            Some(g) => { gpu.insert(cc, g); }
-            None => { gpu.remove(&cc); }
+            Some(g) => {
+                gpu.insert(cc, g);
+            }
+            None => {
+                gpu.remove(&cc);
+            }
         }
     }
 
@@ -475,7 +535,10 @@ fn greedy_face_quads(
                     corners[i][1] += origin.y;
                     corners[i][2] += origin.z;
                 }
-                let col = palette.get(mat as usize).copied().unwrap_or([1.0, 0.0, 1.0]);
+                let col = palette
+                    .get(mat as usize)
+                    .copied()
+                    .unwrap_or([1.0, 0.0, 1.0]);
                 let mut normal = [0.0_f32; 3];
                 normal[d] = sign as f32;
 
@@ -589,13 +652,14 @@ impl RenderPipeline for VoxelChunkAdapter {
                 } else {
                     // Generator returned empty; record an empty CPU entry
                     // so we don't re-enqueue it every frame.
-                    self.inner.cpu.borrow_mut().insert(coord, VoxelChunk::new(
-                        Vec3::new(
+                    self.inner.cpu.borrow_mut().insert(
+                        coord,
+                        VoxelChunk::new(Vec3::new(
                             (coord.0 * CHUNK_SIZE as i32) as f32,
                             (coord.1 * CHUNK_SIZE as i32) as f32,
                             (coord.2 * CHUNK_SIZE as i32) as f32,
-                        ),
-                    ));
+                        )),
+                    );
                 }
             }
         }

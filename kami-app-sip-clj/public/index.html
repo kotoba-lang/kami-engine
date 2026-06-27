@@ -36,25 +36,29 @@
   </div>
 
   <script type="module">
-    // 1) Instantiate the kami-clj-host wasm (owns wgpu/WebGPU) and expose the
-    //    KamiCljHost class as a global — kami.backend.browser/make reads it.
-    //    Built by: wasm-pack build kami-clj-host --target web --features host
-    import wasmInit, { KamiCljHost } from '/wasm/kami_clj_host.js';
-    // 2) The cljs bundle (shadow-cljs :app build) exposes window.sip.web.boot.
-    import './js/sip.js?b=5';
+    // The cljs bundle (shadow-cljs :app build) exposes window.sip.{ui,web}.
+    import './js/sip.js?b=6';
+
+    // The game is playable from the pure session FSM (sip.ui) without WebGPU;
+    // the 3D water-city scene is a best-effort backdrop layered behind it. The
+    // kami-clj-host wasm is loaded *dynamically* so a missing/failed wasm never
+    // blocks the HUD (static import would fail the whole module).
+    async function boot3d() {
+      if (!navigator.gpu) { console.warn('WebGPU unavailable — running 2D HUD only'); return; }
+      try {
+        const mod = await import('/wasm/kami_clj_host.js');   // wasm-pack build kami-clj-host --target web --features host
+        await mod.default();                    // wasm-bindgen init
+        window.KamiCljHost = mod.KamiCljHost;   // global the backend resolves
+        await window.sip.web.boot('sip-canvas', '/snapshot.edn');
+      } catch (err) {
+        console.warn('3D scene unavailable — continuing with HUD only', err);
+      }
+    }
 
     async function go() {
-      const hint = document.querySelector('.hint');
-      try {
-        if (!navigator.gpu) { hint.textContent = 'このブラウザは WebGPU 非対応です。Chrome/Edge 最新版をお試しください。'; return; }
-        await wasmInit();                       // wasm-bindgen init
-        window.KamiCljHost = KamiCljHost;       // global the backend resolves
-        await window.sip.web.boot('sip-canvas', '/snapshot.edn');
-        document.getElementById('intro').classList.add('hidden');
-      } catch (err) {
-        hint.textContent = '起動に失敗しました（コンソールを確認してください）。';
-        console.error(err);
-      }
+      window.sip.ui.mount();                    // playable HUD (always)
+      document.getElementById('intro').classList.add('hidden');
+      boot3d();                                 // non-fatal, best-effort backdrop
     }
     window.addEventListener('load', go);
   </script>

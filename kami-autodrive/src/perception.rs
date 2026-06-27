@@ -33,7 +33,13 @@ impl OccupancyGrid {
     pub fn centered(center: Vec2, half_extent: f32, res: f32) -> Self {
         let n = ((2.0 * half_extent / res).ceil() as usize).max(1);
         let origin = center - Vec2::splat((n as f32 - 1.0) * 0.5 * res);
-        Self { origin, res, w: n, h: n, cells: vec![0; n * n] }
+        Self {
+            origin,
+            res,
+            w: n,
+            h: n,
+            cells: vec![0; n * n],
+        }
     }
 
     pub fn clear(&mut self) {
@@ -178,7 +184,10 @@ impl OccupancyGrid {
     pub fn nearest_free(&self, p: Vec2) -> Option<GridPos> {
         let (cx, cy) = self.world_to_cell(p)?;
         if !self.is_occupied(cx, cy) {
-            return Some(GridPos { x: cx as i32, y: cy as i32 });
+            return Some(GridPos {
+                x: cx as i32,
+                y: cy as i32,
+            });
         }
         let max_r = self.w.max(self.h) as i32;
         for r in 1..max_r {
@@ -189,7 +198,10 @@ impl OccupancyGrid {
                     }
                     let nx = cx as i32 + dx;
                     let ny = cy as i32 + dy;
-                    if nx >= 0 && ny >= 0 && (nx as usize) < self.w && (ny as usize) < self.h
+                    if nx >= 0
+                        && ny >= 0
+                        && (nx as usize) < self.w
+                        && (ny as usize) < self.h
                         && !self.is_occupied(nx as usize, ny as usize)
                     {
                         return Some(GridPos { x: nx, y: ny });
@@ -273,16 +285,27 @@ mod tests {
     use glam::Vec3;
 
     fn hit(point_sensor: Vec3, range: f32) -> LidarReturn {
-        LidarReturn { range, point_sensor, prim_index: 0 }
+        LidarReturn {
+            range,
+            point_sensor,
+            prim_index: 0,
+        }
     }
 
     #[test]
     fn cell_world_round_trip() {
         let g = OccupancyGrid::centered(Vec2::new(10.0, -5.0), 20.0, 0.5);
-        for &p in &[Vec2::new(10.0, -5.0), Vec2::new(3.5, 2.0), Vec2::new(-7.0, -12.0)] {
+        for &p in &[
+            Vec2::new(10.0, -5.0),
+            Vec2::new(3.5, 2.0),
+            Vec2::new(-7.0, -12.0),
+        ] {
             let (cx, cy) = g.world_to_cell(p).expect("inside");
             let c = g.cell_to_world(cx, cy);
-            assert!(c.distance(p) <= 0.5 * std::f32::consts::SQRT_2 + 1e-4, "{p:?} -> {c:?}");
+            assert!(
+                c.distance(p) <= 0.5 * std::f32::consts::SQRT_2 + 1e-4,
+                "{p:?} -> {c:?}"
+            );
         }
     }
 
@@ -301,7 +324,10 @@ mod tests {
 
         let inflated = g.inflated(1.0); // 2 cells
         let nbr = g.world_to_cell(Vec2::new(0.8, 0.0)).unwrap();
-        assert!(inflated.is_occupied(nbr.0, nbr.1), "inflation should reach 0.8 m");
+        assert!(
+            inflated.is_occupied(nbr.0, nbr.1),
+            "inflation should reach 0.8 m"
+        );
         // Original grid is untouched by inflated().
         assert!(!g.is_occupied(nbr.0, nbr.1));
 
@@ -321,9 +347,9 @@ mod tests {
     fn forward_clearance_picks_nearest_in_cone() {
         let pose = Pose2::new(0.0, 0.0, 0.0);
         let returns = [
-            hit(Vec3::new(8.0, 0.0, 0.0), 8.0),  // ahead, far
-            hit(Vec3::new(3.0, 0.2, 0.0), 3.0),  // ahead, near
-            hit(Vec3::new(0.0, 5.0, 0.0), 5.0),  // 90° abeam — outside cone
+            hit(Vec3::new(8.0, 0.0, 0.0), 8.0), // ahead, far
+            hit(Vec3::new(3.0, 0.2, 0.0), 3.0), // ahead, near
+            hit(Vec3::new(0.0, 5.0, 0.0), 5.0), // 90° abeam — outside cone
         ];
         let _ = pose;
         let c = forward_clearance(&returns, 0.35, (-1.0, 1.0)).unwrap();
@@ -344,7 +370,11 @@ mod tests {
         // Camera at (0,0,1) looking down +x (world z-up).
         let intr = CameraIntrinsics::from_hfov(160, 120, 70f32.to_radians());
         let mut cam = Camera::new("c", "/c", intr);
-        cam.look_at(Vec3::new(0.0, 0.0, 1.0), Vec3::new(10.0, 0.0, 1.0), Vec3::new(0.0, 0.0, 1.0));
+        cam.look_at(
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(10.0, 0.0, 1.0),
+            Vec3::new(0.0, 0.0, 1.0),
+        );
 
         // A box face at x=8, sampled on a y×z grid within the obstacle band.
         let mut pts = Vec::new();
@@ -383,7 +413,11 @@ mod tests {
         use kami_sensor_sim::{Camera, CameraIntrinsics};
         let intr = CameraIntrinsics::from_hfov(160, 120, 70f32.to_radians());
         let mut cam = Camera::new("c", "/c", intr);
-        cam.look_at(Vec3::new(0.0, 0.0, 1.0), Vec3::new(10.0, 0.0, 1.0), Vec3::new(0.0, 0.0, 1.0));
+        cam.look_at(
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(10.0, 0.0, 1.0),
+            Vec3::new(0.0, 0.0, 1.0),
+        );
 
         // Wall face 8 m ahead, within the obstacle height band.
         let mut pts = Vec::new();
@@ -401,7 +435,9 @@ mod tests {
         assert!((c - 8.0).abs() < 1.0, "should report ≈8 m ahead, got {c}");
 
         // Overhead-only structure is rejected (no reflex on a gantry).
-        let high: Vec<Vec3> = (0..20).map(|i| Vec3::new(8.0, -1.5 + 0.15 * i as f32, 6.0)).collect();
+        let high: Vec<Vec3> = (0..20)
+            .map(|i| Vec3::new(8.0, -1.5 + 0.15 * i as f32, 6.0))
+            .collect();
         let depth_high = cam.render_points_to_depth_image(&high);
         assert!(forward_clearance_camera(&depth_high, &cam, 0.35, (0.3, 2.5)).is_none());
     }
@@ -411,14 +447,27 @@ mod tests {
         use kami_sensor_sim::{Camera, CameraIntrinsics};
         let intr = CameraIntrinsics::from_hfov(160, 120, 70f32.to_radians());
         let mut cam = Camera::new("c", "/c", intr);
-        cam.look_at(Vec3::new(0.0, 0.0, 1.0), Vec3::new(10.0, 0.0, 1.0), Vec3::new(0.0, 0.0, 1.0));
+        cam.look_at(
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(10.0, 0.0, 1.0),
+            Vec3::new(0.0, 0.0, 1.0),
+        );
         // A gantry far above the band (world z≈6).
-        let pts: Vec<Vec3> = (0..20).map(|i| Vec3::new(8.0, -1.0 + 0.1 * i as f32, 6.0)).collect();
+        let pts: Vec<Vec3> = (0..20)
+            .map(|i| Vec3::new(8.0, -1.0 + 0.1 * i as f32, 6.0))
+            .collect();
         let depth = cam.render_points_to_depth_image(&pts);
 
         let mut grid = OccupancyGrid::centered(Vec2::new(5.0, 0.0), 12.0, 0.25);
         grid.ingest_camera_depth(&depth, &cam, (0.3, 2.5));
-        assert_eq!(grid.to_cost_grid().iter().flatten().filter(|c| **c == 0).count(), 0,
-            "overhead structure must not appear in the ground costmap");
+        assert_eq!(
+            grid.to_cost_grid()
+                .iter()
+                .flatten()
+                .filter(|c| **c == 0)
+                .count(),
+            0,
+            "overhead structure must not appear in the ground costmap"
+        );
     }
 }

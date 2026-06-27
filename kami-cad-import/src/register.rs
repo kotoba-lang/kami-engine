@@ -133,7 +133,10 @@ pub fn register_request(
         headers.push(("Authorization".to_string(), format!("Bearer {tok}")));
     }
     Ok(RegisterRequest {
-        url: opts.endpoint.clone().unwrap_or_else(|| DEFAULT_ENDPOINT.to_string()),
+        url: opts
+            .endpoint
+            .clone()
+            .unwrap_or_else(|| DEFAULT_ENDPOINT.to_string()),
         method: "POST",
         headers,
         body: json,
@@ -216,7 +219,10 @@ mod tests {
         a.add_part(part("rail", PartKind::Chassis, Material::SteelHss));
         let req = register_request(&a, &RegisterOptions::default()).unwrap();
         assert_eq!(req.method, "POST");
-        assert!(req.url.contains("/xrpc/app.etzhayyim.sbom.registerArtifact"));
+        assert!(
+            req.url
+                .contains("/xrpc/app.etzhayyim.sbom.registerArtifact")
+        );
         assert!(req.url.starts_with("https://atproto.etzhayyim.com"));
     }
 
@@ -248,7 +254,11 @@ mod tests {
             ..Default::default()
         };
         let req = register_request(&a, &opts).unwrap();
-        let auth = req.headers.iter().find(|(k, _)| k == "Authorization").unwrap();
+        let auth = req
+            .headers
+            .iter()
+            .find(|(k, _)| k == "Authorization")
+            .unwrap();
         assert_eq!(auth.1, "Bearer eyJ.testtoken");
     }
 
@@ -269,7 +279,10 @@ mod tests {
         let mut a = VehicleAssembly::new("v1", provenance());
         a.add_part(part("rail", PartKind::Chassis, Material::SteelHss));
         let opts = RegisterOptions {
-            endpoint: Some("https://staging.atproto.etzhayyim.com/xrpc/app.etzhayyim.sbom.registerArtifact".into()),
+            endpoint: Some(
+                "https://staging.atproto.etzhayyim.com/xrpc/app.etzhayyim.sbom.registerArtifact"
+                    .into(),
+            ),
             ..Default::default()
         };
         let req = register_request(&a, &opts).unwrap();

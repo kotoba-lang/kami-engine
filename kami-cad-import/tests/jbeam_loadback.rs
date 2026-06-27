@@ -120,11 +120,12 @@ fn roadster_wheel_tire_nodes_populate_via_jbeam_loader() {
         );
         // every tire node should land in the WheelTire group.
         for &id in &w.tire_nodes {
-            let n = vehicle.nodes.iter().find(|n| n.id == id).expect("ring node");
-            assert!(matches!(
-                n.group,
-                kami_vehicle::node::NodeGroup::WheelTire
-            ));
+            let n = vehicle
+                .nodes
+                .iter()
+                .find(|n| n.id == id)
+                .expect("ring node");
+            assert!(matches!(n.group, kami_vehicle::node::NodeGroup::WheelTire));
         }
     }
 }
@@ -159,7 +160,11 @@ fn roadster_wheel_axles_resolve_to_wheel_hub_nodes() {
     use kami_vehicle::node::NodeGroup;
     for w in &vehicle.wheels {
         for &axle_id in &w.hub_nodes {
-            let n = vehicle.nodes.iter().find(|n| n.id == axle_id).expect("axle node");
+            let n = vehicle
+                .nodes
+                .iter()
+                .find(|n| n.id == axle_id)
+                .expect("axle node");
             assert!(
                 matches!(n.group, NodeGroup::WheelHub),
                 "axle node should be in WheelHub group"

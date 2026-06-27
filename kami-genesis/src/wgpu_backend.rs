@@ -38,13 +38,23 @@ struct GpuCfg {
 
 impl From<&CartpoleState> for GpuState {
     fn from(s: &CartpoleState) -> Self {
-        GpuState { x: s.x, x_dot: s.x_dot, theta: s.theta, theta_dot: s.theta_dot }
+        GpuState {
+            x: s.x,
+            x_dot: s.x_dot,
+            theta: s.theta,
+            theta_dot: s.theta_dot,
+        }
     }
 }
 
 impl From<GpuState> for CartpoleState {
     fn from(s: GpuState) -> Self {
-        CartpoleState { x: s.x, x_dot: s.x_dot, theta: s.theta, theta_dot: s.theta_dot }
+        CartpoleState {
+            x: s.x,
+            x_dot: s.x_dot,
+            theta: s.theta,
+            theta_dot: s.theta_dot,
+        }
     }
 }
 
@@ -81,13 +91,23 @@ struct GpuDpCfg {
 
 impl From<&DoublePendulumState> for GpuDpState {
     fn from(s: &DoublePendulumState) -> Self {
-        GpuDpState { q1: s.q1, q2: s.q2, q1_dot: s.q1_dot, q2_dot: s.q2_dot }
+        GpuDpState {
+            q1: s.q1,
+            q2: s.q2,
+            q1_dot: s.q1_dot,
+            q2_dot: s.q2_dot,
+        }
     }
 }
 
 impl From<GpuDpState> for DoublePendulumState {
     fn from(s: GpuDpState) -> Self {
-        DoublePendulumState { q1: s.q1, q2: s.q2, q1_dot: s.q1_dot, q2_dot: s.q2_dot }
+        DoublePendulumState {
+            q1: s.q1,
+            q2: s.q2,
+            q1_dot: s.q1_dot,
+            q2_dot: s.q2_dot,
+        }
     }
 }
 
@@ -203,8 +223,7 @@ impl WgpuBackend {
             label: Some("double_pendulum_step.wgsl"),
             source: wgpu::ShaderSource::Wgsl(Cow::Borrowed(DP_WGSL_SOURCE)),
         });
-        let dp_bgl =
-            device.create_bind_group_layout(&triple_storage_layout("kami-genesis-dp-bgl"));
+        let dp_bgl = device.create_bind_group_layout(&triple_storage_layout("kami-genesis-dp-bgl"));
         let dp_pl_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("kami-genesis-dp-pl"),
             bind_group_layouts: &[&dp_bgl],
@@ -273,21 +292,27 @@ impl WgpuBackend {
             _pad: 0,
         };
 
-        let states_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("states"),
-            contents: states_bytes,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-        });
-        let actions_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("actions"),
-            contents: actions_bytes,
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let cfg_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("cfg"),
-            contents: bytemuck::bytes_of(&gpu_cfg),
-            usage: wgpu::BufferUsages::UNIFORM,
-        });
+        let states_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("states"),
+                contents: states_bytes,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+            });
+        let actions_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("actions"),
+                contents: actions_bytes,
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+        let cfg_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("cfg"),
+                contents: bytemuck::bytes_of(&gpu_cfg),
+                usage: wgpu::BufferUsages::UNIFORM,
+            });
         let readback_buf = self.device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("readback"),
             size: states_bytes.len() as u64,
@@ -316,7 +341,9 @@ impl WgpuBackend {
 
         let mut encoder = self
             .device
-            .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: Some("kami-genesis-encoder") });
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                label: Some("kami-genesis-encoder"),
+            });
         {
             let mut cpass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
                 label: Some("cartpole_step"),
@@ -401,21 +428,27 @@ impl WgpuBackend {
             _pad: 0,
         };
 
-        let states_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("kami-genesis-step-n-states"),
-            contents: states_bytes,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-        });
-        let actions_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("kami-genesis-step-n-actions"),
-            contents: actions_bytes,
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let cfg_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("kami-genesis-step-n-cfg"),
-            contents: bytemuck::bytes_of(&gpu_cfg),
-            usage: wgpu::BufferUsages::UNIFORM,
-        });
+        let states_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("kami-genesis-step-n-states"),
+                contents: states_bytes,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+            });
+        let actions_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("kami-genesis-step-n-actions"),
+                contents: actions_bytes,
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+        let cfg_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("kami-genesis-step-n-cfg"),
+                contents: bytemuck::bytes_of(&gpu_cfg),
+                usage: wgpu::BufferUsages::UNIFORM,
+            });
         let readback_buf = self.device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("kami-genesis-step-n-readback"),
             size: states_bytes.len() as u64,
@@ -530,7 +563,12 @@ impl WgpuBackend {
         let gpu_states: Vec<GpuDpState> = states.iter().map(Into::into).collect();
         let gpu_torques: Vec<GpuDpTorque> = torques
             .iter()
-            .map(|t| GpuDpTorque { t1: t[0], t2: t[1], _pad0: 0.0, _pad1: 0.0 })
+            .map(|t| GpuDpTorque {
+                t1: t[0],
+                t2: t[1],
+                _pad0: 0.0,
+                _pad1: 0.0,
+            })
             .collect();
         let states_bytes = bytemuck::cast_slice(&gpu_states);
         let torques_bytes = bytemuck::cast_slice(&gpu_torques);
@@ -545,21 +583,27 @@ impl WgpuBackend {
             num_envs: n,
         };
 
-        let states_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("dp-states"),
-            contents: states_bytes,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-        });
-        let torques_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("dp-torques"),
-            contents: torques_bytes,
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let cfg_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("dp-cfg"),
-            contents: bytemuck::bytes_of(&gpu_cfg),
-            usage: wgpu::BufferUsages::UNIFORM,
-        });
+        let states_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("dp-states"),
+                contents: states_bytes,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+            });
+        let torques_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("dp-torques"),
+                contents: torques_bytes,
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+        let cfg_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("dp-cfg"),
+                contents: bytemuck::bytes_of(&gpu_cfg),
+                usage: wgpu::BufferUsages::UNIFORM,
+            });
         let readback_buf = self.device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("dp-readback"),
             size: states_bytes.len() as u64,
@@ -571,15 +615,26 @@ impl WgpuBackend {
             label: Some("dp-bg"),
             layout: &self.dp_bgl,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: states_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 1, resource: torques_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 2, resource: cfg_buf.as_entire_binding() },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: states_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: torques_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: cfg_buf.as_entire_binding(),
+                },
             ],
         });
 
         let mut encoder = self
             .device
-            .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: Some("dp-encoder") });
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                label: Some("dp-encoder"),
+            });
         {
             let mut cpass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
                 label: Some("double_pendulum_step"),
@@ -648,7 +703,12 @@ impl WgpuBackend {
         let gpu_states: Vec<GpuDpState> = states.iter().map(Into::into).collect();
         let gpu_torques: Vec<GpuDpTorque> = torques
             .iter()
-            .map(|t| GpuDpTorque { t1: t[0], t2: t[1], _pad0: 0.0, _pad1: 0.0 })
+            .map(|t| GpuDpTorque {
+                t1: t[0],
+                t2: t[1],
+                _pad0: 0.0,
+                _pad1: 0.0,
+            })
             .collect();
         let states_bytes = bytemuck::cast_slice(&gpu_states);
         let torques_bytes = bytemuck::cast_slice(&gpu_torques);
@@ -663,21 +723,27 @@ impl WgpuBackend {
             num_envs: n,
         };
 
-        let states_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("dp-step-n-states"),
-            contents: states_bytes,
-            usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
-        });
-        let torques_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("dp-step-n-torques"),
-            contents: torques_bytes,
-            usage: wgpu::BufferUsages::STORAGE,
-        });
-        let cfg_buf = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("dp-step-n-cfg"),
-            contents: bytemuck::bytes_of(&gpu_cfg),
-            usage: wgpu::BufferUsages::UNIFORM,
-        });
+        let states_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("dp-step-n-states"),
+                contents: states_bytes,
+                usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+            });
+        let torques_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("dp-step-n-torques"),
+                contents: torques_bytes,
+                usage: wgpu::BufferUsages::STORAGE,
+            });
+        let cfg_buf = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("dp-step-n-cfg"),
+                contents: bytemuck::bytes_of(&gpu_cfg),
+                usage: wgpu::BufferUsages::UNIFORM,
+            });
         let readback_buf = self.device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("dp-step-n-readback"),
             size: states_bytes.len() as u64,
@@ -689,9 +755,18 @@ impl WgpuBackend {
             label: Some("dp-step-n-bg"),
             layout: &self.dp_bgl,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: states_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 1, resource: torques_buf.as_entire_binding() },
-                wgpu::BindGroupEntry { binding: 2, resource: cfg_buf.as_entire_binding() },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: states_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: torques_buf.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: cfg_buf.as_entire_binding(),
+                },
             ],
         });
 
@@ -774,7 +849,10 @@ mod tests {
             max_dx = max_dx.max((gpu_states[i].x - cpu_states[i].x).abs());
             max_dtheta = max_dtheta.max((gpu_states[i].theta - cpu_states[i].theta).abs());
         }
-        println!("max |Δx| = {:.3e}, max |Δθ| = {:.3e} over {} envs × 50 steps", max_dx, max_dtheta, n);
+        println!(
+            "max |Δx| = {:.3e}, max |Δθ| = {:.3e} over {} envs × 50 steps",
+            max_dx, max_dtheta, n
+        );
         // f32 rounding may produce small drift over 50 steps; require ≤ 1e-3.
         assert!(max_dx < 1e-3, "x drift too large: {max_dx}");
         assert!(max_dtheta < 1e-3, "theta drift too large: {max_dtheta}");
@@ -790,8 +868,17 @@ mod tests {
             }
         };
         let cfg = CartpoleConfig::default();
-        let mut gpu = vec![CartpoleState { theta: 0.1, ..Default::default() }; 1];
-        let mut scalar = CartpoleState { theta: 0.1, ..Default::default() };
+        let mut gpu = vec![
+            CartpoleState {
+                theta: 0.1,
+                ..Default::default()
+            };
+            1
+        ];
+        let mut scalar = CartpoleState {
+            theta: 0.1,
+            ..Default::default()
+        };
         let actions = vec![5.0_f32];
         backend.step(&mut gpu, &actions, &cfg).unwrap();
         scalar.step(5.0, &cfg);
@@ -825,7 +912,9 @@ mod tests {
             .collect();
 
         for _ in 0..50 {
-            backend.step_double_pendulum(&mut gpu_states, &torques, &cfg).unwrap();
+            backend
+                .step_double_pendulum(&mut gpu_states, &torques, &cfg)
+                .unwrap();
             for (st, tau) in cpu_states.iter_mut().zip(torques.iter()) {
                 st.step(*tau, &cfg);
             }
@@ -856,9 +945,19 @@ mod tests {
             }
         };
         let cfg = DoublePendulumConfig::default();
-        let mut gpu = vec![DoublePendulumState { q1: 0.5, q2: -0.2, ..Default::default() }];
-        let mut scalar = DoublePendulumState { q1: 0.5, q2: -0.2, ..Default::default() };
-        backend.step_double_pendulum(&mut gpu, &[[2.0, -1.0]], &cfg).unwrap();
+        let mut gpu = vec![DoublePendulumState {
+            q1: 0.5,
+            q2: -0.2,
+            ..Default::default()
+        }];
+        let mut scalar = DoublePendulumState {
+            q1: 0.5,
+            q2: -0.2,
+            ..Default::default()
+        };
+        backend
+            .step_double_pendulum(&mut gpu, &[[2.0, -1.0]], &cfg)
+            .unwrap();
         scalar.step([2.0, -1.0], &cfg);
         assert!((gpu[0].q1 - scalar.q1).abs() < 1e-6);
         assert!((gpu[0].q2 - scalar.q2).abs() < 1e-6);

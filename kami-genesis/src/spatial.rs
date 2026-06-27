@@ -227,8 +227,14 @@ mod tests {
         let ang = sv_top(&h);
         let want_lin = (w.cross(c)) * m;
         let want_ang = c.cross(w.cross(c)) * m;
-        assert!((lin - want_lin).length() < 1e-5, "lin {lin:?} vs {want_lin:?}");
-        assert!((ang - want_ang).length() < 1e-5, "ang {ang:?} vs {want_ang:?}");
+        assert!(
+            (lin - want_lin).length() < 1e-5,
+            "lin {lin:?} vs {want_lin:?}"
+        );
+        assert!(
+            (ang - want_ang).length() < 1e-5,
+            "ang {ang:?} vs {want_ang:?}"
+        );
     }
 
     #[test]

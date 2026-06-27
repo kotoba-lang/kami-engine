@@ -1,7 +1,7 @@
 //! PBR material definitions for character parts.
 
+use crate::params::{ClothingParams, EyeParams, HairParams, MouthParams, SkinParams};
 use crate::MaterialId;
-use crate::params::{SkinParams, HairParams, EyeParams, MouthParams, ClothingParams};
 
 /// PBR material properties for GLB export.
 #[derive(Debug, Clone)]
@@ -59,7 +59,12 @@ impl PbrMaterial {
             },
             MaterialId::Iris => Self {
                 name: "iris".into(),
-                base_color: [eyes.iris_color[0], eyes.iris_color[1], eyes.iris_color[2], 1.0],
+                base_color: [
+                    eyes.iris_color[0],
+                    eyes.iris_color[1],
+                    eyes.iris_color[2],
+                    1.0,
+                ],
                 metallic: 0.05,
                 roughness: 0.12,
                 subsurface: 0.0,
@@ -83,7 +88,12 @@ impl PbrMaterial {
             },
             MaterialId::Lip => Self {
                 name: "lip".into(),
-                base_color: [mouth.lip_color[0], mouth.lip_color[1], mouth.lip_color[2], 1.0],
+                base_color: [
+                    mouth.lip_color[0],
+                    mouth.lip_color[1],
+                    mouth.lip_color[2],
+                    1.0,
+                ],
                 metallic: 0.0,
                 roughness: 0.3,
                 subsurface: 0.5,
@@ -95,7 +105,12 @@ impl PbrMaterial {
             },
             MaterialId::Eyebrow => Self {
                 name: "eyebrow".into(),
-                base_color: [hair.color[0] * 0.7, hair.color[1] * 0.6, hair.color[2] * 0.5, 1.0],
+                base_color: [
+                    hair.color[0] * 0.7,
+                    hair.color[1] * 0.6,
+                    hair.color[2] * 0.5,
+                    1.0,
+                ],
                 metallic: 0.0,
                 roughness: 0.7,
                 subsurface: 0.0,

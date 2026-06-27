@@ -4,24 +4,23 @@
 //! `SendInput` for synthetic injection, and `EnumDisplayMonitors` for screen geometry.
 
 use crate::{BridgeError, BridgeEvent, InputBridge, ScreenGeometry};
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, Sender};
-use std::sync::Arc;
 use windows::Win32::Foundation::{BOOL, HINSTANCE, LPARAM, LRESULT, POINT, RECT, TRUE, WPARAM};
 use windows::Win32::Graphics::Gdi::{
     EnumDisplayMonitors, GetMonitorInfoW, HDC, HMONITOR, MONITORINFO,
 };
 use windows::Win32::UI::Input::KeyboardAndMouse::{
-    SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, INPUT_MOUSE, KEYBDINPUT, KEYEVENTF_KEYUP,
-    MOUSEEVENTF_ABSOLUTE, MOUSEEVENTF_HWHEEL, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP,
-    MOUSEEVENTF_MOVE, MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, MOUSEEVENTF_WHEEL,
-    MOUSEINPUT, VIRTUAL_KEY,
+    INPUT, INPUT_0, INPUT_KEYBOARD, INPUT_MOUSE, KEYBDINPUT, KEYEVENTF_KEYUP, MOUSEEVENTF_ABSOLUTE,
+    MOUSEEVENTF_HWHEEL, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP, MOUSEEVENTF_MOVE,
+    MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, MOUSEEVENTF_WHEEL, MOUSEINPUT, SendInput,
+    VIRTUAL_KEY,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
-    CallNextHookEx, GetCursorPos, GetMessageW, SetCursorPos, SetWindowsHookExW, ShowCursor,
-    HHOOK, KBDLLHOOKSTRUCT, MSG, MSLLHOOKSTRUCT, WH_KEYBOARD_LL, WH_MOUSE_LL, WM_KEYDOWN,
-    WM_KEYUP, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_RBUTTONDOWN,
-    WM_RBUTTONUP,
+    CallNextHookEx, GetCursorPos, GetMessageW, HHOOK, KBDLLHOOKSTRUCT, MSG, MSLLHOOKSTRUCT,
+    SetCursorPos, SetWindowsHookExW, ShowCursor, WH_KEYBOARD_LL, WH_MOUSE_LL, WM_KEYDOWN, WM_KEYUP,
+    WM_LBUTTONDOWN, WM_LBUTTONUP, WM_MOUSEMOVE, WM_MOUSEWHEEL, WM_RBUTTONDOWN, WM_RBUTTONUP,
 };
 
 /// Thread-local sender for hook callbacks.
@@ -46,11 +45,7 @@ impl WindowsBridge {
 }
 
 /// Low-level mouse hook callback.
-unsafe extern "system" fn mouse_hook_proc(
-    code: i32,
-    wparam: WPARAM,
-    lparam: LPARAM,
-) -> LRESULT {
+unsafe extern "system" fn mouse_hook_proc(code: i32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     if code >= 0 {
         let info = unsafe { &*(lparam.0 as *const MSLLHOOKSTRUCT) };
         let (lx, ly) = LAST_MOUSE_POS.get();
@@ -97,25 +92,15 @@ unsafe extern "system" fn mouse_hook_proc(
 }
 
 /// Low-level keyboard hook callback.
-unsafe extern "system" fn keyboard_hook_proc(
-    code: i32,
-    wparam: WPARAM,
-    lparam: LPARAM,
-) -> LRESULT {
+unsafe extern "system" fn keyboard_hook_proc(code: i32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     if code >= 0 {
         let info = unsafe { &*(lparam.0 as *const KBDLLHOOKSTRUCT) };
         let keycode = info.vkCode;
         let modifiers = get_current_modifiers();
 
         let event = match wparam.0 as u32 {
-            WM_KEYDOWN => Some(BridgeEvent::KeyDown {
-                keycode,
-                modifiers,
-            }),
-            WM_KEYUP => Some(BridgeEvent::KeyUp {
-                keycode,
-                modifiers,
-            }),
+            WM_KEYDOWN => Some(BridgeEvent::KeyDown { keycode, modifiers }),
+            WM_KEYUP => Some(BridgeEvent::KeyUp { keycode, modifiers }),
             _ => None,
         };
 
@@ -318,8 +303,13 @@ impl InputBridge for WindowsBridge {
         let mut monitors: Vec<ScreenGeometry> = Vec::new();
         let ptr = &mut monitors as *mut Vec<ScreenGeometry>;
         unsafe {
-            if !EnumDisplayMonitors(HDC::default(), None, Some(monitor_enum_proc), LPARAM(ptr as _))
-                .as_bool()
+            if !EnumDisplayMonitors(
+                HDC::default(),
+                None,
+                Some(monitor_enum_proc),
+                LPARAM(ptr as _),
+            )
+            .as_bool()
             {
                 return Err(BridgeError::OsError("EnumDisplayMonitors failed".into()));
             }

@@ -4,11 +4,11 @@
 //! injection, screen geometry discovery, and clipboard sync.
 //! Platform implementations: macOS (CGEvent), Windows (Win32).
 
+pub mod clipboard;
 #[cfg(target_os = "macos")]
 pub mod macos;
 #[cfg(target_os = "windows")]
 pub mod windows;
-pub mod clipboard;
 
 use std::sync::mpsc::Receiver;
 
@@ -220,10 +220,7 @@ mod tests {
                 button: 0,
                 pressed: true,
             },
-            BridgeEvent::Scroll {
-                dx: 0.0,
-                dy: -3.0,
-            },
+            BridgeEvent::Scroll { dx: 0.0, dy: -3.0 },
             BridgeEvent::KeyDown {
                 keycode: 42,
                 modifiers: modifiers::SHIFT | modifiers::CTRL,

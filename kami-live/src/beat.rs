@@ -212,7 +212,10 @@ mod tests {
         g.tick(0.5);
         let evts = g.drain_events();
         assert!(matches!(evts[0], BeatEvent::Eighth { .. }));
-        assert!(evts.iter().any(|e| matches!(e, BeatEvent::Beat { beat_index: 1, .. })));
+        assert!(
+            evts.iter()
+                .any(|e| matches!(e, BeatEvent::Beat { beat_index: 1, .. }))
+        );
     }
 
     #[test]
@@ -220,8 +223,14 @@ mod tests {
         let mut g = BeatGrid::new(120.0); // 4/4, 8 bars/phrase → phrase = 16s
         g.tick(16.0);
         let evts = g.drain_events();
-        let bars = evts.iter().filter(|e| matches!(e, BeatEvent::Bar { .. })).count();
-        let phrases = evts.iter().filter(|e| matches!(e, BeatEvent::Phrase { .. })).count();
+        let bars = evts
+            .iter()
+            .filter(|e| matches!(e, BeatEvent::Bar { .. }))
+            .count();
+        let phrases = evts
+            .iter()
+            .filter(|e| matches!(e, BeatEvent::Phrase { .. }))
+            .count();
         assert_eq!(bars, 8, "8 bars in 16s at 120 bpm");
         assert_eq!(phrases, 1, "phrase fires at the 16s boundary");
     }
@@ -249,7 +258,10 @@ mod tests {
             .drain_events()
             .into_iter()
             .find_map(|e| match e {
-                BeatEvent::Eighth { time, eighth_index: 1 } => Some(time),
+                BeatEvent::Eighth {
+                    time,
+                    eighth_index: 1,
+                } => Some(time),
                 _ => None,
             })
             .unwrap();
@@ -257,7 +269,10 @@ mod tests {
             .drain_events()
             .into_iter()
             .find_map(|e| match e {
-                BeatEvent::Eighth { time, eighth_index: 1 } => Some(time),
+                BeatEvent::Eighth {
+                    time,
+                    eighth_index: 1,
+                } => Some(time),
                 _ => None,
             })
             .unwrap();

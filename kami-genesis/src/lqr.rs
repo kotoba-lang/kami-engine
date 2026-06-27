@@ -92,7 +92,12 @@ fn state_to_arr(s: &CartpoleState) -> [f32; 4] {
 }
 
 fn arr_to_state(a: [f32; 4]) -> CartpoleState {
-    CartpoleState { x: a[0], x_dot: a[1], theta: a[2], theta_dot: a[3] }
+    CartpoleState {
+        x: a[0],
+        x_dot: a[1],
+        theta: a[2],
+        theta_dot: a[3],
+    }
 }
 
 fn linearize_cartpole(cfg: &CartpoleConfig, eps: f32) -> ([[f32; 4]; 4], [f32; 4]) {
@@ -302,7 +307,11 @@ mod tests {
         let cfg = CartpoleConfig::default();
         let lqr = LqrController::build(&cfg, LqrWeights::default());
         assert!(lqr.dare_iters > 0);
-        assert!(lqr.dare_residual < 1e-3, "residual = {:.3e}", lqr.dare_residual);
+        assert!(
+            lqr.dare_residual < 1e-3,
+            "residual = {:.3e}",
+            lqr.dare_residual
+        );
     }
 
     fn gain_magnitudes_and_signs_are_balance_compatible() {
@@ -315,7 +324,11 @@ mod tests {
         let lqr = LqrController::build(&cfg, LqrWeights::default());
         assert!(lqr.gain[2] < 0.0, "K_theta = {}", lqr.gain[2]);
         assert!(lqr.gain[3] < 0.0, "K_theta_dot = {}", lqr.gain[3]);
-        assert!(lqr.gain[2].abs() > 5.0, "K_theta magnitude = {}", lqr.gain[2].abs());
+        assert!(
+            lqr.gain[2].abs() > 5.0,
+            "K_theta magnitude = {}",
+            lqr.gain[2].abs()
+        );
     }
 
     #[test]
@@ -330,7 +343,10 @@ mod tests {
         // it back to the upright equilibrium over many steps.
         let cfg = CartpoleConfig::default();
         let lqr = LqrController::build(&cfg, LqrWeights::default());
-        let mut s = CartpoleState { theta: 0.05, ..Default::default() };
+        let mut s = CartpoleState {
+            theta: 0.05,
+            ..Default::default()
+        };
         // Run 500 steps (~8 s at 60 Hz).
         let mut max_theta = 0.0_f32;
         for _ in 0..500 {
@@ -341,7 +357,11 @@ mod tests {
             }
         }
         // Pole should never tip past ±0.2 rad (Cartpole-v1 termination bound).
-        assert!(max_theta < 0.2, "pole tipped past 0.2 rad: max |theta| = {}", max_theta);
+        assert!(
+            max_theta < 0.2,
+            "pole tipped past 0.2 rad: max |theta| = {}",
+            max_theta
+        );
         // After 500 steps the pole should be near upright (within 0.05 rad).
         assert!(s.theta.abs() < 0.05, "final theta = {}", s.theta);
     }
@@ -351,7 +371,10 @@ mod tests {
         // Larger perturbation: theta = 0.1 rad. LQR should still recover.
         let cfg = CartpoleConfig::default();
         let lqr = LqrController::build(&cfg, LqrWeights::default());
-        let mut s = CartpoleState { theta: 0.1, ..Default::default() };
+        let mut s = CartpoleState {
+            theta: 0.1,
+            ..Default::default()
+        };
         let mut max_theta = 0.0_f32;
         for _ in 0..500 {
             let u = lqr.control(&s);
@@ -369,7 +392,10 @@ mod tests {
         let cfg = CartpoleConfig::default();
         let lqr = LqrController::build(&cfg, LqrWeights::default());
         // theta = 0.5 rad way past the linearisation point → large K·s
-        let s = CartpoleState { theta: 0.5, ..Default::default() };
+        let s = CartpoleState {
+            theta: 0.5,
+            ..Default::default()
+        };
         let u = lqr.control(&s);
         // The raw -K·s would be much larger than ±100 N; ensure clamped.
         assert!(u.abs() <= cfg.force_mag + 1e-3);
@@ -401,6 +427,10 @@ mod tests {
                 }
             }
         }
-        assert!(max_theta < 0.2, "max |theta| across 256 envs = {}", max_theta);
+        assert!(
+            max_theta < 0.2,
+            "max |theta| across 256 envs = {}",
+            max_theta
+        );
     }
 }

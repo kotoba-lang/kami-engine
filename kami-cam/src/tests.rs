@@ -1,6 +1,6 @@
 use glam::DVec3;
 
-use crate::gcode::{generate_gcode, GcodeConfig};
+use crate::gcode::{GcodeConfig, generate_gcode};
 use crate::stock::{CamMaterial, Stock, StockShape};
 use crate::tool::{Tool, ToolLibrary, ToolMaterial, ToolType};
 use crate::toolpath::{CamJob, CamOperation, PocketStrategy};
@@ -193,11 +193,19 @@ fn pocket_toolpath_generates_segments() {
     let segments = job.generate_toolpath();
 
     // Should produce a non-trivial number of segments
-    assert!(segments.len() > 5, "expected many segments, got {}", segments.len());
+    assert!(
+        segments.len() > 5,
+        "expected many segments, got {}",
+        segments.len()
+    );
 
     // Should contain both rapids and linear cuts
-    let has_rapid = segments.iter().any(|s| s.segment_type == crate::toolpath::SegmentType::Rapid);
-    let has_linear = segments.iter().any(|s| s.segment_type == crate::toolpath::SegmentType::Linear);
+    let has_rapid = segments
+        .iter()
+        .any(|s| s.segment_type == crate::toolpath::SegmentType::Rapid);
+    let has_linear = segments
+        .iter()
+        .any(|s| s.segment_type == crate::toolpath::SegmentType::Linear);
     assert!(has_rapid, "pocket should have rapid moves");
     assert!(has_linear, "pocket should have linear cutting moves");
 

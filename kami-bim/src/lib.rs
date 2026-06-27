@@ -31,8 +31,12 @@ pub enum BimId {
 }
 
 impl BimId {
-    pub fn local(v: u64) -> Self { BimId::Local(v) }
-    pub fn guid(s: impl Into<String>) -> Self { BimId::Guid(s.into()) }
+    pub fn local(v: u64) -> Self {
+        BimId::Local(v)
+    }
+    pub fn guid(s: impl Into<String>) -> Self {
+        BimId::Guid(s.into())
+    }
 }
 
 // ── Spatial Hierarchy ──
@@ -181,10 +185,7 @@ pub enum ElementGeometry {
     /// Boundary-represented solid from kami-cad.
     Brep(BrepSolid),
     /// Swept profile along a 3D axis polyline.
-    AxisSweep {
-        axis: Vec<DVec3>,
-        profile: Profile,
-    },
+    AxisSweep { axis: Vec<DVec3>, profile: Profile },
     /// Pure tessellation reference (triangle mesh id in blob store).
     /// Used for imported IFC geometry that is already meshed.
     MeshRef {
@@ -203,7 +204,12 @@ pub enum Profile {
     /// Circle (pipe, column).
     Circle { diameter: f64 },
     /// I-section (beam) with flange + web.
-    IShape { height: f64, flange_width: f64, flange_thickness: f64, web_thickness: f64 },
+    IShape {
+        height: f64,
+        flange_width: f64,
+        flange_thickness: f64,
+        web_thickness: f64,
+    },
     /// Free polygon in local XY (CCW).
     Polygon(Vec<glam::DVec2>),
 }
@@ -268,9 +274,15 @@ pub enum PropertyValue {
     Real(f64),
     Text(String),
     /// Real value with IFC unit string (`"kg"`, `"W/m2K"`, ...).
-    Measured { value: f64, unit: String },
+    Measured {
+        value: f64,
+        unit: String,
+    },
     /// Enumerated choice with allowed-values list.
-    Enum { value: String, allowed: Vec<String> },
+    Enum {
+        value: String,
+        allowed: Vec<String>,
+    },
 }
 
 /// IFC Qto_* element quantities (gross/net surface/volume/weight).
@@ -295,18 +307,35 @@ pub struct UnitSystem {
 
 impl Default for UnitSystem {
     fn default() -> Self {
-        UnitSystem { length: LengthUnit::Metre, angle: AngleUnit::Radian, time: TimeUnit::Second }
+        UnitSystem {
+            length: LengthUnit::Metre,
+            angle: AngleUnit::Radian,
+            time: TimeUnit::Second,
+        }
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum LengthUnit { Metre, Millimetre, Centimetre, Foot, Inch }
+pub enum LengthUnit {
+    Metre,
+    Millimetre,
+    Centimetre,
+    Foot,
+    Inch,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum AngleUnit { Radian, Degree }
+pub enum AngleUnit {
+    Radian,
+    Degree,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum TimeUnit { Second, Minute, Hour }
+pub enum TimeUnit {
+    Second,
+    Minute,
+    Hour,
+}
 
 // ── Scene projection (consumed by kami-pipelines::BimSceneAdapter) ──
 
@@ -347,10 +376,16 @@ pub struct SceneItem {
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum SceneGeom {
     #[serde(rename_all = "camelCase")]
-    Triangles { positions: Vec<[f32; 3]>, indices: Vec<u32>, normals: Vec<[f32; 3]> },
+    Triangles {
+        positions: Vec<[f32; 3]>,
+        indices: Vec<u32>,
+        normals: Vec<[f32; 3]>,
+    },
     Axis(Vec<[f32; 3]>),
     #[serde(rename_all = "camelCase")]
-    MeshRef { blob_key: String },
+    MeshRef {
+        blob_key: String,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -384,7 +419,9 @@ impl Project {
         for s in &self.sites {
             for b in &s.buildings {
                 for st in &b.storeys {
-                    for e in &st.elements { f(e); }
+                    for e in &st.elements {
+                        f(e);
+                    }
                 }
             }
         }
@@ -392,7 +429,8 @@ impl Project {
 
     /// Find a storey by id (linear scan; fine for authoring-scale models).
     pub fn find_storey(&self, id: &BimId) -> Option<&Storey> {
-        self.sites.iter()
+        self.sites
+            .iter()
             .flat_map(|s| s.buildings.iter())
             .flat_map(|b| b.storeys.iter())
             .find(|s| &s.id == id)

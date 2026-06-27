@@ -1,8 +1,8 @@
 //! Conversions between kami-vrm types and kami-skeleton types.
 
+use crate::VrmError;
 use crate::gltf_types::component_type;
 use crate::vrm_types::VrmDocument;
-use crate::VrmError;
 
 /// Read typed data from a glTF accessor in the BIN chunk.
 ///
@@ -71,7 +71,8 @@ pub fn read_accessor_f32(doc: &VrmDocument, accessor_idx: usize) -> Result<Vec<f
                     if o + 4 > doc.bin.len() {
                         return Err(VrmError::InvalidGlb("accessor data truncated"));
                     }
-                    u32::from_le_bytes([doc.bin[o], doc.bin[o + 1], doc.bin[o + 2], doc.bin[o + 3]]) as f32
+                    u32::from_le_bytes([doc.bin[o], doc.bin[o + 1], doc.bin[o + 2], doc.bin[o + 3]])
+                        as f32
                 }
                 _ => 0.0,
             };
@@ -101,11 +102,11 @@ pub fn extract_primitive_mesh(
         .ok_or_else(|| VrmError::Part(format!("primitive {prim_idx} not found")))?;
 
     // Read POSITION
-    let pos_acc = prim
-        .attributes
-        .get("POSITION")
-        .and_then(|v| v.as_u64())
-        .ok_or_else(|| VrmError::Part("missing POSITION attribute".into()))? as usize;
+    let pos_acc =
+        prim.attributes
+            .get("POSITION")
+            .and_then(|v| v.as_u64())
+            .ok_or_else(|| VrmError::Part("missing POSITION attribute".into()))? as usize;
     let positions = read_accessor_f32(doc, pos_acc)?;
 
     // Read NORMAL (optional, generate flat normals if missing)

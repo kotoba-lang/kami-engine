@@ -22,31 +22,45 @@ pub struct CharMesh {
 }
 
 fn push_box(
-    verts: &mut Vec<CharVertex>, idx: &mut Vec<u32>,
-    cx: f32, cy: f32, cz: f32, sx: f32, sy: f32, sz: f32,
+    verts: &mut Vec<CharVertex>,
+    idx: &mut Vec<u32>,
+    cx: f32,
+    cy: f32,
+    cz: f32,
+    sx: f32,
+    sy: f32,
+    sz: f32,
     color: [f32; 3],
 ) {
     let (hx, hy, hz) = (sx * 0.5, sy * 0.5, sz * 0.5);
     let corners = [
-        [cx-hx, cy-hy, cz-hz], [cx+hx, cy-hy, cz-hz],
-        [cx+hx, cy+hy, cz-hz], [cx-hx, cy+hy, cz-hz],
-        [cx-hx, cy-hy, cz+hz], [cx+hx, cy-hy, cz+hz],
-        [cx+hx, cy+hy, cz+hz], [cx-hx, cy+hy, cz+hz],
+        [cx - hx, cy - hy, cz - hz],
+        [cx + hx, cy - hy, cz - hz],
+        [cx + hx, cy + hy, cz - hz],
+        [cx - hx, cy + hy, cz - hz],
+        [cx - hx, cy - hy, cz + hz],
+        [cx + hx, cy - hy, cz + hz],
+        [cx + hx, cy + hy, cz + hz],
+        [cx - hx, cy + hy, cz + hz],
     ];
     let faces: [([usize; 4], [f32; 3]); 6] = [
-        ([0,1,2,3], [ 0.0, 0.0,-1.0]),
-        ([5,4,7,6], [ 0.0, 0.0, 1.0]),
-        ([4,0,3,7], [-1.0, 0.0, 0.0]),
-        ([1,5,6,2], [ 1.0, 0.0, 0.0]),
-        ([3,2,6,7], [ 0.0, 1.0, 0.0]),
-        ([4,5,1,0], [ 0.0,-1.0, 0.0]),
+        ([0, 1, 2, 3], [0.0, 0.0, -1.0]),
+        ([5, 4, 7, 6], [0.0, 0.0, 1.0]),
+        ([4, 0, 3, 7], [-1.0, 0.0, 0.0]),
+        ([1, 5, 6, 2], [1.0, 0.0, 0.0]),
+        ([3, 2, 6, 7], [0.0, 1.0, 0.0]),
+        ([4, 5, 1, 0], [0.0, -1.0, 0.0]),
     ];
     for (corner_idx, n) in faces {
         let base = verts.len() as u32;
         for i in corner_idx {
-            verts.push(CharVertex { position: corners[i], normal: n, color });
+            verts.push(CharVertex {
+                position: corners[i],
+                normal: n,
+                color,
+            });
         }
-        idx.extend_from_slice(&[base, base+1, base+2, base, base+2, base+3]);
+        idx.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
     }
 }
 
@@ -67,18 +81,21 @@ pub fn build_character_mesh() -> CharMesh {
     push_box(&mut v, &mut i, 0.0, 1.30, -0.22, 0.42, 0.55, 0.24, pack);
     // Arms
     push_box(&mut v, &mut i, -0.32, 1.30, 0.0, 0.16, 0.38, 0.16, cloth);
-    push_box(&mut v, &mut i,  0.32, 1.30, 0.0, 0.16, 0.38, 0.16, cloth);
+    push_box(&mut v, &mut i, 0.32, 1.30, 0.0, 0.16, 0.38, 0.16, cloth);
     push_box(&mut v, &mut i, -0.32, 0.92, 0.0, 0.14, 0.36, 0.14, skin);
-    push_box(&mut v, &mut i,  0.32, 0.92, 0.0, 0.14, 0.36, 0.14, skin);
+    push_box(&mut v, &mut i, 0.32, 0.92, 0.0, 0.14, 0.36, 0.14, skin);
     // Legs
     push_box(&mut v, &mut i, -0.14, 0.70, 0.0, 0.20, 0.48, 0.22, pants);
-    push_box(&mut v, &mut i,  0.14, 0.70, 0.0, 0.20, 0.48, 0.22, pants);
+    push_box(&mut v, &mut i, 0.14, 0.70, 0.0, 0.20, 0.48, 0.22, pants);
     push_box(&mut v, &mut i, -0.14, 0.26, 0.0, 0.18, 0.40, 0.20, pants);
-    push_box(&mut v, &mut i,  0.14, 0.26, 0.0, 0.18, 0.40, 0.20, pants);
+    push_box(&mut v, &mut i, 0.14, 0.26, 0.0, 0.18, 0.40, 0.20, pants);
     // Boots
     push_box(&mut v, &mut i, -0.14, 0.04, 0.03, 0.20, 0.12, 0.32, boots);
-    push_box(&mut v, &mut i,  0.14, 0.04, 0.03, 0.20, 0.12, 0.32, boots);
-    CharMesh { vertices: v, indices: i }
+    push_box(&mut v, &mut i, 0.14, 0.04, 0.03, 0.20, 0.12, 0.32, boots);
+    CharMesh {
+        vertices: v,
+        indices: i,
+    }
 }
 
 // ── Player state ──
@@ -91,7 +108,9 @@ pub const SPRINT_MULT: f32 = 1.8;
 
 #[derive(Debug, Clone)]
 pub struct Player {
-    pub x: f32, pub y: f32, pub z: f32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
     pub y_vel: f32,
     pub on_ground: bool,
     pub yaw: f32,
@@ -102,8 +121,17 @@ pub struct Player {
 
 impl Default for Player {
     fn default() -> Self {
-        Self { x: 0.0, y: 0.0, z: 0.0, y_vel: 0.0, on_ground: true,
-               yaw: 0.0, pitch: 0.0, facing: 0.0, move_speed: 0.0 }
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+            y_vel: 0.0,
+            on_ground: true,
+            yaw: 0.0,
+            pitch: 0.0,
+            facing: 0.0,
+            move_speed: 0.0,
+        }
     }
 }
 
@@ -123,7 +151,10 @@ pub struct InputState {
 
 /// Mode for third-person / first-person camera.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum CameraMode { ThirdPerson, FirstPerson }
+pub enum CameraMode {
+    ThirdPerson,
+    FirstPerson,
+}
 
 #[derive(Debug, Clone)]
 pub struct CameraState {
@@ -132,7 +163,12 @@ pub struct CameraState {
 }
 
 impl Default for CameraState {
-    fn default() -> Self { Self { mode: CameraMode::ThirdPerson, distance: 5.0 } }
+    fn default() -> Self {
+        Self {
+            mode: CameraMode::ThirdPerson,
+            distance: 5.0,
+        }
+    }
 }
 
 /// Sample ground height at (x, z). Supplied by the WASM host (via heightmap cache).
@@ -157,13 +193,29 @@ pub fn tick_player(
     let fz = player.yaw.cos();
     let rx = player.yaw.cos();
     let rz = -player.yaw.sin();
-    let mut mx = 0.0; let mut mz = 0.0;
-    if input.forward { mx += fx; mz += fz; }
-    if input.back    { mx -= fx; mz -= fz; }
-    if input.left    { mx -= rx; mz -= rz; }
-    if input.right   { mx += rx; mz += rz; }
-    let mag = (mx*mx + mz*mz).sqrt();
-    if mag > 0.0 { mx /= mag; mz /= mag; }
+    let mut mx = 0.0;
+    let mut mz = 0.0;
+    if input.forward {
+        mx += fx;
+        mz += fz;
+    }
+    if input.back {
+        mx -= fx;
+        mz -= fz;
+    }
+    if input.left {
+        mx -= rx;
+        mz -= rz;
+    }
+    if input.right {
+        mx += rx;
+        mz += rz;
+    }
+    let mag = (mx * mx + mz * mz).sqrt();
+    if mag > 0.0 {
+        mx /= mag;
+        mz /= mag;
+    }
     let sprint = if input.sprint { SPRINT_MULT } else { 1.0 };
     let speed = WALK_SPEED * sprint;
     player.x += mx * speed * dt;
@@ -174,8 +226,12 @@ pub fn tick_player(
     if mag > 0.01 {
         let target = mx.atan2(mz);
         let mut diff = target - player.facing;
-        while diff > std::f32::consts::PI { diff -= std::f32::consts::TAU; }
-        while diff < -std::f32::consts::PI { diff += std::f32::consts::TAU; }
+        while diff > std::f32::consts::PI {
+            diff -= std::f32::consts::TAU;
+        }
+        while diff < -std::f32::consts::PI {
+            diff += std::f32::consts::TAU;
+        }
         player.facing += diff * (dt * 10.0).min(1.0);
     }
 
@@ -190,12 +246,15 @@ pub fn tick_player(
         player.y_vel -= GRAVITY * dt;
         player.y += player.y_vel * dt;
         if player.y <= ground {
-            player.y = ground; player.y_vel = 0.0; player.on_ground = true;
+            player.y = ground;
+            player.y_vel = 0.0;
+            player.on_ground = true;
         }
     } else {
         player.y = ground;
         if input.jump_pressed {
-            player.y_vel = JUMP_VELOCITY; player.on_ground = false;
+            player.y_vel = JUMP_VELOCITY;
+            player.on_ground = false;
         }
     }
     input.jump_pressed = false;
@@ -225,7 +284,9 @@ pub fn camera_matrices(
             let mut cy = player.y + EYE_HEIGHT + up + player.pitch.sin() * 3.0;
             // Raycast camera to avoid clipping terrain
             let ground_at_cam = sample_h(cx, cz);
-            if cy < ground_at_cam + 1.5 { cy = ground_at_cam + 1.5; }
+            if cy < ground_at_cam + 1.5 {
+                cy = ground_at_cam + 1.5;
+            }
             let eye = Vec3::new(cx, cy, cz);
             let target = Vec3::new(player.x, player.y + EYE_HEIGHT * 0.7, player.z);
             (eye, target)
@@ -243,7 +304,9 @@ pub fn character_model_matrix(player: &Player) -> Mat4 {
 mod tests {
     use super::*;
 
-    fn flat(_x: f32, _z: f32) -> f32 { 0.0 }
+    fn flat(_x: f32, _z: f32) -> f32 {
+        0.0
+    }
 
     #[test]
     fn char_mesh_nonzero() {
@@ -257,9 +320,13 @@ mod tests {
         let mut p = Player::default();
         let mut i = InputState::default();
         i.forward = true;
-        let flat_fn: &dyn Fn(f32,f32) -> f32 = &flat;
+        let flat_fn: &dyn Fn(f32, f32) -> f32 = &flat;
         tick_player(&mut p, &mut i, flat_fn, 1.0, 100.0);
-        assert!(p.z > 3.0, "forward should move +z by ~WALK_SPEED: got {}", p.z);
+        assert!(
+            p.z > 3.0,
+            "forward should move +z by ~WALK_SPEED: got {}",
+            p.z
+        );
     }
 
     #[test]
@@ -268,7 +335,7 @@ mod tests {
         p.on_ground = false;
         p.y = 10.0;
         let mut i = InputState::default();
-        let flat_fn: &dyn Fn(f32,f32) -> f32 = &flat;
+        let flat_fn: &dyn Fn(f32, f32) -> f32 = &flat;
         tick_player(&mut p, &mut i, flat_fn, 0.5, 100.0);
         assert!(p.y < 10.0);
     }
@@ -278,7 +345,7 @@ mod tests {
         let mut p = Player::default();
         let mut i = InputState::default();
         i.jump_pressed = true;
-        let flat_fn: &dyn Fn(f32,f32) -> f32 = &flat;
+        let flat_fn: &dyn Fn(f32, f32) -> f32 = &flat;
         tick_player(&mut p, &mut i, flat_fn, 0.016, 100.0);
         assert!(!p.on_ground);
         assert!(p.y_vel > 0.0);

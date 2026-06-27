@@ -1,5 +1,4 @@
 /// Aging and degradation mechanisms estimation (NBTI, PBTI, HCI, TDDB, EM).
-
 use serde::{Deserialize, Serialize};
 
 /// Aging degradation mechanism.
@@ -56,7 +55,8 @@ pub fn estimate_aging(
             let gamma = 3.0; // voltage acceleration
             let n = 0.25; // time exponent (reaction-diffusion)
             let a = 1e-3;
-            let deg = a * (-ea / (K_B * temp_k)).exp() * voltage.powf(gamma) * time_hours.powf(n) * 100.0;
+            let deg =
+                a * (-ea / (K_B * temp_k)).exp() * voltage.powf(gamma) * time_hours.powf(n) * 100.0;
             ("Vth_shift".to_string(), deg, 10.0)
         }
         AgingMechanism::Pbti => {
@@ -64,7 +64,8 @@ pub fn estimate_aging(
             let gamma = 4.0;
             let n = 0.2;
             let a = 5e-4;
-            let deg = a * (-ea / (K_B * temp_k)).exp() * voltage.powf(gamma) * time_hours.powf(n) * 100.0;
+            let deg =
+                a * (-ea / (K_B * temp_k)).exp() * voltage.powf(gamma) * time_hours.powf(n) * 100.0;
             ("Vth_shift".to_string(), deg, 10.0)
         }
         AgingMechanism::Hci => {
@@ -72,7 +73,11 @@ pub fn estimate_aging(
             let ea = 0.3;
             let m = 5.0;
             let a = 2e-4;
-            let deg = a * (-ea / (K_B * temp_k)).exp() * (voltage / 0.9).powf(m) * time_hours.sqrt() * 100.0;
+            let deg = a
+                * (-ea / (K_B * temp_k)).exp()
+                * (voltage / 0.9).powf(m)
+                * time_hours.sqrt()
+                * 100.0;
             ("Idsat_degradation".to_string(), deg, 10.0)
         }
         AgingMechanism::Tddb => {
@@ -80,7 +85,11 @@ pub fn estimate_aging(
             let ea = 0.7;
             let gamma_v = 3.5;
             let a = 1e-6;
-            let deg = a * (-ea / (K_B * temp_k)).exp() * (gamma_v * voltage).exp() * time_hours.powf(0.3) * 100.0;
+            let deg = a
+                * (-ea / (K_B * temp_k)).exp()
+                * (gamma_v * voltage).exp()
+                * time_hours.powf(0.3)
+                * 100.0;
             ("dielectric_integrity".to_string(), deg, 5.0)
         }
         AgingMechanism::Em => {
@@ -90,7 +99,8 @@ pub fn estimate_aging(
             let n = 2.0;
             let a = 1e-8;
             let current_density = voltage * 1e6; // simplified
-            let deg = a * current_density.powf(n) * (-ea / (K_B * temp_k)).exp() * time_hours * 100.0;
+            let deg =
+                a * current_density.powf(n) * (-ea / (K_B * temp_k)).exp() * time_hours * 100.0;
             ("metal_void_growth".to_string(), deg, 20.0)
         }
     };
@@ -112,15 +122,23 @@ mod tests {
     fn nbti_increases_with_temperature() {
         let cool = estimate_aging(AgingMechanism::Nbti, 0.9, 25.0, 10.0);
         let hot = estimate_aging(AgingMechanism::Nbti, 0.9, 125.0, 10.0);
-        assert!(hot.degradation_percent > cool.degradation_percent,
-            "NBTI at 125C ({}) should exceed 25C ({})", hot.degradation_percent, cool.degradation_percent);
+        assert!(
+            hot.degradation_percent > cool.degradation_percent,
+            "NBTI at 125C ({}) should exceed 25C ({})",
+            hot.degradation_percent,
+            cool.degradation_percent
+        );
     }
 
     #[test]
     fn degradation_increases_with_time() {
         let short = estimate_aging(AgingMechanism::Hci, 0.9, 85.0, 1.0);
         let long = estimate_aging(AgingMechanism::Hci, 0.9, 85.0, 10.0);
-        assert!(long.degradation_percent > short.degradation_percent,
-            "10yr ({}) should degrade more than 1yr ({})", long.degradation_percent, short.degradation_percent);
+        assert!(
+            long.degradation_percent > short.degradation_percent,
+            "10yr ({}) should degrade more than 1yr ({})",
+            long.degradation_percent,
+            short.degradation_percent
+        );
     }
 }

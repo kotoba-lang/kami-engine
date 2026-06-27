@@ -35,7 +35,7 @@
 use std::collections::BTreeMap;
 
 use kami_input::{Action, InputMap};
-use kami_scene::{kw_key, mget, root_map, EdnValue};
+use kami_scene::{EdnValue, kw_key, mget, root_map};
 
 /// The canonical default input-binding CONFIG shipped with this crate. This is
 /// the source of truth; the compiled-in preset fns are the parity-tested mirror.
@@ -135,12 +135,16 @@ pub fn input_map_from_pairs(pairs: &[EdnValue]) -> Result<InputMap, Error> {
     let mut bindings: Vec<(String, Action)> = Vec::with_capacity(pairs.len());
     for pair in pairs {
         // Each binding is a [key-code action-keyword] 2-vector.
-        let Some(slots) = pair.as_vector() else { continue };
+        let Some(slots) = pair.as_vector() else {
+            continue;
+        };
         let (Some(key), Some(act)) = (slots.first(), slots.get(1)) else {
             continue;
         };
         // key-code: a string. Shape error → skip.
-        let Some(code) = key.as_string() else { continue };
+        let Some(code) = key.as_string() else {
+            continue;
+        };
         // action: a keyword id. Shape error → skip; unknown id → hard error.
         let Some(id) = kw_key(act) else { continue };
         let action = action_from_id(&id).ok_or_else(|| Error::UnknownAction(id.clone()))?;

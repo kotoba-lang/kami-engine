@@ -34,8 +34,20 @@ pub struct FleetAgent {
 }
 
 impl FleetAgent {
-    pub fn new(plant: Box<dyn Plant>, autopilot: Autopilot, goal: Vec2, radius: f32, priority: u32) -> Self {
-        let mut a = Self { plant, autopilot, goal, radius, priority };
+    pub fn new(
+        plant: Box<dyn Plant>,
+        autopilot: Autopilot,
+        goal: Vec2,
+        radius: f32,
+        priority: u32,
+    ) -> Self {
+        let mut a = Self {
+            plant,
+            autopilot,
+            goal,
+            radius,
+            priority,
+        };
         a.autopilot.set_goal(goal);
         a
     }
@@ -130,7 +142,9 @@ impl Fleet {
             let agent = &mut self.agents[i];
             let pose = agent.plant.pose();
             let returns = ring_sweep(&self.intr, pose, self.mount_z, &scene);
-            let cmd = agent.autopilot.step(pose, agent.plant.speed(), &returns, pose, dt);
+            let cmd = agent
+                .autopilot
+                .step(pose, agent.plant.speed(), &returns, pose, dt);
             agent.plant.step(cmd, dt);
         }
     }
@@ -155,7 +169,12 @@ impl Fleet {
     }
 }
 
-fn ring_sweep(intr: &LidarIntrinsics, pose: Pose2, mount_z: f32, scene: &Scene) -> Vec<LidarReturn> {
+fn ring_sweep(
+    intr: &LidarIntrinsics,
+    pose: Pose2,
+    mount_z: f32,
+    scene: &Scene,
+) -> Vec<LidarReturn> {
     let mut lidar = Lidar::new("fleet", "/fleet", *intr);
     let s2w = Affine3A::from_rotation_translation(
         Quat::from_rotation_z(pose.yaw),
