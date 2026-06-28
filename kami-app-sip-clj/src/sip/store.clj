@@ -23,8 +23,8 @@
   (:import [java.security MessageDigest]
            [java.util Base64]
            [java.net URI]
-           [java.net.http HttpClient HttpRequest HttpRequest$BodyPublishers
-                          HttpResponse$BodyHandlers]))
+           [java.net.http HttpClient HttpRequest HttpRequest$Builder
+                          HttpRequest$BodyPublishers HttpResponse$BodyHandlers]))
 
 ;; ---------------------------------------------------------------------------
 ;; Layer 1 — Datomic/datalevin world
@@ -116,37 +116,49 @@
 (def ^:private b64-enc (Base64/getEncoder))
 (def ^:private b64-dec (Base64/getDecoder))
 
-(defn- http-post-json [^HttpClient client url body-map]
+(defn- with-auth
+  "Add an `Authorization: Bearer` header when `token` is present. `block.put`
+  requires an operator JWT (`graph_auth/require_operator_auth` on the server);
+  `block.get` is unauthenticated, so the header is harmless there."
+  [^HttpRequest$Builder b token]
+  (cond-> b (and token (seq token)) (.header "authorization" (str "Bearer " token))))
+
+(defn- http-post-json [^HttpClient client url body-map token]
   (let [req (-> (HttpRequest/newBuilder (URI/create url))
                 (.header "content-type" "application/json")
+                (with-auth token)
                 (.POST (HttpRequest$BodyPublishers/ofString (json/write-str body-map)))
                 (.build))
         resp (.send client req (HttpResponse$BodyHandlers/ofString))]
     (when (<= 200 (.statusCode resp) 299)
       (json/read-str (.body resp) :key-fn keyword))))
 
-(defn- http-get-json [^HttpClient client url]
-  (let [req (-> (HttpRequest/newBuilder (URI/create url)) (.GET) (.build))
+(defn- http-get-json [^HttpClient client url token]
+  (let [req (-> (HttpRequest/newBuilder (URI/create url)) (with-auth token) (.GET) (.build))
         resp (.send client req (HttpResponse$BodyHandlers/ofString))]
     (when (<= 200 (.statusCode resp) 299)
       (json/read-str (.body resp) :key-fn keyword))))
 
-(defrecord KotobaHttp [^HttpClient client base]
+(defrecord KotobaHttp [^HttpClient client base token]
   Durable
   (put! [_ bytes]
     (-> (http-post-json client (str base "/xrpc/com.etzhayyim.apps.kotoba.block.put")
-                        {:data_b64 (.encodeToString b64-enc bytes)})
+                        {:data_b64 (.encodeToString b64-enc bytes)} token)
         :cid))
   (fetch [_ cid]
-    (some-> (http-get-json client (str base "/xrpc/com.etzhayyim.apps.kotoba.block.get?cid=" cid))
+    (some-> (http-get-json client (str base "/xrpc/com.etzhayyim.apps.kotoba.block.get?cid=" cid) token)
             :data_b64
             (->> (.decode b64-dec)))))
 
 (defn kotoba-http
   "Real Kotoba durable store. `base` defaults to $KOTOBA_URL or http://localhost:8080
-  (the `kotoba server` HTTP port). Speaks the same CID contract as `LocalCas`."
+  (the `kotoba server` HTTP port). `token` is the operator JWT Bearer that
+  `block.put` requires (defaults to $KOTOBA_TOKEN); mint it from the deployment
+  identity (`kotoba init` + the operator-JWT the CLI builds). `block.get` needs
+  none. Speaks the same CID contract as `LocalCas`."
   ([] (kotoba-http (or (System/getenv "KOTOBA_URL") "http://localhost:8080")))
-  ([base] (->KotobaHttp (HttpClient/newHttpClient) base)))
+  ([base] (kotoba-http base (System/getenv "KOTOBA_TOKEN")))
+  ([base token] (->KotobaHttp (HttpClient/newHttpClient) base token)))
 
 ;; ---------------------------------------------------------------------------
 ;; Saves & 瓶詞 letters over the durable layer

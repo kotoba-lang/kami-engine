@@ -34,12 +34,14 @@
   {:base url :stop (fn)}. CID = \"b\"+sha256 (CAS), blocks kept in an atom."
   []
   (let [blocks (atom {})
+        auth   (atom nil)   ; records the Authorization header seen on block.put
         srv (HttpServer/create (InetSocketAddress. "127.0.0.1" 0) 0)
         b64 (Base64/getDecoder)
         enc (Base64/getEncoder)]
     (.createContext srv "/xrpc/com.etzhayyim.apps.kotoba.block.put"
       (reify HttpHandler
         (handle [_ exch]
+          (reset! auth (.getFirst (.getRequestHeaders exch) "Authorization"))
           (let [in (json/read-str (slurp (.getRequestBody exch)) :key-fn keyword)
                 bytes (.decode b64 ^String (:data_b64 in))
                 cid (str "b" (sha bytes))]
@@ -54,7 +56,7 @@
                                            :data_b64 (.encodeToString enc bytes)}))))))
     (.setExecutor srv nil)
     (.start srv)
-    {:base (str "http://127.0.0.1:" (.getPort (.getAddress srv))) :stop #(.stop srv 0)}))
+    {:base (str "http://127.0.0.1:" (.getPort (.getAddress srv))) :auth auth :stop #(.stop srv 0)}))
 
 ;; --- tests ------------------------------------------------------------------
 
@@ -78,6 +80,22 @@
           (is (string? cid))
           (is (= (seq payload) (seq (store/fetch k cid))) "round-trips bytes over HTTP"))
         (finally (stop))))))
+
+(deftest kotoba-http-sends-operator-token
+  (testing "block.put carries the operator JWT as a Bearer token (server requires it)"
+    (let [{:keys [base auth stop]} (start-mock-kotoba!)]
+      (try
+        (let [k (store/kotoba-http base "operator-jwt-xyz")]
+          (store/put! k (.getBytes "瓶詞" "UTF-8"))
+          (is (= "Bearer operator-jwt-xyz" @auth)
+              "real kotoba block.put needs Authorization: Bearer <operator JWT>"))
+        (finally (stop)))
+      ;; and no token → no header (LocalCas / unauthenticated reads still fine)
+      (let [{:keys [base auth stop]} (start-mock-kotoba!)]
+        (try
+          (store/put! (store/kotoba-http base nil) (.getBytes "x" "UTF-8"))
+          (is (nil? @auth) "no token configured → no Authorization header")
+          (finally (stop)))))))
 
 (deftest letter-inbox-flow
   (testing "post-letter! durably stores body + records CID; inbox lists & hydrates"
