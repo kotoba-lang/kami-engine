@@ -13,7 +13,12 @@
   participants by demographics only). Real collection requires consent + the
   write-auth/Datomic-Cloud decisions in the P3-B design doc — this ns is the
   data foundation, not a consent-bearing collector."
-  (:require [datalevin.core :as d]))
+  (:require [datalevin.core :as d]
+            [clojure.edn :as edn]
+            [clojure.data.json :as json])
+  (:import [java.net URI]
+           [java.net.http HttpClient HttpRequest HttpRequest$Builder
+                          HttpRequest$BodyPublishers HttpResponse$BodyHandlers]))
 
 (def emotion-axes
   [:joy :sadness :anger :fear :surprise :disgust :calm :focus :excitement :confusion])
@@ -100,3 +105,78 @@
     (reduce (fn [acc [ax v]]
               (update acc (keyword (name ax)) (fnil + 0) (or v 0)))
             {} rows)))
+
+;; ---------------------------------------------------------------------------
+;; Shared backend — Kotoba Datomic XRPC (datomic.transact / datomic.q)
+;;   The cross-researcher store. ingest requires the operator JWT (Bearer);
+;;   reads use datomic.q. `graph` is the shared research graph (CID/name).
+;;   See docs/p2-shared-index.md / docs/p3b-data-collection.md.
+;; ---------------------------------------------------------------------------
+
+(defn- session-tx-data
+  "Full datom vector for a session (participant upsert + session + emotions) as a
+  single Datomic transaction — lookup refs resolve in-tx on a real Datomic."
+  [{:keys [participant session emotions]}]
+  (let [pid (:id participant) sid (:id session)]
+    (into [(participant-tx participant)
+           (cond-> {:research.session/id sid
+                    :research.session/participant [:research.participant/id pid]}
+             (:word-count session) (assoc :research.session/word-count (:word-count session))
+             (:created-at session) (assoc :research.session/created-at (:created-at session)))]
+          (for [e emotions]
+            (into {:research.emotion/session [:research.session/id sid]
+                   :research.emotion/word (:word e)
+                   :research.emotion/entry-count (long (:entry-count e 0))}
+                  (for [ax emotion-axes] [(keyword "research.emotion" (name ax)) (long (get e ax 0))]))))))
+
+(defn- with-auth [^HttpRequest$Builder b token]
+  (cond-> b (and token (seq token)) (.header "authorization" (str "Bearer " token))))
+
+(defn- xrpc-post [^HttpClient client base nsid body token]
+  (let [req (-> (HttpRequest/newBuilder (URI/create (str base "/xrpc/" nsid)))
+                (.header "content-type" "application/json")
+                (with-auth token)
+                (.POST (HttpRequest$BodyPublishers/ofString (json/write-str body)))
+                (.build))
+        resp (.send client req (HttpResponse$BodyHandlers/ofString))]
+    (when (<= 200 (.statusCode resp) 299)
+      (json/read-str (.body resp) :key-fn keyword))))
+
+(defrecord KotobaGraph [^HttpClient client base graph token])
+
+(defn kotoba-graph
+  "Shared research store over Kotoba Datomic XRPC. `graph` is the shared research
+  graph (CID/name). `token` (operator JWT) is required for ingest; reads need
+  none. Defaults: base $KOTOBA_URL, token $KOTOBA_TOKEN."
+  ([graph] (kotoba-graph graph (or (System/getenv "KOTOBA_URL") "http://localhost:8080")
+                         (System/getenv "KOTOBA_TOKEN")))
+  ([graph base token] (->KotobaGraph (HttpClient/newHttpClient) base graph token)))
+
+(defn kotoba-ingest-session!
+  "Ingest a session into the shared graph via datomic.transact (tx_edn = the
+  session datoms as EDN). Requires the operator JWT. Returns the response map."
+  [{:keys [client base graph token]} m]
+  (xrpc-post client base "com.etzhayyim.apps.kotoba.datomic.transact"
+             {:graph graph :tx_edn (pr-str (session-tx-data m))} token))
+
+(defn- q-rows
+  "Run a Datalog query over the shared graph; rows of EDN-parsed cells."
+  [{:keys [client base graph token]} query inputs]
+  (->> (xrpc-post client base "com.etzhayyim.apps.kotoba.datomic.q"
+                  {:graph graph :query_edn (pr-str query) :inputs_edn (mapv pr-str inputs)} token)
+       :rows_edn
+       (mapv (fn [row] (mapv edn/read-string row)))))
+
+(defn kotoba-participants
+  "Read public participants (demographics only, no PII) from the shared graph."
+  [kg]
+  (->> (q-rows kg '[:find ?id ?ag ?g
+                    :where
+                    [?p :research.participant/id ?id]
+                    [?p :research.participant/public? true]
+                    [(get-else $ ?p :research.participant/age-group "") ?ag]
+                    [(get-else $ ?p :research.participant/gender "") ?g]]
+               [])
+       (mapv (fn [[id ag g]] {:research.participant/id id
+                              :research.participant/age-group ag
+                              :research.participant/gender g}))))
