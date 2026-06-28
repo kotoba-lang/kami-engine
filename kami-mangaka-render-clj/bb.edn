@@ -1,0 +1,9 @@
+;; kami-mangaka-render-clj — task runner.
+;; This crate is pure (no datalevin, no GPU); compose/render are library calls
+;; driven by each work (e.g. kami-app-sip-clj). bb here just runs the tests.
+{:min-bb-version "1.0.0"
+ :paths ["src" "test"]
+ :tasks
+ {:requires ([babashka.process :as p])
+  test {:doc "Run the render-commons unit tests (pure: compose / budget / dims)"
+        :task (p/shell "clojure -M:test")}}}

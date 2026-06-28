@@ -5,28 +5,16 @@
 ;; (AnimagineXL 4.0). Canon = the graphic-novel art direction, NOT the older
 ;; *-portrait.jsonld (which predate it; e.g. Nei is a translucent gold-blue light
 ;; being / a pale grey-suit girl, never a photoreal shrine maiden).
-{:model "cagliostrolab/animagine-xl-4.0"
-
- ;; Style lead — kept SHORT and placed FIRST so it survives CLIP's 77-token
- ;; window (the 2026-06-18 render verification showed style/color tags placed
- ;; last were silently truncated).
- ;; ARIA / Yokohama Kaidashi Kikou serenity — slow-life calm, kept first.
+;;
+;; WORK-SPECIFIC anchors only. The generic keys (:model :quality-tail
+;; :word-budget :base-negative :aspect-by-layout) now live in
+;; kami-mangaka-render-clj's mangaka_default_anchors.edn and are merged UNDER
+;; this file by kami.mangaka.render/load-anchors (ADR-2606282100). Add a
+;; :base-negative here only to EXTEND the universal set; SIP needs no extras.
+{;; Style lead — SIP art direction (ARIA / Yokohama Kaidashi Kikou serenity).
+ ;; Kept SHORT and FIRST so it survives CLIP's 77-token window (the 2026-06-18
+ ;; render verification showed style/color tags placed last were truncated).
  :style-lead ["watercolor wash" "anime style" "serene slice of life" "soft lighting"]
- :quality-tail ["masterpiece" "best quality" "very aesthetic" "absurdres"]
-
- ;; Token budget for the WHOLE positive prompt (we drive the image-gen /generate
- ;; endpoint directly, so we own all 77 tokens — no server-side prefix/suffix).
- ;; Conservative word cap keeps us safely under 77 CLIP tokens.
- :word-budget 42
-
- ;; kept tight (≤ ~24 tags) so the whole negative fits CLIP's 77-token window
- ;; without truncation; most-important first.
- :base-negative
- ["lowres" "worst quality" "low quality" "bad anatomy" "bad hands"
-  "extra digits" "blurry" "watermark" "signature" "text"
-  "multiple panels" "tiled grid" "collage" "split screen" "speech bubble"
-  "greyscale" "monochrome" "photorealistic" "3d render" "chibi"
-  "wings" "deformed face" "nsfw"]
 
  ;; vol → color grade tags (lead the body right after style)
  :volume-color
@@ -99,11 +87,4 @@
   :tamaki-apartment{:tags ["small cozy apartment" "morning kitchen" "window over canal"
                            "wooden table" "two cups" "warm amber light"]}
   :canal-path      {:tags ["canal-side walkway" "cherry trees" "falling petals"
-                           "reflections on water" "golden hour light"]}}
-
- ;; layout → aspect keyword (maps to dims in sip.render/dims)
- :aspect-by-layout
- {"splash" :2x3 "full-page" :2x3 "double-page spread" :16x9
-  "2-panel-horizontal" :3x2 "2-panel-vertical" :3x4
-  "3-panel-vertical" :3x4 "3-panel-horizontal" :16x9
-  "4-panel-grid" :1x1 "insert" :1x1}}
+                           "reflections on water" "golden hour light"]}}}

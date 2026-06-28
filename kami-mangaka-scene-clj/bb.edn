@@ -1,0 +1,7 @@
+;; kami-mangaka-scene-clj — task runner. Pure data authoring; bb runs the tests.
+{:min-bb-version "1.0.0"
+ :paths ["src" "test"]
+ :tasks
+ {:requires ([babashka.process :as p])
+  test {:doc "Run the scene-authoring tests (enums / transforms / JSON-LD shape)"
+        :task (p/shell "clojure -M:test")}}}

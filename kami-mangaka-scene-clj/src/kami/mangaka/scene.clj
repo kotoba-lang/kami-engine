@@ -1,0 +1,179 @@
+(ns kami.mangaka.scene
+  "clj/EDN authoring tier over the Rust `kami-mangaka-scene` 3D facade
+  (ADR-2605141200 / ADR-2606282100). Author a MangakaScene as plain data, then
+  project it to the exact JSON-LD that `MangakaScene::from_jsonld` reads (and the
+  `com.etzhayyim.mangaka.composeScene3d` XRPC payload). Pure data: no GPU, no VRM
+  bytes — the GPU/VRM work stays in the Rust facade.
+
+  Mirrors the Rust public types (lib.rs): Transform / CameraSpec / LightSpec /
+  EnvironmentSpec / ShotGrammar / LightRole / Expression / FxKind. glam Vec3 ↔
+  [x y z] and Quat ↔ [x y z w] (glam's serde array form). Enum values are the
+  Rust variant names verbatim (e.g. \"FullShot\", \"Key\", \"Happy\", \"Dust\")."
+  (:require [clojure.data.json :as json]
+            [clojure.string :as str]))
+
+(def context "https://kami.etzhayyim.com/mangaka-scene/v1")
+
+;; ---------------------------------------------------------------------------
+;; Enums (Rust variant names, verbatim — serde default serialization)
+;; ---------------------------------------------------------------------------
+
+(def shot-grammars #{"FullShot" "MediumShot" "Closeup" "OverShoulder"
+                     "Dutch" "BirdsEye" "WormsEye"})
+(def light-roles   #{"Key" "Fill" "Rim" "Ambient"})
+(def expressions   #{"Neutral" "Happy" "Angry" "Sad" "Surprised"
+                     "Determined" "Pained" "Smirk"})
+(def fx-kinds      #{"Dust" "HitSpark" "Splash" "Sparkle" "Smoke" "SpeedLines3d"})
+
+(defn- check [pred v what]
+  (when-not (pred v) (throw (ex-info (str "invalid " what ": " v) {:value v})))
+  v)
+
+(defn expression-of
+  "Normalize an emotion word to an Expression variant, mirroring the Rust
+  `lexicon::expression_preset` synonym table. Unknown → \"Neutral\"."
+  [name]
+  (case (str/lower-case (str name))
+    ("happy" "joy" "smile")            "Happy"
+    ("angry" "rage")                   "Angry"
+    ("sad" "sorrow" "grief")           "Sad"
+    ("surprised" "surprise" "shock")   "Surprised"
+    ("determined" "resolve" "focus")   "Determined"
+    ("pained" "pain" "hurt")           "Pained"
+    ("smirk" "smug")                   "Smirk"
+    "Neutral"))
+
+;; ---------------------------------------------------------------------------
+;; Math primitives (glam serde form)
+;; ---------------------------------------------------------------------------
+
+(defn vec3 [x y z] [(double x) (double y) (double z)])
+(def  v3-zero [0.0 0.0 0.0])
+(def  v3-one  [1.0 1.0 1.0])
+(def  quat-identity [0.0 0.0 0.0 1.0])
+
+(defn normalize3
+  "Normalize a [x y z] (so authored light/camera directions match the Rust
+  presets, which call Vec3::normalize)."
+  [[x y z]]
+  (let [m (Math/sqrt (+ (* x x) (* y y) (* z z)))]
+    (if (zero? m) [0.0 0.0 0.0] [(/ x m) (/ y m) (/ z m)])))
+
+(defn transform
+  "A Transform. Defaults mirror Rust `Transform::default` (zero/identity/one)."
+  ([] (transform v3-zero quat-identity v3-one))
+  ([translation] (transform translation quat-identity v3-one))
+  ([translation rotation] (transform translation rotation v3-one))
+  ([translation rotation scale]
+   {:translation (mapv double translation)
+    :rotation (mapv double rotation)
+    :scale (mapv double scale)}))
+
+;; ---------------------------------------------------------------------------
+;; Camera + lights
+;; ---------------------------------------------------------------------------
+
+(defn dof [focus-distance-m aperture]
+  {:focus-distance-m (double focus-distance-m) :aperture (double aperture)})
+
+(defn camera
+  "A CameraSpec. `:shot` defaults to \"MediumShot\"; `:dof` optional."
+  [{:keys [eye target up fov-deg roll-deg dof shot]
+    :or {up [0.0 1.0 0.0] fov-deg 35.0 roll-deg 0.0 shot "MediumShot"}}]
+  {:eye (vec eye) :target (vec target) :up (vec up)
+   :fov-deg (double fov-deg) :roll-deg (double roll-deg)
+   :dof dof :shot (check shot-grammars shot "shot-grammar")})
+
+(defn light
+  [{:keys [role direction colour intensity]
+    :or {colour [1.0 1.0 1.0] intensity 1.0}}]
+  {:role (check light-roles role "light-role")
+   :direction (vec direction)
+   :colour (vec colour)
+   :intensity (double intensity)})
+
+;; Three-point presets — values mirror Rust `LightSpec::three_point_*`.
+(def three-point-key
+  (light {:role "Key"  :direction (normalize3 [-0.6 -0.8 -0.4]) :colour [1.0 0.96 0.92] :intensity 4.0}))
+(def three-point-fill
+  (light {:role "Fill" :direction (normalize3 [0.7 -0.4 -0.2])  :colour [0.86 0.92 1.0] :intensity 1.4}))
+(def three-point-rim
+  (light {:role "Rim"  :direction (normalize3 [0.1 -0.2 0.95])  :colour [1.0 1.0 1.0]   :intensity 2.0}))
+(def three-point [three-point-key three-point-fill three-point-rim])
+
+;; ---------------------------------------------------------------------------
+;; Environment + scene
+;; ---------------------------------------------------------------------------
+
+(defn anchor [name xform] {:name (str name) :xform xform})
+
+(defn environment
+  [{:keys [biome weather seed ground-size-m layout-anchors]
+    :or {seed 0 ground-size-m 64.0 layout-anchors []}}]
+  {:biome (str biome) :weather weather :seed (long seed)
+   :ground-size-m (double ground-size-m) :layout-anchors (vec layout-anchors)})
+
+(defn scene
+  "An empty MangakaScene authoring map."
+  []
+  {:characters [] :props [] :camera nil :lights [] :environment nil})
+
+(defn add-character
+  "Add a character. `:id` numeric, `:rkey` the VRM record key, `:expression`
+  an Expression (or an emotion word via `expression-of`), `:pose-label` a
+  `lexicon` preset like \"action.dash\", `:root-xform` a Transform."
+  [s {:keys [id rkey expression pose-label root-xform]
+      :or {expression "Neutral" root-xform (transform)}}]
+  (update s :characters conj
+          {:id (long id) :rkey (str rkey)
+           :expression (check expressions
+                              (if (expressions expression) expression (expression-of expression))
+                              "expression")
+           :pose-label pose-label :root-xform root-xform}))
+
+(defn add-prop [s id xform] (update s :props conj {:id (long id) :xform xform}))
+(defn set-camera [s cam] (assoc s :camera cam))
+(defn add-light [s l] (update s :lights conj l))
+(defn set-lights [s ls] (assoc s :lights (vec ls)))
+(defn set-environment [s env] (assoc s :environment env))
+
+;; ---------------------------------------------------------------------------
+;; Projection → JSON-LD (the shape MangakaScene::from_jsonld reads)
+;; ---------------------------------------------------------------------------
+
+(defn- xform->jsonld [{:keys [translation rotation scale]}]
+  {"translation" translation "rotation" rotation "scale" scale})
+
+(defn- dof->jsonld [d]
+  (when d {"focus_distance_m" (:focus-distance-m d) "aperture" (:aperture d)}))
+
+(defn- camera->jsonld [{:keys [eye target up fov-deg roll-deg dof shot]}]
+  {"eye" eye "target" target "up" up
+   "fov_deg" fov-deg "roll_deg" roll-deg
+   "dof" (dof->jsonld dof) "shot" shot})
+
+(defn- light->jsonld [{:keys [role direction colour intensity]}]
+  {"role" role "direction" direction "colour" colour "intensity" intensity})
+
+(defn- env->jsonld [{:keys [biome weather seed ground-size-m layout-anchors]}]
+  {"biome" biome "weather" weather "seed" seed "ground_size_m" ground-size-m
+   "layout_anchors" (mapv (fn [{:keys [name xform]}]
+                            {"name" name "xform" (xform->jsonld xform)})
+                          layout-anchors)})
+
+(defn ->jsonld
+  "Project an authored scene to the JSON-LD value MangakaScene::from_jsonld reads."
+  [{:keys [characters props camera lights environment]}]
+  {"@context" context
+   "characters" (mapv (fn [{:keys [id rkey pose-label expression root-xform]}]
+                        {"id" id "rkey" rkey "pose_label" pose-label
+                         "expression" expression "root_xform" (xform->jsonld root-xform)})
+                      characters)
+   "props"      (mapv (fn [{:keys [id]}] {"id" id}) props)
+   "camera"     (when camera (camera->jsonld camera))
+   "lights"     (mapv light->jsonld lights)
+   "environment" (when environment (env->jsonld environment))})
+
+(defn ->json
+  "JSON string ready to hand to the Rust facade / composeScene3d XRPC."
+  [s] (json/write-str (->jsonld s)))

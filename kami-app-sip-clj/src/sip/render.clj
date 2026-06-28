@@ -1,50 +1,37 @@
 (ns sip.render
-  "Compose per-panel render prompts from the anchor bible + storyboard panels,
-  drive the local image-gen engine, and record everything as datoms.
+  "Spirit in Physics render — the WORK-SPECIFIC facade over the generic mangaka
+  render commons (`kami.mangaka.render`, ADR-2606282100).
 
-  This is the Clojure + Datomic replacement for the old JSON-LD anchors + Python
-  render scripts. Two facts learned from the 2026-06-18 render verification are
-  baked in, not just documented:
+  The generic half — STYLE-FIRST CLIP-77-budgeted composition + the image-gen
+  HTTP client + comic dims — now lives in `kami-mangaka-render-clj`. This ns
+  keeps only what is *about Spirit in Physics*: the Nei light/embodied focal
+  rule, the 静寂→serene emotion table, the 事務所→:schwa-office location map, and
+  the datalevin provenance/datom layer. We inject the three work mappers into
+  `km/compose`; everything else re-derives from the commons.
 
-    1. CLIP 77-token truncation. We drive image-gen's `/generate` directly (no
-       server-side style prefix/suffix), so we own the whole 77-token window and
-       compose STYLE-FIRST under a hard word budget — style/color never get cut.
-
-    2. IP-Adapter on the diffusers app (AnimagineXL 4.0 + MPS float32) returns
-       noise. Tag-only rendering is faithful, so we render tag-only here and keep
-       `:sip.panel/refs` as metadata for the future ComfyUI IP-Adapter path."
-  (:require [clojure.edn :as edn]
-            [clojure.java.io :as io]
-            [clojure.string :as str]
-            [clojure.data.json :as json]
+  Two render facts (verified 2026-06-18) live in the commons, not here:
+  CLIP 77-token truncation (own the whole window, style-first) and IP-Adapter
+  returning noise on AnimagineXL 4.0 + MPS (render tag-only, keep refs as meta)."
+  (:require [clojure.string :as str]
+            [kami.mangaka.render :as km]
             [sip.store :as store]
             [sip.storyboard :as sb]
-            [sip.lore :as lore])
-  (:import [java.net URI]
-           [java.util Base64]
-           [java.net.http HttpClient HttpClient$Version HttpRequest HttpRequest$BodyPublishers
-                          HttpResponse$BodyHandlers]))
+            [sip.lore :as lore]))
 
 ;; ---------------------------------------------------------------------------
-;; Anchors
+;; Anchors (SIP's anchor bible, loaded via the commons)
 ;; ---------------------------------------------------------------------------
 
 (defn anchors
-  "Load the EDN anchor bible from the classpath (resources/render_anchors.edn)."
+  "Load the SIP EDN anchor bible from the classpath (resources/render_anchors.edn)."
   []
-  (with-open [r (io/reader (io/resource "render_anchors.edn"))]
-    (edn/read (java.io.PushbackReader. r))))
+  (km/load-anchors "render_anchors.edn"))
 
 ;; ---------------------------------------------------------------------------
-;; Composition (pure)
+;; Composition — SIP-specific mappers injected into the generic commons
 ;; ---------------------------------------------------------------------------
 
-(def ^:private dims
-  "Aspect keyword → [w h], multiples of 8 (mirrors image-gen config ASPECT_RATIOS)."
-  {:16x9 [1216 688] :9x16 [688 1216] :1x1 [1024 1024]
-   :4x3 [1152 864] :3x4 [864 1152] :3x2 [1152 768] :2x3 [768 1152]})
-
-(defn aspect->dims [aspect] (get dims aspect (dims :2x3)))
+(def aspect->dims km/aspect->dims)
 
 (def ^:private nei-light-cues
   ["ポッド" "光体" "発光" "半透明" "粒子" "光の" "明滅" "覚醒" "起動"
@@ -57,42 +44,16 @@
   (let [blob (str/lower-case (str description " " emotion " " colorNote " " location))]
     (if (some #(str/includes? blob (str/lower-case %)) nei-light-cues) :nei-light :nei)))
 
-(defn- resolve-characters
-  "Storyboard character keywords → anchor keywords, swapping nei→nei-light per cue."
-  [panel]
-  (let [form (nei-form panel)]
-    (mapv (fn [c] (if (= c :nei) form c)) (:characters panel))))
-
 (defn focal-character
   "パネル1キャラクター — one character per panel. The first dialogue speaker if
   they're in the cast (natural shot / reverse-shot), else the first listed.
-  Applies the nei→nei-light swap for awakening/ghost-space beats. nil if none."
+  Applies the nei→nei-light swap for awakening/ghost-space beats. nil if none.
+  This is SIP's `:focal-character` mapper for `km/compose`."
   [panel]
   (let [chars (:characters panel)
         sp    (some-> (first (:dialogue panel)) :speaker str str/lower-case keyword)
         pick  (or (some #{sp} chars) (first chars))]
     (when pick (if (= pick :nei) (nei-form panel) pick))))
-
-(defn- framing
-  "camera string → 1-2 booru framing tags."
-  [camera]
-  (let [c (str/lower-case (str camera))
-        seg (str/trim (first (str/split c #"/")))
-        shot (cond
-               (str/includes? seg "extreme close") "extreme close-up"
-               (str/includes? seg "close")         "close-up"
-               (str/includes? seg "extreme wide")  "extreme wide shot"
-               (str/includes? seg "wide")          "wide shot"
-               (str/includes? seg "medium")        "medium shot"
-               (str/includes? seg "over")          "over the shoulder"
-               (str/includes? seg "two")           "two shot"
-               :else "cinematic shot")
-        angle (cond
-                (str/includes? c "bird")  "from above"
-                (str/includes? c "low")   "from below"
-                (re-find #"over" c)       nil
-                :else nil)]
-    (filterv some? [shot angle])))
 
 (def ^:private emotion->tag
   {"静寂" "serene" "静けさ" "serene" "目覚め" "awakening mood"
@@ -104,12 +65,18 @@
    "発見" "wonder" "驚き" "surprised expression" "歓喜" "joyful expression"
    "ためらい" "hesitant expression" "余韻" "lingering quiet"})
 
-(defn- mood-tags [emotion]
+(defn mood-tags
+  "SIP's `:emotion->tags` mapper: Japanese emotion prose → ≤2 booru mood tags."
+  [emotion]
   (->> emotion->tag
        (keep (fn [[jp en]] (when (str/includes? (str emotion) jp) en)))
        distinct (take 2) vec))
 
-(defn- env-key [location]
+(defn env-key
+  "SIP's `:location->env` mapper: storyboard location prose → environment anchor
+  key. The character-named keys (schwa-office / tamaki-apartment) and the
+  water-city default are SIP-specific — they live here, never in the commons."
+  [location]
   (let [l (str location)]
     (cond
       (re-find #"事務所|office|デスク|オフィス" l) :schwa-office
@@ -118,97 +85,19 @@
       (re-find #"運河|水の都|canal|水面" l) :water-city
       :else :water-city)))
 
-(defn- subject-count
-  "Combine present character subjects into a booru subject phrase."
-  [present chars-anchors]
-  (let [subs (keep #(get-in chars-anchors [% :subject]) present)
-        g (count (filter #{"1girl"} subs))
-        b (count (filter #{"1boy"} subs))]
-    (->> [(case g 0 nil 1 "1girl" 2 "2girls" (str g "girls"))
-          (case b 0 nil 1 "1boy" (str b "boys"))]
-         (filterv some?))))
-
-(defn- word-count [tags] (count (str/split (str/join " " tags) #"\s+")))
-
-(defn- take-budget
-  "Greedily concat tag groups, never exceeding `budget` words. Earlier groups win."
-  [budget groups]
-  (reduce (fn [acc tag]
-            (let [acc' (conj acc tag)]
-              (if (> (word-count acc') budget) (reduced acc) acc')))
-          [] (distinct (apply concat groups))))
-
 (defn compose
-  "Panel map + anchors → render spec {:tags :prompt :neg :refs :aspect :dims}.
-  STYLE-FIRST + word-budgeted so it survives CLIP 77 tokens."
+  "Panel map + SIP anchors → render spec, by injecting SIP's three work mappers
+  (focal-character / env-key / mood-tags) into the generic `km/compose`. The
+  STYLE-FIRST word budgeting + tag grouping all live in the commons now."
   [{:keys [anchors panel]}]
-  (let [{:keys [style-lead quality-tail word-budget base-negative
-                volume-color characters environments aspect-by-layout]} anchors
-        present  (if-let [f (focal-character panel)] [f] []) ; one character per panel
-        char-an  characters
-        col      (get volume-color (:area panel) [])
-        env      (get-in environments [(env-key (:location panel)) :tags] [])
-        subj     (subject-count present char-an)
-        ;; cap identity tags per character so every present character keeps its
-        ;; most-distinguishing tags in a two/three-shot (else the first character
-        ;; eats the budget and the rest render generic).
-        per-char (if (> (count present) 1) 4 7)
-        id-tags  (vec (mapcat #(take per-char (get-in char-an [% :tags] [])) present))
-        ;; priority groups (high → low); style & color lead, env trails
-        body     (take-budget word-budget
-                              [style-lead (vec (take 2 col)) (framing (:camera panel))
-                               subj id-tags (mood-tags (:emotion panel))
-                               (vec (take 3 env)) quality-tail])
-        neg      (->> (concat base-negative (mapcat #(get-in char-an [% :negative] []) present))
-                      distinct vec)
-        refs     (->> present (keep #(get-in char-an [% :ref])) vec)
-        aspect   (get aspect-by-layout (:layout panel) :2x3)]
-    {:tags body
-     :prompt (str/join ", " body)
-     :neg neg
-     :refs refs
-     :aspect aspect
-     :dims (aspect->dims aspect)}))
+  (km/compose {:anchors anchors
+               :panel panel
+               :mappers {:focal-character focal-character
+                         :location->env   env-key
+                         :emotion->tags   mood-tags}}))
 
-;; ---------------------------------------------------------------------------
-;; image-gen HTTP client — /generate (we own the full prompt, tag-only)
-;; ---------------------------------------------------------------------------
-
-(def ^:private b64 (Base64/getDecoder))
-
-(defn- post-json [^HttpClient client url body]
-  (let [req (-> (HttpRequest/newBuilder (URI/create url))
-                (.header "content-type" "application/json")
-                (.timeout (java.time.Duration/ofMinutes 40))
-                (.POST (HttpRequest$BodyPublishers/ofString (json/write-str body)))
-                (.build))
-        resp (.send client req (HttpResponse$BodyHandlers/ofString))]
-    (if (<= 200 (.statusCode resp) 299)
-      (json/read-str (.body resp) :key-fn keyword)
-      (throw (ex-info "image-gen error" {:status (.statusCode resp) :body (.body resp)})))))
-
-(defn render!
-  "Render `spec` via image-gen /generate and write the PNG to `out-path`.
-  Returns {:path :seed :ms}. `base` defaults to $IMAGEGEN_URL or :8100."
-  [spec out-path & {:keys [base seed steps]
-                    :or {base (or (System/getenv "IMAGEGEN_URL") "http://localhost:8100")
-                         steps 28}}]
-  (let [[w h] (:dims spec)
-        ;; force HTTP/1.1 — uvicorn rejects the JDK client's default h2c upgrade
-        client (-> (HttpClient/newBuilder) (.version HttpClient$Version/HTTP_1_1) (.build))
-        res (post-json client (str base "/generate")
-                       {:prompt (:prompt spec)
-                        :negative_prompt (str/join ", " (:neg spec))
-                        :width w :height h
-                        :num_inference_steps steps
-                        :seed seed})
-        ;; /generate returns a data-URL ("data:image/png;base64,XXXX"); strip the prefix
-        raw   (:image_base64 res)
-        b64s  (if-let [i (str/index-of raw ",")] (subs raw (inc i)) raw)
-        bytes (.decode b64 ^String b64s)]
-    (io/make-parents (io/file out-path))
-    (with-open [o (io/output-stream out-path)] (.write o bytes))
-    {:path out-path :seed (:seed res) :ms (:generation_time_ms res)}))
+;; image-gen HTTP client lives in the commons; re-export for callers/CLI.
+(def render! km/render!)
 
 ;; ---------------------------------------------------------------------------
 ;; Datoms — anchors + panels into the world (datalevin)
