@@ -49,7 +49,7 @@
 ;; --- shared backend: Kotoba Datomic XRPC (in-process mock) ------------------
 
 (defn- start-mock-graph! [rows]
-  (let [tx (atom nil) auth (atom nil)
+  (let [tx (atom nil) auth (atom nil) qreq (atom nil)
         srv (HttpServer/create (InetSocketAddress. "127.0.0.1" 0) 0)
         respond (fn [exch ^String s] (let [b (.getBytes s "UTF-8")]
                                        (.sendResponseHeaders exch 200 (count b))
@@ -62,9 +62,12 @@
           (respond e (json/write-str {:graph "g" :basis_t "1"})))))
     (.createContext srv "/xrpc/com.etzhayyim.apps.kotoba.datomic.q"
       (reify HttpHandler
-        (handle [_ e] (respond e (json/write-str {:graph "g" :rows_edn rows})))))
+        (handle [_ e]
+          (reset! qreq (json/read-str (slurp (.getRequestBody e)) :key-fn keyword))
+          (respond e (json/write-str {:graph "g" :rows_edn rows})))))
     (.start srv)
-    {:base (str "http://127.0.0.1:" (.getPort (.getAddress srv))) :tx tx :auth auth :stop #(.stop srv 0)}))
+    {:base (str "http://127.0.0.1:" (.getPort (.getAddress srv)))
+     :tx tx :auth auth :qreq qreq :stop #(.stop srv 0)}))
 
 (deftest kotoba-shared-backend
   (testing "ingest → datomic.transact (operator JWT + tx_edn) ; participants ← datomic.q"
@@ -83,4 +86,15 @@
                    :research.participant/gender "F"}]
                  (r/kotoba-participants kg))
               "datomic.q rows_edn parsed into participant maps (no PII)"))
+        (finally (stop))))))
+
+(deftest kotoba-as-of-time-travel
+  (testing "as-of read forwards datomic.q :as_of (Kotoba-native provenance; no Datomic Cloud)"
+    (let [{:keys [base qreq stop]} (start-mock-graph! [["\"p-1\"" "\"30-39\"" "\"M\""]])]
+      (try
+        (let [kg (r/kotoba-graph "research-graph" base "op-jwt")]
+          (r/kotoba-participants kg "t-42")
+          (is (= "t-42" (:as_of @qreq)) "datomic.q carries the as_of basis-t")
+          (r/kotoba-participants kg)
+          (is (nil? (:as_of @qreq)) "no as-of → current view (no :as_of)"))
         (finally (stop))))))

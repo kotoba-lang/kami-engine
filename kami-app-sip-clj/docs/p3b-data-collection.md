@@ -23,7 +23,7 @@ ADR-0022 P3 の収集（書き込み）フェーズ。P3-A（read-only ダッシ
 - **誰が書けるか**:
   - **(推奨) サーバ/authoring 経由のみ**: 研究端末→（認証済み）収集サービス→operator JWT で `datomic.transact`。ブラウザに operator 秘密鍵を置かない。
   - 代替: 参加者個別 DID の **CACAO write-cap**（`kotoba cacao-sign`）。粒度は細かいが鍵配布が重い。
-- **as-of / 来歴**: 研究データ継続性が最重要 → datalevin では time-travel 不可。**Datomic Cloud/Peer へ昇格**（ADR-0022 のクリティカルパス）。
+- **as-of / 来歴**: 研究データ継続性が最重要。**Datomic は kotobase.net のホスト Kotoba（kotoba-datomic, CF Worker）を使う** → `datomic.q` の `as_of`/`since`/`history` で時間遡及・来歴が**ネイティブに得られる**。**別途 Datomic Cloud は不要**（決定: 2026-06-28）。`sip.research/kotoba-participants` は `as-of` 引数で過去時点読みに対応済み。datalevin はローカル/テスト用。
 
 ## 同意・プライバシー（ブロッカー）
 
@@ -36,16 +36,16 @@ ADR-0022 P3 の収集（書き込み）フェーズ。P3-A（read-only ダッシ
 
 ## 既存データ移行
 
-- 旧 researcher のストア（D1/XRPC）→ `:research.*` datom へ ETL。`ingest-session!` を移行スクリプトから流用。**移行は Datomic Cloud 確定後**（来歴を壊さないため）。
+- 旧 researcher のストア（D1/XRPC）→ `:research.*` datom へ ETL。`ingest-session!` を移行スクリプトから流用。**移行は kotobase.net の共有 graph 確定後**（来歴を壊さないため）。
 
 ## 段階導入
 
 1. **本 PR（done）**: データモデル + ingest/query + テスト（local datalevin）。
 2. shared 書き込み: `datomic.transact` XRPC ingest（operator JWT）を `sip.research` に追加（実 kotoba デプロイ前提）。
 3. 収集サービス + 同意フロー（サーバ側、Hume 連携）。
-4. Datomic Cloud 昇格 + 既存データ移行。
+4. kotobase.net の共有 research graph 確定（operator JWT / CACAO）+ 既存データ移行。
 5. dashboard を shared read（`datomic.q`）へ接続（P3-A の seam を有効化）。
 
 ## 未決（要オーナー判断）
 
-- Datomic Cloud のコスト/運用主体、IRB/同意の所管、Hume の継続利用、移行の停止許容時間。
+- kotobase.net 上の research graph の作成・権限（operator/CACAO）、IRB/同意の所管、Hume の継続利用、移行の停止許容時間。

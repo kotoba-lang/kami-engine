@@ -146,9 +146,11 @@
 
 (defn kotoba-graph
   "Shared research store over Kotoba Datomic XRPC. `graph` is the shared research
-  graph (CID/name). `token` (operator JWT) is required for ingest; reads need
-  none. Defaults: base $KOTOBA_URL, token $KOTOBA_TOKEN."
-  ([graph] (kotoba-graph graph (or (System/getenv "KOTOBA_URL") "http://localhost:8080")
+  graph (CID/name). `token` (operator JWT / CACAO) authorises ingest and reads.
+  Default base is the hosted Kotoba CF Worker at https://kotobase.net — its
+  kotoba-datomic gives `as_of`/`history` natively, so the study's provenance
+  needs NO separate Datomic Cloud. Override with $KOTOBA_URL / $KOTOBA_TOKEN."
+  ([graph] (kotoba-graph graph (or (System/getenv "KOTOBA_URL") "https://kotobase.net")
                          (System/getenv "KOTOBA_TOKEN")))
   ([graph base token] (->KotobaGraph (HttpClient/newHttpClient) base graph token)))
 
@@ -160,23 +162,32 @@
              {:graph graph :tx_edn (pr-str (session-tx-data m))} token))
 
 (defn- q-rows
-  "Run a Datalog query over the shared graph; rows of EDN-parsed cells."
-  [{:keys [client base graph token]} query inputs]
-  (->> (xrpc-post client base "com.etzhayyim.apps.kotoba.datomic.q"
-                  {:graph graph :query_edn (pr-str query) :inputs_edn (mapv pr-str inputs)} token)
-       :rows_edn
-       (mapv (fn [row] (mapv edn/read-string row)))))
+  "Run a Datalog query over the shared graph; rows of EDN-parsed cells.
+  `opts` {:as-of <basis-t>} reads the graph at that point (Kotoba-native
+  time-travel via datomic.q `as_of`)."
+  ([kg query inputs] (q-rows kg query inputs nil))
+  ([{:keys [client base graph token]} query inputs {:keys [as-of]}]
+   (->> (xrpc-post client base "com.etzhayyim.apps.kotoba.datomic.q"
+                   (cond-> {:graph graph :query_edn (pr-str query) :inputs_edn (mapv pr-str inputs)}
+                     as-of (assoc :as_of (str as-of)))
+                   token)
+        :rows_edn
+        (mapv (fn [row] (mapv edn/read-string row))))))
 
 (defn kotoba-participants
-  "Read public participants (demographics only, no PII) from the shared graph."
-  [kg]
-  (->> (q-rows kg '[:find ?id ?ag ?g
-                    :where
-                    [?p :research.participant/id ?id]
-                    [?p :research.participant/public? true]
-                    [(get-else $ ?p :research.participant/age-group "") ?ag]
-                    [(get-else $ ?p :research.participant/gender "") ?g]]
-               [])
-       (mapv (fn [[id ag g]] {:research.participant/id id
-                              :research.participant/age-group ag
-                              :research.participant/gender g}))))
+  "Read public participants (demographics only, no PII) from the shared graph.
+  Pass `as-of` (a basis-t string) to read the cohort as it was at that point —
+  the provenance/reproducibility the n=1000 study needs, served by Kotoba's own
+  datomic.q (kotobase.net), not Datomic Cloud."
+  ([kg] (kotoba-participants kg nil))
+  ([kg as-of]
+   (->> (q-rows kg '[:find ?id ?ag ?g
+                     :where
+                     [?p :research.participant/id ?id]
+                     [?p :research.participant/public? true]
+                     [(get-else $ ?p :research.participant/age-group "") ?ag]
+                     [(get-else $ ?p :research.participant/gender "") ?g]]
+                [] {:as-of as-of})
+        (mapv (fn [[id ag g]] {:research.participant/id id
+                               :research.participant/age-group ag
+                               :research.participant/gender g})))))
