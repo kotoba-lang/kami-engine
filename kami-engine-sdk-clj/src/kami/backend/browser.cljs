@@ -23,18 +23,18 @@
 (defrecord BrowserBackend [host]
   gpu/IGpuBackend
   (register-mesh! [_ id vertices indices]
-    (.register_mesh host id (->f32 vertices) (->u32 indices)))
+    (.register_mesh ^js host id (->f32 vertices) (->u32 indices)))
   (register-material! [_ id params]
-    (.register_material host id (->f32 (or params []))))
+    (.register_material ^js host id (->f32 (or params []))))
   (register-shader! [_ id wgsl layout]
-    (.register_shader host id wgsl (or layout "")))
+    (.register_shader ^js host id wgsl (or layout "")))
   (submit-frame! [_ packed]
     ;; packed = {:buffer :len :meta …}; meta travels as JSON, buffer as bytes.
-    (.submit_frame host
+    (.submit_frame ^js host
                    (js/JSON.stringify (clj->js (:meta packed)))
                    (->u8 (:buffer packed))))
   (resize! [_ w h]
-    (.resize host w h)))
+    (.resize ^js host w h)))
 
 (defn make
   "Create a browser GPU backend bound to canvas id `:canvas`. Returns a channel
@@ -45,5 +45,5 @@
   (go
     (let [el   (.getElementById js/document canvas)
           ctor (or host-ctor js/KamiCljHost)
-          host (js/await (.create ctor el))]
+          host (js/await (.create ^js ctor el))]
       (->BrowserBackend host))))

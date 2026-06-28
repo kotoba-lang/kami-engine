@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Spirit in Physics — 水の都の心音</title>
   <meta name="description" content="水の都・東京2065。のんびり暮らし、学び、誰かに寄り添う、癒しのオンラインゲーム。">
+  <!-- PWA (P4-A): installable + offline app shell -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#6b5b95">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="心音">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #f4f1fb; }
@@ -59,6 +67,10 @@
       window.sip.ui.mount();                    // playable HUD (always)
       document.getElementById('intro').classList.add('hidden');
       boot3d();                                 // non-fatal, best-effort backdrop
+      // PWA: register the service worker (offline app shell). Non-fatal.
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch((e) => console.warn('SW register failed', e));
+      }
     }
     window.addEventListener('load', go);
   </script>
