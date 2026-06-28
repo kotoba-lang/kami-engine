@@ -11,4 +11,11 @@
         ;; No :init-fn — index.html drives boot explicitly (after wasm init).
         ;; `^:export` on sip.web/boot exposes it as window.sip.web.boot.
         :modules    {:sip {:entries [sip.web sip.ui]}}
-        :release    {:compiler-options {:optimizations :advanced}}}}}
+        :release    {:compiler-options {:optimizations :advanced}}}
+
+  ;; P3-A — read-only researcher dashboard (separate page, researcher.html).
+  :researcher {:target     :browser
+               :output-dir "public/js"
+               :asset-path "/js"
+               :modules    {:researcher {:entries [sip.researcher]}}
+               :release    {:compiler-options {:optimizations :advanced}}}}}

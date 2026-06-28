@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Spirit in Physics — Researcher</title>
+  <meta name="description" content="n=1000 study — read-only researcher dashboard (participants & session emotion summaries).">
+  <style>* { margin: 0; box-sizing: border-box; } html, body { background: #faf8fd; }</style>
+</head>
+<body>
+  <!-- P3-A read-only dashboard. The cljs build (shadow :researcher) exposes
+       window.sip.researcher.mount. Data source: Kotoba Datomic XRPC when
+       window.SIP_KOTOBA_URL is set, else bundled seed. -->
+  <script type="module">
+    import './js/researcher.js?b=1';
+    window.addEventListener('load', () => window.sip.researcher.mount());
+  </script>
+</body>
+</html>
