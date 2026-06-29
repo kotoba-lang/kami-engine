@@ -13,6 +13,13 @@ use glam::{Mat4, Vec3};
 use kami_scene::{mget, num, root_map, vec3};
 use kotoba_edn::EdnValue;
 
+// Render-IR GPU executor (ADR-0044 phase 6): multi-light + IBL + post chain + AA.
+mod ir_gpu;
+pub use ir_gpu::{
+    build_env_mips, f32_to_f16, instance_draw_order, pack_gir, render_ir_to_pixels,
+    render_ir_to_pixels_env, IrRenderer, MAX_LIGHTS,
+};
+
 #[derive(Clone, Debug)]
 pub struct Instance {
     pub pos: [f32; 3],
@@ -22,6 +29,9 @@ pub struct Instance {
     pub metallic: f32,
     pub roughness: f32,
     pub emissive: f32,
+    /// Opacity in [0,1]; < 1.0 marks the instance as alpha-blended (drawn back-to-front
+    /// after the opaque pass, no depth write). 1.0 = opaque (the default).
+    pub alpha: f32,
 }
 
 #[derive(Clone, Debug)]
@@ -577,6 +587,7 @@ pub fn parse_ir(edn: &str) -> (Globals, Vec<Instance>) {
             metallic: num(mget(&m, "metallic")),
             roughness: mget(&m, "roughness").map(|v| num(Some(v))).unwrap_or(0.65),
             emissive: num(mget(&m, "emissive")),
+            alpha: mget(&m, "alpha").map(|v| num(Some(v))).unwrap_or(1.0),
         })
         .collect();
     (globals, insts)
@@ -602,7 +613,7 @@ pub fn scene_to_ir(scene_src: &str) -> (Globals, Vec<Instance>) {
         g.eye = Some([dist * az.cos(), h, dist * az.sin()]);
         g.target = Some([0.0, lh, 0.0]);
     }
-    let mut insts = vec![Instance { pos: [0.0, -0.5, 0.0], color: ground_color, size: [400.0, 1.0], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0 }];
+    let mut insts = vec![Instance { pos: [0.0, -0.5, 0.0], color: ground_color, size: [400.0, 1.0], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0, alpha: 1.0 }];
 
     if let Some(props) = mget(&root, "render/props").and_then(|x| x.as_map().cloned()) {
         let count = num(mget(&props, "count")) as i32;
@@ -623,15 +634,15 @@ pub fn scene_to_ir(scene_src: &str) -> (Globals, Vec<Instance>) {
                 if let Some(t) = &trees {
                     let tw = num(mget(t, "w")); let th = num(mget(t, "h"));
                     let (tm, tr) = (num(mget(t, "metallic")), { let r = num(mget(t, "roughness")); if r == 0.0 { 0.95 } else { r } });
-                    insts.push(Instance { pos: [x, 0.0, z], color: [0.45, 0.32, 0.2], size: [tw * 0.3, th * 0.5], yaw: 0.0, metallic: 0.0, roughness: 0.9, emissive: 0.0 });
-                    insts.push(Instance { pos: [x, th * 0.5, z], color: vec3(mget(t, "color")), size: [tw, th * 0.6], yaw: 0.0, metallic: tm, roughness: tr, emissive: 0.0 });
+                    insts.push(Instance { pos: [x, 0.0, z], color: [0.45, 0.32, 0.2], size: [tw * 0.3, th * 0.5], yaw: 0.0, metallic: 0.0, roughness: 0.9, emissive: 0.0, alpha: 1.0 });
+                    insts.push(Instance { pos: [x, th * 0.5, z], color: vec3(mget(t, "color")), size: [tw, th * 0.6], yaw: 0.0, metallic: tm, roughness: tr, emissive: 0.0, alpha: 1.0 });
                 }
             } else if !buildings.is_empty() {
                 let b = &buildings[(rnd() * buildings.len() as f32) as usize % buildings.len()];
                 let mn = num(mget(b, "min-h")); let mx = num(mget(b, "max-h"));
                 let h = mn + rnd() * (mx - mn);
                 let rgh = { let r = num(mget(b, "roughness")); if r == 0.0 { 0.7 } else { r } };
-                insts.push(Instance { pos: [x, 0.0, z], color: vec3(mget(b, "color")), size: [num(mget(b, "w")), h], yaw: 0.0, metallic: num(mget(b, "metallic")), roughness: rgh, emissive: 0.0 });
+                insts.push(Instance { pos: [x, 0.0, z], color: vec3(mget(b, "color")), size: [num(mget(b, "w")), h], yaw: 0.0, metallic: num(mget(b, "metallic")), roughness: rgh, emissive: 0.0, alpha: 1.0 });
             }
         }
     }
@@ -683,7 +694,7 @@ const MAX_INST: u32 = 16384;
 /// PNG and live-window examples so both render the same world.
 pub fn demo_city() -> (Globals, Vec<Instance>) {
     let mut insts: Vec<Instance> = Vec::new();
-    insts.push(Instance { pos: [0.0, -0.5, 0.0], color: [0.34, 0.52, 0.30], size: [400.0, 1.0], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0 });
+    insts.push(Instance { pos: [0.0, -0.5, 0.0], color: [0.34, 0.52, 0.30], size: [400.0, 1.0], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0, alpha: 1.0 });
     let mut seed: u32 = 2654435769;
     let mut rnd = || { seed ^= seed << 13; seed ^= seed >> 17; seed ^= seed << 5; (seed & 0x7fffffff) as f32 / 2147483647.0 };
     let spread = 90.0;
@@ -692,15 +703,15 @@ pub fn demo_city() -> (Globals, Vec<Instance>) {
         let z = (rnd() * 2.0 - 1.0) * spread;
         if (x * x + z * z).sqrt() < 8.0 { continue; }
         if rnd() < 0.4 {
-            insts.push(Instance { pos: [x, 0.0, z], color: [0.45, 0.32, 0.2], size: [0.33, 1.3], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0 });
-            insts.push(Instance { pos: [x, 1.3, z], color: [0.28, 0.55, 0.30], size: [1.1, 1.6], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0 });
+            insts.push(Instance { pos: [x, 0.0, z], color: [0.45, 0.32, 0.2], size: [0.33, 1.3], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0, alpha: 1.0 });
+            insts.push(Instance { pos: [x, 1.3, z], color: [0.28, 0.55, 0.30], size: [1.1, 1.6], yaw: 0.0, metallic: 0.0, roughness: 0.95, emissive: 0.0, alpha: 1.0 });
         } else {
             let h = 2.0 + rnd() * 5.0;
             let (color, metallic, roughness) = if rnd() < 0.5 { ([0.62, 0.60, 0.66], 0.8, 0.25) } else { ([0.70, 0.66, 0.55], 0.05, 0.85) };
-            insts.push(Instance { pos: [x, 0.0, z], color, size: [2.0, h], yaw: 0.0, metallic, roughness, emissive: 0.0 });
+            insts.push(Instance { pos: [x, 0.0, z], color, size: [2.0, h], yaw: 0.0, metallic, roughness, emissive: 0.0, alpha: 1.0 });
         }
     }
-    insts.push(Instance { pos: [0.0, 0.0, 0.0], color: [0.30, 0.62, 1.0], size: [0.9, 1.9], yaw: 0.0, metallic: 0.2, roughness: 0.35, emissive: 0.5 });
+    insts.push(Instance { pos: [0.0, 0.0, 0.0], color: [0.30, 0.62, 1.0], size: [0.9, 1.9], yaw: 0.0, metallic: 0.2, roughness: 0.35, emissive: 0.5, alpha: 1.0 });
     let g = Globals { horizon: [0.74, 0.84, 0.95], sun_dir: [-0.4, -0.85, -0.35], sun: [1.0, 0.96, 0.85], eye: Some([45.0, 40.0, 45.0]), target: Some([0.0, 0.0, 0.0]) };
     (g, insts)
 }
@@ -1178,7 +1189,7 @@ mod tests {
     fn model_mat_translates_lifts_and_scales() {
         let i = Instance {
             pos: [10.0, 0.0, 20.0], color: [1.0, 1.0, 1.0], size: [2.0, 4.0],
-            yaw: 0.0, metallic: 0.0, roughness: 0.5, emissive: 0.0,
+            yaw: 0.0, metallic: 0.0, roughness: 0.5, emissive: 0.0, alpha: 1.0,
         };
         let m = model_mat(&i);
         // local origin → world: x,z from pos; y lifted by h/2 so the box sits on the ground
