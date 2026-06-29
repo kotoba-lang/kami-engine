@@ -1,4 +1,0 @@
-[submodule "kami-engine-sdk"]
-	path = kami-engine-sdk
-	url = https://github.com/etzhayyim/kami-engine-sdk.git
-	branch = main
