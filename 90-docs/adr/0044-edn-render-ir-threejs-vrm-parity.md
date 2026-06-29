@@ -1,6 +1,7 @@
 # ADR-0044 — EDN render-IR vocabulary for three.js / VRM parity
 
-- Status: accepted (design + phased implementation; **phase 1 done**)
+- Status: accepted (design + phased implementation; **phases 1–5 done (data layer); phase 6
+  GPU wiring done for multi-light + IBL + post + AA via `kami-webgpu-rs::IrRenderer`**)
 - Date: 2026-06-24
 - Builds on: ADR-0031 (kami-vrm / `run_embed_vrm`), ADR-0040 (everything describable is EDN),
   ADR-0041 (play3d adopts the EDN render-IR), ADR-0043 (VRM dance scenes in CLJ/EDN)
@@ -130,8 +131,52 @@ remain engine-owner-gated (merge gate).
    visible, `ThirdPersonOnly` culled in FP, `FirstPersonOnly` culled in TP) — the
    `VRMFirstPerson` analogue; `hidden_nodes(view)` gives the host cull set. 5 tests. **Phase 5
    complete.**
-6. **Render features** — point/spot shadows + cascades, MSAA, alpha-to-coverage, anisotropic
-   filtering (lighting/shadow vocabulary under `[:globals …]` in progress). **`:particles`
+6. **Render features.** **GPU executor wiring DONE for multi-light + IBL + post + AA**
+   (`kami_webgpu_rs::IrRenderer`, `ir_gpu.rs` + `lit_ir.wgsl` + `post.wgsl`). This is the
+   first place the parsed render-IR (`:lights`/`:env`/`:camera`) is *actually rendered* rather
+   than data-only: `lit_ir.wgsl` loops up to 8 lights (directional/point/spot with range
+   attenuation + smooth spot cone — closing "directional-only" on the GPU) and adds IBL
+   (hemisphere irradiance + procedural reflection-direction env specular scaled by
+   `:env :ibl :intensity` — closing "no IBL on the GPU"); `post.wgsl` runs a real fullscreen
+   chain (threshold bright-pass → separable Gaussian bloom → ACES filmic tonemap + vignette
+   composite → FXAA — closing "post-FX declared but no shaders"); and the lit pass takes a
+   `sample_count` (MSAA 4× with HDR resolve) ahead of the FXAA pass — closing "AA: none".
+   The pipeline is shadow → lit HDR(Rgba16Float) → bloom → composite → FXAA, additive beside
+   the v1 `Renderer` (golden frames untouched). **Shadows generalised to a multi-caster atlas:**
+   a `Depth32Float` 2D-array (`MAX_SHADOWS=4` layers) with one matrix + atlas layer per
+   shadow-casting light — **directional (ortho) and spot (perspective) casters both render**
+   (`assign_shadows` + `shadow_ir.wgsl`; `lit_ir.wgsl` PCF-samples each light's layer),
+   closing "single directional shadow only". **Point-light omnidirectional shadows DONE:**
+   the first shadow-casting point light renders linear distance into a 6-layer R16Float array
+   (`point_shadow.wgsl`, `cube_face_views`), and `lit_ir.wgsl` resolves it by picking the face
+   from the major axis of the light→fragment direction and projecting with the *same*
+   `point_vp[face]` matrix it was rendered with — a self-consistent scheme that sidesteps the
+   hardware-cube-convention pitfall (no face-orientation guesswork). **All three light types
+   now cast shadows.** Verified on Metal via `examples/render_ir_png.rs` (directional + spot
+   atlas shadows; a point light throwing a correctly-oriented perspective cast shadow; bloom
+   haloes, MSAA+FXAA edges); pure logic unit-tested (`pack_gir` layout incl. per-light shadow
+   layer + point sentinel; `assign_shadows`: directional/spot atlas + first point→cube, capped
+   at MAX_SHADOWS; `cube_face_views`: 6 distinct faces). **Transparency (alpha blend) DONE:**
+   `:instances` carry `:alpha` (1.0 opaque); `instance_draw_order` partitions opaque-first then
+   sorts the translucent tail **back-to-front** from the eye, and a second lit pipeline
+   (`lit_blend_pipe`, src-over `ALPHA_BLENDING`, depth-tested, **no depth write**) draws that
+   tail over the opaque HDR — translucent cuboids show what's behind them; transparent
+   instances don't cast shadows (opaque range only). One explicit `lit_bgl` bind-group layout
+   is shared by the opaque + blend pipelines (auto-derived layouts are pipeline-exclusive).
+   Verified on Metal (a glass panel revealing the box behind it); `instance_draw_order`
+   unit-tested (opaque first, transparent back-to-front). **Image-based env-map IBL DONE:**
+   `IrRenderer::set_env_map` uploads an equirectangular HDR (the host-decoded `:env :ibl :url`)
+   as an `Rgba16Float` texture with a CPU-built mip chain (`build_env_mips` + `f32_to_f16`,
+   dependency-free); `lit_ir.wgsl` then samples it by equirect direction — diffuse irradiance
+   from the blurred top mip along N, **roughness-blurred specular from a `roughness*maxLod`
+   mip along the reflection vector** — replacing the procedural gradient when `sky.w` flags an
+   uploaded map (1×1 fallback otherwise, so old scenes are unchanged). Verified on Metal: a
+   near-mirror metal floor reflects the synthetic HDR sky + a bright sun, and a row of metal
+   cubes shows the reflection sharpen→blur with roughness; unit-tested (`f32_to_f16` known
+   values, `build_env_mips` chain dims + values). It's an approximate prefilter (box-mip LOD),
+   not full importance-sampled PMREM. Still engine-owner-gated / remaining: true PMREM
+   prefiltering + a drawn skybox background, alpha-test cutout, order-independent transparency,
+   cascades (CSM), a 2nd+ point caster, anisotropic filtering. **`:particles`
    DONE:** `kami_webgpu_rs::ParticleBurst` + `RenderIr.particles` parse `:particles [{:pos :color
    :count :speed :life :size :gravity}]`; `kami_live` turns each fired `:fx` reaction
    (confetti/pyro/sparkle) into a burst at the performer, so a host particle pipeline draws
