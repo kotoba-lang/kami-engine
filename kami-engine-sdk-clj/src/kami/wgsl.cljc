@@ -18,17 +18,18 @@
 
   The body sub-language is a small s-expression subset; unsupported forms throw
   so the author can fall back to a raw WGSL string (scope: ADR-CLJ §13.2)."
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [kami.render.authority :as authority]))
 
 (def builtin-pipelines
   "Pipeline keywords that map directly to kami-render::scene_pipelines — no WGSL
   emission needed; `:draw/pipeline` just names one."
-  #{:pbr :sky :terrain :vegetation :character :water :voxel :particle :atlas})
+  authority/builtin-pipelines)
 
 (defn builtin?
   "True if `pipeline` is a built-in kami-render pipeline (skip WGSL emission)."
   [pipeline]
-  (contains? builtin-pipelines pipeline))
+  (authority/builtin? pipeline))
 
 ;; ---------------------------------------------------------------------------
 ;; Expression + statement lowering (small subset)

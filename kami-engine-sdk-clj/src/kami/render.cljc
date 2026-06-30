@@ -4,11 +4,12 @@
   (ARCHITECTURE.md §7). The renderer (`kami-render`, Rust/wgpu) is a dumb executor
   of this IR; instancing is the default, not an optimization."
   (:require [kami.ecs  :as ecs]
-            [kami.math :as m]))
+            [kami.math :as m]
+            [kami.render.authority :as authority]))
 
 (def nintendo-cream
   "Default clear color #f0ead6 (KAMI Engine prohibits dark themes; see §14)."
-  [0.94 0.917 0.839 1.0])
+  authority/default-clear)
 
 (def ^:private default-rot [0.0 0.0 0.0 1.0])
 (def ^:private default-scale [1.0 1.0 1.0])
@@ -40,9 +41,6 @@
                       (:camera/near cam -1.0) (:camera/far cam 1.0))
              (m/perspective (:camera/fov cam 60.0) aspect
                             (:camera/near cam 0.1) (:camera/far cam 1000.0)))}))
-
-(def ^:private builtin-pipelines
-  #{:pbr :sky :terrain :vegetation :character :water :voxel :particle :atlas})
 
 (defn- pipeline-of
   "Choose the pipeline for an entity: explicit :shader/asset id → that registered
@@ -98,9 +96,10 @@
   surface. Hand to `kami.ipc/pack` then `kami.gpu/submit!`."
   [world {:keys [n aspect clear]
           :or   {n 0 aspect 1.7777778 clear nintendo-cream}}]
-  {:frame/n      n
-   :frame/clear  clear
-   :frame/camera (camera-ir world aspect)
-   :frame/passes [{:pass/id     :main
-                   :pass/target :swapchain
-                   :pass/draws  (draws-for world :main)}]})
+  (let [{:keys [:pass/id :pass/target]} authority/default-pass]
+    {:frame/n      n
+     :frame/clear  clear
+     :frame/camera (camera-ir world aspect)
+     :frame/passes [{:pass/id     id
+                     :pass/target target
+                     :pass/draws  (draws-for world id)}]}))
