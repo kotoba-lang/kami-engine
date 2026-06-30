@@ -4,9 +4,12 @@
   These pin the clj ↔ Rust contracts (ARCHITECTURE.md §7/§9) so they can be
   validated long before a GPU is wired up."
   (:require [clojure.test :refer [deftest testing is]]
+            #?(:clj [clojure.edn :as edn])
+            #?(:clj [clojure.java.io :as io])
             [kami.scene  :as scene]
             [kami.ecs    :as ecs]
             [kami.render :as render]
+            [kami.render.authority :as authority]
             [kami.ipc    :as ipc]
             [kami.wgsl   :as wgsl]
             [kami.math   :as m]))
@@ -93,6 +96,20 @@
       (is (empty? (ecs/->tx (ecs/mark-saved w1 2)))))))
 
 ;; --- render-IR --------------------------------------------------------------
+
+#?(:clj
+   (deftest render-authority-edn
+     (let [artifact (-> "kami/render/authority.edn"
+                        io/resource
+                        slurp
+                        edn/read-string)]
+       (is (= artifact authority/authority))
+       (is (= artifact authority/authority-edn))
+       (is (authority/validate artifact))
+       (is (= #{:pbr :sky :terrain :vegetation :character :water :voxel :particle :atlas}
+              authority/builtin-pipelines))
+       (is (= "kami_render::scene_pipelines::pbr"
+              (:pipeline/adapter (authority/pipeline :pbr)))))))
 
 (deftest render-frame
   (let [w  (ecs/load-snapshot snap)

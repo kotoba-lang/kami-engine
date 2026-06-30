@@ -1,0 +1,45 @@
+{:authority/id :kami.render/authority
+ :authority/version 1
+ :authority/surface :render
+
+ :render/default-clear [0.94 0.917 0.839 1.0]
+ :render/default-pass {:pass/id :main
+                       :pass/target :swapchain}
+
+ :render/pipelines
+ [{:pipeline/id :pbr
+   :pipeline/backend :kami-render/scene-pipeline
+   :pipeline/role :material-lit
+   :pipeline/adapter "kami_render::scene_pipelines::pbr"}
+  {:pipeline/id :sky
+   :pipeline/backend :kami-render/scene-pipeline
+   :pipeline/role :environment
+   :pipeline/adapter "kami_render::scene_pipelines::sky"}
+  {:pipeline/id :terrain
+   :pipeline/backend :kami-render/scene-pipeline
+   :pipeline/role :landscape
+   :pipeline/adapter "kami_render::scene_pipelines::terrain"}
+  {:pipeline/id :vegetation
+   :pipeline/backend :kami-render/scene-pipeline
+   :pipeline/role :instanced-foliage
+   :pipeline/adapter "kami_render::scene_pipelines::vegetation"}
+  {:pipeline/id :character
+   :pipeline/backend :kami-render/scene-pipeline
+   :pipeline/role :skinned-character
+   :pipeline/adapter "kami_render::scene_pipelines::character"}
+  {:pipeline/id :water
+   :pipeline/backend :kami-render/scene-pipeline
+   :pipeline/role :surface-water
+   :pipeline/adapter "kami_render::scene_pipelines::water"}
+  {:pipeline/id :voxel
+   :pipeline/backend :kami-render/scene-pipeline
+   :pipeline/role :voxel-scene
+   :pipeline/adapter "kami_render::scene_pipelines::voxel"}
+  {:pipeline/id :particle
+   :pipeline/backend :kami-render/scene-pipeline
+   :pipeline/role :sprite-particle
+   :pipeline/adapter "kami_render::scene_pipelines::particle"}
+  {:pipeline/id :atlas
+   :pipeline/backend :kami-render/scene-pipeline
+   :pipeline/role :atlas-sprite
+   :pipeline/adapter "kami_render::scene_pipelines::atlas"}]}
