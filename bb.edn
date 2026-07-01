@@ -1,134 +1,19 @@
-;; bb kami — the KAMI game build/ship orchestrator (ADR-0037/0038).
-;;
-;; Ties together the pieces that already exist: the `kami` CLI (packaging matrix,
-;; single source of truth), `author.clj` (datalevin → scene.edn), the `kamiclj`
-;; compiler (logic.clj → game.wasm), `kami-clj-play` (the host), and the
-;; dual-backend test gate. The per-platform decisions are NOT re-encoded here —
-;; `host`/`package` read them from `kami spec <target>` (EDN).
-;;
-;;   bb tasks                 list tasks
-;;   bb targets               packaging matrix (all 8 targets)
-;;   bb plan ios              human build plan for one target
-;;   bb spec ios              machine-readable EDN spec
-;;   bb bake survivors        datalevin → scene.edn   (Model-A authoring)
-;;   bb compile survivors     logic.clj → game.wasm   (kami-engine-clj)
-;;   bb host ios              cross-build the host for a target (feature+triple from kami)
-;;   bb run mac               launch the native player
-;;   bb test                  golden-frame + suite under BOTH backends
-
 {:min-bb-version "1.0.0"
- :paths []
  :tasks
- {:requires ([babashka.process :refer [shell]]
-             [clojure.edn :as edn]
-             [clojure.string :as str])
+ {:requires ([babashka.process :refer [shell]])
 
-  ;; ---- single-source interface gate --------------------------------------
-  wit-check  {:doc  "Gate: the kami:engine EDN IDL == world.wit == kami-clj Builtin host-imports."
-              :task (load-file "scripts/wit_test.clj")}
-  gen-wit    {:doc  "Print world.wit regenerated from wit/kami-interface.edn (the EDN IDL)."
-              :task (binding [*command-line-args* ["--gen"]] (load-file "scripts/wit_test.clj"))}
+  wit-check
+  {:doc "Gate: the kami:engine EDN IDL == world.wit == kami-clj Builtin map."
+   :task (load-file "scripts/wit_test.clj")}
 
-  ;; ---- matrix -------------------------------------------------------------
-  targets    {:doc  "Print the packaging matrix (all targets)."
-              :task (shell "cargo" "run" "-q" "--target" "aarch64-apple-darwin"
-                           "-p" "kami-script-runtime" "--bin" "kami" "--" "targets")}
+  gen-wit
+  {:doc "Print world.wit regenerated from wit/kami-interface.edn."
+   :task (binding [*command-line-args* ["--gen"]]
+           (load-file "scripts/wit_test.clj"))}
 
-  plan       {:doc  "Human build plan for one target:  bb plan ios"
-              :task (apply shell "cargo" "run" "-q" "--target" "aarch64-apple-darwin"
-                           "-p" "kami-script-runtime" "--bin" "kami" "--" "plan"
-                           *command-line-args*)}
-
-  spec       {:doc  "Machine-readable EDN spec:  bb spec ios"
-              :task (apply shell "cargo" "run" "-q" "--target" "aarch64-apple-darwin"
-                           "-p" "kami-script-runtime" "--bin" "kami" "--" "spec"
-                           *command-line-args*)}
-
-  ;; ---- author / compile (Model A → Model B artifacts) ---------------------
-  bake       {:doc  "datalevin → scene.edn for a game:  bb bake survivors"
-              :requires ([babashka.fs :as fs])
-              :task (let [g    (or (first *command-line-args*) "survivors")
-                          dir  (str "kami-clj-play/games/" g)
-                          lib  (System/getProperty "user.home")]
-                      (when-not (fs/exists? (str dir "/author.clj"))
-                        (println "no author.clj for game" g) (System/exit 1))
-                      ;; libdtlv.dylib must sit on the dlopen path (macOS arm64).
-                      (shell {:dir dir} "clojure" "-M" "author.clj"))}
-
-  compile    {:doc  "kami-engine-clj: logic.clj → game.wasm:  bb compile survivors"
-              :task (let [g   (or (first *command-line-args*) "survivors")
-                          dir (str "kami-clj-play/games/" g)]
-                      (shell "cargo" "run" "-q" "--target" "aarch64-apple-darwin"
-                             "-p" "kami-engine-clj" "--bin" "kamiclj" "--"
-                             (str dir "/logic.clj") "-o" (str dir "/game.wasm"))
-                      (println "wrote" (str dir "/game.wasm")))}
-
-  ;; ---- host build (decisions come from `kami spec`) ------------------------
-  host       {:doc  "Cross-build the host for a target:  bb host ios"
-              :requires ([babashka.process :as p])
-              :task (let [target (or (first *command-line-args*) "mac")
-                          spec   (-> (p/shell {:out :string}
-                                              "cargo" "run" "-q" "--target" "aarch64-apple-darwin"
-                                              "-p" "kami-script-runtime" "--bin" "kami" "--" "spec" target)
-                                     :out edn/read-string)
-                          {:keys [triple feature]} spec]
-                      (cond
-                        (nil? triple)
-                        (do (println "✗" target "needs the NDA console SDK toolchain (private repo).")
-                            (System/exit 3))
-                        :else
-                        (let [base ["cargo" "build" "-p" "kami-clj-play" "--target" triple]
-                              args (if (= feature "backend-wasmtime")
-                                     base
-                                     (into base ["--no-default-features" "--features" feature]))]
-                          (println "→" (str/join " " args))
-                          (apply shell args))))}
-
-  play       {:doc  "Launch the native player:  bb play"
-              :task (shell "cargo" "run" "--target" "aarch64-apple-darwin"
-                           "-p" "kami-clj-play")}
-
-  package    {:doc  "Assemble a relocatable artifact:  bb package mac [survivors]"
-              :requires ([babashka.fs :as fs] [babashka.process :as p])
-              :task (let [target (or (first *command-line-args*) "mac")
-                          game   (or (second *command-line-args*) "survivors")
-                          spec   (-> (p/shell {:out :string}
-                                              "cargo" "run" "-q" "--target" "aarch64-apple-darwin"
-                                              "-p" "kami-script-runtime" "--bin" "kami" "--" "spec" target)
-                                     :out edn/read-string)
-                          {:keys [triple feature]} spec
-                          gdir   (str "kami-clj-play/games/" game)]
-                      (when (nil? triple)
-                        (println "✗" target "packaging needs the NDA console SDK toolchain.") (System/exit 3))
-                      (when-not (= target "mac")
-                        (println "note: only the mac .app bundle is assembled here;"
-                                 target "needs its native shell (Swift/NativeActivity/SDK).") (System/exit 0))
-                      ;; build release host
-                      (let [base ["cargo" "build" "--release" "-p" "kami-clj-play" "--target" triple]
-                            args (if (= feature "backend-wasmtime") base
-                                     (into base ["--no-default-features" "--features" feature]))]
-                        (apply shell args))
-                      ;; assemble <dist>/KamiSurvivors.app
-                      (let [app  (str "dist/" (str/capitalize game) ".app")
-                            cont (str app "/Contents")]
-                        (fs/create-dirs (str cont "/MacOS"))
-                        (fs/create-dirs (str cont "/Resources/game"))
-                        (fs/copy (str "target/" triple "/release/kami-clj-play")
-                                 (str cont "/MacOS/kami-clj-play") {:replace-existing true})
-                        (doseq [f ["logic.clj" "scene.edn"]]
-                          (fs/copy (str gdir "/" f) (str cont "/Resources/game/" f) {:replace-existing true}))
-                        (spit (str cont "/Info.plist")
-                              (str "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                   "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
-                                   "<plist version=\"1.0\"><dict>\n"
-                                   "  <key>CFBundleName</key><string>" (str/capitalize game) "</string>\n"
-                                   "  <key>CFBundleExecutable</key><string>kami-clj-play</string>\n"
-                                   "  <key>CFBundleIdentifier</key><string>group.gftd.kami." game "</string>\n"
-                                   "  <key>CFBundlePackageType</key><string>APPL</string>\n"
-                                   "  <key>CFBundleVersion</key><string>0.1.0</string>\n"
-                                   "</dict></plist>\n"))
-                        (println "✓ packaged" app
-                                 (str "(host=" feature ", game data in Resources/game — relocatable)"))))}
-
-  test       {:doc  "Golden-frame + suite under BOTH backends."
-              :task (shell "scripts/test-script-backends.sh")}}}
+  test
+  {:doc "Run Rust-free repository gates."
+   :task (do
+           (shell "bb" "wit-check")
+           (shell "bash" "-lc"
+                  "if find . \\( -name Cargo.toml -o -name Cargo.lock -o -name '*.rs' -o -name 'rust-toolchain*' -o -path './.cargo/*' \\) -print -quit | grep -q .; then find . \\( -name Cargo.toml -o -name Cargo.lock -o -name '*.rs' -o -name 'rust-toolchain*' -o -path './.cargo/*' \\) -print; exit 1; fi"))}}}

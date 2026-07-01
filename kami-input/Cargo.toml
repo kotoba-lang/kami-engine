@@ -1,7 +1,0 @@
-[package]
-name = "kami-input"
-version.workspace = true
-edition.workspace = true
-description = "Unified input system (keyboard, mouse, touch, gamepad, gesture)"
-[dependencies]
-glam.workspace = true

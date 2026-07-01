@@ -1,9 +1,0 @@
-[package]
-name = "kami-skeleton"
-version.workspace = true
-edition.workspace = true
-description = "Skeletal animation (bone hierarchy, skinning, blend)"
-[dependencies]
-glam.workspace = true
-bytemuck.workspace = true
-serde.workspace = true

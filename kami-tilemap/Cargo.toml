@@ -1,9 +1,0 @@
-[package]
-name = "kami-tilemap"
-version.workspace = true
-edition.workspace = true
-description = "2D tilemap renderer (tile layers, auto-tile, animated tiles)"
-[dependencies]
-glam.workspace = true
-serde.workspace = true
-serde_json.workspace = true
