@@ -11,9 +11,14 @@
    :task (binding [*command-line-args* ["--gen"]]
            (load-file "scripts/wit_test.clj"))}
 
+  adapter-check
+  {:doc "Gate: adapter registry is explicit and Rust-free."
+   :task (load-file "scripts/check_adapter_registry.clj")}
+
   test
   {:doc "Run Rust-free repository gates."
    :task (do
            (shell "bb" "wit-check")
+           (shell "bb" "adapter-check")
            (shell "bash" "-lc"
                   "if find . \\( -name Cargo.toml -o -name Cargo.lock -o -name '*.rs' -o -name 'rust-toolchain*' -o -path './.cargo/*' \\) -print -quit | grep -q .; then find . \\( -name Cargo.toml -o -name Cargo.lock -o -name '*.rs' -o -name 'rust-toolchain*' -o -path './.cargo/*' \\) -print; exit 1; fi"))}}}

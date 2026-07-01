@@ -14,6 +14,8 @@ jobs:
         with: { bb: 'latest' }
       - name: WIT interface — EDN IDL == world.wit == kami-clj Builtin map
         run: bb wit-check
+      - name: adapter registry
+        run: bb adapter-check
       - name: ensure Rust runtime files stay out
         run: |
           if find . \
