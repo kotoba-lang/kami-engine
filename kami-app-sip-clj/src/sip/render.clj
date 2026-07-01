@@ -23,9 +23,11 @@
 ;; ---------------------------------------------------------------------------
 
 (defn anchors
-  "Load the SIP EDN anchor bible from the classpath (resources/render_anchors.edn)."
+  "Load the SIP EDN anchor bible from the IP repo (resources/render-anchors.edn
+  under $SIP_IP_ROOT, see `sip.lore/ip-root`) — it's SIP content, not engine
+  code, so it lives with the rest of the story data, not in this app's jar."
   []
-  (km/load-anchors "render_anchors.edn"))
+  (km/read-anchors (str lore/ip-root "/resources/render-anchors.edn")))
 
 ;; ---------------------------------------------------------------------------
 ;; Composition — SIP-specific mappers injected into the generic commons
