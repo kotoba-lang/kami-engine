@@ -13,6 +13,7 @@
             [kami.ipc    :as ipc]
             [kami.wgsl   :as wgsl]
             [kami.postfx :as postfx]
+            [kami.physics-compute :as physics]
             [kami.fsm    :as fsm]
             [kami.input  :as input]
             [kami.math   :as m]))
@@ -251,6 +252,56 @@
   (is (thrown? #?(:clj Exception :cljs js/Error)
                (postfx/emit-postfx :bogus)))
   (is (= #{:vignette :pixelate :outline} postfx/postfx-kinds)))
+
+;; --- WGSL compute stage (Phase 2.1) -----------------------------------------
+
+(defn- compute-shader
+  "Minimal @compute-only shader to exercise the emitter without the full
+  cartpole body."
+  []
+  {:wgsl/name    "compute_smoke"
+   :wgsl/structs {:Cfg [[:dt :f32] [:num_envs :u32]]}
+   :wgsl/bindings [{:group 0 :binding 0 :var :storage :access :read_write
+                    :name "states" :type :array<f32>}
+                   {:group 0 :binding 1 :var :uniform
+                    :name "cfg" :type :Cfg}]
+   :wgsl/compute {:workgroup-size [64 1 1]
+                  :entry          "step_main"
+                  :builtin        :global_invocation_id
+                  :builtin-name   "gid"
+                  :wgsl/body      "  let i = gid.x;\n  if (i >= cfg.num_envs) { return; }\n  states[i] = states[i] + cfg.dt;"}})
+
+(deftest wgsl-compute-emit
+  (let [src (wgsl/emit (compute-shader))]
+    (testing "entry-point scaffolding"
+      (is (re-find #"@compute @workgroup_size\(64, 1, 1\)" src))
+      (is (re-find #"fn step_main\(@builtin\(global_invocation_id\) gid: vec3<u32>\)" src)))
+    (testing "storage + uniform bindings"
+      (is (re-find #"@group\(0\) @binding\(0\) var<storage, read_write> states: array<f32>;" src))
+      (is (re-find #"@group\(0\) @binding\(1\) var<uniform> cfg: Cfg;" src)))
+    (testing "structs + raw body spliced"
+      (is (re-find #"struct Cfg" src))
+      (is (re-find #"let i = gid\.x;" src))
+      (is (re-find #"states\[i\] = states\[i\] \+ cfg\.dt;" src)))))
+
+(deftest physics-cartpole-step-emit
+  (let [src (physics/cartpole-step-emit)]
+    (testing "compute entry point"
+      (is (re-find #"@compute @workgroup_size\(64, 1, 1\)" src))
+      (is (re-find #"fn step_main\(@builtin\(global_invocation_id\) gid: vec3<u32>\)" src)))
+    (testing "storage + uniform bindings"
+      (is (re-find #"@group\(0\) @binding\(0\) var<storage, read_write> states: array<State>;" src))
+      (is (re-find #"@group\(0\) @binding\(1\) var<storage, read> actions: array<f32>;" src))
+      (is (re-find #"@group\(0\) @binding\(2\) var<uniform> cfg: Cfg;" src)))
+    (testing "structs"
+      (is (re-find #"struct State" src))
+      (is (re-find #"struct Cfg" src)))
+    (testing "math ops (semi-implicit Euler, Sutton & Barto 1983)"
+      (is (re-find #"let temp: f32 =" src))
+      (is (re-find #"let theta_acc: f32 =" src))
+      (is (re-find #"let x_acc: f32 =" src))
+      (is (re-find #"s\.x_dot     = s\.x_dot     \+ cfg\.dt \* x_acc;" src))
+      (is (re-find #"s\.theta     = s\.theta     \+ cfg\.dt \* s\.theta_dot;" src)))))
 
 ;; --- math -------------------------------------------------------------------
 
