@@ -12,6 +12,8 @@
             [kami.render.authority :as authority]
             [kami.ipc    :as ipc]
             [kami.wgsl   :as wgsl]
+            [kami.fsm    :as fsm]
+            [kami.input  :as input]
             [kami.math   :as m]))
 
 ;; --- fixtures ---------------------------------------------------------------
@@ -192,3 +194,73 @@
 (deftest math-trs-translation
   (let [mm (m/from-trs [1.0 2.0 3.0] [0.0 0.0 0.0 1.0] [1.0 1.0 1.0])]
     (is (= [1.0 2.0 3.0] [(nth mm 12) (nth mm 13) (nth mm 14)]))))
+
+;; --- fsm (Phase 1.2: data-heavy domain interpreter → CLJC) ------------------
+
+(def guard-fsm
+  (fsm/fsm
+   [{:from :idle    :event :start   :to :running}
+    {:from :running :event :pause   :to :paused}
+    {:from :paused  :event :resume  :to :running}
+    {:from :running :event :stop    :to :idle  :guard #(> (:fuel %) 0)
+     :on-enter (fn [ctx] [:emit :stopped (:fuel ctx)])}
+    {:from :idle    :event :start   :to :idle}]           ; duplicate event, no transition
+   {:initial :idle}))
+
+(deftest fsm-advance-transition
+  (let [r (fsm/advance guard-fsm :idle :start)]
+    (is (:transitioned? r))
+    (is (= :running (:state r)))
+    (is (empty? (:actions r)))))
+
+(deftest fsm-advance-guard-rejects
+  (testing "guard fails → no transition, state unchanged"
+    (let [r (fsm/advance guard-fsm :running :stop {:fuel 0})]
+      (is (not (:transitioned? r)))
+      (is (= :running (:state r))))))
+
+(deftest fsm-advance-guard-passes-and-emits-action
+  (let [r (fsm/advance guard-fsm :running :stop {:fuel 5})]
+    (is (:transitioned? r))
+    (is (= :idle (:state r)))
+    (is (= [[:emit :stopped 5]] (:actions r)))))
+
+(deftest fsm-advance-no-matching-row
+  (is (not (:transitioned? (fsm/advance guard-fsm :paused :start)))))
+
+(deftest fsm-advance-seq-threads-state
+  (let [r (fsm/advance-seq guard-fsm :idle [[:start {}] [:pause {}] [:resume {}] [:stop {:fuel 2}]])]
+    (is (= :idle (:state r)))
+    (is (= [[:emit :stopped 2]] (:actions r)))))
+
+(deftest fsm-reachable-states-from-initial
+  (is (= #{:idle :running :paused} (fsm/reachable-states guard-fsm))))
+
+;; --- input action maps (Phase 1.2) ------------------------------------------
+
+(def input-table
+  {:axes    [{:axis :move-x :positive :d :negative :a :scale 1.0}
+             {:axis :move-y :positive :w :negative :s :scale 1.0}]
+   :actions [{:action :fire :keys #{:space :j}}]
+   :triggers {:jump :space}})
+
+(deftest input-axes-from-held
+  (testing "single direction"
+    (is (= {:move-x 1.0 :move-y 0.0} (input/action-axes #{:d} input-table))))
+  (testing "mutual cancellation (both held → 0)"
+    (is (= {:move-x 0.0 :move-y 0.0} (input/action-axes #{:a :d} input-table))))
+  (testing "diagonal"
+    (is (= {:move-x -1.0 :move-y 1.0} (input/action-axes #{:a :w} input-table)))))
+
+(deftest input-active-actions
+  (is (contains? (input/active-actions #{:space} input-table) :fire))
+  (is (empty? (input/active-actions #{:k} input-table))))
+
+(deftest input-triggered-edge
+  (testing "trigger fires only on the rising edge"
+    (is (contains? (input/triggered-actions #{:space} #{} input-table) :space))
+    (is (empty? (input/triggered-actions #{:space} #{:space} input-table)))))
+
+(deftest input-merge-held-press-release
+  (is (= #{:a :d} (input/merge-held #{:a} {:press #{:d}})))
+  (is (= #{:a}   (input/merge-held #{:a :d} {:release #{:d}}))))
