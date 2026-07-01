@@ -25,8 +25,18 @@
      :binaural/sources  [{:id :foot :cue :step :pos [3 0 -1] :gain 0.8}
                          {:id :bell :cue :ring :pos [0 1  4] :gain 1.0}]}
 
-  `mix` is pure and serializable — the golden-test / record-replay surface."
-  (:require [kami.math :as m]))
+  `mix` is pure and serializable — the golden-test / record-replay surface.
+
+  Phase 2.2 (ADR-CLJ-2607010930) adds an `emit :wgsl` backend: the per-source
+  spatialization (the SAME ITD/ILD/gain/delay math as `spatialize`) lowers to a
+  WGSL @compute kernel that reads a source buffer (positions/gains) + a mono
+  source-PCM buffer and writes a stereo output buffer. This is the OFFLINE
+  bounce / render-to-file path — the per-sample hot loop runs on GPU. The
+  real-time, latency-critical path stays `emit :native` (the kami-audio Rust
+  mixer): CLJ authors + emits; native stays the sample mixer. Do NOT route
+  live playback through `:wgsl`."
+  (:require [kami.math :as m]
+            [kami.wgsl :as wgsl]))
 
 ;; --- physical + default constants ------------------------------------------
 
@@ -139,6 +149,118 @@
 
 ;; --- backend lowering (execution delegated per platform) --------------------
 
+;; Phase 2.2 — WGSL @compute kernel (offline bounce). The spatialization math
+;; below mirrors `spatialize` (and thus the kami-audio Rust native arm)
+;; formula-for-formula: Woodworth spherical-head ITD, head-shadow ILD, inverse
+;; distance rolloff, per-ear gain + integer-sample ITD delay. The body uses the
+;; `:wgsl/body` raw-WGSL escape hatch (storage-buffer indexing / `if/return`
+;; early-out exceed the s-expr subset), exactly like the Phase 2.1 cartpole
+;; kernel. The surrounding @compute scaffolding, structs, and storage bindings
+;; remain fully data-driven. One workgroup lane = one output sample; the kernel
+;; spatializes `sources[0]` (single-source bounce — multi-source is a sequence
+;; of bounces + a mixdown, kept for a later kernel).
+
+(def ^:private binaural-source-struct
+  {:Source [[:pos  :vec3<f32>]
+            [:gain :f32]]})
+
+(def ^:private binaural-cfg-struct
+  {:Cfg [[:listener_pos   :vec3<f32>]
+         [:right           :vec3<f32>]
+         [:up              :vec3<f32>]
+         [:forward         :vec3<f32>]
+         [:head_radius     :f32]
+         [:max_ild_db      :f32]
+         [:speed_of_sound  :f32]
+         [:sample_rate     :f32]
+         [:ref             :f32]
+         [:max_dist        :f32]
+         [:factor          :f32]
+         [:num_samples     :u32]
+         [:num_sources     :u32]]})
+
+(def ^:private binaural-wgsl-bindings
+  [{:group 0 :binding 0 :var :storage :access :read
+    :name "sources" :type :array<Source>}
+   {:group 0 :binding 1 :var :storage :access :read
+    :name "pcm" :type :array<f32>}
+   {:group 0 :binding 2 :var :storage :access :read_write
+    :name "stereo" :type :array<f32>}
+   {:group 0 :binding 3 :var :uniform
+    :name "cfg" :type :Cfg}])
+
+(def ^:private binaural-wgsl-body
+  "
+  let i = gid.x;
+  if (i >= cfg.num_samples) {
+    return;
+  }
+
+  // spatialize source[0] — mirrors kami.binaural/spatialize formula-for-formula.
+  let src = sources[0u];
+  let rel = src.pos - cfg.listener_pos;
+  let dist = length(rel);
+  let dir = normalize(rel);
+  let lateral = clamp(dot(dir, cfg.right), -1.0, 1.0);
+  let theta = asin(lateral);
+
+  // Woodworth spherical-head ITD:  itd = (a / c) * (theta + sin theta)
+  let itd_s = (cfg.head_radius / cfg.speed_of_sound) * (theta + sin(theta));
+
+  // ILD — frequency-independent head shadow: contralateral ear attenuated by
+  // |ILD| dB.  shadow = 10^(-|ild_db| / 20)
+  let ild_db = cfg.max_ild_db * lateral;
+  let shadow = pow(10.0, (-abs(ild_db)) / 20.0);
+
+  // distance attenuation (inverse rolloff, OpenAL semantics)
+  let d = clamp(dist, cfg.ref, cfg.max_dist);
+  let dgain = cfg.ref / (cfg.ref + cfg.factor * (d - cfg.ref));
+  let g = dgain * src.gain;
+
+  // fold ILD into per-ear gain (contralateral ear x shadow; ipsilateral x 1.0)
+  let right_leads = lateral >= 0.0;
+  let gain_l = g * select(1.0, shadow, right_leads);
+  let gain_r = g * select(shadow, 1.0, right_leads);
+
+  // ITD -> integer sample delay per ear (leading ear delay = 0)
+  let dl_f = select(0.0, itd_s, itd_s >= 0.0);
+  let dr_f = select(0.0, -itd_s, itd_s < 0.0);
+  let dl = u32(clamp(round(dl_f * cfg.sample_rate), 0.0, f32(cfg.num_samples)));
+  let dr = u32(clamp(round(dr_f * cfg.sample_rate), 0.0, f32(cfg.num_samples)));
+
+  // per-sample mix: read delayed source PCM, apply per-ear gain -> stereo out
+  var sl: f32 = 0.0;
+  var sr: f32 = 0.0;
+  if (i >= dl) {
+    sl = pcm[i - dl];
+  }
+  if (i >= dr) {
+    sr = pcm[i - dr];
+  }
+  stereo[2u * i]      = gain_l * sl;
+  stereo[2u * i + 1u] = gain_r * sr;")
+
+(defn binaural-wgsl-shader
+  "Return the binaural offline-bounce @compute kernel as a `kami.wgsl` data map.
+  One workgroup invocation = one output sample; 64 samples per workgroup,
+  dispatch `ceil(num_samples / 64, 1, 1)` groups. The kernel reads `sources[0]`
+  (single-source bounce), spatializes it (ITD/ILD/gain/delay matching
+  `spatialize`), and writes the stereo pair `stereo[2*i], stereo[2*i+1]`."
+  []
+  {:wgsl/name    "binaural_bounce"
+   :wgsl/structs (merge binaural-source-struct binaural-cfg-struct)
+   :wgsl/bindings binaural-wgsl-bindings
+   :wgsl/compute {:workgroup-size [64 1 1]
+                  :entry          "binaural_main"
+                  :builtin        :global_invocation_id
+                  :builtin-name   "gid"
+                  :wgsl/body      binaural-wgsl-body}})
+
+(defn binaural-wgsl-emit
+  "Return the binaural bounce WGSL source string via `kami.wgsl/emit`. Pure."
+  []
+  (wgsl/emit (binaural-wgsl-shader)))
+
 (defmulti emit
   "Lower the spatialization IR (from `mix`) to a backend-specific, executable
   descriptor. Dispatch on backend keyword. Execution itself happens in the
@@ -168,6 +290,45 @@
                    :pan       (Math/sin (:azimuth spatial))
                    :delay-l-samples (long (Math/round (* (:delay-l-s spatial) sample-rate)))
                    :delay-r-samples (long (Math/round (* (:delay-r-s spatial) sample-rate)))}))})
+
+(defmethod emit :wgsl
+  ;; Offline-bounce lowering: emit the binaural @compute kernel (WGSL source) +
+  ;; the bind-group config the host uploads. The shader is generic (cached,
+  ;; reusable); the per-scene listener/HRTF/rolloff/sample-rate go into the `cfg`
+  ;; uniform descriptor returned here, and the host fills the `sources` storage
+  ;; buffer (positions/gains) + `pcm` mono buffer + `stereo` output buffer at
+  ;; dispatch time. The per-source spatialization math runs IN the kernel
+  ;; (mirrors `spatialize`); CLJ only authors + dispatches. See ns docstring:
+  ;; this is the offline bounce path, NOT real-time playback.
+  [_ ir & [{:keys [sample-rate num-samples] :or {sample-rate 48000 num-samples 0}}]]
+  (let [{:keys [binaural/listener binaural/hrtf binaural/rolloff binaural/sources]} ir
+        hrtf    (merge default-hrtf hrtf)
+        rolloff (merge default-rolloff rolloff)
+        {:keys [right up forward]} (listener-basis listener)]
+    {:backend      :wgsl
+     :src          (binaural-wgsl-emit)
+     :sample-rate  sample-rate
+     :num-samples  num-samples
+     :layout       {:bindings
+                    [{:group 0 :binding 0 :var :storage :access :read
+                      :name "sources" :type :array<Source>}
+                     {:group 0 :binding 1 :var :storage :access :read
+                      :name "pcm" :type :array<f32>}
+                     {:group 0 :binding 2 :var :storage :access :read_write
+                      :name "stereo" :type :array<f32>}
+                     {:group 0 :binding 3 :var :uniform
+                      :name "cfg" :type :Cfg}]}
+     :cfg          {:listener-pos  (:pos listener)
+                    :right         right :up up :forward forward
+                    :head-radius   (:head-radius hrtf default-head-radius)
+                    :max-ild-db    (:max-ild-db hrtf 12.0)
+                    :speed-of-sound speed-of-sound
+                    :sample-rate   (double sample-rate)
+                    :ref           (:ref rolloff 1.0)
+                    :max-dist      (:max rolloff 100.0)
+                    :factor        (:factor rolloff 1.0)
+                    :num-samples   (long num-samples)
+                    :num-sources   (count (or sources []))}}))
 
 (defmethod emit :default [backend ir & _]
   ;; Unknown backend: hand back the neutral IR so the caller can lower it itself.

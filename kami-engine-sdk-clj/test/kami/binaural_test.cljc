@@ -3,7 +3,8 @@
   (ITD / ILD / distance / gains) and per-backend lowering. Pins the data
   contract long before any audio device is wired up."
   (:require [clojure.test :refer [deftest testing is]]
-            [kami.binaural :as b]))
+            [kami.binaural :as b]
+            [kami.wgsl   :as wgsl]))
 
 (defn- close? [a x] (< (Math/abs (- a x)) 1e-6))
 
@@ -99,3 +100,70 @@
 (deftest emit-unknown-backend-passes-ir-through
   (let [ir (b/mix {:binaural/sources [{:id :a :pos [1.0 0.0 0.0]}]})]
     (is (= ir (:ir (b/emit :ps5-mixer ir))))))
+
+;; --- Phase 2.2: emit :wgsl (offline-bounce @compute kernel) ------------------
+;;
+;; The WGSL kernel mirrors `spatialize` (and thus the kami-audio native arm)
+;; formula-for-formula. These tests assert the emitted source contains the
+;; @compute scaffolding, the storage source/PCM/stereo bindings, the uniform
+;; cfg, and the spatialization math tokens (Woodworth ITD, head-shadow ILD,
+;; distance gain, per-ear delay). Pure data → string; no GPU.
+
+(deftest binaural-wgsl-shader-structure
+  (let [src (b/binaural-wgsl-emit)]
+    (testing "name header"
+      (is (re-find #"// kami.wgsl emitted shader: binaural_bounce" src)))
+    (testing "@compute entry-point scaffolding"
+      (is (re-find #"@compute @workgroup_size\(64, 1, 1\)" src))
+      (is (re-find #"fn binaural_main\(@builtin\(global_invocation_id\) gid: vec3<u32>\)" src)))
+    (testing "storage source + PCM + stereo bindings, uniform cfg"
+      (is (re-find #"@group\(0\) @binding\(0\) var<storage, read> sources: array<Source>;" src))
+      (is (re-find #"@group\(0\) @binding\(1\) var<storage, read> pcm: array<f32>;" src))
+      (is (re-find #"@group\(0\) @binding\(2\) var<storage, read_write> stereo: array<f32>;" src))
+      (is (re-find #"@group\(0\) @binding\(3\) var<uniform> cfg: Cfg;" src)))
+    (testing "Source + Cfg structs"
+      (is (re-find #"struct Source \{" src))
+      (is (re-find #"pos: vec3<f32>," src))
+      (is (re-find #"gain: f32," src))
+      (is (re-find #"struct Cfg \{" src))
+      (is (re-find #"listener_pos: vec3<f32>," src))
+      (is (re-find #"num_samples: u32," src)))))
+
+(deftest binaural-wgsl-spatialization-math
+  (let [src (b/binaural-wgsl-emit)]
+    (testing "Woodworth spherical-head ITD: (a/c)(theta + sin theta)"
+      (is (re-find #"let theta = asin\(lateral\);" src))
+      (is (re-find #"\(cfg\.head_radius / cfg\.speed_of_sound\) \* \(theta \+ sin\(theta\)\)" src)))
+    (testing "ILD head-shadow: ild_db = max_ild_db * lateral; shadow = 10^(-|ild|/20)"
+      (is (re-find #"let ild_db = cfg\.max_ild_db \* lateral;" src))
+      (is (re-find #"let shadow = pow\(10\.0, \(-abs\(ild_db\)\) / 20\.0\);" src)))
+    (testing "distance gain (inverse rolloff)"
+      (is (re-find #"let dgain = cfg\.ref / \(cfg\.ref \+ cfg\.factor \* \(d - cfg\.ref\)\);" src)))
+    (testing "per-ear gain folds in ILD shadow (contralateral attenuated)"
+      (is (re-find #"let gain_l = g \* select\(1\.0, shadow, right_leads\);" src))
+      (is (re-find #"let gain_r = g \* select\(shadow, 1\.0, right_leads\);" src)))
+    (testing "ITD -> integer sample delay per ear (leading ear delay = 0)"
+      (is (re-find #"let dl_f = select\(0\.0, itd_s, itd_s >= 0\.0\);" src))
+      (is (re-find #"let dr_f = select\(0\.0, -itd_s, itd_s < 0\.0\);" src)))
+    (testing "per-sample mix into stereo output buffer"
+      (is (re-find #"stereo\[2u \* i\]      = gain_l \* sl;" src))
+      (is (re-find #"stereo\[2u \* i \+ 1u\] = gain_r \* sr;" src)))))
+
+(deftest emit-wgsl-lowering
+  (let [ir  (b/mix {:binaural/listener {:pos [0.0 0.0 0.0] :forward [0.0 0.0 -1.0] :up [0.0 1.0 0.0]}
+                    :binaural/sources  [{:id :r :cue :ping :pos [5.0 0.0 0.0] :gain 0.8}]})
+        out (b/emit :wgsl ir {:sample-rate 48000 :num-samples 4096})]
+    (testing "backend tag + kernel source present"
+      (is (= :wgsl (:backend out)))
+      (is (string? (:src out)))
+      (is (re-find #"@compute" (:src out))))
+    (testing "cfg descriptor carries listener/HRTF/rolloff + dispatch dims"
+      (let [cfg (:cfg out)]
+        (is (= 48000.0 (:sample-rate cfg)))
+        (is (= 4096 (:num-samples cfg)))
+        (is (= 1 (:num-sources cfg)))
+        (is (= 343.0 (:speed-of-sound cfg)))
+        (is (some? (:right cfg)))))
+    (testing "layout lists source/pcm/stereo/cfg bindings"
+      (let [names (mapv :name (-> out :layout :bindings))]
+        (is (= ["sources" "pcm" "stereo" "cfg"] names))))))
