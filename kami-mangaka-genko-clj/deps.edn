@@ -16,7 +16,12 @@
         io.github.kotoba-lang/kami-mangaka-expression {:local/root "../kami-mangaka-expression-clj"}}
 
  :aliases
- {:test {:extra-paths ["test"]
+ {;; Browser bridge: compile the genko cljc SSoT to a single JS that installs
+  ;; globalThis.KamiGenko (genko-embed.ts の inline JS が委譲する)。reader と同型。
+  :cljs {:extra-deps {org.clojure/clojurescript {:mvn/version "1.11.132"}
+                      thheller/shadow-cljs      {:mvn/version "2.28.20"}}}
+
+  :test {:extra-paths ["test"]
          :extra-deps  {io.github.cognitect-labs/test-runner
                        {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
          :main-opts   ["-m" "cognitect.test-runner"]}}}

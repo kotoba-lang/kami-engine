@@ -21,7 +21,6 @@
   kami.mangaka.expression の語彙を共有し、`page->storyboard` で kami.mangaka.text /
   analyzeExpression へ橋渡しする。Sibling of kami-mangaka-{text,expression}-clj。"
   (:require [clojure.string :as str]
-            [kami.mangaka.expression :as expr]
             #?(:clj [clojure.data.json :as json])))
 
 ;; ---------------------------------------------------------------------------
