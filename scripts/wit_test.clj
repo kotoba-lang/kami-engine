@@ -1,12 +1,12 @@
 ;; wit_test.clj — codegen + consistency gate for the kami:engine interface.
 ;;
-;; Reads wit/kami-interface.edn (the ONE source), generates WIT, and asserts the generated WIT is
-;; ABI-equivalent to the committed wit/kami-game/world.wit — same interfaces, same functions, same
-;; lowered parameter/return types. If the EDN and the hand-written WIT drift, this throws.
+;; Reads wit/kami-interface.edn (the ONE source), generates WIT, and asserts the
+;; generated WIT is ABI-equivalent to the committed wit/kami-game/world.wit.
 ;;
 ;;   bb scripts/wit_test.clj           # check (throws on drift)
 ;;   bb scripts/wit_test.clj --gen     # print the regenerated WIT
-(require '[clojure.edn :as edn]
+(require '[clojure.set :as set]
+         '[clojure.edn :as edn]
          '[clojure.string :as str])
 
 (def idl   (edn/read-string (slurp "wit/kami-interface.edn")))
@@ -57,37 +57,18 @@
                         (re-seq #"([\w-]+)\s*:\s*func\s*\(([^)]*)\)\s*(->\s*s\d+)?\s*;" body)))
                  (re-seq #"interface\s+([\w-]+)\s*\{([^}]*)\}" nc)))))
 
-;; ── 3rd source: the kami-clj Builtin→HostImport map (ast.rs). Names only (its signatures live in
-;;    a separate table); a HostImport "SceneGetX" derives interface.fn "scene.get-x". ─────────────
-(def iface-prefixes ["Scene" "Physics" "Input" "Render" "Audio" "Time" "Random"])
-(defn- kebab [s] (-> s (str/replace #"(.)([A-Z])" "$1-$2") str/lower-case))
-(defn builtin-names [src]
-  (set (for [[_ hi] (re-seq #"Some\(HostImport::(\w+)\)" src)
-             :let [pfx (first (filter #(str/starts-with? hi %) iface-prefixes))]
-             :when pfx]
-         (str (str/lower-case pfx) "." (kebab (subs hi (count pfx)))))))
-(defn idl-names [idl]
-  (set (for [[iname ispec] (:interfaces idl), [fname _] (:funcs ispec)]
-         (str (name iname) "." (name fname)))))
-
 ;; ── run ──────────────────────────────────────────────────────────────────────────────────
 (if (some #{"--gen"} *command-line-args*)
   (println (gen-wit idl))
   (let [g (gen-canon idl), w (wit-canon world)
-        edn-only (sort (clojure.set/difference g w))
-        wit-only (sort (clojure.set/difference w g))
-        ast (slurp "kami-engine-clj/src/ast.rs")
-        bi  (builtin-names ast), in (idl-names idl)
-        bi-edn (sort (clojure.set/difference in bi))    ;; in EDN, missing a Builtin host-import
-        bi-only (sort (clojure.set/difference bi in))]  ;; a Builtin host-import the IDL doesn't list
+        edn-only (sort (set/difference g w))
+        wit-only (sort (set/difference w g))]
     (println "── kami:engine interface — single-source consistency ──")
     (println (format "  EDN IDL: %d host functions across %d interfaces" (count g) (count (:interfaces idl))))
-    (println (format "  WIT:     %d  ·  kami-clj Builtin host-imports: %d" (count w) (count bi)))
+    (println (format "  WIT:     %d" (count w)))
     (when (seq edn-only) (println "  WIT drift — only in EDN:" (vec edn-only)))
     (when (seq wit-only) (println "  WIT drift — only in WIT:" (vec wit-only)))
-    (when (seq bi-edn)   (println "  Builtin drift — EDN fn with no host-import:" (vec bi-edn)))
-    (when (seq bi-only)  (println "  Builtin drift — host-import not in EDN:" (vec bi-only)))
-    (if (and (= g w) (= in bi))
-      (println "  ✓ EDN IDL, world.wit, and the kami-clj Builtin map all agree — one source, three targets.")
+    (if (= g w)
+      (println "  ✓ EDN IDL and world.wit agree.")
       (throw (ex-info "kami:engine interface DRIFT"
-                      {:wit-only wit-only :edn-only edn-only :builtin-only bi-only :edn-no-builtin bi-edn})))))
+                      {:wit-only wit-only :edn-only edn-only})))))

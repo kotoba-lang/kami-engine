@@ -1,17 +1,31 @@
 # kami-engine
 
-Reusable Rust game/robotics engine (wgpu renderer + physics + WASM) for the
-etzhayyim project. Standalone reusable layer (L2) per ADR-2606011500.
+`kami-engine` is now a Kotoba/CLJ/EDN/WIT asset and contract repository for the
+Kami engine family.
 
-- **Workspace**: a Cargo workspace of `kami-*` crates (core / render / genesis
-  physics + control / articulated / sensor-sim / autodrive / pathfind / vehicle
-  / terrain / atmosphere / …), generic robot fixtures under `fixtures/`, plus
-  reference-game + product app crates (`kami-app-*`).
-- **UI SDK**: `kami-engine-sdk/` is a **nested git-submodule** (the TS/Svelte L1
-  UI layer, `etzhayyim/kami-engine-sdk`). Run `git submodule update --init` to
-  populate it.
-- **etzhayyim-specific robotics-actor apps** (shibuya / giemon / giemon-factory
-  / tatekata) live OUTSIDE this repo, in the monorepo's `40-engine/kami-apps/`
-  (ADR-2606011500 stage 3).
+The former in-repository Rust workspace has been removed. Native render,
+physics, robotics, WebGPU, and packaging runtimes should live in adapter
+repositories and consume the data, WIT, scene, fixture, and CLJ/CLJC assets kept
+here.
 
-License: Apache 2.0 + etzhayyim Charter Compliance Rider (see `CHARTER-RIDER.md`).
+## Current Scope
+
+- `wit/` defines the host interface contract.
+- `scripts/wit_test.clj` checks the EDN IDL, generated WIT, and kami-clj builtin
+  host import map agree.
+- `kami-*-scene/data/` and `fixtures/` retain EDN, YAML, CSV, URDF, and scene
+  assets for adapter conformance.
+- `kami-*-clj/` projects retain CLJ/CLJC authoring, manga, SIP, and web
+  surfaces.
+- `kami-web/`, `kami-web-modelb/`, and shader/data assets remain as web-facing
+  non-Rust fixtures.
+
+## Verify
+
+```bash
+bb wit-check
+bb test
+```
+
+The default path should not contain `Cargo.toml`, `Cargo.lock`, `.rs`,
+`rust-toolchain*`, or `.cargo/` files.

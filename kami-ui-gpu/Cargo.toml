@@ -1,8 +1,0 @@
-[package]
-name = "kami-ui-gpu"
-version.workspace = true
-edition.workspace = true
-description = "GPU-rendered UI primitives (rect, rounded rect, gradient)"
-[dependencies]
-glam.workspace = true
-bytemuck.workspace = true

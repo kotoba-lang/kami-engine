@@ -1,8 +1,0 @@
-[package]
-name = "kami-scene-graph"
-version.workspace = true
-edition.workspace = true
-description = "Scene DAG with parent-child transform hierarchy"
-[dependencies]
-glam.workspace = true
-hecs.workspace = true

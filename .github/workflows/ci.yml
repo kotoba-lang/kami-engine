@@ -4,7 +4,7 @@ on:
   pull_request:
 jobs:
   parity:
-    name: WIT single-source + data-config parity
+    name: WIT single-source + no-rust guard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -14,59 +14,11 @@ jobs:
         with: { bb: 'latest' }
       - name: WIT interface — EDN IDL == world.wit == kami-clj Builtin map
         run: bb wit-check
-  rust:
-    name: cargo build + data-tier parity tests (no-GPU)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout kami-engine
-        uses: actions/checkout@v4
-        with:
-          path: kami-engine
-      # kami-engine-clj / kami-live / kami-scene / kami-webgpu-rs path-depend on the
-      # sibling `../../kotoba/crates/kotoba-edn`, so the workspace build needs kotoba
-      # checked out alongside (at <workspace>/kotoba, sibling of kami-engine/).
-      # Needs a KOTOBA_TOKEN secret with read access to the private
-      # com-junkawasaki/kotoba; falls back to github.token (works only if public).
-      - name: Checkout kotoba (sibling kotoba-edn path dep)
-        uses: actions/checkout@v4
-        with:
-          repository: com-junkawasaki/kotoba
-          path: kotoba
-          token: ${{ secrets.KOTOBA_TOKEN || github.token }}
-      # kami-script-runtime path-depends on the sibling com-junkawasaki/kototama
-      # (the Clojure→WASM compiler). Public; falls back to github.token.
-      - name: Checkout kototama (sibling compiler path dep)
-        uses: actions/checkout@v4
-        with:
-          repository: com-junkawasaki/kototama
-          path: kototama
-          token: ${{ secrets.KOTOTAMA_TOKEN || github.token }}
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: kami-engine
-      # Linux system libs the workspace links at build time: ALSA (alsa-sys, via
-      # kami-audio) and udev (gamepad input). Headless runners ship neither.
-      - name: System libraries (ALSA + udev)
-        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev
-      - name: Build the workspace (catch breaks)
-        working-directory: kami-engine
-        # kami-bridge is macOS-CGEvent / Windows-Win32 only (no Linux `platform`
-        # module), so it can't build on the ubuntu runner. It's pulled in only by
-        # kami-os (the desktop compositor), so exclude both — neither is data-tier.
-        run: cargo build --workspace --exclude kami-bridge --exclude kami-os
-      - name: Data-tier parity oracles (EDN == Rust) + geometry golden — pure, no GPU
-        working-directory: kami-engine
+      - name: ensure Rust runtime files stay out
         run: |
-          cargo test -p kami-vehicle-scene -p kami-atmosphere-scene -p kami-terrain-scene
-          cargo test -p kami-webgpu-rs --lib cube_matches sphere_matches cylinder_matches lit_shader_matches shadow_shader_matches 2>/dev/null || true
-      # Web Model-B foundation: the compiled-CLJ gameplay runtime (kami-script-runtime
-      # on the wasmi no-JIT backend) must build for the browser (wasm32), so a
-      # game.wasm can run wasm-in-wasm in-page. Guards "compiled CLJ runs in the browser".
-      - name: Model-B runtime builds for the browser (wasm32 + wasmi)
-        working-directory: kami-engine
-        run: |
-          rustup target add wasm32-unknown-unknown
-          cargo build -p kami-script-runtime --no-default-features --features backend-wasmi --target wasm32-unknown-unknown
-          cargo build -p kami-web-modelb --target wasm32-unknown-unknown
-          cargo build -p kami-webgpu-rs --target wasm32-unknown-unknown
+          if find . \
+            \( -name Cargo.toml -o -name Cargo.lock -o -name '*.rs' -o -name 'rust-toolchain*' -o -path './.cargo/*' \) \
+            -print -quit | grep -q .; then
+            find . \( -name Cargo.toml -o -name Cargo.lock -o -name '*.rs' -o -name 'rust-toolchain*' -o -path './.cargo/*' \) -print
+            exit 1
+          fi
