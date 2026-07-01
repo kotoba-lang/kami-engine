@@ -12,6 +12,7 @@
             [kami.render.authority :as authority]
             [kami.ipc    :as ipc]
             [kami.wgsl   :as wgsl]
+            [kami.postfx :as postfx]
             [kami.fsm    :as fsm]
             [kami.input  :as input]
             [kami.math   :as m]))
@@ -185,6 +186,71 @@
   (testing "built-in pipelines need no WGSL"
     (is (wgsl/builtin? :pbr))
     (is (not (wgsl/builtin? "custom/ripple")))))
+
+;; --- postfx CLJC-authored WGSL (Phase 2.3) ----------------------------------
+;;
+;; Postfx passes authored as EDN data via kami.postfx → kami.wgsl/emit. These
+;; tests assert the emitted WGSL contains the expected structural tokens
+;; (uniform bindings, the postfx math, @fragment) the same way `wgsl-emit`
+;; does. Pure data → string; no GPU.
+
+(deftest postfx-shared-structure
+  (doseq [kind postfx/postfx-kinds]
+    (testing (str kind " shares the postfx bind group + params struct")
+      (let [src (postfx/emit-postfx kind)]
+        (is (re-find #"@group\(0\) @binding\(0\)" src) kind)
+        (is (re-find #"@group\(0\) @binding\(1\)" src) kind)
+        (is (re-find #"@group\(0\) @binding\(2\) var<uniform> p: P;" src) kind)
+        (is (re-find #"struct P \{" src) kind)
+        (is (re-find #"p0: vec4<f32>," src) kind)
+        (is (re-find #"p1: vec4<f32>," src) kind)
+        (is (re-find #"@vertex" src) kind)
+        (is (re-find #"@fragment" src) kind)
+        (is (re-find #"fn vertex_main" src) kind)
+        (is (re-find #"fn fragment_main" src) kind)
+        (is (re-find #"textureSample\(tex, samp" src) kind)))))
+
+(deftest postfx-vignette-emit
+  (let [src (postfx/emit-postfx :vignette)]
+    (testing "name header"
+      (is (re-find #"// kami.wgsl emitted shader: postfx_vignette" src)))
+    (testing "fullscreen-triangle vertex math"
+      (is (re-find #"@builtin\(vertex_index\) vi: u32," src))
+      (is (re-find #"\(in\.vi << 1u\) & 2u" src))
+      (is (re-find #"out\.clip = vec4<f32>\(\(\(x \* 2\.0\) - 1\.0\)" src)))
+    (testing "vignette math: vig = clamp(1 - p.p0.x * 2 * dot(d,d), 0, 1); color *= vig"
+      (is (re-find #"let d = \(in\.uv - vec2<f32>\(0\.5, 0\.5\)\);" src))
+      (is (re-find #"let vig = clamp\(\(1\.0 - \(p\.p0\.x \* \(2\.0 \* dot\(d, d\)\)\)\), 0\.0, 1\.0\);" src))
+      (is (re-find #"out\.color = vec4<f32>\(\(c \* vig\), 1\.0\);" src)))))
+
+(deftest postfx-pixelate-emit
+  (let [src (postfx/emit-postfx :pixelate)]
+    (testing "name header"
+      (is (re-find #"// kami.wgsl emitted shader: postfx_pixelate" src)))
+    (testing "pixelate math: snap uv to block grid, sample at block center"
+      (is (re-find #"let block = p\.p0\.x;" src))
+      (is (re-find #"textureDimensions\(tex, 0\)" src))
+      (is (re-find #"let blkIdx = floor\(\(\(in\.uv \* pix\) / block\)\);" src))
+      (is (re-find #"let quv = \(\(\(blkIdx \+ 0\.5\) \* block\) / pix\);" src))
+      (is (re-find #"out\.color = vec4<f32>\(textureSample\(tex, samp, quv\)\.rgb, 1\.0\);" src)))))
+
+(deftest postfx-outline-emit
+  (let [src (postfx/emit-postfx :outline)]
+    (testing "name header"
+      (is (re-find #"// kami.wgsl emitted shader: postfx_outline" src)))
+    (testing "outline math: 4-neighbor edge detection, strength gain"
+      (is (re-find #"let texel = p\.p0\.xy;" src))
+      (is (re-find #"let c = textureSample\(tex, samp, in\.uv\)\.rgb;" src))
+      (is (re-find #"let cL = textureSample\(tex, samp, oL\)\.rgb;" src))
+      (is (re-find #"let edge = \(p\.p0\.z \* \(\(abs\(\(c - cL\)\) \+ abs\(\(c - cR\)\)\) \+ \(abs\(\(c - cU\)\) \+ abs\(\(c - cD\)\)\)\)\);" src))
+      (is (re-find #"out\.color = vec4<f32>\(\(c \+ edge\), 1\.0\);" src)))))
+
+(deftest postfx-unknown-kind-throws
+  (is (thrown? #?(:clj Exception :cljs js/Error)
+               (postfx/postfx-shader :bogus)))
+  (is (thrown? #?(:clj Exception :cljs js/Error)
+               (postfx/emit-postfx :bogus)))
+  (is (= #{:vignette :pixelate :outline} postfx/postfx-kinds)))
 
 ;; --- math -------------------------------------------------------------------
 
