@@ -11,6 +11,8 @@ here.
 ## Current Scope
 
 - `wit/` defines the host interface contract.
+- `docs/adapter-registry.edn` names adapter-owned native/backend targets and
+  keeps them outside this default repository.
 - `scripts/wit_test.clj` checks the EDN IDL, generated WIT, and kami-clj builtin
   host import map agree.
 - `kami-*-scene/data/` and `fixtures/` retain EDN, YAML, CSV, URDF, and scene
@@ -24,6 +26,7 @@ here.
 
 ```bash
 bb wit-check
+bb adapter-check
 bb test
 ```
 

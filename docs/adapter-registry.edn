@@ -1,0 +1,18 @@
+{:kami.adapter.registry/version 1
+ :kami.adapter.registry/source :kotoba-clj-edn-wit
+ :kami.adapter.registry/policy
+ {:native-implementation "Native backends live outside this repository and consume EDN/WIT contracts."
+  :rust-in-default-repo? false}
+ :kami.adapter.registry/contracts
+ [{:id :host-interface
+   :authority :wit/kami-interface.edn
+   :check :bb/wit-check
+   :adapters [:webgpu :metal :vulkan :wasm :browser]}
+  {:id :scene-data
+   :authority :kami-scene-data/edn
+   :check :adapter/conformance
+   :adapters [:render :physics :robotics :simulation]}
+  {:id :clj-authoring
+   :authority :kami-clj
+   :check :clj-contract
+   :adapters [:wasm-host :browser-host :native-host]}]}
