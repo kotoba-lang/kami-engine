@@ -6,7 +6,7 @@
 ;; PROJECTS that to `scene.edn` — the snapshot the Rust host consumes. Editing
 ;; the game's look is now a transaction, not a hand-edited file.
 ;;
-;;   clojure -M author.clj
+;;   kbb -M author.clj
 ;;
 ;; Re-run after changing the data below; the player picks up the new scene.edn.
 

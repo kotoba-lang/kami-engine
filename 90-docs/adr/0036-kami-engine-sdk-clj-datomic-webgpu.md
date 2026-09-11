@@ -81,15 +81,15 @@ All headless gates green; the end-to-end browser render was confirmed on WebGPU.
 
 | Gate | Command | Result |
 |---|---|---|
-| clj contract layer | `clojure -Sdeps … contract+runtime` | 16 tests / 61 assertions |
-| Datomic two-layer (real datalevin) | `clj -M:roundtrip` | connect→tx→snapshot→ecs→render-IR→pack→commit ✅ |
+| clj contract layer | `kbb -Sdeps … contract+runtime` | 16 tests / 61 assertions |
+| Datomic two-layer (real datalevin) | `kbb -M:roundtrip` | connect→tx→snapshot→ecs→render-IR→pack→commit ✅ |
 | clj↔Rust byte contract | `cargo test -p kami-clj-host` | 4 tests (decodes exact `kami.ipc/pack` bytes) |
 | Rust GPU host compiles (wasm) | `cargo check -p kami-clj-host --features host` | clean |
 | **Browser end-to-end** | `wasm-pack build … && http.server` | **2 cubes rendered on cream via clj render-IR → Rust wgpu → WebGPU** |
 
 The cross-language anchor is `kami-clj-host/tests/fixtures/frame.bin` — the literal
 bytes `kami.ipc/pack` emits, decoded and asserted by the Rust test (regenerate via
-`clj -M:gen -m gen-fixture`).
+`kbb -M:gen -m gen-fixture`).
 
 ## Consequences
 

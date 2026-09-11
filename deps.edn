@@ -15,7 +15,7 @@
 ;; would put a directory that does not exist on every consumer's classpath.
 ;;
 ;; The :test alias added 2026-08-22 does not change that. It exists because the
-;; workspace's :jvm-test fleet gate runs `clojure -M:test` at a repository root
+;; workspace's :jvm-test fleet gate runs `kbb -M:test` at a repository root
 ;; and nothing else, so a suite that lives in a subdirectory is a suite that
 ;; gate cannot see. kami-engine is not registered in scripts/fleet-ci/gates.edn
 ;; at all today; this is the precondition for registering it, not the

@@ -88,7 +88,7 @@ adoptable equivalent:
   this org's "no silent fallback" convention, matching `cloud-murakumo.gen/resolve-model`'s
   own doc comment) — this is a **checked runtime contract**, not a compile-time guarantee, and
   this ADR says so plainly rather than overclaiming Rust-equivalent safety.
-- A `clj-kondo` custom lint rule (this org already runs `clojure -M:lint` as standard,
+- A `clj-kondo` custom lint rule (this org already runs `kbb -M:lint` as standard,
   CLAUDE.md/repos.edn convention) flags a bare vector literal passed where a tagged-point map
   is the declared parameter shape — a *static*, best-effort second layer, catching the most
   common mistake (forgetting the wrapper entirely) without needing a real type checker.

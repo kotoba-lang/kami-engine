@@ -64,7 +64,7 @@ Both stylized and photoreal bind all resources. Photoreal sets
 `outline-enabled = 0`, avoiding pipeline-layout variants while retaining ACES
 and color grading. Upstream MSAA targets must be resolved before this pass.
 
-Run the contract tests with `clojure -M:test` from this directory.
+Run the contract tests with `kbb -M:test` from this directory.
 
 ## Stylized character library
 

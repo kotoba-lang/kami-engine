@@ -83,7 +83,7 @@ Three follow-ups from phase 1, all landed and tested:
    (Web Audio) and native; `BinauralParams::sample_delays` emits the integer ITD delays of the
    `:native` IR. 6 tests (right-leads, left-mirror, dead-ahead-centered, ITD bound, sample
    delays, rolloff).
-3. **Game-facing WIT host imports.** Extended all three gate sources together so `bb wit-check`
+3. **Game-facing WIT host imports.** Extended all three gate sources together so `kbb -M:wit-check`
    stays green (now 40 functions): `audio.set-listener` (binaural listener pose) and
    `render.rt-enable` (select a named RT recipe). Wired end-to-end — clj builtin
    (`set-listener!` / `rt-enable!`) → WASM import → `kami-script-runtime` `func_wrap` binding →
@@ -124,7 +124,7 @@ Web Audio); upload BVH per-frame with refit; the hardware ray-query path on a su
   executor differs. This matches ADR-0037's "author once, ship everywhere".
 - Tests: `kami.rt-test` + `kami.binaural-test` (GPU-free, mixer-free) pin the IR contract,
   WGSL emission, backend lowering, and — via the CPU oracle and Woodworth bounds — the
-  numerical semantics. `clojure -M:test` green; no regression in `kami.contract-test`.
+  numerical semantics. `kbb -M:test` green; no regression in `kami.contract-test`.
 - Next: (1) host-side WGSL ray-query executor in `kami-rt`/`kami-render`; (2) a real native
   binaural mixer reading the `:native` IR in `kami-audio`; (3) optional WIT host imports to
   call these from compiled-guest games; (4) HRTF dataset model (`:model :dataset`) beyond the

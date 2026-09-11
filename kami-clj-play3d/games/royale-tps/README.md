@@ -56,10 +56,10 @@ all: the slot is the bot's own index. The underlying defect is documented in
 
 ```sh
 # the rules, on both platforms
-cd ../../../kami-gameplay && clojure -M:test && npx --yes nbb bin/run_tests.cljs
+cd ../../../kami-gameplay && kbb -M:test && npx --yes kbb --backend sci bin/run_tests.cljk
 
 # a full 24-entrant match against this scene, headless
-npx --yes nbb bin/simulate.cljs --seed 20260822
+npx --yes kbb --backend sci bin/simulate.cljk --seed 20260822
 ```
 
 The harness plays the match with no renderer through the same code a host would
@@ -82,7 +82,7 @@ repository does not contain:
 **No level collision.** Shots pass through buildings and bots walk through them.
 The seams are there and unwired — see the kami-gameplay README.
 
-`clojure -M scripts/guest_lint.cljk` from the repository root checks this file
+`kbb -M scripts/guest_lint.cljk` from the repository root checks this file
 against the declared guest vocabulary: no call to a name the guest does not
 have, and no host import at the wrong arity. It found ten invented names in the
 first draft of this file, including four pieces of floating-point arithmetic the

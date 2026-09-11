@@ -1,6 +1,6 @@
 ;; nbb entry point for the kami-gameplay suite.
 ;;
-;;   npx --yes nbb bin/run_tests.cljs
+;;   npx --yes kbb --backend sci bin/run_tests.cljk
 ;;
 ;; Exits non-zero on any failure or error, and — the part that matters — refuses
 ;; to report a pass when it ran no tests. A suite that silently discovers

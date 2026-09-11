@@ -16,7 +16,7 @@ logic.clj   ──(kamiclj → game.wasm)─────────────
 
 | File | Owns |
 |---|---|
-| `author.clj` | The source of truth. Transacts the setlist + cues + avatar binding into datalevin, queries them back, projects `scene.edn`. Edit here, then `clojure -M author.clj`. |
+| `author.clj` | The source of truth. Transacts the setlist + cues + avatar binding into datalevin, queries them back, projects `scene.edn`. Edit here, then `kbb -M author.clj`. |
 | `scene.edn` | Generated snapshot the host reads. The `:dance/*` shape below. |
 | `logic.clj` | Gameplay glue (kami-clj subset → `game.wasm`): spawns the performer entity the rig binds to + an audience ring. The dance itself is not here — it's data. |
 | `models/` | Drop the `.vrm` referenced by `:dance/avatar :vrm` here (host-supplied asset). |

@@ -60,9 +60,9 @@ test can assert on a whole match instead of on a frame.
 ## Run it
 
 ```sh
-clojure -M:test                      # JVM
-npx --yes nbb bin/run_tests.cljs     # Node / ClojureScript
-npx --yes nbb bin/simulate.cljs      # a full 24-entrant match, headless
+kbb -M:test                      # JVM
+npx --yes kbb --backend sci bin/run_tests.cljk     # Node / ClojureScript
+npx --yes kbb --backend sci bin/simulate.cljk      # a full 24-entrant match, headless
 ```
 
 Both suites must pass. That is not belt-and-braces: cross-platform bit-identical

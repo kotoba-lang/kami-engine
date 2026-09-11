@@ -96,7 +96,7 @@ kami-engine adapter surface.
 
 ### Tooling & tests
 
-- **`kami` CLI** — **unavailable**. It was `bb kami`, defined in a root `bb.edn`
+- **`kami` CLI** — **unavailable**. It was `kbb -M:kami`, defined in a root `bb.edn`
   that ADR-2607173000 deleted when babashka was retired; nothing replaced it
   (ADR-2608131600). The subcommands it exposed are listed here so the capability
   is not silently lost, not because they can be invoked today:
