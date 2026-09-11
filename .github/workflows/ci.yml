@@ -11,9 +11,9 @@ jobs:
       - uses: DeLaGuardo/setup-clojure@13.0
         with: { bb: 'latest' }
       - name: WIT interface — EDN IDL == world.wit == kami-clj Builtin map
-        run: bb scripts/wit_test.clj
+        run: bb scripts/wit_test.cljk
       - name: adapter registry
-        run: bb scripts/check_adapter_registry.clj
+        run: bb scripts/check_adapter_registry.cljk
       - name: ensure Rust runtime files stay out
         run: |
           if find . \

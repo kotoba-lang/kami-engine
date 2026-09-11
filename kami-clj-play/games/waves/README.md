@@ -8,4 +8,4 @@ This game exists to exercise the expanded compiler forms in real gameplay: `->` 
 difficulty ramp (`burst-size`), `dotimes` for the wave burst, `even?` + `case` for the per-wave spawn
 pattern, and `max` for the fire-rate floor. Compile it with:
 
-    cargo run -p kami-engine-clj --bin kamiclj -- kami-clj-play/games/waves/logic.clj -o /tmp/waves.wasm
+    cargo run -p kami-engine-clj --bin kamiclj -- kami-clj-play/games/waves/logic.cljk -o /tmp/waves.wasm

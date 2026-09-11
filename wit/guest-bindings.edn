@@ -17,7 +17,7 @@
 ;;     `look-at`, `set-ads-held` and `warning-level` were added in that shape.
 ;;   * There is no math library. No sin, cos, sqrt, min, max, or float compare.
 ;;
-;; `scripts/guest_lint.clj` checks games against this file.
+;; `scripts/guest_lint.cljk` checks games against this file.
 
 {:core-forms
  ;; Compiler forms and pure-INTEGER operators the kami-clj subset accepts.

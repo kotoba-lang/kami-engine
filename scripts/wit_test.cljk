@@ -3,13 +3,13 @@
 ;; Reads wit/kami-interface.edn (the ONE source), generates WIT, and asserts the
 ;; generated WIT is ABI-equivalent to the committed wit/kami-game/world.wit.
 ;;
-;;   bb scripts/wit_test.clj           # check (throws on drift)
-;;   bb scripts/wit_test.clj --gen     # print the regenerated WIT
+;;   bb scripts/wit_test.cljk           # check (throws on drift)
+;;   bb scripts/wit_test.cljk --gen     # print the regenerated WIT
 (require '[clojure.set :as set]
          '[clojure.edn :as edn]
          '[kotoba.lang.text :as str])
 
-;; wit/kami-interface.edn was datomic/datascript-ized by edn-datomize.cljs
+;; wit/kami-interface.edn was datomic/datascript-ized by edn-datomize.cljk
 ;; (wrap-map, ns="wit.kami-interface"): top level is now `[{:db/id -1
 ;; :wit.kami-interface/package ... :wit.kami-interface/interfaces "..." ...}]`
 ;; tx-data, with the nested :interfaces/:exports maps pr-str'd into blob string
