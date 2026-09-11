@@ -82,7 +82,7 @@ repository does not contain:
 **No level collision.** Shots pass through buildings and bots walk through them.
 The seams are there and unwired — see the kami-gameplay README.
 
-`clojure -M scripts/guest_lint.clj` from the repository root checks this file
+`clojure -M scripts/guest_lint.cljk` from the repository root checks this file
 against the declared guest vocabulary: no call to a name the guest does not
 have, and no host import at the wrong arity. It found ten invented names in the
 first draft of this file, including four pieces of floating-point arithmetic the

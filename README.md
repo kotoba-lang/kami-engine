@@ -20,7 +20,7 @@ here.
 - `wit/` defines the host interface contract.
 - `docs/adapter-registry.edn` names adapter-owned native/backend targets and
   keeps them outside this default repository.
-- `scripts/wit_test.clj` checks the EDN IDL, generated WIT, and kami-clj builtin
+- `scripts/wit_test.cljk` checks the EDN IDL, generated WIT, and kami-clj builtin
   host import map agree.
 - `kami-*-scene/data/` and `fixtures/` retain EDN, YAML, CSV, URDF, and scene
   assets for adapter conformance.
@@ -35,9 +35,9 @@ here.
 ## Verify
 
 ```bash
-clojure -M scripts/wit_test.clj            # wit/kami-interface.edn is the ONE source; world.wit must agree
-clojure -M scripts/check_adapter_registry.clj  # docs/adapter-registry.edn is well-formed
-clojure -M scripts/guest_lint.clj          # every kami-clj game stays inside wit/guest-bindings.edn
+clojure -M scripts/wit_test.cljk            # wit/kami-interface.edn is the ONE source; world.wit must agree
+clojure -M scripts/check_adapter_registry.cljk  # docs/adapter-registry.edn is well-formed
+clojure -M scripts/guest_lint.cljk          # every kami-clj game stays inside wit/guest-bindings.edn
 cd kami-gameplay && clojure -M:test        # gameplay rules, JVM
 cd kami-gameplay && npx --yes nbb bin/run_tests.cljs   # the same suite under Node
 ```

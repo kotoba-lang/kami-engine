@@ -1,6 +1,6 @@
 (require '[clojure.edn :as edn])
 
-;; docs/adapter-registry.edn was datomic/datascript-ized by edn-datomize.cljs
+;; docs/adapter-registry.edn was datomic/datascript-ized by edn-datomize.cljk
 ;; (wrap-map-keep-ns, ns="docs.adapter-registry"): top level is now
 ;; `[{:db/id -1 :kami.adapter.registry/version ... :kami.adapter.registry/policy
 ;; "..." ...}]` tx-data. Every key here was already idiomatically namespaced

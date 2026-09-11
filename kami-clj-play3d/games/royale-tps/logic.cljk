@@ -1,6 +1,6 @@
 ;; KAMI Royale TPS — gameplay in the kami-clj guest subset.
 ;;
-;; Forked from kami-clj-play3d/games/royale/logic.clj. The parent is 50 lines
+;; Forked from kami-clj-play3d/games/royale/logic.cljk. The parent is 50 lines
 ;; and does four things: writes two raw input axes into the player's velocity,
 ;; drops bots at one of four hardcoded points, walks every bot at the player
 ;; from anywhere on the map, and leaves shooting to the host. It has no health,
@@ -13,7 +13,7 @@
 ;; lives here — the split Unreal draws between the engine and a game module.
 ;;
 ;; Guest subset discipline, inherited from the parent and checked by
-;; `clojure -M scripts/guest_lint.clj`: arithmetic is integer-only and there is
+;; `clojure -M scripts/guest_lint.cljk`: arithmetic is integer-only and there is
 ;; no math library. Every fractional value here is either an `(f32 ...)`
 ;; literal or a value passed straight from one host import into another. That
 ;; constraint is why `move!`, `move-to!`, `look-at!`, `spawn-ring!` and
