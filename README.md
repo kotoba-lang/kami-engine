@@ -35,11 +35,11 @@ here.
 ## Verify
 
 ```bash
-clojure -M scripts/wit_test.cljk            # wit/kami-interface.edn is the ONE source; world.wit must agree
-clojure -M scripts/check_adapter_registry.cljk  # docs/adapter-registry.edn is well-formed
-clojure -M scripts/guest_lint.cljk          # every kami-clj game stays inside wit/guest-bindings.edn
-cd kami-gameplay && clojure -M:test        # gameplay rules, JVM
-cd kami-gameplay && npx --yes nbb bin/run_tests.cljs   # the same suite under Node
+kbb -M scripts/wit_test.cljk            # wit/kami-interface.edn is the ONE source; world.wit must agree
+kbb -M scripts/check_adapter_registry.cljk  # docs/adapter-registry.edn is well-formed
+kbb -M scripts/guest_lint.cljk          # every kami-clj game stays inside wit/guest-bindings.edn
+cd kami-gameplay && kbb -M:test        # gameplay rules, JVM
+cd kami-gameplay && npx --yes kbb --backend sci bin/run_tests.cljk   # the same suite under Node
 ```
 
 `wit-check` also asserts that every host function carries documentation and that

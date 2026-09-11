@@ -1,4 +1,4 @@
-;; Task registry for `nbb scripts/run-task.cljk <task> [args…]` (ADR-2607173000).
+;; Task registry for `kbb --backend sci scripts/run-task.cljk <task> [args…]` (ADR-2607173000).
 ;;
 ;; Empty from the Wave-3 conversion until 2026-08-13. bb.edn defined the two
 ;; repository gates as (load-file "scripts/…") bodies, which the converter
@@ -14,16 +14,16 @@
 ;;
 ;; NOT restored: `gen-wit` (prints world.wit) and `test` (a babashka.process
 ;; shell body over the Rust-free repository gates) — those need a port.
-{:wit-check     {:cmd ["clojure" "-M" "scripts/wit_test.cljk"]
+{:wit-check     {:cmd ["kbb" "-M" "scripts/wit_test.cljk"]
                  :doc "Codegen + consistency gate for the kami:engine interface: wit/kami-interface.edn is the ONE source, and world.wit must agree with it."}
- :adapter-check {:cmd ["clojure" "-M" "scripts/check_adapter_registry.cljk"]
+ :adapter-check {:cmd ["kbb" "-M" "scripts/check_adapter_registry.cljk"]
                  :doc "Assert docs/adapter-registry.edn is well-formed and its contracts resolve."}
- :guest-lint    {:cmd ["clojure" "-M" "scripts/guest_lint.cljk"]
+ :guest-lint    {:cmd ["kbb" "-M" "scripts/guest_lint.cljk"]
                  :doc (str "Check every kami-clj game against wit/guest-bindings.edn: "
                            "no call to a name the guest does not have, and no host import "
                            "called at the wrong arity. Catches the two ways a game fails "
                            "only at compile or link time.")}
- :gameplay-test {:cmd ["clojure" "-M:test"]
+ :gameplay-test {:cmd ["kbb" "-M:test"]
                  :dir "kami-gameplay"
                  :doc "kami-gameplay suite on the JVM."}
  :gameplay-test-node {:cmd ["npx" "--yes" "nbb" "bin/run_tests.cljs"]

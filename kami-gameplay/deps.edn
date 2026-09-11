@@ -6,8 +6,8 @@
 ;; oracle the Rust `battle_royale.rs` used to be before it left this repository.
 ;;
 ;; Two ways to run the suite, both of which must pass:
-;;   clojure -M:test              JVM
-;;   npx --yes nbb bin/run_tests.cljs   Node / ClojureScript
+;;   kbb -M:test              JVM
+;;   npx --yes kbb --backend sci bin/run_tests.cljk   Node / ClojureScript
 ;; The second is not a convenience: cross-platform bit-identical arithmetic is a
 ;; load-bearing property here (see kami.gameplay.rng), and a suite that only ran
 ;; on one platform could not observe it.

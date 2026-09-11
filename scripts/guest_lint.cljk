@@ -1,6 +1,6 @@
 ;; guest_lint.clj — check a kami-clj game against the declared guest vocabulary.
 ;;
-;;   clojure -M scripts/guest_lint.cljk [<game-dir> ...]
+;;   kbb -M scripts/guest_lint.cljk [<game-dir> ...]
 ;;
 ;; A `.clj` game compiles to WASM whose imports must all resolve against
 ;; kami:engine/*. A call to something that is not a host import, not a compiler

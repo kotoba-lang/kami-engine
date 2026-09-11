@@ -1,6 +1,6 @@
 ;; Headless match harness.
 ;;
-;;   npx --yes nbb bin/simulate.cljs [--seed N] [--bots N] [--ticks N] [--edn]
+;;   npx --yes kbb --backend sci bin/simulate.cljk [--seed N] [--bots N] [--ticks N] [--edn]
 ;;
 ;; Plays a full battle royale with no renderer, no browser and no GPU, and
 ;; prints what happened. This is the artifact the repository has been missing:

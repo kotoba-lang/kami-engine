@@ -136,13 +136,13 @@ Only these diverge per target; the game never sees them.
 Add a babashka task layer (`tools/kami`) orchestrating the write-once → per-target flow:
 
 ```
-bb kami bake     <game>            ; Datomic snapshot (transit/edn) + KTX2 asset variants per target
-bb kami compile  <game>            ; kami-engine-clj: game .clj → game.wasm  (one artifact, all targets)
-bb kami host     --target ios|android|ps5|switch|web|mac
+kbb -M:kami bake     <game>            ; Datomic snapshot (transit/edn) + KTX2 asset variants per target
+kbb -M:kami compile  <game>            ; kami-engine-clj: game .clj → game.wasm  (one artifact, all targets)
+kbb -M:kami host     --target ios|android|ps5|switch|web|mac
                                   ; cargo build the per-target host (backend-wasmi for ios/ps5/switch)
-bb kami package  --target …        ; .app / .apk(.aab) / console package / web bundle / .app
-bb kami run      --target mac      ; dev loop (wasmtime + hot-reload, kami-engine-clj Phase 3)
-bb kami test                       ; headless golden-frame: run game.wasm under wasmi, hash ECS state
+kbb -M:kami package  --target …        ; .app / .apk(.aab) / console package / web bundle / .app
+kbb -M:kami run      --target mac      ; dev loop (wasmtime + hot-reload, kami-engine-clj Phase 3)
+kbb -M:kami test                       ; headless golden-frame: run game.wasm under wasmi, hash ECS state
 ```
 
 `game.wasm` and the snapshot are built **once**; `host`/`package` are the only per-target
@@ -150,17 +150,17 @@ steps. `kami test` runs on the no-JIT (`wasmi`) path in CI so the console/iOS co
 continuously exercised without a device.
 
 ✅ **`bb.edn` orchestrator implemented** (root `bb.edn`): `bb {targets,plan,spec,bake,compile,
-host,play,test}` wire the existing pieces — `bb bake survivors` runs `author.clj` (datalevin →
-scene.edn), `bb compile survivors` runs `kamiclj` (logic.clj → game.wasm, verified 3 KB out),
-`bb host <target>` reads the feature+triple from `kami spec <target>` (EDN — single source of
-truth, no re-encoding) and cross-builds, reporting "NDA console SDK" for PS5/Switch. `bb test`
+host,play,test}` wire the existing pieces — `kbb -M:bake survivors` runs `author.clj` (datalevin →
+scene.edn), `kbb -M:compile survivors` runs `kamiclj` (logic.clj → game.wasm, verified 3 KB out),
+`kbb -M:host <target>` reads the feature+triple from `kami spec <target>` (EDN — single source of
+truth, no re-encoding) and cross-builds, reporting "NDA console SDK" for PS5/Switch. `kbb -M:test`
 is the dual-backend gate. The per-platform decisions live only in `kami-script-runtime::platform`.
-✅ **`bb package mac` produces a relocatable `.app`** (`dist/<Game>.app`): release host binary in
+✅ **`kbb -M:package mac` produces a relocatable `.app`** (`dist/<Game>.app`): release host binary in
 `Contents/MacOS/`, the game's `logic.clj` + `scene.edn` in `Contents/Resources/game/`, and an
 `Info.plist`. The player resolves its game dir relocatably (`$KAMI_GAME_DIR` → `<exe>/../Resources/game`
 → dev `CARGO_MANIFEST_DIR`), so the bundle is self-contained — verified: the bundled binary loads the
 game from `Resources/game`, not the source tree. iOS/Android/console mirror this layout behind their
-native shells (Swift / NativeActivity / console SDK), which `bb package <target>` flags as the
+native shells (Swift / NativeActivity / console SDK), which `kbb -M:package <target>` flags as the
 remaining native-shell step.
 
 ---
@@ -281,11 +281,11 @@ Switch}::spec()` returns the `jit_allowed` / `LogicHost` (wasmi vs wasmtime vs b
 default for each, plus `host_feature()` (the cargo feature the host links). 5 tests pin the
 invariants — iOS/PS5/Switch are no-JIT⇒wasmi, only consoles need the seam, mobile/Switch get
 ASTC — so the per-platform decisions can't silently regress as the host crates land. The
-`bb kami host/package` tooling and CI consume this instead of re-encoding the matrix in prose.
+`kbb -M:kami host/package` tooling and CI consume this instead of re-encoding the matrix in prose.
 A `kami` CLI (`cargo run -p kami-script-runtime --bin kami -- targets | plan <target>`) makes
 it actionable: it prints the full matrix and, per target, the JIT/host/texfmt/render/input
 decision + rustc triple + the exact `cargo build` command for the host (or "NDA console SDK"
-for PS5/Switch). This is the seam `bb kami host/package` shells out to.
+for PS5/Switch). This is the seam `kbb -M:kami host/package` shells out to.
 
 ---
 

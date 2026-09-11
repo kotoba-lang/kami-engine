@@ -24,7 +24,7 @@ gates. See `CLAUDE.md` → "CLJ/EDN Game Layer" for the architecture.
 | `cargo test-native -p kami-clj-host` | render-IR decoder: fixture round-trip + **rejects malformed bytes** (bad magic/version, truncation, out-of-bounds) |
 | `cargo test-native -p kami-scene` | scene.edn EDN accessors: keyword/namespace match, int↔float coercion, defaults, malformed → `None` |
 | **`scripts/test-script-backends.sh`** | the **dual-backend gate** — runs the kami-script-runtime suite under BOTH `wasmtime` (JIT) and `wasmi` (no-JIT, the iOS/PS5/Switch path); **both must pass**. Override the host triple with `HOST_TARGET=…`. |
-| **`scripts/test-bb-pipeline.sh`** | the `bb kami` pipeline end-to-end: `bb spec` emits the expected matrix EDN per target, `bb compile` turns `logic.clj` → a real `game.wasm`. |
+| **`scripts/test-bb-pipeline.sh`** | the `kbb -M:kami` pipeline end-to-end: `kbb -M:spec` emits the expected matrix EDN per target, `kbb -M:compile` turns `logic.clj` → a real `game.wasm`. |
 
 ## The two load-bearing invariants
 

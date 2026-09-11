@@ -13,7 +13,7 @@
 ;; lives here — the split Unreal draws between the engine and a game module.
 ;;
 ;; Guest subset discipline, inherited from the parent and checked by
-;; `clojure -M scripts/guest_lint.cljk`: arithmetic is integer-only and there is
+;; `kbb -M scripts/guest_lint.cljk`: arithmetic is integer-only and there is
 ;; no math library. Every fractional value here is either an `(f32 ...)`
 ;; literal or a value passed straight from one host import into another. That
 ;; constraint is why `move!`, `move-to!`, `look-at!`, `spawn-ring!` and

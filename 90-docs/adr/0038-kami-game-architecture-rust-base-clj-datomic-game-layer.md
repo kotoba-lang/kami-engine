@@ -128,7 +128,7 @@ churn while the hosts are still landing.
 - **CLJ is the default**, Rust-direct (`kami-app`) is the escape hatch. Reverses the prior
   implicit default.
 - **Cost:** two models to maintain. Justified — A gives REPL/live-Datomic dev ergonomics, B
-  gives universal reach; neither alone covers both. The bake step (`bb kami bake`) is the seam
+  gives universal reach; neither alone covers both. The bake step (`kbb -M:kami bake`) is the seam
   that keeps them in sync.
 - **Migration:** existing `kami-app-{game}` titles keep working; new games go CLJ. The
   `kami-engine-clj` rename is mechanical (done + verified: all tests green on both backends).
