@@ -6,7 +6,7 @@
 ;;   kbb scripts/wit_test.cljk           # check (throws on drift)
 ;;   kbb scripts/wit_test.cljk --gen     # print the regenerated WIT
 (require '[clojure.set :as set]
-         '[clojure.edn :as edn]
+         '[kotoba.lang.edn :as edn]
          '[kotoba.lang.text :as str])
 
 ;; wit/kami-interface.edn was datomic/datascript-ized by edn-datomize.cljk

@@ -1,4 +1,4 @@
-(require '[clojure.edn :as edn])
+(require '[kotoba.lang.edn :as edn])
 
 ;; docs/adapter-registry.edn was datomic/datascript-ized by edn-datomize.cljk
 ;; (wrap-map-keep-ns, ns="docs.adapter-registry"): top level is now

@@ -12,7 +12,7 @@
 ;; It is also how you tell a mechanic is real rather than declared. Every number
 ;; below is produced by the same code path the browser host would run.
 (ns simulate
-  (:require [clojure.edn :as edn]
+  (:require [kotoba.lang.edn :as edn]
             [kotoba.lang.text :as str]
             [kami.gameplay.world :as world]
             [kami.gameplay.match :as match]
