@@ -21,7 +21,7 @@
 ;; It also enforces arity against wit/kami-interface.edn, since a wrong-arity
 ;; import is a link error rather than a compile error.
 
-(require '[clojure.edn :as edn] '[kotoba.lang.text :as str] '[clojure.java.io :as io])
+(require '[kotoba.lang.edn :as edn] '[kotoba.lang.text :as str] '[clojure.java.io :as io])
 
 (defn- unblob
   "The IDL is stored datomised: nested maps are pr-str'd into string attrs.

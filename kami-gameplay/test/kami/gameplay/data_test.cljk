@@ -15,7 +15,7 @@
   file cannot be read — an unreadable table must not look the same as a table
   that was checked and found correct."
   (:require [clojure.test :refer [deftest is testing]]
-            [clojure.edn :as edn]
+            [kotoba.lang.edn :as edn]
             [kami.gameplay.weapon :as weapon]
             [kami.gameplay.zone :as zone]
             [kami.gameplay.loot :as loot]
