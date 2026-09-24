@@ -12,7 +12,7 @@
 ;; Re-run after changing the data below; the player picks up the new scene.edn.
 
 (require '[datalevin.core :as d]
-         '[clojure.pprint :as pp])
+         '[kotoba.pprint :as pp])
 
 ;; ── schema (the Datalog vocabulary for a dance scene) ───────────────────────
 (def schema
