@@ -1,0 +1,26 @@
+{
+  "jobs": [
+    {
+      "base_url": null,
+      "context_from": null,
+      "deliver": "local",
+      "enabled": true,
+      "enabled_toolsets": null,
+      "id": "d2b7078dfea2",
+      "model": "qwen3.8-27b-whitehacker",
+      "name": "itonami-anatomy-fascia-scout",
+      "no_agent": false,
+      "prompt": "SOUL.md に従え。1反復=1 finding。必ずこの順で。\n\n1) 測定: nbb scripts/anatomy_fascia_evidence.cljs を実行して stdout JSON をそのまま測定として読む。これだけが最終判断材料。QID を curl/EntityData で再確認しない。node/python/nbb のインライン計算(-e/-c/heredoc)を一切しない — unattended cron では承認が得られず deny される上、script の判断を信頼しないことになる。\n\n2) status が ready-to-propose のときだけ :chosen-qid を shoseki frontier (config/knowledge-ingest.edn) に追加提案する。それ以外の status では提案しない(測れなかったことを成功と報告しない)。\n\n3) 提案は専用 worktree (~/.gftd/worktrees/itonami-anatomy-fascia-shoseki) で行う。同期は REPLACE しない非破壊手順のみ: `git fetch origin` した上で、既存の未コミット変更は残し、該当 config/knowledge-ingest.edn だけを読んで追加する。branch は `git switch -c bot/itonami-anatomy-fascia-<date> origin/main` (分岐元 title/main 明示) で必ず切る。決して git reset / git checkout -- で worktree を破壊しない。config conformance を実測して通してから commit → push → PR を作る。merge はしない。\n\n4) kami sim は :kami-vocab の測定を読み、既存 backend (vrm/soft-body/xpbd/cae/skeleton) が筋膜 meridian sim に何をもたらすか 1 finding を報告する。コードは書かない。\n\n禁止: main 直 push, merge, execute_code, インライン計算, git reset --hard, git checkout -- による作業消失, 破壊的コマンド(acknowledge 不要の破壊操作)。測定は evidence script のみ。cron は unattended(承認 prompt を出さない)。シンプルに: 測定1回 → 1提案 → 報告文で終わる。\n\n報告書式: 対象 corpus / 追加 QID / 台帳 seq | PR URL / 異常の有無",
+      "provider": "kotoba",
+      "schedule": {
+        "kind": "cron",
+        "expr": "12 10 * * *",
+        "display": "12 10 * * *"
+      },
+      "script": "anatomy_fascia_evidence.cljs",
+      "skill": null,
+      "skills": [],
+      "workdir": null
+    }
+  ]
+}
