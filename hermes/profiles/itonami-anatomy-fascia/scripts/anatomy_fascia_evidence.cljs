@@ -29,12 +29,18 @@
 (def kami-root "~/github/com-junkawasaki/orgs/kotoba-lang/kami-engine")
 
 (defn sh [cmd cwd]
-  (try (str/trim (str (cp/execSync cmd #js {:cwd cwd :timeout 30000})))
+  ;; maxBuffer: the default execSync buffer is 1MB but app-hyakka's
+  ;; config/knowledge-ingest.edn is ~1.1MB, so `git show origin/main:...`
+  ;; failed with spawnSync ENOBUFS; the catch folded that into an "ERR:"
+  ;; string whose regex matched 0 QIDs, reporting an empty frontier and a
+  ;; false ready-to-propose for QIDs already on main (the 2026-09-23
+  ;; duplicate wikidata-books-6 entry came from exactly this).
+  (try (str/trim (str (cp/execSync cmd #js {:cwd cwd :timeout 30000 :maxBuffer 10485760})))
        (catch :default e (str "ERR:" (.-message e)))))
 
 (defn curl [url]
   (let [cmd (str "curl -s -m 25 -H 'User-Agent: itonami-anatomy-fascia/0.1' " url)]
-    (try (str (cp/execSync cmd #js {:timeout 30000 :encoding "utf8"}))
+    (try (str (cp/execSync cmd #js {:timeout 30000 :encoding "utf8" :maxBuffer 10485760}))
          (catch :default e (str "ERR:" (.-message e))))))
 
 ;; ---- 1. app-hyakka 現在の shoseki frontier + kami 語彙 ----
@@ -111,8 +117,7 @@
                           (seq eligible) :ready-to-propose
                           (some #(str/starts-with? (str (or (:error %) "")) "parse") checked)
                           :some-parse-error
-                          :else :no-eligible-new)
-                :kami-vocab (kami-fascia-vocab)}
+                          :else :no-eligible-new)}
         outp (path/join find-dir (str "anatomy-fascia-" (.slice ts 0 10) ".json"))]
     (fs/mkdirSync find-dir #js {:recursive true})
     (fs/writeFileSync outp (js/JSON.stringify (clj->js result) nil 2))
