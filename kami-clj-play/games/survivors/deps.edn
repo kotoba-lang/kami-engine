@@ -2,4 +2,10 @@
 ;; (ADR-0036 / ADR-CLJ-02). Run the authoring step with:
 ;;   kbb -M author.clj      ;; transacts datoms → Datalog query → spits scene.edn
 {:paths ["."]
- :deps  {datalevin/datalevin {:mvn/version "0.9.22"}}}
+ :deps  {
+        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
+        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
+        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
+        ;; sha it is shown.
+        io.github.kotoba-lang/io {:git/sha "98045c7ad26c71c3505cb8fefdcbe0dcdf98f925"}
+        datalevin/datalevin {:mvn/version "0.9.22"}}}

@@ -12,7 +12,7 @@
 
 (require '[datalevin.core :as d]
          '[clojure.pprint :as pp]
-         '[clojure.java.io :as io])
+         '[kotoba.io :as io])
 
 ;; ── schema (the Datalog vocabulary for a renderable game entity) ────────────
 (def schema
