@@ -1,0 +1,40 @@
+;; Concept 2/5 — 見えてる・バトル (Mieteru Battle)
+;; STATUS: design-only. No kami-engine code yet.
+
+{:concept/id     :concept/02-mieteru-battle
+ :concept/number 2
+ :concept/title-ja "見えてる・バトル"
+ :concept/title-en "It's Already Visible — Boss Rush"
+ :concept/status :design-only
+
+ :concept/genre "3D ロックオン・ボスラッシュ"
+ :concept/platform "kami-clj-play3d (native winit + wgpu, 3D battle-royale 基盤を転用)"
+
+ :concept/core-loop
+ ["巨大な Ghost/Daemon 1体との1対1定点戦"
+  "シロで弱点可視化 (スキャンして弱点を光らせる)"
+  "ピコで連打削り"
+  "ゲージ満タンで合体奥義 — 原作の必殺技演出 (名前/溜め/解放/余韻) をカメラ演出化"]
+
+ :concept/controls
+ {:buttons 3
+  :scheme ["攻撃" "回避 (自動ロックオン+長め無敵フレーム、初心者ほど猶予拡大)" "必殺技"]}
+
+ :concept/tone
+ {:action-inspiration "Naruto/鬼滅級の必殺技カットイン演出"
+  :music-direction
+  "開幕前の『間合い』フェーズはAORギター/ジャジーコードでタメを作り、開戦の
+   瞬間に一気に転調 — 原作の『静→動』を音楽構造として体現する、5作中もっとも
+   Naruto/鬼滅寄りの企画。"}
+
+ :concept/kami-engine
+ {:model "Model B 想定"
+  :player "kami-clj-play3d"
+  :reuse ["kami-pipelines::AtlasVisAdapter (衝撃波/火花/シャイン等 Nintendo風スプライトの被弾演出に転用)"
+          "kami-skeleton (ボス/シロ/ピコのスケルタルアニメ、IK含む)"]
+  :open-questions
+  ["kami-clj サブセットでロックオン対象選択・弱点部位判定をどう表現するか (現状の
+    survivors/waves テンプレートには単一 nearest-tagged しかない)"
+   "必殺技カットインの演出はゲームロジック(CLJ)側かRustホスト側か、境界線の検討要"]}
+
+ :concept/rating "7+/PG/TV-Y7-FV"}

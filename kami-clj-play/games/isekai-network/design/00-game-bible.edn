@@ -1,0 +1,80 @@
+;; Ghost Hacker: Shiro & Pico — Isekai Network
+;; Game bible (EDN). Design source of truth for the 5 concept variants in this
+;; directory. Franchise canon lives in
+;; orgs/gftdcojp/ai-gftd-mangaka/data/ghosthacker-shiropico/{SERIES-BIBLE.md,
+;; character-design-spec.json} — this file does not duplicate it, only maps it
+;; onto game mechanics.
+
+{:game/title       "Ghost Hacker: Shiro & Pico"
+ :game/subtitle-ja "アイセカイ・ネットワーク"
+ :game/codename    "isekai-network"
+ :game/universe    "GFTD Cyber Universe (sister work to Ren's Ghost Hacker)"
+
+ :game/logline
+ "世界最強の放浪ホワイトハッカー・シロと、元クリプトキディーの相棒ピコが、
+  追い詰めたはずの宿敵ゴーストに逆にネットの奥底 — 深層網 (ディープネット) へ
+  引きずり込まれる。現実に戻る唯一の方法は、この異世界そのものの正体を暴くこと。"
+
+ :design/theme          :landauer-principle
+ :design/theme-statement
+ "情報は物理である。消したつもりでも、ひかりは のこる。"
+ :design/theme-note
+ "ランダウアーの原理 (情報消去には必ず kT ln2 の熱が伴う) が世界法則そのもの。
+  ゲーム内の『デス』は存在しない — 倒れても必ず熱痕が残り、拠点で再構成される。
+  死亡ペナルティ無し = 全年齢の安心感と、原作テーマの一致を同時に満たす。"
+
+ :cast
+ [{:id :shiro
+   :role "主人公/世界トップのホワイトハッカー — 静"
+   :eyes-hex "#1FB6A6" :hair-hex "#F4F8F7"
+   :verb "可視化して一撃で仕留める"
+   :catchphrase "——もう、視えてる"}
+  {:id :pico
+   :role "相棒/元クリプトキディー → 成長する白帽 — 動"
+   :eyes-hex "#A8E05F" :hair-hex "#7F9C6E"
+   :verb "高速連打で穴を開ける"
+   :catchphrase-late "オレの手癖、ナメんなよ。……今は、味方のためのな"}]
+
+ :bestiary
+ [{:id :ghost  :origin "data remanence / APT" :body-hex "#29D3C2" :defeat "熱痕を辿って見つける"}
+  {:id :daemon :origin "常駐プロセス / Maxwell's Demon" :accent-hex "#FF8A3D" :defeat "自動起動の根を断つ"}
+  {:id :zombie :origin "zombie process / botnet" :body-hex "#5B7A99" :defeat "やさしく起こす"}]
+
+ :shared-foundation
+ {:controls
+  {:buttons 3
+   :scheme  ["攻撃 (シロ=単発可視化 / ピコ=連打)" "回避 (猶予長め・無敵フレーム)" "必殺技ゲージ (合体技)"]
+   :no-combo-memorization? true
+   :no-death-penalty?      true}
+
+  :action-grammar
+  "技には必ず名前・溜め・解放・余韻 (鬼滅/Naruto型の4拍子)。
+   倒す ≠ 殺す = 起こす/眠らせる/根を断つ。"
+
+  :tone-structure
+  "静 (探索・拠点) と動 (戦闘) の二層構造をゲーム全体の音楽構造に拡張する。
+   探索・拠点パートは FreeTEMPO 的な洗練されたボサノヴァ/AOR/ハウスのラウンジ・
+   グルーヴ。戦闘に入った瞬間、鬼滅/Naruto 級の爆発力あるアクションへ転調する。"
+
+  :engine-note
+  "kami-ui-sdk の kami-sound.js は現状『音声ファイル禁止・Web Audio 合成のみ』の
+   短SFXプリセット止まり。FreeTEMPO 級の生グルーヴを鳴らすには拍グリッド駆動の
+   生成音楽レイヤーが要る — kami-live の :dance/{show,setlist,lighting} ビート
+   グリッド+トリガー機構を『音楽ジャンル』ではなく『拍を刻んで世界に反応させる
+   仕組み』として転用するのが実装上の筋。この bible では設計方針として明記のみ
+   に留め、実装は各コンセプトの :kami-engine セクションに委ねる。"
+
+  :rating "7+ / PG / TV-Y7-FV — 流血・恐怖・宗教/オカルト意匠は全版NG"}
+
+ :concepts
+ [:concept/01-netsurvivors
+  :concept/02-mieteru-battle
+  :concept/03-futari-dungeon
+  :concept/04-groove-hack
+  :concept/05-tabi-suru-futari]
+
+ :related
+ ["orgs/gftdcojp/ai-gftd-mangaka/data/ghosthacker-shiropico/SERIES-BIBLE.md"
+  "orgs/gftdcojp/ai-gftd-mangaka/data/ghosthacker-shiropico/character-design-spec.json"
+  "orgs/kotoba-lang/kami-engine/CLAUDE.md (ADR-0035/0036/0037/0038 — CLJ game layer)"
+  "orgs/kotoba-lang/kami-engine/ARCHITECTURE.md"]}

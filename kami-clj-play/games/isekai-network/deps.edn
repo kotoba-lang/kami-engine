@@ -1,0 +1,5 @@
+;; Authoring deps for isekai-network — datalevin is the scene source of truth
+;; (ADR-0036 / ADR-CLJ-02). Run the authoring step with:
+;;   clojure -M author.clj      ;; transacts datoms → Datalog query → spits scene.edn
+{:paths ["."]
+ :deps  {datalevin/datalevin {:mvn/version "0.9.22"}}}
