@@ -69,12 +69,12 @@
   ;; ClojureScript would otherwise store NaN silently: every comparison against
   ;; it is false, so the clamp falls through to :else. A NaN deadline never
   ;; expires and NaN health is neither alive nor dead.
-  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+  (is (thrown? js/Error
                (attr/set blank :health nil)))
-  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+  (is (thrown? js/Error
                (attr/set blank :health (/ 0.0 0.0))))
-  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+  (is (thrown? js/Error
                (attr/set blank :yaw (/ 1.0 0.0))))
   (testing "and a nil arriving through update-attr is refused too"
-    (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
+    (is (thrown? js/Error
                  (attr/update-attr blank :health (fn [_ _] nil) 1)))))
