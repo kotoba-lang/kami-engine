@@ -17,7 +17,7 @@
 ;; Output: ~/.hermes/profiles/itonami-anatomy-fascia/workspace/findings/*.json
 ;;        plus stdout (injected into agent prompt)
 
-(require '[clojure.string :as str]
+(require '[kotoba.lang.text :as str]
          '["node:child_process" :as cp]
          '["node:fs" :as fs]
          '["node:path" :as path]
@@ -52,8 +52,8 @@
 
 (defn kami-fascia-vocab []
   (let [read (fn [p] (try (fs/readFileSync p "utf8") (catch :default _ "")))
-        claude (str/lower-case (read (path/join kami-root "CLAUDE.md")))
-        adapter (str/lower-case (read (path/join kami-root "docs/adapter-registry.edn")))
+        claude (str/lower (read (path/join kami-root "CLAUDE.md")))
+        adapter (str/lower (read (path/join kami-root "docs/adapter-registry.edn")))
         terms ["fascia" "myofascial" "muscle" "skeleton" "rigid-body" "soft-body"
                "spring" "cloth" "finite-element" "cae" "xpbd" "tension" "vrm"
                "spring-bone" "kinematics" "mesh-deform"]]
