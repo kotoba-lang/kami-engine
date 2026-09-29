@@ -1,0 +1,37 @@
+;; Concept 3/5 — ふたりでネット探検 (Futari Dungeon)
+;; STATUS: design-only. No kami-engine code yet.
+
+{:concept/id     :concept/03-futari-dungeon
+ :concept/number 3
+ :concept/title-ja "ふたりでネット探検"
+ :concept/title-en "Two of Us, Deep Net Expedition"
+ :concept/status :design-only
+
+ :concept/genre "couch co-op 見下ろし探索ダンジョン (2人協力)"
+ :concept/platform "kami-app-isekai のボクセルバイオーム技術を『ネットワークセグメント』に再スキン"
+
+ :concept/core-loop
+ ["1P=シロ / 2P=ピコ (1人プレイ時は片方をAI操作)"
+  "侵害されたセグメントを探索、住人NPC (プロトコルの擬人化) を救出"
+  "奥のボスへ向けて協力プレイ"]
+
+ :concept/controls
+ {:buttons 3 :co-op true
+  :scheme ["攻撃" "回避" "アイコンだけの意思疎通 (ボイスチャット不要、絵文字的ラベル共有)"]}
+
+ :concept/tone
+ {:hub "拠点 (SOC) はラウンジ風カフェとして作り込む — 5作中もっとも FreeTEMPO の
+        『カフェBGM』ポジションに近い拠点"
+  :music-direction "拠点=FreeTEMPO的ラウンジ、探索/戦闘=テンポアップ"}
+
+ :concept/kami-engine
+ {:model "Model A (拠点/NPC生成はライブDatomicオーサリング) → Model B へ bake"
+  :reuse ["kami-app-isekai の VoxelChunkAdapter (採掘/設置APIを『隔離・浄化』ジェスチャーに転用)"
+          "kami-live の DanceScene 基盤を NPC の環境アニメ (拠点で音楽に合わせて微揺れ) に転用"
+          "KamiUI.LabelOverlay (カメラ追従ラベルでの協力プレイ意思疎通)"]
+  :open-questions
+  ["ローカル2人プレイのための2入力ソース(2パッド/キーボード分割)の kami-app 側対応状況"
+   "EDR/XDR 等セキュリティ学習トピックを探索ギミックの『鍵』にどう落とすか (原作
+    12話カリキュラムのマッピングは design/00-game-bible.edn の bestiary 参照)"]}
+
+ :concept/rating "7+/PG/TV-Y7-FV"}

@@ -1,0 +1,42 @@
+;; Concept 5/5 — 旅する二人 (Tabi Suru Futari)
+;; STATUS: design-only. No kami-engine code yet.
+
+{:concept/id     :concept/05-tabi-suru-futari
+ :concept/number 5
+ :concept/title-ja "旅する二人"
+ :concept/title-en "The Two Who Travel"
+ :concept/status :design-only
+
+ :concept/genre "軽戦闘つきチル探索オープンワールド"
+ :concept/platform "kami-terrain / kami-vegetation / kami-atmosphere ストリーミング地形
+                     (kami-app-quarry-walk 系リファレンスを流用)"
+
+ :concept/core-loop
+ ["深層網の各バイオーム (家庭ルーター界隈 〜 クラウド境界 〜 未踏領域) を自由移動"
+  "道中で軽いモブ戦、時々大型ボスの『事件』に遭遇"
+  "探索の比率が最も高い — 原作の『図鑑コーナー』を景色の中の発見要素として自然に埋め込む"]
+
+ :concept/controls
+ {:buttons 2
+  :scheme ["移動+軽攻撃" "『熱痕スキャン』ミニゲーム (AR的な発見/撮影要素)"]
+  :difficulty-note "5作中もっとも戦闘難度が低い — アクション不得手な子どもでも
+                     最後まで遊べる導線"}
+
+ :concept/tone
+ {:music-direction
+  "kami-atmosphere の day/night サイクルに合わせてBGMがボサノヴァ→ハウス→
+   アンビエントへ緩やかにクロスフェード。5作中もっとも FreeTEMPO の
+   『洗練された聴かせるBGM』路線に近い、旅ゲーとしての落とし所。"}
+
+ :concept/kami-engine
+ {:model "Model B (地形ストリーミングはRustネイティブ、ゲームプレイ糊付けのみCLJ)"
+  :reuse ["kami-app-quarry-walk のバイオーム技術 (Plains/Quarry/Desert/Tundra
+           プリセット) を『ネットワークの地形』に再解釈"
+          "kami-atmosphere の day/night + weather preset を音楽クロスフェードの
+           トリガー元にする (新しい統合ポイント — 現状は視覚専用)"]
+  :open-questions
+  ["day/nightサイクルの時刻を CLJ ゲームロジック側からどう読み出すか
+    (kami-atmosphere は現状 kami-web wasm export 経由、kami-app-{game} からの
+    直接参照経路の確認が必要)"]}
+
+ :concept/rating "7+/PG/TV-Y7-FV"}

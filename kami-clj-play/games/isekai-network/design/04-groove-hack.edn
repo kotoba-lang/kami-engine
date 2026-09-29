@@ -1,0 +1,40 @@
+;; Concept 4/5 — グルーヴ・ハック (Groove Hack)
+;; STATUS: design-only. No kami-engine code yet. Most FreeTEMPO-forward concept.
+
+{:concept/id     :concept/04-groove-hack
+ :concept/number 4
+ :concept/title-ja "グルーヴ・ハック"
+ :concept/title-en "Groove Hack"
+ :concept/status :design-only
+
+ :concept/genre "リズム同期アクション (音ゲー要素は任意ボーナス、必須ではない)"
+ :concept/platform "kami-clj-play もしくは play3d (未確定 — 拠点はDJブース風ラウンジのため3D寄りが有力)"
+
+ :concept/core-loop
+ ["拠点=ラウンジ。DJブースのシロ、フロアで戦うピコというビジュアルコンセプト"
+  "戦闘中は拍グリッドが可視化され、ジャスト入力でダメージ/エフェクトが強化"
+  "判定は常に緩く、リズムに乗れなくても通常クリア可能 — 音ゲー強制はしない"]
+
+ :concept/controls
+ {:buttons 3
+  :scheme ["攻撃 (拍に合わせるとボーナス、必須ではない)" "回避" "必殺技"]}
+
+ :concept/tone
+ {:music-direction
+  "5作中もっとも FreeTEMPO のDNAに忠実 — ラウンジ/ハウスのグルーヴがゲーム
+   プレイのフィードバックそのものになる企画。"
+  :design-constraint
+  "『ビートに乗れないと勝てない』を絶対に作らない。全年齢アクセシビリティを
+   リズム精度より優先する。"}
+
+ :concept/kami-engine
+ {:model "Model A で拍グリッド+セットリストをオーサリング → Model B へ bake"
+  :reuse ["kami-live::DanceScene の beat grid + :dance/triggers 機構を
+           『戦闘イベントのタイミング判定源』として転用 (ダンス演出用途からの
+           新しい使い道の提案 — 既存READMEにこの用途の記載はまだ無い)"]
+  :open-questions
+  ["kami-live は現状 VRM/Live2D ダンス演出向け。戦闘ダメージ計算のトリガーとして
+    転用する場合、:dance/triggers の action語彙をゲームプレイ側にどう拡張するか
+    が未検討 (このコンセプトの最大の技術的不確定要素)"]}
+
+ :concept/rating "7+/PG/TV-Y7-FV"}

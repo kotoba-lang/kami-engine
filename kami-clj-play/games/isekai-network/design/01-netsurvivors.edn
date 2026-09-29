@@ -1,0 +1,51 @@
+;; Concept 1/5 — 熱痕ランナー (Heat-Trace Runner)
+;; STATUS: prototyped in this directory (author.clj + logic.clj + scene.edn).
+;; The only one of the 5 with a real, running kami-engine implementation so far.
+
+{:concept/id     :concept/01-netsurvivors
+ :concept/number 1
+ :concept/title-ja "熱痕ランナー"
+ :concept/title-en "Heat-Trace Runner"
+ :concept/status :prototyped
+
+ :concept/genre "見下ろし型オートバトラー (サバイバーズ系)"
+ :concept/genre-note
+ "当初案は横スクロールだったが、実装基盤の kami-clj-play `survivors` リファレ
+  ンスゲームが見下ろし型 (全方位湧き + 自動移動なしプレイヤー操作) のため、
+  実装に合わせてジャンルを見下ろし型オートバトラーへ確定した。"
+
+ :concept/platform "kami-clj-play (2D, ECS+wgpu native player) → 将来的に kami-web wasm export も可"
+
+ :concept/core-loop
+ ["深層網の配管をリング状に囲むゴーストが常時湧く"
+  "シロ&ピコは一体のユニットとして自由移動 (axis MoveX/MoveY)"
+  "シロの一撃 (weapon system) が周期的に射程内の最も近いゴーストを可視化即消去"
+  "ピコの刈り取り (contact system) が接触したゴーストを即座に払う"
+  "倒しても『殺す』ではなく熱痕が白く残るバーストで消える — 死亡表現なし"]
+
+ :concept/controls
+ {:buttons 1
+  :scheme ["移動のみ (アナログ2軸)。攻撃は自動 — 操作ミス=迷子が起きない設計"]}
+
+ :concept/tone
+ {:action-inspiration "Naruto/鬼滅の『間断ない掃討戦』のテンポ感"
+  :music-direction
+  "ミドルテンポのハウス〜ボサ調グルーヴ。拍にジャストで当てると軽く光る
+   ボーナス演出のみ (強制リズムゲーではない)。"}
+
+ :concept/bestiary-scope
+ "第一実装スロットは Ghost 単一種のみ (色: body-hex #29D3C2)。Daemon/Zombie
+  の多種湧きは次スロットの拡張対象 (logic.clj の enemy タグを複数化する必要
+  があり、現行 kami-clj サブセットでの複数タグ湧き分けは未検証)。"
+
+ :concept/kami-engine
+ {:model "Model B (compiled-guest wasm) — Datomic/EDN 経由でのみ author 側を通す"
+  :player "kami-clj-play"
+  :reference-game "kami-clj-play/games/survivors (テンプレート踏襲、命名/配色のみ変更)"
+  :files ["author.clj (datalevin transact → Datalog query → scene.edn projection)"
+          "logic.clj (kami-clj subset: control/spawn/ai/weapon/contact defsystems)"
+          "scene.edn (author.clj の生成物 — 手編集禁止)"]
+  :compile-cmd
+  "cargo run -p kami-engine-clj --bin kamiclj -- kami-clj-play/games/isekai-network/logic.clj -o /tmp/isekai-network.wasm"}
+
+ :concept/rating "7+/PG/TV-Y7-FV"}
