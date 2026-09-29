@@ -1,0 +1,26 @@
+[package]
+name = "kami-app-giemon"
+description = "Giemon robot kit viewer (giemon.etzhayyim.com) — orbit camera + ArmCrawler procedural model via CadSceneAdapter"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+kami-app = { path = "../kami-app" }
+kami-pipelines = { path = "../kami-pipelines" }
+kami-render = { path = "../kami-render" }
+kami-genesis = { path = "../kami-genesis" }
+kami-articulated = { path = "../kami-articulated" }
+glam = { workspace = true }
+log = { workspace = true }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = ["console", "Window"] }
+js-sys = "0.3"
+console_error_panic_hook = "0.1"
+console_log = "1"
