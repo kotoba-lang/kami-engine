@@ -1,7 +1,7 @@
 # Testing the CLJ/EDN game stack
 
 How the kami-clj game layer (ADR-0035/0036/0037/0038) is tested, and how to run the
-gates. See `CLAUDE.md` → "CLJ/EDN Game Layer" for the architecture.
+gates. See `AGENTS.md` → "CLJ/EDN Game Layer" for the architecture.
 
 ## Setup caveats (read first)
 

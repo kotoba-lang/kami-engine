@@ -20,7 +20,7 @@
 
 ## Context
 
-**A documentation staleness bug, found while drafting this ADR.** This repo's own `CLAUDE.md`
+**A documentation staleness bug, found while drafting this ADR.** This repo's own `AGENTS.md`
 (as of this ADR's date) describes a 29-crate Rust workspace (`kami-core`, `kami-render`,
 `kami-vrm`, `kami-gltf`, `kami-sdf`, `kami-mesher`, `kami-scad`, `kami-terrain`,
 `kami-vegetation`, `kami-skeleton`, …) with explicit prohibitions ("JS/Clojure による Rust
@@ -33,7 +33,7 @@ named "WIT single-source + no-rust guard" that **fails the build** if it finds a
 `Cargo.toml`/`Cargo.lock`/`*.rs`/`rust-toolchain*`/`.cargo/` anywhere in this repo. The former
 Rust crate logic (`character`, `mesher`, `vrm`, `skeleton`, `sdf`, `scad`, `terrain`,
 `vegetation`, `nerf`, `gltf`) was ported to standalone zero-dep `.cljc` repos under
-`kotoba-lang/*` (ADR-2607010930, "clj-wgsl migration"). **`CLAUDE.md`'s crate table and Rust
+`kotoba-lang/*` (ADR-2607010930, "clj-wgsl migration"). **`AGENTS.md`'s crate table and Rust
 prohibitions describe a pre-migration state and need a follow-up documentation-only fix**
 (tracked as a Consequence below, not blocking this ADR).
 
@@ -89,7 +89,7 @@ adoptable equivalent:
   own doc comment) — this is a **checked runtime contract**, not a compile-time guarantee, and
   this ADR says so plainly rather than overclaiming Rust-equivalent safety.
 - A `clj-kondo` custom lint rule (this org already runs `kbb -M:lint` as standard,
-  CLAUDE.md/repos.edn convention) flags a bare vector literal passed where a tagged-point map
+  AGENTS.md/repos.edn convention) flags a bare vector literal passed where a tagged-point map
   is the declared parameter shape — a *static*, best-effort second layer, catching the most
   common mistake (forgetting the wrapper entirely) without needing a real type checker.
 - Retrofit target (proves the convention on the exact bugs that motivated it): `character`'s
@@ -217,7 +217,7 @@ inside it rather than being thrown away.
   that gap, it explicitly leaves it to ADR-2605261800.
 - (−) UniRig integration is GPU-inference-gated (same real-money caveat as ADR-2607051120) —
   this ADR designs the wiring, it does not authorize spending.
-- **Follow-up, not blocking**: `kami-engine/CLAUDE.md`'s crate table and Rust-prohibition
+- **Follow-up, not blocking**: `kami-engine/AGENTS.md`'s crate table and Rust-prohibition
   section describe the pre-`clj-wgsl-migration` state and should be corrected in a
   documentation-only commit (tracked separately from this ADR's technical decision).
 

@@ -18,7 +18,7 @@
   - book 受理判定: `src/hyakka/wikidata_book.cljc` `book-classes`
     （P31: Q7725634/Q571/Q47461344/Q3331189/Q8261/Q49084/Q1279564/Q25379）
   - gate: config conformance（`test/hyakka/wikidata_book_test.cljs`）
-- kami-engine: `orgs/kotoba-lang/kami-engine`（CLAUDE.md / ARCHITECTURE.md /
+- kami-engine: `orgs/kotoba-lang/kami-engine`（AGENTS.md / ARCHITECTURE.md /
   `docs/adapter-registry.edn`）
 - 測定: `scripts/anatomy_fascia_evidence.cljs` を nbb で実行。stdout が
   この tick の測定になる。findings は workspace/findings/ に JSON 保存。

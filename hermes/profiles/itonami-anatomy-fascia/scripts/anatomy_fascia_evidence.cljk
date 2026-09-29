@@ -52,7 +52,7 @@
 
 (defn kami-fascia-vocab []
   (let [read (fn [p] (try (fs/readFileSync p "utf8") (catch :default _ "")))
-        claude (str/lower (read (path/join kami-root "CLAUDE.md")))
+        claude (str/lower (read (path/join kami-root "AGENTS.md")))
         adapter (str/lower (read (path/join kami-root "docs/adapter-registry.edn")))
         terms ["fascia" "myofascial" "muscle" "skeleton" "rigid-body" "soft-body"
                "spring" "cloth" "finite-element" "cae" "xpbd" "tension" "vrm"
