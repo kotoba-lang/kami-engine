@@ -429,7 +429,7 @@ stack.render(&mut layer);                    // Render to UiLayer (top-right)
 
 ### kami-os: OS Compositor
 
-Desktop environment crate consuming both SDK primitives above. See `60-apps/ai-gftd-project-os/CLAUDE.md`.
+Desktop environment crate consuming both SDK primitives above. See `60-apps/ai-gftd-project-os/AGENTS.md`.
 
 ## Genko (原稿) — Manga Canvas Editor (kami-engine-sdk)
 
