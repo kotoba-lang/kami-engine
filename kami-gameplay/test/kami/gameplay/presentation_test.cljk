@@ -1,0 +1,25 @@
+(ns kami.gameplay.presentation-test (:require [clojure.test :refer [deftest is]] [kami.gameplay.presentation :as p]))
+(def bank {:touch {:duration-ms 500 :audio [{:freq 440}] :effect {:count 8 :radius 1}
+                   :animation {:track/keyframes [{:keyframe/time 0 :keyframe/value 0} {:keyframe/time 100 :keyframe/value 1} {:keyframe/time 500 :keyframe/value 0}]}}})
+(deftest event-clock-and-once
+ (let [s (p/enqueue (p/initial-state) bank :touch "hand" [0 1 0] 40)
+       [before audio0] (p/advance s 39) [after audio1] (p/advance before 40)
+       [again audio2] (p/advance after 41)]
+  (is (empty? audio0)) (is (= 440 (:freq (first audio1)))) (is (empty? audio2))
+  (is (= 1 (count (:active again)))) (is (empty? (:active (first (p/advance again 540)))))))
+(deftest visual-clock-and-reduced-motion
+ (let [[s _] (p/advance (p/enqueue (p/initial-state) bank :touch "hand" [0 1 0] 0) 100)
+       i [{:id "hand" :pos [0 1 0]} {:id "other" :pos [0 1 0]}]]
+  (is (== 2 (get-in (p/transform-instances i s 100 false) [0 :pos 1])))
+  (is (= i (p/transform-instances i s 100 true)))
+  (is (= 8 (count (p/effect-instances s 100 false))))
+  (is (= 2 (count (p/effect-instances s 100 true))))))
+(deftest bounded-and-no-resume-burst
+ (let [s (reduce #(p/enqueue %1 bank :touch "hand" [0 0 0] %2) (p/initial-state) (range 100))
+       [late sounds] (p/advance s 400)]
+  (is (= 64 (count (:pending s)))) (is (empty? sounds)) (is (= 16 (count (:active late))))
+  (is (= (p/initial-state) (p/enqueue (p/initial-state) bank :missing nil [0 0 0] 0)))))
+(deftest score-arrangement
+ (let [score {:notes [220 330]}]
+  (is (= 330 (:freq (first (p/music-notes score 3 0)))))
+  (is (= 3 (count (p/music-notes score 0 4))))))

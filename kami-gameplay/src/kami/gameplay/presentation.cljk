@@ -1,0 +1,54 @@
+(ns kami.gameplay.presentation
+  "One portable event timeline for audio, mesh animation and bounded VFX.
+  Hosts execute sound recipes; the existing renderer executes effect instances.
+  No gameplay authority, device, renderer or wall-clock is owned here."
+  (:require [kami.animation :as animation]))
+(defn initial-state [] {:pending [] :active [] :serial 0})
+(defn enqueue [state bank cue target position now]
+  (if-let [spec (get bank (keyword cue))]
+    (let [event {:id (:serial state) :cue (keyword cue) :target target :pos position
+                 :at now :spec spec}]
+      (-> state (update :serial inc)
+          (update :pending #(vec (take-last 64 (conj % event)))))) state))
+(defn advance
+  "Audio emits once. Events older than 250ms never burst into sound after a
+  suspended tab. Visual lifetimes and queue budgets prevent effect accumulation."
+  [state now]
+  (let [ready (filter #(<= (:at %) now) (:pending state))
+        active (vec (take-last 16 (filter #(< (- now (:at %)) (get-in % [:spec :duration-ms] 500))
+                                         (concat (:active state) ready))))]
+    [(assoc state :pending (vec (filter #(> (:at %) now) (:pending state))) :active active)
+     (vec (mapcat (fn [e] (when (<= (- now (:at e)) 250)
+                            (map #(assoc % :position (:pos e) :event-id (:id e)) (get-in e [:spec :audio])))) ready))]))
+(defn transform-instances [instances state now reduced-motion?]
+  (mapv (fn [i]
+          (reduce (fn [item e]
+                    (if (= (:id item) (:target e))
+                      (let [clip (get-in e [:spec :animation])
+                            offset (if (or reduced-motion? (nil? clip)) 0
+                                       (animation/sample clip (- now (:at e))))]
+                        (cond-> (update-in item [:pos 1] + offset)
+                          (get-in e [:spec :color]) (assoc :color (get-in e [:spec :color])))) item))
+                  i (:active state))) instances))
+(defn effect-instances [state now reduced-motion?]
+  (vec (mapcat
+        (fn [{:keys [id pos at spec]}]
+          (when-let [effect (:effect spec)]
+            (let [progress (max 0 (min 1 (/ (- now at) (:duration-ms spec 500))))
+                  count (if reduced-motion? 2 (min 12 (:count effect 8)))
+                  spread (if reduced-motion? 0.2 (* (:radius effect 1.0) progress))
+                  size (* (:size effect 0.12) (- 1 progress))]
+              (for [n (range count) :let [angle (+ (* n 2.399963) (* id 0.7))]]
+                {:id (str "fx-" id "-" n) :geo :sphere
+                 :pos [(+ (pos 0) (* spread (Math/cos angle)))
+                       (+ (pos 1) (if reduced-motion? 0 (* 0.6 progress)))
+                       (+ (pos 2) (* spread (Math/sin angle)))]
+                 :size [size size size] :color (:color effect [0.6 0.9 0.8]) :emissive 0.5})))) (:active state))))
+(defn music-notes
+  "Return a bounded score step. Muting and stage arrangement are host policy;
+  authored score is shared across browser/Roblox and uses the game beat."
+  [score beat stage]
+  (let [notes (:notes score) root (nth notes (mod beat (count notes)))]
+    (cond-> [{:freq root :wave "sine" :dur 0.5 :gain 0.025 :bus :music}]
+      (>= stage 2) (conj {:freq (* root 1.5) :wave "sine" :dur 0.5 :gain 0.015 :bus :music})
+      (>= stage 4) (conj {:freq (* root 2) :wave "triangle" :dur 0.4 :gain 0.012 :bus :music}))))

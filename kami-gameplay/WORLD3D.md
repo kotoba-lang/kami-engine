@@ -48,3 +48,31 @@ Verification: five behavior tests (18 assertions) under JVM and Node, plus the
 existing gameplay suite; real browser walkthrough uses the existing GPU
 renderer. Native Roblox character physics/camera stay with Roblox rather
 than pretending this controller is its authoritative movement simulation.
+
+## Integrated sound, effects and animation
+
+`kami.gameplay.presentation` consumes authored `presentation.edn`. One event
+(target, world position, cue, timestamp) launches a sound recipe, keyframe
+track and GPU effect instances together. `advance` emits sounds only once,
+prunes expired effects, limits pending/active events to 64/16 and drops stale
+sound bursts after suspended tabs. Animation sampling delegates to the existing
+`kami.animation` package, pinned in the engine and gameplay manifests.
+
+The bank includes touch/reassurance/movement, discovery, feedback cut,
+synchronization/miss, comfort, steps/jump/landing. Matching stimulus/response
+uses the same recipe at different spatial sources; mismatched responses use
+the returned modality and delay. Music has eight authored 600ms beats with
+three arrangements. The host uses the game's beat phase, not a second free
+running music clock. Music/sfx buses, master mute and reduced motion are
+required host controls; reduced motion retains color and timing information.
+
+The browser consumer routes synth nodes through the existing audio runtime's
+music/sfx mixer and HRTF spatial panners, releasing nodes on completion.
+Roblox executes native local Sound/Tween/Part effects from the same bank.
+Its audio requires uploaded assets: the game build generates 15 PCM WAVs and
+an explicit missing-ID map. It must not claim Roblox sound is playable before
+IDs/experience permissions and an actual client session are verified.
+
+Validation: portable presentation tests cover one-shot timing, delayed events,
+expiration/budgets, reduced motion and arrangement. Browser host graph tests
+use a mock device and verify spatial routing/cleanup/mute, not audible output.

@@ -1,0 +1,26 @@
+{:schema :kami.presentation/v1
+ :music {:beat-ms 600 :notes [130.81 146.83 164.81 196 164.81 146.83 130.81 174.61]}
+ :bank
+ {:touch {:duration-ms 450 :audio [{:wave "sine" :freq 440 :dur 0.12 :gain 0.10 :bus :sfx}]
+          :color [1 0.83 0.52] :animation {:track/keyframes [{:keyframe/time 0 :keyframe/value 0} {:keyframe/time 80 :keyframe/value 0.18} {:keyframe/time 450 :keyframe/value 0}]}
+          :effect {:count 8 :radius 1 :color [0.96 0.74 0.44]}}
+  :reassure {:duration-ms 650 :audio [{:wave "triangle" :freq 523.25 :to 659.25 :dur 0.25 :gain 0.07 :bus :sfx}]
+             :color [0.61 0.94 0.74] :effect {:count 8 :radius 1.2 :color [0.61 0.94 0.74]}}
+  :motion {:duration-ms 500 :audio [{:wave "sine" :freq 330 :to 440 :dur 0.18 :gain 0.08 :bus :sfx}]
+           :animation {:track/keyframes [{:keyframe/time 0 :keyframe/value 0} {:keyframe/time 160 :keyframe/value 0.4} {:keyframe/time 500 :keyframe/value 0}]}
+           :effect {:count 8 :radius 0.9 :color [0.50 0.74 0.95]}}
+  :attack {:duration-ms 300 :audio [{:wave "triangle" :freq 150 :to 70 :dur 0.14 :gain 0.07 :bus :sfx}]
+           :effect {:count 6 :radius 1.8 :color [0.82 0.76 0.65]}}
+  :discover {:duration-ms 1000 :audio [{:wave "sine" :freq 659.25 :dur 0.6 :gain 0.08 :bus :sfx} {:wave "sine" :freq 987.77 :dur 0.6 :gain 0.04 :bus :sfx}]
+             :effect {:count 12 :radius 2 :color [0.98 0.76 0.42]}}
+  :cut {:duration-ms 650 :audio [{:wave "sine" :freq 240 :to 120 :dur 0.4 :gain 0.06 :bus :sfx}]
+        :effect {:count 10 :radius 1.8 :color [0.67 0.89 0.78]}}
+  :sync {:duration-ms 500 :audio [{:wave "sine" :freq 440 :dur 0.16 :gain 0.07 :bus :sfx}]
+         :effect {:count 8 :radius 1 :color [0.7 0.95 0.8]}}
+  :miss {:duration-ms 200 :audio [{:wave "triangle" :freq 196 :dur 0.1 :gain 0.04 :bus :sfx}]}
+  :comfort {:duration-ms 1600 :audio [{:wave "sine" :freq 523.25 :dur 1.2 :gain 0.06 :bus :sfx} {:wave "sine" :freq 659.25 :dur 1.2 :gain 0.04 :bus :sfx} {:wave "sine" :freq 783.99 :dur 1.2 :gain 0.03 :bus :sfx}]
+            :effect {:count 12 :radius 3 :color [0.75 0.97 0.80]}}
+  :step {:duration-ms 150 :audio [{:wave "triangle" :freq 90 :to 55 :dur 0.06 :gain 0.035 :bus :sfx}]}
+  :jump {:duration-ms 450 :audio [{:wave "sine" :freq 180 :to 360 :dur 0.15 :gain 0.04 :bus :sfx}] :effect {:count 6 :radius 0.8 :color [0.8 0.85 0.75]}}
+  :land {:duration-ms 300 :audio [{:wave "triangle" :freq 100 :to 45 :dur 0.1 :gain 0.04 :bus :sfx}] :effect {:count 6 :radius 1 :color [0.8 0.85 0.75]}}}
+ :roblox-asset-ids {}}
