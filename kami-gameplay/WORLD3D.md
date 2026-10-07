@@ -78,3 +78,11 @@ and human listening remain pending; Studio loading is not publication evidence.
 Validation: portable presentation tests cover one-shot timing, delayed events,
 expiration/budgets, reduced motion and arrangement. Browser host graph tests
 use a mock device and verify spatial routing/cleanup/mute, not audible output.
+
+Keyboard pressure surfaces use `kami.gameplay.key-contacts`: actor occupancy,
+press/release edges, shared-key counts, disconnect release, deterministic sample
+selection and feet-origin plate sensors. `kami.gameplay.keyboard-audio` creates
+five paired procedural press/release transients; browser buffers and Roblox PCM
+exports use the same deterministic recipe. The Keyboard Garden consumer owns
+the compiled progression rule and native contact adapter. Audio synthesis is
+not a real keyboard recording; native asset IDs belong to the consumer.

@@ -1,0 +1,32 @@
+(ns kami.gameplay.key-contacts
+  "Portable occupancy edges for pressure keys. Hosts pass validated foot contacts;
+  one actor leaving never releases a key still occupied by another actor.")
+
+(defn initial-state [] {:actors {} :counts {} :serial 0})
+(defn transition [state actor key]
+  (let [old (get-in state [:actors actor])]
+    (if (= old key) [state []]
+      (let [counts (:counts state)
+            next-counts (cond-> counts
+                          old (update old (fn [n] (max 0 (dec (or n 0)))))
+                          key (update key (fnil inc 0)))
+            serial (inc (:serial state))
+            events (cond-> []
+                     old (conj {:phase :up :key old :actor actor :serial serial
+                                :occupied? (pos? (get next-counts old 0))})
+                     key (conj {:phase :down :key key :actor actor :serial serial
+                                :occupied? true}))]
+        [(assoc state :actors (if key (assoc (:actors state) actor key)
+                                (dissoc (:actors state) actor))
+                      :counts next-counts :serial serial) events]))))
+
+(defn sample-index [key serial variants]
+  (mod (+ (* 3 key) serial) (max 1 variants)))
+
+(defn foot-contact
+  "Box sensor with feet-origin metres. Jumping above the plate is not contact."
+  [plates [x y z]]
+  (:id (first (filter (fn [{[px py pz] :pos [w _ d] :size}]
+                       (and (<= (Math/abs (- x px)) (/ w 2))
+                            (<= (Math/abs (- z pz)) (/ d 2))
+                            (<= (- py 0.15) y (+ py 0.25)))) plates))))

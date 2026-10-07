@@ -21,7 +21,8 @@
             [kami.gameplay.world-test]
             [kami.gameplay.data-test]
             [kami.gameplay.world3d-test]
-            [kami.gameplay.presentation-test]))
+            [kami.gameplay.presentation-test]
+            [kami.gameplay.key-contacts-test]))
 
 (def ^:private minimum-tests
   "Evidence floor. Raise it when the suite grows; never lower it to make a run
@@ -54,4 +55,5 @@
              'kami.gameplay.world-test
              'kami.gameplay.data-test
              'kami.gameplay.world3d-test
-             'kami.gameplay.presentation-test)
+             'kami.gameplay.presentation-test
+             'kami.gameplay.key-contacts-test)

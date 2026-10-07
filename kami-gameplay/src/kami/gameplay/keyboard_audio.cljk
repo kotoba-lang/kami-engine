@@ -1,0 +1,23 @@
+(ns kami.gameplay.keyboard-audio
+  "Deterministic procedural pressure/release transients. Browser buffers and
+  Roblox PCM exports use the same recipe; these are synthesized, not recordings.")
+
+(def variants 5)
+(defn recipe [phase variant]
+  (let [v (mod variant variants) up? (= phase :up)]
+    {:duration (if up? 0.085 0.14) :frequency (+ (if up? 470 165) (* v 13))
+     :decay (if up? 62 37) :gain (if up? 0.18 0.32) :seed (+ 29 (* v 19))}))
+(defn samples [phase variant sample-rate]
+  (let [{:keys [duration frequency decay gain seed]} (recipe phase variant)]
+    (loop [i 0 rng seed filtered 0.0 out []]
+      (if (>= i (int (* duration sample-rate))) out
+        (let [next-rng (mod (+ (* rng 16807) 31) 2147483647)
+              noise (- (* 2 (/ next-rng 2147483647.0)) 1)
+              low (+ (* 0.76 filtered) (* 0.24 noise))
+              t (/ i sample-rate)
+              attack (min 1 (/ t 0.0015))
+              envelope (* gain attack (Math/exp (* (- decay) t)))
+              body (+ (* 0.52 (Math/sin (* 2 Math/PI frequency t)))
+                      (* 0.19 (Math/sin (* 2 Math/PI (* frequency 2.71) t)))
+                      (* 0.64 low) (* 0.08 noise))]
+          (recur (inc i) next-rng low (conj out (* envelope body))))))))
