@@ -19,12 +19,13 @@
             [kami.gameplay.ai-test]
             [kami.gameplay.match-test]
             [kami.gameplay.world-test]
-            [kami.gameplay.data-test]))
+            [kami.gameplay.data-test]
+            [kami.gameplay.world3d-test]))
 
 (def ^:private minimum-tests
   "Evidence floor. Raise it when the suite grows; never lower it to make a run
   pass."
-  60)
+  65)
 
 (defmethod t/report [:cljs.test/default :end-run-tests] [m]
   (let [ran (+ (:pass m) (:fail m) (:error m))]
@@ -50,4 +51,5 @@
              'kami.gameplay.ai-test
              'kami.gameplay.match-test
              'kami.gameplay.world-test
-             'kami.gameplay.data-test)
+             'kami.gameplay.data-test
+             'kami.gameplay.world3d-test)

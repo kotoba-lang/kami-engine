@@ -1,0 +1,42 @@
+(ns kami.gameplay.world3d-test
+  (:require [clojure.test :refer [deftest is]] [kami.gameplay.world3d :as w]))
+(def ground {:pos [0 -1 0] :size [40 1 40] :solid? true})
+(def scene {:spawn [0 0 0] :instances [ground]})
+(defn advance [world s input n] (nth (iterate #(w/step world % input 0.016) s) n))
+(deftest walk-and-diagonal-speed
+  (let [s (w/initial-state scene) straight (advance scene s {:move [0 1]} 60)
+        diagonal (advance scene s {:move [1 1]} 60)]
+    (is (< (Math/abs (- -5.76 (get-in straight [:position 2]))) 0.001))
+    (is (< (Math/abs (- 5.76 (Math/sqrt (reduce + (map #(* % %) (:position diagonal)))))) 0.001))
+    (is (:grounded? straight))))
+(deftest jump-ceiling-and-release
+  (let [s (advance scene (w/initial-state scene) {} 1)
+        jumped (w/step scene s {:jump? true} 0.016)
+        held (advance scene jumped {:jump? true} 100)
+        ceiling (assoc scene :instances [ground {:pos [0 2.1 0] :size [4 1 4] :solid? true}])]
+    (is (> (second (:position jumped)) 0))
+    (is (:grounded? held))
+    (is (== 0.0 (second (:position held))) "held jump does not auto-bounce")
+    (is (> (second (:position (w/step scene (w/step scene held {} 0.016) {:jump? true} 0.016))) 0))
+    (is (<= (second (:position (advance ceiling s {:jump? true} 12))) 0.300001))))
+(deftest wall-and-raised-platform
+  (let [world (assoc scene :instances [ground {:pos [0 0 -2] :size [4 3 0.1] :solid? true}])
+        hit (advance world (w/initial-state world) {:move [0 1]} 150)
+        platform (assoc scene :spawn [0 5 0] :instances [ground {:pos [0 0 0] :size [4 2 4] :solid? true}])
+        landed (advance platform (w/initial-state platform) {} 120)]
+    (is (>= (get-in hit [:position 2]) -1.570001))
+    (is (== 2.0 (get-in landed [:position 1])))
+    (is (:grounded? landed))))
+(deftest camera-and-proximity-use-third-axis
+  (let [world (assoc scene :instances [ground {:pos [0 0 3] :size [4 5 0.5] :solid? true}]
+                     :interactions [{:id :above :pos [0 10 0]} {:id :near :pos [0 1 2]}])
+        s (w/initial-state world)]
+    (is (< (get-in (w/camera world s) [:eye 2]) 2.75))
+    (is (= :near (:id (w/nearby world s))))
+    (is (nil? (w/nearby (assoc world :interactions [{:id :above :pos [0 10 0]}]) s)))
+    (is (> (get-in (w/camera scene (assoc s :camera-yaw 1.5)) [:eye 0]) 5))))
+(deftest resume-and-respawn
+  (let [s (w/initial-state scene)]
+    (is (< (Math/abs (get-in (w/step scene s {:move [0 1]} 100) [:position 2])) 0.61))
+    (is (= (:spawn scene) (:position (w/step scene (assoc s :position [0 -50 0]) {} 0.016))))
+    (is (= 7 (count (:instances (w/render-ir scene s 0 false)))))))
