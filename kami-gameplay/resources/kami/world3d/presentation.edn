@@ -23,4 +23,10 @@
   :step {:duration-ms 150 :audio [{:wave "triangle" :freq 90 :to 55 :dur 0.06 :gain 0.035 :bus :sfx}]}
   :jump {:duration-ms 450 :audio [{:wave "sine" :freq 180 :to 360 :dur 0.15 :gain 0.04 :bus :sfx}] :effect {:count 6 :radius 0.8 :color [0.8 0.85 0.75]}}
   :land {:duration-ms 300 :audio [{:wave "triangle" :freq 100 :to 45 :dur 0.1 :gain 0.04 :bus :sfx}] :effect {:count 6 :radius 1 :color [0.8 0.85 0.75]}}}
- :roblox-asset-ids {}}
+ :roblox-asset-ids {:attack 84808472936525 :comfort 139449846394469
+                   :cut 106908384747611 :discover 90637720542952
+                   :jump 82921551103262 :land 89744586661427
+                   :miss 113822339084548 :motion 82160484653129
+                   :music-connected 82819378945714 :music-observe 105121679472426
+                   :music-rescued 124911487025553 :reassure 118561842334288
+                   :step 98151275183554 :sync 87674706181799 :touch 96027581045007}}

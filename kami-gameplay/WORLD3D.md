@@ -69,9 +69,11 @@ required host controls; reduced motion retains color and timing information.
 The browser consumer routes synth nodes through the existing audio runtime's
 music/sfx mixer and HRTF spatial panners, releasing nodes on completion.
 Roblox executes native local Sound/Tween/Part effects from the same bank.
-Its audio requires uploaded assets: the game build generates 15 PCM WAVs and
-an explicit missing-ID map. It must not claim Roblox sound is playable before
-IDs/experience permissions and an actual client session are verified.
+The shared bank now contains 15 audio asset IDs uploaded by `jun784_roblox`.
+All 15 loaded with positive TimeLength in Roblox Studio 0.741.19.7411056
+on 2026-10-07. The observe arrangement was IsPlaying with volume 0.21.
+Experience creation and permission verification, standalone client playback,
+and human listening remain pending; Studio loading is not publication evidence.
 
 Validation: portable presentation tests cover one-shot timing, delayed events,
 expiration/budgets, reduced motion and arrangement. Browser host graph tests
