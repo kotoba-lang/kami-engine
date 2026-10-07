@@ -68,3 +68,11 @@ The default path should not contain `Cargo.toml`, `Cargo.lock`, `.rs`,
 - Moved `kami-webgpu-rs` WGSL assets to `fixtures/webgpu-rs-shaders/` (runtime is `webgpu`).
 - Removed 1–2 file README stubs that duplicate standalone scene/app repos.
 - Kept: `kami-engine-clj/`, `kami-render/` shaders, `kami-ui-sdk/` JS, scene data that is still asset-authoritative here, `wit/`, `fixtures/`.
+
+## Walkable 3D worlds
+
+The portable gameplay layer now includes `kami.gameplay.world3d`: camera-relative
+walking, jump/gravity, static box collision, orbit camera with wall avoidance,
+3D proximity interactions and a replaceable block avatar. The EDN station
+example feeds the existing WebGPU/WebGL2 render-IR executor; no Canvas2D
+renderer is added. See [kami-gameplay/WORLD3D.md](kami-gameplay/WORLD3D.md).

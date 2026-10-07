@@ -1,0 +1,115 @@
+(ns kami.gameplay.world3d
+  "Portable third-person world controller. Positions use feet-origin metres;
+  authored box instances also provide static collision. Pure data in/out; the
+  host supplies input and submits render-ir to the existing Kami renderer."
+  (:require [kami.gameplay.vec3 :as v]))
+
+(def defaults {:speed 6.0 :radius 0.38 :height 1.8 :gravity 24.0 :jump-speed 9.0
+               :camera-distance 7.0 :camera-pitch 0.35 :interaction-radius 3.0})
+(defn- clamp [x lo hi] (max lo (min hi x)))
+(defn initial-state [world]
+  {:position (:spawn world [0 0 0]) :velocity-y 0.0 :grounded? false
+   :yaw 0.0 :camera-yaw 0.0 :camera-pitch (:camera-pitch (merge defaults (:controller world)))
+   :camera-distance (:camera-distance (merge defaults (:controller world))) :jump-held? false})
+(defn- box-bounds [{[x y z] :pos [w h d] :size}]
+  [[(- x (/ w 2)) y (- z (/ d 2))] [(+ x (/ w 2)) (+ y h) (+ z (/ d 2))]])
+(defn- overlaps? [p r h box]
+  (let [[lo hi] (box-bounds box) [x y z] p]
+    (and (> (+ x r) (lo 0)) (< (- x r) (hi 0))
+         (> (+ y h) (+ (lo 1) 0.000001)) (< y (- (hi 1) 0.000001))
+         (> (+ z r) (lo 2)) (< (- z r) (hi 2)))))
+(defn- move-axis [p delta axis r h boxes]
+  ;; Clamp against the first crossed face, retaining tangential movement.
+  (reduce (fn [q b]
+            (if (overlaps? q r h b)
+              (let [[lo hi] (box-bounds b) extent (if (= axis 1) h r)]
+                (assoc q axis (if (pos? delta) (- (lo axis) extent)
+                                 (+ (hi axis) (if (= axis 1) 0 r))))) q))
+          (update p axis + delta) boxes))
+(defn step
+  "Advance with camera-relative :move [right forward], :look [yaw pitch],
+  edge-triggered :jump? and :zoom. dt is seconds, capped at 0.1 after tab stalls.
+  Physics substeps prevent crossing thin static boxes at the default walk speed.
+  Collision is axis-aligned boxes; moving bodies and slopes need physics adapters."
+  [world state input dt]
+  (let [cfg (merge defaults (:controller world))
+        yaw (+ (:camera-yaw state) (first (:look input [0 0])))
+        pitch (clamp (+ (:camera-pitch state) (second (:look input [0 0]))) -0.1 1.2)
+        distance (clamp (+ (:camera-distance state) (:zoom input 0)) 2.0 14.0)
+        [rx fz] (:move input [0 0])
+        len (max 1.0 (Math/sqrt (+ (* rx rx) (* fz fz))))
+        dx (/ (- (* rx (Math/cos yaw)) (* fz (Math/sin yaw))) len)
+        dz (/ (- (* (- rx) (Math/sin yaw)) (* fz (Math/cos yaw))) len)
+        seconds (clamp dt 0.0 0.1) steps (max 1 (int (Math/ceil (/ seconds 0.008))))
+        slice (/ seconds steps)
+        boxes (filter #(true? (:solid? %)) (:instances world))
+        jump (and (:jump? input) (not (:jump-held? state)) (:grounded? state))
+        start (assoc state :camera-yaw yaw :camera-pitch pitch :camera-distance distance
+                     :jump-held? (boolean (:jump? input))
+                     :velocity-y (if jump (:jump-speed cfg) (:velocity-y state))
+                     :yaw (if (> (+ (* dx dx) (* dz dz)) 0.001) (Math/atan2 dx dz) (:yaw state)))
+        result (loop [s start i 0]
+                 (if (= i steps) s
+                   (let [vy (- (:velocity-y s) (* (:gravity cfg) slice))
+                         p (:position s)
+                         px (move-axis p (* dx (:speed cfg) slice) 0 (:radius cfg) (:height cfg) boxes)
+                         pz (move-axis px (* dz (:speed cfg) slice) 2 (:radius cfg) (:height cfg) boxes)
+                         py (move-axis pz (* vy slice) 1 (:radius cfg) (:height cfg) boxes)
+                         hit (not= (py 1) (+ (pz 1) (* vy slice)))]
+                     (recur (assoc s :position py :velocity-y (if hit 0.0 vy)
+                                   :grounded? (and hit (neg? vy))) (inc i)))))]
+    (if (< (second (:position result)) (:respawn-y world -30))
+      (assoc result :position (:spawn world [0 0 0]) :velocity-y 0.0 :grounded? false)
+      result)))
+
+(defn- segment-hit [a b box padding]
+  (let [[lo hi] (box-bounds box) d (v/sub b a)]
+    (loop [axis 0 near 0.0 far 1.0]
+      (if (= axis 3) near
+        (let [mn (- (lo axis) padding) mx (+ (hi axis) padding) origin (a axis) dir (d axis)]
+          (if (< (Math/abs dir) 1e-9)
+            (when (<= mn origin mx) (recur (inc axis) near far))
+            (let [t1 (/ (- mn origin) dir) t2 (/ (- mx origin) dir)
+                  n (max near (min t1 t2)) f (min far (max t1 t2))]
+              (when (<= n f) (recur (inc axis) n f)))))))))
+(defn camera
+  "Perspective orbit camera, shortened before static obstacles. No fixed overview."
+  [world state]
+  (let [target (v/add (:position state) [0 1.5 0])
+        yaw (:camera-yaw state) pitch (:camera-pitch state) distance (:camera-distance state)
+        desired (v/add target [(* distance (Math/sin yaw) (Math/cos pitch))
+                               (* distance (Math/sin pitch))
+                               (* distance (Math/cos yaw) (Math/cos pitch))])
+        t (reduce min 1.0 (keep #(when (:solid? %) (segment-hit target desired % 0.18)) (:instances world)))
+        length (v/dist target desired)
+        safe (max 0.0 (- t (/ 0.12 length)))]
+    {:eye (v/lerp target desired safe) :target target :fov 60}))
+(defn nearby
+  "Nearest interaction inside a TRUE 3D radius, with stable ID tie breaking."
+  [world state]
+  (let [origin (v/add (:position state) [0 1 0])
+        radius (:interaction-radius (merge defaults (:controller world)))]
+    (first (sort-by (juxt :distance #(str (:id %)))
+                   (keep (fn [object]
+                           (let [d (v/dist origin (:pos object))]
+                             (when (<= d radius) (assoc object :distance d)))) (:interactions world))))))
+(defn avatar-instances
+  "Six-piece block avatar in world space, animated by locomotion. Replace this
+  presentation with an authored/skinned rig without replacing the controller."
+  [state time walking?]
+  (let [[x y z] (:position state) yaw (:yaw state)
+        limb (* (if walking? 0.22 0.0) (Math/sin (* time 12)))
+        part (fn [offset size color]
+               (let [[ox oy oz] offset]
+                 {:pos [(+ x (* ox (Math/cos yaw)) (* oz (Math/sin yaw))) (+ y oy)
+                        (+ z (* (- ox) (Math/sin yaw)) (* oz (Math/cos yaw)))]
+                  :size size :yaw yaw :color color :roughness 0.8 :geo :box}))]
+    [(part [0 1.4 0] [0.65 0.55 0.65] [0.97 0.77 0.52])
+     (part [0 0.65 0] [0.8 0.75 0.45] [0.18 0.49 0.71])
+     (part [-0.56 0.65 limb] [0.28 0.75 0.3] [0.97 0.77 0.52])
+     (part [0.56 0.65 (- limb)] [0.28 0.75 0.3] [0.97 0.77 0.52])
+     (part [-0.22 0 (- limb)] [0.32 0.65 0.38] [0.14 0.22 0.31])
+     (part [0.22 0 limb] [0.32 0.65 0.38] [0.14 0.22 0.31])]))
+(defn render-ir [world state time walking?]
+  {:globals (merge (:globals world) (camera world state))
+   :instances (into (vec (:instances world)) (avatar-instances state time walking?))})
