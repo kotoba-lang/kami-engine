@@ -1,0 +1,19 @@
+(ns kami.gameplay.key-contacts-test
+  (:require [clojure.test :refer [deftest is]] [kami.gameplay.key-contacts :as k]))
+(deftest occupancy-and-reentry
+  (let [[a ae] (k/transition (k/initial-state) :a 0)
+        [held he] (k/transition a :a 0)
+        [b _] (k/transition held :b 0)
+        [left le] (k/transition b :a nil)
+        [empty ee] (k/transition left :b nil)
+        [_ again] (k/transition empty :a 0)]
+    (is (= :down (:phase (first ae))))
+    (is (= a held)) (is (empty? he))
+    (is (:occupied? (first le)))
+    (is (false? (:occupied? (first ee))))
+    (is (= :down (:phase (first again))))))
+(deftest contact-requires-foot-height
+  (let [p [{:id 0 :pos [0 0 0] :size [3 0.2 3]}]]
+    (is (= 0 (k/foot-contact p [0 0 0])))
+    (is (nil? (k/foot-contact p [0 2 0])))
+    (is (nil? (k/foot-contact p [2 0 0])))))
