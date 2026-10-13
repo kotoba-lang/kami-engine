@@ -46,10 +46,10 @@ were renamed to `.cljk` on 2026-09-11 (`cljk-origin.edn`).
 | `kami-text/` | fonts and the macOS emoji raster helper |
 | `kami-app-sip-clj/`, `kami-mangaka-reader-clj/dist/`, `kami-clj-host/demo/` | built web artifacts and demos |
 | `kami-flow/graph/` | graph-ingest assets for `graph.etzhayyim.com` |
-| `kami-web/`, `kami-ui-sdk/`, `kami-engine-guest/`, `kami-mangaka-*-clj/` | pointer READMEs only — the code moved to its own repo; do not restore a nested tree |
+| `kami-web/`, `kami-ui-sdk/`, `kami-engine-guest/`, `kami-mangaka-*-clj/` | pointer READMEs only — the code moved to its own repo; do not restore a nested tree. Exception: `kami-mangaka-reader-clj/` has no README and keeps only its built `dist/` (`reader.js`, `manifest.edn`) |
 | `kami-engine-sdk` | gitlink (no `.gitmodules`); the SDK is a separate repo |
 | `hermes/` | resident-bot profiles for this repo |
-| `scripts/` | gates (`wit_test.cljk`, `check_adapter_registry.cljk`, `guest_lint.cljk`), task runner (`run-task.cljk` + `tasks.edn`) |
+| `scripts/` | gates (`wit_test.cljk`, `check_adapter_registry.cljk`, `guest_lint.cljk`), task runner (`run-task.cljk` + `scripts/tasks.edn`) |
 | `edn-datomize.cljk`, `schema.edn` | EDN → datom conversion; `schema.edn` is generated |
 | `90-docs/adr/` | repo-local ADRs (0032–0048) |
 
@@ -59,21 +59,24 @@ were renamed to `.cljk` on 2026-09-11 (`cljk-origin.edn`).
 kbb -M scripts/wit_test.cljk               # EDN IDL == world.wit, every host fn documented
 kbb -M scripts/wit_test.cljk --gen         # print world.wit regenerated from the EDN
 kbb -M scripts/check_adapter_registry.cljk # docs/adapter-registry.edn is well-formed
+kbb -M scripts/guest_lint.cljk             # every kami-clj game stays inside wit/guest-bindings.edn
 kbb -M:test                                # kami-gameplay suite from the root deps.edn
 (cd kami-gameplay && kbb -M:test)          # same suite, JVM-shaped
 (cd kami-gameplay && kbb --backend sci bin/run_tests.cljk)   # same suite under Node
 (cd kami-render && kbb -M:test)
 (cd kami-physics && kbb -M:test)
-kbb --backend sci scripts/run-task.cljk    # lists registered tasks (also `npm run task <name>`)
+kbb --backend sci scripts/run-task.cljk wit-check   # run a registered task by name
 ```
 
-CI (`.github/workflows/ci.yml`) runs the WIT and adapter-registry gates and a
-guard that fails on any `Cargo.toml`, `Cargo.lock`, `*.rs`, `rust-toolchain*`
-or `.cargo/` file.
+`kbb --backend sci scripts/run-task.cljk` with no task prints the registered
+task names (`scripts/tasks.edn`) and exits 2.
 
-`scripts/guest_lint.cljk` currently refuses to report (exit 3): it looks for
-`logic.clj`, and the games are now `logic.cljk`. `scripts/test-*.sh` drive the
-removed Rust crates and do not run.
+CI (`.github/workflows/ci.yml`) installs kbb with `kotoba-lang/setup-kbb` and
+runs the WIT, adapter-registry and guest-lint gates, plus a guard that fails on
+any `Cargo.toml`, `Cargo.lock`, `*.rs`, `rust-toolchain*` or `.cargo/` file.
+CI does not run the gameplay/render/physics suites.
+
+`scripts/test-*.sh` drive the removed Rust crates and do not run.
 
 ## Rules
 
@@ -82,7 +85,8 @@ removed Rust crates and do not run.
 - No Rust in this repo. Native backends go in adapter repos registered in
   `docs/adapter-registry.edn`.
 - Moved sub-projects (`kami-web`, `kami-ui-sdk`, `kami-engine-guest`,
-  `kami-mangaka-*`) keep only their pointer README here. `kami-ui-sdk` JS is
+  `kami-mangaka-*`) keep only their pointer README here
+  (`kami-mangaka-reader-clj` keeps only its built `dist/`). `kami-ui-sdk` JS is
   retired: CLJC lives in `kotoba-lang/kami-engine-app-sdk`, the game host
   surface in `kotoba-lang/host`.
 - Root `deps.edn` keeps `:paths []`: consumers point `:local/root` here, and a
@@ -98,8 +102,8 @@ removed Rust crates and do not run.
   the EDN (including the `:doc` prose), then regenerate `world.wit`. Never
   hand-edit `world.wit` alone.
 - Guest code has integer-only arithmetic and no math library (no sin, cos,
-  sqrt, min, max, or float compare). A host function must not expect the
-  guest to compute a float. Add it in the `move-toward`/`spawn-ring` shape and
+  sqrt, or float compare; `min`, `max` and `clamp` exist but only on
+  integers). A host function must not expect the guest to compute a float. Add it in the `move-toward`/`spawn-ring` shape and
   record it in `wit/guest-bindings.edn`.
 - `kami.render.capture-lifecycle` consumes WebGPU's
   `:kotoba.webgpu/capture-presence-evidence-v2`. Adapters must not rename or

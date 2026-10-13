@@ -26,7 +26,7 @@
  :gameplay-test {:cmd ["kbb" "-M:test"]
                  :dir "kami-gameplay"
                  :doc "kami-gameplay suite on the JVM."}
- :gameplay-test-node {:cmd ["npx" "--yes" "nbb" "bin/run_tests.cljs"]
+ :gameplay-test-node {:cmd ["kbb" "--backend" "sci" "bin/run_tests.cljk"]
                       :dir "kami-gameplay"
                       :doc (str "The same suite under Node. Not a convenience: "
                                 "cross-platform bit-identical arithmetic is a load-bearing "

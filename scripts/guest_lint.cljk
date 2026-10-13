@@ -86,9 +86,9 @@
     @named))
 
 (defn lint-game [dir]
-  (let [f (io/file dir "logic.clj")]
+  (let [f (io/file dir "logic.cljk")]
     (when-not (.exists f)
-      (throw (ex-info "no logic.clj — refusing to report a pass on an absent game"
+      (throw (ex-info "no logic.cljk — refusing to report a pass on an absent game"
                       {:dir (str dir)})))
     (let [fs (forms f)
           local (defined fs)
@@ -121,8 +121,8 @@
       (->> (concat (.listFiles (io/file "kami-clj-play3d/games"))
                    (.listFiles (io/file "kami-clj-play/games")))
            (filter #(.isDirectory %))
-           (filter #(.exists (io/file % "logic.clj")))
-           sort))))
+           (filter #(.exists (io/file % "logic.cljk")))
+           (sort-by str)))))
 
 (println "── kami-clj guest vocabulary ──")
 (println (format "  declared: %d host bindings, %d core forms"
