@@ -67,7 +67,7 @@ The default path should not contain `Cargo.toml`, `Cargo.lock`, `.rs`,
 - Removed nested `kami-engine-sdk-clj/` (standalone `kotoba-lang/kami-engine-sdk`, formerly `kami-engine-sdk-clj`, is SSoT).
 - Moved `kami-webgpu-rs` WGSL assets to `fixtures/webgpu-rs-shaders/` (runtime is `webgpu`).
 - Removed 1–2 file README stubs that duplicate standalone scene/app repos.
-- Kept: `kami-engine-clj/`, `kami-render/` shaders, `kami-ui-sdk/` JS, scene data that is still asset-authoritative here, `wit/`, `fixtures/`.
+- Kept: `kami-render/` shaders, scene data that is still asset-authoritative here, `wit/`, `fixtures/`. `kami-ui-sdk/` remains only as a pointer README (its JS is retired, see the note above); `kami-engine-clj` moved to `kotoba-lang/kami-engine-guest` (pointer README in `kami-engine-guest/`).
 
 ## Walkable 3D worlds
 
