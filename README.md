@@ -64,7 +64,7 @@ The default path should not contain `Cargo.toml`, `Cargo.lock`, `.rs`,
 
 ## Nested monorepo cleanup (ADR-2607102200)
 
-- Removed nested `kami-engine-sdk-clj/` (standalone `kotoba-lang/kami-engine-sdk-clj` is SSoT).
+- Removed nested `kami-engine-sdk-clj/` (standalone `kotoba-lang/kami-engine-sdk`, formerly `kami-engine-sdk-clj`, is SSoT).
 - Moved `kami-webgpu-rs` WGSL assets to `fixtures/webgpu-rs-shaders/` (runtime is `webgpu`).
 - Removed 1–2 file README stubs that duplicate standalone scene/app repos.
 - Kept: `kami-engine-clj/`, `kami-render/` shaders, `kami-ui-sdk/` JS, scene data that is still asset-authoritative here, `wit/`, `fixtures/`.
