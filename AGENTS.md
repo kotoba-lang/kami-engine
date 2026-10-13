@@ -65,7 +65,7 @@ kbb -M:test                                # kami-gameplay suite from the root d
 (cd kami-gameplay && kbb --backend sci bin/run_tests.cljk)   # same suite under Node
 (cd kami-render && kbb -M:test)
 (cd kami-physics && kbb -M:test)
-kbb --backend sci scripts/run-task.cljk wit-check   # run a registered task by name
+kbb --backend sci scripts/run-task.cljk wit-check   # run a registered task (also `npm run task wit-check`)
 ```
 
 `kbb --backend sci scripts/run-task.cljk` with no task prints the registered
