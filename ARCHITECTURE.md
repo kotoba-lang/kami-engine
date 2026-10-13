@@ -11,7 +11,7 @@ Defines responsibility and authority boundaries across:
 - `kami-pipelines` — shared `RenderPipeline` adapters (Sky, Terrain + vegetation streaming)
 - `kami-app-{game}` — per-game crates composing engine primitives via the Builder API
 - `kami-web` — legacy monolithic WASM entries (`run_with_*`); being retired in favor of per-game crates
-- `kami-engine-sdk` — TypeScript / Svelte integration SDK
+- `kami-engine-sdk-svelte` — TypeScript / Svelte integration SDK (archived public mirror; the name `kami-engine-sdk` now belongs to the CLJ SDK / WIT contract layer)
 - `kami-ui-sdk` — framework-agnostic DOM UI utilities
 
 ## Topology (post-2026-04 migration)
@@ -60,7 +60,7 @@ Defines responsibility and authority boundaries across:
 | `kami-pipelines` | `RenderPipeline` trait impls wrapping kami-render's pipelines. Streaming chunk logic for terrain + vegetation + voxel. Voxel `raycast` (Amanatides & Woo DDA) + `break_voxel` / `set_voxel` with neighbor rebuild + `aabb_solid` / `sample_floor` collision probes. Billboard particle system (emit / burst, gravity integration, camera-facing quads). Sun/fog/time helpers. Greedy voxel meshing (Lysenko 2012, same-material quad merge). `GsplatAdapter` (3DGS preview/QC, ADR-2605092800 — multi-cloud, CPU sort, WGSL EWA covariance, ≤50k splats per cloud, consumes `kami_render::splat`/`splat_loader` PLY + `.splat` parsers; runtime delivery on `maps.etzhayyim.com` stays on baked static meshes per 260416-maps-kami-street-asset-pipeline). | Game-specific scenes, input schemes, bespoke shaders |
 | `kami-app-{game}` | Per-game composition: biome/seed/spawn choice, `wasm_bindgen` entry, game-specific pipeline authored in-crate (e.g. voxel sandbox) | Engine primitives, shared pipelines (import them) |
 | `kami-web` (legacy) | Retained WASM exports (`run_with_*`, VRM morph, RTC bindings) for endpoints not yet migrated. Being phased out as kami-app-{game} crates are added. | **New game entries must go to kami-app-{game}, NOT here** |
-| `kami-engine-sdk` | Svelte components / builders / types; contract adapters for `kami-web` or `kami-app-{game}` wasm exports | Defining engine semantics |
+| `kami-engine-sdk-svelte` | Svelte components / builders / types; contract adapters for `kami-web` or `kami-app-{game}` wasm exports | Defining engine semantics |
 | `kami-ui-sdk` | Generic DOM UI utilities (`KamiUI`, `KamiMotion`, `KamiSound`, `KamiEffect`) | VRM engine control contracts, wasm API definitions |
 
 ## Authority Rules
@@ -69,13 +69,13 @@ Defines responsibility and authority boundaries across:
 2. **Builder API surface** (`KamiApp::with_*`) is owned by `kami-app` and is a soft contract — additive changes are free, removing/renaming requires downstream impact note.
 3. **Shared pipelines** (`SkyAdapter`, `TerrainAdapter`) are owned by `kami-pipelines`. Game crates MAY author their own `impl RenderPipeline` for game-specific content (voxel, SDF character, particles). These do not need to move to kami-pipelines unless reused.
 4. **Legacy `kami-web` contract** (`run_with_*`, VRM morphs, RTC) is frozen — no new exports. Migrations happen only outward (to `kami-app-{game}`).
-5. **Motion semantics** (`evaluate_motion`, `clamp_bone`) remain in `kami-web` for backward compatibility with `kami-engine-sdk`; migration to a new crate is a separate decision.
+5. **Motion semantics** (`evaluate_motion`, `clamp_bone`) remain in `kami-web` for backward compatibility with `kami-engine-sdk-svelte`; migration to a new crate is a separate decision.
 
 ## Naming and Contract Conventions
 
 1. `kami-web` wasm exports use snake_case (`run_with_scene`).
 2. `kami-app-{game}` wasm exports use snake_case with a `v2` suffix during the migration (`run_isekai_v2`, `run_quarry_walk_v2`). The `v2` suffix can be dropped once legacy is retired.
-3. `kami-engine-sdk` may expose camelCase wrappers; mapping centralized in one place.
+3. `kami-engine-sdk-svelte` may expose camelCase wrappers; mapping centralized in one place.
 4. New wasm exports from `kami-app-{game}` crates do NOT require engine owner review (they're per-game, isolated bundles).
 5. New method on `KamiApp` builder (engine contract) DOES require engine owner review.
 
@@ -98,7 +98,7 @@ For PRs touching `kami-render`, `kami-app`, or `kami-pipelines`:
 1. Verify downstream `kami-app-{game}` crates still compile (`cargo check --workspace --target wasm32-unknown-unknown`).
 2. Verify legacy `kami-web::run_with_*` still compiles (until retired).
 3. Verify the 1m/sample invariant in `Heightmap::generate` if chunk streaming is touched.
-4. Verify `kami-engine-sdk` motion key mapping if `evaluate_motion` is touched.
+4. Verify `kami-engine-sdk-svelte` motion key mapping if `evaluate_motion` is touched.
 
 ## Migration Status (2026-04-18)
 
@@ -117,5 +117,5 @@ For PRs touching `kami-render`, `kami-app`, or `kami-pipelines`:
 ## Known Risks
 
 1. **Legacy `kami-web` ownership is split across 11 entries**; incremental migration to `kami-app-{game}` is ongoing. Don't add new entries to `kami-web`.
-2. `kami-engine-sdk` includes TypeScript fallback motions that can diverge from `kami-web::evaluate_motion` if not audited (pre-existing).
+2. `kami-engine-sdk-svelte` includes TypeScript fallback motions that can diverge from `kami-web::evaluate_motion` if not audited (pre-existing).
 3. Streaming terrain depends on `Heightmap::generate`'s hard-coded 1m/sample convention (`kami-terrain/src/heightmap.rs:53`). Changing that invalidates seamless chunk tiling.
