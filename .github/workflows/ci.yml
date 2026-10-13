@@ -4,16 +4,19 @@ on:
   pull_request:
 jobs:
   parity:
-    name: WIT single-source + no-rust guard
+    name: WIT single-source + guest lint + no-rust guard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: DeLaGuardo/setup-clojure@13.0
-        with: { bb: 'latest' }
-      - name: WIT interface — EDN IDL == world.wit == kami-clj Builtin map
-        run: bb scripts/wit_test.cljk
+      # kbb resolves the kotoba.lang.* stdlib these gates require (from
+      # nbb.edn); plain babashka has no kotoba.lang.edn and no bb.edn here.
+      - uses: kotoba-lang/setup-kbb@9df85c3572851df091ba0f42d31acccb8acd84f1
+      - name: WIT interface — EDN IDL == world.wit, every host fn documented
+        run: kbb -M scripts/wit_test.cljk
       - name: adapter registry
-        run: bb scripts/check_adapter_registry.cljk
+        run: kbb -M scripts/check_adapter_registry.cljk
+      - name: kami-clj games stay inside the guest vocabulary
+        run: kbb -M scripts/guest_lint.cljk
       - name: ensure Rust runtime files stay out
         run: |
           if find . \

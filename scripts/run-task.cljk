@@ -8,9 +8,10 @@
 (def path (js/require "node:path"))
 (def cp (js/require "node:child_process"))
 
-(defn- sh [argv]
-  (let [r (.spawnSync cp (first argv) (to-array (rest argv))
-                      #js {:encoding "utf8" :stdio "inherit" :shell false})]
+(defn- sh [argv dir]
+  (let [opts (cond-> {:encoding "utf8" :stdio "inherit" :shell false}
+               dir (assoc :cwd dir))
+        r (.spawnSync cp (first argv) (to-array (rest argv)) (clj->js opts))]
     ;; A child that never started, and one killed by a signal, BOTH report
     ;; status:null and land on the synthetic exit 1 -- with nothing printed,
     ;; because stdio is inherited and there was no child to write anything.
@@ -47,7 +48,7 @@
       (let [argv (if (:pass-args? t)
                    (into (vec (:cmd t)) rest-args)
                    (vec (:cmd t)))]
-        (sh argv))
+        (sh argv (:dir t)))
       :else
       (do (js/console.error "bad task entry" task t)
           (.exit js/process 2)))))
