@@ -14,12 +14,20 @@ document operations, retains immutable detector state and sorted press/release
 vectors, and has no JVM, CLJS/Node, device-I/O or Wasm-host dependency.
 The `.cljk` reading is preserved as migration input, not a paired final surface.
 
-The candidate is **not qualified**. The pinned self-built Amu compiler rejects
+The candidate is **not qualified**. The historical pinned Amu compiler rejects
 `document-f64-value`; isolated compiler probes also confirm that
 `document-f64`, `document-print`, and `document-read` are unsupported. Native
 f64 arithmetic itself compiled and executed in that historical trusted-C route. Keep the full
 component blocked until its required value operations are supported; no
-integer-only replacement or hosted fallback is used.
+integer-only replacement or hosted fallback is used. Amu PR #1443 now contains
+source lowering for all four operations, but it has not been compiled or run
+through the required loaderless selfhost route. No old refusal is cleared by
+the presence of those sources.
+
+Set state is sorted by document canonical-byte order before it is passed to
+the validating codec; the codec must reject unordered sets. Pressed/released
+vectors retain UTF-16 action order. The existing ordering-and-set-state group
+checks both orderings together, including different-length and Unicode actions.
 
 `maintenance/kami-input-map-native-contract.json` at the owner root records
 the API, historical refusal, toolchain and whole-component test scope. The

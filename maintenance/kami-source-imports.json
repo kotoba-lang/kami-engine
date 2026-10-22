@@ -4822,9 +4822,9 @@
         {
           "path": "packages/kotoba.kami.engine.input-map/README.md",
           "original-sha256": "31e6a8ca99566f9a6f626314f99c81809f3070360641a228fd2e40328409a0f3",
-          "rewritten-sha256": "b4078ab855bf2f6cda36f6bfb058fb93bfef75406f06e44d9da73abfa4bad869",
+          "rewritten-sha256": "637741a9e1003b3c275dd8230c3cfa796a29f3a84fdfe9fc30ecae8c35f1c3f4",
           "kind": "native-migration-documentation",
-          "reason": "Record candidate source and historical trusted-C diagnostics, retire the task-created C-loader gate from operational paths, and require current loaderless Amu selfhost closure; CLJK remains preserved migration input only."
+          "reason": "Record canonical set ordering before codec validation and upstream source lowering candidate; historical refusals remain evidence only and native qualification is open."
         }
       ],
       "config-changes": [],
@@ -4904,9 +4904,9 @@
         {
           "path": "src/input_map.kotoba",
           "mode": "100644",
-          "sha256": "2065be0409ec7248aa9711b4ef1683fede6054f0b5bf74d9d193ed54d2afe701",
+          "sha256": "b2c428a65a2b784f95fef2a6be0ec46d15a1ab938b7ed0494124ef9729dba6e1",
           "kind": "native-component-candidate",
-          "qualification": "compiler-refused; not qualified"
+          "qualification": "unqualified; upstream lowering candidate not compiled or executed"
         }
       ]
     },
@@ -14207,8 +14207,8 @@
   "native-component-contracts": [
     {
       "file": "maintenance/kami-input-map-native-contract.json",
-      "sha256": "182dffdffff03dd89d4d36a520a0f09bf3c95d3354a72cb5d189e287d36579f4",
-      "state": "unqualified; loaderless selfhost closure and native document primitives required"
+      "sha256": "2e794df230332f2aad04c04a084afb8a4fc5bef5e80572c05545582db38137d8",
+      "state": "unqualified; connected upstream source lowering still requires complete loaderless selfhost and component execution"
     }
   ]
 }

@@ -2,11 +2,11 @@
   "schema": "kotoba.kami.input-map-native-contract.v1",
   "source-id": "kotoba.kami.engine.inputMap",
   "namespace": "input-map",
-  "state": "candidate source implemented; self-built compiler refuses required primitives; native qualification not achieved",
+  "state": "native source candidate updated; historical compiler refusal retained; upstream source lowering uncompiled and unqualified",
   "owner-main-qualified": false,
   "runtime-admission": "not-granted",
   "source": "packages/kotoba.kami.engine.input-map/src/input_map.kotoba",
-  "source-sha256": "2065be0409ec7248aa9711b4ef1683fede6054f0b5bf74d9d193ed54d2afe701",
+  "source-sha256": "b2c428a65a2b784f95fef2a6be0ec46d15a1ab938b7ed0494124ef9729dba6e1",
   "public-API": [
     {
       "name": "stick",
@@ -138,7 +138,7 @@
       }
     ]
   },
-  "next-required-work": "Support these language-owned native document operations in the separate Amu owner; rerun complete component compile/link/run and refusals; review all public contracts and merged owner main before retirement",
+  "next-required-work": "Qualify upstream document source lowering through complete loaderless Amu selfhost, then compile/link/run the complete five-API input-map component and all semantic/input/fuel controls. No repository retirement before merged owner-main evidence.",
   "tracking": [
     "https://linear.app/com-junkawasaki/issue/JUN-198",
     "https://linear.app/com-junkawasaki/issue/JUN-269",
@@ -146,23 +146,23 @@
   ],
   "current-upstream-source-observation": {
     "repository": "kotoba-lang/amu",
-    "main": "7872d10f587a2d4a0b92bc124037915e34c0cf26",
+    "main": "5c5d9bced26393b2f78dd59c167af640f70a807a",
     "path": "seed/21-check.kotoba",
     "git-blob": "2328702571350e8bcde7652e6d5b5e51faa4c248",
     "sha256": "4228b2afeb923ea0cf5dd6e07205b03716ff830cbea340b1b231eef38dd9ba2f",
-    "identical-to-qualified-pin": true,
     "symbol-occurrences": {
       "document-f64": 0,
       "document-f64-value": 0,
       "document-print": 0,
       "document-read": 0
     },
-    "qualification": "current source observation only; exact runtime refusals measured with pinned self-built G3"
+    "qualification": "source observation only; historical trusted-C refusal diagnostics do not qualify the current candidate",
+    "identical-to-historical-diagnostic-pin": true
   },
   "evidence-classification": "Historical trusted-C supervisor diagnostics only; not current native/selfhost/Q9/CDCI qualification",
   "current-acceptance": {
     "policy-repository": "kotoba-lang/amu",
-    "policy-commit": "7872d10f587a2d4a0b92bc124037915e34c0cf26",
+    "policy-commit": "5c5d9bced26393b2f78dd59c167af640f70a807a",
     "policy-paths": [
       "AGENTS.md",
       "docs/selfhost-priority.md"
@@ -175,7 +175,16 @@
   "upstream-implementation-candidate": {
     "repository": "kotoba-lang/amu",
     "pull-request": 1443,
-    "head": "f2e60a75caa753dfb05dd66572c4310062b2eda6",
-    "scope": "Kotoba binary64 text core and native corpus; unexecuted/unqualified, primitive lowering not integrated"
+    "head": "56845739b1484630ac3f045c741d31c156f86be1",
+    "scope": "source lowering connected for document-f64/document-f64-value/document-print/document-read; thirteen wire anchors and eighteen refusal entries; native type/build/run not performed",
+    "source-contract": "seed/runtime/document-runtime.json",
+    "qualification": "not achieved"
+  },
+  "set-state-ordering": {
+    "source": "document-vector-sort before EDN set reframe and codec validation",
+    "reason": "document-read/print validate canonical order; they must not silently repair unordered sets",
+    "action-vectors": "UTF-16 lexical order unchanged",
+    "existing-semantic-group": "ordering-and-set-state",
+    "execution": "not run on qualified native route"
   }
 }

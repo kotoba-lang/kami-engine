@@ -111,11 +111,11 @@
       (let [x (at a i)]
         (recur (+ i 1) (if (member? b x) out (document-vector-conj out x)))))))
 (defn- action-set [v :document] :document
-  (let [s (document-edn-print v)
+  (let [s (document-edn-print (document-vector-sort v))
         value (document-edn-read
                 (string-concat "#{" (string-concat (string-substring s 1 (- (string-length s) 1)) "}")))]
-    ;; Round-trip through the language canonical codec: set order is canonical
-    ;; byte order, while pressed/released vectors retain lexical action order.
+    ;; A set must already have canonical byte order before the codec validates
+    ;; it. Pressed/released vectors retain their separate UTF-16 action order.
     (document-read (document-print value))))
 
 (defn button-edges [] :document

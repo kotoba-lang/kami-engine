@@ -1,6 +1,6 @@
 {
   "schema": "kotoba.kami.native-migration-inventory.v1",
-  "authority": "2026-10-22 owner steering: remove JVM and CLJS/Node dependence; Kotoba is primary, CLJK remains compatibility input",
+  "authority": "2026-10-22 owner steering: canonical Kotoba; remove JVM/CLJS/Node and C dependencies; CLJK is preserved migration input only",
   "owner-base": "c7f86b7de720976f9b0083018d16e721b1fd94ba",
   "catalog-head": "e570ec69a0c66302c6520a6b2cab56bc63620d72",
   "state": "incomplete; source co-location and hosted oracle results do not satisfy native migration",
@@ -31,7 +31,8 @@
     "whole-component-native-proofs-recorded-in-this-wave": 0,
     "native-source-files": 5,
     "projects-with-native-source": 4,
-    "candidate-components-compiler-refused": 1
+    "candidate-components-compiler-refused": 1,
+    "compiler-refusal-count-scope": "historical recorded toolchain; updated source candidates remain uncompiled"
   },
   "projects": [
     {
@@ -476,11 +477,11 @@
       "native-sources": [
         {
           "path": "packages/kotoba.kami.engine.input-map/src/input_map.kotoba",
-          "sha256": "2065be0409ec7248aa9711b4ef1683fede6054f0b5bf74d9d193ed54d2afe701"
+          "sha256": "b2c428a65a2b784f95fef2a6be0ec46d15a1ab938b7ed0494124ef9729dba6e1"
         }
       ],
       "native-component-proof": "not-recorded-in-this-wave",
-      "native-status": "candidate-compiler-refused",
+      "native-status": "candidate-source-lowering-upstream; native qualification open",
       "compatibility-source-does-not-prove-native-migration": true,
       "native-contract": "maintenance/kami-input-map-native-contract.json",
       "required-compiler-primitives": [
