@@ -27,8 +27,9 @@
   "summary": {
     "projects": 70,
     "whole-component-native-proofs-recorded-in-this-wave": 0,
-    "native-source-files": 4,
-    "projects-with-native-source": 3
+    "native-source-files": 5,
+    "projects-with-native-source": 4,
+    "candidate-components-compiler-refused": 1
   },
   "projects": [
     {
@@ -464,16 +465,28 @@
         "test"
       ],
       "source-file-counts": {
-        ".kotoba": 0,
+        ".kotoba": 1,
         ".cljk": 3,
         ".clj": 0,
         ".cljc": 0,
         ".cljs": 0
       },
-      "native-sources": [],
+      "native-sources": [
+        {
+          "path": "packages/kotoba.kami.engine.input-map/src/input_map.kotoba",
+          "sha256": "2065be0409ec7248aa9711b4ef1683fede6054f0b5bf74d9d193ed54d2afe701"
+        }
+      ],
       "native-component-proof": "not-recorded-in-this-wave",
-      "native-status": "unverified",
-      "compatibility-source-does-not-prove-native-migration": true
+      "native-status": "candidate-compiler-refused",
+      "compatibility-source-does-not-prove-native-migration": true,
+      "native-contract": "maintenance/kami-input-map-native-contract.json",
+      "required-compiler-primitives": [
+        "document-f64",
+        "document-f64-value",
+        "document-print",
+        "document-read"
+      ]
     },
     {
       "id": "kotoba.kami.engine.modeling",

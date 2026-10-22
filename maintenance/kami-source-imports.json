@@ -4818,7 +4818,15 @@
       "source-id": "kotoba.kami.engine.inputMap",
       "commit": "9841302680163b7aafb760cd1d21de809d172084",
       "tree": "b1fd3cfe77b90a1c57b7f9b35d8c9d380d685655",
-      "source-and-test-changes": [],
+      "source-and-test-changes": [
+        {
+          "path": "packages/kotoba.kami.engine.input-map/README.md",
+          "original-sha256": "31e6a8ca99566f9a6f626314f99c81809f3070360641a228fd2e40328409a0f3",
+          "rewritten-sha256": "55cd115a86f80191c8d9994b09f80adf8d511d508b6cd8d665e4f17b50b70a10",
+          "kind": "native-migration-documentation",
+          "reason": "Record allfive candidate operations, required selfhost primitives and actual refusal; retained historical CLJK source/APIs/tests are unchanged."
+        }
+      ],
       "config-changes": [],
       "original-files": [
         {
@@ -4890,6 +4898,15 @@
           "git-blob": "b92727f12dde0a3d4fb97a3f4dac49440c532f24",
           "sha256": "5e31b69e00b2fa0f1c4344bd47964173aae8d4439118951f3133c41190655576",
           "bytes": 968
+        }
+      ],
+      "added-files": [
+        {
+          "path": "src/input_map.kotoba",
+          "mode": "100644",
+          "sha256": "2065be0409ec7248aa9711b4ef1683fede6054f0b5bf74d9d193ed54d2afe701",
+          "kind": "native-component-candidate",
+          "qualification": "compiler-refused; not qualified"
         }
       ]
     },
@@ -14186,5 +14203,12 @@
       "kind": "public-source-import-probe"
     }
   ],
-  "test-host-matrix": "maintenance/kami-test-hosts.json"
+  "test-host-matrix": "maintenance/kami-test-hosts.json",
+  "native-component-contracts": [
+    {
+      "file": "maintenance/kami-input-map-native-contract.json",
+      "sha256": "c692a8784d74548cf030eb9f3b9e4175dce4f72aaafc4d7b3360e80afcb58a01",
+      "state": "compiler-refused"
+    }
+  ]
 }

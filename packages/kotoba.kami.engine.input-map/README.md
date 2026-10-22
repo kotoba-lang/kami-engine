@@ -5,7 +5,31 @@
 > **Renamed 2026-07-10 (ADR-2607102200):** `kotoba-lang/kami-script-runtime` → `kotoba-lang/kami-input-map`.
 > Old GitHub URLs redirect. See root ADR for the full authority/deps map.
 
-# kami-script-runtime (input_map only)
+# Native Kotoba migration
+
+`src/input_map.kotoba` is the candidate native reading for the complete five-
+operation input-map component: `stick`, `axes`, `apply-dead-zone`,
+`button-edges`, and `update`. It uses typed f64 arithmetic and language-owned
+document operations, retains immutable detector state and sorted press/release
+vectors, and has no JVM, CLJS/Node, device-I/O or Wasm-host dependency.
+The `.cljk` reading is retained for explicit compatibility.
+
+The candidate is **not qualified**. The pinned self-built Amu compiler rejects
+`document-f64-value`; isolated compiler probes also confirm that
+`document-f64`, `document-print`, and `document-read` are unsupported. Native
+f64 arithmetic itself compiled and executed successfully. Keep the full
+component blocked until its required value operations are supported; no
+integer-only replacement or hosted fallback is used.
+
+`maintenance/kami-input-map-native-contract.json` at the owner root records
+the API, actual refusal, toolchain and whole-component test scope. The owner
+command is `KOTOBA_NATIVE_HOME=/path/to/kotoba bash
+scripts/test-kami-native-input-map.sh TOOLCHAIN NEW_OUTPUT`. It denies twelve
+hosted executables and requires the actual two-module closure, all eight
+semantic groups, input/fuel refusals and source digest readback. Its current
+compiler refusal is a failure, not a migration pass.
+
+# Historical compatibility reading: input_map only
 
 This repo is a **deliberately partial** restoration — it ports exactly one
 file from the legacy `kami-script-runtime` Rust crate, not the crate as a

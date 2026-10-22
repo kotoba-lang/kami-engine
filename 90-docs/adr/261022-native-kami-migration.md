@@ -54,7 +54,8 @@ signed locks remain unchanged. No service or deployment change is authorized.
 ## Current evidence and next work
 
 `maintenance/kami-native-migration.json` inventories all70 source projects.
-Their declared roots contain four `.kotoba` source files across three projects.
+Its initial observation found four `.kotoba` source files across three projects;
+the inventory records subsequent candidates and their actual qualification.
 This wave records no whole-component native qualification for the70 projects;
 the suffix count itself does not measure API coverage. Existing scalar,
 generated-JavaScript and typed-Wasm probes do not establish that missing proof.
