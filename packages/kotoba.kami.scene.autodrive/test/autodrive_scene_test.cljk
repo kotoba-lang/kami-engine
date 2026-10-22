@@ -1,0 +1,162 @@
+(ns autodrive-scene-test
+  "Tests for `autodrive-scene`, ported 1:1 from the original Rust
+  `#[cfg(test)] mod tests` in kami-autodrive-scene/src/lib.rs and from
+  kami-autodrive-scene/tests/class_parity.rs (kotoba-lang/kami-engine,
+  deleted PR #82), plus a namespace-loads smoke test.
+
+  The Rust parity tests compared `classes-edn` against the real
+  `kami-autodrive` engine structs (called, not transcribed). Since
+  `kami-autodrive` does not exist yet at restoration time, this port
+  compares against the duck-typed `builtin-limits` / `builtin-autopilot`
+  oracle defined in this namespace instead (see the namespace
+  docstring in `src/autodrive_scene.cljk`)."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [autodrive-scene :as as]))
+
+;; ── smoke test ──────────────────────────────────────────────────────
+
+(deftest namespace-loads-smoke-test
+  (is (fn? as/shipped-limits))
+  (is (= 4 (count as/all-class-names))))
+
+;; ── ported from src/lib.rs #[cfg(test)] mod tests ──────────────────
+
+(deftest shipped-has-all-classes-test
+  (let [l (as/shipped-limits)]
+    (is (not (as/error? l)))
+    (is (= 4 (count l)))
+    (doseq [name as/all-class-names]
+      (is (contains? l name) (str name " present in EDN")))))
+
+(deftest class-id-round-trips-test
+  (doseq [name as/all-class-names]
+    (let [c (as/try-class-from-id name)]
+      (is (some? c) "known class")
+      (is (= (as/class-id c) name))))
+  (is (nil? (as/try-class-from-id "submarine")))
+  (is (= (as/class-from-id "submarine") :car)) ;; tolerant fallback
+  (is (= (as/class-from-id "AIRCRAFT") :aircraft)))
+
+(deftest unknown-class-from-edn-is-an-error-test
+  (let [r (as/limits-for-from-edn as/classes-edn "submarine")]
+    (is (as/error? r))
+    (is (= (:kind r) :class-not-found))))
+
+(deftest non-map-root-is-an-error-test
+  (is (= (:kind (as/limits-specs-from-edn "42")) :not-a-map))
+  (is (= (:kind (as/autopilot-specs-from-edn "42")) :not-a-map)))
+
+(deftest missing-table-is-an-error-test
+  (let [r1 (as/limits-specs-from-edn "{:other 1}")
+        r2 (as/autopilot-specs-from-edn "{:other 1}")]
+    (is (= (:kind r1) :no-table))
+    (is (= (:table r1) "limits"))
+    (is (= (:kind r2) :no-table))
+    (is (= (:table r2) "autopilot"))))
+
+(deftest missing-field-defaults-to-zero-test
+  ;; A class map missing :max-decel degrades to 0.0 (tolerant parse),
+  ;; not an error.
+  (let [edn "{:autodrive/limits {:car {:max-speed 25.0}}}"
+        l (as/limits-from-edn edn)]
+    (is (not (as/error? l)))
+    (let [car (get l "car")]
+      (is (some? car))
+      (is (= (:max-speed car) 25.0))
+      (is (= (:max-decel car) 0.0))))) ;; absent -> default
+
+(deftest only-aircraft-loiters-test
+  (let [ap (as/shipped-autopilot)]
+    (is (not (as/error? ap)))
+    (is (= (:loiter-radius (get ap "aircraft")) 200.0))
+    (doseq [name ["car" "ship" "drone"]]
+      (is (nil? (:loiter-radius (get ap name))) (str name " does not loiter")))))
+
+;; ── ported from tests/class_parity.rs ──────────────────────────────
+
+(defn- assert-limits-eq [name got want]
+  (is (= (:max-speed got) (:max-speed want)) (str name ": max-speed"))
+  (is (= (:max-accel got) (:max-accel want)) (str name ": max-accel"))
+  (is (= (:max-decel got) (:max-decel want)) (str name ": max-decel"))
+  (is (= (:wheelbase got) (:wheelbase want)) (str name ": wheelbase"))
+  (is (= (:max-steer got) (:max-steer want)) (str name ": max-steer"))
+  (is (= (:turn-radius-ref got) (:turn-radius-ref want)) (str name ": turn-radius-ref"))
+  (is (= (:footprint-radius got) (:footprint-radius want)) (str name ": footprint-radius"))
+  (is (= got want) (str name ": full VehicleLimits parity")))
+
+(deftest limits-edn-matches-builtin-test
+  (let [loaded (as/limits-from-edn as/classes-edn)]
+    (is (not (as/error? loaded)))
+    (is (= 4 (count loaded)) "all classes present in EDN")
+    (doseq [class [:car :ship :drone :aircraft]]
+      (let [id (as/class-id class)
+            got (get loaded id)
+            want (as/builtin-limits class)]
+        (assert-limits-eq id got want)
+        (is (= (as/builtin-limits class) want) (str id ": builtin-limits == limits()"))))
+    (let [shipped (as/shipped-limits)]
+      (doseq [name as/all-class-names]
+        (is (= (get shipped name) (get loaded name)) (str name ": shipped == loaded"))))))
+
+(deftest single-limits-from-edn-matches-test
+  (doseq [class [:car :ship :drone :aircraft]]
+    (let [id (as/class-id class)
+          got (as/shipped-limits-for id)]
+      (assert-limits-eq id got (as/builtin-limits class)))))
+
+(defn- assert-autopilot-eq [name got want]
+  (assert-limits-eq name (:limits got) (:limits want))
+  (is (= (as/autopilot-config->autopilot-spec got)
+         (as/autopilot-config->autopilot-spec want))
+      (str name ": full AutopilotConfig parity (every non-limits field)"))
+  (is (= (:goal-tol got) (:goal-tol want)) (str name ": goal-tol"))
+  (is (= (:loiter-radius got) (:loiter-radius want)) (str name ": loiter-radius"))
+  (is (= (:grid-half-extent got) (:grid-half-extent want)) (str name ": grid-half-extent"))
+  (is (= (:z-band got) (:z-band want)) (str name ": z-band"))
+  (is (= (:camera-z-band got) (:camera-z-band want)) (str name ": camera-z-band"))
+  (is (= (:dynamic-obstacles got) (:dynamic-obstacles want)) (str name ": dynamic-obstacles"))
+  (is (= (:stuck-limit got) (:stuck-limit want)) (str name ": stuck-limit"))
+  (is (= (:recovery-ticks got) (:recovery-ticks want)) (str name ": recovery-ticks")))
+
+(deftest autopilot-edn-matches-builtin-test
+  (let [loaded (as/autopilot-from-edn as/classes-edn)]
+    (is (not (as/error? loaded)))
+    (is (= 4 (count loaded)) "all classes present in EDN")
+    (doseq [class [:car :ship :drone :aircraft]]
+      (let [id (as/class-id class)
+            got (get loaded id)
+            want (as/builtin-autopilot class)]
+        (assert-autopilot-eq id got want)
+        (assert-autopilot-eq id (as/builtin-autopilot class) want)))
+    (let [shipped (as/shipped-autopilot)]
+      (doseq [class [:car :ship :drone :aircraft]]
+        (let [id (as/class-id class)]
+          (assert-autopilot-eq id (get shipped id) (as/builtin-autopilot class))
+          (assert-autopilot-eq id (as/shipped-autopilot-for id) (as/builtin-autopilot class)))))))
+
+(deftest tolerant-parse-errors-test
+  ;; Unknown class id.
+  (is (= (:kind (as/shipped-limits-for "submarine")) :class-not-found))
+  ;; Non-map root.
+  (is (= (:kind (as/limits-from-edn "123")) :not-a-map))
+  (is (= (:kind (as/autopilot-from-edn "123")) :not-a-map))
+  ;; Missing table.
+  (let [r (as/limits-from-edn "{:x 1}")]
+    (is (= (:kind r) :no-table))
+    (is (= (:table r) "limits")))
+  ;; autopilot-from-edn resolves the limits table first (to attach each
+  ;; config's :limits), so a fully-empty doc surfaces the limits table
+  ;; as missing before the autopilot table.
+  (let [r (as/autopilot-from-edn "{:x 1}")]
+    (is (= (:kind r) :no-table))
+    (is (= (:table r) "limits")))
+  ;; With a limits table present but no autopilot table, the autopilot
+  ;; table is the one reported missing.
+  (let [r (as/autopilot-from-edn "{:autodrive/limits {:car {:max-speed 1.0}}}")]
+    (is (= (:kind r) :no-table))
+    (is (= (:table r) "autopilot")))
+  ;; Missing key -> default/inherit (0.0), not an error.
+  (let [partial (as/limits-from-edn "{:autodrive/limits {:car {:max-speed 9.0}}}")]
+    (is (not (as/error? partial)))
+    (is (= (:max-speed (get partial "car")) 9.0))
+    (is (= (:footprint-radius (get partial "car")) 0.0)))) ;; absent -> default

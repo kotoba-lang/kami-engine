@@ -1,0 +1,206 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTLT0yA",
+    "databaseId": 1286927560,
+    "nameWithOwner": "kotoba-lang/kami-mangaka-page",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-25T02:10:59Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed"
+      }
+    },
+    "heads": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "chore/bb-to-nbb-wave3",
+          "target": {
+            "oid": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 7
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-mangaka-page\nHEAD 555e18af8731e49e0fbdfc9af5fc0830af44b5ed\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 555e18af8731e49e0fbdfc9af5fc0830af44b5ed\nrefs/heads/main 3ace76d0d5ad76a64c09d22098ecfdc1646eb1f5\nrefs/heads/manifest-rev 776fb42585b38939315aa479617841af431c74eb\nrefs/remotes/kotoba-lang/HEAD 555e18af8731e49e0fbdfc9af5fc0830af44b5ed\nrefs/remotes/kotoba-lang/agent/bubble-placement-score 6f9390048acc698e5f0dbe17be94718bfcc6b387\nrefs/remotes/kotoba-lang/agent/dialogue-font-role-and-tight-fit c93b5e2d80ccad7e82466a2864b252c54e258b9e\nrefs/remotes/kotoba-lang/agent/dialogue-sfx-fit 8218d21d061130c5d55b65d0ea6ede57fda41cbe\nrefs/remotes/kotoba-lang/agent/komawari-artist-styles 4b09611f9fe52bd9ca530d27177c4be9a6f52e5a\nrefs/remotes/kotoba-lang/agent/sheared-row-governor 197220e9ed244fccc33b0ec79e0bbfff3e5bedfd\nrefs/remotes/kotoba-lang/agent/text-sha-refresh bbb023f49581f8cfb31e41006e4ebcb4c4e5a490\nrefs/remotes/kotoba-lang/chore/bb-to-nbb-wave3 40cdf7274bf15bdee0161fe8da1eab915d2f1d75\nrefs/remotes/kotoba-lang/effectlines-gaze-20260709 8bd8e7921e315ee305301f6236745f55af3f3343\nrefs/remotes/kotoba-lang/jv/drop-nbb-cache a9a838c817d1985474f47f2bc79d49e18bf6cb20\nrefs/remotes/kotoba-lang/jv/full-sha 61a7036b038de66602d358eef0ab50ca69e73003\nrefs/remotes/kotoba-lang/jv/kotoba-text 4098f1dd186e2ad9274c634bff95173203199874\nrefs/remotes/kotoba-lang/jv/kotoba-text-cljs ebe1bf058d1e4ea5fe51e6a9ecfd4ea43ede17e9\nrefs/remotes/kotoba-lang/jv/nbb-declaration e5383effde9b0068c3a6a8b2a0a23619897029e2\nrefs/remotes/kotoba-lang/main 555e18af8731e49e0fbdfc9af5fc0830af44b5ed\nrefs/remotes/origin/HEAD 555e18af8731e49e0fbdfc9af5fc0830af44b5ed\nrefs/remotes/origin/agent/text-sha-refresh bbb023f49581f8cfb31e41006e4ebcb4c4e5a490\nrefs/remotes/origin/chore/bb-to-nbb-wave3 40cdf7274bf15bdee0161fe8da1eab915d2f1d75\nrefs/remotes/origin/cljk-rename-20260911 676266066e01168fad166981f929bd016e8ea170\nrefs/remotes/origin/kbb-cutover-20260911 022043cbefa2aaec589b6c42519e310fabdcf787\nrefs/remotes/origin/main 555e18af8731e49e0fbdfc9af5fc0830af44b5ed"
+  },
+  "local-after-preservation": {
+    "HEAD": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-mangaka-page\nHEAD 555e18af8731e49e0fbdfc9af5fc0830af44b5ed\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "refs/heads/main": "3ace76d0d5ad76a64c09d22098ecfdc1646eb1f5",
+      "refs/heads/manifest-rev": "776fb42585b38939315aa479617841af431c74eb",
+      "refs/preservation/kami-monorepo-20261022/heads/chore/bb-to-nbb-wave3": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "acc1612eac1e1bd8fc3e83c7fff334a8667681c3",
+      "refs/preservation/kami-monorepo-20261022/pull-2": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "refs/preservation/kami-monorepo-20261022/pull-3": "8218d21d061130c5d55b65d0ea6ede57fda41cbe",
+      "refs/preservation/kami-monorepo-20261022/pull-4": "c93b5e2d80ccad7e82466a2864b252c54e258b9e",
+      "refs/preservation/kami-monorepo-20261022/pull-5": "6f9390048acc698e5f0dbe17be94718bfcc6b387",
+      "refs/preservation/kami-monorepo-20261022/pull-6": "55860eef17b1608a49e8990fce803e90e919ff8d",
+      "refs/preservation/kami-monorepo-20261022/pull-7": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "refs/remotes/kotoba-lang/HEAD": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "refs/remotes/kotoba-lang/agent/bubble-placement-score": "6f9390048acc698e5f0dbe17be94718bfcc6b387",
+      "refs/remotes/kotoba-lang/agent/dialogue-font-role-and-tight-fit": "c93b5e2d80ccad7e82466a2864b252c54e258b9e",
+      "refs/remotes/kotoba-lang/agent/dialogue-sfx-fit": "8218d21d061130c5d55b65d0ea6ede57fda41cbe",
+      "refs/remotes/kotoba-lang/agent/komawari-artist-styles": "4b09611f9fe52bd9ca530d27177c4be9a6f52e5a",
+      "refs/remotes/kotoba-lang/agent/sheared-row-governor": "197220e9ed244fccc33b0ec79e0bbfff3e5bedfd",
+      "refs/remotes/kotoba-lang/agent/text-sha-refresh": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "refs/remotes/kotoba-lang/chore/bb-to-nbb-wave3": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75",
+      "refs/remotes/kotoba-lang/effectlines-gaze-20260709": "8bd8e7921e315ee305301f6236745f55af3f3343",
+      "refs/remotes/kotoba-lang/jv/drop-nbb-cache": "a9a838c817d1985474f47f2bc79d49e18bf6cb20",
+      "refs/remotes/kotoba-lang/jv/full-sha": "61a7036b038de66602d358eef0ab50ca69e73003",
+      "refs/remotes/kotoba-lang/jv/kotoba-text": "4098f1dd186e2ad9274c634bff95173203199874",
+      "refs/remotes/kotoba-lang/jv/kotoba-text-cljs": "ebe1bf058d1e4ea5fe51e6a9ecfd4ea43ede17e9",
+      "refs/remotes/kotoba-lang/jv/nbb-declaration": "e5383effde9b0068c3a6a8b2a0a23619897029e2",
+      "refs/remotes/kotoba-lang/main": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "refs/remotes/origin/HEAD": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "refs/remotes/origin/agent/text-sha-refresh": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "refs/remotes/origin/chore/bb-to-nbb-wave3": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75",
+      "refs/remotes/origin/cljk-rename-20260911": "676266066e01168fad166981f929bd016e8ea170",
+      "refs/remotes/origin/kbb-cutover-20260911": "022043cbefa2aaec589b6c42519e310fabdcf787",
+      "refs/remotes/origin/main": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "feat(komawari): additive force-line tilt + panel-in-panel port (Togashi)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "feat/komawari-force-line-tilt",
+      "headRefOid": "acc1612eac1e1bd8fc3e83c7fff334a8667681c3",
+      "baseRefName": "main",
+      "baseRefOid": "c416dd96dfefc251d0c66eb87999fb258f7ad315",
+      "mergeCommit": {
+        "oid": "45148cdf8858818815043b2f9df76a208d1060f0"
+      },
+      "mergedAt": "2026-07-06T02:08:50Z",
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/1"
+    },
+    {
+      "number": 2,
+      "title": "Respect authored manga page composition",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/text-sha-refresh",
+      "headRefOid": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "baseRefName": "main",
+      "baseRefOid": "d4b578d6025601d49b167c7372a5af3613954332",
+      "mergeCommit": {
+        "oid": "b99c4023c2d283e17741e9acbefbd929c0cde2df"
+      },
+      "mergedAt": "2026-07-20T05:50:47Z",
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/2"
+    },
+    {
+      "number": 3,
+      "title": "feat(page): pre-flight sizing for vertical dialogue + SFX (fixes silent character drop)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/dialogue-sfx-fit",
+      "headRefOid": "8218d21d061130c5d55b65d0ea6ede57fda41cbe",
+      "baseRefName": "main",
+      "baseRefOid": "b99c4023c2d283e17741e9acbefbd929c0cde2df",
+      "mergeCommit": {
+        "oid": "33aba144d5b59c7ddb1038d06e42b5a64ef4f02d"
+      },
+      "mergedAt": "2026-07-24T01:25:04Z",
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/3"
+    },
+    {
+      "number": 4,
+      "title": "feat(page): per-font-role typefaces + tight (not padded) dialogue sizing",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/dialogue-font-role-and-tight-fit",
+      "headRefOid": "c93b5e2d80ccad7e82466a2864b252c54e258b9e",
+      "baseRefName": "main",
+      "baseRefOid": "33aba144d5b59c7ddb1038d06e42b5a64ef4f02d",
+      "mergeCommit": {
+        "oid": "71f139f852e572fcf0c5861f3821e0ab8e1ed039"
+      },
+      "mergedAt": "2026-07-24T02:03:20Z",
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/4"
+    },
+    {
+      "number": 5,
+      "title": "feat(page): bubble-placement-score against the HUNTER\u00d7HUNTER baseline",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/bubble-placement-score",
+      "headRefOid": "6f9390048acc698e5f0dbe17be94718bfcc6b387",
+      "baseRefName": "main",
+      "baseRefOid": "71f139f852e572fcf0c5861f3821e0ab8e1ed039",
+      "mergeCommit": {
+        "oid": "de175762204200766b8f9007f064da7d4e40cf25"
+      },
+      "mergedAt": "2026-07-24T02:36:32Z",
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/5"
+    },
+    {
+      "number": 6,
+      "title": "feat(page): stub tails, layout-bubbles, score blind-spot axes",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/bubble-tail-and-layout",
+      "headRefOid": "55860eef17b1608a49e8990fce803e90e919ff8d",
+      "baseRefName": "main",
+      "baseRefOid": "de175762204200766b8f9007f064da7d4e40cf25",
+      "mergeCommit": {
+        "oid": "7244f8d37aac9c92ee98abd471d9ffb31e9a093f"
+      },
+      "mergedAt": "2026-07-24T04:59:06Z",
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/6"
+    },
+    {
+      "number": 7,
+      "title": "DO-NOT-MERGE cleanup: review un-landed branch agent/text-sha-refresh",
+      "state": "CLOSED",
+      "isDraft": true,
+      "headRefName": "agent/text-sha-refresh",
+      "headRefOid": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "baseRefName": "main",
+      "baseRefOid": "3ace76d0d5ad76a64c09d22098ecfdc1646eb1f5",
+      "mergeCommit": null,
+      "mergedAt": null,
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/7"
+    }
+  ]
+}

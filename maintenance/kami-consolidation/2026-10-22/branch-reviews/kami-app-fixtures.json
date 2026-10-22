@@ -1,0 +1,85 @@
+{
+  "repository": "kotoba-lang/kami-app-fixtures",
+  "default": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "commit": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "commit": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "efd843e6b0ad9e8b1d89d95cfd1493252cc48b87",
+      "commit": "efd843e6b0ad9e8b1d89d95cfd1493252cc48b87",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "commit": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "commit": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "58d5b3175d5f177f59714e2a1d121c54923c8911",
+      "commit": "58d5b3175d5f177f59714e2a1d121c54923c8911",
+      "decision": "default-tree-identical"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "commit": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "253bda1bd4d726396d8c0aa99da0235f941d5fb4",
+      "commit": "253bda1bd4d726396d8c0aa99da0235f941d5fb4",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/edn-datomize-fanout",
+      "object": "4daa7cc2f0adf1fa63d6af4d70653bd29360ea54",
+      "commit": "4daa7cc2f0adf1fa63d6af4d70653bd29360ea54",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/edn-datomize-lint-fix",
+      "object": "2bc70df4208a8c82c3996dbbd9980ab4dcb80b9f",
+      "commit": "2bc70df4208a8c82c3996dbbd9980ab4dcb80b9f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/kotoba-text",
+      "object": "fd2cca0c639ba4d7090adcd36d00623e123148db",
+      "commit": "fd2cca0c639ba4d7090adcd36d00623e123148db",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "ecaf57de2ef732c99a0462b7ed3fea1737664259",
+      "commit": "ecaf57de2ef732c99a0462b7ed3fea1737664259",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "commit": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

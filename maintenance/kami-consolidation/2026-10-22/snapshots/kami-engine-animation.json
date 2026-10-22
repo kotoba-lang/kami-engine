@@ -1,0 +1,144 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTUfVug",
+    "databaseId": 1296553402,
+    "nameWithOwner": "kotoba-lang/kami-engine-animation",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-10-16T04:48:59Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "33ac2ab4864e64ba5d359fda6bce5187074144b3"
+      }
+    },
+    "heads": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "hermes-save/anim-app-maint",
+          "target": {
+            "oid": "403c9f0965e34d0cd29d90d60d3d371a7bf09a91"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "33ac2ab4864e64ba5d359fda6bce5187074144b3"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 4
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "6ef34819cc92f8eb763e851fd6711ac58bbaa6d3",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-animation\nHEAD 6ef34819cc92f8eb763e851fd6711ac58bbaa6d3\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 33ac2ab4864e64ba5d359fda6bce5187074144b3\nrefs/heads/main 4f5c01a5c84afb05ba943c355fbe296e611b17dc\nrefs/heads/manifest-rev 6ef34819cc92f8eb763e851fd6711ac58bbaa6d3\nrefs/remotes/origin/HEAD 33ac2ab4864e64ba5d359fda6bce5187074144b3\nrefs/remotes/origin/cljk-rename-20260911 47f4c8db66fe6b7beb376b064911c2bee54fb327\nrefs/remotes/origin/hermes-save/anim-app-maint 403c9f0965e34d0cd29d90d60d3d371a7bf09a91\nrefs/remotes/origin/jv/full-sha 38b494edb83375fe36bbb11b86f368fd191d2753\nrefs/remotes/origin/main 33ac2ab4864e64ba5d359fda6bce5187074144b3"
+  },
+  "local-after-preservation": {
+    "HEAD": "6ef34819cc92f8eb763e851fd6711ac58bbaa6d3",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-animation\nHEAD 6ef34819cc92f8eb763e851fd6711ac58bbaa6d3\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "33ac2ab4864e64ba5d359fda6bce5187074144b3",
+      "refs/heads/main": "4f5c01a5c84afb05ba943c355fbe296e611b17dc",
+      "refs/heads/manifest-rev": "6ef34819cc92f8eb763e851fd6711ac58bbaa6d3",
+      "refs/preservation/kami-monorepo-20261022/heads/hermes-save/anim-app-maint": "403c9f0965e34d0cd29d90d60d3d371a7bf09a91",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "33ac2ab4864e64ba5d359fda6bce5187074144b3",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "9aa428851f5abfe115e1836611d3f05c99d0638a",
+      "refs/preservation/kami-monorepo-20261022/pull-2": "1cca648c9e896f90733f5a73f37fa9900a0fb578",
+      "refs/preservation/kami-monorepo-20261022/pull-3": "e4dfcec99c728b753e795be73ec19615736555fc",
+      "refs/preservation/kami-monorepo-20261022/pull-4": "403c9f0965e34d0cd29d90d60d3d371a7bf09a91",
+      "refs/remotes/origin/HEAD": "33ac2ab4864e64ba5d359fda6bce5187074144b3",
+      "refs/remotes/origin/cljk-rename-20260911": "47f4c8db66fe6b7beb376b064911c2bee54fb327",
+      "refs/remotes/origin/hermes-save/anim-app-maint": "403c9f0965e34d0cd29d90d60d3d371a7bf09a91",
+      "refs/remotes/origin/jv/full-sha": "38b494edb83375fe36bbb11b86f368fd191d2753",
+      "refs/remotes/origin/main": "33ac2ab4864e64ba5d359fda6bce5187074144b3"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "hermes: save anim-app-maint edits from the host",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "hermes-save/anim-app-maint",
+      "headRefOid": "9aa428851f5abfe115e1836611d3f05c99d0638a",
+      "baseRefName": "main",
+      "baseRefOid": "001bc5a4bc567b7941ce603a5b637e9141da7bf5",
+      "mergeCommit": {
+        "oid": "2801b26952c7f5e703655fb4ee280b10cc68b089"
+      },
+      "mergedAt": "2026-09-28T02:44:59Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/1"
+    },
+    {
+      "number": 2,
+      "title": "hermes: save anim-app-maint edits from the host",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "hermes-save/anim-app-maint",
+      "headRefOid": "1cca648c9e896f90733f5a73f37fa9900a0fb578",
+      "baseRefName": "main",
+      "baseRefOid": "2801b26952c7f5e703655fb4ee280b10cc68b089",
+      "mergeCommit": {
+        "oid": "f4ad50f19dd36536478efc18524ca13263495891"
+      },
+      "mergedAt": "2026-10-07T08:46:22Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/2"
+    },
+    {
+      "number": 3,
+      "title": "hermes: save anim-app-maint edits from the host",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "hermes-save/anim-app-maint",
+      "headRefOid": "e4dfcec99c728b753e795be73ec19615736555fc",
+      "baseRefName": "main",
+      "baseRefOid": "f4ad50f19dd36536478efc18524ca13263495891",
+      "mergeCommit": {
+        "oid": "6ef34819cc92f8eb763e851fd6711ac58bbaa6d3"
+      },
+      "mergedAt": "2026-10-08T07:18:26Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/3"
+    },
+    {
+      "number": 4,
+      "title": "hermes: save anim-app-maint edits from the host",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "hermes-save/anim-app-maint",
+      "headRefOid": "403c9f0965e34d0cd29d90d60d3d371a7bf09a91",
+      "baseRefName": "main",
+      "baseRefOid": "6ef34819cc92f8eb763e851fd6711ac58bbaa6d3",
+      "mergeCommit": {
+        "oid": "33ac2ab4864e64ba5d359fda6bce5187074144b3"
+      },
+      "mergedAt": "2026-10-16T04:48:59Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/4"
+    }
+  ]
+}

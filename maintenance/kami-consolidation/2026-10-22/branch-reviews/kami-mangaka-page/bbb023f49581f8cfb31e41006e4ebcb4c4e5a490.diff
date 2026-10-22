@@ -1,0 +1,3150 @@
+diff --git a/.gitignore b/.gitignore
+index d04e6e0..8c51bbf 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -2,3 +2,6 @@
+ .nrepl-port
+ *.jar
+ target/
++
++# nbb dependency cache -- a build artifact, not source
++.nbb/
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..57bc88a
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,202 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
+diff --git a/README.md b/README.md
+index 98c1e23..66247e5 100644
+--- a/README.md
++++ b/README.md
+@@ -102,8 +102,8 @@ Without `:gaze-overlay? true` the output is byte-identical whether or not
+ ## Test
+ 
+ ```bash
+-clojure -M:test   # templates / layout (splash·grid·ネーム rows) / komawari propose+validate / headless compose-page!
+-clojure -M:lint   # clj-kondo, matches CI (.github/workflows/ci.yml)
++kbb -M:test   # templates / layout (splash·grid·ネーム rows) / komawari propose+validate / headless compose-page!
++kbb -M:lint   # clj-kondo, matches CI (.github/workflows/ci.yml)
+ ```
+ 
+ `kami-mangaka-text` (the shared multilingual lettering dependency) is its own
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..ab04b42
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,10 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"scripts/run-task.cljk" ".cljs"
++  "src/kami/mangaka/komawari.cljk" ".cljc"
++  "src/kami/mangaka/page.cljk" ".clj"
++  "test/kami/mangaka/komawari_test.cljk" ".cljc"
++  "test/kami/mangaka/page_test.cljk" ".clj"}}
+diff --git a/deps.edn b/deps.edn
+index 7c3c321..e9954ff 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -8,7 +8,25 @@
+ ;; Sibling of kami-mangaka-render (2D panels) and kami-mangaka-scene (3D).
+ {:paths ["src"]
+ 
+- :deps {org.clojure/clojure    {:mvn/version "1.12.0"}
++ :deps {
++        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
++        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
++        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
++        ;; sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
++        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
++        ;; only from nbb.edn, so every project file this repo has names it.
++        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
++       ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       org.clojure/clojure    {:mvn/version "1.12.0"}
+         ;; shared multilingual lettering layer (locale-keyed MangaText)
+         gftd/kami-mangaka-text {:git/url "https://github.com/kotoba-lang/kami-mangaka-text.git"
+                                 :sha "e575d147533d4a490d71b6e86876d900aa89d50b"}}
+@@ -16,7 +34,7 @@
+  :aliases
+  {:test {:extra-paths ["test"]
+          :extra-deps  {io.github.cognitect-labs/test-runner
+-                       {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                       {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+          :jvm-opts    ["-Djava.awt.headless=true"]
+          :main-opts ["-m" "cognitect.test-runner"]}
+        ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
+diff --git a/nbb.edn b/nbb.edn
+index 655f4a5..c3141c9 100644
+--- a/nbb.edn
++++ b/nbb.edn
+@@ -1,3 +1,22 @@
+ ;; Generated by bb_edn_to_nbb_tasks.cljs (ADR-2607173000).
+ ;; Note: nbb does not resolve :deps from bb.edn; use sibling :paths or deps.edn+clojure.
+-{:paths ["src" "test"]}
++{:paths ["src" "test"]
++ :deps {
++        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
++        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
++        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
++        ;; sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
++        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
++        ;; only from nbb.edn, so every project file this repo has names it.
++        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
++       ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; Declared HERE and not only in deps.edn: nbb reads nbb.edn and does NOT
++        ;; read deps.edn or bb.edn, and the .cljs in this repo are run as
++        ;; bare `nbb <file>`. A coordinate they cannot see is not a
++        ;; declaration. sha and :paths are COPIED from deps.edn.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}}}
+diff --git a/package.json b/package.json
+index 64df696..f9c667c 100644
+--- a/package.json
++++ b/package.json
+@@ -1,7 +1,7 @@
+ {
+   "private": true,
+   "scripts": {
+-    "task": "nbb scripts/run-task.cljs",
+-    "tasks": "nbb scripts/run-task.cljs"
++    "task": "kbb --backend sci scripts/run-task.cljk",
++    "tasks": "kbb --backend sci scripts/run-task.cljk"
+   }
+ }
+diff --git a/scripts/run-task.cljs b/scripts/run-task.cljk
+similarity index 52%
+rename from scripts/run-task.cljs
+rename to scripts/run-task.cljk
+index 786efd4..cd6b4cb 100644
+--- a/scripts/run-task.cljs
++++ b/scripts/run-task.cljk
+@@ -1,8 +1,8 @@
+-#!/usr/bin/env nbb
++#!/usr/bin/env kbb
+ ;; Auto-generated by bb_edn_to_nbb_tasks.cljs (ADR-2607173000).
+-;;   nbb scripts/run-task.cljs <task> [args…]
+-(require '[clojure.edn :as edn]
+-         '[clojure.string :as str])
++;;   kbb --backend sci scripts/run-task.cljk <task> [args…]
++(require '[kotoba.lang.edn :as edn]
++         '[kotoba.lang.text :as str])
+ 
+ (def fs (js/require "node:fs"))
+ (def path (js/require "node:path"))
+@@ -11,6 +11,15 @@
+ (defn- sh [argv]
+   (let [r (.spawnSync cp (first argv) (to-array (rest argv))
+                       #js {:encoding "utf8" :stdio "inherit" :shell false})]
++    ;; A child that never started, and one killed by a signal, BOTH report
++    ;; status:null and land on the synthetic exit 1 -- with nothing printed,
++    ;; because stdio is inherited and there was no child to write anything.
++    ;; Say which it was: an exit 1 with no output is indistinguishable from a
++    ;; command that ran and failed quietly.
++    (when-let [e (.-error r)]
++      (js/console.error "run-task: could not start" (pr-str argv) "--" (.-message e)))
++    (when-let [sig (.-signal r)]
++      (js/console.error "run-task:" (pr-str (first argv)) "killed by signal" sig))
+     (or (.-status r) 1)))
+ 
+ (def tasks-path (.join path (.dirname path *file*) "tasks.edn"))
+@@ -24,8 +33,10 @@
+ (defn- run-one [task rest-args]
+   (let [t (resolve-task task)]
+     (when-not t
+-      (binding [*out* *err*] (println "unknown task:" task)
+-        (println "known:" (str/join ", " (map name (sort (keys tasks))))))
++      ;; js/console.error, NOT (binding [*out* *err*] (println …)) -- nbb does
++      ;; not honour that binding and the text lands on stdout (ADR-2608130600).
++      (js/console.error "unknown task:" task)
++      (js/console.error "known:" (str/join ", " (map name (sort (keys tasks)))))
+       (.exit js/process 2))
+     (cond
+       (:runs t)
+@@ -38,7 +49,7 @@
+                    (vec (:cmd t)))]
+         (sh argv))
+       :else
+-      (do (binding [*out* *err*] (println "bad task entry" task t))
++      (do (js/console.error "bad task entry" task t)
+           (.exit js/process 2)))))
+ 
+ (let [args (vec *command-line-args*)
+@@ -47,8 +58,7 @@
+       task (first args)
+       rest-args (vec (rest args))]
+   (when-not task
+-    (binding [*out* *err*]
+-      (println "usage: nbb scripts/run-task.cljs <task> [args…]")
+-      (println "tasks:" (str/join ", " (map name (sort (keys tasks))))))
++    (js/console.error "usage: kbb --backend sci scripts/run-task.cljk <task> [args…]")
++    (js/console.error "tasks:" (str/join ", " (map name (sort (keys tasks)))))
+     (.exit js/process 2))
+   (.exit js/process (or (run-one task rest-args) 0)))
+diff --git a/scripts/tasks-complex.edn b/scripts/tasks-complex.edn
+index ec71b64..6545be5 100644
+--- a/scripts/tasks-complex.edn
++++ b/scripts/tasks-complex.edn
+@@ -1,2 +1,2 @@
+ ;; Hand-port backlog from bb.edn (ADR-2607173000).
+-{:requires {:kind :unknown, :doc nil, :form "([babashka.process :as p])"}, :test {:kind :unknown, :doc "Run the page-composition tests (templates / layout / headless compose)", :form "(p/shell \"clojure -M:test\")"}}
++{:requires {:kind :unknown, :doc nil, :form "([babashka.process :as p])"}, :test {:kind :unknown, :doc "Run the page-composition tests (templates / layout / headless compose)", :form "(p/shell \"kbb -M:test\")"}}
+diff --git a/scripts/tasks.edn b/scripts/tasks.edn
+index 3469804..64478aa 100644
+--- a/scripts/tasks.edn
++++ b/scripts/tasks.edn
+@@ -1,3 +1,10 @@
+-;; Auto-generated from bb.edn (ADR-2607173000).
+-;; nbb scripts/run-task.cljs <task> [args…]
+-{}
++;; Originally generated from bb.edn (ADR-2607173000 Wave 3); repaired 2026-08-13
++;; (ADR-2608131600).  kbb --backend sci scripts/run-task.cljk <task> [args…]
++;;
++;; The Wave-3 conversion emitted an EMPTY registry here and deleted bb.edn, so
++;; this repo had no runnable entrypoint at all from 2026-07-17 until today.
++;; bb.edn's sole task was `(p/shell "kbb -M:test")`; the converter matched
++;; only the bare symbol `shell`, not the `p/` alias, and filed a one-line
++;; conversion as a hand-port backlog item (scripts/tasks-complex.edn).
++{:test {:cmd ["kbb" "-M:test"]
++        :doc "Run the page-composition tests (templates / layout / headless compose)"}}
+diff --git a/src/kami/mangaka/komawari.cljc b/src/kami/mangaka/komawari.cljk
+similarity index 100%
+rename from src/kami/mangaka/komawari.cljc
+rename to src/kami/mangaka/komawari.cljk
+diff --git a/src/kami/mangaka/page.clj b/src/kami/mangaka/page.clj
+deleted file mode 100644
+index 4227cd7..0000000
+--- a/src/kami/mangaka/page.clj
++++ /dev/null
+@@ -1,610 +0,0 @@
+-(ns kami.mangaka.page
+-  "Work-agnostic graphic-novel PAGE composition (ADR-2606282100, Tier-1 mangaka).
+-
+-  Ported from mangaka.gftd.ai's `manga-layouts.ts` GRAPHIC_NOVEL_TEMPLATES
+-  (left-to-right reading): place rendered panel images into a B5 page, draw panel
+-  frames + gutters, overlay dialogue as speech bubbles and narration as caption
+-  boxes — turning isolated panels into a readable graphic-novel page.
+-
+-  Generic: a `page` is just {:layout str :panels [{:id :size :narration :dialogue}…]}
+-  and `img-of` maps a panel-id → image File (or nil → placeholder). The text layer
+-  is the shared locale-keyed MangaText (kami.mangaka.text): `compose-page!` takes a
+-  `:locale`, so the baked page (EPUB/KDP/print) is multilingual from the same data
+-  the web reader uses — image stays language-neutral. No story, character, or world.
+-  JVM/Java2D headless — no Canvas-2D, no GPU (page DTP, not the wgpu render path)."
+-  (:require [clojure.java.io :as io]
+-            [clojure.string :as str]
+-            [kami.mangaka.text :as t])
+-  (:import [java.awt Color Font BasicStroke RenderingHints GraphicsEnvironment
+-                     RadialGradientPaint GradientPaint]
+-           [java.awt.geom RoundRectangle2D$Double Point2D$Float Path2D$Double]
+-           [java.awt.image BufferedImage]
+-           [javax.imageio ImageIO]
+-           [java.io File]))
+-
+-;; --- graphic-novel layout templates (x y w h in %, LTR reading order) --------
+-
+-(def gn-templates
+-  {1 [[0 0 100 100]]
+-   2 [[0 0 50 100] [50 0 50 100]]
+-   3 [[0 0 100 55] [0 55 50 45] [50 55 50 45]]
+-   4 [[0 0 50 50] [50 0 50 50] [0 50 50 50] [50 50 50 50]]
+-   5 [[0 0 100 40] [0 40 50 30] [50 40 50 30] [0 70 50 30] [50 70 50 30]]
+-   6 [[0 0 33.34 50] [33.34 0 33.33 50] [66.67 0 33.33 50]
+-      [0 50 33.34 50] [33.34 50 33.33 50] [66.67 50 33.33 50]]
+-   7 [[0 0 100 34] [0 34 33.34 33] [33.34 34 33.33 33] [66.67 34 33.33 33]
+-      [0 67 33.34 33] [33.34 67 33.33 33] [66.67 67 33.33 33]]
+-   8 [[0 0 25 50] [25 0 25 50] [50 0 25 50] [75 0 25 50]
+-      [0 50 25 50] [25 50 25 50] [50 50 25 50] [75 50 25 50]]
+-   9 [[0 0 33.34 33.34] [33.34 0 33.33 33.34] [66.67 0 33.33 33.34]
+-      [0 33.34 33.34 33.33] [33.34 33.34 33.33 33.33] [66.67 33.34 33.33 33.33]
+-      [0 66.67 33.34 33.33] [33.34 66.67 33.33 33.33] [66.67 66.67 33.33 33.33]]})
+-
+-(defn- grid-template [n]
+-  (let [cols (long (Math/ceil (Math/sqrt n)))
+-        rows (long (Math/ceil (/ (double n) cols)))
+-        cw (/ 100.0 cols) ch (/ 100.0 rows)]
+-    (vec (for [i (range n) :let [r (quot i cols) c (mod i cols)]]
+-           [(* c cw) (* r ch) cw ch]))))
+-
+-(defn template-for [n]
+-  (cond (<= n 0) []
+-        (get gn-templates n) (get gn-templates n)
+-        :else (grid-template n)))
+-
+-;; --- komawari force-line tilt (ADR-2607051500, ported from ai-gftd-mangaka's
+-;; mangaka.layout.komawari — same design, this ecosystem's Java2D pixel space
+-;; instead of that one's normalized-EDN datom space) ---------------------------
+-;; A panel may opt into a dynamic diagonal border by carrying :tilt/:intensity/
+-;; :vector (mirroring komawari's :beat/* keys). Purely additive: a panel with
+-;; none of these renders exactly as before (axis-aligned rect, unchanged pixel
+-;; output) — see page_test.clj's pre-existing layout/compose assertions.
+-
+-(def phi 1.618033988749895)
+-
+-(def ^:private impact-tilt-max
+-  "The 1:φ rectangle's own diagonal angle (~31.7°) — same bound as
+-  mangaka.layout.komawari/impact-tilt-max, so both ecosystems agree on how
+-  steep a panel border is allowed to read."
+-  (Math/toDegrees (Math/atan (/ 1.0 phi))))
+-(def ^:private tension-tilt-max 10.0)
+-
+-(defn komawari-tilt
+-  "An action-line angle (degrees, any range) + :calm/:tension/:impact →
+-  a signed shear angle within a legible bound, or nil for :calm. Identical
+-  folding/clamping to mangaka.layout.komawari/tilt-for."
+-  [vector-deg intensity]
+-  (when (and vector-deg (not= intensity :calm))
+-    (let [max-t (if (= intensity :impact) impact-tilt-max tension-tilt-max)
+-          folded (- (mod (+ vector-deg 90) 180) 90)]
+-      (double (max (- max-t) (min max-t folded))))))
+-
+-(defn- row-tilt
+-  "The shared tilt for a row of panels: the first :impact panel's tilt, else
+-  the first :tension panel's, else nil — a row reads as ONE force-line."
+-  [row]
+-  (let [pick (or (first (filter #(= :impact (:intensity %)) row))
+-                 (first (filter #(= :tension (:intensity %)) row)))]
+-    (when pick (komawari-tilt (:vector pick) (:intensity pick)))))
+-
+-;; --- ネーム-driven layout: vary panel size by the storyboard's intent --------
+-;; A uniform grid reads flat. Real pages breathe: hero bands, split rows, and
+-;; full-bleed splashes. We derive that from each panel's :size + the page layout,
+-;; so the composition follows the artist's ネーム, not a generic grid.
+-
+-(defn- size-weight [s]
+-  (let [s (str/lower-case (str s))]
+-    (cond (re-find #"full" s)            2.6
+-          (re-find #"two-thirds|wide" s) 2.0
+-          (re-find #"half" s)            1.5
+-          (re-find #"one-third|narrow" s) 1.05
+-          :else 1.5)))
+-
+-(defn- small? [s]
+-  (boolean (re-find #"one-third|narrow|half" (str/lower-case (str s)))))
+-
+-(defn- rows-of
+-  "Pack panels into rows (reading order): two consecutive small panels share a
+-  row (side-by-side); everything else gets its own full-width band."
+-  [panels]
+-  (loop [ps panels rows []]
+-    (if (empty? ps)
+-      rows
+-      (let [a (first ps) b (second ps)]
+-        (if (and (small? (:size a)) b (small? (:size b)))
+-          (recur (drop 2 ps) (conj rows [a b]))
+-          (recur (rest ps) (conj rows [a])))))))
+-
+-(defn layout-page
+-  "→ {:bleed bool :pairs [[panel [x y w h] tilt] ...]} in page-percent units,
+-  derived from the page :layout + each panel's :size. `tilt` (nil unless a
+-  panel opts into :intensity/:vector) is the row's shared komawari force-line
+-  angle — see `komawari-tilt` — nil for every panel unless a caller supplies
+-  those keys, so pre-existing callers see byte-identical `pairs` rects."
+-  [page]
+-  (let [ps (:panels page) n (count ps)
+-        lay (str/lower-case (str (:layout page)))]
+-    (cond
+-      ;; Authored Genko/storyboard geometry is authoritative. Values use the
+-      ;; portable normalized [x y w h] contract; convert to this compositor's
+-      ;; percent coordinate space without reflowing the page.
+-      (and (seq ps) (every? #(let [r (:rect %)]
+-                              (and (= 4 (count r)) (every? number? r))) ps))
+-      {:bleed false
+-       :pairs (mapv (fn [p]
+-                      (let [[x y w h] (:rect p)]
+-                        [p [(* 100.0 x) (* 100.0 y) (* 100.0 w) (* 100.0 h)] nil]))
+-                    ps)}
+-
+-      (or (<= n 1) (re-find #"splash|full|spread" lay))
+-      {:bleed true :pairs (mapv #(conj % nil) (mapv vector ps [[0 0 100 100]]))}
+-
+-      (re-find #"grid" lay)
+-      {:bleed false :pairs (mapv #(conj % nil) (mapv vector ps (template-for n)))}
+-
+-      :else
+-      (let [rows    (rows-of ps)
+-            weights (mapv (fn [row] (reduce max (map #(size-weight (:size %)) row))) rows)
+-            total   (reduce + weights)
+-            pairs   (volatile! []) y (volatile! 0.0)]
+-        (doseq [[row w] (map vector rows weights)]
+-          (let [h (* 100.0 (/ w total)) k (count row) cw (/ 100.0 k)
+-                tilt (row-tilt row)]
+-            (doseq [[i p] (map-indexed vector row)]
+-              (vswap! pairs conj [p [(* i cw) @y cw h] tilt]))
+-            (vswap! y + h)))
+-        {:bleed false :pairs @pairs}))))
+-
+-;; --- fonts (pick an installed JP-capable family) -----------------------------
+-
+-(def ^:private jp-font-family
+-  (let [avail (set (.getAvailableFontFamilyNames
+-                    (GraphicsEnvironment/getLocalGraphicsEnvironment)))]
+-    (some avail ["Hiragino Maru Gothic ProN" "Hiragino Sans" "YuGothic"
+-                 "Yu Gothic" "Noto Sans CJK JP" "Noto Sans JP"])))
+-
+-(defn- font [style size]
+-  (Font. (or jp-font-family Font/SANS_SERIF) style (int size)))
+-
+-;; --- manga-expression → Java2D mapping (kami.mangaka.expression tags) ---------
+-;; 文字の薄さ (:weight) → 色/太さ, 文字の大きさ (:scale) → フォントサイズ,
+-;; 背景トーン (:tone) → コマ背景の効果, :nameplate/:chatter register → 専用描画。
+-
+-(defn- weight->color [w]
+-  (case w
+-    :faint (Color. 140 140 140)   ; 薄いグレー (モブのざわめき)
+-    :light (Color. 85 85 85)
+-    Color/BLACK))
+-
+-(defn- weight->style [w] (case w (:bold :heavy) Font/BOLD Font/PLAIN))
+-
+-(defn- scaled [base scale] (int (Math/round (* (double base) (double (or scale 1.0))))))
+-
+-(defn- tone-bg!
+-  "Draw a panel background TONE over the image (under the text): screentone /
+-  focus-lines / flash / vignette / crowd-silhouette — the 背景トーン device that
+-  keys mood to emotion (kami.mangaka.expression :tone)."
+-  [g tone x y w h]
+-  (when (and tone (not (#{:none :flat-white} tone)))
+-    (let [g2 (.create g)
+-          x (double x) y (double y) w (double w) h (double h)
+-          cx (+ x (/ w 2.0)) cy (+ y (/ h 2.0))]
+-      (try
+-        (.setClip g2 (int x) (int y) (int w) (int h))   ; g2 inherits g's AA (RenderingHints copied by .create)
+-        (case tone
+-          (:focus-lines :radial-burst)
+-          (do (.setColor g2 (Color. 0 0 0 150)) (.setStroke g2 (BasicStroke. 2.0))
+-              (doseq [a (range 0 360 6)]
+-                (let [r (Math/toRadians a)]
+-                  (.drawLine g2 (int cx) (int cy)
+-                             (int (+ cx (* (Math/cos r) w 1.3)))
+-                             (int (+ cy (* (Math/sin r) h 1.3)))))))
+-          :flash
+-          (do (.setColor g2 (Color. 0 0 0 205)) (.setStroke g2 (BasicStroke. 3.5))
+-              (doseq [a (range 0 360 13)]
+-                (let [r (Math/toRadians a)]
+-                  (.drawLine g2 (int cx) (int cy)
+-                             (int (+ cx (* (Math/cos r) w 1.3)))
+-                             (int (+ cy (* (Math/sin r) h 1.3)))))))
+-          :vignette-dark
+-          (do (.setPaint g2 (RadialGradientPaint.
+-                             (Point2D$Float. (float cx) (float cy)) (float (max w h))
+-                             (float-array [0.5 1.0])
+-                             (into-array Color [(Color. 0 0 0 0) (Color. 0 0 0 190)])))
+-              (.fillRect g2 (int x) (int y) (int w) (int h)))
+-          :gradient
+-          (do (.setPaint g2 (GradientPaint. (float x) (float y) (Color. 0 0 0 0)
+-                                            (float x) (float (+ y h)) (Color. 0 0 0 130)))
+-              (.fillRect g2 (int x) (int y) (int w) (int h)))
+-          :dot
+-          (do (.setColor g2 (Color. 0 0 0 55))
+-              (doseq [yy (range (int y) (int (+ y h)) 11) xx (range (int x) (int (+ x w)) 11)]
+-                (.fillOval g2 xx yy 3 3)))
+-          :hatching
+-          (do (.setColor g2 (Color. 0 0 0 75)) (.setStroke g2 (BasicStroke. 1.0))
+-              (doseq [d (range (int (- x h)) (int (+ x w)) 8)]
+-                (.drawLine g2 d (int y) (int (+ d h)) (int (+ y h)))))
+-          :crowd-silhouette
+-          (do (.setColor g2 (Color. 0 0 0 95))
+-              (doseq [i (range 0 (inc (int (/ w 40.0))))]
+-                (let [hx (+ x 8 (* i 40.0)) hy (+ y (* h 0.5))]
+-                  (.fillOval g2 (int hx) (int hy) 28 28)
+-                  (.fillRect g2 (int (- hx 5)) (int (+ hy 22)) 38 (int (max 0 (- (+ y h) (+ hy 22))))))))
+-          nil)
+-        (finally (.dispose g2))))))
+-
+-(defn- nameplate!
+-  "キャラ名札 → 黒箱に白抜きゴシック, コマ左下 (HxH の従事兵ラベル)."
+-  [g text x y w h]
+-  (when (and text (seq (str text)))
+-    (.setFont g (font Font/BOLD 20))
+-    (let [fm (.getFontMetrics g) pad 8
+-          tw (.stringWidth fm (str text))
+-          bw (+ (* 2 pad) tw) bh (+ (* 2 pad) (.getHeight fm))
+-          bx (int (+ x 12)) by (int (- (+ y h) bh 12))]
+-      (doto g (.setColor Color/BLACK) (.fillRect bx by bw bh)
+-              (.setColor Color/WHITE))
+-      (.drawString g ^String (str text) (int (+ bx pad)) (int (+ by pad (.getAscent fm)))))))
+-
+-(defn- chatter!
+-  "モブのざわめき → 薄いグレーの小さな独白, コマ上部に散らす."
+-  [g texts x y w]
+-  (doseq [[i s] (map-indexed vector (filter #(seq (str %)) texts))]
+-    (.setFont g (font Font/PLAIN 16))
+-    (.setColor g (Color. 140 140 140))
+-    (.drawString g ^String (str s)
+-                 (int (+ x 14 (* i (* w 0.24))))
+-                 (int (+ y 26 (* (mod i 2) 22))))))
+-
+-;; --- text wrapping (CJK: break by char to fit width) -------------------------
+-
+-(defn- wrap [g text max-w]
+-  (let [fm (.getFontMetrics g)]
+-    (loop [chars (seq (str text)) cur "" lines []]
+-      (if (empty? chars)
+-        (cond-> lines (seq cur) (conj cur))
+-        (let [c (first chars) cand (str cur c)]
+-          (if (and (seq cur) (> (.stringWidth fm cand) max-w))
+-            (recur chars "" (conj lines cur))
+-            (recur (rest chars) cand lines)))))))
+-
+-;; --- drawing helpers ---------------------------------------------------------
+-
+-(defn- aa! [g]
+-  (doto g
+-    (.setRenderingHint RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_ON)
+-    (.setRenderingHint RenderingHints/KEY_INTERPOLATION RenderingHints/VALUE_INTERPOLATION_BILINEAR)
+-    (.setRenderingHint RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_ON)))
+-
+-(defn- shear-polygon
+-  "[x y w h] + tilt degrees → a Path2D parallelogram shifting the TOP edge by
+-  dx = h·tan(tilt) — the same shear model as
+-  mangaka.layout.komawari/shear-polygon (ai-gftd-mangaka), here in Java2D
+-  pixel space instead of normalized page-space."
+-  ^Path2D$Double [x y w h tilt-deg]
+-  (let [dx (* h (Math/tan (Math/toRadians tilt-deg)))]
+-    (doto (Path2D$Double.)
+-      (.moveTo (+ x dx) y)
+-      (.lineTo (+ x w dx) y)
+-      (.lineTo (+ x w) (+ y h))
+-      (.lineTo x (+ y h))
+-      (.closePath))))
+-
+-(defn- draw-cover
+-  "Draws `img` covering [x y w h]. An optional komawari `tilt` (degrees) clips
+-  to the sheared parallelogram instead of the axis-aligned rect — nil/absent
+-  renders identically to before."
+-  [g ^BufferedImage img x y w h & [tilt]]
+-  (let [g2 (.create g)]
+-    (try
+-      (if tilt
+-        (.setClip g2 (shear-polygon x y w h tilt))
+-        (.setClip g2 (int x) (int y) (int w) (int h)))
+-      (let [iw (.getWidth img) ih (.getHeight img)
+-            s (max (/ (double w) iw) (/ (double h) ih))
+-            sw (* iw s) sh (* ih s)
+-            dx (+ x (/ (- w sw) 2.0)) dy (+ y (/ (- h sh) 2.0))]
+-        (.drawImage g2 img (int dx) (int dy) (int sw) (int sh) nil))
+-      (finally (.dispose g2)))))
+-
+-(defn- placeholder [g x y w h id & [tilt]]
+-  (.setColor g (Color. 233 227 207))
+-  (if tilt (.fill g (shear-polygon x y w h tilt)) (.fillRect g (int x) (int y) (int w) (int h)))
+-  (doto g (.setColor (Color. 150 150 140)) (.setFont (font Font/PLAIN 22)))
+-  (.drawString g (str id) (int (+ x 14)) (int (+ y 30))))
+-
+-(defn- caption-box
+-  "Narration → a small caption box at the panel's top-left (serif, white). The
+-  optional style map carries :weight (薄さ→色/太さ) + :scale (大きさ→フォント)."
+-  [g text x y w & [{:keys [weight scale]}]]
+-  (when (and text (seq (str text)))
+-    (.setFont g (font (weight->style weight) (scaled 22 scale)))
+-    (let [pad 10 maxw (int (- (* w 0.62) (* 2 pad)))
+-          lines (wrap g text maxw)
+-          fm (.getFontMetrics g) lh (+ 4 (.getHeight fm))
+-          bw (+ (* 2 pad) (reduce max 1 (map #(.stringWidth fm %) lines)))
+-          bh (+ (* 2 pad) (* lh (count lines)))
+-          bx (+ x 10) by (+ y 10)]
+-      (doto g (.setColor (Color. 255 253 247 235))
+-              (.fillRect bx by bw bh)
+-              (.setColor (Color. 60 60 56)) (.setStroke (BasicStroke. 1.5))
+-              (.drawRect bx by bw bh))
+-      (.setColor g (if (#{:faint :light} weight) (weight->color weight) (Color. 40 40 38)))
+-      (doseq [[i ln] (map-indexed vector lines)]
+-        (.drawString g ^String ln (int (+ bx pad)) (int (+ by pad (* (inc i) lh) -6)))))))
+-
+-(defn- bubble
+-  "Dialogue → a white rounded speech bubble with a tail + black outline + JP text.
+-  `cx` is the desired bubble centre; `side` (:l/:r) aims the tail. The optional
+-  style map carries :weight (薄さ→色/太さ), :scale (大きさ→フォント), and :shape
+-  (:spike/:jagged/:burst の叫び系は太い輪郭で強調 — full clip-path は web reader 側).
+-  Returns bottom-y."
+-  [g text cx top w side & [{:keys [weight scale shape writing-mode columns
+-                                   width-ratio height-ratio panel-height tail-target]}]]
+-  (when (and text (seq (str text)))
+-    (.setFont g (font (weight->style weight) (scaled 25 scale)))
+-    (let [vertical? (= writing-mode "vertical-rtl")
+-          shout? (boolean (#{:spike :jagged :burst} shape))
+-          pad 17 maxw (int (* w (double (or width-ratio 0.46))))
+-          lines (if vertical?
+-                  (or (seq columns) (mapv str (seq (str text))))
+-                  (wrap g text maxw))
+-          fm (.getFontMetrics g) lh (+ 6 (.getHeight fm))
+-          tw (reduce max 1 (map #(.stringWidth fm %) lines))
+-          bw (if width-ratio (max (+ (* 2 pad) tw) (* w width-ratio)) (+ (* 2 pad) tw))
+-          bh (if height-ratio (max (+ (* 2 pad) lh) (* (or panel-height w) height-ratio))
+-                 (+ (* 2 pad) (* lh (count lines))))
+-          bx (- cx (/ bw 2.0)) by top
+-          rad (if shout? 8 38)
+-          rr (RoundRectangle2D$Double. bx by bw bh rad rad)
+-          ;; tail: a small triangle dropping from the bubble toward the speaker
+-          tailx (if (= side :r) (- (+ bx bw) (* bw 0.28)) (+ bx (* bw 0.16)))
+-          [target-x target-y] (or tail-target
+-                                  [(+ tailx (if (= side :r) -2 28)) (+ by bh 24)])
+-          txs (int-array [(int tailx) (int (+ tailx 26)) (int target-x)])
+-          tys (int-array [(int (+ by bh -4)) (int (+ by bh -4)) (int target-y)])]
+-      (doto g (.setColor Color/WHITE) (.fillPolygon txs tys 3) (.fill rr)
+-              (.setColor Color/BLACK) (.setStroke (BasicStroke. (float (if shout? 5.0 3.0))))
+-              (.drawPolygon txs tys 3) (.draw rr)
+-              ;; paint over the seam where the tail meets the bubble
+-              (.setColor Color/WHITE) (.fillRect (int (+ tailx 2)) (int (+ by bh -7)) 22 6))
+-      (.setColor g (weight->color weight))
+-      (if vertical?
+-        (let [chars (seq (str text)) rows (max 1 (int (/ (- bh (* 2 pad)) lh)))]
+-          (doseq [[i ch] (map-indexed vector chars)]
+-            (let [col (quot i rows) row (mod i rows)]
+-              (.drawString g (str ch)
+-                           (int (- (+ bx bw (- pad)) (* col lh)))
+-                           (int (+ by pad (* (inc row) lh) -8))))))
+-        (doseq [[i ln] (map-indexed vector lines)]
+-          (.drawString g ^String ln
+-                       (int (- cx (/ (.stringWidth fm ln) 2.0)))
+-                       (int (+ by pad (* (inc i) lh) -8)))))
+-      (+ by bh 30))))
+-
+-(defn- draw-sfx
+-  "SFX (擬音) → bold white text with a black stroke, tilted, upper-right of the
+-  panel. The locale-resolved string (e.g. ちゃぷ / lap…)."
+-  [g text x y w & [scale]]
+-  (when (and text (seq (str text)))
+-    (let [g2 (.create g)]
+-      (try
+-        (let [fsz (int (max 30 (* w 0.16 (double (or scale 1.0)))))
+-              sx  (int (+ x (* w 0.5))) sy (int (+ y (* w 0.3)))]
+-          (.setFont g2 (font Font/BOLD fsz))
+-          (.rotate g2 (Math/toRadians -8) sx sy)
+-          (.setColor g2 Color/BLACK)
+-          (doseq [dx [-3 -2 2 3] dy [-3 -2 2 3]]
+-            (.drawString g2 ^String (str text) (+ sx (int dx)) (+ sy (int dy))))
+-          (.setColor g2 Color/WHITE)
+-          (.drawString g2 ^String (str text) sx sy))
+-        (finally (.dispose g2))))))
+-
+-;; --- 効果線 (effectLines) + 視線誘導 (gaze) — ai.gftd.mangaka page lexicon ----
+-;; Both fields live on the panel in the lexicon's panel-local 0-1000 coordinate
+-;; space (both axes, independent of the panel's pixel size): {:centerX 480
+-;; :centerY 450} means 48% across / 45% down the panel rect. Z-order per the
+-;; lexicon: panel art → tones → effectLines → SFX → bubbles.
+-
+-(defn- fx->px
+-  "Panel-local 0-1000 coordinate `v` → a pixel position along [origin origin+extent]
+-  (nil → 500 = panel centre)."
+-  ^double [v origin extent]
+-  (+ (double origin) (* (double extent) (/ (double (or v 500)) 1000.0))))
+-
+-(defn- draw-effect-lines!
+-  "Draw 効果線 (effect lines) over the panel rect [x y w h] — the lexicon panel
+-  field `effectLines`: [{:kind :centerX :centerY :density :coverage}…] in
+-  panel-local 0-1000 coords. Kinds:
+-    :focus / :explosion — radial black lines from the panel border toward the
+-      centre, leaving an inner clear radius derived from :coverage (85 → lines
+-      cover the outer 85% of the radius); :explosion adds per-line angle jitter
+-      + an irregular inner radius (seeded, so bakes stay deterministic).
+-    :flash — lighter-stroke radial burst (alternating inner reach = フラッシュ).
+-    :speed — parallel horizontal lines (optional :direction degrees rotates them).
+-  :density ≈ line count. Unknown kinds are ignored. Clipped to the panel rect;
+-  drawn after the tone layer and before SFX/bubbles (lexicon z-order)."
+-  [g lines x y w h]
+-  (doseq [{:keys [kind centerX centerY density coverage direction]} lines]
+-    (let [g2 (.create g)]
+-      (try
+-        (.setClip g2 (int x) (int y) (int w) (int h))
+-        (let [kind (keyword (str/lower-case (name (or kind :focus))))
+-              n    (int (min 240 (max 4 (long (if (number? density) density 32)))))
+-              cov  (double (if (number? coverage) coverage 70))
+-              cx   (fx->px centerX x w)
+-              cy   (fx->px centerY y h)
+-              ;; far enough to reach the panel's farthest corner from the centre
+-              rmax (Math/hypot (max (- cx x) (- (+ x w) cx))
+-                               (max (- cy y) (- (+ y h) cy)))
+-              r0   (* rmax (max 0.02 (- 1.0 (/ cov 100.0))))
+-              rnd  (java.util.Random. (long (+ n (* 31 (long cx)) (* 131 (long cy)))))]
+-          (case kind
+-            (:focus :explosion)
+-            (let [expl? (= kind :explosion)]
+-              (.setColor g2 (Color. 0 0 0 (if expl? 225 195)))
+-              (doseq [i (range n)]
+-                (let [base (* 2.0 Math/PI (/ (double i) n))
+-                      a    (if expl? (+ base (* 0.12 (.nextGaussian rnd))) base)
+-                      ri   (if expl? (* r0 (+ 0.55 (* 0.9 (.nextDouble rnd)))) r0)]
+-                  (.setStroke g2 (BasicStroke. (float (if expl?
+-                                                        (+ 1.5 (* 2.5 (.nextDouble rnd)))
+-                                                        2.0))))
+-                  (.drawLine g2 (int (+ cx (* ri (Math/cos a)))) (int (+ cy (* ri (Math/sin a))))
+-                             (int (+ cx (* rmax (Math/cos a)))) (int (+ cy (* rmax (Math/sin a))))))))
+-            :flash
+-            (do (.setColor g2 (Color. 0 0 0 130))
+-                (.setStroke g2 (BasicStroke. 1.2))
+-                (doseq [i (range n)]
+-                  (let [a  (* 2.0 Math/PI (/ (double i) n))
+-                        ri (* r0 (if (even? i) 1.0 1.4))]
+-                    (.drawLine g2 (int (+ cx (* ri (Math/cos a)))) (int (+ cy (* ri (Math/sin a))))
+-                               (int (+ cx (* rmax (Math/cos a)))) (int (+ cy (* rmax (Math/sin a))))))))
+-            :speed
+-            (let [ang  (Math/toRadians (double (if (number? direction) direction 0)))
+-                  mx   (+ x (/ w 2.0)) my (+ y (/ h 2.0))
+-                  span (Math/hypot w h)
+-                  x0   (- mx (/ span 2.0))]
+-              (.rotate g2 ang mx my)
+-              (.setColor g2 (Color. 0 0 0 175))
+-              (doseq [i (range n)]
+-                (let [yy (+ y (* h (/ (+ i 0.5) (double n))) (* 2.0 (.nextGaussian rnd)))
+-                      st (+ x0 (* span 0.35 (.nextDouble rnd)))
+-                      en (+ st (* span (+ 0.35 (* 0.45 (.nextDouble rnd)))))]
+-                  (.setStroke g2 (BasicStroke. (float (+ 0.8 (* 1.6 (.nextDouble rnd))))))
+-                  (.drawLine g2 (int st) (int yy) (int en) (int yy)))))
+-            nil))
+-        (finally (.dispose g2))))))
+-
+-(defn- draw-gaze-overlay!
+-  "視線誘導 (gaze guidance) REVIEW overlay — NOT print content: only drawn when
+-  `compose-page!` is called with :gaze-overlay? true. `gaze` is the lexicon
+-  panel field {:entryX :entryY :focusX :focusY :exitX :exitY :impression} in
+-  panel-local 0-1000 coords: a dashed red entry→focus→exit curve (a quadratic
+-  passing through the focus point) with an entry dot, a focus ring, an
+-  arrowhead at the exit, and the :impression label near the entry."
+-  [g gaze x y w h]
+-  (when (map? gaze)
+-    (let [g2 (.create g)]
+-      (try
+-        (.setClip g2 (int x) (int y) (int w) (int h))
+-        (let [ex (fx->px (:entryX gaze) x w) ey (fx->px (:entryY gaze) y h)
+-              fx (fx->px (:focusX gaze) x w) fy (fx->px (:focusY gaze) y h)
+-              gx (fx->px (:exitX gaze) x w)  gy (fx->px (:exitY gaze) y h)
+-              ;; control point so the quadratic passes through focus at t=0.5
+-              qx (- (* 2.0 fx) (/ (+ ex gx) 2.0))
+-              qy (- (* 2.0 fy) (/ (+ ey gy) 2.0))
+-              red (Color. 220 30 30 235)]
+-          (.setColor g2 red)
+-          (.setStroke g2 (BasicStroke. 3.0 BasicStroke/CAP_ROUND BasicStroke/JOIN_ROUND
+-                                       10.0 (float-array [12.0 9.0]) 0.0))
+-          (.draw g2 (doto (Path2D$Double.) (.moveTo ex ey) (.quadTo qx qy gx gy)))
+-          (.fillOval g2 (int (- ex 5)) (int (- ey 5)) 10 10)          ; entry dot
+-          (.setStroke g2 (BasicStroke. 2.5))
+-          (.drawOval g2 (int (- fx 11)) (int (- fy 11)) 22 22)        ; focus ring
+-          ;; arrowhead at the exit along the curve's end tangent (exit − control)
+-          (let [vx (- gx qx) vy (- gy qy)
+-                m  (max 1.0E-6 (Math/hypot vx vy))
+-                ux (/ vx m) uy (/ vy m) len 18.0
+-                rot (fn [th] [(- (* (- ux) (Math/cos th)) (* (- uy) (Math/sin th)))
+-                              (+ (* (- ux) (Math/sin th)) (* (- uy) (Math/cos th)))])
+-                [lx ly] (rot 0.45) [rx ry] (rot -0.45)]
+-            (.setStroke g2 (BasicStroke. 3.0 BasicStroke/CAP_ROUND BasicStroke/JOIN_ROUND))
+-            (.drawLine g2 (int gx) (int gy) (int (+ gx (* len lx))) (int (+ gy (* len ly))))
+-            (.drawLine g2 (int gx) (int gy) (int (+ gx (* len rx))) (int (+ gy (* len ry)))))
+-          (when-let [imp (:impression gaze)]
+-            (.setFont g2 (font Font/PLAIN 16))
+-            (.drawString g2 ^String (str imp) (int (+ ex 8)) (int (- ey 8)))))
+-        (finally (.dispose g2))))))
+-
+-;; --- page composition --------------------------------------------------------
+-
+-(def PAGE-W 1075) (def PAGE-H 1518)   ; B5 @ ~150dpi
+-(def MARGIN 38) (def GUTTER 16)
+-
+-(defn compose-page!
+-  "Compose one storyboard `page` ({:layout :panels […]}) into a B5 PNG at `out`.
+-  `img-of` maps a panel-id → image File (or nil → placeholder). The text layer
+-  (narration caption + dialogue bubbles + SFX) is derived from each panel via
+-  kami.mangaka.text and rendered in `:locale` (default :ja) — the image is the
+-  same regardless of language.
+-
+-  A panel may carry the lexicon fields `:effectLines` (効果線, baked into the
+-  print image between the tone layer and the lettering) and `:gaze` (視線誘導,
+-  review-only: drawn as a dashed red overlay ONLY when called with
+-  `:gaze-overlay? true` — never part of print output). Both use the panel-local
+-  0-1000 coordinate space (see `draw-effect-lines!` / `draw-gaze-overlay!`)."
+-  [page img-of out & {:keys [locale gaze-overlay?] :or {locale :ja}}]
+-  (let [{:keys [bleed pairs]} (layout-page page)
+-        canvas (BufferedImage. PAGE-W PAGE-H BufferedImage/TYPE_INT_RGB)
+-        g (.createGraphics canvas)
+-        ;; a full-bleed splash uses the whole sheet; otherwise inset by MARGIN
+-        m  (if bleed 0 MARGIN)
+-        gut (if bleed 0 GUTTER)
+-        cx0 m cy0 m cw (- PAGE-W (* 2 m)) ch (- PAGE-H (* 2 m))]
+-    (aa! g)
+-    (.setColor g (Color. 22 20 18)) (.fillRect g 0 0 PAGE-W PAGE-H) ; ink page base = crisp gutters
+-    (doseq [[idx [panel [px py pw ph] tilt]] (map-indexed vector pairs)]
+-      (let [x (+ cx0 (* cw (/ px 100.0)) (/ gut 2.0))
+-            y (+ cy0 (* ch (/ py 100.0)) (/ gut 2.0))
+-            w (- (* cw (/ pw 100.0)) gut)
+-            h (- (* ch (/ ph 100.0)) gut)
+-            f (img-of (:id panel))]
+-        (if (and f (.exists ^File f))
+-          (draw-cover g (ImageIO/read ^File f) x y w h tilt)
+-          (placeholder g x y w h (:id panel) tilt))
+-        ;; 背景トーン (kami.mangaka.expression :tone) — 画像の上, フレーム/文字の下
+-        ;; (rect-clipped even under a komawari tilt — a sheared tone overlay is
+-        ;; a future refinement, not needed to demonstrate the force-line frame)
+-        (tone-bg! g (:tone panel) x y w h)
+-        ;; 効果線 (lexicon z-order: panel art → tones → effectLines → SFX → bubbles)
+-        (when-let [fx (seq (or (:effectLines panel) (:effect-lines panel)))]
+-          (draw-effect-lines! g fx x y w h))
+-        ;; confident black frame (heavier on a bleed splash) — a komawari force-line
+-        ;; row draws the sheared parallelogram, so the frame itself carries the angle
+-        (.setColor g Color/BLACK) (.setStroke g (BasicStroke. (float (if bleed 10 5))))
+-        (if tilt
+-          (.draw g (shear-polygon x y w h tilt))
+-          (.drawRect g (int x) (int y) (int w) (int h)))
+-        ;; text layer (shared, locale-keyed): nameplate + chatter + caption + bubbles + SFX
+-        (let [els     (t/panel->elements panel)
+-              narr-el (some #(when (= :narration (:kind %)) %) els)
+-              dlgs    (if (seq (:dialogue panel))
+-                        (map #(assoc % :kind :dialogue) (:dialogue panel))
+-                        (filter #(= :dialogue (:kind %)) els))
+-              sfxs    (filter #(= :sfx (:kind %)) els)
+-              nps     (filter #(= :nameplate (:kind %)) els)
+-              chat    (filter #(= :chatter (:kind %)) els)]
+-          (when (seq chat)
+-            (chatter! g (map #(t/localize (:text %) locale) chat) x y w))
+-          (when narr-el
+-            (caption-box g (t/localize (:text narr-el) locale) x y w
+-                         {:weight (:weight narr-el) :scale (:scale narr-el)}))
+-          ;; alternate bubble side per panel for rhythm; keep inside the panel
+-          (let [side (if (even? idx) :l :r)
+-                cx (+ x (* w (if (= side :l) 0.42 0.58)))]
+-            (loop [ds dlgs top (+ y 22)]
+-              (when (seq ds)
+-                (let [d (first ds)
+-                      [rx ry] (:pos d)
+-                      dcx (if (number? rx) (+ x (* w rx)) cx)
+-                      dtop (if (number? ry) (+ y (* h ry)) top)
+-                      [tx ty] (:tail-target d)
+-                      target (when (and (number? tx) (number? ty))
+-                               [(+ x (* w tx)) (+ y (* h ty))])
+-                      nt (bubble g (t/localize (:text d) locale) dcx dtop w side
+-                                 {:weight (:weight d) :scale (:scale d) :shape (:bubble d)
+-                                  :writing-mode (:writing-mode d) :columns (:columns d)
+-                                  :width-ratio (:width d) :height-ratio (:height d)
+-                                  :panel-height h
+-                                  :tail-target target})]
+-                  (recur (rest ds) (or nt (+ top 96)))))))
+-          (doseq [s sfxs] (draw-sfx g (t/localize (:text s) locale) x y w (:scale s)))
+-          (doseq [np nps] (nameplate! g (t/localize (:text np) locale) x y w h)))
+-        ;; 視線誘導 review overlay — opt-in only, on top of everything in the panel
+-        (when gaze-overlay?
+-          (draw-gaze-overlay! g (:gaze panel) x y w h))))
+-    (.dispose g)
+-    (io/make-parents out)
+-    (ImageIO/write canvas "png" (File. ^String out))
+-    out))
+diff --git a/src/kami/mangaka/page.cljk b/src/kami/mangaka/page.cljk
+new file mode 100644
+index 0000000..61f2d74
+--- /dev/null
++++ b/src/kami/mangaka/page.cljk
+@@ -0,0 +1,1197 @@
++(ns kami.mangaka.page
++  "Work-agnostic graphic-novel PAGE composition (ADR-2606282100, Tier-1 mangaka).
++
++  Ported from mangaka.gftd.ai's `manga-layouts.ts` GRAPHIC_NOVEL_TEMPLATES
++  (left-to-right reading): place rendered panel images into a B5 page, draw panel
++  frames + gutters, overlay dialogue as speech bubbles and narration as caption
++  boxes — turning isolated panels into a readable graphic-novel page.
++
++  Generic: a `page` is just {:layout str :panels [{:id :size :narration :dialogue}…]}
++  and `img-of` maps a panel-id → image File (or nil → placeholder). The text layer
++  is the shared locale-keyed MangaText (kami.mangaka.text): `compose-page!` takes a
++  `:locale`, so the baked page (EPUB/KDP/print) is multilingual from the same data
++  the web reader uses — image stays language-neutral. No story, character, or world.
++  JVM/Java2D headless — no Canvas-2D, no GPU (page DTP, not the wgpu render path)."
++  (:require [kotoba.io :as io]
++            [kotoba.lang.text :as str]
++            [kami.mangaka.text :as t])
++  (:import [java.awt Color Font BasicStroke RenderingHints GraphicsEnvironment
++                     RadialGradientPaint GradientPaint]
++           [java.awt.geom RoundRectangle2D$Double Point2D$Float Path2D$Double]
++           [java.awt.image BufferedImage]
++           [javax.imageio ImageIO]))
++
++;; --- graphic-novel layout templates (x y w h in %, LTR reading order) --------
++
++(def gn-templates
++  {1 [[0 0 100 100]]
++   2 [[0 0 50 100] [50 0 50 100]]
++   3 [[0 0 100 55] [0 55 50 45] [50 55 50 45]]
++   4 [[0 0 50 50] [50 0 50 50] [0 50 50 50] [50 50 50 50]]
++   5 [[0 0 100 40] [0 40 50 30] [50 40 50 30] [0 70 50 30] [50 70 50 30]]
++   6 [[0 0 33.34 50] [33.34 0 33.33 50] [66.67 0 33.33 50]
++      [0 50 33.34 50] [33.34 50 33.33 50] [66.67 50 33.33 50]]
++   7 [[0 0 100 34] [0 34 33.34 33] [33.34 34 33.33 33] [66.67 34 33.33 33]
++      [0 67 33.34 33] [33.34 67 33.33 33] [66.67 67 33.33 33]]
++   8 [[0 0 25 50] [25 0 25 50] [50 0 25 50] [75 0 25 50]
++      [0 50 25 50] [25 50 25 50] [50 50 25 50] [75 50 25 50]]
++   9 [[0 0 33.34 33.34] [33.34 0 33.33 33.34] [66.67 0 33.33 33.34]
++      [0 33.34 33.34 33.33] [33.34 33.34 33.33 33.33] [66.67 33.34 33.33 33.33]
++      [0 66.67 33.34 33.33] [33.34 66.67 33.33 33.33] [66.67 66.67 33.33 33.33]]})
++
++(defn- grid-template [n]
++  (let [cols (long (Math/ceil (Math/sqrt n)))
++        rows (long (Math/ceil (/ (double n) cols)))
++        cw (/ 100.0 cols) ch (/ 100.0 rows)]
++    (vec (for [i (range n) :let [r (quot i cols) c (mod i cols)]]
++           [(* c cw) (* r ch) cw ch]))))
++
++(defn template-for [n]
++  (cond (<= n 0) []
++        (get gn-templates n) (get gn-templates n)
++        :else (grid-template n)))
++
++;; --- komawari force-line tilt (ADR-2607051500, ported from ai-gftd-mangaka's
++;; mangaka.layout.komawari — same design, this ecosystem's Java2D pixel space
++;; instead of that one's normalized-EDN datom space) ---------------------------
++;; A panel may opt into a dynamic diagonal border by carrying :tilt/:intensity/
++;; :vector (mirroring komawari's :beat/* keys). Purely additive: a panel with
++;; none of these renders exactly as before (axis-aligned rect, unchanged pixel
++;; output) — see page_test.clj's pre-existing layout/compose assertions.
++
++(def phi 1.618033988749895)
++
++(def ^:private impact-tilt-max
++  "The 1:φ rectangle's own diagonal angle (~31.7°) — same bound as
++  mangaka.layout.komawari/impact-tilt-max, so both ecosystems agree on how
++  steep a panel border is allowed to read."
++  (Math/toDegrees (Math/atan (/ 1.0 phi))))
++(def ^:private tension-tilt-max 10.0)
++
++(defn komawari-tilt
++  "An action-line angle (degrees, any range) + :calm/:tension/:impact →
++  a signed shear angle within a legible bound, or nil for :calm. Identical
++  folding/clamping to mangaka.layout.komawari/tilt-for."
++  [vector-deg intensity]
++  (when (and vector-deg (not= intensity :calm))
++    (let [max-t (if (= intensity :impact) impact-tilt-max tension-tilt-max)
++          folded (- (mod (+ vector-deg 90) 180) 90)]
++      (double (max (- max-t) (min max-t folded))))))
++
++(defn- row-tilt
++  "The shared tilt for a row of panels: the first :impact panel's tilt, else
++  the first :tension panel's, else nil — a row reads as ONE force-line."
++  [row]
++  (let [pick (or (first (filter #(= :impact (:intensity %)) row))
++                 (first (filter #(= :tension (:intensity %)) row)))]
++    (when pick (komawari-tilt (:vector pick) (:intensity pick)))))
++
++;; --- ネーム-driven layout: vary panel size by the storyboard's intent --------
++;; A uniform grid reads flat. Real pages breathe: hero bands, split rows, and
++;; full-bleed splashes. We derive that from each panel's :size + the page layout,
++;; so the composition follows the artist's ネーム, not a generic grid.
++
++(defn- size-weight [s]
++  (let [s (str/lower (str s))]
++    (cond (re-find #"full" s)            2.6
++          (re-find #"two-thirds|wide" s) 2.0
++          (re-find #"half" s)            1.5
++          (re-find #"one-third|narrow" s) 1.05
++          :else 1.5)))
++
++(defn- small? [s]
++  (boolean (re-find #"one-third|narrow|half" (str/lower (str s)))))
++
++(defn- rows-of
++  "Pack panels into rows (reading order): two consecutive small panels share a
++  row (side-by-side); everything else gets its own full-width band."
++  [panels]
++  (loop [ps panels rows []]
++    (if (empty? ps)
++      rows
++      (let [a (first ps) b (second ps)]
++        (if (and (small? (:size a)) b (small? (:size b)))
++          (recur (drop 2 ps) (conj rows [a b]))
++          (recur (rest ps) (conj rows [a])))))))
++
++(defn layout-page
++  "→ {:bleed bool :pairs [[panel [x y w h] tilt] ...]} in page-percent units,
++  derived from the page :layout + each panel's :size. `tilt` (nil unless a
++  panel opts into :intensity/:vector) is the row's shared komawari force-line
++  angle — see `komawari-tilt` — nil for every panel unless a caller supplies
++  those keys, so pre-existing callers see byte-identical `pairs` rects."
++  [page]
++  (let [ps (:panels page) n (count ps)
++        lay (str/lower (str (:layout page)))]
++    (cond
++      ;; Authored Genko/storyboard geometry is authoritative. Values use the
++      ;; portable normalized [x y w h] contract; convert to this compositor's
++      ;; percent coordinate space without reflowing the page.
++      (and (seq ps) (every? #(let [r (:rect %)]
++                              (and (= 4 (count r)) (every? number? r))) ps))
++      {:bleed false
++       :pairs (mapv (fn [p]
++                      (let [[x y w h] (:rect p)]
++                        [p [(* 100.0 x) (* 100.0 y) (* 100.0 w) (* 100.0 h)] nil]))
++                    ps)}
++
++      (or (<= n 1) (re-find #"splash|full|spread" lay))
++      {:bleed true :pairs (mapv #(conj % nil) (mapv vector ps [[0 0 100 100]]))}
++
++      (re-find #"grid" lay)
++      {:bleed false :pairs (mapv #(conj % nil) (mapv vector ps (template-for n)))}
++
++      :else
++      (let [rows    (rows-of ps)
++            weights (mapv (fn [row] (reduce max (map #(size-weight (:size %)) row))) rows)
++            total   (reduce + weights)
++            pairs   (volatile! []) y (volatile! 0.0)]
++        (doseq [[row w] (map vector rows weights)]
++          (let [h (* 100.0 (/ w total)) k (count row) cw (/ 100.0 k)
++                tilt (row-tilt row)]
++            (doseq [[i p] (map-indexed vector row)]
++              (vswap! pairs conj [p [(* i cw) @y cw h] tilt]))
++            (vswap! y + h)))
++        {:bleed false :pairs @pairs}))))
++
++;; --- fonts (pick an installed JP-capable family, one per :font-role) ---------
++;; kami.mangaka.expression's archetypes/registers resolve a :font-role tag
++;; (:gothic :mincho :maru :bold-mincho :handwritten :brush :kyokasho
++;; :antigochi :digital :horror) per speaker/register -- e.g. :stoic/:energetic
++;; speak in :gothic, :strategist/:narration in :mincho, :gentle in :maru,
++;; :chatter/:mob in :handwritten. Each resolves independently (same
++;; `some avail […]` graceful-degrade pattern as the old single
++;; `jp-font-family`) so a speaker's dialogue actually looks different, not
++;; just differently weighted.
++
++(defn- family-of [& candidates]
++  (let [avail (set (.getAvailableFontFamilyNames
++                    (GraphicsEnvironment/getLocalGraphicsEnvironment)))]
++    (some avail candidates)))
++
++(def ^:private jp-font-family
++  (family-of "Hiragino Maru Gothic ProN" "Hiragino Sans" "YuGothic"
++             "Yu Gothic" "Noto Sans CJK JP" "Noto Sans JP"))
++
++(def font-role-families
++  "font-role -> concrete installed family. :default is the old single
++  jp-font-family (also the fallback for a role with no closer match)."
++  {:default        jp-font-family
++   :gothic         (family-of "Hiragino Sans" "YuGothic" "Yu Gothic" "Noto Sans JP" jp-font-family)
++   :mincho         (family-of "Hiragino Mincho ProN" "YuMincho" "Yu Mincho" "Noto Serif JP" jp-font-family)
++   :bold-mincho    (family-of "Toppan Bunkyu Midashi Mincho" "Hiragino Mincho ProN" "YuMincho" jp-font-family)
++   :maru           (family-of "Hiragino Maru Gothic ProN" "Tsukushi A Round Gothic" jp-font-family)
++   :handwritten    (family-of "nskpenkaishotai100koteitehon" "Klee" jp-font-family)
++   :brush          (family-of "nskpenkaishotai100koteitehon" "Klee" jp-font-family)
++   :kyokasho       (family-of "BIZ UDMincho" "nskpenkaishotai100koteitehon" jp-font-family)
++   :antigochi      (family-of "Toppan Bunkyu Gothic" "Gothic A1" jp-font-family)
++   :digital        (family-of "Osaka" jp-font-family)
++   :horror         (family-of "Hiragino Mincho ProN" jp-font-family)})
++
++(defn- family-for [font-role]
++  (or (get font-role-families font-role) jp-font-family Font/SANS_SERIF))
++
++(defn- font
++  ([style size] (font nil style size))
++  ([font-role style size] (Font. (family-for font-role) style (int size))))
++
++;; --- manga-expression → Java2D mapping (kami.mangaka.expression tags) ---------
++;; 文字の薄さ (:weight) → 色/太さ, 文字の大きさ (:scale) → フォントサイズ,
++;; 背景トーン (:tone) → コマ背景の効果, :nameplate/:chatter register → 専用描画。
++
++(defn- weight->color [w]
++  (case w
++    :faint (Color. 140 140 140)   ; 薄いグレー (モブのざわめき)
++    :light (Color. 85 85 85)
++    Color/BLACK))
++
++(defn- weight->style [w] (case w (:bold :heavy) Font/BOLD Font/PLAIN))
++
++(defn- scaled [base scale] (int (Math/round (* (double base) (double (or scale 1.0))))))
++
++(defn- tone-bg!
++  "Draw a panel background TONE over the image (under the text): screentone /
++  focus-lines / flash / vignette / crowd-silhouette — the 背景トーン device that
++  keys mood to emotion (kami.mangaka.expression :tone)."
++  [g tone x y w h]
++  (when (and tone (not (#{:none :flat-white} tone)))
++    (let [g2 (.create g)
++          x (double x) y (double y) w (double w) h (double h)
++          cx (+ x (/ w 2.0)) cy (+ y (/ h 2.0))]
++      (try
++        (.setClip g2 (int x) (int y) (int w) (int h))   ; g2 inherits g's AA (RenderingHints copied by .create)
++        (case tone
++          (:focus-lines :radial-burst)
++          (do (.setColor g2 (Color. 0 0 0 150)) (.setStroke g2 (BasicStroke. 2.0))
++              (doseq [a (range 0 360 6)]
++                (let [r (Math/toRadians a)]
++                  (.drawLine g2 (int cx) (int cy)
++                             (int (+ cx (* (Math/cos r) w 1.3)))
++                             (int (+ cy (* (Math/sin r) h 1.3)))))))
++          :flash
++          (do (.setColor g2 (Color. 0 0 0 205)) (.setStroke g2 (BasicStroke. 3.5))
++              (doseq [a (range 0 360 13)]
++                (let [r (Math/toRadians a)]
++                  (.drawLine g2 (int cx) (int cy)
++                             (int (+ cx (* (Math/cos r) w 1.3)))
++                             (int (+ cy (* (Math/sin r) h 1.3)))))))
++          :vignette-dark
++          (do (.setPaint g2 (RadialGradientPaint.
++                             (Point2D$Float. (float cx) (float cy)) (float (max w h))
++                             (float-array [0.5 1.0])
++                             (into-array Color [(Color. 0 0 0 0) (Color. 0 0 0 190)])))
++              (.fillRect g2 (int x) (int y) (int w) (int h)))
++          :gradient
++          (do (.setPaint g2 (GradientPaint. (float x) (float y) (Color. 0 0 0 0)
++                                            (float x) (float (+ y h)) (Color. 0 0 0 130)))
++              (.fillRect g2 (int x) (int y) (int w) (int h)))
++          :dot
++          (do (.setColor g2 (Color. 0 0 0 55))
++              (doseq [yy (range (int y) (int (+ y h)) 11) xx (range (int x) (int (+ x w)) 11)]
++                (.fillOval g2 xx yy 3 3)))
++          :hatching
++          (do (.setColor g2 (Color. 0 0 0 75)) (.setStroke g2 (BasicStroke. 1.0))
++              (doseq [d (range (int (- x h)) (int (+ x w)) 8)]
++                (.drawLine g2 d (int y) (int (+ d h)) (int (+ y h)))))
++          :crowd-silhouette
++          (do (.setColor g2 (Color. 0 0 0 95))
++              (doseq [i (range 0 (inc (int (/ w 40.0))))]
++                (let [hx (+ x 8 (* i 40.0)) hy (+ y (* h 0.5))]
++                  (.fillOval g2 (int hx) (int hy) 28 28)
++                  (.fillRect g2 (int (- hx 5)) (int (+ hy 22)) 38 (int (max 0 (- (+ y h) (+ hy 22))))))))
++          nil)
++        (finally (.dispose g2))))))
++
++(defn- nameplate!
++  "キャラ名札 → 黒箱に白抜きゴシック, コマ左下 (HxH の従事兵ラベル)."
++  [g text x y w h]
++  (when (and text (seq (str text)))
++    (.setFont g (font Font/BOLD 20))
++    (let [fm (.getFontMetrics g) pad 8
++          tw (.stringWidth fm (str text))
++          bw (+ (* 2 pad) tw) bh (+ (* 2 pad) (.getHeight fm))
++          bx (int (+ x 12)) by (int (- (+ y h) bh 12))]
++      (doto g (.setColor Color/BLACK) (.fillRect bx by bw bh)
++              (.setColor Color/WHITE))
++      (.drawString g ^String (str text) (int (+ bx pad)) (int (+ by pad (.getAscent fm)))))))
++
++(defn- chatter!
++  "モブのざわめき → 薄いグレーの小さな独白, コマ上部に散らす."
++  [g texts x y w]
++  (doseq [[i s] (map-indexed vector (filter #(seq (str %)) texts))]
++    (.setFont g (font Font/PLAIN 16))
++    (.setColor g (Color. 140 140 140))
++    (.drawString g ^String (str s)
++                 (int (+ x 14 (* i (* w 0.24))))
++                 (int (+ y 26 (* (mod i 2) 22))))))
++
++;; --- text wrapping (CJK: break by char to fit width) -------------------------
++
++(defn- wrap [g text max-w]
++  (let [fm (.getFontMetrics g)]
++    (loop [chars (seq (str text)) cur "" lines []]
++      (if (empty? chars)
++        (cond-> lines (seq cur) (conj cur))
++        (let [c (first chars) cand (str cur c)]
++          (if (and (seq cur) (> (.stringWidth fm cand) max-w))
++            (recur chars "" (conj lines cur))
++            (recur (rest chars) cand lines)))))))
++
++;; --- drawing helpers ---------------------------------------------------------
++
++(defn- aa! [g]
++  (doto g
++    (.setRenderingHint RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_ON)
++    (.setRenderingHint RenderingHints/KEY_INTERPOLATION RenderingHints/VALUE_INTERPOLATION_BILINEAR)
++    (.setRenderingHint RenderingHints/KEY_TEXT_ANTIALIASING RenderingHints/VALUE_TEXT_ANTIALIAS_ON)))
++
++(defn- shear-polygon
++  "[x y w h] + tilt degrees → a Path2D parallelogram shifting the TOP edge by
++  dx = h·tan(tilt) — the same shear model as
++  mangaka.layout.komawari/shear-polygon (ai-gftd-mangaka), here in Java2D
++  pixel space instead of normalized page-space."
++  ^Path2D$Double [x y w h tilt-deg]
++  (let [dx (* h (Math/tan (Math/toRadians tilt-deg)))]
++    (doto (Path2D$Double.)
++      (.moveTo (+ x dx) y)
++      (.lineTo (+ x w dx) y)
++      (.lineTo (+ x w) (+ y h))
++      (.lineTo x (+ y h))
++      (.closePath))))
++
++(defn- grayscale
++  "Luma-weighted grayscale copy of `img` — the print-manga monochrome pass.
++  Generated video frames often keep a colour cast (blue night tints etc.)
++  even under a black-and-white prompt; print manga is ink. Applied per
++  panel image when compose-page! gets `:monochrome? true` — lettering,
++  tones and frames are already ink-coloured, so only the art needs it."
++  ^BufferedImage [^BufferedImage img]
++  (let [w (.getWidth img) h (.getHeight img)
++        out (BufferedImage. w h BufferedImage/TYPE_INT_RGB)]
++    (doseq [y (range h) x (range w)]
++      (let [rgb (.getRGB img x y)
++            r (bit-and (bit-shift-right rgb 16) 0xff)
++            g (bit-and (bit-shift-right rgb 8) 0xff)
++            b (bit-and rgb 0xff)
++            l (int (min 255 (+ (* 0.299 r) (* 0.587 g) (* 0.114 b))))]
++        (.setRGB out x y (bit-or (bit-shift-left l 16) (bit-shift-left l 8) l))))
++    out))
++
++(defn- draw-cover
++  "Draws `img` covering [x y w h]. An optional komawari `tilt` (degrees) clips
++  to the sheared parallelogram instead of the axis-aligned rect — nil/absent
++  renders identically to before."
++  [g ^BufferedImage img x y w h & [tilt]]
++  (let [g2 (.create g)]
++    (try
++      (if tilt
++        (.setClip g2 (shear-polygon x y w h tilt))
++        (.setClip g2 (int x) (int y) (int w) (int h)))
++      (let [iw (.getWidth img) ih (.getHeight img)
++            s (max (/ (double w) iw) (/ (double h) ih))
++            sw (* iw s) sh (* ih s)
++            dx (+ x (/ (- w sw) 2.0)) dy (+ y (/ (- h sh) 2.0))]
++        (.drawImage g2 img (int dx) (int dy) (int sw) (int sh) nil))
++      (finally (.dispose g2)))))
++
++(defn- placeholder [g x y w h id & [tilt]]
++  (.setColor g (Color. 233 227 207))
++  (if tilt (.fill g (shear-polygon x y w h tilt)) (.fillRect g (int x) (int y) (int w) (int h)))
++  (doto g (.setColor (Color. 150 150 140)) (.setFont (font Font/PLAIN 22)))
++  (.drawString g (str id) (int (+ x 14)) (int (+ y 30))))
++
++(defn- caption-box
++  "Narration → a small caption box at the panel's top-left (serif, white). The
++  optional style map carries :weight (薄さ→色/太さ) + :scale (大きさ→フォント)
++  + :font-role (see `bubble`)."
++  [g text x y w & [{:keys [weight scale font-role]}]]
++  (when (and text (seq (str text)))
++    (.setFont g (font font-role (weight->style weight) (scaled 22 scale)))
++    (let [pad 10 maxw (int (- (* w 0.62) (* 2 pad)))
++          lines (wrap g text maxw)
++          fm (.getFontMetrics g) lh (+ 4 (.getHeight fm))
++          bw (+ (* 2 pad) (reduce max 1 (map #(.stringWidth fm %) lines)))
++          bh (+ (* 2 pad) (* lh (count lines)))
++          bx (+ x 10) by (+ y 10)]
++      (doto g (.setColor (Color. 255 253 247 235))
++              (.fillRect bx by bw bh)
++              (.setColor (Color. 60 60 56)) (.setStroke (BasicStroke. 1.5))
++              (.drawRect bx by bw bh))
++      (.setColor g (if (#{:faint :light} weight) (weight->color weight) (Color. 40 40 38)))
++      (doseq [[i ln] (map-indexed vector lines)]
++        (.drawString g ^String ln (int (+ bx pad)) (int (+ by pad (* (inc i) lh) -6)))))))
++
++(declare vertical-metrics)
++
++(defn tail-geometry
++  "Where a bubble's tail attaches and how far it reaches, as pure data (so
++  the shape is testable without a Graphics2D). The reference pages this
++  library's placement score is calibrated against (HUNTER×HUNTER 王位継承戦編)
++  draw tails as SHORT filled stubs on whichever bubble edge faces the
++  speaker — a pointer, not a leader line. The old rendering anchored the
++  tail on the bottom edge with a fixed 26px base and stretched the apex all
++  the way to the face: with a far-away speaker that degenerates into two
++  near-parallel lines crossing the whole panel (observed on a real genko
++  page — the single most visible defect after the boxes themselves were
++  fixed).
++
++  [bx by bw bh] the bubble rect in px, [target-x target-y] the speaker
++  point. Returns {:edge :l/:r/:t/:b, :base [[x1 y1] [x2 y2]] (on that edge),
++  :apex [x y]} — apex reach is clamped to ~35% of the gap to the target and
++  never more than 55px, so the stub points at the speaker without spanning
++  the distance. Returns nil if the target sits inside the bubble (no
++  direction to point)."
++  [[bx by bw bh] [target-x target-y]]
++  (let [bcx (+ bx (/ bw 2.0)) bcy (+ by (/ bh 2.0))
++        dx (- (double target-x) bcx) dy (- (double target-y) bcy)
++        dist (Math/sqrt (+ (* dx dx) (* dy dy)))]
++    (when (pos? dist)
++      (let [tx* (if (zero? dx) Double/MAX_VALUE
++                    (/ (- (if (pos? dx) (+ bx bw) bx) bcx) dx))
++            ty* (if (zero? dy) Double/MAX_VALUE
++                    (/ (- (if (pos? dy) (+ by bh) by) bcy) dy))
++            t (min tx* ty*)]
++        (when (< t 1.0)                       ; target outside the bubble
++          (let [edge (if (< tx* ty*) (if (pos? dx) :r :l) (if (pos? dy) :b :t))
++                ax (+ bcx (* t dx)) ay (+ bcy (* t dy))
++                gap (* dist (- 1.0 t))
++                stub (max 14.0 (min 55.0 (* 0.35 gap) (* 0.5 (min bw bh))))
++                ux (/ dx dist) uy (/ dy dist)
++                hb (max 8.0 (min 13.0 (* 0.11 (min bw bh))))
++                clamp (fn [v lo hi] (max lo (min hi v)))]
++            (case edge
++              (:t :b) (let [ey (if (= edge :b) (+ by bh -4) (+ by 4))
++                            cx* (clamp ax (+ bx hb 8) (- (+ bx bw) hb 8))]
++                        {:edge edge
++                         :base [[(- cx* hb) ey] [(+ cx* hb) ey]]
++                         :apex [(+ cx* (* stub ux)) (+ ey (* stub uy))]})
++              (:l :r) (let [ex (if (= edge :r) (+ bx bw -4) (+ bx 4))
++                            cy* (clamp ay (+ by hb 8) (- (+ by bh) hb 8))]
++                        {:edge edge
++                         :base [[ex (- cy* hb)] [ex (+ cy* hb)]]
++                         :apex [(+ ex (* stub ux)) (+ cy* (* stub uy))]}))))))))
++
++(defn- draw-tail!
++  "Render `tail-geometry` for a bubble: white filled stub, black outline,
++  then a white seam-cover where the base meets the bubble border."
++  [g geom shout?]
++  (when geom
++    (let [{:keys [edge base apex]} geom
++          [[x1 y1] [x2 y2]] base [ax ay] apex
++          txs (int-array [(int x1) (int x2) (int ax)])
++          tys (int-array [(int y1) (int y2) (int ay)])]
++      (doto g (.setColor Color/WHITE) (.fillPolygon txs tys 3)
++              (.setColor Color/BLACK)
++              (.setStroke (BasicStroke. (float (if shout? 5.0 3.0))))
++              (.drawPolygon txs tys 3)
++              (.setColor Color/WHITE))
++      (case edge
++        :b (.fillRect g (int (+ x1 2)) (int (- y1 3)) (int (- x2 x1 4)) 6)
++        :t (.fillRect g (int (+ x1 2)) (int (- y1 3)) (int (- x2 x1 4)) 6)
++        :l (.fillRect g (int (- x1 3)) (int (+ y1 2)) 6 (int (- y2 y1 4)))
++        :r (.fillRect g (int (- x1 3)) (int (+ y1 2)) 6 (int (- y2 y1 4)))))))
++
++(defn- bubble
++  "Dialogue → a white rounded speech bubble with a tail + black outline + JP text.
++  `cx` is the desired bubble centre; `side` (:l/:r) aims the tail. The optional
++  style map carries :weight (薄さ→色/太さ), :scale (大きさ→フォント), :shape
++  (:spike/:jagged/:burst の叫び系は太い輪郭で強調 — full clip-path は web reader 側;
++  :caption は説明・ナレーション用の角箱 — 角丸ゼロ・tail 常に無し。reference
++  pages put exposition in rectangular caption boxes hugging the frame, never
++  in a round speech bubble),
++  and :font-role (kami.mangaka.expression's per-archetype/register typeface —
++  :gothic/:mincho/:maru/:handwritten/… — see `font-role-families`; a speaker's
++  dialogue actually changes typeface, not just weight/size).
++  :tail? false suppresses the tail entirely — the reference pages give a
++  tail only to the FIRST bubble of a speaker's consecutive chain; the 2nd+
++  just sit adjacent (see `layout-bubbles`).
++  Returns bottom-y."
++  [g text cx top w side & [{:keys [weight scale shape writing-mode columns
++                                   width-ratio height-ratio panel-height tail-target
++                                   font-role tail?] :or {tail? true}}]]
++  (when (and text (seq (str text)))
++    (.setFont g (font font-role (weight->style weight) (scaled 25 scale)))
++    (let [vertical? (= writing-mode "vertical-rtl")
++          shout? (boolean (#{:spike :jagged :burst} shape))
++          caption? (= :caption shape)
++          vm (when vertical? (vertical-metrics {:scale scale :weight weight
++                                                :font-role font-role}))
++          pad (if vertical? (:pad vm) 17)
++          maxw (int (* w (double (or width-ratio 0.46))))
++          lines (if vertical?
++                  (or (seq columns) (mapv str (seq (str text))))
++                  (wrap g text maxw))
++          fm (.getFontMetrics g) lh (+ 6 (.getHeight fm))
++          tw (if vertical?
++               (:col-pitch vm)
++               (reduce max 1 (map #(.stringWidth fm %) lines)))
++          bw (if width-ratio (max (+ (* 2 pad) tw) (* w width-ratio)) (+ (* 2 pad) tw))
++          bh (if height-ratio (max (+ (* 2 pad) (if vertical? (:char-pitch vm) lh))
++                                   (* (or panel-height w) height-ratio))
++                 (+ (* 2 pad) (* (if vertical? (:char-pitch vm) lh) (count lines))))
++          bx (- cx (/ bw 2.0)) by top
++          rad (cond caption? 0 shout? 8 :else 38)
++          rr (RoundRectangle2D$Double. bx by bw bh rad rad)
++          geom (when (and tail? (not caption?))
++                 (tail-geometry [bx by bw bh]
++                                (or tail-target
++                                    [(+ bx (* bw (if (= side :r) 0.72 0.16)) 13)
++                                     (+ by bh 24)])))]
++      (doto g (.setColor Color/WHITE) (.fill rr)
++              (.setColor Color/BLACK) (.setStroke (BasicStroke. (float (if shout? 5.0 3.0))))
++              (.draw rr))
++      (draw-tail! g geom shout?)
++      (.setColor g (weight->color weight))
++      (if vertical?
++        ;; column cells advance leftward from the RIGHT padding line: col 0's
++        ;; cell is [right-pad - col-pitch, right-pad], glyph centred in its
++        ;; cell. The old formula drew col 0's glyph left edge AT the right
++        ;; padding line, so at larger scales the glyph crossed the border
++        ;; (廊/ナ clipped on a real page) while the LEFT side kept a
++        ;; pad+one-column ghost margin — the off-by-one behind both the
++        ;; overflow and the '余白空きすぎ' complaints at once.
++        (let [chars (seq (str text))
++              {:keys [font-size char-pitch col-pitch]} vm
++              rows (max 1 (int (/ (+ (- bh (* 2 pad)) 0.5) char-pitch)))
++              x-inset (int (/ (- col-pitch font-size) 2))
++              baseline (int (Math/round (* 0.9 font-size)))]
++          (doseq [[i ch] (map-indexed vector chars)]
++            (let [col (quot i rows) row (mod i rows)]
++              (.drawString g (str ch)
++                           (int (+ (- (+ bx bw) pad (* (inc col) col-pitch)) x-inset))
++                           (int (+ by pad (* row char-pitch) baseline))))))
++        (doseq [[i ln] (map-indexed vector lines)]
++          (.drawString g ^String ln
++                       (int (- cx (/ (.stringWidth fm ln) 2.0)))
++                       (int (+ by pad (* (inc i) lh) -8)))))
++      (+ by bh 30))))
++
++(defn- draw-sfx
++  "SFX (擬音) → bold white text with a black stroke, tilted. The
++  locale-resolved string (e.g. ちゃぷ / lap…). `font-role` (see `bubble`)
++  picks the typeface — SFX usually wants :brush, not the dialogue default.
++  `pos` [px py] places the anchor at panel-local 0-1 fractions — the old
++  fixed anchor (0.5, 0.3·w) dropped a ピ straight onto a character's
++  forehead on a real page; SFX belongs where the sound happens (a tapping
++  thumb, a slammed door), which only the author knows."
++  [g text x y w & [scale font-role pos h]]
++  (when (and text (seq (str text)))
++    (let [g2 (.create g)]
++      (try
++        (let [fsz (int (max 30 (* w 0.16 (double (or scale 1.0)))))
++              [px py] pos
++              sx  (int (+ x (* w (double (or px 0.5)))))
++              sy  (int (+ y (if (and py h) (* (double h) (double py)) (* w 0.3))))]
++          (.setFont g2 (font font-role Font/BOLD fsz))
++          (.rotate g2 (Math/toRadians -8) sx sy)
++          (.setColor g2 Color/BLACK)
++          (doseq [dx [-3 -2 2 3] dy [-3 -2 2 3]]
++            (.drawString g2 ^String (str text) (+ sx (int dx)) (+ sy (int dy))))
++          (.setColor g2 Color/WHITE)
++          (.drawString g2 ^String (str text) sx sy))
++        (finally (.dispose g2))))))
++
++;; --- pre-flight sizing (public): compute a dialogue/SFX box BEFORE calling
++;; compose-page!, so callers (genko authoring, generation pipelines) don't
++;; have to guess :width/:height fractions and re-render to find out they were
++;; wrong. `bubble`'s vertical-text loop places character i at
++;; col=(quot i rows), row=(mod i rows) and does NOT clip or grow the bubble
++;; to fit — a box sized too small silently draws the tail characters past the
++;; bubble's own left edge (they land on the panel art, not "dropped" but
++;; effectively illegible). These functions reuse the *exact* same formulas
++;; `bubble` draws with (not an approximation of them), so a box this reports
++;; as fitting is guaranteed to fit when compose-page! actually draws it.
++
++(def ^:private metrics-scratch
++  (delay (.createGraphics (BufferedImage. 8 8 BufferedImage/TYPE_INT_RGB))))
++
++(defn line-height-for
++  "Pixel line-height for HORIZONTAL text (caption wrap etc.) at a given
++  :scale/:weight/:font-role — mirrors `bubble`'s horizontal `lh` exactly
++  (font size = (scaled 25 scale), lh = 6 + FontMetrics.getHeight).
++  Vertical dialogue does NOT use this any more — FontMetrics.getHeight
++  includes Latin leading (~1.5em) which is why vertical text used to sit in
++  boxes far airier than the reference pages; see `vertical-metrics`."
++  [{:keys [scale weight font-role]}]
++  (let [f (font font-role (weight->style weight) (scaled 25 scale))
++        fm (.getFontMetrics ^java.awt.Graphics2D @metrics-scratch f)]
++    (+ 6 (.getHeight fm))))
++
++(defn vertical-metrics
++  "The em-derived metrics `bubble`'s vertical-rtl branch draws with, and the
++  single source of truth `fit-vertical-dialogue` replays. Calibrated
++  against the same HUNTER×HUNTER 王位継承戦編 pages as the placement score:
++  vertical character pitch there is ~1.05-1.15em (glyphs nearly touching),
++  column pitch ~1.2-1.3em, and the bubble's inner padding ~0.5-0.8em OF THE
++  FONT SIZE — not a fixed pixel amount, so a small whisper bubble is snug
++  and a large narration box doesn't balloon. The previous metrics
++  (FontMetrics.getHeight()+6 for both pitches ≈1.5em, fixed 17px pad) are
++  why real pages read airy/loose next to the reference. CJK glyphs are
++  em-square, so pitch derives from the font SIZE, not from getHeight's
++  Latin leading."
++  [{:keys [scale]}]
++  (let [fsz (scaled 25 scale)]
++    {:font-size fsz
++     :pad (max 10 (int (Math/round (* fsz 0.6))))
++     :char-pitch (max 1 (int (Math/round (* fsz 1.12))))
++     :col-pitch (max 1 (int (Math/round (* fsz 1.28))))}))
++
++(defn- vertical-rows-for
++  "Same `rows` formula as `bubble`'s vertical-text branch: how many
++  characters fit down one column at height `bh` with char pitch `pitch`
++  and inner padding `pad`."
++  [bh pitch pad]
++  ;; +0.5px slack before the floor: bh often arrives as height-fraction *
++  ;; panel-h where the fraction was computed FROM an exact rows count —
++  ;; float round-trip can land 1e-13 under the exact multiple and floor a
++  ;; row away (a real lost-row hazard, found by the metrics test suite).
++  (max 1 (int (/ (+ (- bh (* 2 pad)) 0.5) pitch))))
++
++(defn- vertical-cols-needed
++  "The column index of the LAST character (0-based) + 1, replaying `bubble`'s
++  own `col = (quot i rows)` assignment for i in [0, n) -- i.e. exactly how
++  many columns `bubble` will actually use for `n` characters at `rows` rows
++  per column (not a separate ceil-based estimate of it)."
++  [n rows]
++  (inc (quot (dec (max 1 n)) rows)))
++
++(defn fit-vertical-dialogue
++  "Pre-flight box size for one `writing-mode \"vertical-rtl\"` dialogue
++  string, given the panel's actual pixel `:panel-w`/`:panel-h` (from
++  `layout-page`, NOT guessed) and the same :scale/:weight the caller will
++  pass to `bubble` via the panel's :dialogue map. Returns
++  {:width :height :cols :rows :fits?} — guaranteed (by replaying `bubble`'s
++  own placement formula, not a separate approximation of it) to hold every
++  character inside the drawn bubble.
++
++  The search starts TIGHT (rows=1: the shortest, widest box the text could
++  possibly use) and grows rows only as needed, so the returned :height is
++  never padded past what the text actually needs — a caller that always got
++  a box padded out to some fixed height regardless of text length is why
++  bubbles used to render as mostly empty white space. Rows grows for either
++  of two reasons: (1) the box is still too WIDE at `:max-width` (default
++  0.94) — keeps growing (taller column = fewer, narrower columns) up to
++  `:max-height` (default 0.94), returning :fits? false at the caps if even
++  that doesn't fit (the caller should shrink :scale and retry rather than
++  ship a box that silently draws characters past its own left edge — see
++  the `bubble` docstring, it does not clip or grow itself); or (2) the box
++  is already narrow enough but unattractively FLAT (wide relative to tall —
++  a 42-character narration in a wide panel is mathematically satisfied by 2
++  rows x 21 columns, which is not how manga narration boxes read) — grows
++  toward `:target-height` (default 0.5, a soft aesthetic ceiling, NOT a
++  floor) until the box's aspect clears `:min-aspect` (default 0.6, i.e.
++  height >= width * 0.6) or :target-height's row budget is exhausted,
++  whichever comes first."
++  [text {:keys [scale weight font-role panel-w panel-h max-width max-height
++                target-height min-aspect]
++         :or {max-width 0.94 max-height 0.94 target-height 0.5 min-aspect 0.6}}]
++  (let [n (count (str text))
++        {:keys [pad char-pitch col-pitch]} (vertical-metrics {:scale scale :weight weight
++                                                              :font-role font-role})
++        max-rows (vertical-rows-for (* panel-h max-height) char-pitch pad)
++        target-rows (max 1 (min max-rows (vertical-rows-for (* panel-h target-height) char-pitch pad)))
++        box-at (fn [rows]
++                 (let [cols (vertical-cols-needed n rows)
++                       bw (+ (* 2 pad) (* cols col-pitch))
++                       bh (+ (* 2 pad) (* rows char-pitch))]
++                   {:width (/ bw panel-w) :height (/ bh panel-h) :cols cols :rows rows}))]
++    (loop [rows 1]
++      (let [{:keys [width height] :as box} (box-at rows)
++            wide-enough? (<= width max-width)
++            tall-enough? (or (>= rows target-rows) (>= height (* width min-aspect)))]
++        (cond
++          (and wide-enough? tall-enough?) (assoc box :fits? true)
++          (>= rows max-rows) (assoc (box-at max-rows) :width max-width :fits? false)
++          :else (recur (inc rows)))))))
++
++(defn fit-sfx
++  "Pre-flight check for `draw-sfx` (single-line, not column-wrapped): the
++  font size `draw-sfx` will actually use, and whether the rendered string
++  width fits within `:max-width` (default 0.9) of the panel. `:fits? false`
++  means the caller should lower :scale — draw-sfx does not wrap or shrink
++  SFX text itself."
++  [text {:keys [scale panel-w font-role] :or {scale 1.0}}]
++  (let [fsz (int (max 30 (* panel-w 0.16 (double scale))))
++        f (font font-role Font/BOLD fsz)
++        fm (.getFontMetrics ^java.awt.Graphics2D @metrics-scratch f)
++        tw (.stringWidth fm (str text))]
++    {:font-size fsz :text-width tw :fits? (<= tw (* panel-w 0.9))}))
++
++;; --- bubble layout (size + place + tail, one call) ---------------------------
++;; Grown on a real genko page (ghosthacker p2, 13 bubbles) where every panel
++;; needed the same dance by hand: pick a safe zone beside/above the speaker's
++;; face, size the text into it with fit-vertical-dialogue (shrinking :scale
++;; when the zone is tight), stack same-corner bubbles without collision, aim
++;; the tail. Three real bugs shipped past the hand-rolled version of this
++;; (illegible 1-row collapse, bubbles drawn despite :fits? false, stacked
++;; bubbles overlapping each other) — all three are structural here instead.
++
++(defn- rects-overlap? [[l1 t1 r1 b1] [l2 t2 r2 b2]]
++  (and (< l1 r2) (< l2 r1) (< t1 b2) (< t2 b1)))
++
++(defn layout-bubbles
++  "Size and place one panel's dialogue bubbles. `panel` needs the panel's
++  actual pixel :panel-w/:panel-h (from `panel-pixel-sizes`, NOT guessed);
++  `specs` is a vector of, per bubble:
++    :text / :speaker         the line and who says it (speaker may be nil)
++    :corner                  :tl/:tr/:bl/:br — which corner this bubble hugs
++    :face-bbox               [l t r b] 0-1: the speaker's face — bubbles are
++                             sized into the space BESIDE (x-strategy) or
++                             ABOVE (y-strategy) it, whichever fits at the
++                             larger scale
++    :below-face?             true = the strip above the face is thinner than
++                             the bubble's fixed padding (structurally
++                             impossible at any scale) — place BELOW instead
++    :caption?                true = exposition/narration, NOT speech: renders
++                             as a rectangular caption box (:bubble :caption),
++                             never gets a tail or a tail-target — the
++                             reference pages keep narration in square boxes
++                             hugging the frame, only voiced lines get round
++                             bubbles
++    :scale :weight :font-role :bubble  style, as resolve-style returns
++    :target-height :min-aspect :max-width :scale-floor  fit tuning
++  Options :margin (default 0.045) / :gap (0.035) are the breathing margins
++  against the panel edge and between stacked bubbles.
++
++  Returns {:dialogue [...] :warnings [...]}: each dialogue entry is ready
++  for compose-page! (:pos/:width/:height/:scale/:tail-target/:tail?) and
++  carries :rect/:corner/:face-bbox/:fits?/:chained? for
++  panel-placement-score. Tail policy follows the reference pages: only the
++  FIRST bubble of a speaker's consecutive run gets a tail; the 2nd+ are
++  :tail? false and :chained? true (scored on adjacency to their
++  predecessor, not corner distance). Any :fits? false entry lands in
++  :warnings — it WILL render illegibly, fix the input (shorter line, more
++  room, below-face?) rather than shipping it."
++  [{:keys [panel-w panel-h margin gap] :or {margin 0.045 gap 0.035}} specs]
++  (let [scale-floor* 0.18
++        sized
++        (mapv (fn [{:keys [text corner face-bbox below-face? scale weight font-role
++                           target-height min-aspect max-width scale-floor] :as spec}]
++                (let [floor (or scale-floor scale-floor*)
++                      scale0 (or scale 0.95)
++                      buffer 0.02
++                      [fl ft fr fb] face-bbox
++                      x-safe-w (when (and face-bbox (not below-face?))
++                                 (case corner
++                                   (:tl :bl) (when (> fl margin) (- fl margin buffer))
++                                   (:tr :br) (when (< fr (- 1.0 margin))
++                                               (- (- 1.0 margin) fr buffer))
++                                   nil))
++                      y-safe-h (when face-bbox
++                                 (if below-face?
++                                   (max 0.05 (- 1.0 margin fb buffer))
++                                   (max 0.05 (- ft margin buffer))))
++                      try-strategy
++                      (fn [max-w* max-h*]
++                        (let [try-fit (fn [s]
++                                        (fit-vertical-dialogue
++                                         text {:scale s :weight weight :font-role font-role
++                                               :panel-w panel-w :panel-h panel-h
++                                               :target-height (min (or target-height 0.4) max-h*)
++                                               :max-height max-h* :max-width max-w*
++                                               :min-aspect (or min-aspect 0.3)}))]
++                          (loop [s scale0]
++                            (let [f (try-fit s)]
++                              (cond
++                                (and (:fits? f) (<= (:height f) (+ max-h* 0.01))) [s f]
++                                (<= s floor) [s f :failed]
++                                :else (recur (- s 0.02)))))))
++                      x-result (when (and x-safe-w (>= x-safe-w 0.18))
++                                 (try-strategy (min (or max-width 0.94) x-safe-w) 0.94))
++                      y-result (when face-bbox
++                                 (try-strategy (or max-width 0.94) y-safe-h))
++                      no-face-result (when-not face-bbox
++                                       (try-strategy (or max-width 0.94) 0.94))
++                      candidates (remove nil? [x-result y-result no-face-result])
++                      [s fit failed] (first (sort-by (fn [[s _ f]] [(boolean f) (- s)])
++                                                     candidates))]
++                  (assoc spec :scale s :width (:width fit) :height (:height fit)
++                         :fits? (and (:fits? fit) (not failed)))))
++              specs)
++        placed
++        (loop [in sized placed []]
++          (if (empty? in)
++            placed
++            (let [{:keys [corner width height face-bbox below-face?] :as b} (first in)
++                  left (case corner
++                         (:tl :bl) margin
++                         (:tr :br) (- 1.0 margin width)
++                         margin)
++                  left (max margin (min left (- 1.0 margin width)))
++                  top-start (if (and below-face? face-bbox)
++                              (+ (nth face-bbox 3) 0.02)
++                              margin)
++                  top (loop [top top-start]
++                        (let [cand [left top (+ left width) (+ top height)]]
++                          (if (or (> (+ top height) (- 1.0 margin))
++                                  (not-any? #(rects-overlap? cand %) (map :rect placed)))
++                            top
++                            (recur (+ top gap)))))]
++              (recur (rest in)
++                     (conj placed
++                           (assoc b :pos [(+ left (/ width 2.0)) top]
++                                  :rect [left top (+ left width) (+ top height)]))))))
++        chain-key (fn [b] (or (:speaker b) (:face-bbox b)))
++        dialogue
++        (first
++         (reduce (fn [[out seen] b]
++                   (let [k (chain-key b)
++                         prev (get seen k)
++                         face (:face-bbox b)
++                         caption? (:caption? b)
++                         tail-target (when (and face (not prev) (not caption?))
++                                       [(/ (+ (nth face 0) (nth face 2)) 2.0)
++                                        (/ (+ (nth face 1) (nth face 3)) 2.0)])]
++                     [(conj out (cond-> (assoc b
++                                               :writing-mode (or (:writing-mode b) "vertical-rtl")
++                                               :tail? (and (nil? prev) (not caption?)))
++                                  caption? (assoc :bubble :caption)
++                                  tail-target (assoc :tail-target tail-target)
++                                  prev (assoc :chained? true :prev-rect (:rect prev))))
++                      (assoc seen k b)]))
++                 [[] {}] placed))]
++    {:dialogue dialogue
++     :warnings (vec (concat
++                     (for [d dialogue :when (false? (:fits? d))]
++                       {:text (:text d) :speaker (:speaker d)
++                        :reason :does-not-fit
++                        :hint "shorter line / :below-face? / larger safe zone — this WILL render illegibly"})
++                     ;; the collision scan returns its last candidate when it
++                     ;; runs out of vertical room, which can still overlap a
++                     ;; predecessor — that means the caller's per-bubble
++                     ;; height budget doesn't leave room for the stack
++                     ;; (2 × target-height 0.6 cannot stack in one panel).
++                     ;; Surfaced, not silently shipped.
++                     (for [[i d] (map-indexed vector dialogue)
++                           e (drop (inc i) dialogue)
++                           :when (rects-overlap? (:rect d) (:rect e))]
++                       {:texts [(:text d) (:text e)]
++                        :reason :mutual-overlap
++                        :hint "stack budget exceeded — lower :target-height/:scale so the bubbles fit the panel together"})))}))
++
++;; --- bubble placement score (HUNTER×HUNTER 王位継承戦編 baseline) --------------
++;; Not "does the text fit its own box" (fit-vertical-dialogue already
++;; guarantees that) but "is the box PLACED the way this library's own
++;; observation data (komawari_styles.edn, sourced from real 冨樫義博
++;; panels — :nameplate/:chatter/:energetic/:hot-blooded/:cold-menace) says a
++;; manga bubble reads": flush against a panel corner, never over the
++;; speaker's own face, tail landing ON the speaker, panel border left
++;; rectilinear (Togashi: dynamism lives in bubble register contrast, not
++;; frame shearing). Found the hard way authoring a real genko page: a box
++;; that only satisfies fit-vertical-dialogue's :fits? can still fully cover
++;; a character's eyes — that is a DIFFERENT failure this scores separately
++;; and weights highest, because it is the one a "looks fine" skim misses.
++
++(defn- rect-overlap-area [[l1 t1 r1 b1] [l2 t2 r2 b2]]
++  (* (max 0.0 (- (min r1 r2) (max l1 l2)))
++     (max 0.0 (- (min b1 b2) (max t1 t2)))))
++
++(defn- rect-area [[l t r b]] (* (max 0.0 (- r l)) (max 0.0 (- b t))))
++
++(defn- point-in-rect? [[x y] [l t r b]] (and (<= l x r) (<= t y b)))
++
++(defn bubble-placement-score
++  "One bubble's placement, scored against the baseline above. Inputs (all
++  panel-local 0-1 fractions):
++    :bubble-rect  [left top right bottom] — what was actually placed
++    :panel-rect   defaults to [0 0 1 1] (the whole panel)
++    :face-bbox    the speaker's approximate face region, REQUIRED — this
++                  score cannot judge face-clearance without it (a bubble
++                  authored with no :face-bbox scores :face-clear nil, not a
++                  false 1.0 — an unmeasured dimension must read as
++                  unmeasured, not as passing)
++    :corner       :tl/:tr/:bl/:br this bubble was authored to hug, or nil
++    :prev-rect    for the 2nd+ bubble of a speaker's consecutive chain (see
++                  `layout-bubbles` :chained?): the PREVIOUS bubble's rect.
++                  The reference pages never re-hug a corner mid-chain — the
++                  follow-up bubble sits adjacent to its predecessor, so
++                  when :prev-rect is given, :corner-hug measures adjacency
++                  to it instead of distance to a corner (a chained bubble
++                  used to eat an unconditional corner-hug=0, a false
++                  penalty for the reference layout itself)
++    :fits?        fit-vertical-dialogue's verdict, if the caller has it —
++                  scores :legible 1.0/0.0. A box that draws characters past
++                  its own edge is the worst defect on the page and used to
++                  be INVISIBLE to this score (0.865-scoring page shipped
++                  two unreadable bubbles)
++    :tail-target  [x y] the tail's endpoint, or nil
++    :tilted?      true if this panel/row used a force-line shear (default
++                  false — komawari_styles.edn's Togashi baseline is
++                  rectilinear; :toriyama-style pages should pass this
++                  explicitly, not silently score as violating their OWN
++                  style)
++
++  Returns {:face-clear :corner-hug :tail-on-speaker :rectilinear :legible
++  :score}. Each dimension is 0-1 or nil (not measured); :score is the
++  weighted mean of the non-nil dimensions — nil dimensions are excluded,
++  not defaulted, so an incomplete input can't average up to a flattering
++  score."
++  [{:keys [bubble-rect panel-rect face-bbox corner prev-rect below-face? fits?
++           tail-target tilted?]
++    :or {panel-rect [0.0 0.0 1.0 1.0] tilted? false}}]
++  (let [face-clear (when face-bbox
++                      (let [overlap (rect-overlap-area bubble-rect face-bbox)
++                            ba (rect-area bubble-rect)]
++                        (if (or (zero? overlap) (zero? ba)) 1.0
++                            (max 0.0 (- 1.0 (* 3.0 (/ overlap ba)))))))
++        [bl bt br bb] bubble-rect
++        [pl pt pr pb] panel-rect
++        margin 0.15
++        corner-hug (cond
++                     prev-rect
++                     (let [[ql qt qr qb] prev-rect
++                           gx (max 0.0 (- bl qr) (- ql br))
++                           gy (max 0.0 (- bt qb) (- qt bb))
++                           d (max gx gy)]
++                       (- 1.0 (min 1.0 (/ d margin))))
++                     ;; a below-face bubble CANNOT hug a top corner — that
++                     ;; strip is exactly what was structurally impossible.
++                     ;; Its reference posture is: hugged on the corner's
++                     ;; x-side, tucked right under the face. Scoring it on
++                     ;; corner distance handed every below-face bubble an
++                     ;; unconditional 0.
++                     (and below-face? face-bbox corner)
++                     (let [fb (nth face-bbox 3)
++                           dx (case corner (:tl :bl) (- bl pl) (:tr :br) (- pr br))
++                           dy (max 0.0 (- bt fb))]
++                       (- 1.0 (min 1.0 (/ (max 0.0 dx dy) margin))))
++                     corner
++                     (let [dx (case corner (:tl :bl) (- bl pl) (:tr :br) (- pr br))
++                           dy (case corner (:tl :tr) (- bt pt) (:bl :br) (- pb bb))]
++                       (- 1.0 (min 1.0 (/ (max 0.0 dx dy) margin)))))
++        tail-on-speaker (when (and tail-target face-bbox)
++                          (if (point-in-rect? tail-target face-bbox) 1.0 0.0))
++        rectilinear (if tilted? 0.0 1.0)
++        legible (when (some? fits?) (if fits? 1.0 0.0))
++        weights {:face-clear 0.45 :tail-on-speaker 0.2 :corner-hug 0.2
++                 :rectilinear 0.15 :legible 0.45}
++        dims {:face-clear face-clear :corner-hug corner-hug
++              :tail-on-speaker tail-on-speaker :rectilinear rectilinear
++              :legible legible}
++        measured (into {} (filter (comp some? val)) dims)
++        wsum (reduce + (map weights (keys measured)))
++        score (when (pos? wsum)
++                (/ (reduce + (map (fn [[k v]] (* v (get weights k))) measured)) wsum))]
++    (assoc dims :score score)))
++
++(defn panel-placement-score
++  "bubble-placement-score for every dialogue entry in one placed panel (each
++  entry needs :bubble-rect and, to be scored on face-clearance/tail
++  accuracy, :face-bbox/:tail-target/:corner — plus :prev-rect/:fits? per
++  bubble-placement-score) -> {:bubbles […] :bubble-overlap 0-1 :score}.
++
++  :bubble-overlap is a PANEL-level axis the per-bubble scores can't see:
++  bubbles that overlap EACH OTHER hide each other's text (a 3-bubble
++  monologue stack once rendered with each box 65-71% of panel height, all
++  three overlapping — every individual bubble scored fine). Computed as
++  1 - min(1, 5 * pairwise-overlap-area / total-bubble-area) and MULTIPLIED
++  into :score, not averaged — mutually-hidden text corrupts the whole
++  panel, a good mean shouldn't dilute it."
++  [bubbles]
++  (let [scored (mapv bubble-placement-score bubbles)
++        scores (keep :score scored)
++        rects (keep :bubble-rect bubbles)
++        pair-overlap (reduce + 0.0 (for [[i r1] (map-indexed vector rects)
++                                          r2 (drop (inc i) rects)]
++                                      (rect-overlap-area r1 r2)))
++        total-area (reduce + 0.0 (map rect-area rects))
++        bubble-overlap (if (pos? total-area)
++                         (- 1.0 (min 1.0 (* 5.0 (/ pair-overlap total-area))))
++                         1.0)]
++    {:bubbles scored
++     :bubble-overlap bubble-overlap
++     :score (when (seq scores)
++              (* bubble-overlap (/ (reduce + scores) (count scores))))}))
++;; Both fields live on the panel in the lexicon's panel-local 0-1000 coordinate
++;; space (both axes, independent of the panel's pixel size): {:centerX 480
++;; :centerY 450} means 48% across / 45% down the panel rect. Z-order per the
++;; lexicon: panel art → tones → effectLines → SFX → bubbles.
++
++(defn- fx->px
++  "Panel-local 0-1000 coordinate `v` → a pixel position along [origin origin+extent]
++  (nil → 500 = panel centre)."
++  ^double [v origin extent]
++  (+ (double origin) (* (double extent) (/ (double (or v 500)) 1000.0))))
++
++(defn- draw-effect-lines!
++  "Draw 効果線 (effect lines) over the panel rect [x y w h] — the lexicon panel
++  field `effectLines`: [{:kind :centerX :centerY :density :coverage}…] in
++  panel-local 0-1000 coords. Kinds:
++    :focus / :explosion — radial black lines from the panel border toward the
++      centre, leaving an inner clear radius derived from :coverage (85 → lines
++      cover the outer 85% of the radius); :explosion adds per-line angle jitter
++      + an irregular inner radius (seeded, so bakes stay deterministic).
++    :flash — lighter-stroke radial burst (alternating inner reach = フラッシュ).
++    :speed — parallel horizontal lines (optional :direction degrees rotates them).
++  :density ≈ line count. Unknown kinds are ignored. Clipped to the panel rect;
++  drawn after the tone layer and before SFX/bubbles (lexicon z-order)."
++  [g lines x y w h]
++  (doseq [{:keys [kind centerX centerY density coverage direction]} lines]
++    (let [g2 (.create g)]
++      (try
++        (.setClip g2 (int x) (int y) (int w) (int h))
++        (let [kind (keyword (str/lower (name (or kind :focus))))
++              n    (int (min 240 (max 4 (long (if (number? density) density 32)))))
++              cov  (double (if (number? coverage) coverage 70))
++              cx   (fx->px centerX x w)
++              cy   (fx->px centerY y h)
++              ;; far enough to reach the panel's farthest corner from the centre
++              rmax (Math/hypot (max (- cx x) (- (+ x w) cx))
++                               (max (- cy y) (- (+ y h) cy)))
++              r0   (* rmax (max 0.02 (- 1.0 (/ cov 100.0))))
++              rnd  (java.util.Random. (long (+ n (* 31 (long cx)) (* 131 (long cy)))))]
++          (case kind
++            (:focus :explosion)
++            (let [expl? (= kind :explosion)]
++              (.setColor g2 (Color. 0 0 0 (if expl? 225 195)))
++              (doseq [i (range n)]
++                (let [base (* 2.0 Math/PI (/ (double i) n))
++                      a    (if expl? (+ base (* 0.12 (.nextGaussian rnd))) base)
++                      ri   (if expl? (* r0 (+ 0.55 (* 0.9 (.nextDouble rnd)))) r0)]
++                  (.setStroke g2 (BasicStroke. (float (if expl?
++                                                        (+ 1.5 (* 2.5 (.nextDouble rnd)))
++                                                        2.0))))
++                  (.drawLine g2 (int (+ cx (* ri (Math/cos a)))) (int (+ cy (* ri (Math/sin a))))
++                             (int (+ cx (* rmax (Math/cos a)))) (int (+ cy (* rmax (Math/sin a))))))))
++            :flash
++            (do (.setColor g2 (Color. 0 0 0 130))
++                (.setStroke g2 (BasicStroke. 1.2))
++                (doseq [i (range n)]
++                  (let [a  (* 2.0 Math/PI (/ (double i) n))
++                        ri (* r0 (if (even? i) 1.0 1.4))]
++                    (.drawLine g2 (int (+ cx (* ri (Math/cos a)))) (int (+ cy (* ri (Math/sin a))))
++                               (int (+ cx (* rmax (Math/cos a)))) (int (+ cy (* rmax (Math/sin a))))))))
++            :speed
++            (let [ang  (Math/toRadians (double (if (number? direction) direction 0)))
++                  mx   (+ x (/ w 2.0)) my (+ y (/ h 2.0))
++                  span (Math/hypot w h)
++                  x0   (- mx (/ span 2.0))]
++              (.rotate g2 ang mx my)
++              (.setColor g2 (Color. 0 0 0 175))
++              (doseq [i (range n)]
++                (let [yy (+ y (* h (/ (+ i 0.5) (double n))) (* 2.0 (.nextGaussian rnd)))
++                      st (+ x0 (* span 0.35 (.nextDouble rnd)))
++                      en (+ st (* span (+ 0.35 (* 0.45 (.nextDouble rnd)))))]
++                  (.setStroke g2 (BasicStroke. (float (+ 0.8 (* 1.6 (.nextDouble rnd))))))
++                  (.drawLine g2 (int st) (int yy) (int en) (int yy)))))
++            nil))
++        (finally (.dispose g2))))))
++
++(defn- draw-gaze-overlay!
++  "視線誘導 (gaze guidance) REVIEW overlay — NOT print content: only drawn when
++  `compose-page!` is called with :gaze-overlay? true. `gaze` is the lexicon
++  panel field {:entryX :entryY :focusX :focusY :exitX :exitY :impression} in
++  panel-local 0-1000 coords: a dashed red entry→focus→exit curve (a quadratic
++  passing through the focus point) with an entry dot, a focus ring, an
++  arrowhead at the exit, and the :impression label near the entry."
++  [g gaze x y w h]
++  (when (map? gaze)
++    (let [g2 (.create g)]
++      (try
++        (.setClip g2 (int x) (int y) (int w) (int h))
++        (let [ex (fx->px (:entryX gaze) x w) ey (fx->px (:entryY gaze) y h)
++              fx (fx->px (:focusX gaze) x w) fy (fx->px (:focusY gaze) y h)
++              gx (fx->px (:exitX gaze) x w)  gy (fx->px (:exitY gaze) y h)
++              ;; control point so the quadratic passes through focus at t=0.5
++              qx (- (* 2.0 fx) (/ (+ ex gx) 2.0))
++              qy (- (* 2.0 fy) (/ (+ ey gy) 2.0))
++              red (Color. 220 30 30 235)]
++          (.setColor g2 red)
++          (.setStroke g2 (BasicStroke. 3.0 BasicStroke/CAP_ROUND BasicStroke/JOIN_ROUND
++                                       10.0 (float-array [12.0 9.0]) 0.0))
++          (.draw g2 (doto (Path2D$Double.) (.moveTo ex ey) (.quadTo qx qy gx gy)))
++          (.fillOval g2 (int (- ex 5)) (int (- ey 5)) 10 10)          ; entry dot
++          (.setStroke g2 (BasicStroke. 2.5))
++          (.drawOval g2 (int (- fx 11)) (int (- fy 11)) 22 22)        ; focus ring
++          ;; arrowhead at the exit along the curve's end tangent (exit − control)
++          (let [vx (- gx qx) vy (- gy qy)
++                m  (max 1.0E-6 (Math/hypot vx vy))
++                ux (/ vx m) uy (/ vy m) len 18.0
++                rot (fn [th] [(- (* (- ux) (Math/cos th)) (* (- uy) (Math/sin th)))
++                              (+ (* (- ux) (Math/sin th)) (* (- uy) (Math/cos th)))])
++                [lx ly] (rot 0.45) [rx ry] (rot -0.45)]
++            (.setStroke g2 (BasicStroke. 3.0 BasicStroke/CAP_ROUND BasicStroke/JOIN_ROUND))
++            (.drawLine g2 (int gx) (int gy) (int (+ gx (* len lx))) (int (+ gy (* len ly))))
++            (.drawLine g2 (int gx) (int gy) (int (+ gx (* len rx))) (int (+ gy (* len ry)))))
++          (when-let [imp (:impression gaze)]
++            (.setFont g2 (font Font/PLAIN 16))
++            (.drawString g2 ^String (str imp) (int (+ ex 8)) (int (- ey 8)))))
++        (finally (.dispose g2))))))
++
++;; --- page composition --------------------------------------------------------
++
++(def PAGE-W 1075) (def PAGE-H 1518)   ; B5 @ ~150dpi
++(def MARGIN 38) (def GUTTER 16)
++
++(defn panel-pixel-sizes
++  "The actual pixel {:id :w :h} compose-page! will draw each panel at, for
++  this `page` ({:layout :panels […]}) — i.e. `layout-page` run through the
++  same page-minus-margins math `compose-page!` itself uses. Callers use this
++  BEFORE compose-page! to size dialogue/SFX (see `fit-vertical-dialogue`/
++  `fit-sfx`) against real panel dimensions instead of guessing them."
++  [page]
++  (let [{:keys [bleed pairs]} (layout-page page)
++        m (if bleed 0 MARGIN) gut (if bleed 0 GUTTER)
++        cw (- PAGE-W (* 2 m)) ch (- PAGE-H (* 2 m))]
++    (mapv (fn [[panel [_px _py pw ph] _tilt]]
++            {:id (:id panel)
++             :w (- (* cw (/ pw 100.0)) gut)
++             :h (- (* ch (/ ph 100.0)) gut)})
++          pairs)))
++
++(defn compose-page!
++  "Compose one storyboard `page` ({:layout :panels […]}) into a B5 PNG at `out`.
++  `img-of` maps a panel-id → image File (or nil → placeholder). The text layer
++  (narration caption + dialogue bubbles + SFX) is derived from each panel via
++  kami.mangaka.text and rendered in `:locale` (default :ja) — the image is the
++  same regardless of language.
++
++  A panel may carry the lexicon fields `:effectLines` (効果線, baked into the
++  print image between the tone layer and the lettering) and `:gaze` (視線誘導,
++  review-only: drawn as a dashed red overlay ONLY when called with
++  `:gaze-overlay? true` — never part of print output). Both use the panel-local
++  0-1000 coordinate space (see `draw-effect-lines!` / `draw-gaze-overlay!`).
++  `:monochrome? true` grayscales each panel image before drawing (see
++  `grayscale`) — for video-derived frames that keep a colour cast."
++  [page img-of out & {:keys [locale gaze-overlay? monochrome?] :or {locale :ja}}]
++  (let [{:keys [bleed pairs]} (layout-page page)
++        canvas (BufferedImage. PAGE-W PAGE-H BufferedImage/TYPE_INT_RGB)
++        g (.createGraphics canvas)
++        ;; a full-bleed splash uses the whole sheet; otherwise inset by MARGIN
++        m  (if bleed 0 MARGIN)
++        gut (if bleed 0 GUTTER)
++        cx0 m cy0 m cw (- PAGE-W (* 2 m)) ch (- PAGE-H (* 2 m))]
++    (aa! g)
++    (.setColor g (Color. 22 20 18)) (.fillRect g 0 0 PAGE-W PAGE-H) ; ink page base = crisp gutters
++    (doseq [[idx [panel [px py pw ph] tilt]] (map-indexed vector pairs)]
++      (let [x (+ cx0 (* cw (/ px 100.0)) (/ gut 2.0))
++            y (+ cy0 (* ch (/ py 100.0)) (/ gut 2.0))
++            w (- (* cw (/ pw 100.0)) gut)
++            h (- (* ch (/ ph 100.0)) gut)
++            f (img-of (:id panel))]
++        (if (and f (io/exists? f))
++          (draw-cover g (cond-> (ImageIO/read f) monochrome? grayscale) x y w h tilt)
++          (placeholder g x y w h (:id panel) tilt))
++        ;; 背景トーン (kami.mangaka.expression :tone) — 画像の上, フレーム/文字の下
++        ;; (rect-clipped even under a komawari tilt — a sheared tone overlay is
++        ;; a future refinement, not needed to demonstrate the force-line frame)
++        (tone-bg! g (:tone panel) x y w h)
++        ;; 効果線 (lexicon z-order: panel art → tones → effectLines → SFX → bubbles)
++        (when-let [fx (seq (or (:effectLines panel) (:effect-lines panel)))]
++          (draw-effect-lines! g fx x y w h))
++        ;; confident black frame (heavier on a bleed splash) — a komawari force-line
++        ;; row draws the sheared parallelogram, so the frame itself carries the angle
++        (.setColor g Color/BLACK) (.setStroke g (BasicStroke. (float (if bleed 10 5))))
++        (if tilt
++          (.draw g (shear-polygon x y w h tilt))
++          (.drawRect g (int x) (int y) (int w) (int h)))
++        ;; text layer (shared, locale-keyed): nameplate + chatter + caption + bubbles + SFX
++        (let [els     (t/panel->elements panel)
++              narr-el (some #(when (= :narration (:kind %)) %) els)
++              dlgs    (if (seq (:dialogue panel))
++                        (map #(assoc % :kind :dialogue) (:dialogue panel))
++                        (filter #(= :dialogue (:kind %)) els))
++              ;; kami-mangaka-text's panel->elements only carries the
++              ;; expression tags — recover layout-only keys (:pos) from the
++              ;; original panel entries by position
++              sfxs    (map (fn [el orig] (merge el (select-keys orig [:pos])))
++                           (filter #(= :sfx (:kind %)) els)
++                           (concat (or (:sfx panel) (:gh/sfx panel)) (repeat nil)))
++              nps     (filter #(= :nameplate (:kind %)) els)
++              chat    (filter #(= :chatter (:kind %)) els)]
++          (when (seq chat)
++            (chatter! g (map #(t/localize (:text %) locale) chat) x y w))
++          (when narr-el
++            (caption-box g (t/localize (:text narr-el) locale) x y w
++                         {:weight (:weight narr-el) :scale (:scale narr-el)
++                          :font-role (:font-role narr-el)}))
++          ;; alternate bubble side per panel for rhythm; keep inside the panel
++          (let [side (if (even? idx) :l :r)
++                cx (+ x (* w (if (= side :l) 0.42 0.58)))]
++            (loop [ds dlgs top (+ y 22)]
++              (when (seq ds)
++                (let [d (first ds)
++                      [rx ry] (:pos d)
++                      dcx (if (number? rx) (+ x (* w rx)) cx)
++                      dtop (if (number? ry) (+ y (* h ry)) top)
++                      [tx ty] (:tail-target d)
++                      target (when (and (number? tx) (number? ty))
++                               [(+ x (* w tx)) (+ y (* h ty))])
++                      nt (bubble g (t/localize (:text d) locale) dcx dtop w side
++                                 {:weight (:weight d) :scale (:scale d) :shape (:bubble d)
++                                  :writing-mode (:writing-mode d) :columns (:columns d)
++                                  :width-ratio (:width d) :height-ratio (:height d)
++                                  :panel-height h :font-role (:font-role d)
++                                  :tail-target target
++                                  :tail? (if (contains? d :tail?) (:tail? d) true)})]
++                  (recur (rest ds) (or nt (+ top 96)))))))
++          (doseq [s sfxs] (draw-sfx g (t/localize (:text s) locale) x y w
++                                     (:scale s) (:font-role s) (:pos s) h))
++          (doseq [np nps] (nameplate! g (t/localize (:text np) locale) x y w h)))
++        ;; 視線誘導 review overlay — opt-in only, on top of everything in the panel
++        (when gaze-overlay?
++          (draw-gaze-overlay! g (:gaze panel) x y w h))))
++    (.dispose g)
++    (io/make-parents out)
++    (ImageIO/write canvas "png" (io/file ^String out))
++    out))
+diff --git a/test/kami/mangaka/komawari_test.cljc b/test/kami/mangaka/komawari_test.cljk
+similarity index 99%
+rename from test/kami/mangaka/komawari_test.cljc
+rename to test/kami/mangaka/komawari_test.cljk
+index 0eb2484..90908df 100644
+--- a/test/kami/mangaka/komawari_test.cljc
++++ b/test/kami/mangaka/komawari_test.cljk
+@@ -1,5 +1,5 @@
+ (ns kami.mangaka.komawari-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [kami.mangaka.komawari :as k]))
+ 
+ (deftest golden-ratio-proportions
+diff --git a/test/kami/mangaka/page_test.clj b/test/kami/mangaka/page_test.clj
+deleted file mode 100644
+index 25d13ea..0000000
+--- a/test/kami/mangaka/page_test.clj
++++ /dev/null
+@@ -1,207 +0,0 @@
+-(ns kami.mangaka.page-test
+-  (:require [clojure.test :refer [deftest is testing]]
+-            [clojure.java.io :as io]
+-            [kami.mangaka.page :as page])
+-  (:import [javax.imageio ImageIO]))
+-
+-(defn- bake-bytes
+-  "Compose `pg` to a temp PNG named `nm` (with `opts` kv-args) → its bytes."
+-  [pg nm & opts]
+-  (let [out (str (System/getProperty "java.io.tmpdir") "/" nm)]
+-    (io/delete-file out true)
+-    (apply page/compose-page! pg (constantly nil) out opts)
+-    (java.nio.file.Files/readAllBytes (.toPath (io/file out)))))
+-
+-(deftest template-for-test
+-  (is (= [] (page/template-for 0)))
+-  (is (= [[0 0 100 100]] (page/template-for 1)))
+-  (is (= 4 (count (page/template-for 4))))
+-  (testing "n beyond the preset table falls back to a square-ish grid"
+-    (is (= 10 (count (page/template-for 10))))))
+-
+-(deftest layout-page-splash-is-full-bleed
+-  (let [{:keys [bleed pairs]} (page/layout-page {:layout "splash"
+-                                                 :panels [{:id "a" :size "full-page"}]})]
+-    (is (true? bleed))
+-    (is (= [[0 0 100 100]] (mapv second pairs)))))
+-
+-(deftest layout-page-grid
+-  (let [{:keys [bleed pairs]} (page/layout-page
+-                               {:layout "4-panel-grid"
+-                                :panels (mapv #(hash-map :id % :size "half") (range 4))})]
+-    (is (false? bleed))
+-    (is (= 4 (count pairs)))))
+-
+-(deftest layout-page-name-driven-rows
+-  (testing "two consecutive narrow panels share a row; wide gets its own band"
+-    (let [{:keys [pairs]} (page/layout-page
+-                           {:layout "vertical"
+-                            :panels [{:id "a" :size "narrow"} {:id "b" :size "narrow"}
+-                                     {:id "c" :size "wide"}]})
+-          ys (mapv (fn [[_ [_ y _ _]]] y) pairs)]
+-      ;; a & b on the same row (same y), c on a later row (greater y)
+-      (is (= (nth ys 0) (nth ys 1)))
+-      (is (> (nth ys 2) (nth ys 0))))))
+-
+-(deftest layout-page-komawari-tilt-is-additive
+-  (testing "no panel opts into :intensity/:vector → every tilt is nil (unchanged output)"
+-    (let [{:keys [pairs]} (page/layout-page
+-                           {:layout "vertical"
+-                            :panels [{:id "a" :size "narrow"} {:id "b" :size "narrow"}
+-                                     {:id "c" :size "wide"}]})]
+-      (is (every? nil? (map #(nth % 2) pairs)))))
+-  (testing "an :impact panel shares its tilt with the whole row (force-line, ADR-2607051500)"
+-    (let [{:keys [pairs]} (page/layout-page
+-                           {:layout "vertical"
+-                            :panels [{:id "a" :size "narrow" :intensity :impact :vector 20}
+-                                     {:id "b" :size "narrow"}]})
+-          tilts (map #(nth % 2) pairs)]
+-      (is (apply = tilts) "both panels in the row share one tilt")
+-      (is (some? (first tilts)))))
+-  (testing "tilt is clamped to the 1:φ diagonal for :impact, and never fires for :calm"
+-    (is (nil? (page/komawari-tilt 45 :calm)))
+-    (is (<= (Math/abs (page/komawari-tilt 89 :impact)) 32.0))))
+-
+-(deftest compose-page!-with-force-line-tilt
+-  (testing "a tilted row bakes without error (sheared clip/frame code path)"
+-    (let [out (str (System/getProperty "java.io.tmpdir") "/mangaka-komawari-tilt.png")]
+-      (io/delete-file out true)
+-      (is (= out (page/compose-page!
+-                  {:layout "vertical"
+-                   :panels [{:id "a" :size "narrow" :intensity :impact :vector 25
+-                             :dialogue [{:text "ZBAAAN!!"}]}
+-                            {:id "b" :size "narrow"}]}
+-                  (constantly nil) out)))
+-      (is (.exists (io/file out))))))
+-
+-(deftest compose-page!-multilingual-bake
+-  (testing "bake consumes the shared MangaText layer + renders the chosen locale"
+-    (let [page {:layout "splash"
+-                :panels [{:id "p" :size "full-page"
+-                          :narration {:ja "今朝も、運河は青い。" :en "Canal's blue again."}
+-                          :dialogue [{:speaker "tamaki" :text {:ja "やあ。" :en "Hi."}}]
+-                          :gh/sfx [{:text {:ja "ちゃぷ" :en "lap"}}]}]}
+-          ja (str (System/getProperty "java.io.tmpdir") "/mk-bake-ja.png")
+-          en (str (System/getProperty "java.io.tmpdir") "/mk-bake-en.png")]
+-      (io/delete-file ja true) (io/delete-file en true)
+-      (is (= ja (page/compose-page! page (constantly nil) ja :locale :ja)))
+-      (is (= en (page/compose-page! page (constantly nil) en :locale :en)))
+-      (is (.exists (io/file ja))) (is (.exists (io/file en)))
+-      (testing "same image source, different lettering → different PNG bytes"
+-        (is (not= (.length (io/file ja)) (.length (io/file en))))))))
+-
+-(deftest compose-page!-expression-bake
+-  (testing "背景トーン・薄さ・大きさ・名札・ざわめき を焼き込む (全 tone の描画経路が例外なく走る)"
+-    (let [panels (for [[i tone] (map-indexed vector
+-                                             [:focus-lines :flash :vignette-dark :gradient
+-                                              :dot :hatching :crowd-silhouette])]
+-                   {:id (str "p" i) :size "half" :tone tone
+-                    :nameplate (str "第" i "王子親衛兵")
+-                    :dialogue [{:text "バカな！！" :bubble :spike :weight :heavy :scale 1.6}]
+-                    :chatter ["ざわ" "ざわ"]})
+-          out (str (System/getProperty "java.io.tmpdir") "/mangaka-expr-bake.png")]
+-      (io/delete-file out true)
+-      (is (= out (page/compose-page! {:layout "grid" :panels (vec panels)}
+-                                     (constantly nil) out)))
+-      (is (.exists (io/file out)))
+-      (is (pos? (.length (io/file out)))))))
+-
+-(deftest compose-page!-effect-lines-bake
+-  (testing "every effectLines kind bakes without error (focus/explosion/flash/speed)"
+-    (let [panels [{:id "p0" :size "half"
+-                   :effectLines [{:kind "focus" :centerX 480 :centerY 450 :density 44 :coverage 85}]}
+-                  {:id "p1" :size "half"
+-                   :effectLines [{:kind "explosion" :centerX 500 :centerY 500 :density 40 :coverage 80}]}
+-                  {:id "p2" :size "half"
+-                   :effectLines [{:kind "flash" :centerX 500 :centerY 350 :density 62 :coverage 85}]}
+-                  {:id "p3" :size "half"
+-                   :effectLines [{:kind "speed" :direction 0 :density 30}]}]
+-          out (str (System/getProperty "java.io.tmpdir") "/mangaka-effect-lines.png")]
+-      (io/delete-file out true)
+-      (is (= out (page/compose-page! {:layout "grid" :panels panels} (constantly nil) out)))
+-      (is (.exists (io/file out)))
+-      (is (pos? (.length (io/file out)))))))
+-
+-(deftest compose-page!-focus-lines-pixels
+-  (testing "focus lines darken toward the panel border, leave the coverage-cleared centre clean"
+-    (let [out (str (System/getProperty "java.io.tmpdir") "/mangaka-focus-pixels.png")
+-          _   (io/delete-file out true)
+-          _   (page/compose-page!
+-               {:layout "splash"
+-                :panels [{:id "p" :size "full-page"
+-                          :effectLines [{:kind "focus" :centerX 500 :centerY 500
+-                                         :density 60 :coverage 85}]}]}
+-               (constantly nil) out)
+-          img (ImageIO/read (io/file out))
+-          dark? (fn [rgb]
+-                  (let [r (bit-and (bit-shift-right rgb 16) 0xFF)
+-                        g (bit-and (bit-shift-right rgb 8) 0xFF)
+-                        b (bit-and rgb 0xFF)]
+-                    (< (/ (+ r g b) 3.0) 110)))
+-          cx (quot (.getWidth img) 2) cy (quot (.getHeight img) 2)
+-          count-dark (fn [x0 x1 y0 y1]
+-                       (count (filter dark? (for [xx (range x0 x1) yy (range y0 y1)]
+-                                              (.getRGB img xx yy)))))
+-          centre (count-dark (- cx 50) (+ cx 50) (- cy 50) (+ cy 50))
+-          edge   (count-dark 60 260 (- cy 50) (+ cy 50))]
+-      (is (zero? centre) "the coverage-derived inner radius stays clear of lines")
+-      (is (> edge 20) "radial lines are present near the panel border"))))
+-
+-(deftest compose-page!-effect-lines-nil-guard
+-  (testing "a page with nil/empty effectLines renders byte-identically to one without the key"
+-    (let [base   {:layout "grid" :panels [{:id "a" :size "half"} {:id "b" :size "half"}]}
+-          plain  (bake-bytes base "mk-fx-base.png")
+-          w-nil  (bake-bytes (assoc-in base [:panels 0 :effectLines] nil) "mk-fx-nil.png")
+-          w-empt (bake-bytes (assoc-in base [:panels 0 :effectLines] []) "mk-fx-empty.png")]
+-      (is (= (seq plain) (seq w-nil) (seq w-empt))))))
+-
+-(deftest compose-page!-gaze-overlay-opt-in
+-  (testing "gaze is a review overlay: absent from output unless :gaze-overlay? true"
+-    (let [gaze {:entryX 850 :entryY 150 :focusX 480 :focusY 450
+-                :exitX 200 :exitY 700 :impression "dread"}
+-          pg   {:layout "splash"
+-                :panels [{:id "p" :size "full-page" :gaze gaze}]}
+-          no-key  (bake-bytes (update-in pg [:panels 0] dissoc :gaze) "mk-gaze-nokey.png")
+-          plain   (bake-bytes pg "mk-gaze-plain.png")
+-          overlay (bake-bytes pg "mk-gaze-overlay.png" :gaze-overlay? true)]
+-      (is (= (seq no-key) (seq plain)) "without the option, gaze data changes nothing")
+-      (is (not= (seq plain) (seq overlay)) "with :gaze-overlay? true the overlay is drawn")
+-      (testing "the overlay actually draws red strokes near the focus point"
+-        (let [img (ImageIO/read (io/file (str (System/getProperty "java.io.tmpdir")
+-                                              "/mk-gaze-overlay.png")))
+-              red? (fn [rgb]
+-                     (let [r (bit-and (bit-shift-right rgb 16) 0xFF)
+-                           g (bit-and (bit-shift-right rgb 8) 0xFF)
+-                           b (bit-and rgb 0xFF)]
+-                       (and (> r 170) (< g 110) (< b 110))))
+-              ;; focus (480,450)/1000 of the full-bleed B5 page
+-              fx (int (* (.getWidth img) 0.48)) fy (int (* (.getHeight img) 0.45))]
+-          (is (some red? (for [xx (range (- fx 100) (+ fx 100))
+-                               yy (range (- fy 100) (+ fy 100))]
+-                           (.getRGB img xx yy)))))))))
+-
+-(deftest compose-page!-writes-a-png
+-  (testing "headless Java2D composes a page (placeholders, no source images)"
+-    (let [out (str (System/getProperty "java.io.tmpdir") "/mangaka-page-test.png")
+-          _   (io/delete-file out true)
+-          r   (page/compose-page! {:layout "3-panel-vertical"
+-                                   :panels [{:id "p1" :size "wide" :narration "今朝も、運河は青い。"}
+-                                            {:id "p2" :size "narrow"
+-                                             :dialogue [{:text "よし。行こう。"}]}
+-                                            {:id "p3" :size "narrow"}]}
+-                                  (constantly nil)            ; no images → placeholders
+-                                  out)]
+-      (is (= out r))
+-      (is (.exists (io/file out)))
+-      (is (pos? (.length (io/file out)))))))
+-
+-(deftest authored-rects-are-authoritative
+-  (let [pg {:layout "grid"
+-            :panels [{:id "right" :rect [0.55 0.05 0.4 0.35]}
+-                     {:id "left" :rect [0.05 0.05 0.45 0.35]}]}
+-        pairs (:pairs (page/layout-page pg))]
+-    (is (every? #(< (Math/abs %) 1.0e-9)
+-                (map -
+-                     (mapcat identity [[55.0 5.0 40.0 35.0] [5.0 5.0 45.0 35.0]])
+-                     (mapcat second pairs))))
+-    (is (every? nil? (map #(nth % 2) pairs)))))
+diff --git a/test/kami/mangaka/page_test.cljk b/test/kami/mangaka/page_test.cljk
+new file mode 100644
+index 0000000..f43753d
+--- /dev/null
++++ b/test/kami/mangaka/page_test.cljk
+@@ -0,0 +1,667 @@
++(ns kami.mangaka.page-test
++  (:require [kotoba.io :as kio] [kotoba.test :refer [deftest is testing]]
++            [clojure.java.io :as io]
++            [kami.mangaka.page :as page])
++  (:import [javax.imageio ImageIO]))
++
++(defn- bake-bytes
++  "Compose `pg` to a temp PNG named `nm` (with `opts` kv-args) → its bytes."
++  [pg nm & opts]
++  (let [out (str (System/getProperty "java.io.tmpdir") "/" nm)]
++    (io/delete-file out true)
++    (apply page/compose-page! pg (constantly nil) out opts)
++    (kio/read-all-bytes (io/file out))))
++
++(deftest template-for-test
++  (is (= [] (page/template-for 0)))
++  (is (= [[0 0 100 100]] (page/template-for 1)))
++  (is (= 4 (count (page/template-for 4))))
++  (testing "n beyond the preset table falls back to a square-ish grid"
++    (is (= 10 (count (page/template-for 10))))))
++
++(deftest layout-page-splash-is-full-bleed
++  (let [{:keys [bleed pairs]} (page/layout-page {:layout "splash"
++                                                 :panels [{:id "a" :size "full-page"}]})]
++    (is (true? bleed))
++    (is (= [[0 0 100 100]] (mapv second pairs)))))
++
++(deftest layout-page-grid
++  (let [{:keys [bleed pairs]} (page/layout-page
++                               {:layout "4-panel-grid"
++                                :panels (mapv #(hash-map :id % :size "half") (range 4))})]
++    (is (false? bleed))
++    (is (= 4 (count pairs)))))
++
++(deftest layout-page-name-driven-rows
++  (testing "two consecutive narrow panels share a row; wide gets its own band"
++    (let [{:keys [pairs]} (page/layout-page
++                           {:layout "vertical"
++                            :panels [{:id "a" :size "narrow"} {:id "b" :size "narrow"}
++                                     {:id "c" :size "wide"}]})
++          ys (mapv (fn [[_ [_ y _ _]]] y) pairs)]
++      ;; a & b on the same row (same y), c on a later row (greater y)
++      (is (= (nth ys 0) (nth ys 1)))
++      (is (> (nth ys 2) (nth ys 0))))))
++
++(deftest layout-page-komawari-tilt-is-additive
++  (testing "no panel opts into :intensity/:vector → every tilt is nil (unchanged output)"
++    (let [{:keys [pairs]} (page/layout-page
++                           {:layout "vertical"
++                            :panels [{:id "a" :size "narrow"} {:id "b" :size "narrow"}
++                                     {:id "c" :size "wide"}]})]
++      (is (every? nil? (map #(nth % 2) pairs)))))
++  (testing "an :impact panel shares its tilt with the whole row (force-line, ADR-2607051500)"
++    (let [{:keys [pairs]} (page/layout-page
++                           {:layout "vertical"
++                            :panels [{:id "a" :size "narrow" :intensity :impact :vector 20}
++                                     {:id "b" :size "narrow"}]})
++          tilts (map #(nth % 2) pairs)]
++      (is (apply = tilts) "both panels in the row share one tilt")
++      (is (some? (first tilts)))))
++  (testing "tilt is clamped to the 1:φ diagonal for :impact, and never fires for :calm"
++    (is (nil? (page/komawari-tilt 45 :calm)))
++    (is (<= (Math/abs (page/komawari-tilt 89 :impact)) 32.0))))
++
++(deftest compose-page!-with-force-line-tilt
++  (testing "a tilted row bakes without error (sheared clip/frame code path)"
++    (let [out (str (System/getProperty "java.io.tmpdir") "/mangaka-komawari-tilt.png")]
++      (io/delete-file out true)
++      (is (= out (page/compose-page!
++                  {:layout "vertical"
++                   :panels [{:id "a" :size "narrow" :intensity :impact :vector 25
++                             :dialogue [{:text "ZBAAAN!!"}]}
++                            {:id "b" :size "narrow"}]}
++                  (constantly nil) out)))
++      (is (.exists (io/file out))))))
++
++(deftest compose-page!-multilingual-bake
++  (testing "bake consumes the shared MangaText layer + renders the chosen locale"
++    (let [page {:layout "splash"
++                :panels [{:id "p" :size "full-page"
++                          :narration {:ja "今朝も、運河は青い。" :en "Canal's blue again."}
++                          :dialogue [{:speaker "tamaki" :text {:ja "やあ。" :en "Hi."}}]
++                          :gh/sfx [{:text {:ja "ちゃぷ" :en "lap"}}]}]}
++          ja (str (System/getProperty "java.io.tmpdir") "/mk-bake-ja.png")
++          en (str (System/getProperty "java.io.tmpdir") "/mk-bake-en.png")]
++      (io/delete-file ja true) (io/delete-file en true)
++      (is (= ja (page/compose-page! page (constantly nil) ja :locale :ja)))
++      (is (= en (page/compose-page! page (constantly nil) en :locale :en)))
++      (is (.exists (io/file ja))) (is (.exists (io/file en)))
++      (testing "same image source, different lettering → different PNG bytes"
++        (is (not= (.length (io/file ja)) (.length (io/file en))))))))
++
++(deftest compose-page!-expression-bake
++  (testing "背景トーン・薄さ・大きさ・名札・ざわめき を焼き込む (全 tone の描画経路が例外なく走る)"
++    (let [panels (for [[i tone] (map-indexed vector
++                                             [:focus-lines :flash :vignette-dark :gradient
++                                              :dot :hatching :crowd-silhouette])]
++                   {:id (str "p" i) :size "half" :tone tone
++                    :nameplate (str "第" i "王子親衛兵")
++                    :dialogue [{:text "バカな！！" :bubble :spike :weight :heavy :scale 1.6}]
++                    :chatter ["ざわ" "ざわ"]})
++          out (str (System/getProperty "java.io.tmpdir") "/mangaka-expr-bake.png")]
++      (io/delete-file out true)
++      (is (= out (page/compose-page! {:layout "grid" :panels (vec panels)}
++                                     (constantly nil) out)))
++      (is (.exists (io/file out)))
++      (is (pos? (.length (io/file out)))))))
++
++(deftest compose-page!-effect-lines-bake
++  (testing "every effectLines kind bakes without error (focus/explosion/flash/speed)"
++    (let [panels [{:id "p0" :size "half"
++                   :effectLines [{:kind "focus" :centerX 480 :centerY 450 :density 44 :coverage 85}]}
++                  {:id "p1" :size "half"
++                   :effectLines [{:kind "explosion" :centerX 500 :centerY 500 :density 40 :coverage 80}]}
++                  {:id "p2" :size "half"
++                   :effectLines [{:kind "flash" :centerX 500 :centerY 350 :density 62 :coverage 85}]}
++                  {:id "p3" :size "half"
++                   :effectLines [{:kind "speed" :direction 0 :density 30}]}]
++          out (str (System/getProperty "java.io.tmpdir") "/mangaka-effect-lines.png")]
++      (io/delete-file out true)
++      (is (= out (page/compose-page! {:layout "grid" :panels panels} (constantly nil) out)))
++      (is (.exists (io/file out)))
++      (is (pos? (.length (io/file out)))))))
++
++(deftest compose-page!-focus-lines-pixels
++  (testing "focus lines darken toward the panel border, leave the coverage-cleared centre clean"
++    (let [out (str (System/getProperty "java.io.tmpdir") "/mangaka-focus-pixels.png")
++          _   (io/delete-file out true)
++          _   (page/compose-page!
++               {:layout "splash"
++                :panels [{:id "p" :size "full-page"
++                          :effectLines [{:kind "focus" :centerX 500 :centerY 500
++                                         :density 60 :coverage 85}]}]}
++               (constantly nil) out)
++          img (ImageIO/read (io/file out))
++          dark? (fn [rgb]
++                  (let [r (bit-and (bit-shift-right rgb 16) 0xFF)
++                        g (bit-and (bit-shift-right rgb 8) 0xFF)
++                        b (bit-and rgb 0xFF)]
++                    (< (/ (+ r g b) 3.0) 110)))
++          cx (quot (.getWidth img) 2) cy (quot (.getHeight img) 2)
++          count-dark (fn [x0 x1 y0 y1]
++                       (count (filter dark? (for [xx (range x0 x1) yy (range y0 y1)]
++                                              (.getRGB img xx yy)))))
++          centre (count-dark (- cx 50) (+ cx 50) (- cy 50) (+ cy 50))
++          edge   (count-dark 60 260 (- cy 50) (+ cy 50))]
++      (is (zero? centre) "the coverage-derived inner radius stays clear of lines")
++      (is (> edge 20) "radial lines are present near the panel border"))))
++
++(deftest compose-page!-effect-lines-nil-guard
++  (testing "a page with nil/empty effectLines renders byte-identically to one without the key"
++    (let [base   {:layout "grid" :panels [{:id "a" :size "half"} {:id "b" :size "half"}]}
++          plain  (bake-bytes base "mk-fx-base.png")
++          w-nil  (bake-bytes (assoc-in base [:panels 0 :effectLines] nil) "mk-fx-nil.png")
++          w-empt (bake-bytes (assoc-in base [:panels 0 :effectLines] []) "mk-fx-empty.png")]
++      (is (= (seq plain) (seq w-nil) (seq w-empt))))))
++
++(deftest compose-page!-gaze-overlay-opt-in
++  (testing "gaze is a review overlay: absent from output unless :gaze-overlay? true"
++    (let [gaze {:entryX 850 :entryY 150 :focusX 480 :focusY 450
++                :exitX 200 :exitY 700 :impression "dread"}
++          pg   {:layout "splash"
++                :panels [{:id "p" :size "full-page" :gaze gaze}]}
++          no-key  (bake-bytes (update-in pg [:panels 0] dissoc :gaze) "mk-gaze-nokey.png")
++          plain   (bake-bytes pg "mk-gaze-plain.png")
++          overlay (bake-bytes pg "mk-gaze-overlay.png" :gaze-overlay? true)]
++      (is (= (seq no-key) (seq plain)) "without the option, gaze data changes nothing")
++      (is (not= (seq plain) (seq overlay)) "with :gaze-overlay? true the overlay is drawn")
++      (testing "the overlay actually draws red strokes near the focus point"
++        (let [img (ImageIO/read (io/file (str (System/getProperty "java.io.tmpdir")
++                                              "/mk-gaze-overlay.png")))
++              red? (fn [rgb]
++                     (let [r (bit-and (bit-shift-right rgb 16) 0xFF)
++                           g (bit-and (bit-shift-right rgb 8) 0xFF)
++                           b (bit-and rgb 0xFF)]
++                       (and (> r 170) (< g 110) (< b 110))))
++              ;; focus (480,450)/1000 of the full-bleed B5 page
++              fx (int (* (.getWidth img) 0.48)) fy (int (* (.getHeight img) 0.45))]
++          (is (some red? (for [xx (range (- fx 100) (+ fx 100))
++                               yy (range (- fy 100) (+ fy 100))]
++                           (.getRGB img xx yy)))))))))
++
++(deftest compose-page!-writes-a-png
++  (testing "headless Java2D composes a page (placeholders, no source images)"
++    (let [out (str (System/getProperty "java.io.tmpdir") "/mangaka-page-test.png")
++          _   (io/delete-file out true)
++          r   (page/compose-page! {:layout "3-panel-vertical"
++                                   :panels [{:id "p1" :size "wide" :narration "今朝も、運河は青い。"}
++                                            {:id "p2" :size "narrow"
++                                             :dialogue [{:text "よし。行こう。"}]}
++                                            {:id "p3" :size "narrow"}]}
++                                  (constantly nil)            ; no images → placeholders
++                                  out)]
++      (is (= out r))
++      (is (.exists (io/file out)))
++      (is (pos? (.length (io/file out)))))))
++
++(deftest authored-rects-are-authoritative
++  (let [pg {:layout "grid"
++            :panels [{:id "right" :rect [0.55 0.05 0.4 0.35]}
++                     {:id "left" :rect [0.05 0.05 0.45 0.35]}]}
++        pairs (:pairs (page/layout-page pg))]
++    (is (every? #(< (Math/abs %) 1.0e-9)
++                (map -
++                     (mapcat identity [[55.0 5.0 40.0 35.0] [5.0 5.0 45.0 35.0]])
++                     (mapcat second pairs))))
++    (is (every? nil? (map #(nth % 2) pairs)))))
++
++;; --- fit-vertical-dialogue / fit-sfx --------------------------------------
++;; A box `bubble` will draw MUST hold every character inside itself: `bubble`
++;; places char i at col=(quot i rows) and never clips or grows the box, so a
++;; too-small box silently draws tail characters past the bubble's own left
++;; edge (illegible against the panel art, not a crash). These tests replay
++;; `bubble`'s own col/row formula against fit-vertical-dialogue's output —
++;; not a second approximation of it — so a false positive here would mean
++;; the two are actually out of sync, not just "the box looked small."
++
++(defn- simulate-fits?
++  "True iff every character bubble would draw for `text` at this exact
++  {:width :height} (against `panel-w`/`panel-h`) lands within the box —
++  the same col=(quot i rows) placement `bubble` itself uses."
++  [text {:keys [scale weight panel-w panel-h]} {:keys [width height]}]
++  (let [{:keys [pad char-pitch col-pitch]} (page/vertical-metrics
++                                            {:scale scale :weight weight})
++        bw (* width panel-w) bh (* height panel-h)
++        rows (max 1 (int (/ (+ (- bh (* 2 pad)) 0.5) char-pitch)))
++        n (count (str text))
++        cols (inc (quot (dec (max 1 n)) rows))]
++    (<= (* cols col-pitch) (+ (- bw (* 2 pad)) 0.5))))
++
++(deftest fit-vertical-dialogue-regression-dropped-characters
++  (testing "a 42-char narration in a wide panel (the exact case that used to
++            silently drop はずかずか's second ずか when width/height were
++            guessed instead of computed) now verifiably fits"
++    (let [text "廊下から、隣のD組の白瀬寧が、コメッコンのドーナツ袋を片手に、ずかずかと入ってきた。"
++          opts {:scale 0.6 :weight :light :panel-w 983.0 :panel-h 427.7 :target-height 0.85}
++          fit (page/fit-vertical-dialogue text opts)]
++      (is (:fits? fit))
++      (is (simulate-fits? text opts fit)))))
++
++(deftest fit-vertical-dialogue-grows-height-before-giving-up
++  (testing "text too wide at the requested target-height grows taller
++            (fewer, narrower columns) rather than reporting fits? false
++            prematurely"
++    (let [text "起きないと、コメッコンの米粉ドーナツ、わたしが、全部食べるよ"
++          opts {:scale 0.55 :weight :bold :panel-w 483.5 :panel-h 316.8 :target-height 0.1}
++          fit (page/fit-vertical-dialogue text opts)]
++      (is (:fits? fit))
++      (is (> (:height fit) 0.1) "grew past the too-small target-height")
++      (is (simulate-fits? text opts fit)))))
++
++(deftest fit-vertical-dialogue-short-text-stays-compact
++  (testing "a short interjection doesn't get blown up to target-height's
++            full box — cols stays small"
++    (let [fit (page/fit-vertical-dialogue "……" {:scale 0.85 :weight :faint
++                                                  :panel-w 483.5 :panel-h 316.8
++                                                  :target-height 0.18})]
++      (is (:fits? fit))
++      (is (<= (:cols fit) 2)))))
++
++(deftest fit-vertical-dialogue-reports-fits-false-at-the-caps
++  (testing "even :max-height can't rescue a huge string crammed into a tiny
++            panel at a large scale -- fits? false tells the caller to shrink
++            :scale rather than silently shipping a box that drops characters"
++    (let [fit (page/fit-vertical-dialogue
++               "あいうえおかきくけこさしすせそたちつてとなにぬねの"
++               {:scale 3.0 :panel-w 100.0 :panel-h 100.0})]
++      (is (false? (:fits? fit))))))
++
++(deftest fit-sfx-reports-width-fit
++  (let [ok (page/fit-sfx "ドン" {:scale 1.0 :panel-w 400.0})
++        too-wide (page/fit-sfx "うわああああああああああ" {:scale 1.5 :panel-w 200.0})]
++    (is (:fits? ok))
++    (is (false? (:fits? too-wide)))))
++
++(deftest panel-pixel-sizes-matches-layout-page-panel-count
++  (let [sizes (page/panel-pixel-sizes
++               {:panels [{:id "a" :size "wide"} {:id "b" :size "half"} {:id "c" :size "half"}]})]
++    (is (= 3 (count sizes)))
++    (is (every? #(and (pos? (:w %)) (pos? (:h %))) sizes))))
++
++;; --- :font-role -------------------------------------------------------------
++;; kami.mangaka.expression resolves a :font-role per archetype/register
++;; (:gothic for :stoic/:energetic, :mincho for narration/:strategist, :maru
++;; for :gentle, :handwritten for :chatter/:mob, …) so two speakers with
++;; different archetypes read in different typefaces, not just different
++;; weight/size. These tests are about the family/metrics PLUMBING (a role
++;; resolves to a real installed family, and different roles can have
++;; different metrics at the same nominal size) — not about which exact font
++;; ships on any given machine, since font-role-families itself
++;; graceful-degrades per installed fonts (same pattern as the pre-existing
++;; single jp-font-family).
++
++(deftest font-role-families-resolve-to-installed-fonts
++  (let [avail (set (.getAvailableFontFamilyNames
++                    (java.awt.GraphicsEnvironment/getLocalGraphicsEnvironment)))]
++    (doseq [[role family] page/font-role-families]
++      (is (or (nil? family) (avail family))
++          (str role " resolved to " family " which isn't an installed family")))))
++
++(deftest font-role-changes-line-height
++  (testing "two font-roles at the same :scale can report different
++            line-height-for -- different typefaces have different metrics at
++            the same nominal size, so fit-vertical-dialogue sizing a box for
++            the WRONG role's metrics would under/over-shoot"
++    (let [roles (keys page/font-role-families)
++          heights (into #{} (map #(page/line-height-for {:scale 1.0 :font-role %})) roles)]
++      ;; not asserting a *specific* pair differs (font availability varies by
++      ;; machine) -- only that the plumbing threads :font-role into the real
++      ;; FontMetrics call at all, rather than silently ignoring it.
++      (is (every? pos? heights)))))
++
++(deftest fit-vertical-dialogue-respects-font-role-metrics
++  (testing "fit-vertical-dialogue's own box uses the SAME :font-role metrics
++            line-height-for reports for that role (not a mismatched default)"
++    (let [text "あいうえおかきくけこさしすせそ"
++          fit (page/fit-vertical-dialogue text {:scale 1.0 :font-role :mincho
++                                                 :panel-w 400.0 :panel-h 400.0
++                                                 :target-height 0.5})]
++      (is (:fits? fit))
++      (is (simulate-fits? text {:scale 1.0 :weight nil :panel-w 400.0 :panel-h 400.0} fit)))))
++
++;; --- tight fit (no more padding height out to :target-height) --------------
++
++(deftest fit-vertical-dialogue-does-not-pad-height-past-what-the-text-needs
++  (testing "a short line at a generous :target-height comes back close to the
++            TIGHT box the text needs, not blown up to fill :target-height --
++            the bug that made every bubble render mostly empty white space"
++    (let [fit (page/fit-vertical-dialogue "……" {:scale 1.0 :panel-w 500.0 :panel-h 500.0
++                                                  :target-height 0.85})]
++      (is (:fits? fit))
++      (is (< (:height fit) 0.3)
++          (str "height " (:height fit) " was padded out toward target-height 0.85"
++               " instead of the ~2-character box the text actually needs")))))
++
++;; --- bubble-placement-score (HUNTER×HUNTER baseline) -------------------------
++;; Found the hard way: fit-vertical-dialogue guaranteeing text fits its OWN
++;; box says nothing about whether that box was placed on top of the
++;; speaker's face. These tests are about THAT separate failure mode.
++
++(deftest bubble-placement-score-penalizes-covering-the-face
++  (testing "a bubble that fully overlaps the speaker's face bbox scores
++            :face-clear 0, not a false pass"
++    (let [on-face (page/bubble-placement-score
++                   {:bubble-rect [0.1 0.1 0.6 0.6] :face-bbox [0.2 0.2 0.5 0.5]})
++          clear (page/bubble-placement-score
++                 {:bubble-rect [0.6 0.02 0.95 0.3] :face-bbox [0.1 0.3 0.5 0.7]})]
++      (is (= 0.0 (:face-clear on-face)))
++      (is (= 1.0 (:face-clear clear)))
++      (is (< (:score on-face) (:score clear))))))
++
++(deftest bubble-placement-score-partial-overlap-is-between-0-and-1
++  (let [nicked (page/bubble-placement-score
++                {:bubble-rect [0.0 0.0 0.3 0.3] :face-bbox [0.25 0.25 0.6 0.6]})]
++    (is (< 0.0 (:face-clear nicked) 1.0))))
++
++(deftest bubble-placement-score-rewards-corner-hugging
++  (let [flush (page/bubble-placement-score {:bubble-rect [0.0 0.0 0.4 0.3] :corner :tl})
++        near (page/bubble-placement-score {:bubble-rect [0.02 0.02 0.4 0.3] :corner :tl})
++        floating (page/bubble-placement-score {:bubble-rect [0.4 0.4 0.7 0.6] :corner :tl})]
++    (is (= 1.0 (:corner-hug flush)))
++    (is (> (:corner-hug near) 0.8) "the library's own standard 0.02 margin should score close to flush")
++    (is (< (:corner-hug floating) (:corner-hug near)))))
++
++(deftest bubble-placement-score-tail-must-land-on-the-speaker
++  (let [on-speaker (page/bubble-placement-score
++                    {:bubble-rect [0 0 0.3 0.3] :face-bbox [0.5 0.5 0.8 0.8]
++                     :tail-target [0.6 0.6]})
++        off-speaker (page/bubble-placement-score
++                     {:bubble-rect [0 0 0.3 0.3] :face-bbox [0.5 0.5 0.8 0.8]
++                      :tail-target [0.1 0.1]})]
++    (is (= 1.0 (:tail-on-speaker on-speaker)))
++    (is (= 0.0 (:tail-on-speaker off-speaker)))))
++
++(deftest bubble-placement-score-unmeasured-dimensions-are-nil-not-a-free-pass
++  (testing "no :face-bbox given -> :face-clear nil (unmeasured), and the
++            overall :score is the mean of only what WAS measured -- an
++            author who omits face-bbox doesn't get a free 1.0 for it"
++    (let [bare (page/bubble-placement-score {:bubble-rect [0.02 0.02 0.3 0.2]})]
++      (is (nil? (:face-clear bare)))
++      (is (nil? (:tail-on-speaker bare)))
++      (is (some? (:score bare)))
++      (is (= 1.0 (:rectilinear bare))))))
++
++(deftest bubble-placement-score-tilted-panel-fails-rectilinear-unless-declared
++  (let [rigid (page/bubble-placement-score {:bubble-rect [0.02 0.02 0.3 0.2]})
++        sheared (page/bubble-placement-score {:bubble-rect [0.02 0.02 0.3 0.2] :tilted? true})]
++    (is (= 1.0 (:rectilinear rigid)))
++    (is (= 0.0 (:rectilinear sheared)))))
++
++(deftest panel-placement-score-averages-its-bubbles
++  (let [result (page/panel-placement-score
++                [{:bubble-rect [0.02 0.02 0.3 0.2] :corner :tl}
++                 {:bubble-rect [0.6 0.6 0.9 0.9] :face-bbox [0.1 0.1 0.4 0.4]}])]
++    (is (= 2 (count (:bubbles result))))
++    (is (some? (:score result)))))
++
++;; --- tail-geometry: short stub anchored on the edge facing the speaker -------
++;; The defect this replaces: a tail always dropped from the bottom edge with
++;; its apex stretched ALL the way to the face — with a far speaker that reads
++;; as two near-parallel lines crossing the panel, not a manga tail.
++
++(deftest tail-geometry-anchors-on-the-edge-facing-the-target
++  (let [rect [500.0 100.0 200.0 100.0]]        ; bubble x500-700, y100-200
++    (is (= :l (:edge (page/tail-geometry rect [100.0 150.0]))))
++    (is (= :r (:edge (page/tail-geometry rect [900.0 150.0]))))
++    (is (= :t (:edge (page/tail-geometry rect [600.0 -300.0]))))
++    (is (= :b (:edge (page/tail-geometry rect [600.0 600.0]))))))
++
++(deftest tail-geometry-stub-is-short-not-a-leader-line
++  (testing "a speaker 400px away gets a stub apex, not a 400px reach"
++    (let [{:keys [base apex]} (page/tail-geometry [500.0 100.0 200.0 100.0]
++                                                   [100.0 150.0])
++          [[x1 _] [_ _]] base [ax _] apex]
++      (is (< (Math/abs (- x1 ax)) 60.0)
++          "apex must stay within the 55px stub clamp of its base edge")
++      (is (> ax 400.0) "apex points toward the speaker but nowhere near x=100"))))
++
++(deftest tail-geometry-nil-when-target-inside-the-bubble
++  (is (nil? (page/tail-geometry [0.0 0.0 100.0 100.0] [50.0 50.0]))
++      "no direction to point at — a tail into the bubble's own text is garbage"))
++
++;; --- layout-bubbles ----------------------------------------------------------
++
++(def ^:private half-panel {:panel-w 483.5 :panel-h 316.77})
++
++(deftest layout-bubbles-places-a-corner-bubble-at-the-margin
++  (let [{:keys [dialogue warnings]}
++        (page/layout-bubbles half-panel
++                             [{:text "それ俺の・・・なんだけど" :speaker "Ren"
++                               :corner :tl :scale 0.5
++                               :face-bbox [0.63 0.2 0.85 0.48]}])
++        [d] dialogue
++        [l t _ _] (:rect d)]
++    (is (empty? warnings))
++    (is (true? (:fits? d)))
++    (is (< (Math/abs (- l 0.045)) 1e-9) "left edge sits AT the margin")
++    (is (< (Math/abs (- t 0.045)) 1e-9))
++    (is (true? (:tail? d)))
++    (let [[tx ty] (:tail-target d)]
++      (is (< (Math/abs (- tx 0.74)) 1e-6) "tail aims at the face-bbox centre x")
++      (is (< (Math/abs (- ty 0.34)) 1e-6) "tail aims at the face-bbox centre y"))))
++
++(deftest layout-bubbles-stacks-same-corner-bubbles-without-overlap
++  (let [{:keys [dialogue]}
++        (page/layout-bubbles half-panel
++                             [{:text "沼野くん、今日も寝てた。" :speaker "Yuto"
++                               :corner :tr :scale 0.35
++                               :face-bbox [0.15 0.25 0.55 0.75]}
++                              {:text "授業は聞いてないのに、" :speaker "Yuto"
++                               :corner :tr :scale 0.35
++                               :face-bbox [0.15 0.25 0.55 0.75]}])
++        [a b] dialogue
++        [_ _at _ ab] (:rect a)
++        [_ bt _ _] (:rect b)]
++    (is (>= bt ab) "second bubble starts below the first, no overlap")
++    (is (true? (:tail? a)) "first of the chain gets the tail")
++    (is (false? (:tail? b)) "the follow-up does NOT — reference-page convention")
++    (is (true? (:chained? b)))
++    (is (= (:rect a) (:prev-rect b)))
++    (is (nil? (:tail-target b)))))
++
++(deftest layout-bubbles-below-face-places-under-the-face
++  (let [{:keys [dialogue]}
++        (page/layout-bubbles half-panel
++                             [{:text "怠惰がおれの美徳なんだよ..." :speaker "Ren"
++                               :corner :tr :scale 0.42 :below-face? true
++                               :face-bbox [0.65 0.15 0.88 0.45]}])
++        [d] dialogue
++        [_ t _ _] (:rect d)]
++    (is (true? (:fits? d)))
++    (is (>= t 0.45) "bubble top starts below the face's bottom edge")))
++
++(deftest layout-bubbles-flags-what-cannot-fit-instead-of-shipping-it
++  (testing "a long line forced above a face whose safe strip is thinner than
++            the bubble's own padding: :fits? false lands in :warnings — the
++            exact bug that shipped two invisible bubbles on a real page"
++    (let [{:keys [dialogue warnings]}
++          (page/layout-bubbles half-panel
++                               [{:text "起きないと、コメッコンの米粉ドーナツ、わたしが、全部食べるよ"
++                                 :speaker "Nei" :corner :tl :scale 0.4
++                                 :max-width 0.4
++                                 :face-bbox [0.05 0.12 0.95 0.9]}])]
++      (is (false? (:fits? (first dialogue))))
++      (is (= 1 (count warnings)))
++      (is (= :does-not-fit (:reason (first warnings)))))))
++
++;; --- score additions: chain-hug / legible / bubble-overlap -------------------
++
++(deftest bubble-placement-score-chained-bubble-scores-adjacency-not-corner
++  (let [adjacent (page/bubble-placement-score
++                  {:bubble-rect [0.5 0.4 0.8 0.6] :prev-rect [0.5 0.05 0.8 0.38]})
++        drifted (page/bubble-placement-score
++                 {:bubble-rect [0.5 0.7 0.8 0.9] :prev-rect [0.5 0.05 0.8 0.38]})]
++    (is (> (:corner-hug adjacent) 0.85)
++        "a chained bubble sitting just under its predecessor is a GOOD layout")
++    (is (< (:corner-hug drifted) (:corner-hug adjacent)))))
++
++(deftest bubble-placement-score-illegible-box-cannot-score-well
++  (let [legible (page/bubble-placement-score
++                 {:bubble-rect [0.02 0.02 0.4 0.3] :corner :tl :fits? true})
++        illegible (page/bubble-placement-score
++                   {:bubble-rect [0.02 0.02 0.4 0.3] :corner :tl :fits? false})]
++    (is (= 1.0 (:legible legible)))
++    (is (= 0.0 (:legible illegible)))
++    (is (< (:score illegible) 0.7)
++        "0.865 pages used to ship unreadable bubbles — :fits? false must bite")))
++
++(deftest panel-placement-score-mutual-overlap-penalizes-the-panel
++  (let [stacked (page/panel-placement-score
++                 [{:bubble-rect [0.5 0.05 0.85 0.3] :corner :tr}
++                  {:bubble-rect [0.5 0.35 0.85 0.6] :corner :tr}])
++        piled (page/panel-placement-score
++               [{:bubble-rect [0.5 0.05 0.85 0.7] :corner :tr}
++                {:bubble-rect [0.5 0.1 0.85 0.75] :corner :tr}])]
++    (is (= 1.0 (:bubble-overlap stacked)))
++    (is (< (:bubble-overlap piled) 0.5)
++        "boxes hiding each other's text: the 3-bubble monologue pileup bug")
++    (is (< (:score piled) (:score stacked)))))
++
++(deftest layout-bubbles-warns-when-the-stack-budget-is-exceeded
++  (testing "two bubbles whose combined height cannot fit the panel: the
++            collision scan runs out of room and the residual overlap is
++            surfaced as :mutual-overlap, not silently shipped (found: two
++            0.48-tall narration boxes overlapping by 0.025 on a real page)"
++    (let [{:keys [warnings]}
++          (page/layout-bubbles {:panel-w 483.5 :panel-h 316.77}
++                               [{:text "廊下から、隣のD組の白瀬寧が、コメッ"
++                                 :corner :tr :scale 0.95 :scale-floor 0.95
++                                 :target-height 0.94 :min-aspect 3.0}
++                                {:text "ドーナツ袋を片手に、ずかずかと入って"
++                                 :corner :tr :scale 0.95 :scale-floor 0.95
++                                 :target-height 0.94 :min-aspect 3.0}])]
++      (is (some #(= :mutual-overlap (:reason %)) warnings)))))
++
++(deftest bubble-placement-score-below-face-hugs-the-face-not-the-corner
++  (testing "a below-face bubble tucked under the face, flush on its corner's
++            x-side, is the CORRECT posture — it must not eat corner-hug=0
++            for being unable to reach a structurally-impossible top strip"
++    (let [tucked (page/bubble-placement-score
++                  {:bubble-rect [0.5 0.49 0.95 0.8] :corner :tr :below-face? true
++                   :face-bbox [0.65 0.15 0.88 0.45]})
++          plain (page/bubble-placement-score
++                 {:bubble-rect [0.5 0.49 0.95 0.8] :corner :tr
++                  :face-bbox [0.65 0.15 0.88 0.45]})]
++      (is (> (:corner-hug tucked) 0.6))
++      (is (= 0.0 (:corner-hug plain))))))
++
++;; --- vertical metrics: em-based tightness + the off-by-one clip --------------
++
++(deftest vertical-metrics-are-em-proportional-not-fixed
++  (testing "pad/pitches scale with the font — a whisper bubble is snug, a
++            narration box doesn't keep a fixed 17px moat"
++    (let [small (page/vertical-metrics {:scale 0.35})
++          large (page/vertical-metrics {:scale 0.95})]
++      (is (< (:pad small) (:pad large)))
++      (is (< (:char-pitch small) (:char-pitch large)))
++      (is (<= (:char-pitch large) (int (* (:font-size large) 1.2)))
++          "char pitch stays near 1.1em — the reference's near-touching set")
++      (is (<= (:col-pitch large) (int (* (:font-size large) 1.35)))))))
++
++(deftest vertical-glyphs-do-not-cross-the-bubble-border
++  (testing "pixel-level regression for the 廊/ナ clip: render a large-scale
++            vertical bubble onto a gray canvas and assert no ink lands right
++            of the bubble's right edge (the old col-0 placement drew the
++            first column's glyph ON the right padding line, crossing the
++            border at scale≈0.95)"
++    (let [img (java.awt.image.BufferedImage. 800 600 java.awt.image.BufferedImage/TYPE_INT_RGB)
++          g (.createGraphics img)]
++      (.setColor g (java.awt.Color. 128 128 128))
++      (.fillRect g 0 0 800 600)
++      (#'page/bubble g "廊下から、隣のD組の白瀬寧が" 400 50 800 :l
++       {:scale 0.95 :writing-mode "vertical-rtl"
++        :width-ratio 0.4 :height-ratio 0.5 :panel-height 600 :tail? false})
++      ;; bubble: cx=400 bw=320 → right edge x=560; border stroke ≤ ±3px.
++      (let [ink (for [x (range 566 640) y (range 40 400)
++                      :let [rgb (.getRGB img x y)
++                            r (bit-and (bit-shift-right rgb 16) 0xff)]
++                      :when (< r 100)]
++                  [x y])]
++        (is (empty? ink)
++            (str "found ink right of the bubble border at " (take 5 ink)))))))
++
++;; --- :caption? — narration is a square box, not a speech bubble --------------
++
++(deftest layout-bubbles-caption-gets-no-tail-and-square-shape
++  (let [{:keys [dialogue]}
++        (page/layout-bubbles half-panel
++                             [{:text "廊下から、隣のD組の白瀬寧が" :caption? true
++                               :corner :tr :scale 0.6
++                               :face-bbox [0.16 0.17 0.25 0.27]}
++                              {:text "ずかずかと入ってきた。" :caption? true
++                               :corner :tr :scale 0.6
++                               :face-bbox [0.16 0.17 0.25 0.27]}])
++        [a b] dialogue]
++    (is (= :caption (:bubble a)))
++    (is (false? (:tail? a)) "narration never gets a tail, even chain-first")
++    (is (nil? (:tail-target a)))
++    (is (false? (:tail? b)))
++    (is (true? (:chained? b)) "captions still stack/chain for placement")))
++
++(deftest caption-shape-renders-square-corners
++  (testing "a :caption bubble's corner pixel is ink (square box reaches the
++            corner); a default bubble's is background (radius-38 cut)"
++    (let [render (fn [shape]
++                   (let [img (java.awt.image.BufferedImage.
++                              800 600 java.awt.image.BufferedImage/TYPE_INT_RGB)
++                         g (.createGraphics img)]
++                     (.setColor g (java.awt.Color. 128 128 128))
++                     (.fillRect g 0 0 800 600)
++                     (#'page/bubble g "説明文のはこ" 400 50 800 :l
++                      {:scale 0.6 :writing-mode "vertical-rtl" :shape shape
++                       :width-ratio 0.4 :height-ratio 0.4 :panel-height 600
++                       :tail? true})
++                     img))
++          corner-r (fn [img] (bit-and (bit-shift-right (.getRGB img 242 52) 16) 0xff))]
++      (is (> (corner-r (render :caption)) 200)
++          "square box reaches the corner — pixel is the box's white fill")
++      (is (< 100 (corner-r (render nil)) 160)
++          "radius-38 corner is cut — pixel stays background gray"))))
++
++;; --- SFX :pos + :monochrome? -------------------------------------------------
++
++(deftest compose-page-monochrome-grayscales-panel-art
++  (testing "a saturated-colour panel image renders with r==g==b everywhere
++            under :monochrome? true (video frames keep colour casts even
++            under a black-and-white prompt)"
++    (let [src (java.awt.image.BufferedImage. 64 64 java.awt.image.BufferedImage/TYPE_INT_RGB)
++          g (.createGraphics src)
++          _ (do (.setColor g (java.awt.Color. 40 80 200)) (.fillRect g 0 0 64 64) (.dispose g))
++          f (java.io.File/createTempFile "mono-src" ".png")
++          _ (javax.imageio.ImageIO/write src "png" f)
++          out (str (System/getProperty "java.io.tmpdir") "/mono-test.png")
++          _ (page/compose-page! {:panels [{:id "a" :size "wide"}]}
++                                (constantly f) out :monochrome? true)
++          img (javax.imageio.ImageIO/read (java.io.File. ^String out))
++          ;; sample inside the panel art area
++          rgb (.getRGB img 300 200)
++          r (bit-and (bit-shift-right rgb 16) 0xff)
++          gg (bit-and (bit-shift-right rgb 8) 0xff)
++          b (bit-and rgb 0xff)]
++      (is (= r gg b) (str "expected gray, got " [r gg b])))))
++
++(deftest sfx-pos-moves-the-anchor
++  (testing "an :sfx entry's :pos [px py] moves where the white ink lands —
++            default anchor used to sit at (0.5, 0.3w) unconditionally,
++            landing on a face on a real page"
++    (let [render (fn [pos]
++                   (let [out (str (System/getProperty "java.io.tmpdir")
++                                  "/sfx-pos-" (hash pos) ".png")]
++                     (page/compose-page!
++                      {:panels [{:id "a" :size "wide"
++                                 :sfx [(cond-> {:text "ピ" :scale 0.6}
++                                         pos (assoc :pos pos))]}]}
++                      (constantly nil) out)
++                     (javax.imageio.ImageIO/read (java.io.File. ^String out))))
++          white-centroid (fn [img]
++                           (let [pts (for [x (range 0 1075 3) y (range 0 700 3)
++                                           :let [rgb (.getRGB img x y)
++                                                 r (bit-and (bit-shift-right rgb 16) 0xff)]
++                                           :when (> r 240)]
++                                       [x y])]
++                             [(/ (reduce + (map first pts)) (max 1 (count pts)))
++                              (/ (reduce + (map second pts)) (max 1 (count pts)))]))
++          [dx _] (white-centroid (render nil))
++          [lx _] (white-centroid (render [0.15 0.8]))]
++      (is (< lx dx) "pos [0.15 …] must land left of the default 0.5 anchor"))))

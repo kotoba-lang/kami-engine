@@ -1,0 +1,375 @@
+diff --git a/.gitignore b/.gitignore
+index d2400ff..fbbf973 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,4 @@
+ .cpcache/
+ .clj-kondo/.cache/
+ .lsp/
++.nbb/
+diff --git a/README.md b/README.md
+index 8148b48..412b8e0 100644
+--- a/README.md
++++ b/README.md
+@@ -5,7 +5,7 @@
+ Reduced-order traction-motor solver (`:rom-motor`) — air-gap shear sizing + loss-fraction efficiency → torque density, peak power, mass. A kami-emag magnetostatic FEA registers `:emag-fea` on the same contract.
+ 
+ Part of the clean-sheet vehicle-design / CAE stack (purpose-split shared libs).
+-Zero-dep portable `.cljc`. Run `clojure -M:test`.
++Zero-dep portable `.cljc`. Run `kbb -M:test`.
+ 
+ ## `motor.bldc` (`:rom-bldc`) — small motors, calibrated instead of extrapolated
+ 
+@@ -55,4 +55,4 @@ component. The bus is idealized lossless; converter efficiency, battery
+ round-trip loss, and the fuel-cell partial-load curve are all declared
+ `:unmeasured` on the result. Registers `:dcbus-balance` on the shared
+ `cae.solver/solve` contract. Zero-dep portable `.cljc`; run with
+-`clojure -M:test`.
++`kbb -M:test`.
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..c8ee04b
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,16 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/motor/bldc.cljk" ".cljc"
++  "src/motor/dcbus.cljk" ".cljc"
++  "src/motor/envelope.cljk" ".cljc"
++  "src/motor/esc.cljk" ".cljc"
++  "src/motor/solver.cljk" ".cljc"
++  "test/motor/bldc_test.cljk" ".clj"
++  "test/motor/dcbus_test.cljk" ".clj"
++  "test/motor/envelope_test.cljk" ".clj"
++  "test/motor/esc_drive_test.cljk" ".clj"
++  "test/motor/esc_test.cljk" ".clj"
++  "test/motor/solver_test.cljk" ".clj"}}
+diff --git a/deps.edn b/deps.edn
+index 6fdf10c..2ea8316 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -3,12 +3,16 @@
+  ;; Registers :rom-motor on the cae-solver contract; turns the design's peak-kW
+  ;; assumption into a sized motor (torque density + efficiency). A high-fidelity
+  ;; kami-emag magnetostatic FEA registers :emag-fea on the same contract later.
+- :deps {io.github.kotoba-lang/datom                {:git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}io.github.kotoba-lang/datom                {:git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
+         io.github.kotoba-lang/kami-engine-cae-solver {:git/sha "53e27f18ddcf10615a8a17adbb78018b1ab64a17"}}
+  :aliases
+  {:test {:extra-paths ["test"]
+          :extra-deps {io.github.cognitect-labs/test-runner
+-                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+          :main-opts ["-m" "cognitect.test-runner"]
+          :exec-fn cognitect.test-runner.api/test}
+   :dev {:override-deps {io.github.kotoba-lang/datom                {:local/root "../datom"}
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..af416ec
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,9 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src"]
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/motor/bldc.cljc b/src/motor/bldc.cljk
+similarity index 100%
+rename from src/motor/bldc.cljc
+rename to src/motor/bldc.cljk
+diff --git a/src/motor/dcbus.cljc b/src/motor/dcbus.cljk
+similarity index 100%
+rename from src/motor/dcbus.cljc
+rename to src/motor/dcbus.cljk
+diff --git a/src/motor/envelope.cljc b/src/motor/envelope.cljk
+similarity index 100%
+rename from src/motor/envelope.cljc
+rename to src/motor/envelope.cljk
+diff --git a/src/motor/esc.cljc b/src/motor/esc.cljk
+similarity index 53%
+rename from src/motor/esc.cljc
+rename to src/motor/esc.cljk
+index 345bcd2..46ab725 100644
+--- a/src/motor/esc.cljc
++++ b/src/motor/esc.cljk
+@@ -1,6 +1,6 @@
+ (ns motor.esc
+   "ESC (inverter) feasibility of one torque-speed operating point against a DC
+-  bus (:esc-feasibility).
++  bus (:esc-feasibility) and of a whole torque-speed drive profile (:drive-feasibility).
+ 
+   This is the missing link between the bus plane and the mechanical planes of
+   this library: `motor.dcbus` treats the traction load as an already-net kW
+@@ -101,5 +101,83 @@
+      :unmeasured [:iron-loss :friction-windage-loss :switching-loss
+                   :esc-thermal-derating :regeneration-braking]
+      :solver :esc-feasibility}))
++(defn- require-profile
++  [profile]
++  (when-not (and (sequential? profile) (seq profile))
++    (throw (ex-info "esc: :profile must be a non-empty sequential of {:rpm .. :torque-Nm ..} points"
++                    {:profile profile})))
++  (when-not (every? (fn [pt]
++                      (and (map? pt)
++                           (number? (:rpm pt))
++                           (number? (:torque-Nm pt))))
++                    profile)
++    (throw (ex-info "esc: :profile must contain only {:rpm .. :torque-Nm ..} maps"
++                    {:profile profile}))))
++
++(defn drive-feasibility
++  "Verify a motor + ESC over a uniformly-sampled, torque-speed drive profile —
++  the mission-level companion to `solve`, which checks ONE operating point.
++  Composes `solve` per point (identical quasi-static DC-equivalent math, no
++  physical constant is invented) and integrates electrical, mechanical, and
++  copper energy exactly: E = P*dt over each uniform interval.
++
++  case:
++    :profile       non-empty sequential of {:rpm r :torque-Nm t} operating
++                   points (r >= 0, t >= 0; a 0/0 idle point is allowed), each
++                   held for :dt-s seconds.
++    :dt-s          uniform sample interval, seconds, > 0.
++    :kt-Nm-per-A / :ke-Vs-per-rad / :r-phase-ohm / :i-max-A / :v-ceiling-V
++                   the same ESC+machine constants as `solve`, REQUIRED with no
++                   defaults (shared across the whole profile; validated per
++                   point by `solve`).
++
++  Returns:
++    {:solver :drive-feasibility
++     :points [{:i :rpm :torque-Nm ...every `solve` field, plus
++              :elec-kWh :mech-kWh :copper-kWh} ...]
++     :energy {:elec-kWh :mech-kWh :copper-kWh :overall-eff}
++     :all-feasible?    boolean (every point feasible?)
++     :infeasible-count int
++     :duration-s       dt-s x profile length
++     :unmeasured       union of point-level losses `solve` does not model
++     :provenance       {:dt-s .. :profile-count ..}}
++
++  Refusals (fail closed): empty/non-map :profile, non-positive :dt-s, or a
++  missing/non-physical electrical constant (surfaced by `solve` per point)."
++  [{:keys [profile dt-s] :as case}]
++  (require-profile profile)
++  (when-not (and (number? dt-s) (pos? dt-s))
++    (throw (ex-info "esc: :dt-s must be a positive number of seconds"
++                    {:dt-s dt-s})))
++  (let [esc-params (select-keys case
++                                [:kt-Nm-per-A :ke-Vs-per-rad :r-phase-ohm
++                                 :i-max-A :v-ceiling-V])
++        dt-h  (/ (double dt-s) 3600.0)
++        pts   (mapv (fn [i pt]
++                      (let [r (solve (merge esc-params
++                                            {:torque-Nm (:torque-Nm pt)
++                                             :rpm       (:rpm pt)}))]
++                        (assoc r
++                               :i i
++                               :rpm (:rpm pt)
++                               :torque-Nm (:torque-Nm pt)
++                               :elec-kWh   (* (:p-elec-kW r) dt-h)
++                               :mech-kWh   (* (:p-mech-kW r) dt-h)
++                               :copper-kWh (* (:copper-loss-kW r) dt-h))))
++                    (range)
++                    profile)
++        elec   (reduce + 0.0 (map :elec-kWh pts))
++        mech   (reduce + 0.0 (map :mech-kWh pts))
++        copper (reduce + 0.0 (map :copper-kWh pts))
++        eff    (when (pos? elec) (/ mech elec))]
++    {:solver :drive-feasibility
++     :points pts
++     :energy {:elec-kWh elec :mech-kWh mech :copper-kWh copper :overall-eff eff}
++     :all-feasible? (every? :feasible? pts)
++     :infeasible-count (count (remove :feasible? pts))
++     :duration-s (* (double dt-s) (count pts))
++     :unmeasured (vec (distinct (reduce into [] (map :unmeasured pts))))
++     :provenance {:dt-s (double dt-s) :profile-count (count pts)}}))
+ 
+ (defmethod cae/solve :esc-feasibility [case] (solve case))
++(defmethod cae/solve :drive-feasibility [case] (drive-feasibility case))
+\ No newline at end of file
+diff --git a/src/motor/solver.cljc b/src/motor/solver.cljk
+similarity index 100%
+rename from src/motor/solver.cljc
+rename to src/motor/solver.cljk
+diff --git a/test/motor/bldc_test.clj b/test/motor/bldc_test.cljk
+similarity index 98%
+rename from test/motor/bldc_test.clj
+rename to test/motor/bldc_test.cljk
+index d3be40d..3502653 100644
+--- a/test/motor/bldc_test.clj
++++ b/test/motor/bldc_test.cljk
+@@ -2,7 +2,7 @@
+   "The fit is checked against the five published motors it was fitted to, and
+   the disagreement with the traction-motor model at drone scale is pinned as a
+   fact rather than left as a footnote — it is the reason this namespace exists."
+-  (:require [clojure.test :refer [deftest testing is]]
++  (:require [kotoba.test :refer [deftest testing is]]
+             [cae.solver :as cae]
+             [motor.bldc :as bldc]
+             [motor.solver :as motor]))
+diff --git a/test/motor/dcbus_test.clj b/test/motor/dcbus_test.cljk
+similarity index 98%
+rename from test/motor/dcbus_test.clj
+rename to test/motor/dcbus_test.cljk
+index 664627e..c227852 100644
+--- a/test/motor/dcbus_test.clj
++++ b/test/motor/dcbus_test.cljk
+@@ -1,5 +1,5 @@
+ (ns motor.dcbus-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [motor.dcbus :as dcbus]
+             [cae.solver :as cae]))
+ 
+diff --git a/test/motor/envelope_test.clj b/test/motor/envelope_test.cljk
+similarity index 97%
+rename from test/motor/envelope_test.clj
+rename to test/motor/envelope_test.cljk
+index 56593dc..e9949d6 100644
+--- a/test/motor/envelope_test.clj
++++ b/test/motor/envelope_test.cljk
+@@ -1,5 +1,5 @@
+ (ns motor.envelope-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [motor.solver :as motor]
+             [motor.envelope :as env]
+             [cae.solver :as cae]))
+diff --git a/test/motor/esc_drive_test.cljk b/test/motor/esc_drive_test.cljk
+new file mode 100644
+index 0000000..9e3205f
+--- /dev/null
++++ b/test/motor/esc_drive_test.cljk
+@@ -0,0 +1,92 @@
++(ns motor.esc-drive-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [motor.esc :as esc]
++            [cae.solver :as cae]))
++
++(def ^:private esc-params
++  {:kt-Nm-per-A 0.1 :ke-Vs-per-rad 0.1 :r-phase-ohm 0.05
++   :i-max-A 60.0 :v-ceiling-V 42.0})
++
++(defn- approx=
++  ([a b] (approx= a b 1e-6))
++  ([a b tol] (< (Math/abs (- (double a) (double b))) tol)))
++
++(deftest single-point-matches-solve-and-integrates-energy
++  (testing "one operating point reproduces esc/solve and integrates E = P*dt"
++    (let [case (merge esc-params
++                      {:profile [{:rpm 3000.0 :torque-Nm 5.0}] :dt-s 60.0})
++          d   (esc/drive-feasibility case)
++          pt  (first (:points d))
++          ref (esc/solve (merge esc-params {:rpm 3000.0 :torque-Nm 5.0}))]
++      (is (= 1 (count (:points d))))
++      (is (approx= (:i-A ref) (:i-A pt)))
++      (is (approx= (:p-mech-kW ref) (:p-mech-kW pt)))
++      (is (approx= (:p-elec-kW ref) (:p-elec-kW pt)))
++      (is (approx= (:eff ref) (:eff pt)))
++      ;; energy identity: dt 60s = 1/60 h
++      (is (approx= (* (:p-elec-kW pt) (/ 60.0 3600.0)) (:elec-kWh pt)))
++      (is (approx= (* (:p-mech-kW pt) (/ 60.0 3600.0)) (:mech-kWh pt)))
++      (is (approx= (get-in d [:energy :elec-kWh]) (:elec-kWh pt)))
++      (is (true? (:all-feasible? d)))
++      (is (= 0 (:infeasible-count d)))
++      (is (= :drive-feasibility (:solver d))))))
++
++(deftest integrates-over-multi-point-profile
++  (testing "energy sums across points; idle draws nothing"
++    (let [profile [{:rpm 0.0 :torque-Nm 0.0}
++                   {:rpm 3000.0 :torque-Nm 5.0}
++                   {:rpm 3000.0 :torque-Nm 5.0}]
++          d  (esc/drive-feasibility (merge esc-params {:profile profile :dt-s 100.0}))
++          pts (:points d)
++          elec (reduce + 0.0 (map :elec-kWh pts))
++          mech (reduce + 0.0 (map :mech-kWh pts))]
++      (is (= 3 (count pts)))
++      (is (approx= 0.0 (:mech-kWh (nth pts 0))))
++      (is (approx= (:mech-kWh (nth pts 1)) (:mech-kWh (nth pts 2))))
++      (is (approx= (get-in d [:energy :elec-kWh]) elec))
++      (is (approx= (get-in d [:energy :mech-kWh]) mech))
++      ;; round-trip overall efficiency identity
++      (is (approx= (get-in d [:energy :overall-eff]) (/ mech elec)))
++      (is (approx= (* 100.0 3) (:duration-s d))))))
++
++(deftest infeasible-points-flagged
++  (testing "a point beyond the ESC current limit is counted, not hidden"
++    (let [d (esc/drive-feasibility (merge esc-params
++                                          {:i-max-A 40.0
++                                           :profile [{:rpm 3000.0 :torque-Nm 5.0}
++                                                     {:rpm 3000.0 :torque-Nm 5.0}]
++                                           :dt-s 60.0}))]
++      (is (false? (:all-feasible? d)))
++      (is (= 2 (:infeasible-count d)))
++      (is (every? #(false? (:feasible? %)) (:points d))))))
++
++(deftest refusals
++  (testing "fail closed: empties, non-positive dt, missing constant"
++    (is (thrown? clojure.lang.ExceptionInfo
++                 (esc/drive-feasibility (assoc esc-params :profile []))))
++    (is (thrown? clojure.lang.ExceptionInfo
++                 (esc/drive-feasibility (assoc esc-params :profile [{:rpm 3000 :torque-Nm 5}] :dt-s 0.0))))
++    (is (thrown? clojure.lang.ExceptionInfo
++                 (esc/drive-feasibility (assoc (dissoc esc-params :i-max-A)
++                                               :profile [{:rpm 3000 :torque-Nm 5}]
++                                               :dt-s 60.0))))
++    (is (thrown? clojure.lang.ExceptionInfo
++                 (esc/drive-feasibility (assoc esc-params :profile "not-a-profile" :dt-s 60.0))))))
++
++(deftest registered-on-cae-solver-contract
++  (testing "dispatchable through the shared cae.solver contract"
++    (let [case (merge esc-params {:profile [{:rpm 3000.0 :torque-Nm 5.0}]
++                                   :dt-s 60.0})
++          direct (esc/drive-feasibility case)
++          via    (cae/solve (assoc case :solver {:kind :drive-feasibility}))]
++      (is (= (:solver direct) (:solver via)))
++      (is (= (:energy direct) (:energy via)))
++      (is (= (:all-feasible? direct) (:all-feasible? via))))))
++
++(deftest unmeasured-losses-declared
++  (testing "the drive contract names what it does NOT model"
++    (let [d (esc/drive-feasibility (merge esc-params
++                                          {:profile [{:rpm 3000.0 :torque-Nm 5.0}]
++                                           :dt-s 60.0}))]
++      (is (contains? (set (:unmeasured d)) :iron-loss))
++      (is (every? :feasible? (:points d))))))
+\ No newline at end of file
+diff --git a/test/motor/esc_test.clj b/test/motor/esc_test.cljk
+similarity index 98%
+rename from test/motor/esc_test.clj
+rename to test/motor/esc_test.cljk
+index 58efcda..8aeb2fd 100644
+--- a/test/motor/esc_test.clj
++++ b/test/motor/esc_test.cljk
+@@ -1,5 +1,5 @@
+ (ns motor.esc-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [motor.esc :as esc]
+             [cae.solver :as cae]))
+ 
+diff --git a/test/motor/solver_test.clj b/test/motor/solver_test.cljk
+similarity index 98%
+rename from test/motor/solver_test.clj
+rename to test/motor/solver_test.cljk
+index 3e01090..3035164 100644
+--- a/test/motor/solver_test.clj
++++ b/test/motor/solver_test.cljk
+@@ -1,5 +1,5 @@
+ (ns motor.solver-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [motor.solver :as motor]
+             [cae.solver :as cae]))
+ 

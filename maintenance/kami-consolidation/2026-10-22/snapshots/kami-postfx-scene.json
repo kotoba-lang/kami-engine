@@ -1,0 +1,72 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTLUuYg",
+    "databaseId": 1286942306,
+    "nameWithOwner": "kotoba-lang/kami-postfx-scene",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-24T06:41:21Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 0
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-postfx-scene\nHEAD 585f2f0c6947b4a9e8927ca34f611f115dc9c7a0\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 585f2f0c6947b4a9e8927ca34f611f115dc9c7a0\nrefs/heads/main e9c63df697e4af1d3562fd3eff0ec8a9de0eff7c\nrefs/heads/manifest-rev d9cb5408b9b3504fe9fa07f165a9e00d189f89e4\nrefs/remotes/kotoba-lang/HEAD 585f2f0c6947b4a9e8927ca34f611f115dc9c7a0\nrefs/remotes/kotoba-lang/cljk-rename-20260911 82110999708b4e520349e6f956bff2203f624253\nrefs/remotes/kotoba-lang/jv/full-sha a40a0991182d3f658e2f08584b7e74a3b8b8e647\nrefs/remotes/kotoba-lang/kbb-cutover-20260911 aca97f24bbc4896b505bf4de86aeaeff120def88\nrefs/remotes/kotoba-lang/main 585f2f0c6947b4a9e8927ca34f611f115dc9c7a0"
+  },
+  "local-after-preservation": {
+    "HEAD": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-postfx-scene\nHEAD 585f2f0c6947b4a9e8927ca34f611f115dc9c7a0\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0",
+      "refs/heads/main": "e9c63df697e4af1d3562fd3eff0ec8a9de0eff7c",
+      "refs/heads/manifest-rev": "d9cb5408b9b3504fe9fa07f165a9e00d189f89e4",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0",
+      "refs/remotes/kotoba-lang/HEAD": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0",
+      "refs/remotes/kotoba-lang/cljk-rename-20260911": "82110999708b4e520349e6f956bff2203f624253",
+      "refs/remotes/kotoba-lang/jv/full-sha": "a40a0991182d3f658e2f08584b7e74a3b8b8e647",
+      "refs/remotes/kotoba-lang/kbb-cutover-20260911": "aca97f24bbc4896b505bf4de86aeaeff120def88",
+      "refs/remotes/kotoba-lang/main": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0"
+    }
+  },
+  "historical-pulls": []
+}

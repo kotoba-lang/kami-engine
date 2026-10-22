@@ -1,0 +1,83 @@
+;; kami-engine-sdk — KAMI Engine Clojure SDK (clj + Datomic + WebGPU)
+;; See ARCHITECTURE.md. clj is the brain; kami-render (Rust/wgpu) is the GPU arm.
+;;
+;; Datomic flavor is an open question (ADR-CLJ-02 / §13). The schema and kami.db
+;; API are Datalog-portable; datalevin is the default here as an OSS, embeddable,
+;; blockchain-friendly Datalog store aligned with root/'s "no proprietary Datomic"
+;; platform note. Swap the :datomic alias for Cloud/Peer if desired.
+{:paths ["src" "resources"]
+
+ :deps {
+        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
+        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
+        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
+        ;; sha it is shown.
+        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
+        ;; kotoba.json replaced clojure.data.json here (2026-09-24). An explicit
+        ;; floor: kotoba.json/read-str and /write-str first exist at 9c11ad1, and
+        ;; tools.deps takes the NEWEST sha it is shown.
+        io.github.kotoba-lang/json {:git/sha "9c11ad189e64907700e8b4eb9b26f40336bffa01"}
+        ;; kotoba.lang.coll replaced clojure.set here (2026-09-24). An explicit
+        ;; floor: kotoba.lang.coll carries clojure.set's union/intersection/
+        ;; difference/map-invert from 0ffd5f6, and tools.deps takes the NEWEST
+        ;; sha it is shown.
+        io.github.kotoba-lang/coll {:git/sha "f74e248f0a07e8ae572885f50fab6bdb39dc24be"}
+        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
+        ;; only from nbb.edn, so every project file this repo has names it.
+        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
+       ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
+        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
+        ;; this repo silently rides whatever a sibling happens to name.
+        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+       org.clojure/clojure       {:mvn/version "1.12.0"}
+} ; snapshot transport (JVM↔browser)
+
+ :aliases
+ {;; ----- JVM authoring / Datomic source of truth -----------------------------
+  :datomic  {:extra-deps {datalevin/datalevin {:mvn/version "0.9.22"}}}
+  ;; alt: com.datomic/peer {:mvn/version "..."}  | com.datomic/client-cloud {:mvn/version "..."}
+
+  :dev      {:extra-paths ["dev" "examples"]
+             :extra-deps  {datalevin/datalevin   {:mvn/version "0.9.22"}
+                           org.clojure/tools.namespace {:mvn/version "1.5.0"}}
+             :jvm-opts    ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                           "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"]
+             :main-opts   ["-e" "(println \"kami-engine-sdk dev REPL — see ARCHITECTURE.md §12\")"]}
+
+  ;; Real-datalevin round-trip: connect → tx → snapshot → ECS → render-IR → pack → commit
+  :roundtrip {:extra-paths ["dev"]
+              :extra-deps  {datalevin/datalevin {:mvn/version "0.9.22"}}
+              :jvm-opts    ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                            "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"]
+              :main-opts   ["-m" "roundtrip"]}
+
+  ;; Regenerate cross-language artifacts consumed by the Rust side:
+  ;;   -m gen-fixture  → ../kami-clj-host/tests/fixtures/frame.bin (decoder contract test)
+  ;;   -m gen-demo     → ../kami-clj-host/demo/{frame.bin,frame.json} (browser smoke test)
+  :gen      {:extra-paths ["dev"]
+             :extra-deps  {org.clojure/data.json {:mvn/version "2.5.0"}}}
+
+  ;; ----- Browser runtime (ClojureScript → kami-render WASM → WebGPU) ---------
+  :shadow   {:extra-paths ["src"]
+             :extra-deps  {thheller/shadow-cljs            {:mvn/version "2.28.20"}
+                           org.clojure/clojurescript       {:mvn/version "1.11.132"}
+                           com.cognitect/transit-cljs      {:mvn/version "0.8.280"}}
+             :main-opts   ["-m" "shadow.cljs.devtools.cli"]}
+
+  ;; ----- Contract tests (no GPU): render-IR golden, WGSL emit, IPC packing ---
+  :test     {:extra-paths ["test"]
+             :extra-deps  {io.github.cognitect-labs/test-runner
+                           {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+             :main-opts   ["-m" "cognitect.test-runner"]}
+
+  ;; clj-kondo as a Clojars lib (no Homebrew/system install needed). --fail-level
+  ;; error so clj-kondo actually gates CI (the version this replaced had no
+  ;; --fail-level and so exited 0 even with real errors).
+  :lint     {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
+             :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test"
+                         "--fail-level" "error"]}}}

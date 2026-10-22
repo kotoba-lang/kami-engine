@@ -1,0 +1,73 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTLA8Nw",
+    "databaseId": 1286618167,
+    "nameWithOwner": "kotoba-lang/kami-scene-contracts",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-25T01:49:09Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "87918d611775141ee32bac16a7c62b838ba5dc03"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "87918d611775141ee32bac16a7c62b838ba5dc03"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 0
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "87918d611775141ee32bac16a7c62b838ba5dc03",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-scene-contracts\nHEAD 87918d611775141ee32bac16a7c62b838ba5dc03\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 87918d611775141ee32bac16a7c62b838ba5dc03\nrefs/heads/main 3aed7d72380daed6b727d62fbe6fefa313d64871\nrefs/heads/manifest-rev b949e1f01460476eeaeb5cdb222a7ba6ab86ef7b\nrefs/remotes/origin/HEAD 87918d611775141ee32bac16a7c62b838ba5dc03\nrefs/remotes/origin/cljk-rename-20260911 d40945644f173e25416dd536a625526d08a5eec3\nrefs/remotes/origin/jv/full-sha 20f807cf86086c35efdb7a403c044d6a15fb052a\nrefs/remotes/origin/jv/kotoba-text a6d85fc53315a2048784f4aa5b317ab7310da030\nrefs/remotes/origin/kbb-cutover-20260911 cbaebc63d1d44b3b287b995e526c1590f4d9d05c\nrefs/remotes/origin/main 87918d611775141ee32bac16a7c62b838ba5dc03"
+  },
+  "local-after-preservation": {
+    "HEAD": "87918d611775141ee32bac16a7c62b838ba5dc03",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-scene-contracts\nHEAD 87918d611775141ee32bac16a7c62b838ba5dc03\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "87918d611775141ee32bac16a7c62b838ba5dc03",
+      "refs/heads/main": "3aed7d72380daed6b727d62fbe6fefa313d64871",
+      "refs/heads/manifest-rev": "b949e1f01460476eeaeb5cdb222a7ba6ab86ef7b",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "87918d611775141ee32bac16a7c62b838ba5dc03",
+      "refs/remotes/origin/HEAD": "87918d611775141ee32bac16a7c62b838ba5dc03",
+      "refs/remotes/origin/cljk-rename-20260911": "d40945644f173e25416dd536a625526d08a5eec3",
+      "refs/remotes/origin/jv/full-sha": "20f807cf86086c35efdb7a403c044d6a15fb052a",
+      "refs/remotes/origin/jv/kotoba-text": "a6d85fc53315a2048784f4aa5b317ab7310da030",
+      "refs/remotes/origin/kbb-cutover-20260911": "cbaebc63d1d44b3b287b995e526c1590f4d9d05c",
+      "refs/remotes/origin/main": "87918d611775141ee32bac16a7c62b838ba5dc03"
+    }
+  },
+  "historical-pulls": []
+}

@@ -1,0 +1,213 @@
+{
+  "repository": "kotoba-lang/kami-usd-native",
+  "default": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "commit": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "commit": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "b185f48efdfdb15059b7d22daf8a9671a462b7ab",
+      "commit": "b185f48efdfdb15059b7d22daf8a9671a462b7ab",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "commit": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "commit": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "7b8c4b9438db58094d0eba9f9664936195b6ae8f",
+      "commit": "7b8c4b9438db58094d0eba9f9664936195b6ae8f",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-usd-native/pull/1",
+        "head": "7b8c4b9438db58094d0eba9f9664936195b6ae8f",
+        "merge": "e56fffc291406a5871ee4cd11969a42e8ece3bd2",
+        "merge-base": "b185f48efdfdb15059b7d22daf8a9671a462b7ab",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "0a10db5b66f6a429b6d2ff87e577f5207e1c2f83"
+            }
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "1abb3fc47d09140bc6c21d64536eaae4a25cb548"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "e20e78e344a0378b0a35e648d91cd7dedc817826"
+            }
+          },
+          {
+            "path": "docs/adr/0001-kotoba-source-authority.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "e8f1d4a4eefc763bf12610b31afcddd62c303403"
+            }
+          },
+          {
+            "path": "src/usd_native.cljc",
+            "entry": null
+          },
+          {
+            "path": "src/usd_native.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c16a7ab8b84af02bb59bff274ea56edc61aac353"
+            }
+          },
+          {
+            "path": "test/usd_native/core_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "34ec422a9bb65a1bd5f805a2347118a835c46439"
+            }
+          },
+          {
+            "path": "test/usd_native/core_test.cljc",
+            "entry": null
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "commit": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/cljk-rename-20260911",
+      "object": "dc0980c7388de36897dca4e316c0cc2b5b6adaad",
+      "commit": "dc0980c7388de36897dca4e316c0cc2b5b6adaad",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "c26ce204992e447410c69ed8047a6e451a5cca92",
+      "commit": "c26ce204992e447410c69ed8047a6e451a5cca92",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text",
+      "object": "5a0b18483c06d3f21f78250bcb1c62a67fa9ce9a",
+      "commit": "5a0b18483c06d3f21f78250bcb1c62a67fa9ce9a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/kbb-cutover-20260911",
+      "object": "9fbfca1dcdcb3ce11fef83cfd43dde2e5d4429cc",
+      "commit": "9fbfca1dcdcb3ce11fef83cfd43dde2e5d4429cc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "commit": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-usd-native/pull/1",
+      "head": "7b8c4b9438db58094d0eba9f9664936195b6ae8f",
+      "merge": "e56fffc291406a5871ee4cd11969a42e8ece3bd2",
+      "merge-base": "b185f48efdfdb15059b7d22daf8a9671a462b7ab",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "0a10db5b66f6a429b6d2ff87e577f5207e1c2f83"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1abb3fc47d09140bc6c21d64536eaae4a25cb548"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "e20e78e344a0378b0a35e648d91cd7dedc817826"
+          }
+        },
+        {
+          "path": "docs/adr/0001-kotoba-source-authority.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "e8f1d4a4eefc763bf12610b31afcddd62c303403"
+          }
+        },
+        {
+          "path": "src/usd_native.cljc",
+          "entry": null
+        },
+        {
+          "path": "src/usd_native.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c16a7ab8b84af02bb59bff274ea56edc61aac353"
+          }
+        },
+        {
+          "path": "test/usd_native/core_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "34ec422a9bb65a1bd5f805a2347118a835c46439"
+          }
+        },
+        {
+          "path": "test/usd_native/core_test.cljc",
+          "entry": null
+        }
+      ]
+    }
+  ]
+}

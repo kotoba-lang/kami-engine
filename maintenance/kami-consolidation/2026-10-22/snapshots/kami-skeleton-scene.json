@@ -1,0 +1,72 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTLU0sQ",
+    "databaseId": 1286943921,
+    "nameWithOwner": "kotoba-lang/kami-skeleton-scene",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-24T10:12:01Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 0
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-skeleton-scene\nHEAD 58d4d3a143ec08f917df905a8a016f0ab3f5a1a0\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 58d4d3a143ec08f917df905a8a016f0ab3f5a1a0\nrefs/heads/main 86d009edfb4c6ad617f1f019f9ad39662e3bcaf7\nrefs/heads/manifest-rev 3eb8f441a6947a38f64d38be3566b6afd0e5cf71\nrefs/remotes/kotoba-lang/HEAD 58d4d3a143ec08f917df905a8a016f0ab3f5a1a0\nrefs/remotes/kotoba-lang/cljk-rename-20260911 cae3bcaec81231b8bcb5de5692ca8d7a47546b96\nrefs/remotes/kotoba-lang/jv/full-sha f4a7764d4ab6e2e29c1bb96acb2333764f954748\nrefs/remotes/kotoba-lang/kbb-cutover-20260911 caa8a7def45cdd1d7f557af1a10ac202c24b69df\nrefs/remotes/kotoba-lang/main 58d4d3a143ec08f917df905a8a016f0ab3f5a1a0"
+  },
+  "local-after-preservation": {
+    "HEAD": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-skeleton-scene\nHEAD 58d4d3a143ec08f917df905a8a016f0ab3f5a1a0\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0",
+      "refs/heads/main": "86d009edfb4c6ad617f1f019f9ad39662e3bcaf7",
+      "refs/heads/manifest-rev": "3eb8f441a6947a38f64d38be3566b6afd0e5cf71",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0",
+      "refs/remotes/kotoba-lang/HEAD": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0",
+      "refs/remotes/kotoba-lang/cljk-rename-20260911": "cae3bcaec81231b8bcb5de5692ca8d7a47546b96",
+      "refs/remotes/kotoba-lang/jv/full-sha": "f4a7764d4ab6e2e29c1bb96acb2333764f954748",
+      "refs/remotes/kotoba-lang/kbb-cutover-20260911": "caa8a7def45cdd1d7f557af1a10ac202c24b69df",
+      "refs/remotes/kotoba-lang/main": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0"
+    }
+  },
+  "historical-pulls": []
+}

@@ -1,0 +1,28 @@
+;; kotoba-lang/kami-web — portable CLJC (math/render-IR/document) + static demos/
+;; Related runtime packages (not hard-required for pure CLJC tests):
+;;   webgpu (executor), host (game surface), kami-engine-app-sdk (DOM chrome)
+{:paths ["src"]
+ :deps {
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
+        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
+        ;; this repo silently rides whatever a sibling happens to name.
+        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+       org.clojure/clojure {:mvn/version "1.12.0"}
+        org.clojure/clojurescript {:mvn/version "1.11.132"}}
+ :aliases
+ {:test {:extra-paths ["test"]
+         :extra-deps {io.github.cognitect-labs/test-runner
+                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+         :main-opts ["-m" "cognitect.test-runner"]
+         :exec-fn cognitect.test-runner.api/test}
+  :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
+         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test" "--fail-level" "error"]}
+  ;; Optional classpath for demo-adjacent development
+  :demos {:extra-deps {io.github.kotoba-lang/webgpu {:local/root "../webgpu"}
+                       io.github.kotoba-lang/host {:local/root "../host"}
+                       io.github.kotoba-lang/kami-engine-app-sdk {:local/root "../kami-engine-app-sdk"}
+                       io.github.kotoba-lang/kami-engine-sdk {:local/root "../kami-engine-sdk"}}}}}

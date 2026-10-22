@@ -1,0 +1,86 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTGwt3w",
+    "databaseId": 1282158047,
+    "nameWithOwner": "kotoba-lang/kami-engine-crash",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-23T10:37:39Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "849a2be18a1c1442fc28983629b655e9d355835f"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "849a2be18a1c1442fc28983629b655e9d355835f"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 1
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "849a2be18a1c1442fc28983629b655e9d355835f",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-crash\nHEAD 849a2be18a1c1442fc28983629b655e9d355835f\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 849a2be18a1c1442fc28983629b655e9d355835f\nrefs/heads/main 043dba140810e7ef03a1b8965ed4111eabe11d9f\nrefs/heads/manifest-rev 1efa15efbd426ff8aff7ee4c15c6ddfe308c8331\nrefs/remotes/origin/HEAD 849a2be18a1c1442fc28983629b655e9d355835f\nrefs/remotes/origin/main 849a2be18a1c1442fc28983629b655e9d355835f"
+  },
+  "local-after-preservation": {
+    "HEAD": "849a2be18a1c1442fc28983629b655e9d355835f",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-crash\nHEAD 849a2be18a1c1442fc28983629b655e9d355835f\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "refs/heads/main": "043dba140810e7ef03a1b8965ed4111eabe11d9f",
+      "refs/heads/manifest-rev": "1efa15efbd426ff8aff7ee4c15c6ddfe308c8331",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "378906bdc5cd77e55e7855aa05231672786b4b0d",
+      "refs/remotes/origin/HEAD": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "refs/remotes/origin/main": "849a2be18a1c1442fc28983629b655e9d355835f"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "chore(deps): rename com-junkawasaki/*-clj \u2192 kotoba-lang/* (org reconcile)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "chore/org-rename-reconcile",
+      "headRefOid": "378906bdc5cd77e55e7855aa05231672786b4b0d",
+      "baseRefName": "main",
+      "baseRefOid": "20166fff676297427b0ac77a3680a0fc05c06c09",
+      "mergeCommit": {
+        "oid": "fa29f4e0282c5ab00741084dc9492b5fe76e5b1a"
+      },
+      "mergedAt": "2026-06-30T05:16:15Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-crash/pull/1"
+    }
+  ]
+}

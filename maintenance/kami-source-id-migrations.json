@@ -1,0 +1,90 @@
+{
+  "schema": "kotoba.kami.source-id-migrations.v1",
+  "specification": {
+    "repository": "kotoba-lang/kotoba-lang",
+    "commit": "4094b1d9023a3dde8217b735d0bba124ad6e4870",
+    "path": "docs/lang/naming.md",
+    "sha256": "4212ff303bbc7d69ada1971ffe9316acc00027b7a7ad7e6d693f2a6e746c0cd2",
+    "git-blob": "d1033c5a54486a6c9d803b6651e31b7c08ddfd59"
+  },
+  "previous-catalog-commit": "093abf0c478ede0f9df76373e3f8e9c8cd7c54c8",
+  "previous-catalog-sha256": "3db6e844ea1cc86ef4ac92032f3e1186d144bc623c11910c185c185078767f09",
+  "policy": "Preserve named dot levels; multiword segments become explicit lowerCamelCase spellings. Every previous draft ID is an exact one-hop alias. No implicit case conversion, hyphen replacement, namespace/path rewrite, signed lock or admission change. Existing source directory names stay explicit in catalog paths.",
+  "migrations": [
+    {
+      "before": "kotoba.kami.cad-import",
+      "after": "kotoba.kami.cadImport",
+      "repository": "kotoba-lang/kami-cad-import"
+    },
+    {
+      "before": "kotoba.kami.eng-web",
+      "after": "kotoba.kami.engWeb",
+      "repository": "kotoba-lang/kami-eng-web"
+    },
+    {
+      "before": "kotoba.kami.engine.app-sdk",
+      "after": "kotoba.kami.engine.appSdk",
+      "repository": "kotoba-lang/kami-engine-app-sdk"
+    },
+    {
+      "before": "kotoba.kami.engine.cae-solver",
+      "after": "kotoba.kami.engine.caeSolver",
+      "repository": "kotoba-lang/kami-engine-cae-solver"
+    },
+    {
+      "before": "kotoba.kami.engine.hud-gpu",
+      "after": "kotoba.kami.engine.hudGpu",
+      "repository": "kotoba-lang/kami-engine-hud-gpu"
+    },
+    {
+      "before": "kotoba.kami.engine.input-map",
+      "after": "kotoba.kami.engine.inputMap",
+      "repository": "kotoba-lang/kami-engine-input-map"
+    },
+    {
+      "before": "kotoba.kami.engine.vehicle-designer",
+      "after": "kotoba.kami.engine.vehicleDesigner",
+      "repository": "kotoba-lang/kami-engine-vehicle-designer"
+    },
+    {
+      "before": "kotoba.kami.gen.sdf-agent",
+      "after": "kotoba.kami.gen.sdfAgent",
+      "repository": "kotoba-lang/kami-gen-sdf-agent"
+    },
+    {
+      "before": "kotoba.kami.genre-base-systems",
+      "after": "kotoba.kami.genreBaseSystems",
+      "repository": "kotoba-lang/kami-genre-base-systems"
+    },
+    {
+      "before": "kotoba.kami.mangaka.scene-author",
+      "after": "kotoba.kami.mangaka.sceneAuthor",
+      "repository": "kotoba-lang/kami-mangaka-scene-author"
+    },
+    {
+      "before": "kotoba.kami.nv-compat",
+      "after": "kotoba.kami.nvCompat",
+      "repository": "kotoba-lang/kami-nv-compat"
+    },
+    {
+      "before": "kotoba.kami.ongaku.plugin-host",
+      "after": "kotoba.kami.ongaku.pluginHost",
+      "repository": "kotoba-lang/kami-ongaku-plugin-host"
+    },
+    {
+      "before": "kotoba.kami.sensor-sim",
+      "after": "kotoba.kami.sensorSim",
+      "repository": "kotoba-lang/kami-sensor-sim"
+    },
+    {
+      "before": "kotoba.kami.scene.solar-helix",
+      "after": "kotoba.kami.scene.solarHelix",
+      "repository": "kotoba-lang/kami-solar-helix-scene"
+    },
+    {
+      "before": "kotoba.kami.usd-native",
+      "after": "kotoba.kami.usdNative",
+      "repository": "kotoba-lang/kami-usd-native"
+    }
+  ]
+}

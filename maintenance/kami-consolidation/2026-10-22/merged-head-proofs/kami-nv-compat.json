@@ -1,0 +1,91 @@
+{
+  "repository": "kotoba-lang/kami-nv-compat",
+  "default": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+  "heads": {},
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-nv-compat/pull/1",
+      "head": "6fe5aa1aeeab46a1fb9e246bfb2cc4695c71e01c",
+      "merge": "e4ed98d251b87f497f363cd07fe30a38534b91fb",
+      "merge-base": "f121edeab0e12682498f608c2038e3a6466bfd51",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kotoba/lang/kami_nv_compat/dynamics/urdf_parser.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "27cda8015a7dc6e2cec1bee6d1e95228337c4c35"
+          }
+        },
+        {
+          "path": "test/kotoba/lang/kami_nv_compat/dynamics/urdf_parser_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "6f94836d4447f0d6eff36078f9fd3bd5717329ed"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-nv-compat/pull/2",
+      "head": "9088b616f83a4d4410b5bf77f11b10b7b262b3ed",
+      "merge": "2f8a2e2fe4ff8621b6855ecabf4f6295324e4c43",
+      "merge-base": "e4ed98d251b87f497f363cd07fe30a38534b91fb",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "test/isaac-sim-wasm-bridge.smoke.test.ts",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "9d2ece7bc8ee29523dd41678d54e49655ca72e4b"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1bfdb1a2196975279d13565dfd4e49785b3b68af"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm.cjs",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "03285e0da5dc875857192296365023dc2bc58aac"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm.d.cts",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c29d9ba6836a4502f4dd8a88ba3fe14356965a88"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm_bg.wasm",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "65ccfd61e57d4f81301b4a1d7fa01d2b27fa71be"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm_bg.wasm.d.ts",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b4dd31a0a949be14e8aa5a0cab2529435d3c507b"
+          }
+        }
+      ]
+    }
+  ]
+}

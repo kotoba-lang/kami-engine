@@ -1,0 +1,90 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTOtzZQ",
+    "databaseId": 1290498917,
+    "nameWithOwner": "kotoba-lang/kami-webvr",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-23T10:44:00Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "24087fee54a92b982aa1c04af84f886d9e2fa88f"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "24087fee54a92b982aa1c04af84f886d9e2fa88f"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 1
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "24087fee54a92b982aa1c04af84f886d9e2fa88f",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-webvr\nHEAD 24087fee54a92b982aa1c04af84f886d9e2fa88f\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 24087fee54a92b982aa1c04af84f886d9e2fa88f\nrefs/heads/main 04aa85ed0e63eb985a63e5c23a30bc5fa98d9884\nrefs/heads/manifest-rev 150247cb2cfb8e431ede75fa08142ce1987b7700\nrefs/remotes/origin/HEAD 24087fee54a92b982aa1c04af84f886d9e2fa88f\nrefs/remotes/origin/cljk-rename-20260911 57178ee7b87808610f85e3abbb36f8ac97bf022e\nrefs/remotes/origin/jv/full-sha 0a8d3cd039f8b5c2215d913cdcc9fbc2a839d659\nrefs/remotes/origin/jv/kotoba-text-cljs da01851074236427d14fdaf13ba508a80f131632\nrefs/remotes/origin/kbb-cutover-20260911 aa0bf4db1ce574381ea9468edc9d384471bed27a\nrefs/remotes/origin/main 24087fee54a92b982aa1c04af84f886d9e2fa88f"
+  },
+  "local-after-preservation": {
+    "HEAD": "24087fee54a92b982aa1c04af84f886d9e2fa88f",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-webvr\nHEAD 24087fee54a92b982aa1c04af84f886d9e2fa88f\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "24087fee54a92b982aa1c04af84f886d9e2fa88f",
+      "refs/heads/main": "04aa85ed0e63eb985a63e5c23a30bc5fa98d9884",
+      "refs/heads/manifest-rev": "150247cb2cfb8e431ede75fa08142ce1987b7700",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "24087fee54a92b982aa1c04af84f886d9e2fa88f",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "fa8550a4acd85a673e2ce213c3ae8c084de61807",
+      "refs/remotes/origin/HEAD": "24087fee54a92b982aa1c04af84f886d9e2fa88f",
+      "refs/remotes/origin/cljk-rename-20260911": "57178ee7b87808610f85e3abbb36f8ac97bf022e",
+      "refs/remotes/origin/jv/full-sha": "0a8d3cd039f8b5c2215d913cdcc9fbc2a839d659",
+      "refs/remotes/origin/jv/kotoba-text-cljs": "da01851074236427d14fdaf13ba508a80f131632",
+      "refs/remotes/origin/kbb-cutover-20260911": "aa0bf4db1ce574381ea9468edc9d384471bed27a",
+      "refs/remotes/origin/main": "24087fee54a92b982aa1c04af84f886d9e2fa88f"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "chore(tooling): remove leftover bb.edn (ADR-2607173000)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "chore/bb-to-nbb-complete-adr2607173000",
+      "headRefOid": "fa8550a4acd85a673e2ce213c3ae8c084de61807",
+      "baseRefName": "main",
+      "baseRefOid": "04aa85ed0e63eb985a63e5c23a30bc5fa98d9884",
+      "mergeCommit": {
+        "oid": "1196513db3607b530574854d87f2beecc6ca2966"
+      },
+      "mergedAt": "2026-07-21T06:54:51Z",
+      "url": "https://github.com/kotoba-lang/kami-webvr/pull/1"
+    }
+  ]
+}

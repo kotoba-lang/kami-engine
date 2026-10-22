@@ -1,0 +1,5 @@
+
+# Generated consolidation recovery evidence
+maintenance/kami-consolidation/** linguist-generated=true
+maintenance/kami-original-configs/** linguist-generated=true
+maintenance/kami-source-imports.json linguist-generated=true

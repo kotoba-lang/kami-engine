@@ -1,0 +1,70 @@
+(ns game-scene.item-catalog-test
+  "Tests for `game-scene.item-catalog`, ported 1:1 from the original
+  `kami-game-scene` Rust crate's `src/item_catalog.rs` `#[cfg(test)]`
+  module AND `tests/item_catalog_parity.rs` (both deleted in
+  kotoba-lang/kami-engine PR #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [game-scene.item-catalog :as item-catalog]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'game-scene.item-catalog)))))
+
+;; ── item_catalog.rs #[cfg(test)] ────────────────────────────────────────
+
+;; Rust: shipped_has_four_items
+(deftest shipped-has-four-items
+  (let [specs (item-catalog/item-specs-from-edn item-catalog/item-catalog-edn)]
+    (is (= 4 (count specs)))
+    (is (= (count specs) (count (item-catalog/builtin-item-specs))))
+    (is (= 15 (reduce + (map #(count (:zones %)) specs))) "15 rust zones across the catalog")))
+
+;; Rust: enum_ids_round_trip
+(deftest enum-ids-round-trip
+  (doseq [id ["surface" "deep" "pitted" "patina"]]
+    (is (= id (item-catalog/rust-type-id (item-catalog/rust-type-from-id id)))))
+  (doseq [id ["pressure-washer" "wire-brush" "sandpaper" "chemical-solvent" "polishing-cloth" "ultrasonic"]]
+    (is (= id (item-catalog/tool-kind-id (item-catalog/tool-kind-from-id id))))))
+
+;; Rust: current_level_defaults_to_initial
+(deftest current-level-defaults-to-initial
+  (let [specs (item-catalog/item-specs-from-edn item-catalog/item-catalog-edn)]
+    (doseq [it specs]
+      (doseq [z (:zones it)]
+        (is (= (:current-level z) (:initial-level z)) (str (:id it) "/" (:id z)))))))
+
+;; Rust: non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try (item-catalog/item-specs-from-edn "42") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :not-a-map (:game-scene.item-catalog/error err)))))
+
+;; Rust: missing_table_is_an_error
+(deftest missing-table-is-an-error
+  (let [err (try (item-catalog/item-specs-from-edn "{:x 1}") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :no-table (:game-scene.item-catalog/error err)))))
+
+;; ── tests/item_catalog_parity.rs ────────────────────────────────────────
+
+;; Rust: item_catalog_edn_matches_builtin
+(deftest item-catalog-edn-matches-builtin
+  (let [loaded (item-catalog/item-specs-from-edn item-catalog/item-catalog-edn)
+        builtin (item-catalog/builtin-item-specs)]
+    (is (= (count loaded) (count builtin)) "item count")
+    (is (= 4 (count loaded)) "all 4 items present")
+    (doseq [[i g w] (map vector (range) loaded builtin)]
+      (is (= (count (:zones g)) (count (:zones w))) (str "item[" i "] (" (:id w) ") zone count"))
+      (doseq [[j gz wz] (map vector (range) (:zones g) (:zones w))]
+        (is (= gz wz) (str "item[" i "].zone[" j "] (center/extent/rust-type/levels/nerf)")))
+      (is (= (:disassembly-steps g) (:disassembly-steps w)) (str "item[" i "] (" (:id w) ") disassembly steps"))
+      (is (= g w) (str "item[" i "] (" (:id w) ") full parity")))
+    (is (= loaded builtin) "full item-catalog parity (ordered)")))
+
+;; Rust: spec_round_trips_through_item
+(deftest spec-round-trips-through-item
+  (let [loaded (item-catalog/item-specs-from-edn item-catalog/item-catalog-edn)
+        builtin (item-catalog/builtin-item-specs)]
+    (doseq [[spec want] (map vector loaded builtin)]
+      (let [item (item-catalog/spec-to-item spec)]
+        (is (= item want) (str (:id want) ": item round-trips through spec"))))))

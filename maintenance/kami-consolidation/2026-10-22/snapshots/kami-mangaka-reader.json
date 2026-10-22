@@ -1,0 +1,74 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTLT18w",
+    "databaseId": 1286927859,
+    "nameWithOwner": "kotoba-lang/kami-mangaka-reader",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-24T06:39:01Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "01823ab3c0dc1e15a59f38c2805609bbfd5318ed"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "01823ab3c0dc1e15a59f38c2805609bbfd5318ed"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 0
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "01823ab3c0dc1e15a59f38c2805609bbfd5318ed",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-mangaka-reader\nHEAD 01823ab3c0dc1e15a59f38c2805609bbfd5318ed\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 01823ab3c0dc1e15a59f38c2805609bbfd5318ed\nrefs/heads/main 52607f155db9bddcbc3881bc6e6505e17bea7208\nrefs/heads/manifest-rev 5c216e1c6bee1e397e07ce507c997203cc94e1c0\nrefs/remotes/kotoba-lang/HEAD 01823ab3c0dc1e15a59f38c2805609bbfd5318ed\nrefs/remotes/kotoba-lang/agent/clj-to-cljc 394c2bbb52b5be0b2958176c42f998a8d000a22f\nrefs/remotes/kotoba-lang/cljk-rename-20260911 2d0d41fd97247b7ea3758b6ae710b5a3c87eef0f\nrefs/remotes/kotoba-lang/jv/full-sha 1535ba06265a0bacebfb80d90247233a23544524\nrefs/remotes/kotoba-lang/jv/kotoba-text ec42e577befefc15146f89f7d8af152aad84d2e7\nrefs/remotes/kotoba-lang/kbb-cutover-20260911 a8ae6890b6084959953afbf4a271904456760f38\nrefs/remotes/kotoba-lang/main 01823ab3c0dc1e15a59f38c2805609bbfd5318ed"
+  },
+  "local-after-preservation": {
+    "HEAD": "01823ab3c0dc1e15a59f38c2805609bbfd5318ed",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-mangaka-reader\nHEAD 01823ab3c0dc1e15a59f38c2805609bbfd5318ed\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "01823ab3c0dc1e15a59f38c2805609bbfd5318ed",
+      "refs/heads/main": "52607f155db9bddcbc3881bc6e6505e17bea7208",
+      "refs/heads/manifest-rev": "5c216e1c6bee1e397e07ce507c997203cc94e1c0",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "01823ab3c0dc1e15a59f38c2805609bbfd5318ed",
+      "refs/remotes/kotoba-lang/HEAD": "01823ab3c0dc1e15a59f38c2805609bbfd5318ed",
+      "refs/remotes/kotoba-lang/agent/clj-to-cljc": "394c2bbb52b5be0b2958176c42f998a8d000a22f",
+      "refs/remotes/kotoba-lang/cljk-rename-20260911": "2d0d41fd97247b7ea3758b6ae710b5a3c87eef0f",
+      "refs/remotes/kotoba-lang/jv/full-sha": "1535ba06265a0bacebfb80d90247233a23544524",
+      "refs/remotes/kotoba-lang/jv/kotoba-text": "ec42e577befefc15146f89f7d8af152aad84d2e7",
+      "refs/remotes/kotoba-lang/kbb-cutover-20260911": "a8ae6890b6084959953afbf4a271904456760f38",
+      "refs/remotes/kotoba-lang/main": "01823ab3c0dc1e15a59f38c2805609bbfd5318ed"
+    }
+  },
+  "historical-pulls": []
+}

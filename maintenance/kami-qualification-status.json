@@ -1,0 +1,318 @@
+{
+  "schema": "kotoba.kami.qualification-status.v1",
+  "state": "draft; targeted compatibility/host repairs and14 branch decisions verified; whole-wave qualification incomplete",
+  "tracking": "https://linear.app/kotobalabs/issue/JUN-267",
+  "scope": {
+    "family-review": 97,
+    "source-imports": 67,
+    "retired-doc-trees": 7,
+    "catalog-projects": 70,
+    "exact-aliases": 152
+  },
+  "source-cli": {
+    "exactLookups": 222,
+    "sourceIDs": 70,
+    "exactAliases": 152,
+    "explicitDraftIDMigrations": 15,
+    "retiredScaffoldRefusals": 7,
+    "catalogAndSymlinkRefusals": 12,
+    "externalCWD": true,
+    "admission": "not-granted"
+  },
+  "provenance": {
+    "original-files": 1677,
+    "complete-histories-restored-fsck": 74,
+    "refs": 1174,
+    "historical-PR-heads": 181,
+    "nonancestor-heads": 107,
+    "strongly-proven-merged-heads": 91,
+    "pending-manual-decisions": 2,
+    "manual-head-decisions": 14
+  },
+  "dependency-validation": {
+    "literal-manifests": 161,
+    "internal-relocations": 42,
+    "external-canonical-path-relocations": 14,
+    "other-external-Git-floors": "unchanged",
+    "root-default-paths": [],
+    "fixture-owner-option-relocations": 2
+  },
+  "initial-JVM-probe": {
+    "projects": 70,
+    "passed": 54,
+    "no-declared-JVM-tests": 0,
+    "needs-repair": 16,
+    "probe-only": "Host declarations and remaining runtimes are still required before qualification/main/archive"
+  },
+  "first-repair-suites": [
+    {
+      "id": "kotoba.kami.engine.cae-solver",
+      "exit": 0,
+      "passed": true,
+      "tests": 176,
+      "assertions": 813,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.articulated",
+      "exit": 0,
+      "passed": true,
+      "tests": 12,
+      "assertions": 63,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.engine.modeling",
+      "exit": 1,
+      "passed": false,
+      "tests": 100,
+      "assertions": 724,
+      "failures": 0,
+      "errors": 1
+    },
+    {
+      "id": "kotoba.kami.engine.sdk",
+      "exit": 0,
+      "passed": true,
+      "tests": 95,
+      "assertions": 407,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.engine.vehicle-designer",
+      "exit": 1,
+      "passed": false
+    },
+    {
+      "id": "kotoba.kami.nv-compat",
+      "exit": 0,
+      "passed": true,
+      "tests": 482,
+      "assertions": 2746,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.usd-native",
+      "exit": 0,
+      "passed": true,
+      "tests": 8,
+      "assertions": 26,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.gameplay",
+      "exit": 0,
+      "passed": true,
+      "tests": 151,
+      "assertions": 71397,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.cad-import",
+      "exit": 1,
+      "passed": false,
+      "tests": 55,
+      "assertions": 1189,
+      "failures": 1,
+      "errors": 0
+    }
+  ],
+  "first-repair-wrapper": "Known missing ML3D classpath aborted aggregate report;9 completed per-project results recovered,6 pass. This is partial evidence, not whole-wave qualification.",
+  "pending": [
+    "Review the two novel functional proposals: Echem run-at-power and vehicle-regeneration; do not label them merged/discarded",
+    "Preserve CAD original dependency semantics; latest internal vehicle revision changes its smoke-test result",
+    "Resolve ML3D private-provider assembly without copying private source/revision/WIP or invoking live inference",
+    "Resolve remaining asset test host, autodrive numeric regressions and owner physics missing API floor",
+    "Finish every selected project declared-host/native/public-CLI gate and actual-main qualification before archive",
+    "Recheck all original source/ref/WIP/239 holds before any retirement"
+  ],
+  "Actions": "Existing kami-engine Actions are disabled and remain unchanged; no CI success claimed",
+  "main-merged": false,
+  "repositories-archived": 0,
+  "repositories-deleted": 0,
+  "deployment-and-runtime-admission": "not performed",
+  "existing-owner-gates": {
+    "command": "kbb -M scripts/<gate>.cljk",
+    "results": [
+      {
+        "gate": "wit_test",
+        "exit": 0
+      },
+      {
+        "gate": "check_adapter_registry",
+        "exit": 0
+      },
+      {
+        "gate": "guest_lint",
+        "exit": 0
+      }
+    ],
+    "initial-invocation-error": "Adding --backend sci before -M passed -M as a filename; corrected to documented invocation, all3 actual gates pass"
+  },
+  "canonical-ID-migrations": {
+    "count": 15,
+    "policy": "explicit lowerCamelCase corrections; named dot levels unchanged; previous draft IDs remain exact one-hop aliases",
+    "spec-commit": "4094b1d9023a3dde8217b735d0bba124ad6e4870",
+    "paths-and-namespace-APIs": "unchanged"
+  },
+  "follow-up-JVM-targets": {
+    "projects": 5,
+    "tests": 294,
+    "assertions": 1574,
+    "failures": 0,
+    "errors": 0,
+    "qualification": "targeted suites; whole70-project run not repeated or claimed",
+    "results": [
+      {
+        "id": "kotoba.kami.engine.modeling",
+        "exit": 0,
+        "namespaces": [
+          "kami.modeling-assembly-test",
+          "kami.modeling-brep-test",
+          "kami.modeling-cae-test",
+          "kami.modeling-collaboration-test",
+          "kami.modeling-crypto-test",
+          "kami.modeling-document-test",
+          "kami.modeling-drawing-test",
+          "kami.modeling-feature-graph-test",
+          "kami.modeling-large-scene-test",
+          "kami.modeling-nurbs-test",
+          "kami.modeling-sheet-metal-test",
+          "kami.modeling-step-test",
+          "kami.modeling-test"
+        ],
+        "passed": true,
+        "tests": 102,
+        "assertions": 738,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "id": "kotoba.kami.mangaka.scene-author",
+        "exit": 0,
+        "namespaces": [
+          "kami.mangaka.scene-test"
+        ],
+        "passed": true,
+        "tests": 15,
+        "assertions": 71,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "id": "kotoba.kami.engine.vehicle-designer",
+        "exit": 0,
+        "namespaces": [
+          "vdesign.bev-store-test",
+          "vdesign.cad-bridge-test",
+          "vdesign.cartridge-fcev-test",
+          "vdesign.cartridge-geometry-test",
+          "vdesign.cartridge-test",
+          "vdesign.cartridge-volume-test",
+          "vdesign.closure-contract-test",
+          "vdesign.dc-bus-test",
+          "vdesign.dutycycle-test",
+          "vdesign.endurance-test",
+          "vdesign.fatigue-test",
+          "vdesign.hydrogen-test",
+          "vdesign.motionplan-test",
+          "vdesign.powertrain-test",
+          "vdesign.process-test",
+          "vdesign.reactor-heat-test",
+          "vdesign.scene-test",
+          "vdesign.simphysics-test",
+          "vdesign.swap-schedule-test",
+          "vdesign.swap-station-test",
+          "vdesign.vehicle-test"
+        ],
+        "passed": true,
+        "tests": 149,
+        "assertions": 651,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "id": "kotoba.kami.app.fixtures",
+        "exit": 0,
+        "namespaces": [
+          "kami.app-fixtures-test",
+          "kami.provider.contract-test"
+        ],
+        "passed": true,
+        "tests": 9,
+        "assertions": 32,
+        "failures": 0,
+        "errors": 0
+      },
+      {
+        "id": "kotoba.kami.contracts",
+        "exit": 0,
+        "namespaces": [
+          "kami.app-fixtures-test",
+          "kami.app-state-machines-test",
+          "kami.component-test",
+          "kami.contracts-test",
+          "kami.provider-catalog-test"
+        ],
+        "passed": true,
+        "tests": 19,
+        "assertions": 82,
+        "failures": 0,
+        "errors": 0
+      }
+    ]
+  },
+  "portable-follow-up": {
+    "modeling": {
+      "SCI": {
+        "tests": 100,
+        "assertions": 721,
+        "failures": 0,
+        "errors": 0
+      },
+      "compiled-Node": {
+        "tests": 100,
+        "assertions": 721,
+        "failures": 0,
+        "errors": 0
+      },
+      "remaining-JVM-only-tests": "two real Java Ed25519 tests; exclusion bound to the actual import"
+    },
+    "scene-author": {
+      "SCI": {
+        "tests": 15,
+        "assertions": 71,
+        "failures": 0,
+        "errors": 0
+      },
+      "compiled-Node": {
+        "tests": 15,
+        "assertions": 71,
+        "failures": 0,
+        "errors": 0
+      }
+    },
+    "compiled-negative": {
+      "tests": 17,
+      "assertions": 73,
+      "failures": 1,
+      "errors": 1,
+      "expected-Node-exit": 1,
+      "actual-Node-exit": 1,
+      "refusal-verified": true
+    },
+    "public-CLI-import-probes": {
+      "projects": 2,
+      "source-origins": 3,
+      "passed": true,
+      "host": "real public Kotoba CLI / explicit SCI source compatibility",
+      "admission": "not-granted"
+    }
+  }
+}

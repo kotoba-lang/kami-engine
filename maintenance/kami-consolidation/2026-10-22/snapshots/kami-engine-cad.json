@@ -1,0 +1,145 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTUf4yA",
+    "databaseId": 1296562376,
+    "nameWithOwner": "kotoba-lang/kami-engine-cad",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-24T10:07:50Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7"
+      }
+    },
+    "heads": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "cad/rigid-transform-placement",
+          "target": {
+            "oid": "e43f4fb475343f226a0aa421a7659f29d69ba101"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 4
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-cad\nHEAD 7068b4cc2d5044aee479ddbdf75ef4efb8133da7\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 7068b4cc2d5044aee479ddbdf75ef4efb8133da7\nrefs/heads/main a66b438f1909d72400c9c467bd70ca83291a9a5d\nrefs/heads/manifest-rev f2083ca367050acee1dcff61fcc2b495af64e2d8\nrefs/remotes/origin/HEAD 7068b4cc2d5044aee479ddbdf75ef4efb8133da7\nrefs/remotes/origin/cad/extrude-with-holes 38f4f12362bf18912de9a41da57752dfe7db17c5\nrefs/remotes/origin/cad/rigid-transform-placement e43f4fb475343f226a0aa421a7659f29d69ba101\nrefs/remotes/origin/cljk-rename-20260911 d0029f184b1cf4fe5f9f50c6ac61dc8470ba577a\nrefs/remotes/origin/jv/full-sha e848b370e04b40f9562a7126a6c16a65e99020a0\nrefs/remotes/origin/main 7068b4cc2d5044aee479ddbdf75ef4efb8133da7"
+  },
+  "local-after-preservation": {
+    "HEAD": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-cad\nHEAD 7068b4cc2d5044aee479ddbdf75ef4efb8133da7\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7",
+      "refs/heads/main": "a66b438f1909d72400c9c467bd70ca83291a9a5d",
+      "refs/heads/manifest-rev": "f2083ca367050acee1dcff61fcc2b495af64e2d8",
+      "refs/preservation/kami-monorepo-20261022/heads/cad/rigid-transform-placement": "e43f4fb475343f226a0aa421a7659f29d69ba101",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "38f4f12362bf18912de9a41da57752dfe7db17c5",
+      "refs/preservation/kami-monorepo-20261022/pull-2": "667be3de75fd1044954bb82dbee7372c3f0b7581",
+      "refs/preservation/kami-monorepo-20261022/pull-3": "e43f4fb475343f226a0aa421a7659f29d69ba101",
+      "refs/preservation/kami-monorepo-20261022/pull-4": "8354f6f1e329ad7afd5eaf2d0053bbb1bad9d219",
+      "refs/remotes/origin/HEAD": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7",
+      "refs/remotes/origin/cad/extrude-with-holes": "38f4f12362bf18912de9a41da57752dfe7db17c5",
+      "refs/remotes/origin/cad/rigid-transform-placement": "e43f4fb475343f226a0aa421a7659f29d69ba101",
+      "refs/remotes/origin/cljk-rename-20260911": "d0029f184b1cf4fe5f9f50c6ac61dc8470ba577a",
+      "refs/remotes/origin/jv/full-sha": "e848b370e04b40f9562a7126a6c16a65e99020a0",
+      "refs/remotes/origin/main": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "cad: extrude-polygon-with-holes \u2014 watertight one-hole annulus extrusion",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "cad/extrude-with-holes",
+      "headRefOid": "38f4f12362bf18912de9a41da57752dfe7db17c5",
+      "baseRefName": "main",
+      "baseRefOid": "28cf9b5c08f90e89c24264b138d0cc2cc024220e",
+      "mergeCommit": {
+        "oid": "3ef65bcf83251739c0356b249cf31f31fe3afc17"
+      },
+      "mergedAt": "2026-09-05T10:08:47Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/1"
+    },
+    {
+      "number": 2,
+      "title": "cad: revolve \u2014 axisymmetric solid of revolution (:revolve)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "cad/revolve-of-revolution",
+      "headRefOid": "667be3de75fd1044954bb82dbee7372c3f0b7581",
+      "baseRefName": "main",
+      "baseRefOid": "db860f360b7a4e0dbe476a1356aa976365493ab3",
+      "mergeCommit": {
+        "oid": "820a9c896d87c80ff492b4880d1bf8b91820a591"
+      },
+      "mergedAt": "2026-09-04T05:32:22Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/2"
+    },
+    {
+      "number": 3,
+      "title": "cad: rigid transforms + placement features \u2014 translate/rotate/mirror/matrix on watertight solids",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "cad/rigid-transform-placement",
+      "headRefOid": "e43f4fb475343f226a0aa421a7659f29d69ba101",
+      "baseRefName": "main",
+      "baseRefOid": "820a9c896d87c80ff492b4880d1bf8b91820a591",
+      "mergeCommit": {
+        "oid": "28cf9b5c08f90e89c24264b138d0cc2cc024220e"
+      },
+      "mergedAt": "2026-09-05T01:13:10Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/3"
+    },
+    {
+      "number": 4,
+      "title": "cad: solid-mass-properties \u2014 centroid + inertia tensor for watertight solids",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "cad/solid-mass-properties",
+      "headRefOid": "8354f6f1e329ad7afd5eaf2d0053bbb1bad9d219",
+      "baseRefName": "main",
+      "baseRefOid": "3ef65bcf83251739c0356b249cf31f31fe3afc17",
+      "mergeCommit": {
+        "oid": "462181e751284998d6d6c0139d1b85c139649a93"
+      },
+      "mergedAt": "2026-09-08T06:03:57Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/4"
+    }
+  ]
+}

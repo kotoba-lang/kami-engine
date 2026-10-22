@@ -1,0 +1,111 @@
+(ns input-scene-test
+  "Tests for `input-scene`, ported 1:1 from the original
+  kami-input-scene Rust crate's `#[cfg(test)] mod tests` (src/lib.rs)
+  and `tests/input_parity.rs` (deleted kotoba-lang/kami-engine PR #82),
+  plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [input-scene :as input-scene]
+            [input :as input]))
+
+;; ── Smoke test ───────────────────────────────────────────────────
+
+(deftest smoke-test
+  (testing "namespace loads and exposes its public vars"
+    (is (some? input-scene/input-edn))
+    (is (= ["fps" "graph"] input-scene/all-map-names))
+    (is (fn? input-scene/shipped-input-maps))))
+
+;; ── Ported from src/lib.rs #[cfg(test)] mod tests ────────────────
+
+(deftest shipped-has-all-maps
+  (let [m (input-scene/shipped-input-maps)]
+    (is (= 2 (count m)))
+    (doseq [name input-scene/all-map-names]
+      (is (contains? m name) (str name " present in EDN")))))
+
+(deftest unknown-builtin-map-is-none
+  (is (nil? (input-scene/builtin-input-map "does-not-exist"))))
+
+(deftest unknown-map-from-edn-is-an-error
+  (let [e (try (input-scene/input-map-from-edn input-scene/input-edn "vehicle")
+               (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (= ::input-scene/map-not-found (:type (ex-data e))))))
+
+(deftest non-map-root-is-an-error
+  (let [e (try (input-scene/input-maps-from-edn "42")
+               (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (= ::input-scene/not-a-map (:type (ex-data e))))))
+
+(deftest missing-table-is-an-error
+  (let [e (try (input-scene/input-maps-from-edn "{:other 1}")
+               (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (= ::input-scene/no-table (:type (ex-data e))))))
+
+(deftest unknown-action-is-an-error
+  (let [e (try (input-scene/input-map-from-edn
+                "{:input/maps {:m [[\"KeyW\" :fly-to-moon]]}}" "m")
+               (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (= ::input-scene/unknown-action (:type (ex-data e))))
+    (is (= "fly-to-moon" (:action (ex-data e))))))
+
+(deftest action-id-round-trips
+  (doseq [a input/actions]
+    (is (= a (input-scene/action-from-id (input-scene/id-from-action a))))))
+
+;; ── Ported from tests/input_parity.rs ────────────────────────────
+
+(defn- oracle [name]
+  (case name
+    "fps" (input/default-fps-map)
+    "graph" (input/default-graph-map)))
+
+(deftest input-maps-edn-matches-builtin
+  (let [loaded (input-scene/input-maps-from-edn input-scene/input-edn)]
+    (is (= 2 (count loaded)) "all maps present in EDN")
+    (doseq [name input-scene/all-map-names]
+      (is (= (:bindings (oracle name)) (:bindings (get loaded name)))
+          (str name ": full input-map bindings parity"))
+      (let [built (input-scene/builtin-input-map name)]
+        (is (= (:bindings (get loaded name)) (:bindings built)))))
+    (let [shipped (input-scene/shipped-input-maps)]
+      (doseq [name input-scene/all-map-names]
+        (is (= (:bindings (get shipped name)) (:bindings (get loaded name))))))))
+
+(deftest single-map-from-edn-matches
+  (doseq [name input-scene/all-map-names]
+    (let [got (input-scene/input-map-from-edn input-scene/input-edn name)]
+      (is (= (:bindings (oracle name)) (:bindings got)))
+      (let [shipped (input-scene/shipped-input-map name)]
+        (is (= (:bindings (oracle name)) (:bindings shipped)))))))
+
+(deftest shipped-maps-have-expected-counts-and-resolve
+  (let [fps (input-scene/shipped-input-map "fps")
+        graph (input-scene/shipped-input-map "graph")]
+    (is (= 12 (count (:bindings fps))) "fps has 12 bindings")
+    (is (= 12 (count (:bindings graph))) "graph has 12 bindings")
+
+    (is (= (input/resolve-action fps "KeyW")
+           (input/resolve-action (input/default-fps-map) "KeyW")))
+    (is (= (input/resolve-action fps "Escape")
+           (input/resolve-action (input/default-fps-map) "Escape")))
+    (is (= (input/resolve-action graph "Equal")
+           (input/resolve-action (input/default-graph-map) "Equal")))
+    (is (= (input/resolve-action graph "NumpadSubtract")
+           (input/resolve-action (input/default-graph-map) "NumpadSubtract")))
+    (is (nil? (input/resolve-action fps "KeyX")) "unbound key -> nil")))
+
+(deftest tolerant-parse-errors
+  (let [e1 (try (input-scene/input-map-from-edn input-scene/input-edn "vehicle")
+                (catch #?(:clj Exception :cljs js/Error) e e))
+        e2 (try (input-scene/input-map-from-edn
+                 "{:input/maps {:m [[\"KeyW\" :teleport]]}}" "m")
+                (catch #?(:clj Exception :cljs js/Error) e e))
+        e3 (try (input-scene/input-maps-from-edn "123")
+                (catch #?(:clj Exception :cljs js/Error) e e))
+        e4 (try (input-scene/input-maps-from-edn "{:x 1}")
+                (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (= ::input-scene/map-not-found (:type (ex-data e1))))
+    (is (= ::input-scene/unknown-action (:type (ex-data e2))))
+    (is (= "teleport" (:action (ex-data e2))))
+    (is (= ::input-scene/not-a-map (:type (ex-data e3))))
+    (is (= ::input-scene/no-table (:type (ex-data e4))))))

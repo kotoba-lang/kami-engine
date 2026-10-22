@@ -1,0 +1,71 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTWAIfQ",
+    "databaseId": 1298139261,
+    "nameWithOwner": "kotoba-lang/kami-ongaku-plugin-host",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-23T10:43:51Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "7d86077d019a66cff33e7d1ee37155f93696ec49"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "7d86077d019a66cff33e7d1ee37155f93696ec49"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 0
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-ongaku-plugin-host\nHEAD 7d86077d019a66cff33e7d1ee37155f93696ec49\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 7d86077d019a66cff33e7d1ee37155f93696ec49\nrefs/heads/manifest-rev 86654255566cc1c06ece90f4fe2772b65bb359f9\nrefs/remotes/kotoba-lang/HEAD 7d86077d019a66cff33e7d1ee37155f93696ec49\nrefs/remotes/kotoba-lang/cljk-rename-20260911 7c578ac8d04918d131e093bf6f978fcc57eab787\nrefs/remotes/kotoba-lang/jv/full-sha 65802c353e4bbbf29ee25cea4f2173e09280ff37\nrefs/remotes/kotoba-lang/kbb-cutover-20260911 93537a5071c54c320d15de33d2109398d0c8a968\nrefs/remotes/kotoba-lang/main 7d86077d019a66cff33e7d1ee37155f93696ec49"
+  },
+  "local-after-preservation": {
+    "HEAD": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-ongaku-plugin-host\nHEAD 7d86077d019a66cff33e7d1ee37155f93696ec49\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "refs/heads/manifest-rev": "86654255566cc1c06ece90f4fe2772b65bb359f9",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "refs/remotes/kotoba-lang/HEAD": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "refs/remotes/kotoba-lang/cljk-rename-20260911": "7c578ac8d04918d131e093bf6f978fcc57eab787",
+      "refs/remotes/kotoba-lang/jv/full-sha": "65802c353e4bbbf29ee25cea4f2173e09280ff37",
+      "refs/remotes/kotoba-lang/kbb-cutover-20260911": "93537a5071c54c320d15de33d2109398d0c8a968",
+      "refs/remotes/kotoba-lang/main": "7d86077d019a66cff33e7d1ee37155f93696ec49"
+    }
+  },
+  "historical-pulls": []
+}

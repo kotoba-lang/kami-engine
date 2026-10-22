@@ -1,0 +1,826 @@
+{
+  "schema" : "kotoba.kami.dependency-transitions.v1",
+  "policy" : "Only selected internal source edges and existing external development paths are relocated. Every other coordinate/value, alias, path and option remains typed-EDN identical. Original configs are retained byte-for-byte. Root :paths stays empty.",
+  "transitions" : [ {
+    "file" : "packages/kotoba.kami.cad-import/deps.edn",
+    "site" : [ ":aliases", ":test", ":extra-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-vehicle",
+    "target-repository" : "kotoba-lang/kami-vehicle",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "49efb48d04542bdeb905529f94420ff149cc61bd"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.vehicle"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.aero/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-vphysics",
+    "target-repository" : "kotoba-lang/kami-engine-vphysics",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "32c2329ed6bd1074b2d0d3dab17f3440477cbbc3"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.vphysics"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.aero/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "53e27f18ddcf10615a8a17adbb78018b1ab64a17"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.aero/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/datom",
+    "target-repository" : "kotoba-lang/datom",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../datom"
+    },
+    "after" : {
+      ":local/root" : "../../../datom"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.aero/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-vphysics",
+    "target-repository" : "kotoba-lang/kami-engine-vphysics",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-vphysics"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.vphysics"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.aero/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-cae-solver"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.crash/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-vphysics",
+    "target-repository" : "kotoba-lang/kami-engine-vphysics",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "32c2329ed6bd1074b2d0d3dab17f3440477cbbc3"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.vphysics"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.crash/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "53e27f18ddcf10615a8a17adbb78018b1ab64a17"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.crash/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/datom",
+    "target-repository" : "kotoba-lang/datom",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../datom"
+    },
+    "after" : {
+      ":local/root" : "../../../datom"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.crash/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-vphysics",
+    "target-repository" : "kotoba-lang/kami-engine-vphysics",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-vphysics"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.vphysics"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.crash/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-cae-solver"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.echem/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "53e27f18ddcf10615a8a17adbb78018b1ab64a17"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.echem/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/datom",
+    "target-repository" : "kotoba-lang/datom",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../datom"
+    },
+    "after" : {
+      ":local/root" : "../../../datom"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.echem/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-cae-solver"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.motor/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "53e27f18ddcf10615a8a17adbb78018b1ab64a17"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.motor/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/datom",
+    "target-repository" : "kotoba-lang/datom",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../datom"
+    },
+    "after" : {
+      ":local/root" : "../../../datom"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.motor/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-cae-solver"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.multirotor/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "214a1907890b75cbb5ed6781cf3dea8cba0f4351"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.multirotor/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-rotor",
+    "target-repository" : "kotoba-lang/kami-engine-rotor",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "fd8ea447f6bc4df64ea4c33a771fd10a7739ad82"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.rotor"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.multirotor/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-pack",
+    "target-repository" : "kotoba-lang/kami-engine-pack",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "ed2ff2d7ccca44656352c832f0e46a44f19d48fe"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.pack"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.multirotor/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-motor",
+    "target-repository" : "kotoba-lang/kami-engine-motor",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "1dccf82dcf42a4622a77e615a0532ba247f5d3b8"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.motor"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.multirotor/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/datom",
+    "target-repository" : "kotoba-lang/datom",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../datom"
+    },
+    "after" : {
+      ":local/root" : "../../../datom"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.multirotor/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-cae-solver"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.multirotor/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-rotor",
+    "target-repository" : "kotoba-lang/kami-engine-rotor",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-rotor"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.rotor"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.multirotor/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-pack",
+    "target-repository" : "kotoba-lang/kami-engine-pack",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-pack"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.pack"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.multirotor/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-motor",
+    "target-repository" : "kotoba-lang/kami-engine-motor",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-motor"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.motor"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.pack/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "214a1907890b75cbb5ed6781cf3dea8cba0f4351"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.pack/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/datom",
+    "target-repository" : "kotoba-lang/datom",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../datom"
+    },
+    "after" : {
+      ":local/root" : "../../../datom"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.pack/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-cae-solver"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.rotor/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/sha" : "214a1907890b75cbb5ed6781cf3dea8cba0f4351"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.rotor/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/datom",
+    "target-repository" : "kotoba-lang/datom",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../datom"
+    },
+    "after" : {
+      ":local/root" : "../../../datom"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.rotor/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-cae-solver"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.cae-solver"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.vehicle-designer/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-motor",
+    "target-repository" : "kotoba-lang/kami-engine-motor",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-motor.git",
+      ":git/sha" : "d49a16e7563ef230531b3b0c7f3152f5f9d2ce8c"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.motor"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.vehicle-designer/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-vphysics",
+    "target-repository" : "kotoba-lang/kami-engine-vphysics",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-vphysics.git",
+      ":git/sha" : "f6b5936c5009b61c681f7926a0ab10c0030841b6"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.vphysics"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.vehicle-designer/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-aero",
+    "target-repository" : "kotoba-lang/kami-engine-aero",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-aero.git",
+      ":git/sha" : "7151ae056b8dcd8338c9717d932e347c1817ba66"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.aero"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.vehicle-designer/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-echem",
+    "target-repository" : "kotoba-lang/kami-engine-echem",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-echem.git",
+      ":git/sha" : "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.echem"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.vehicle-designer/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-crash",
+    "target-repository" : "kotoba-lang/kami-engine-crash",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-crash.git",
+      ":git/sha" : "fa29f4e0282c5ab00741084dc9492b5fe76e5b1a"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.crash"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.engine.vehicle-designer/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/langchain",
+    "target-repository" : "kotoba-lang/langchain",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../langchain"
+    },
+    "after" : {
+      ":local/root" : "../../../langchain"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.gen.hybrid/deps.edn",
+    "site" : [ ":aliases", ":dev", ":override-deps" ],
+    "coordinate" : "io.github.kotoba-lang/langchain",
+    "target-repository" : "kotoba-lang/langchain",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../langchain"
+    },
+    "after" : {
+      ":local/root" : "../../../langchain"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.gen.ml3d/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/org-vrmc-vrm",
+    "target-repository" : "kotoba-lang/org-vrmc-vrm",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../org-vrmc-vrm"
+    },
+    "after" : {
+      ":local/root" : "../../../org-vrmc-vrm"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.gen.ml3d/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.gftdcojp/cloud-murakumo",
+    "target-repository" : "kotoba-lang/cloud-murakumo",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../../network-awai/cloud-murakumo"
+    },
+    "after" : {
+      ":local/root" : "../../../../network-awai/cloud-murakumo"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.gen.ml3d/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/skeleton",
+    "target-repository" : "kotoba-lang/skeleton",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../skeleton"
+    },
+    "after" : {
+      ":local/root" : "../../../skeleton"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.mangaka.page/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "gftd/kami-mangaka-text",
+    "target-repository" : "kotoba-lang/kami-mangaka-text",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-mangaka-text.git",
+      ":sha" : "e575d147533d4a490d71b6e86876d900aa89d50b"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.mangaka.text"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.mangaka.reader/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "gftd/kami-mangaka-text",
+    "target-repository" : "kotoba-lang/kami-mangaka-text",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-mangaka-text.git",
+      ":sha" : "978b9c252dcb953ad8c420f5c22152da1ab70478"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.mangaka.text"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.ongaku.project/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-ongaku-notation",
+    "target-repository" : "kotoba-lang/kami-ongaku-notation",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-ongaku-notation",
+      ":git/sha" : "76ac886986f208211f9f595e54b07ed7cebade9b"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.ongaku.notation"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.ongaku.project/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-ongaku-sequencer",
+    "target-repository" : "kotoba-lang/kami-ongaku-sequencer",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-ongaku-sequencer",
+      ":git/sha" : "6864b91fc0927bf5884b2649be426afee19e963a"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.ongaku.sequencer"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.scene.vehicle/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-vehicle",
+    "target-repository" : "kotoba-lang/kami-vehicle",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-vehicle.git",
+      ":git/sha" : "9a3c3cbfee195692d6dbd23a2b6891f991483d00"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.vehicle"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.web/deps.edn",
+    "site" : [ ":aliases", ":demos", ":extra-deps" ],
+    "coordinate" : "io.github.kotoba-lang/webgpu",
+    "target-repository" : "kotoba-lang/webgpu",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../webgpu"
+    },
+    "after" : {
+      ":local/root" : "../../../webgpu"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.web/deps.edn",
+    "site" : [ ":aliases", ":demos", ":extra-deps" ],
+    "coordinate" : "io.github.kotoba-lang/host",
+    "target-repository" : "kotoba-lang/host",
+    "kind" : "external-development-path-relocation",
+    "before" : {
+      ":local/root" : "../host"
+    },
+    "after" : {
+      ":local/root" : "../../../host"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.web/deps.edn",
+    "site" : [ ":aliases", ":demos", ":extra-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-app-sdk",
+    "target-repository" : "kotoba-lang/kami-engine-app-sdk",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-app-sdk"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.app-sdk"
+    }
+  }, {
+    "file" : "packages/kotoba.kami.web/deps.edn",
+    "site" : [ ":aliases", ":demos", ":extra-deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-sdk",
+    "target-repository" : "kotoba-lang/kami-engine-sdk",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":local/root" : "../kami-engine-sdk"
+    },
+    "after" : {
+      ":local/root" : "../kotoba.kami.engine.sdk"
+    }
+  }, {
+    "file" : "deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-animation",
+    "target-repository" : "kotoba-lang/kami-engine-animation",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-animation.git",
+      ":git/sha" : "2801b26952c7f5e703655fb4ee280b10cc68b089"
+    },
+    "after" : {
+      ":local/root" : "packages/kotoba.kami.engine.animation"
+    }
+  }, {
+    "file" : "kami-gameplay/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-animation",
+    "target-repository" : "kotoba-lang/kami-engine-animation",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-animation.git",
+      ":git/sha" : "2801b26952c7f5e703655fb4ee280b10cc68b089"
+    },
+    "after" : {
+      ":local/root" : "../packages/kotoba.kami.engine.animation"
+    }
+  }, {
+    "file" : "kami-gameplay/nbb.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/kami-engine-animation",
+    "target-repository" : "kotoba-lang/kami-engine-animation",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-animation.git",
+      ":git/sha" : "2801b26952c7f5e703655fb4ee280b10cc68b089"
+    },
+    "after" : {
+      ":local/root" : "../packages/kotoba.kami.engine.animation"
+    }
+  }, {
+    "file" : "kami-physics/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/vphysics",
+    "target-repository" : "kotoba-lang/kami-engine-vphysics",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-vphysics.git",
+      ":git/sha" : "28d4692cde550b8d8af0b663e1a7b7d8d91c6332"
+    },
+    "after" : {
+      ":local/root" : "../packages/kotoba.kami.engine.vphysics"
+    }
+  }, {
+    "file" : "kami-physics/deps.edn",
+    "site" : [ ":deps" ],
+    "coordinate" : "io.github.kotoba-lang/cae-solver",
+    "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+    "kind" : "internal-source-relocation",
+    "before" : {
+      ":git/url" : "https://github.com/kotoba-lang/kami-engine-cae-solver.git",
+      ":git/sha" : "71ce0c27a675bc4f792759a23232aaff546813e8"
+    },
+    "after" : {
+      ":local/root" : "../packages/kotoba.kami.engine.cae-solver"
+    }
+  } ],
+  "owner-config-changes" : [ {
+    "path" : "deps.edn",
+    "original-sha256" : "c42318365ba4609338e74e32c67cee5be64545404f4239a957b1aa8d32166b1b",
+    "rewritten-sha256" : "336a1f2f5d18eaf037844a7579fb64b51f1656ba2c8e7e7961e17fd16512f3cf",
+    "transitions" : [ {
+      "file" : "deps.edn",
+      "site" : [ ":deps" ],
+      "coordinate" : "io.github.kotoba-lang/kami-engine-animation",
+      "target-repository" : "kotoba-lang/kami-engine-animation",
+      "kind" : "internal-source-relocation",
+      "before" : {
+        ":git/url" : "https://github.com/kotoba-lang/kami-engine-animation.git",
+        ":git/sha" : "2801b26952c7f5e703655fb4ee280b10cc68b089"
+      },
+      "after" : {
+        ":local/root" : "packages/kotoba.kami.engine.animation"
+      }
+    } ]
+  }, {
+    "path" : "kami-gameplay/deps.edn",
+    "original-sha256" : "12fa0253608588bf2581c4589e693aef9d6f56c01bddec96d10b03896f887706",
+    "rewritten-sha256" : "840eb5e8318bf5fcaf21e02cbbc3b890eebc69e5d16858f93047afe80a14ad48",
+    "transitions" : [ {
+      "file" : "kami-gameplay/deps.edn",
+      "site" : [ ":deps" ],
+      "coordinate" : "io.github.kotoba-lang/kami-engine-animation",
+      "target-repository" : "kotoba-lang/kami-engine-animation",
+      "kind" : "internal-source-relocation",
+      "before" : {
+        ":git/url" : "https://github.com/kotoba-lang/kami-engine-animation.git",
+        ":git/sha" : "2801b26952c7f5e703655fb4ee280b10cc68b089"
+      },
+      "after" : {
+        ":local/root" : "../packages/kotoba.kami.engine.animation"
+      }
+    } ]
+  }, {
+    "path" : "kami-gameplay/nbb.edn",
+    "original-sha256" : "a4421cbb4cf23f6c16bf8147f7b6c49ad18db6080d170d216d3a5481c907491e",
+    "rewritten-sha256" : "c50445606e539310a1180fce332950714f709ca38c54f8567d2b372c16f4adfd",
+    "transitions" : [ {
+      "file" : "kami-gameplay/nbb.edn",
+      "site" : [ ":deps" ],
+      "coordinate" : "io.github.kotoba-lang/kami-engine-animation",
+      "target-repository" : "kotoba-lang/kami-engine-animation",
+      "kind" : "internal-source-relocation",
+      "before" : {
+        ":git/url" : "https://github.com/kotoba-lang/kami-engine-animation.git",
+        ":git/sha" : "2801b26952c7f5e703655fb4ee280b10cc68b089"
+      },
+      "after" : {
+        ":local/root" : "../packages/kotoba.kami.engine.animation"
+      }
+    } ]
+  }, {
+    "path" : "kami-physics/deps.edn",
+    "original-sha256" : "dd439dad7de3d0bf54487c616b169b9155c66358ab41cf8f6b5b46bb7477f44b",
+    "rewritten-sha256" : "e0813e3dcfaaa5d3c983a94ac5476efefbde2e51ac0dc8bbea74ece4032c6404",
+    "transitions" : [ {
+      "file" : "kami-physics/deps.edn",
+      "site" : [ ":deps" ],
+      "coordinate" : "io.github.kotoba-lang/vphysics",
+      "target-repository" : "kotoba-lang/kami-engine-vphysics",
+      "kind" : "internal-source-relocation",
+      "before" : {
+        ":git/url" : "https://github.com/kotoba-lang/kami-engine-vphysics.git",
+        ":git/sha" : "28d4692cde550b8d8af0b663e1a7b7d8d91c6332"
+      },
+      "after" : {
+        ":local/root" : "../packages/kotoba.kami.engine.vphysics"
+      }
+    }, {
+      "file" : "kami-physics/deps.edn",
+      "site" : [ ":deps" ],
+      "coordinate" : "io.github.kotoba-lang/cae-solver",
+      "target-repository" : "kotoba-lang/kami-engine-cae-solver",
+      "kind" : "internal-source-relocation",
+      "before" : {
+        ":git/url" : "https://github.com/kotoba-lang/kami-engine-cae-solver.git",
+        ":git/sha" : "71ce0c27a675bc4f792759a23232aaff546813e8"
+      },
+      "after" : {
+        ":local/root" : "../packages/kotoba.kami.engine.cae-solver"
+      }
+    } ]
+  } ],
+  "option-transitions": [
+    {
+      "file": "packages/kotoba.kami.app.fixtures/deps.edn",
+      "site": [
+        ":aliases",
+        ":check-engine-mirror",
+        ":main-opts"
+      ],
+      "target-repository": "kotoba-lang/kami-engine",
+      "kind": "fixture-owner-root-relocation",
+      "before": [
+        "-m",
+        "kami.app-fixtures",
+        "--engine-root",
+        "../kami-engine"
+      ],
+      "after": [
+        "-m",
+        "kami.app-fixtures",
+        "--engine-root",
+        "../.."
+      ]
+    },
+    {
+      "file": "packages/kotoba.kami.app.fixtures/deps.edn",
+      "site": [
+        ":aliases",
+        ":sync-engine-mirror",
+        ":main-opts"
+      ],
+      "target-repository": "kotoba-lang/kami-engine",
+      "kind": "fixture-owner-root-relocation",
+      "before": [
+        "-m",
+        "kami.app-fixtures",
+        "--write",
+        "--engine-root",
+        "../kami-engine"
+      ],
+      "after": [
+        "-m",
+        "kami.app-fixtures",
+        "--write",
+        "--engine-root",
+        "../.."
+      ]
+    }
+  ]
+}

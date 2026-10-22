@@ -1,0 +1,127 @@
+;; Device-neutral input mapping. Maintained native reading; CLJK remains the
+;; explicit compatibility reading. All five public operations are implemented.
+(ns input-map
+  (:export [stick axes apply-dead-zone button-edges update]))
+
+(defn- at [v :document i :i64] :document
+  (option-or (document-vector-at v i) (document-null)))
+(defn- field [v :document k :keyword] :document
+  (option-or (document-get v k) (document-null)))
+(defn- number [d :document] :f64
+  (if (= (document-kind d) :i64)
+    (i64-to-f64-rounded (option-or (document-i64-value d) 0))
+    (if (option-some?-of [:option :f64] (document-f64-value d))
+      (option-value-of [:option :f64] (document-f64-value d) 0.0)
+      (f64-from-bits (quot 1 0)))))
+(defn- pair [x :f64 y :f64] :document
+  (document-vector (document-f64 x) (document-f64 y)))
+(defn- clamp [x :f64 lo :f64 hi :f64] :f64
+  (f64-max lo (f64-min hi x)))
+
+(defn stick [center :document radius :f64] :document
+  (document-map :center center :radius (document-f64 radius)
+                :dead-zone (document-f64 0.15)))
+
+(defn axes [s :document touch :document] :document
+  (let [center (field s :center)
+        dx (f64-sub (number (at touch 0)) (number (at center 0)))
+        dy (f64-sub (number (at touch 1)) (number (at center 1)))
+        radius (number (field s :radius))
+        r (if (f64-gt radius 0.00000011920929) radius 1.0)
+        mag (f64-sqrt (f64-add (f64-mul dx dx) (f64-mul dy dy)))
+        dead (f64-mul (clamp (number (field s :dead-zone)) 0.0 0.999) r)]
+    (if (f64-le mag dead)
+      (pair 0.0 0.0)
+      (let [scaled (f64-min 1.0 (f64-div (f64-sub mag dead) (f64-sub r dead)))
+            inv (f64-div scaled mag)]
+        (pair (f64-mul dx inv) (f64-neg (f64-mul dy inv)))))))
+
+(defn apply-dead-zone [x :f64 y :f64 dead :f64] :document
+  (let [mag (f64-sqrt (f64-add (f64-mul x x) (f64-mul y y)))
+        d (clamp dead 0.0 0.999)]
+    (if (f64-le mag d)
+      (pair 0.0 0.0)
+      (let [scaled (f64-min 1.0 (f64-div (f64-sub mag d) (f64-sub 1.0 d)))
+            inv (f64-div scaled mag)]
+        (pair (f64-mul x inv) (f64-mul y inv))))))
+
+;; Document traversal has no set-at operation. Reframe the language-owned EDN
+;; representation as a vector; the language reader retains escaped strings.
+;; This does not implement an alternate parser, codec or runtime.
+(defn- as-vector [d :document] :document
+  (let [kind (document-kind d)]
+    (cond
+      (= kind :vector) d
+      (= kind :null) (document-vector)
+      (or (= kind :list) (= kind :set))
+      (let [s (document-edn-print d)
+            start (if (= kind :set) 2 1)]
+        (document-edn-read
+          (string-concat "[" (string-concat (string-substring s start (- (string-length s) 1)) "]"))))
+      :else (document-vector (document-i64 (quot 1 0))))))
+
+(defn- member? [v :document x :document] :bool
+  (loop [i 0]
+    (if (>= i (document-count v)) false
+      (if (document-equal? (at v i) x) true (recur (+ i 1))))))
+
+(defn- width [cp :i64] :i64
+  (cond (< cp 128) 1 (< cp 2048) 2 (< cp 65536) 3 :else 4))
+(defn- utf16-first [cp :i64] :i64
+  (if (> cp 65535) (+ 55296 (quot (- cp 65536) 1024)) cp))
+;; Java and JS order strings by UTF-16 code units. Compare whole Unicode
+;; scalars using their leading UTF-16 unit, then the scalar within a surrogate
+;; pair, while advancing native strings by UTF-8 bytes.
+(defn- action-less? [a :string b :string] :bool
+  (loop [i 0 j 0]
+    (cond
+      (>= i (string-length a)) (< j (string-length b))
+      (>= j (string-length b)) false
+      :else (let [x (string-code-point-at a i) y (string-code-point-at b j)
+                  ux (utf16-first x) uy (utf16-first y)]
+              (cond (< ux uy) true (> ux uy) false
+                    (< x y) true (> x y) false
+                    :else (recur (+ i (width x)) (+ j (width y))))))))
+(defn- append-from [out :document v :document start :i64] :document
+  (loop [i start acc out]
+    (if (>= i (document-count v)) acc
+      (recur (+ i 1) (document-vector-conj acc (at v i))))))
+(defn- insert-action [v :document x :document] :document
+  (let [name (option-or (document-string-value x) "")]
+    (loop [i 0 out (document-vector)]
+      (if (>= i (document-count v))
+        (document-vector-conj out x)
+        (let [other (at v i)]
+          (if (action-less? name (option-or (document-string-value other) ""))
+            (append-from (document-vector-conj out x) v i)
+            (recur (+ i 1) (document-vector-conj out other))))))))
+(defn- normalize-actions [held :document] :document
+  (let [items (as-vector held)]
+    (loop [i 0 out (document-vector)]
+      (if (>= i (document-count items)) out
+        (let [item (at items i)
+              action (document-string
+                       (cond (= (document-kind item) :string) (option-or (document-string-value item) "")
+                             (= (document-kind item) :null) ""
+                             :else (document-edn-print item)))]
+          (recur (+ i 1) (if (member? out action) out (insert-action out action))))))))
+(defn- difference [a :document b :document] :document
+  (loop [i 0 out (document-vector)]
+    (if (>= i (document-count a)) out
+      (let [x (at a i)]
+        (recur (+ i 1) (if (member? b x) out (document-vector-conj out x)))))))
+(defn- action-set [v :document] :document
+  (let [s (document-edn-print (document-vector-sort v))
+        value (document-edn-read
+                (string-concat "#{" (string-concat (string-substring s 1 (- (string-length s) 1)) "}")))]
+    ;; A set must already have canonical byte order before the codec validates
+    ;; it. Pressed/released vectors retain their separate UTF-16 action order.
+    (document-read (document-print value))))
+
+(defn button-edges [] :document
+  (document-map :prev (document-set)))
+(defn update [detector :document held :document] :document
+  (let [prev (normalize-actions (field detector :prev))
+        cur (normalize-actions held)
+        edges (document-map :pressed (difference cur prev) :released (difference prev cur))]
+    (document-vector edges (document-map :prev (action-set cur)))))

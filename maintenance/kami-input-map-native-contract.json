@@ -1,0 +1,224 @@
+{
+  "schema": "kotoba.kami.input-map-native-contract.v1",
+  "source-id": "kotoba.kami.engine.inputMap",
+  "namespace": "input-map",
+  "state": "native source candidate updated; historical compiler refusal retained; upstream decimal/document/x86 float source lowering uncompiled and unqualified",
+  "owner-main-qualified": false,
+  "runtime-admission": "not-granted",
+  "source": "packages/kotoba.kami.engine.input-map/src/input_map.kotoba",
+  "source-sha256": "b2c428a65a2b784f95fef2a6be0ec46d15a1ab938b7ed0494124ef9729dba6e1",
+  "public-API": [
+    {
+      "name": "stick",
+      "input": "center document [numeric x,y], radius f64",
+      "output": "document map with center/radius/dead-zone",
+      "required-behavior": "default radial dead zone0.15; radius fallback preserved by axes"
+    },
+    {
+      "name": "axes",
+      "input": "stick map, touch document [numeric x,y]",
+      "output": "document [f64 x,f64 y]",
+      "required-behavior": "screen-y inversion, radial dead zone, smooth rescaling, unit clamp, nonpositive/tiny-radius fallback"
+    },
+    {
+      "name": "apply-dead-zone",
+      "input": "x,y,dead f64",
+      "output": "document [f64 x,f64 y]",
+      "required-behavior": "dead clamped to[0,0.999], zero inside, smooth magnitude rescale and unit-circle clamp"
+    },
+    {
+      "name": "button-edges",
+      "input": "none",
+      "output": "immutable document {:prev #{}}",
+      "required-behavior": "empty detector; no platform state/effect"
+    },
+    {
+      "name": "update",
+      "input": "detector, held vector/list/set or nil; action normalization retains scalar stringification",
+      "output": "document [edges,new-detector]",
+      "required-behavior": "deduplication, UTF-16 lexical pressed/released vector order, canonical set state, duplicate-free edges and immutable multi-frame transitions"
+    }
+  ],
+  "native-dependency-closure": {
+    "source-modules": [
+      "input-map",
+      "kami.native-input-map"
+    ],
+    "external-libraries": [],
+    "runtime": "existing language value/f64 primitives and separate Amu compiler/runtime owner; no new runtime in Kami"
+  },
+  "fixture": {
+    "path": "test/native/kami/native_input_map.kotoba",
+    "sha256": "92e0fcf671ac4b3d71c82b1f401df883c04308e4553ae2952328e4e7fb506576",
+    "semantic-groups": [
+      "center/dead-zone",
+      "four screen-to-axis directions",
+      "magnitude clamps and gamepad dead-zone",
+      "smooth scaling/radius fallback/custom dead zone",
+      "immutable press/hold/release",
+      "multiple action/list/set transitions",
+      "Unicode UTF-16 ordering and canonical set state",
+      "escaping, scalar coercion and release-all"
+    ],
+    "expected-bitmask": 255,
+    "execution": "not reached; full component compilation refuses; no assertion count or pass claimed",
+    "refusal-entries": [
+      "malformed-touch",
+      "malformed-buttons"
+    ],
+    "fuel-refusal-required": true
+  },
+  "gate": {
+    "path": "maintenance/kami-consolidation/2026-10-22/historical-native-input-map-gate.txt",
+    "sha256": "41056da484f7c4c3b83c468185f87c70089e01388f7a2aa03c89410c0562c050",
+    "requires-hosted-executable-denial-controls": 12,
+    "requires-full-source-readback": true,
+    "no-hosted-fallback": true,
+    "current-exit": 1,
+    "current-first-diagnostic": "seed: E2101 unknown or unsupported form 'document-f64-value' (byte 597)",
+    "kind": "historical-C-loader-recipe; non-operational evidence",
+    "current-acceptance": false
+  },
+  "compiler": {
+    "status": "pass",
+    "scope": "amu-seed-self-rebuild",
+    "amu_revision": "1b0687a5997c35fec1d3903840eecc76b934589e",
+    "source_sha256": "a6906f3b48825aeca44607de5bd4c67305e2ef8bc9ac4cbef3074236f4b2ae0d",
+    "compiler_sha256": "b10e381344a1f5a8b82cac981c0011bd20ecbcc4b48dd5f5dce97364c74e8a00",
+    "loader_sha256": "05798f17613db2936cf8fe29c16590c8c2b7513fc80e5b2334e89d16b482f7aa",
+    "generations": 3,
+    "fixed_point": true,
+    "trusted_c_supervisor": true,
+    "public_cli_migrated": false
+  },
+  "hosted-executable-control": {
+    "controls": 12,
+    "marker-unchanged-after-self-build-and-probes": true,
+    "hosted-calls": 0
+  },
+  "primitive-diagnosis-only": {
+    "f64-control": {
+      "operation": "sqrt(1.5*1.5)",
+      "actual-native-result-bits": 4609434218613702656,
+      "compile-and-run": true,
+      "does-not-qualify-component": true
+    },
+    "unsupported": [
+      {
+        "operation": "document-f64",
+        "source": "(ns native-probe.document-f64 (:export [main]))\n(defn main [] :i64 (if (= (document-kind (document-f64 1.5)) :f64) 1 0))\n",
+        "source-sha256": "01c276e7da6f91ad50d4b7d5fbc6495cecf3d5ab95b4bc71243c200954517832",
+        "compile-exit": 1,
+        "diagnostic": "seed: E2101 unknown or unsupported form 'document-f64' (byte 90)",
+        "compiler-output-sha256": "25ae808f041bb00fd83014879c176d708de84271a29a51b4d95e43a2ce45224a"
+      },
+      {
+        "operation": "document-f64-value",
+        "source": "(ns native-probe.document-f64-value (:export [main]))\n(defn main [] :i64 (f64-to-bits (option-value-of [:option :f64] (document-f64-value (document-edn-read \"1.5\")) 0.0)))\n",
+        "source-sha256": "d12e74315727033008fa4cd435029cbb6c7fe103fd5726d4ca3e200517e04498",
+        "compile-exit": 1,
+        "diagnostic": "seed: E2101 unknown or unsupported form 'document-f64-value' (byte 119)",
+        "compiler-output-sha256": "69a346f4da5ac5b74f8bf0a371a17c46ef1f685d3e6504378efdca7fbf34920d"
+      },
+      {
+        "operation": "document-print",
+        "source": "(ns native-probe.document-print (:export [main]))\n(defn main [] :i64 (string-length (document-print (document-i64 42))))\n",
+        "source-sha256": "d976a854fbf6bafb3238de49e7664b83bdd143a503c6a61a9fbf88b82596f1c3",
+        "compile-exit": 1,
+        "diagnostic": "seed: E2101 unknown or unsupported form 'document-print' (byte 85)",
+        "compiler-output-sha256": "b5ba9c143844f9bb14b1fb909ae6effd962ca9dfeb023a627bfc01f8f0a5f542"
+      },
+      {
+        "operation": "document-read",
+        "source": "(ns native-probe.document-read (:export [main]))\n(defn main [] :i64 (document-count (document-read \"6934323b\")))\n",
+        "source-sha256": "246a3f17b2d47de7f932e915357fdf928313eb6daf433bae2cf688b88e9bb1ed",
+        "compile-exit": 1,
+        "diagnostic": "seed: E2101 unknown or unsupported form 'document-read' (byte 85)",
+        "compiler-output-sha256": "1e55c19b22b96f80c1d3f512cba2d89bf97d65389bac0acd77e74b984aaf3387"
+      }
+    ]
+  },
+  "next-required-work": "Qualify decimal/document/hash/x86 float candidates through the complete loaderless Amu selfhost compiler/runtime/project/link/package/launch closure, including the full existing document payload domain; run all native positive/refusal/fuel/ABI controls and unchanged full input-map corpus. No repository retirement before merged owner-main evidence.",
+  "tracking": [
+    "https://linear.app/com-junkawasaki/issue/JUN-198",
+    "https://linear.app/com-junkawasaki/issue/JUN-269",
+    "https://linear.app/kotobalabs/issue/AWAI-53"
+  ],
+  "current-upstream-source-observation": {
+    "repository": "kotoba-lang/amu",
+    "main": "3d96e43b191755813b5ef276d414eec98cc5eb2d",
+    "path": "seed/21-check.kotoba",
+    "git-blob": "2328702571350e8bcde7652e6d5b5e51faa4c248",
+    "sha256": "4228b2afeb923ea0cf5dd6e07205b03716ff830cbea340b1b231eef38dd9ba2f",
+    "symbol-occurrences": {
+      "document-f64": 0,
+      "document-f64-value": 0,
+      "document-print": 0,
+      "document-read": 0
+    },
+    "qualification": "source observation only; historical trusted-C refusal diagnostics do not qualify the current candidate",
+    "identical-to-historical-diagnostic-pin": true
+  },
+  "evidence-classification": "Historical trusted-C supervisor diagnostics only; not current native/selfhost/Q9/CDCI qualification",
+  "current-acceptance": {
+    "policy-repository": "kotoba-lang/amu",
+    "policy-commit": "5c5d9bced26393b2f78dd59c167af640f70a807a",
+    "policy-paths": [
+      "AGENTS.md",
+      "docs/selfhost-priority.md"
+    ],
+    "required": "canonical Kotoba and complete Amu-selfhost-produced loaderless native closure; no legacy language host, C compiler/loader/runtime",
+    "CDCI-target": "x86_64-linux-static ELF; no interpreter/shared-runtime dependence",
+    "qualification": "not achieved; no accepted loaderless component gate currently recorded",
+    "original-CLJK": "preserved migration input, not a paired final surface"
+  },
+  "upstream-implementation-candidate": {
+    "repository": "kotoba-lang/amu",
+    "pull-request": 1443,
+    "head": "0893264f018110e752d4c3885d72831850f23eae",
+    "scope": "native decimal/document including pure SHA-256 and 36 x86 floating SIR source lowerings; all native type/selfbuild/full-domain/run qualification pending",
+    "source-contract": "seed/runtime/document-runtime.json",
+    "qualification": "not achieved",
+    "literal-contract": "seed/decimal-literals.json",
+    "x86-floating-SIR-contract": "seed/x86-float.json"
+  },
+  "set-state-ordering": {
+    "source": "document-vector-sort before EDN set reframe and codec validation",
+    "reason": "document-read/print validate canonical order; they must not silently repair unordered sets",
+    "action-vectors": "UTF-16 lexical order unchanged",
+    "existing-semantic-group": "ordering-and-set-state",
+    "execution": "not run on qualified native route"
+  },
+  "compiler-literal-inputs": {
+    "fixture": "test/native/kami/native_input_map.kotoba",
+    "fixture-sha256": "92e0fcf671ac4b3d71c82b1f401df883c04308e4553ae2952328e4e7fb506576",
+    "fraction": "0.4117647058823529",
+    "unchanged-occurrences": 3,
+    "historical-source-bound": "ck-r6m-flscan nd<=15; source inspection, not a new execution diagnostic",
+    "upstream-candidate": "canonical exact integer parser at compile time; raw binary64 carrier constant; up to64 bytes and3 exponent digits",
+    "native-verdict": "not measured",
+    "test-narrowing": false
+  },
+  "compiler-floating-SIR": {
+    "source-contract": "seed/x86-float.json",
+    "tags": 36,
+    "implementation": "x86 SSE2 with existing GPR carriers, scoped MXCSR, NaN/signed-zero minmax and saturating truncation",
+    "boundaries": "public scalar main()->i64 unchanged; integer-only kernel object route refuses all floating SIR; extra scratch counted in existing frame bound",
+    "source-review": "complete cross-source call/arity closure; independent hand-assembled opcode disassembly only",
+    "native-typecheck-build-run": "not performed",
+    "actual-generated-artifacts-checked": false,
+    "unchanged-component-gate": "full five-API/eight-group fixture; no test narrowing"
+  },
+  "compiler-document-hash": {
+    "source-contract": "seed/runtime/document-runtime.json",
+    "canonical-core": "src/kotoba/compiler/sha256_bits.kotoba",
+    "implementation": "pure integer SHA-256 of validated raw canonical document bytes; no host hash/capability",
+    "source-review": "eight-function alpha-equivalence, helper/primitive arities, 64 round constants/eight IV words and independent anchor-data checks",
+    "unchanged-owning-language-anchor-bodies": 26,
+    "required-full-existing-document-payload": 65536,
+    "native-typecheck-build-run": "not performed",
+    "full-domain-qualification": "not achieved; existing EDN/string-pool representation gaps must not be hidden by skipping large cases",
+    "complete-SHA2-library-qualified": false,
+    "test-narrowing": false
+  }
+}

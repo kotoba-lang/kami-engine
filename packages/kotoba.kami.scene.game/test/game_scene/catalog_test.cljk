@@ -1,0 +1,57 @@
+(ns game-scene.catalog-test
+  "Tests for `game-scene.catalog`, ported 1:1 from the original
+  `kami-game-scene` Rust crate's `src/catalog.rs` `#[cfg(test)]` module AND
+  `tests/catalog_parity.rs` (both deleted in kotoba-lang/kami-engine PR
+  #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [game-scene.catalog :as catalog]
+            [game.island-gen :as island-gen]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'game-scene.catalog)))))
+
+;; ── catalog.rs #[cfg(test)] ───────────────────────────────────────────────
+
+;; Rust: shipped_count_matches_builtin
+(deftest shipped-count-matches-builtin
+  (let [loaded (catalog/catalog-specs-from-edn catalog/game-catalog-edn)]
+    (is (= (count loaded) (count (catalog/builtin-catalog-specs))))
+    (is (= 29 (count loaded)))))
+
+;; Rust: genre_id_round_trips
+(deftest genre-id-round-trips
+  (doseq [g island-gen/genres]
+    (is (= (catalog/genre-id g) (catalog/genre-id (catalog/genre-from-id (catalog/genre-id g)))))))
+
+;; Rust: non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try (catalog/catalog-specs-from-edn "42") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :not-a-map (:game-scene.catalog/error err)))))
+
+;; Rust: missing_table_is_an_error
+(deftest missing-table-is-an-error
+  (let [err (try (catalog/catalog-specs-from-edn "{:other 1}") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :no-catalog (:game-scene.catalog/error err)))))
+
+;; ── tests/catalog_parity.rs ────────────────────────────────────────────
+
+;; Rust: catalog_edn_matches_builtin
+(deftest catalog-edn-matches-builtin
+  (let [loaded (catalog/catalog-specs-from-edn catalog/game-catalog-edn)
+        builtin (catalog/builtin-catalog-specs)]
+    (is (= (count loaded) (count builtin)) "entry count")
+    (is (= 29 (count loaded)) "all 29 games present in EDN")
+    (doseq [[g w] (map vector loaded builtin)]
+      (is (= g w) (str (:slug w) " — slug/title/genre/max-players/description")))
+    (is (= loaded builtin) "full catalog parity (ordered)")))
+
+;; Rust: spec_round_trips_through_game_def
+(deftest spec-round-trips-through-game-def
+  (let [loaded (catalog/catalog-specs-from-edn catalog/game-catalog-edn)
+        builtin (catalog/builtin-catalog-specs)]
+    (doseq [[spec want] (map vector loaded builtin)]
+      (let [g (catalog/spec-to-game-def spec)]
+        (is (= g want) (str (:slug want) ": game-def round-trips through spec"))))))

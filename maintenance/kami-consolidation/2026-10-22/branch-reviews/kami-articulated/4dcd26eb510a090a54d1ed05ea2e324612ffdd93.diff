@@ -1,0 +1,1279 @@
+diff --git a/.gitignore b/.gitignore
+index bd04223..05e79af 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,2 @@
+ .cpcache/
++.nbb/
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..57bc88a
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,202 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
+diff --git a/NOTICE b/NOTICE
+new file mode 100644
+index 0000000..6b2cfe4
+--- /dev/null
++++ b/NOTICE
+@@ -0,0 +1,17 @@
++Copyright 2026 Jun Kawasaki
++
++This product is licensed under the Apache License, Version 2.0
++(see LICENSE). No additional terms or conditions apply.
++
++Defensive publication
++---------------------
++Subject matter in this repository is disclosed as prior art in DP-2026-001:
++
++    https://github.com/com-junkawasaki/prior-art
++
++Published 2026-08-19 (UTC). That bundle fixes this repository by commit and
++tree SHA-1 and carries RFC 3161 time-stamp tokens and OpenTimestamps
++attestations over the fixing manifest.
++
++No patent protection is sought by the copyright holder for any subject matter
++disclosed there.
+diff --git a/README.md b/README.md
+index 243e385..e960395 100644
+--- a/README.md
++++ b/README.md
+@@ -5,10 +5,16 @@ slice for a bounded prismatic coordinate and the cartpole revolute joint's
+ world-space tip transform. Its tests derive the oracle inputs from the existing
+ URDF parser and compare Kotoba reference, restricted JavaScript, and typed Wasm.
+ 
+-XML parsing and general link/joint graph construction remain CLJC host
+-boundaries until bounded XML/string parsing and a structured f64 record/graph
+-ABI are qualified. The downstream physics solver remains a separate engine
+-provider boundary.
++`src/urdf_query.kotoba` now qualifies the bounded XML ingestion slice against
++both real URDF fixtures. Link/joint names, joint kinds and topology attributes,
++mass, Pose, bounded positive-semidefinite Inertia, and nominal Link/Joint
++records agree with the existing CLJC parser across Kotoba reference,
++restricted JavaScript, and typed Wasm. Its indexed graph validator admits
++arbitrary declaration order through 128 links / 127 joints and rejects duplicate
++identities, unknown references, multiple parents, self-edges, cycles,
++disconnection, and every limit violation. Graphs above that sealed profile and full
++`ArticulatedSystem` assembly remain later bounded profile work. The downstream
++physics solver remains a separate engine provider boundary.
+ 
+ Zero-dependency portable CLJC restoration of the deleted `kami-articulated`
+ Rust crate from `kotoba-lang/kami-engine` (removed in PR #82, "Remove Rust
+@@ -71,9 +77,9 @@ description into structured links + joints):
+ 
+ ## Stats
+ 
+-- `src/kami_articulated.cljc` — 57 lines (root namespace, re-exports).
+-- `src/kami_articulated/urdf.cljc` — 344 lines (XML reader + URDF parser).
+-- `test/kami_articulated_test.cljc` — 103 lines.
++- `src/kami_articulated.cljk` — 57 lines (root namespace, re-exports).
++- `src/kami_articulated/urdf.cljk` — 344 lines (XML reader + URDF parser).
++- `test/kami_articulated_test.cljk` — 103 lines.
+ - 6 tests / 28 assertions, 0 failures, 0 errors.
+ - All 4 original Rust `#[test]`s ported 1:1 (`parses_cartpole_urdf`,
+   `cartpole_topology_correct`, `cartpole_masses_match_isaaclab_baseline`,
+@@ -95,5 +101,5 @@ description into structured links + joints):
+ ## Verify
+ 
+ ```sh
+-clojure -M:test
++kbb -M:test
+ ```
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..35039e6
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,10 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/kami_articulated.cljk" ".cljc"
++  "src/kami_articulated/urdf.cljk" ".cljc"
++  "test/articulated_transform_kotoba_golden_test.cljk" ".clj"
++  "test/kami_articulated_test.cljk" ".cljc"
++  "test/urdf_query_kotoba_test.cljk" ".clj"}}
+diff --git a/deps.edn b/deps.edn
+index ad1e82f..360c0bc 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -1,8 +1,28 @@
+ {:paths ["src" "test"]
+- :deps {io.github.kotoba-lang/compiler
+-        {:git/url "https://github.com/kotoba-lang/compiler.git"
+-         :git/sha "243dfccd561c575b66f82b58c469e66f902951f5"}}
++ :deps {
++        ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
++        ;; floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
++        ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
++        ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
++        ;; and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       io.github.kotoba-lang/amu
++        {:git/url "https://github.com/kotoba-lang/amu.git"
++         :git/sha "899ae1da92d6d74e1ae68640b5adea3edbec46a3"}}
+  :aliases {:test {:extra-paths ["test"]
+                   :extra-deps {io.github.cognitect-labs/test-runner
+-                               {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+-                  :main-opts ["-m" "cognitect.test-runner"]}}}
++                               {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
++                  :main-opts ["-m" "cognitect.test-runner"]}
++                ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
++                :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
++                  :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test"
++                              "--fail-level" "error"]}}}
+diff --git a/docs/adr/0001-kotoba-bounded-urdf-ingestion.md b/docs/adr/0001-kotoba-bounded-urdf-ingestion.md
+new file mode 100644
+index 0000000..0714828
+--- /dev/null
++++ b/docs/adr/0001-kotoba-bounded-urdf-ingestion.md
+@@ -0,0 +1,37 @@
++# ADR 0001: Kotoba bounded URDF ingestion slice
++
++Status: qualified
++
++`src/urdf_query.kotoba` owns the pure XML ingestion slice that can already be
++expressed with the sealed Kotoba XML and decimal ABIs. It queries robot name,
++ordered link names, typed finite mass values, ordered joint name, kind, parent,
++and child attributes, typed finite lower, upper, effort, and velocity limits,
++and fixed-width typed inertial-origin, joint-origin, and joint-axis vectors.
++ADR 0002 extends this slice with atomic Pose/Inertia/Link/Joint records and a
++bounded canonical joint-tree validator. It still does not replace the
++downstream physics solver or admit arbitrarily ordered and unbounded graphs.
++
++The query module is authority-free and has no DOM, filesystem, network, entity,
++DTD, selector, or callback access. It inherits the compiler's 65,536-byte,
++2,048-node, depth-32, 32-attribute, and 32-path-segment limits. Missing string
++attributes are typed `[:option :string]`; missing, malformed, or non-finite
++numeric attributes are typed `[:option :f64]` none. Malformed or excessive XML
++traps.
++
++Qualification compares both committed real fixtures, `cartpole.urdf` and
++`hizukue.urdf`, against the existing CLJC `parse-urdf` oracle. The same
++`.kotoba` source and input are executed by the Kotoba reference evaluator,
++restricted JavaScript, and actual typed Wasm through the pinned compiler's
++browser host. Robot/link/joint identity, joint topology, and mass attribute
++vectors agree exactly.
++
++This establishes real URDF ingestion without claiming that every general URDF
++ordering or the full CLJC physics path has been migrated. The remaining
++language/domain boundary is scalable indexed graph assembly; the physics
++solver remains a separate Kami engine provider boundary.
++
++Evidence: kotoba-lang/compiler PR #138 merged as
++`d950713d7a27094371f1b3085a63df6a5b51c7de`; this repository pins that exact
++commit. `kbb -M:test` passes 9 tests and 45 assertions, including both real
++fixtures across the CLJC oracle, Kotoba reference evaluator, restricted
++JavaScript, and actual typed Wasm browser host.
+diff --git a/docs/adr/0002-bounded-structured-urdf-records.md b/docs/adr/0002-bounded-structured-urdf-records.md
+new file mode 100644
+index 0000000..e476930
+--- /dev/null
++++ b/docs/adr/0002-bounded-structured-urdf-records.md
+@@ -0,0 +1,44 @@
++# ADR 0002: Bounded structured URDF records and canonical joint graph
++
++Status: implemented and qualified
++
++ADR 0003 supersedes only this ADR's canonical-order and 12-link graph bound;
++the nominal record and inertia safety contracts below remain current.
++
++`src/urdf_query.kotoba` now assembles four nominal, immutable value shapes:
++`:kami/pose`, `:kami/inertia-tensor`, `:kami/link-reference`, and
++`:kami/joint-reference`. Pose owns two fixed-width f64 triples. Inertia owns
++all six finite f64 tensor components atomically. Before sealing, the tensor is
++bounded to component magnitude `1e12` and must satisfy nonnegative diagonal,
++all three nonnegative second-order principal minors, and a nonnegative 3x3
++determinant under sealed f64 semantics. Link and joint reference records own
++the strings required to establish graph identity. A missing, malformed,
++non-finite, incomplete, over-limit, or non-positive-semidefinite tensor returns
++typed none; no partial record is observable.
++
++`joint-graph-valid` admits a deliberately bounded canonical tree profile. It
++accepts 1 through 12 uniquely named links and exactly `links - 1` uniquely
++named joints. Links are in topological order: joint `i` must connect a parent
++already present in link prefix `0..i` to link `i + 1`. Consequently every
++non-root link has exactly one parent and cycles, self-edges, unknown
++references, duplicate IDs, duplicate children, and disconnected components
++fail closed. The ordering requirement is part of this profile rather than an
++implicit dependence on source order.
++
++The 12-link limit keeps validation within the language's sealed 512-call fuel
++budget even on the restricted JavaScript backend. Arbitrarily ordered or
++larger URDF graphs require a bounded indexed graph collection and a linear
++validator; they remain an explicit scale extension and are not silently
++accepted by this profile.
++
++Qualification compares `cartpole.urdf` and `hizukue.urdf` with the retained
++CLJC oracle across the Kotoba reference evaluator, restricted JavaScript, and
++actual browser-hosted typed Wasm. A negative matrix rejects duplicate link
++names, unknown parents, self-edges, duplicate children, cycles, missing child
++attributes, over-limit graphs, negative diagonal inertia, indefinite inertia,
++and over-limit inertia. Compiler ADRs 0021 and 0022 seal nested descriptor
++trust and the `string=? -> :i64` contract required by these values.
++
++Evidence: kotoba-lang/compiler PR #141 merged as
++`0dc6fc7df3b8d79b7eb39649f50fb2d87e03de82`; `kbb -M:test` passes 11 tests / 60
++assertions with zero failures or errors.
+diff --git a/docs/adr/0003-bounded-indexed-joint-graph.md b/docs/adr/0003-bounded-indexed-joint-graph.md
+new file mode 100644
+index 0000000..354989e
+--- /dev/null
++++ b/docs/adr/0003-bounded-indexed-joint-graph.md
+@@ -0,0 +1,37 @@
++# ADR 0003: Bounded indexed joint graph
++
++Status: implemented and qualified
++
++`joint-graph-valid` now delegates to an order-independent indexed validator.
++The admitted profile contains 1 through 128 uniquely named links and exactly
++`links - 1` joints. Link and joint declaration order has no semantic effect.
++The bound is enforced by compiler typed ABI v10's purpose-specific compact
++values and the worst admitted validation path remains inside the
++non-replenishable 512-call fuel budget. General maps and ADTs retain their
++smaller limits.
++
++The validator builds persistent `:string-index` values for link, joint, and
++child identities and a persistent `:disjoint-set-i64` forest. Duplicate or
++missing link names fail closed. Each joint then resolves
++its parent and child through that sealed index, rejects missing identities,
++duplicate joint names, and a child already owned by an earlier joint, and
++unions the two indices through the bounded runtime operation. Finding both
++endpoints in the same union-find component rejects self-edges and cycles.
++
++With `n - 1` admitted edges, no cycle, and every endpoint resolved to one of
++the `n` links, the undirected graph is connected. Unique child ownership gives
++every non-root link at most one directed parent. Thus multiple parents,
++cycles, disconnected components, unknown references, and duplicate identities
++are rejected without depending on source order or performing an unbounded
++ancestor traversal.
++
++Qualification retains the real cartpole and hizukue CLJC-oracle matrix and the
++existing unsafe graph matrix. It additionally admits a deliberately scrambled
++four-link tree and a maximum-size 128-link chain whose link and joint lists
++are both reversed. The same `.kotoba` module passes through the reference
++evaluator, restricted JavaScript, and actual browser-hosted typed Wasm without
++increasing any general compiler/runtime limit. A 129-link chain is explicitly
++rejected in all three execution paths.
++
++Evidence is the repository `kbb -M:test` gate covering the reference
++evaluator, restricted JavaScript, and actual browser-hosted typed Wasm.
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..25ce62e
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,16 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src" "test"]
++ :deps {
++        ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
++        ;; floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
++        ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
++        ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
++        ;; and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/kami_articulated.cljc b/src/kami_articulated.cljk
+similarity index 100%
+rename from src/kami_articulated.cljc
+rename to src/kami_articulated.cljk
+diff --git a/src/kami_articulated/urdf.cljc b/src/kami_articulated/urdf.cljk
+similarity index 99%
+rename from src/kami_articulated/urdf.cljc
+rename to src/kami_articulated/urdf.cljk
+index 58ecfb3..e8c9f03 100644
+--- a/src/kami_articulated/urdf.cljc
++++ b/src/kami_articulated/urdf.cljk
+@@ -29,8 +29,8 @@
+   that consumes the `ArticulatedSystem` this namespace produces. Only the
+   URDF -> data parsing step is ported here.")
+ 
+-#?(:clj (require '[clojure.string :as str])
+-   :cljs (require '[clojure.string :as str]))
++#?(:clj (require '[kotoba.lang.text :as str])
++   :cljs (require '[kotoba.lang.text :as str]))
+ 
+ ;; ---------------------------------------------------------------------------
+ ;; Minimal recursive-descent XML reader — element/attribute subset only.
+diff --git a/src/urdf_query.kotoba b/src/urdf_query.kotoba
+new file mode 100644
+index 0000000..4c8dc50
+--- /dev/null
++++ b/src/urdf_query.kotoba
+@@ -0,0 +1,383 @@
++(ns kami-articulated.urdf-query
++  (:export [main robot-name
++            link-count link-name
++            mass-count mass-value
++            joint-count joint-name joint-type joint-parent joint-child
++            limit-count limit-lower limit-upper limit-effort limit-velocity
++            inertial-origin-count inertial-origin-xyz inertial-origin-rpy
++            joint-origin-count joint-origin-xyz joint-origin-rpy
++            joint-axis-count joint-axis-xyz
++            inertial-pose inertia-count inertia-tensor
++            link-record joint-reference-record
++            joint-graph-valid joint-graph-indexed-valid]))
++
++(def link-record-type
++  [:record :kami/link-reference [[:name :string]]])
++
++(def link-record-option-type
++  [:option [:record :kami/link-reference [[:name :string]]]])
++
++(def joint-reference-record-type
++  [:record :kami/joint-reference
++   [[:name :string] [:kind :string] [:parent :string] [:child :string]]])
++
++(def joint-reference-record-option-type
++  [:option [:record :kami/joint-reference
++            [[:name :string] [:kind :string]
++             [:parent :string] [:child :string]]]])
++
++(def inertia-tensor-type
++  [:record :kami/inertia-tensor
++   [[:ixx :f64] [:iyy :f64] [:izz :f64]
++    [:ixy :f64] [:ixz :f64] [:iyz :f64]]])
++
++(def indexed-graph-state-type
++  [:record :kami/indexed-graph-state
++   [[:link-index :string-index]
++    [:joint-index :string-index]
++    [:child-index :string-index]
++    [:forest :disjoint-set-i64]]])
++
++(def indexed-graph-state-option-type
++  [:option [:record :kami/indexed-graph-state
++            [[:link-index :string-index]
++             [:joint-index :string-index]
++             [:child-index :string-index]
++             [:forest :disjoint-set-i64]]]])
++
++(defn main [] 0)
++
++(defn robot-name [xml :string] [:option :string]
++  (xml-path-attr xml "robot" 0 "name"))
++
++(defn link-count [xml :string] :i64
++  (xml-path-count xml "robot/link"))
++
++(defn link-name [xml :string index :i64] [:option :string]
++  (xml-path-attr xml "robot/link" index "name"))
++
++(defn link-record [xml :string index :i64]
++  [:alias link-record-option-type]
++  (match-option (link-name xml index) [:option :string]
++    (none (option-none-of link-record-option-type))
++    (some name
++      (option-some-of link-record-option-type
++        (record link-record-type name)))))
++
++(defn mass-count [xml :string] :i64
++  (xml-path-count xml "robot/link/inertial/mass"))
++
++(defn parse-optional-f64 [value [:option :string]] [:option :f64]
++  (match-option value [:option :string]
++    (none (option-none-of [:option :f64]))
++    (some text (decimal-f64-parse text))))
++
++(defn parse-optional-f64x3 [value [:option :string]]
++  [:option [:vector [:f64 :f64 :f64]]]
++  (match-option value [:option :string]
++    (none (option-none-of [:option [:vector [:f64 :f64 :f64]]]))
++    (some text (decimal-f64x3-parse text))))
++
++(defn mass-value [xml :string index :i64] [:option :f64]
++  (parse-optional-f64
++   (xml-path-attr xml "robot/link/inertial/mass" index "value")))
++
++(defn joint-count [xml :string] :i64
++  (xml-path-count xml "robot/joint"))
++
++(defn joint-name [xml :string index :i64] [:option :string]
++  (xml-path-attr xml "robot/joint" index "name"))
++
++(defn joint-type [xml :string index :i64] [:option :string]
++  (xml-path-attr xml "robot/joint" index "type"))
++
++(defn joint-parent [xml :string index :i64] [:option :string]
++  (xml-path-attr xml "robot/joint/parent" index "link"))
++
++(defn joint-child [xml :string index :i64] [:option :string]
++  (xml-path-attr xml "robot/joint/child" index "link"))
++
++(defn joint-reference-record [xml :string index :i64]
++  [:alias joint-reference-record-option-type]
++  (match-option (joint-name xml index) [:option :string]
++    (none (option-none-of joint-reference-record-option-type))
++    (some name
++      (match-option (joint-type xml index) [:option :string]
++        (none (option-none-of joint-reference-record-option-type))
++        (some kind
++          (match-option (joint-parent xml index) [:option :string]
++            (none (option-none-of joint-reference-record-option-type))
++            (some parent
++              (match-option (joint-child xml index) [:option :string]
++                (none (option-none-of joint-reference-record-option-type))
++                (some child
++                  (option-some-of joint-reference-record-option-type
++                    (record joint-reference-record-type
++                      name kind parent child)))))))))))
++
++(defn empty-indexed-graph-state [link-total :i64] [:alias indexed-graph-state-type]
++  (record indexed-graph-state-type
++          (string-index-new)
++          (string-index-new)
++          (string-index-new)
++          (disjoint-set-i64-new link-total)))
++
++(defn build-link-index-from
++  [xml :string index :i64 link-total :i64
++   state [:alias indexed-graph-state-type]]
++  [:alias indexed-graph-state-option-type]
++  (if (= index link-total)
++    (option-some-of indexed-graph-state-option-type state)
++    (match-option (xml-path-attr xml "robot/link" index "name") [:option :string]
++      (none (option-none-of indexed-graph-state-option-type))
++      (some name
++        (let [link-index (record-get indexed-graph-state-type state :link-index)]
++          (if (string-index-contains link-index name)
++            (option-none-of indexed-graph-state-option-type)
++            (build-link-index-from
++             xml (+ index 1) link-total
++             (record indexed-graph-state-type
++                     (string-index-assoc link-index name index)
++                     (record-get indexed-graph-state-type state :joint-index)
++                     (record-get indexed-graph-state-type state :child-index)
++                     (record-get indexed-graph-state-type state :forest)))))))))
++
++(defn validate-indexed-joints-from
++  [xml :string index :i64 joint-total :i64
++   state [:alias indexed-graph-state-type]]
++  [:alias indexed-graph-state-option-type]
++  (if (= index joint-total)
++    (option-some-of indexed-graph-state-option-type state)
++    (match-option (xml-path-attr xml "robot/joint" index "name") [:option :string]
++      (none (option-none-of indexed-graph-state-option-type))
++      (some name
++        (match-option
++         (xml-path-attr xml "robot/joint/parent" index "link") [:option :string]
++         (none (option-none-of indexed-graph-state-option-type))
++         (some parent
++          (match-option
++           (xml-path-attr xml "robot/joint/child" index "link") [:option :string]
++           (none (option-none-of indexed-graph-state-option-type))
++           (some child
++            (let [link-index (record-get indexed-graph-state-type state :link-index)
++                  joint-index-map (record-get indexed-graph-state-type state :joint-index)
++                  child-index-map (record-get indexed-graph-state-type state :child-index)
++                  forest (record-get indexed-graph-state-type state :forest)]
++              (if (or (string-index-contains joint-index-map name)
++                      (string-index-contains child-index-map child))
++                (option-none-of indexed-graph-state-option-type)
++                (match-option
++                 (string-index-get link-index parent) [:option :i64]
++                 (none (option-none-of indexed-graph-state-option-type))
++                 (some parent-index
++                  (match-option
++                   (string-index-get link-index child) [:option :i64]
++                   (none (option-none-of indexed-graph-state-option-type))
++                   (some child-index
++                    (match-option
++                     (disjoint-set-i64-union forest parent-index child-index)
++                     [:option :disjoint-set-i64]
++                     (none (option-none-of indexed-graph-state-option-type))
++                     (some next-forest
++                      (validate-indexed-joints-from
++                       xml (+ index 1) joint-total
++                       (record indexed-graph-state-type
++                               link-index
++                               (string-index-assoc joint-index-map name index)
++                               (string-index-assoc child-index-map child index)
++                               next-forest))))))))))))))))))
++
++(defn joint-graph-indexed-valid [xml :string] :i64
++  (let [links (link-count xml)
++        joints (joint-count xml)]
++    (if (and (> links 0)
++             (<= links 128)
++             (<= joints 127)
++             (= links (+ joints 1)))
++      (match-option
++       (build-link-index-from xml 0 links (empty-indexed-graph-state links))
++       indexed-graph-state-option-type
++       (none 0)
++       (some state
++        (match-option
++         (validate-indexed-joints-from xml 0 joints state)
++         indexed-graph-state-option-type
++         (none 0)
++         (some validated 1))))
++      0)))
++
++(defn joint-graph-valid [xml :string] :i64
++  (joint-graph-indexed-valid xml))
++
++(defn limit-count [xml :string] :i64
++  (xml-path-count xml "robot/joint/limit"))
++
++(defn limit-lower [xml :string index :i64] [:option :f64]
++  (parse-optional-f64
++   (xml-path-attr xml "robot/joint/limit" index "lower")))
++
++(defn limit-upper [xml :string index :i64] [:option :f64]
++  (parse-optional-f64
++   (xml-path-attr xml "robot/joint/limit" index "upper")))
++
++(defn limit-effort [xml :string index :i64] [:option :f64]
++  (parse-optional-f64
++   (xml-path-attr xml "robot/joint/limit" index "effort")))
++
++(defn limit-velocity [xml :string index :i64] [:option :f64]
++  (parse-optional-f64
++   (xml-path-attr xml "robot/joint/limit" index "velocity")))
++
++(defn inertial-origin-count [xml :string] :i64
++  (xml-path-count xml "robot/link/inertial/origin"))
++
++(defn inertial-origin-xyz [xml :string index :i64]
++  [:option [:vector [:f64 :f64 :f64]]]
++  (parse-optional-f64x3
++   (xml-path-attr xml "robot/link/inertial/origin" index "xyz")))
++
++(defn inertial-origin-rpy [xml :string index :i64]
++  [:option [:vector [:f64 :f64 :f64]]]
++  (parse-optional-f64x3
++   (xml-path-attr xml "robot/link/inertial/origin" index "rpy")))
++
++(defn joint-origin-count [xml :string] :i64
++  (xml-path-count xml "robot/joint/origin"))
++
++(defn joint-origin-xyz [xml :string index :i64]
++  [:option [:vector [:f64 :f64 :f64]]]
++  (parse-optional-f64x3
++   (xml-path-attr xml "robot/joint/origin" index "xyz")))
++
++(defn joint-origin-rpy [xml :string index :i64]
++  [:option [:vector [:f64 :f64 :f64]]]
++  (parse-optional-f64x3
++   (xml-path-attr xml "robot/joint/origin" index "rpy")))
++
++(defn joint-axis-count [xml :string] :i64
++  (xml-path-count xml "robot/joint/axis"))
++
++(defn joint-axis-xyz [xml :string index :i64]
++  [:option [:vector [:f64 :f64 :f64]]]
++  (parse-optional-f64x3
++   (xml-path-attr xml "robot/joint/axis" index "xyz")))
++
++(defn inertial-pose [xml :string index :i64]
++  [:option [:record :kami/pose
++            [[:xyz [:vector [:f64 :f64 :f64]]]
++             [:rpy [:vector [:f64 :f64 :f64]]]]]]
++  (match-option
++   (inertial-origin-xyz xml index)
++   [:option [:vector [:f64 :f64 :f64]]]
++   (none
++    (option-none-of
++     [:option [:record :kami/pose
++               [[:xyz [:vector [:f64 :f64 :f64]]]
++                [:rpy [:vector [:f64 :f64 :f64]]]]]]))
++   (some xyz
++    (match-option
++     (inertial-origin-rpy xml index)
++     [:option [:vector [:f64 :f64 :f64]]]
++     (none
++      (option-none-of
++       [:option [:record :kami/pose
++                 [[:xyz [:vector [:f64 :f64 :f64]]]
++                  [:rpy [:vector [:f64 :f64 :f64]]]]]]))
++     (some rpy
++      (option-some-of
++       [:option [:record :kami/pose
++                 [[:xyz [:vector [:f64 :f64 :f64]]]
++                  [:rpy [:vector [:f64 :f64 :f64]]]]]]
++       (record
++        [:record :kami/pose
++         [[:xyz [:vector [:f64 :f64 :f64]]]
++          [:rpy [:vector [:f64 :f64 :f64]]]]]
++        xyz rpy)))))))
++
++(defn inertia-count [xml :string] :i64
++  (xml-path-count xml "robot/link/inertial/inertia"))
++
++(defn inertia-component [xml :string index :i64 attribute :string]
++  [:option :f64]
++  (parse-optional-f64
++   (xml-path-attr xml "robot/link/inertial/inertia" index attribute)))
++
++(defn inertia-tensor-valid
++  [tensor [:alias inertia-tensor-type]] :bool
++  (let [ixx (record-get inertia-tensor-type tensor :ixx)
++        iyy (record-get inertia-tensor-type tensor :iyy)
++        izz (record-get inertia-tensor-type tensor :izz)
++        ixy (record-get inertia-tensor-type tensor :ixy)
++        ixz (record-get inertia-tensor-type tensor :ixz)
++        iyz (record-get inertia-tensor-type tensor :iyz)
++        limit 1000000000000.0
++        minor-xy (f64-sub (f64-mul ixx iyy) (f64-mul ixy ixy))
++        minor-xz (f64-sub (f64-mul ixx izz) (f64-mul ixz ixz))
++        minor-yz (f64-sub (f64-mul iyy izz) (f64-mul iyz iyz))
++        diagonal-product (f64-mul (f64-mul ixx iyy) izz)
++        cross-product (f64-mul 2.0 (f64-mul (f64-mul ixy ixz) iyz))
++        subtract-x (f64-mul ixx (f64-mul iyz iyz))
++        subtract-y (f64-mul iyy (f64-mul ixz ixz))
++        subtract-z (f64-mul izz (f64-mul ixy ixy))
++        determinant (f64-sub
++                     (f64-sub
++                      (f64-sub (f64-add diagonal-product cross-product)
++                               subtract-x)
++                      subtract-y)
++                     subtract-z)]
++    (and (f64-ge ixx 0.0) (f64-ge iyy 0.0) (f64-ge izz 0.0)
++         (f64-le ixx limit) (f64-le iyy limit) (f64-le izz limit)
++         (f64-le (f64-abs ixy) limit)
++         (f64-le (f64-abs ixz) limit)
++         (f64-le (f64-abs iyz) limit)
++         (f64-ge minor-xy 0.0)
++         (f64-ge minor-xz 0.0)
++         (f64-ge minor-yz 0.0)
++         (f64-ge determinant 0.0))))
++
++(defn inertia-tensor [xml :string index :i64]
++  [:option [:record :kami/inertia-tensor
++            [[:ixx :f64] [:iyy :f64] [:izz :f64]
++             [:ixy :f64] [:ixz :f64] [:iyz :f64]]]]
++  (match-option (inertia-component xml index "ixx") [:option :f64]
++   (none (option-none-of [:option [:record :kami/inertia-tensor
++                                   [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                                    [:ixy :f64] [:ixz :f64] [:iyz :f64]]]]))
++   (some ixx
++    (match-option (inertia-component xml index "iyy") [:option :f64]
++     (none (option-none-of [:option [:record :kami/inertia-tensor
++                                     [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                                      [:ixy :f64] [:ixz :f64] [:iyz :f64]]]]))
++     (some iyy
++      (match-option (inertia-component xml index "izz") [:option :f64]
++       (none (option-none-of [:option [:record :kami/inertia-tensor
++                                       [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                                        [:ixy :f64] [:ixz :f64] [:iyz :f64]]]]))
++       (some izz
++        (match-option (inertia-component xml index "ixy") [:option :f64]
++         (none (option-none-of [:option [:record :kami/inertia-tensor
++                                         [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                                          [:ixy :f64] [:ixz :f64] [:iyz :f64]]]]))
++         (some ixy
++          (match-option (inertia-component xml index "ixz") [:option :f64]
++           (none (option-none-of [:option [:record :kami/inertia-tensor
++                                           [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                                            [:ixy :f64] [:ixz :f64] [:iyz :f64]]]]))
++           (some ixz
++            (match-option (inertia-component xml index "iyz") [:option :f64]
++             (none (option-none-of [:option [:record :kami/inertia-tensor
++                                             [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                                              [:ixy :f64] [:ixz :f64] [:iyz :f64]]]]))
++             (some iyz
++              (let [tensor (record inertia-tensor-type
++                                   ixx iyy izz ixy ixz iyz)]
++                (if (inertia-tensor-valid tensor)
++                  (option-some-of
++                   [:option [:record :kami/inertia-tensor
++                             [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                              [:ixy :f64] [:ixz :f64] [:iyz :f64]]]]
++                   tensor)
++                  (option-none-of
++                   [:option [:record :kami/inertia-tensor
++                             [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                              [:ixy :f64] [:ixz :f64] [:iyz :f64]]]]))))))))))))))))
+diff --git a/test/articulated_transform_kotoba_golden_test.clj b/test/articulated_transform_kotoba_golden_test.cljk
+similarity index 87%
+rename from test/articulated_transform_kotoba_golden_test.clj
+rename to test/articulated_transform_kotoba_golden_test.cljk
+index 2aad084..6ddfda1 100644
+--- a/test/articulated_transform_kotoba_golden_test.clj
++++ b/test/articulated_transform_kotoba_golden_test.cljk
+@@ -1,7 +1,7 @@
+ (ns articulated-transform-kotoba-golden-test
+-  (:require [clojure.java.shell :as shell]
+-            [clojure.string :as str]
+-            [clojure.test :refer [deftest is]]
++  (:require [kotoba.bytes :as kbytes] [kotoba.process :as shell]
++            [kotoba.lang.text :as str]
++            [kotoba.test :refer [deftest is]]
+             [kami_articulated :as articulated]
+             [kotoba.compiler.core :as compiler]
+             [kotoba.compiler.ir :as ir]))
+@@ -23,9 +23,9 @@
+         js-artifact (compiler/compile-source source :js-kotoba-v1)
+         wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
+         reference (mapv #(ir/execute (:kir js-artifact) % []) names)
+-        js64 (.encodeToString (java.util.Base64/getEncoder)
+-                              (.getBytes ^String (:source js-artifact) "UTF-8"))
+-        wasm64 (.encodeToString (java.util.Base64/getEncoder) (:bytes wasm-artifact))
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))
+         expected-js (str "[" (str/join "," (map #(Double/toString (double %)) expected)) "]")
+         names-js (str "[" (str/join "," (map #(str "\"" % "\"") names)) "]")
+         node-source
+diff --git a/test/kami_articulated_test.cljc b/test/kami_articulated_test.cljk
+similarity index 97%
+rename from test/kami_articulated_test.cljc
+rename to test/kami_articulated_test.cljk
+index e295873..32fde61 100644
+--- a/test/kami_articulated_test.cljc
++++ b/test/kami_articulated_test.cljk
+@@ -1,6 +1,6 @@
+ (ns kami_articulated-test
+   "Ports every #[test] from the original kami-articulated::urdf::tests
+-  module 1:1 (see src/kami_articulated/urdf.cljc for restoration
++  module 1:1 (see src/kami_articulated/urdf.cljk for restoration
+   provenance: kami-engine PR #82 deletion, ADR-2607010930), plus a
+   namespace-loads smoke test.
+ 
+@@ -11,7 +11,7 @@
+   hizukue.urdf` is the crate's own `urdf/hizukue.urdf` fixture (a 6-DoF
+   panel-servicer robot), read here as an additional real-world parse
+   smoke test beyond what the original crate's #[test]s exercised."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [kami_articulated :as ka]
+             [kami_articulated.urdf :as urdf]))
+ 
+diff --git a/test/urdf_query_kotoba_test.cljk b/test/urdf_query_kotoba_test.cljk
+new file mode 100644
+index 0000000..1dbff6e
+--- /dev/null
++++ b/test/urdf_query_kotoba_test.cljk
+@@ -0,0 +1,312 @@
++(ns urdf-query-kotoba-test
++  (:require [kotoba.bytes :as kbytes] [clojure.java.io :as io]
++            [kotoba.process :as shell]
++            [kotoba.lang.text :as str]
++            [kotoba.test :refer [deftest is testing]]
++            [kami_articulated :as articulated]
++            [kotoba.compiler.core :as compiler]
++            [kotoba.compiler.ir :as ir]))
++
++(declare js-array)
++
++(defn- js-value [value]
++  (if (sequential? value) (js-array value) (pr-str value)))
++
++(defn- js-array [values]
++  (str "[" (str/join "," (map js-value values)) "]"))
++
++(defn- compiler-browser-host-url []
++  (let [source (io/file (io/resource "kotoba/compiler/core.clj"))
++        root (nth (iterate #(.getParentFile %) source) 4)
++        host (io/file root "runtime/browser-host.mjs")]
++    (when-not (.isFile host)
++      (throw (ex-info "pinned compiler browser host is absent" {:path (.getPath host)})))
++    (str (.toURI host))))
++
++(defn- expected-query-values [system]
++  {:robot-name (:name system)
++   :joint-graph-valid 1
++   :link-names (mapv :name (:links system))
++   :link-records (mapv (comp vector :name) (:links system))
++   :mass-values (->> (:links system)
++                     (map #(get-in % [:inertia :mass]))
++                     (remove zero?)
++                     (mapv double))
++   :joint-names (mapv :name (:joints system))
++   :joint-types (mapv #(name (:kind %)) (:joints system))
++   :joint-parents (mapv :parent (:joints system))
++   :joint-children (mapv :child (:joints system))
++   :joint-reference-records
++   (mapv (fn [joint]
++           [(:name joint) (name (:kind joint)) (:parent joint) (:child joint)])
++         (:joints system))
++   :limit-lower (mapv #(double (:lower %)) (:joints system))
++   :limit-upper (mapv #(double (:upper %)) (:joints system))
++   :limit-effort (mapv #(double (:effort %)) (:joints system))
++   :limit-velocity (mapv #(double (:velocity %)) (:joints system))
++   :inertial-origin-xyz (->> (:links system)
++                             (filter #(not (zero? (get-in % [:inertia :mass]))))
++                             (mapv #(mapv double (get-in % [:inertia :com :xyz]))))
++   :inertial-origin-rpy (->> (:links system)
++                             (filter #(not (zero? (get-in % [:inertia :mass]))))
++                             (mapv #(mapv double (get-in % [:inertia :com :rpy]))))
++   :inertial-poses (->> (:links system)
++                        (filter #(not (zero? (get-in % [:inertia :mass]))))
++                        (mapv (fn [link]
++                                [(mapv double (get-in link [:inertia :com :xyz]))
++                                 (mapv double (get-in link [:inertia :com :rpy]))])))
++   :inertia-tensors (->> (:links system)
++                         (filter #(not (zero? (get-in % [:inertia :mass]))))
++                         (mapv (fn [link]
++                                 (let [inertia (:inertia link)]
++                                   (mapv #(double (get inertia %))
++                                         [:ixx :iyy :izz :ixy :ixz :iyz])))))
++   :joint-origin-xyz (mapv #(mapv double (get-in % [:origin :xyz])) (:joints system))
++   :joint-origin-rpy (mapv #(mapv double (get-in % [:origin :rpy])) (:joints system))
++   :joint-axis-xyz (mapv #(mapv double (:axis %)) (:joints system))})
++
++(defn- option-value [value]
++  (when (true? (second value)) (nth value 2)))
++
++(defn- option-vec3 [value]
++  (when-let [typed-vector (option-value value)]
++    (subvec typed-vector 1)))
++
++(defn- option-pose [value]
++  (when-let [record (option-value value)]
++    [(subvec (nth record 1) 1) (subvec (nth record 2) 1)]))
++
++(defn- option-record-values [value]
++  (when-let [record (option-value value)]
++    (subvec record 1)))
++
++(deftest numeric-query-fails-closed-as-typed-none
++  (let [kir (:kir (compiler/compile-source (slurp "src/urdf_query.kotoba") :js-kotoba-v1))
++        parse #(ir/execute kir 'mass-value [% 0])
++        parse-xyz #(ir/execute kir 'inertial-origin-xyz [% 0])
++        parse-pose #(ir/execute kir 'inertial-pose [% 0])
++        parse-tensor #(ir/execute kir 'inertia-tensor [% 0])]
++    (is (= [[:option :f64] false]
++           (parse "<robot><link><inertial><mass/></inertial></link></robot>")))
++    (is (= [[:option :f64] false]
++           (parse "<robot><link><inertial><mass value=\"NaN\"/></inertial></link></robot>")))
++    (is (= [[:option :f64] false]
++           (parse "<robot><link><inertial><mass value=\"1e309\"/></inertial></link></robot>")))
++    (is (= [[:option :f64] true -0.0]
++           (parse "<robot><link><inertial><mass value=\"-0\"/></inertial></link></robot>")))
++    (is (= [[:option [:vector [:f64 :f64 :f64]]] false]
++           (parse-xyz "<robot><link><inertial><origin xyz=\"1 2\"/></inertial></link></robot>")))
++    (is (= [[:option [:vector [:f64 :f64 :f64]]] false]
++           (parse-xyz "<robot><link><inertial><origin xyz=\"1 NaN 3\"/></inertial></link></robot>")))
++    (is (= [[:option [:vector [:f64 :f64 :f64]]] true
++            [[:vector [:f64 :f64 :f64]] -0.0 1.5 Double/MIN_VALUE]]
++           (parse-xyz "<robot><link><inertial><origin xyz=\"-0 1.5 5e-324\"/></inertial></link></robot>")))
++    (is (= [[:option [:record :kami/pose
++                      [[:xyz [:vector [:f64 :f64 :f64]]]
++                       [:rpy [:vector [:f64 :f64 :f64]]]]]] false]
++           (parse-pose "<robot><link><inertial><origin xyz=\"1 2 3\" rpy=\"0 NaN 0\"/></inertial></link></robot>")))
++    (is (= [[:option [:record :kami/inertia-tensor
++                      [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                       [:ixy :f64] [:ixz :f64] [:iyz :f64]]]] false]
++           (parse-tensor "<robot><link><inertial><inertia ixx=\"1\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\"/></inertial></link></robot>")))
++    (is (= [[:option [:record :kami/inertia-tensor
++                      [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                       [:ixy :f64] [:ixz :f64] [:iyz :f64]]]] false]
++           (parse-tensor "<robot><link><inertial><inertia ixx=\"1\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\" iyz=\"Infinity\"/></inertial></link></robot>")))
++    (doseq [xml ["<robot><link><inertial><inertia ixx=\"-1\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\" iyz=\"0\"/></inertial></link></robot>"
++                 "<robot><link><inertial><inertia ixx=\"1\" iyy=\"1\" izz=\"1\" ixy=\"2\" ixz=\"0\" iyz=\"0\"/></inertial></link></robot>"
++                 "<robot><link><inertial><inertia ixx=\"1000000000001\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\" iyz=\"0\"/></inertial></link></robot>"]]
++      (is (= [[:option [:record :kami/inertia-tensor
++                        [[:ixx :f64] [:iyy :f64] [:izz :f64]
++                         [:ixy :f64] [:ixz :f64] [:iyz :f64]]]] false]
++             (parse-tensor xml))))))
++
++(deftest unsafe-inertia-tensors-fail-closed-across-script-and-wasm
++  (let [source (slurp "src/urdf_query.kotoba")
++        js-artifact (compiler/compile-source source :js-kotoba-v1)
++        wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))
++        cases ["<robot><link><inertial><inertia ixx=\"1\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\"/></inertial></link></robot>"
++               "<robot><link><inertial><inertia ixx=\"1\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\" iyz=\"Infinity\"/></inertial></link></robot>"
++               "<robot><link><inertial><inertia ixx=\"-1\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\" iyz=\"0\"/></inertial></link></robot>"
++               "<robot><link><inertial><inertia ixx=\"1\" iyy=\"1\" izz=\"1\" ixy=\"2\" ixz=\"0\" iyz=\"0\"/></inertial></link></robot>"
++               "<robot><link><inertial><inertia ixx=\"1000000000001\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\" iyz=\"0\"/></inertial></link></robot>"]
++        node-source
++        (str "const cases=" (js-array cases) ";const check=x=>{for(const xml of cases)"
++             "if(x['inertia-tensor'](xml,0n)[1])throw Error('unsafe inertia admitted')};"
++             "Promise.all([import('data:text/javascript;base64," js64 "'),import("
++             (pr-str (compiler-browser-host-url)) ")]).then(async([j,h])=>{check(j.instantiateKotoba({}));"
++             "const w=await h.instantiateKotoba(Buffer.from('" wasm64 "','base64'));check(w.instance.exports)})"
++             ".catch(e=>{console.error(e);process.exit(70)})")
++        node-result (shell/sh "node" "--input-type=module" "-e" node-source)]
++    (is (zero? (:exit node-result)) (:err node-result))))
++
++(deftest malformed-or-unsafe-joint-graphs-fail-closed
++  (let [source (slurp "src/urdf_query.kotoba")
++        js-artifact (compiler/compile-source source :js-kotoba-v1)
++        wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))
++        cases
++        ["<robot><link name=\"same\"/><link name=\"same\"/><joint name=\"j\" type=\"fixed\"><parent link=\"same\"/><child link=\"same\"/></joint></robot>"
++         "<robot><link name=\"a\"/><link name=\"b\"/><joint name=\"j\" type=\"fixed\"><parent link=\"missing\"/><child link=\"b\"/></joint></robot>"
++         "<robot><link name=\"a\"/><link name=\"b\"/><joint name=\"j\" type=\"fixed\"><parent link=\"a\"/><child link=\"a\"/></joint></robot>"
++         "<robot><link name=\"a\"/><link name=\"b\"/><link name=\"c\"/><joint name=\"j1\" type=\"fixed\"><parent link=\"a\"/><child link=\"c\"/></joint><joint name=\"j2\" type=\"fixed\"><parent link=\"b\"/><child link=\"c\"/></joint></robot>"
++         "<robot><link name=\"a\"/><link name=\"b\"/><link name=\"root\"/><joint name=\"j1\" type=\"fixed\"><parent link=\"a\"/><child link=\"b\"/></joint><joint name=\"j2\" type=\"fixed\"><parent link=\"b\"/><child link=\"a\"/></joint></robot>"
++         "<robot><link name=\"a\"/><link name=\"b\"/><joint name=\"j\" type=\"fixed\"><parent link=\"a\"/><child/></joint></robot>"
++         (str "<robot>"
++              (apply str (map #(str "<link name=\"l" % "\"/>") (range 129)))
++              (apply str (map #(str "<joint name=\"j" % "\" type=\"fixed\"><parent link=\"l" %
++                                     "\"/><child link=\"l" (inc %) "\"/></joint>")
++                              (range 128)))
++              "</robot>")]
++        reference (:kir js-artifact)
++        node-source
++        (str "const cases=" (js-array cases) ";const check=x=>{for(const xml of cases)"
++             "if(x['joint-graph-valid'](xml)!==0n)throw Error('unsafe graph admitted')};"
++             "Promise.all([import('data:text/javascript;base64," js64 "'),import("
++             (pr-str (compiler-browser-host-url)) ")]).then(async([j,h])=>{check(j.instantiateKotoba({}));"
++             "const w=await h.instantiateKotoba(Buffer.from('" wasm64 "','base64'));check(w.instance.exports)})"
++             ".catch(e=>{console.error(e);process.exit(70)})")
++        node-result (shell/sh "node" "--input-type=module" "-e" node-source)]
++    (doseq [xml cases]
++      (is (zero? (ir/execute reference 'joint-graph-valid [xml]))))
++    (is (zero? (:exit node-result)) (:err node-result))))
++
++(deftest indexed-joint-graphs-admit-arbitrary-order-through-the-128-link-bound
++  (let [source (slurp "src/urdf_query.kotoba")
++        js-artifact (compiler/compile-source source :js-kotoba-v1)
++        wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))
++        arbitrary
++        (str "<robot>"
++             "<link name=\"c\"/><link name=\"a\"/><link name=\"d\"/><link name=\"b\"/>"
++             "<joint name=\"bc\"><parent link=\"b\"/><child link=\"c\"/></joint>"
++             "<joint name=\"cd\"><parent link=\"c\"/><child link=\"d\"/></joint>"
++             "<joint name=\"ab\"><parent link=\"a\"/><child link=\"b\"/></joint>"
++             "</robot>")
++        maximum
++        (str "<robot>"
++             (apply str (map #(str "<link name=\"l" % "\"/>") (reverse (range 128))))
++             (apply str
++                    (map (fn [index]
++                           (str "<joint name=\"j" index "\"><parent link=\"l" (dec index)
++                                "\"/><child link=\"l" index "\"/></joint>"))
++                         (reverse (range 1 128))))
++             "</robot>")
++        cases [arbitrary maximum]
++        reference (:kir js-artifact)
++        node-source
++        (str "const cases=" (js-array cases) ";const check=x=>{for(const xml of cases)"
++             "if(x['joint-graph-indexed-valid'](xml)!==1n)throw Error('valid indexed graph rejected')};"
++             "Promise.all([import('data:text/javascript;base64," js64 "'),import("
++             (pr-str (compiler-browser-host-url)) ")]).then(async([j,h])=>{check(j.instantiateKotoba({}));"
++             "const w=await h.instantiateKotoba(Buffer.from('" wasm64 "','base64'));check(w.instance.exports)})"
++             ".catch(e=>{console.error(e);process.exit(70)})")
++        node-result (shell/sh "node" "--input-type=module" "-e" node-source)]
++    (doseq [xml cases]
++      (is (= 1 (ir/execute reference 'joint-graph-indexed-valid [xml]))))
++    (is (zero? (:exit node-result)) (:err node-result))))
++
++(deftest real-urdf-fixtures-agree-across-cljc-reference-script-and-typed-wasm
++  (let [source (slurp "src/urdf_query.kotoba")
++        js-artifact (compiler/compile-source source :js-kotoba-v1)
++        wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))]
++    (doseq [fixture ["cartpole.urdf" "hizukue.urdf"]]
++      (testing fixture
++        (let [xml (slurp (str "test/fixtures/" fixture))
++              system (articulated/parse-urdf xml)
++              expected (expected-query-values system)
++              execute #(ir/execute (:kir js-artifact) %1 %2)
++              reference
++              {:robot-name (option-value (execute 'robot-name [xml]))
++               :joint-graph-valid (execute 'joint-graph-valid [xml])
++               :link-names (mapv #(option-value (execute 'link-name [xml %]))
++                                 (range (count (:link-names expected))))
++               :link-records (mapv #(option-record-values (execute 'link-record [xml %]))
++                                   (range (count (:link-records expected))))
++               :mass-values (mapv #(option-value (execute 'mass-value [xml %]))
++                                  (range (count (:mass-values expected))))
++               :joint-names (mapv #(option-value (execute 'joint-name [xml %]))
++                                  (range (count (:joint-names expected))))
++               :joint-types (mapv #(option-value (execute 'joint-type [xml %]))
++                                  (range (count (:joint-types expected))))
++               :joint-parents (mapv #(option-value (execute 'joint-parent [xml %]))
++                                    (range (count (:joint-parents expected))))
++               :joint-children (mapv #(option-value (execute 'joint-child [xml %]))
++                                     (range (count (:joint-children expected))))
++               :joint-reference-records
++               (mapv #(option-record-values (execute 'joint-reference-record [xml %]))
++                     (range (count (:joint-reference-records expected))))
++               :limit-lower (mapv #(option-value (execute 'limit-lower [xml %]))
++                                  (range (count (:limit-lower expected))))
++               :limit-upper (mapv #(option-value (execute 'limit-upper [xml %]))
++                                  (range (count (:limit-upper expected))))
++               :limit-effort (mapv #(option-value (execute 'limit-effort [xml %]))
++                                   (range (count (:limit-effort expected))))
++               :limit-velocity (mapv #(option-value (execute 'limit-velocity [xml %]))
++                                     (range (count (:limit-velocity expected))))
++               :inertial-origin-xyz (mapv #(option-vec3 (execute 'inertial-origin-xyz [xml %]))
++                                          (range (count (:inertial-origin-xyz expected))))
++               :inertial-origin-rpy (mapv #(option-vec3 (execute 'inertial-origin-rpy [xml %]))
++                                          (range (count (:inertial-origin-rpy expected))))
++               :inertial-poses (mapv #(option-pose (execute 'inertial-pose [xml %]))
++                                     (range (count (:inertial-origin-xyz expected))))
++               :inertia-tensors (mapv #(option-record-values (execute 'inertia-tensor [xml %]))
++                                      (range (count (:inertia-tensors expected))))
++               :joint-origin-xyz (mapv #(option-vec3 (execute 'joint-origin-xyz [xml %]))
++                                       (range (count (:joint-origin-xyz expected))))
++               :joint-origin-rpy (mapv #(option-vec3 (execute 'joint-origin-rpy [xml %]))
++                                       (range (count (:joint-origin-rpy expected))))
++               :joint-axis-xyz (mapv #(option-vec3 (execute 'joint-axis-xyz [xml %]))
++                                     (range (count (:joint-axis-xyz expected))))}
++              xml64 (kbytes/base64-encode
++                                     (kbytes/utf8-bytes ^String xml))
++              node-source
++              (str "const xml=Buffer.from(process.argv[1],'base64').toString(),expected={"
++                   "robot:" (pr-str (:robot-name expected)) ",links:" (js-array (:link-names expected))
++                   ",linkRecords:" (js-array (:link-records expected))
++                   ",masses:" (js-array (:mass-values expected)) ",joints:" (js-array (:joint-names expected))
++                   ",types:" (js-array (:joint-types expected)) ",parents:" (js-array (:joint-parents expected))
++                   ",children:" (js-array (:joint-children expected))
++                   ",jointRecords:" (js-array (:joint-reference-records expected))
++                   ",lower:" (js-array (:limit-lower expected)) ",upper:" (js-array (:limit-upper expected))
++                   ",effort:" (js-array (:limit-effort expected)) ",velocity:" (js-array (:limit-velocity expected))
++                   ",inertialXyz:" (js-array (:inertial-origin-xyz expected)) ",inertialRpy:" (js-array (:inertial-origin-rpy expected))
++                   ",poses:" (js-array (:inertial-poses expected))
++                   ",tensors:" (js-array (:inertia-tensors expected))
++                   ",jointXyz:" (js-array (:joint-origin-xyz expected)) ",jointRpy:" (js-array (:joint-origin-rpy expected))
++                   ",axis:" (js-array (:joint-axis-xyz expected)) "};"
++                   "const read=(x,n,count)=>Array.from({length:count},(_,i)=>{const v=x[n](xml,BigInt(i));if(!v[1])throw Error(n+' missing '+i);return v[2]});"
++                   "const readVec=(x,n,count)=>read(x,n,count).map(v=>v.slice(1));"
++                   "const readPose=(x,count)=>read(x,'inertial-pose',count).map(v=>[v[1].slice(1),v[2].slice(1)]);"
++                   "const readRecord=(x,n,count)=>read(x,n,count).map(v=>v.slice(1));"
++                   "const check=x=>{const robot=x['robot-name'](xml);if(!robot[1]||robot[2]!==expected.robot)throw Error('robot');"
++                   "if(x['joint-graph-valid'](xml)!==1n)throw Error('joint-graph-valid');"
++                   "for(const [count,n,want] of [[x['link-count'](xml),'link-name',expected.links],[x['mass-count'](xml),'mass-value',expected.masses],[x['joint-count'](xml),'joint-name',expected.joints]])"
++                   "if(count!==BigInt(want.length)||JSON.stringify(read(x,n,want.length))!==JSON.stringify(want))throw Error(n);"
++                   "if(JSON.stringify(readRecord(x,'link-record',expected.linkRecords.length))!==JSON.stringify(expected.linkRecords))throw Error('link-record');"
++                   "for(const [n,want] of [['joint-type',expected.types],['joint-parent',expected.parents],['joint-child',expected.children]])"
++                   "if(JSON.stringify(read(x,n,want.length))!==JSON.stringify(want))throw Error(n);"
++                   "if(JSON.stringify(readRecord(x,'joint-reference-record',expected.jointRecords.length))!==JSON.stringify(expected.jointRecords))throw Error('joint-reference-record');"
++                   "if(x['limit-count'](xml)!==BigInt(expected.lower.length))throw Error('limit-count');"
++                   "for(const [n,want] of [['limit-lower',expected.lower],['limit-upper',expected.upper],['limit-effort',expected.effort],['limit-velocity',expected.velocity]])"
++                   "if(JSON.stringify(read(x,n,want.length))!==JSON.stringify(want))throw Error(n);"
++                   "for(const [count,n,want] of [[x['inertial-origin-count'](xml),'inertial-origin-xyz',expected.inertialXyz],[x['inertial-origin-count'](xml),'inertial-origin-rpy',expected.inertialRpy],[x['joint-origin-count'](xml),'joint-origin-xyz',expected.jointXyz],[x['joint-origin-count'](xml),'joint-origin-rpy',expected.jointRpy],[x['joint-axis-count'](xml),'joint-axis-xyz',expected.axis]])"
++                   "if(count!==BigInt(want.length)||JSON.stringify(readVec(x,n,want.length))!==JSON.stringify(want))throw Error(n);"
++                   "if(JSON.stringify(readPose(x,expected.poses.length))!==JSON.stringify(expected.poses))throw Error('inertial-pose');"
++                   "if(x['inertia-count'](xml)!==BigInt(expected.tensors.length)||JSON.stringify(readRecord(x,'inertia-tensor',expected.tensors.length))!==JSON.stringify(expected.tensors))throw Error('inertia-tensor')};"
++                   "Promise.all([import('data:text/javascript;base64," js64 "'),import(" (pr-str (compiler-browser-host-url)) ")]).then(async([j,h])=>{"
++                   "check(j.instantiateKotoba({}));const w=await h.instantiateKotoba(Buffer.from('" wasm64 "','base64'));check(w.instance.exports)})"
++                   ".catch(e=>{console.error(e);process.exit(70)})")
++              node-result (shell/sh "node" "--input-type=module" "-e" node-source xml64)]
++          (is (= expected reference))
++          (is (zero? (:exit node-result)) (:err node-result)))))))

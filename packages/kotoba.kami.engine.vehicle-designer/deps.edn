@@ -1,0 +1,81 @@
+{:paths ["src"],
+ :deps
+ #:io.github.kotoba-lang{org-iso-6983
+                         #:git{:url
+                               "https://github.com/kotoba-lang/org-iso-6983.git",
+                               :sha
+                               "e1998926e70c3707b2dcb751df0f1380dd86c0bc"},
+                         cad
+                         #:git{:url
+                               "https://github.com/kotoba-lang/cad.git",
+                               :sha
+                               "dd15140fa962d3f7276b26f8cc1fe172a3f30bca"},
+                         kami-engine-motor
+                         #:local{:root "../kotoba.kami.engine.motor"},
+                         langgraph
+                         #:git{:url
+                               "https://github.com/kotoba-lang/langgraph.git",
+                               :sha
+                               "5b4e5e70837b849b14b6a5800894e3be202ad5fa"},
+                         kami-engine-vphysics
+                         #:local{:root
+                                 "../kotoba.kami.engine.vphysics"},
+                         kami-engine-aero
+                         #:local{:root "../kotoba.kami.engine.aero"},
+                         datom
+                         #:git{:url
+                               "https://github.com/kotoba-lang/datom.git",
+                               :sha
+                               "d27a5833d59d909367956705f2ec931399c891ee"},
+                         physics
+                         #:git{:url
+                               "https://github.com/kotoba-lang/physics.git",
+                               :sha
+                               "3081560a4327319d9916a3c1c53471223462c0c3"},
+                         test
+                         #:git{:url
+                               "https://github.com/kotoba-lang/test.git",
+                               :sha
+                               "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"},
+                         org-iso-10303
+                         #:git{:url
+                               "https://github.com/kotoba-lang/org-iso-10303.git",
+                               :sha
+                               "36d50ebe65d07e4ba5714388c8863e7dfa98becc"},
+                         text
+                         #:git{:sha
+                               "73bdb13ae7a3d004b44bca08be03a3191157a38f"},
+                         kami-engine-echem
+                         #:local{:root "../kotoba.kami.engine.echem"},
+                         kami-engine-crash
+                         #:local{:root "../kotoba.kami.engine.crash"},
+                         physics-2d
+                         #:git{:url
+                               "https://github.com/kotoba-lang/physics-2d.git",
+                               :sha
+                               "03b6c23c8d9aa36b92a8130fd3e37fc2548b4d26"}},
+ :aliases
+ {:dev
+  {:override-deps
+   #:io.github.kotoba-lang{langchain
+                           #:local{:root "../../../langchain"}}},
+  :run {:main-opts ["-m" "vdesign.sim"]},
+  :test
+  {:extra-paths ["test"],
+   :extra-deps
+   #:io.github.cognitect-labs{test-runner
+                              #:git{:tag "v0.5.1",
+                                    :sha
+                                    "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}},
+   :main-opts ["-m" "cognitect.test-runner"],
+   :exec-fn cognitect.test-runner.api/test},
+  :lint
+  {:replace-deps #:clj-kondo{clj-kondo #:mvn{:version "2024.11.14"}},
+   :main-opts
+   ["-m"
+    "clj-kondo.main"
+    "--lint"
+    "src"
+    "test"
+    "--fail-level"
+    "error"]}}}

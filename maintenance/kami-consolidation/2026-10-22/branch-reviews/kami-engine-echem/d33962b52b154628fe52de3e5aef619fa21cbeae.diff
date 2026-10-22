@@ -1,0 +1,600 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 748fd70..8bac06f 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -10,7 +10,7 @@ permissions:
+ 
+ jobs:
+   test:
+-    name: clojure -M:test (JDK ${{ matrix.java }})
++    name: CLJK tests and lint (JDK ${{ matrix.java }})
+     runs-on: ubuntu-latest
+     strategy:
+       fail-fast: false
+@@ -18,6 +18,25 @@ jobs:
+         java: ['17', '21']
+     steps:
+       - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '22'
++      - name: Checkout pinned CLJK launcher
++        uses: actions/checkout@v4
++        with:
++          repository: kotoba-lang/kotoba
++          ref: 3d6723a0bed42e88435ee85e8307458fae97db9d
++          path: .ci-runtime/kotoba
++          persist-credentials: false
++      - name: Checkout pinned CLJK engine
++        uses: actions/checkout@v4
++        with:
++          repository: kotoba-lang/org-babashka-nbb
++          ref: 829f0ba11016e925001d80e51f12848c4ad58112
++          path: .ci-runtime/org-babashka-nbb
++          persist-credentials: false
++      - name: Install engine dependency
++        run: npm install --prefix .ci-runtime/org-babashka-nbb --omit=dev --ignore-scripts --no-audit --no-fund --package-lock=false
+ 
+       - name: Setup JDK ${{ matrix.java }}
+         uses: actions/setup-java@v4
+@@ -42,7 +61,10 @@ jobs:
+             ${{ runner.os }}-jdk${{ matrix.java }}-clj-
+ 
+       - name: Run tests
+-        run: clojure -M:test
++        env:
++          KBB_NO_STDLIB: '1'
++        run: .ci-runtime/kotoba/bin/kbb -M:test
+       - name: Lint
+-        run: clojure -M:lint
+-
++        run: |
++          node scripts/lint-mirror.mjs
++          clojure -M:lint --lint .ci-lint --config '{:lint-as {kotoba.test/deftest clojure.test/deftest kotoba.test/is clojure.test/is kotoba.test/testing clojure.test/testing} :linters {:unresolved-symbol {:exclude [(kotoba.test/is [thrown? thrown-with-msg?])]}}}'
+diff --git a/.gitignore b/.gitignore
+index d2400ff..1e7356b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,6 @@
+ .cpcache/
+ .clj-kondo/.cache/
+ .lsp/
++.nbb/
++.ci-lint/
++.ci-runtime/
+diff --git a/README.md b/README.md
+index 90fde6a..569063c 100644
+--- a/README.md
++++ b/README.md
+@@ -5,4 +5,8 @@
+ Reduced-order PEM fuel-cell solver (`:rom-fc`) — polarization curve → cell voltage, LHV efficiency, stack power → real H2 consumption. The right 'combustion' analog for an FCEV is electrochemistry. A kami-echem CFD registers `:pemfc-cfd`.
+ 
+ Part of the clean-sheet vehicle-design / CAE stack (purpose-split shared libs).
+-Zero-dep portable `.cljc`. Run `clojure -M:test`.
++Zero-dep portable `.cljc`. Run `kbb -M:test`.
++
++Duty-profile integration (`echem.profile` / `:rom-fc-profile`): resolves `echem.system/demand-point` at each net-bus-power sample of a duty cycle and trapezoid-integrates H2 mass and net energy — per-sample ROM efficiency instead of a caller-supplied scalar. Transients, thermal lag, purge/recirculation and DC/DC part-load stay declared `:unmeasured`.
++
++The shared `cae.solver/solve` dispatch accepts `{:solver {:kind :rom-fc-profile}}` with the profile and system inputs on the case. In `:on-infeasible :skip` mode, only original adjacent intervals with two feasible endpoints contribute to the integral. `:integrated-duration-s`, `:profile-duration-s` and `:skipped-interval-indices` report coverage; isolated feasible samples contribute zero duration. DC/DC losses are included when solving for the requested bus power.
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..9a38bec
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,13 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/echem/profile.cljk" ".cljc"
++  "test/echem/profile_test.cljk" ".clj"
++  "src/echem/solver.cljk" ".cljc"
++  "src/echem/stack_thermal.cljk" ".cljc"
++  "src/echem/system.cljk" ".cljc"
++  "test/echem/solver_test.cljk" ".clj"
++  "test/echem/stack_thermal_test.cljk" ".clj"
++  "test/echem/system_test.cljk" ".clj"}}
+diff --git a/deps.edn b/deps.edn
+index ea8602a..00b00f7 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -4,12 +4,21 @@
+  ;; efficiency (0.53) into a polarization-curve result → real H2 consumption.
+  ;; The proper "combustion" analog for EV/FCEV is electrochemistry. A detailed
+  ;; kami-echem CFD/electrochem model registers :pemfc-cfd on the same contract.
+- :deps {io.github.kotoba-lang/datom                {:git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       io.github.kotoba-lang/datom                {:git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
+         io.github.kotoba-lang/kami-engine-cae-solver {:git/sha "53e27f18ddcf10615a8a17adbb78018b1ab64a17"}}
+  :aliases
+  {:test {:extra-paths ["test"]
+          :extra-deps {io.github.cognitect-labs/test-runner
+-                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+          :main-opts ["-m" "cognitect.test-runner"]
+          :exec-fn cognitect.test-runner.api/test}
+   :dev {:override-deps {io.github.kotoba-lang/datom                {:local/root "../datom"}
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..af416ec
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,9 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src"]
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/scripts/lint-mirror.mjs b/scripts/lint-mirror.mjs
+new file mode 100644
+index 0000000..113fc50
+--- /dev/null
++++ b/scripts/lint-mirror.mjs
+@@ -0,0 +1,27 @@
++import { readFileSync, readdirSync, mkdirSync, copyFileSync, rmSync } from 'node:fs';
++import { join } from 'node:path';
++
++// clj-kondo ignores canonical .cljk extensions; lint a disposable mirror.
++const manifest = readFileSync('cljk-origin.edn', 'utf8');
++const origins = new Map([...manifest.matchAll(/"([^"]+\.cljk)"\s+"(\.clj[cs]?)"/g)]
++  .map(([, path, extension]) => [path, extension]));
++rmSync('.ci-lint', { recursive: true, force: true });
++let count = 0;
++function mirror(dir) {
++  for (const entry of readdirSync(dir, { withFileTypes: true })) {
++    const path = join(dir, entry.name);
++    if (entry.isDirectory()) mirror(path);
++    else if (path.endsWith('.cljk')) {
++      const extension = origins.get(path);
++      if (!extension) throw new Error(`Missing CLJK origin: ${path}`);
++      const target = join('.ci-lint', path.replace(/\.cljk$/, extension));
++      mkdirSync(join('.ci-lint', dir), { recursive: true });
++      copyFileSync(path, target);
++      count++;
++    }
++  }
++}
++mirror('src');
++mirror('test');
++if (!count) throw new Error('No canonical source files found for lint');
++console.log(`Lint mirror: ${count} canonical files`);
+diff --git a/src/echem/profile.cljk b/src/echem/profile.cljk
+new file mode 100644
+index 0000000..e586cbf
+--- /dev/null
++++ b/src/echem/profile.cljk
+@@ -0,0 +1,146 @@
++(ns echem.profile
++  "Duty-profile integration over the demand-following system closure
++  (:rom-fc-profile) — composes `echem.system/demand-point` per sample of a
++  net-bus-power duty cycle and integrates the H2 mass flow and net energy
++  with the trapezoidal rule.
++
++  Downstream block this removes: the vehicle plane
++  (kami-engine-vehicle-designer vdesign.hydrogen/consumption-profile,
++  vdesign.powertrain) consumes a caller-supplied scalar :fc-elec-eff, and
++  its :cae-probe feeds that scalar from a SINGLE default operating point
++  (echem.solver/solve at i-density 1.2). A real duty cycle sweeps the
++  polarization curve, so a one-point efficiency is silently wrong across
++  the profile. On main there is no executable contract that resolves the
++  ROM at each net-power sample and integrates the result. This contract is
++  that integration:
++
++    per sample:  (demand-point case p-net-kw) → ṁ_H2(t), eta(t)
++    integral:    trapezoidal over the uniform sample interval :dt-s
++
++  Nothing is invented here: every number comes from the composed ROM chain
++  (polarization parameters + BoP group are caller-supplied with provenance,
++  enforced by echem.system). Transient effects are declared :unmeasured,
++  never folded into the integral.
++
++  Infeasible samples (net demand above what the stack + BoP group can
++  deliver) are NEVER silently integrated: by default the call refuses with
++  the offending indices; with :on-infeasible :skip the caller takes
++  responsibility and the skipped samples are counted and reported. Only
++  original adjacent intervals with two feasible endpoints are integrated;
++  isolated feasible samples contribute zero duration, never bridge a gap.
++
++  Required inputs:
++    :p-net-kw       vector of net bus power samples (kW), each finite ≥ 0,
++                    at least 2 samples
++    :dt-s           uniform sample interval (s), finite > 0
++    :profile-source provenance string for the duty cycle itself, required —
++                    a consumption claim travels with the evidence for the
++                    profile it was computed over
++    case            map passed through to demand-point: polarization
++                    parameters + exactly one BoP form (:bop-kw | :bop-frac)
++                    + :bop-source (+ optional :dc-dc-eff/:dc-dc-source)
++
++  Unmeasured (declared on every result, never numeric): startup/shutdown
++  parasitics, stack thermal lag (each sample is a steady-state ROM point),
++  purge/recirculation, DC/DC part-load efficiency curve, and the
++  interpolation error of the trapezoidal rule on a coarse duty cycle."
++  (:require [kotoba.lang.text :as str]
++            [echem.system :as sys]
++            [cae.solver :as cae]))
++
++(defn- finite? [x]
++  ;; NaN check without java.lang.Double so the .cljc stays portable:
++  ;; NaN is the only value not equal to itself.
++  (and (number? x) (== x x) (not= x ##Inf) (not= x ##-Inf)))
++
++(defn- require-provenance [x k]
++  (when-not (and (string? x) (not (str/blank? x)))
++    (throw (ex-info (str "profile: non-blank provenance string required for " k)
++                    {k x}))))
++
++(defn- trapezoid
++  "Integrate only original adjacent intervals whose endpoints are feasible."
++  [intervals k dt]
++  (* dt (reduce + 0.0
++                (map (fn [[a b]] (/ (+ (get a k) (get b k)) 2.0)) intervals))))
++
++(defn demand-profile
++  "Integrate a net-bus-power duty cycle through the demand-following ROM
++  closure. Returns total :h2-kg, :energy-kwh-net, the efficiency envelope,
++  per-sample :points (for downstream composition), covered duration and
++  skipped interval indices, provenance, and the
++  declared :unmeasured gaps. Exact closed-form identities for constant and
++  two-sample profiles are checked in tests."
++  [case {:keys [p-net-kw dt-s profile-source on-infeasible]}]
++  (require-provenance profile-source :profile-source)
++  (when-not (and (vector? p-net-kw) (>= (count p-net-kw) 2))
++    (throw (ex-info "profile: :p-net-kw must be a vector of ≥ 2 net power samples (kW)"
++                    {:p-net-kw p-net-kw})))
++  (when-not (and (finite? dt-s) (pos? dt-s))
++    (throw (ex-info "profile: :dt-s must be a positive finite interval (s)"
++                    {:dt-s dt-s})))
++  (when-not (every? #(and (finite? %) (not (neg? %))) p-net-kw)
++    (throw (ex-info "profile: every :p-net-kw sample must be a finite number ≥ 0 (kW)"
++                    {:p-net-kw p-net-kw})))
++  (when-not (or (nil? on-infeasible) (= :skip on-infeasible))
++    (when-not (nil? on-infeasible)
++      (throw (ex-info "profile: :on-infeasible must be :skip or nil (default refuses)"
++                      {:on-infeasible on-infeasible}))))
++  (let [pts  (vec (map-indexed
++              (fn [idx p]
++                (assoc (sys/demand-point case p)
++                       :sample idx :p-net-kw-target p))
++              p-net-kw))
++        bad  (filterv #(not (:feasible %)) pts)
++        good (if (= :skip on-infeasible)
++               (filterv :feasible pts)
++               (do (when (seq bad)
++                     (throw (ex-info
++                             "profile: infeasible sample(s) — net demand exceeds what this stack + BoP group can deliver; refusing (pass :on-infeasible :skip to integrate feasible samples only)"
++                             {:infeasible-indices (mapv :sample bad)
++                              :infeasible-count (count bad)})))
++                   pts))
++        vs   (mapv :p-net-kw-target good)
++        ms   (mapv :h2-kg-per-s good)]
++    (when (empty? good)
++      (throw (ex-info "profile: no feasible samples to integrate"
++                      {:infeasible-count (count bad)})))
++    (let [intervals (mapv vector pts (rest pts))
++          covered (filterv (fn [[a b]] (and (:feasible a) (:feasible b))) intervals)
++          skipped (filterv (fn [[a b]] (not (and (:feasible a) (:feasible b)))) intervals)
++          h2-kg   (trapezoid covered :h2-kg-per-s dt-s)
++          e-kwh   (/ (trapezoid covered :p-net-kw-target dt-s) 3600.0)
++          etas    (mapv :eta-sys good)
++          any-bus (some :eta-bus good)
++          firstpt (first good)]
++      (cond-> {:solver :rom-fc-profile
++               :samples (count good)
++               :dt-s dt-s
++               :profile-duration-s (* (dec (count pts)) dt-s)
++               :integrated-duration-s (* (count covered) dt-s)
++               :skipped-interval-indices (mapv (comp :sample first) skipped)
++               :h2-kg h2-kg
++               :energy-kwh-net e-kwh
++               :eta-sys-min (apply min etas)
++               :eta-sys-max (apply max etas)
++               :h2-kg-per-s-max (apply max ms)
++               :peak-net-kw (apply max vs)
++               :infeasible-count (count bad)
++               :infeasible-indices (mapv :sample bad)
++               :points (mapv #(select-keys %
++                                           [:sample :p-net-kw-target :stack-kw
++                                            :net-kw :bus-kw :eff-lhv :eta-sys :eta-bus
++                                            :h2-kg-per-s :feasible])
++                             good)
++               :provenance (merge (:provenance firstpt)
++                                  {:profile-source profile-source})
++               :unmeasured {:startup-shutdown-parasitics true
++                            :thermal-lag-of-stack true
++                            :purge-recirculation true
++                            :dc-dc-part-load-curve true
++                            :trapezoidal-interpolation-error true
++                            :infeasible-gap (pos? (count bad))}}
++        any-bus (assoc :eta-bus-min (apply min (map :eta-bus (filter :eta-bus good)))
++                       :eta-bus-max (apply max (map :eta-bus (filter :eta-bus good))))))))
++
++(defmethod cae/solve :rom-fc-profile [case] (demand-profile case case))
+diff --git a/src/echem/solver.cljc b/src/echem/solver.cljk
+similarity index 100%
+rename from src/echem/solver.cljc
+rename to src/echem/solver.cljk
+diff --git a/src/echem/stack_thermal.cljc b/src/echem/stack_thermal.cljk
+similarity index 100%
+rename from src/echem/stack_thermal.cljc
+rename to src/echem/stack_thermal.cljk
+diff --git a/src/echem/system.cljc b/src/echem/system.cljk
+similarity index 92%
+rename from src/echem/system.cljc
+rename to src/echem/system.cljk
+index 343ea91..c2f0b11 100644
+--- a/src/echem/system.cljc
++++ b/src/echem/system.cljk
+@@ -46,7 +46,7 @@
+   provenance strings (:bop-source, :dc-dc-source) are REQUIRED and
+   echoed — an efficiency claim travels with its evidence or the call
+   fails."
+-  (:require [clojure.string :as str]
++  (:require [kotoba.lang.text :as str]
+             [echem.solver :as fc]
+             [cae.solver :as cae]))
+ 
+@@ -151,7 +151,7 @@
+ (defn demand-point
+   "Full vehicle-plane closure: given a required NET bus power and the
+   same BoP group, invert to the gross stack operating point. The stack
+-  must produce (net / (1 − bop-frac)) gross — with an absolute :bop-kw
++  must produce (bus / dc-dc-eff / (1 − bop-frac)) gross — with an absolute :bop-kw
+   the inversion is direct; with a fractional :bop-frac it solves
+   P-net = P-stack·(1 − frac) exactly. Uses echem.solver/solve-at-power
+   on the polarization curve for the gross point, so the operating
+@@ -175,10 +175,17 @@
+                                        {:bop-frac bop-frac})))
+                      bop-frac)
+                  0.0)
+-          ;; gross needed so that net survives BOTH the fractional and the
+-          ;; absolute BoP draw: P-gross = (P-net + bop-kw) / (1 − frac)
++          dc-eff (if (some? (:dc-dc-eff c))
++                   (let [eff (:dc-dc-eff c)]
++                     (when-not (and (finite? eff) (< 0.0 eff) (<= eff 1.0))
++                       (throw (ex-info "demand-point: :dc-dc-eff must be in (0, 1]"
++                                       {:dc-dc-eff eff})))
++                     (require-provenance (:dc-dc-source c) :dc-dc-source)
++                     eff)
++                   1.0)
++          ;; Invert the full bus chain, including DC/DC loss and BoP draw.
+           bop-abs (or bop-kw 0.0)
+-          p-gross (/ (+ p-net-kw bop-abs) (- 1.0 frac))
++          p-gross (/ (+ (/ p-net-kw dc-eff) bop-abs) (- 1.0 frac))
+           rom (fc/solve-at-power (select-keys case
+                                               [:cells :area-cm2 :T-K
+                                                :pt-loading :E0 :tafel-b
+diff --git a/test/echem/profile_test.cljk b/test/echem/profile_test.cljk
+new file mode 100644
+index 0000000..86a3a20
+--- /dev/null
++++ b/test/echem/profile_test.cljk
+@@ -0,0 +1,173 @@
++(ns echem.profile-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [echem.system :as sys]
++            [echem.profile :as prof]
++            [cae.solver :as cae]))
++
++(def case
++  {:bop-frac 0.15 :bop-source "fixture: synthetic screening value"})
++
++(deftest skips-preserve-the-original-time-grid
++  (let [r (prof/demand-profile case
++            {:p-net-kw [80.0 1.0e6 80.0 80.0] :dt-s 10.0
++             :profile-source "fixture: separated feasible intervals" :on-infeasible :skip})
++        rate (:h2-kg-per-s (sys/demand-point case 80.0))]
++    (is (< (Math/abs (- (:h2-kg r) (* rate 10.0))) 1.0e-12))
++    (is (= (/ 800.0 3600.0) (:energy-kwh-net r)))
++    (is (= 10.0 (:integrated-duration-s r)))
++    (is (= [0 1] (:skipped-interval-indices r)))))
++
++(deftest isolated-feasible-samples-do-not-create-an-interval
++  (doseq [powers [[80.0 1.0e6] [1.0e6 80.0] [80.0 1.0e6 80.0]]]
++    (let [r (prof/demand-profile case
++              {:p-net-kw powers :dt-s 10.0 :profile-source "fixture: no known interval"
++               :on-infeasible :skip})]
++      (is (zero? (:h2-kg r)))
++      (is (zero? (:energy-kwh-net r)))
++      (is (zero? (:integrated-duration-s r))))))
++
++(deftest dc-dc-demand-hits-bus-target-and-energy-identity
++  (doseq [bop [{:bop-frac 0.15} {:bop-kw 5.0}]]
++   (let [r (prof/demand-profile
++            (merge bop {:bop-source "fixture" :dc-dc-eff 0.97 :dc-dc-source "fixture"})
++            {:p-net-kw [80.0 80.0] :dt-s 10.0 :profile-source "fixture"})
++        pt (first (:points r))
++        chemical-kwh (/ (* (:h2-kg r) sys/h2-lhv-j-per-kg) 3.6e6)]
++    (is (< (Math/abs (- 80.0 (:bus-kw pt))) 1.0e-6))
++    (is (< (Math/abs (- (:energy-kwh-net r) (* chemical-kwh (:eta-bus-min r)))) 1.0e-8)))))
++
++(deftest profile-registers-the-common-solver-contract
++  (let [c {:bop-frac 0.15 :bop-source "fixture" :p-net-kw [80.0 80.0]
++           :dt-s 10.0 :profile-source "fixture" :solver {:kind :rom-fc-profile}}]
++    (is (= (prof/demand-profile c c) (cae/solve c)))))
++
++(def req
++  {:p-net-kw [80.0 80.0 80.0 80.0]
++   :dt-s 10.0
++   :profile-source "fixture: synthetic constant duty cycle"})
++
++(deftest constant-profile-closed-form
++  (testing "a constant net demand integrates to the exact analytic value"
++    (let [r  (prof/demand-profile case req)
++          p1 (sys/demand-point case 80.0)
++          dt-total (* 10.0 3)]                  ; trapezoid over constant = ṁ·(N-1)·dt
++      (is (= :rom-fc-profile (:solver r)))
++      (is (= 4 (:samples r)))
++      (is (< (Math/abs (- (:h2-kg r) (* (:h2-kg-per-s p1) dt-total)))
++             (* 1.0e-12 (:h2-kg r))))
++      (is (< (Math/abs (- (:energy-kwh-net r) (/ (* 80.0 dt-total) 3600.0)))
++             1.0e-12))
++      (is (= (:eta-sys p1) (:eta-sys-min r) (:eta-sys-max r)))
++      (is (= 80.0 (:peak-net-kw r)))
++      (is (zero? (:infeasible-count r))))))
++
++(deftest two-sample-linear-ramp
++  (testing "trapezoid is exact for the 2-sample profile: mean of the two rates"
++    (let [r (prof/demand-profile case (assoc req :p-net-kw [40.0 80.0]))
++          m40 (:h2-kg-per-s (sys/demand-point case 40.0))
++          m80 (:h2-kg-per-s (sys/demand-point case 80.0))
++          expect (* 10.0 (/ (+ m40 m80) 2.0))]
++      (is (= 2 (:samples r)))
++      (is (< (Math/abs (- (:h2-kg r) expect)) (* 1.0e-12 expect)))
++      ;; energy: trapezoid of [40 80] kW over 10 s = 600 kW·s = 1/6 kWh
++      (is (< (Math/abs (- (:energy-kwh-net r) (/ 600.0 3600.0))) 1.0e-12)))))
++
++(deftest efficiency-envelope-sweeps
++  (testing "a wide sweep reports min/max eta from the ROM, not a scalar"
++    (let [r (prof/demand-profile case (assoc req :p-net-kw [5.0 80.0 80.0 5.0]))]
++      (is (< (:eta-sys-min r) (:eta-sys-max r))
++          "polarization curve makes low-load efficiency differ from high-load")
++      (is (= 80.0 (:peak-net-kw r)))
++      (is (= 4 (:samples r))))))
++
++(deftest dc-dc-stage-composes-through-profile
++  (testing "eta-bus envelope present when the case carries a DC/DC stage"
++    (let [r (prof/demand-profile (merge case {:dc-dc-eff 0.97
++                                              :dc-dc-source "fixture: synthetic"})
++                                 (assoc req :p-net-kw [5.0 80.0 80.0 5.0]))]
++      (is (< (:eta-bus-min r) (:eta-bus-max r) 1.0))
++      (is (= (* (:eta-sys-max r) 0.97) (:eta-bus-max r))))))
++
++(deftest per-sample-points-compose
++  (testing "per-sample points reuse demand-point numbers verbatim"
++    (let [r  (prof/demand-profile case req)
++          p1 (sys/demand-point case 80.0)
++          pt (first (:points r))]
++      (is (= (:stack-kw p1) (:stack-kw pt)))
++      (is (= (:eta-sys p1) (:eta-sys pt)))
++      (is (= (:h2-kg-per-s p1) (:h2-kg-per-s pt)))
++      (is (= [0 1 2 3] (mapv :sample (:points r)))))))
++
++(deftest provenance-travels
++  (testing "profile-source and BoP provenance are echoed; unmeasured declared"
++    (let [r (prof/demand-profile case req)]
++      (is (= "fixture: synthetic constant duty cycle"
++             (get-in r [:provenance :profile-source])))
++      (is (= "fixture: synthetic screening value"
++             (get-in r [:provenance :bop-source])))
++      (is (get-in r [:unmeasured :startup-shutdown-parasitics]))
++      (is (get-in r [:unmeasured :thermal-lag-of-stack]))
++      (is (get-in r [:unmeasured :purge-recirculation]))
++      (is (get-in r [:unmeasured :trapezoidal-interpolation-error]))
++      (is (false? (get-in r [:unmeasured :infeasible-gap]))))))
++
++;; ---- infeasible handling: refuse by default, skip only on request ----
++
++(deftest refuses-infeasible-by-default
++  (testing "a demand above the stack peak refuses with the offending indices"
++    (is (thrown-with-msg? Exception #"infeasible sample"
++          (prof/demand-profile case
++                               (assoc req :p-net-kw [80.0 1.0e6 80.0 80.0]))))))
++
++(deftest skip-mode-integrates-feasible-only
++  (testing ":on-infeasible :skip integrates only the feasible samples and reports the gap"
++    (let [r (prof/demand-profile case
++                                 (assoc req :p-net-kw [80.0 1.0e6 80.0 80.0]
++                                        :on-infeasible :skip))]
++      (is (= 3 (:samples r)))
++      (is (= 1 (:infeasible-count r)))
++      (is (= [1] (:infeasible-indices r)))
++      (is (true? (get-in r [:unmeasured :infeasible-gap]))))))
++
++(deftest all-infeasible-refuses-even-in-skip-mode
++  (is (thrown-with-msg? Exception #"no feasible samples"
++        (prof/demand-profile case
++                             (assoc req :p-net-kw [1.0e6 1.0e6]
++                                    :on-infeasible :skip)))))
++
++;; ---- refusals ----
++
++(deftest refuses-missing-or-blank-profile-source
++  (is (thrown? Exception (prof/demand-profile case (dissoc req :profile-source))))
++  (is (thrown? Exception (prof/demand-profile case (assoc req :profile-source "")))))
++
++(deftest refuses-bad-profile-shape
++  (is (thrown? Exception (prof/demand-profile case (assoc req :p-net-kw [80.0]))))
++  (is (thrown? Exception (prof/demand-profile case (assoc req :p-net-kw []))))
++  (is (thrown? Exception (prof/demand-profile case (assoc req :p-net-kw '(80.0 80.0)))))
++  (is (thrown? Exception (prof/demand-profile case (assoc req :dt-s 0.0))))
++  (is (thrown? Exception (prof/demand-profile case (assoc req :dt-s -1.0))))
++  (is (thrown? Exception (prof/demand-profile case (assoc req :dt-s ##NaN)))))
++
++(deftest refuses-non-physical-power-samples
++  (is (thrown? Exception (prof/demand-profile case (assoc req :p-net-kw [80.0 -1.0]))))
++  (is (thrown? Exception (prof/demand-profile case (assoc req :p-net-kw [80.0 ##Inf]))))
++  (is (thrown? Exception (prof/demand-profile case (assoc req :p-net-kw [80.0 ##NaN])))))
++
++(deftest refuses-bad-on-infeasible
++  (is (thrown? Exception (prof/demand-profile case (assoc req :on-infeasible :fabricate)))))
++
++(deftest delegates-provenance-refusal-to-system
++  (testing "fail closed downstream: BoP provenance is enforced by demand-point"
++    (is (thrown? Exception
++          (prof/demand-profile {:bop-frac 0.15}   ; no :bop-source
++                               req)))))
++
++(deftest h2-mass-consistent-with-lhv-energy
++  (testing "ṁ·LHV identity survives the integration for a constant profile"
++    (let [r  (prof/demand-profile case req)
++          p1 (sys/demand-point case 80.0)
++          ;; chemical energy of the integrated H2 at the stack's own efficiency
++          e-chem-kwh (/ (* (:h2-kg r) sys/h2-lhv-j-per-kg) 3.6e6)
++          e-net-kwh  (/ (:energy-kwh-net r) (:eta-sys p1))]
++      (is (< (Math/abs (- e-chem-kwh e-net-kwh)) (* 1.0e-9 e-chem-kwh))))))
+diff --git a/test/echem/solver_test.clj b/test/echem/solver_test.cljk
+similarity index 98%
+rename from test/echem/solver_test.clj
+rename to test/echem/solver_test.cljk
+index 5d45cbb..19f8ae2 100644
+--- a/test/echem/solver_test.clj
++++ b/test/echem/solver_test.cljk
+@@ -1,5 +1,5 @@
+ (ns echem.solver-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [echem.solver :as fc]
+             [cae.solver :as cae]))
+ 
+diff --git a/test/echem/stack_thermal_test.clj b/test/echem/stack_thermal_test.cljk
+similarity index 98%
+rename from test/echem/stack_thermal_test.clj
+rename to test/echem/stack_thermal_test.cljk
+index b64e001..6c42b23 100644
+--- a/test/echem/stack_thermal_test.clj
++++ b/test/echem/stack_thermal_test.cljk
+@@ -1,5 +1,5 @@
+ (ns echem.stack-thermal-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [echem.solver :as fc]
+             [echem.stack-thermal :as st]
+             [cae.solver :as cae]))
+diff --git a/test/echem/system_test.clj b/test/echem/system_test.cljk
+similarity index 99%
+rename from test/echem/system_test.clj
+rename to test/echem/system_test.cljk
+index f2ef1e7..a491fe9 100644
+--- a/test/echem/system_test.clj
++++ b/test/echem/system_test.cljk
+@@ -1,5 +1,5 @@
+ (ns echem.system-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [echem.solver :as fc]
+             [echem.system :as sys]
+             [cae.solver :as cae]))

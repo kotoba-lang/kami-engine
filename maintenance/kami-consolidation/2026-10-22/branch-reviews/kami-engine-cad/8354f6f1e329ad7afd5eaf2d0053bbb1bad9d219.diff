@@ -1,0 +1,69 @@
+diff --git a/.gitignore b/.gitignore
+index bd04223..05e79af 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,2 @@
+ .cpcache/
++.nbb/
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..e5346cd
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,7 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/kami/cad.cljk" ".cljc"
++  "test/kami/cad_test.cljk" ".cljc"}}
+diff --git a/deps.edn b/deps.edn
+index ce11eda..fc3f32c 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -1,5 +1,10 @@
+-{:paths ["src"]
++{:deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}
++ :paths ["src"]
+  :aliases {:test {:extra-paths ["test"]
+                   :extra-deps {io.github.cognitect-labs/test-runner
+-                               {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                               {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+                   :main-opts ["-m" "cognitect.test-runner"]}}}
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..af416ec
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,9 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src"]
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/kami/cad.cljc b/src/kami/cad.cljk
+similarity index 100%
+rename from src/kami/cad.cljc
+rename to src/kami/cad.cljk
+diff --git a/test/kami/cad_test.cljc b/test/kami/cad_test.cljk
+similarity index 99%
+rename from test/kami/cad_test.cljc
+rename to test/kami/cad_test.cljk
+index 8759163..c37e4a3 100644
+--- a/test/kami/cad_test.cljc
++++ b/test/kami/cad_test.cljk
+@@ -1,4 +1,4 @@
+-(ns kami.cad-test (:require [clojure.test :refer [deftest is testing]] [kami.cad :as cad]))
++(ns kami.cad-test (:require [kotoba.test :refer [deftest is testing]] [kami.cad :as cad]))
+ (defn close-point? [a b]
+   (every? true? (map #(< (#?(:clj Math/abs :cljs js/Math.abs) (- %1 %2)) 1.0e-10) a b)))
+ (defn near-point? [a b]

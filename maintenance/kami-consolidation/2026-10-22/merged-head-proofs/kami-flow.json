@@ -1,0 +1,107 @@
+{
+  "repository": "kotoba-lang/kami-flow",
+  "default": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+  "heads": {
+    "2511cb6e8191437ff1592233863b9564c562ef81": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-flow/pull/1",
+        "head": "2511cb6e8191437ff1592233863b9564c562ef81",
+        "merge": "b9488e1cc899c38570b5f44131b2ee719c506766",
+        "merge-base": "0fba8194f56c00e358fe4874e077535964a811ea",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "2a4604dab3af9a4b230e95310966e1cecbbd50b2"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-flow/pull/1",
+      "head": "2511cb6e8191437ff1592233863b9564c562ef81",
+      "merge": "b9488e1cc899c38570b5f44131b2ee719c506766",
+      "merge-base": "0fba8194f56c00e358fe4874e077535964a811ea",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2a4604dab3af9a4b230e95310966e1cecbbd50b2"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-flow/pull/2",
+      "head": "dd917b8185486cfbc92edf802edb5a2cae340a26",
+      "merge": "c06b05a5b4b69073f03032dd1f14c2d46a6f4aba",
+      "merge-base": "1902a27dd363200ad5f73a6384914427b448bbeb",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/flow/pump.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2afed4f7ac53c2c7f992489fe69eab0153ace90f"
+          }
+        },
+        {
+          "path": "test/flow/pump_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1886f6f8163802f179232652e2df9b1168b7664c"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-flow/pull/3",
+      "head": "a04405c311832bbbfbb1c01a125426d144f64448",
+      "merge": "0fba8194f56c00e358fe4874e077535964a811ea",
+      "merge-base": "c06b05a5b4b69073f03032dd1f14c2d46a6f4aba",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "21fff58a51155b781321dfa711a1f2d9d5fc5472"
+          }
+        },
+        {
+          "path": "src/flow/choked.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "326278b038111fb03a310702b472c01c40509388"
+          }
+        },
+        {
+          "path": "test/flow/choked_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "5aacb83eeacc00aa5775262be523fcf09075d872"
+          }
+        }
+      ]
+    }
+  ]
+}

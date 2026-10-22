@@ -1,0 +1,67 @@
+{
+  "repository": "kotoba-lang/kami-cam-scene",
+  "default": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "commit": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "commit": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "051293f96dd1a984a0f88b3809d0334cd88b4ab8",
+      "commit": "051293f96dd1a984a0f88b3809d0334cd88b4ab8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "f7b6f689849071f50bc8ac943c8187b981799382",
+      "commit": "f7b6f689849071f50bc8ac943c8187b981799382",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "commit": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "commit": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/cljk-rename-20260911",
+      "object": "8221741b6d9006d55094c4a75fd36dad5cec9a9a",
+      "commit": "8221741b6d9006d55094c4a75fd36dad5cec9a9a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "939393313358a9b2b8c7041a01295609a266616c",
+      "commit": "939393313358a9b2b8c7041a01295609a266616c",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/kbb-cutover-20260911",
+      "object": "dce9756db30d76a1a9feee733142ab0e4db45363",
+      "commit": "dce9756db30d76a1a9feee733142ab0e4db45363",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "commit": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

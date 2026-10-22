@@ -1,0 +1,175 @@
+{
+  "repository": "kotoba-lang/kami-engine-input-map",
+  "default": "9841302680163b7aafb760cd1d21de809d172084",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "9841302680163b7aafb760cd1d21de809d172084",
+      "commit": "9841302680163b7aafb760cd1d21de809d172084",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "9841302680163b7aafb760cd1d21de809d172084",
+      "commit": "9841302680163b7aafb760cd1d21de809d172084",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "b50b88dd4c99049b1cc0a6fdcdd64d7251ac9f80",
+      "commit": "b50b88dd4c99049b1cc0a6fdcdd64d7251ac9f80",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "9841302680163b7aafb760cd1d21de809d172084",
+      "commit": "9841302680163b7aafb760cd1d21de809d172084",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/rename-banner2",
+      "object": "e9a14c98965e584f82286ce8f48229ba6caf8560",
+      "commit": "e9a14c98965e584f82286ce8f48229ba6caf8560",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "9841302680163b7aafb760cd1d21de809d172084",
+      "commit": "9841302680163b7aafb760cd1d21de809d172084",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "538c11eaaa04cb318fe73582d67b5f26b857a58f",
+      "commit": "538c11eaaa04cb318fe73582d67b5f26b857a58f",
+      "decision": "cherry-picked-exact-patch-and-postimages",
+      "proof": {
+        "original": "538c11eaaa04cb318fe73582d67b5f26b857a58f",
+        "landed": "e9a14c98965e584f82286ce8f48229ba6caf8560",
+        "patch-id": "c15e7bfb5d4b91f432c0be74046ed52974775ee9",
+        "changed-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a521580d398bf7ecbee30e03781c26862de30add"
+            }
+          }
+        ],
+        "landed-is-ancestor-of-current-default": true
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "dd500b5b04a291459dc7b467ef3bb4aee59920f6",
+      "commit": "dd500b5b04a291459dc7b467ef3bb4aee59920f6",
+      "decision": "default-tree-identical"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "c41a79dd856b350dba4b1c9078a2fd85ffa14639",
+      "commit": "c41a79dd856b350dba4b1c9078a2fd85ffa14639",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/rename-banner2",
+      "object": "e9a14c98965e584f82286ce8f48229ba6caf8560",
+      "commit": "e9a14c98965e584f82286ce8f48229ba6caf8560",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "c41a79dd856b350dba4b1c9078a2fd85ffa14639",
+      "commit": "c41a79dd856b350dba4b1c9078a2fd85ffa14639",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "9841302680163b7aafb760cd1d21de809d172084",
+      "commit": "9841302680163b7aafb760cd1d21de809d172084",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/rename-banner",
+      "object": "538c11eaaa04cb318fe73582d67b5f26b857a58f",
+      "commit": "538c11eaaa04cb318fe73582d67b5f26b857a58f",
+      "decision": "cherry-picked-exact-patch-and-postimages",
+      "proof": {
+        "original": "538c11eaaa04cb318fe73582d67b5f26b857a58f",
+        "landed": "e9a14c98965e584f82286ce8f48229ba6caf8560",
+        "patch-id": "c15e7bfb5d4b91f432c0be74046ed52974775ee9",
+        "changed-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a521580d398bf7ecbee30e03781c26862de30add"
+            }
+          }
+        ],
+        "landed-is-ancestor-of-current-default": true
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/agent/rename-banner2",
+      "object": "e9a14c98965e584f82286ce8f48229ba6caf8560",
+      "commit": "e9a14c98965e584f82286ce8f48229ba6caf8560",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "614132259c0fd57b4882c37265ddeb476bab545e",
+      "commit": "614132259c0fd57b4882c37265ddeb476bab545e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/full-sha",
+      "object": "3d0b4d7f2713616194b6b07673d99a79a4028753",
+      "commit": "3d0b4d7f2713616194b6b07673d99a79a4028753",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "3699792be5e213d5490be57814eae961d48a5412",
+      "commit": "3699792be5e213d5490be57814eae961d48a5412",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "9841302680163b7aafb760cd1d21de809d172084",
+      "commit": "9841302680163b7aafb760cd1d21de809d172084",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-engine-input-map/pull/2",
+      "head": "dd500b5b04a291459dc7b467ef3bb4aee59920f6",
+      "merge": "9841302680163b7aafb760cd1d21de809d172084",
+      "merge-base": "c41a79dd856b350dba4b1c9078a2fd85ffa14639",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "363c8b31e228c749eab36a2f301a822c66b06db7"
+          }
+        },
+        {
+          "path": "src/input_map.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a6e073f745c263cbd6154624669c11cf3f792acd"
+          }
+        }
+      ]
+    }
+  ]
+}

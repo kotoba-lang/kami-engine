@@ -1,0 +1,379 @@
+{
+  "schema": "kotoba.kami.manual-branch-reviews.v1",
+  "reviews": [
+    {
+      "repository": "kotoba-lang/kami-app",
+      "head": "0aa838f6f269c1043fe67e32baec23ba659ed89a",
+      "reviewed-default": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "merge-base": "8fc9cc60b72f45c38912660e2c886590c9ff5a6e",
+      "all-original-history-and-refs-retained": true,
+      "decision": "superseded-empty-scaffold-retirement",
+      "reason": "The branch repairs CI/test aliases and a namespace-load test for an ns-only scaffold. The reviewed default explicitly retired that scaffold, leaving no behavior to port; do not resurrect the empty namespace or disabled CI.",
+      "evidence": {
+        "empty-namespace-tree-entry": "100644 blob e9a4d76a357bd4011d18a122d8320f1aa4e69ba2\tsrc/kami_app.cljc",
+        "retirement-ADR-tree-entry": "100644 blob d044c2ad763f9058301d619b0e69d77594af5671\tdocs/adr/0001-retire-empty-cljc-scaffold.md",
+        "default-files": [
+          ".github/workflows/ci.yml",
+          ".gitignore",
+          "LICENSE",
+          "README.md",
+          "docs/adr/0001-retire-empty-cljc-scaffold.md"
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-cfd",
+      "head": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479",
+      "reviewed-default": "45bdf336d5cf5c92a075cc27a4da0b1e035d2a2f",
+      "merge-base": "2958ba88f2b30a616c3191454a25af4e9c3960b9",
+      "all-original-history-and-refs-retained": true,
+      "decision": "superseded-by-portable-default-and-Rust-retirement",
+      "reason": "The rescue deletes the retired Rust prototype and adds migration notes; all deleted Rust/Cargo paths are absent from the portable reviewed default. Preserve its historical calibration/migration notes without restoring a second native implementation.",
+      "evidence": {
+        "deleted-paths-still-absent": [
+          "Cargo.lock",
+          "Cargo.toml",
+          "src/d3.rs",
+          "src/lib.rs",
+          "src/main.rs",
+          "src/mesh.rs",
+          "tests/drag.rs",
+          "tests/drag3d.rs",
+          "tests/mesh.rs"
+        ],
+        "current-README-tree-entry": "100644 blob 0b564e864fea27d69a2044c2bc8614fe198ef4b1\tREADME.md",
+        "current-source-paths": [
+          "src/kami_cfd.cljk",
+          "src/kami_cfd/d3.cljk",
+          "src/kami_cfd/duct.cljk",
+          "src/kami_cfd/mesh.cljk",
+          "src/kami_cfd/runner.cljk",
+          "src/kami_engine/cfd/contract.cljk"
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-core",
+      "head": "e25c4fd9ce60c26aab6f0d20a9b988073df71660",
+      "reviewed-default": "dcefa5a4d54164060c9eb8f95e656c4026f702d6",
+      "merge-base": "18c7124a0afa2e370d79f820717df5433a7fa37e",
+      "all-original-history-and-refs-retained": true,
+      "decision": "superseded-empty-scaffold-retirement",
+      "reason": "The branch repairs CI/test aliases and a namespace-load test for an ns-only scaffold. The reviewed default explicitly retired that scaffold, leaving no behavior to port; do not resurrect the empty namespace or disabled CI.",
+      "evidence": {
+        "empty-namespace-tree-entry": "100644 blob 1b1f9f1b40578c64f22ef6d9d469a7f2cc7e42e0\tsrc/kami_engine_core.cljc",
+        "retirement-ADR-tree-entry": "100644 blob b32e8388f6e4c9535ae444ce9ff57dcdb8b6b42a\tdocs/adr/0001-retire-empty-cljc-scaffold.md",
+        "default-files": [
+          ".github/workflows/ci.yml",
+          ".gitignore",
+          "LICENSE",
+          "README.md",
+          "docs/adr/0001-retire-empty-cljc-scaffold.md"
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-engine",
+      "head": "74c095144192d76925928487abbb908e4466e1f4",
+      "reviewed-default": "66fd75a89db81abfe430dab00bd38a5bb2dc94ca",
+      "merge-base": "4ae5a2c368a546a9faef063d3d977fa191d99819",
+      "all-original-history-and-refs-retained": true,
+      "decision": "superseded-empty-scaffold-retirement",
+      "reason": "The branch repairs CI/test aliases and a namespace-load test for an ns-only scaffold. The reviewed default explicitly retired that scaffold, leaving no behavior to port; do not resurrect the empty namespace or disabled CI.",
+      "evidence": {
+        "empty-namespace-tree-entry": "100644 blob ced3fa29e9d1542fceda4d68fa42d819a9dc9020\tsrc/kami_engine_engine.cljc",
+        "retirement-ADR-tree-entry": "100644 blob 240e8addfe7550b3ccefc4d20e0c2139de423455\tdocs/adr/0001-retire-empty-cljc-scaffold.md",
+        "default-files": [
+          ".github/workflows/ci.yml",
+          ".gitignore",
+          "LICENSE",
+          "README.md",
+          "docs/adr/0001-retire-empty-cljc-scaffold.md"
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-hud-gpu",
+      "head": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "reviewed-default": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "merge-base": "0ba9ad87cd3526cda9f563da2b05c373fab3ca56",
+      "all-original-history-and-refs-retained": true,
+      "decision": "superseded-by-current-test-host-configuration",
+      "reason": "The active portable default already contains the namespace-registry smoke fix and declared test-runner alias. The old CI/lint setup does not supply missing production behavior.",
+      "evidence": {
+        "test-tree-entry": "100644 blob 00286c29104dbca77113f0a91c067d8c4e21fdcb\ttest/ui_gpu_test.cljk",
+        "deps-tree-entry": "100644 blob 1191bea2183e2398c555f01b2a4a670e49a18c53\tdeps.edn",
+        "existing-smoke-form": "(is (some? (find-ns 'ui_gpu)))"
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-io",
+      "head": "df5c49385878d9d6f80de9b9b9e8b48ce5513d09",
+      "reviewed-default": "87868b4dd440b78df06d48a6f804c57bff0ab894",
+      "merge-base": "b94935f9cfb636c38cdda6cda88899495931b045",
+      "all-original-history-and-refs-retained": true,
+      "decision": "superseded-empty-scaffold-retirement",
+      "reason": "The branch repairs CI/test aliases and a namespace-load test for an ns-only scaffold. The reviewed default explicitly retired that scaffold, leaving no behavior to port; do not resurrect the empty namespace or disabled CI.",
+      "evidence": {
+        "empty-namespace-tree-entry": "100644 blob e9f1e0f9f754b3ef0a587ddedcdcc2eeb2bdb41c\tsrc/kami_engine_io.cljc",
+        "retirement-ADR-tree-entry": "100644 blob 7a0dc233ce975b74d42e361b9b173f4f4a61f522\tdocs/adr/0001-retire-empty-cljc-scaffold.md",
+        "default-files": [
+          ".github/workflows/ci.yml",
+          ".gitignore",
+          "LICENSE",
+          "README.md",
+          "docs/adr/0001-retire-empty-cljc-scaffold.md"
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-render",
+      "head": "ccef6ce9edbf3a85073d3b61d5ac547ed1eddf0c",
+      "reviewed-default": "87f0fd666dff16529f9ef30c25de019f4ab43999",
+      "merge-base": "44f4831efc0a5fb72dde400f6a867cab8ae71dc7",
+      "all-original-history-and-refs-retained": true,
+      "decision": "superseded-empty-scaffold-retirement",
+      "reason": "The branch repairs CI/test aliases and a namespace-load test for an ns-only scaffold. The reviewed default explicitly retired that scaffold, leaving no behavior to port; do not resurrect the empty namespace or disabled CI.",
+      "evidence": {
+        "empty-namespace-tree-entry": "100644 blob a441d490dc18853ac84e27f891dde5e37889c559\tsrc/kami_engine_render.cljc",
+        "retirement-ADR-tree-entry": "100644 blob b32fcdf4d8a95f5693d158b40b253463c0be1f98\tdocs/adr/0001-retire-empty-cljc-scaffold.md",
+        "default-files": [
+          ".github/workflows/ci.yml",
+          ".gitignore",
+          "LICENSE",
+          "README.md",
+          "docs/adr/0001-retire-empty-cljc-scaffold.md"
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-script-runtime",
+      "head": "87ea40504d2f01782299d657d069b44fa6b7c796",
+      "reviewed-default": "55aefca081d29153c354f22cc53526b57d151b02",
+      "merge-base": "5d88ec6b5f4cc52f7577ac3c4846aa6e4166b8f1",
+      "all-original-history-and-refs-retained": true,
+      "decision": "superseded-empty-scaffold-retirement",
+      "reason": "The branch repairs CI/test aliases and a namespace-load test for an ns-only scaffold. The reviewed default explicitly retired that scaffold, leaving no behavior to port; do not resurrect the empty namespace or disabled CI.",
+      "evidence": {
+        "empty-namespace-tree-entry": "100644 blob bf3787019c4295563677343a27b48797839890d5\tsrc/kami_engine_script_runtime.cljc",
+        "retirement-ADR-tree-entry": "100644 blob 47210cf7e0a0de057bb8c60e25b99861bdf122e7\tdocs/adr/0001-retire-empty-cljc-scaffold.md",
+        "default-files": [
+          ".github/workflows/ci.yml",
+          ".gitignore",
+          "LICENSE",
+          "README.md",
+          "docs/adr/0001-retire-empty-cljc-scaffold.md"
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-sdk",
+      "head": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "reviewed-default": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "merge-base": "f2a2c7c5a1c122f05b72b8644a3961230a05b5d4",
+      "all-original-history-and-refs-retained": true,
+      "decision": "functional-postimages-landed-documentation-superseded",
+      "reason": "Every changed implementation/test/sample postimage is bound to the same path and an ancestor of the reviewed default. SDK branch README notes are retained in history; its current README already documents benchmark and M5 authoring APIs. No proposed runtime behavior is omitted.",
+      "evidence": {
+        "repository": "kotoba-lang/kami-engine-sdk",
+        "head": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+        "reviewed-default": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+        "postimages": [
+          {
+            "path": "resources/kami/samples/isekai-swarm.edn",
+            "head-tree-entry": "100644 blob ba5096c85427818df06fd0299e2de0588f287f51\tresources/kami/samples/isekai-swarm.edn",
+            "landed-commit": "67f87b90ff062767b08f4eed967850186e0cd669"
+          },
+          {
+            "path": "src/kami/benchmark.cljc",
+            "head-tree-entry": "100644 blob 6c592e7ed0b10eec665428a0da11e4a4fad8e5ef\tsrc/kami/benchmark.cljc",
+            "landed-commit": "67f87b90ff062767b08f4eed967850186e0cd669"
+          },
+          {
+            "path": "test/kami/benchmark_test.cljc",
+            "head-tree-entry": "100644 blob 43c6d2fdcc5fff03b48786e09d6f7798d998da59\ttest/kami/benchmark_test.cljc",
+            "landed-commit": "67f87b90ff062767b08f4eed967850186e0cd669"
+          }
+        ],
+        "unmatched": [
+          {
+            "path": "README.md",
+            "tree-entry": "100644 blob dd08ada9a132612be33a0bc5d9ee28344cb38b3d\tREADME.md"
+          }
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-sdk",
+      "head": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "reviewed-default": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "merge-base": "9c52ee77364fb043c503b12c5b34fb022b4494c2",
+      "all-original-history-and-refs-retained": true,
+      "decision": "functional-postimages-landed-documentation-superseded",
+      "reason": "Every changed implementation/test/sample postimage is bound to the same path and an ancestor of the reviewed default. SDK branch README notes are retained in history; its current README already documents benchmark and M5 authoring APIs. No proposed runtime behavior is omitted.",
+      "evidence": {
+        "repository": "kotoba-lang/kami-engine-sdk",
+        "head": "f94a8fce4008dc3466370841e8a409ac738d308d",
+        "reviewed-default": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+        "postimages": [
+          {
+            "path": "resources/kami/samples/chronicle-city-sim-lod.edn",
+            "head-tree-entry": "100644 blob 7ecd6e4d4aa6ed4040c81c389412f2b0fa5b3035\tresources/kami/samples/chronicle-city-sim-lod.edn",
+            "landed-commit": "0ea58a1ae39b33a5edb179d71e918a9e969fd430"
+          },
+          {
+            "path": "resources/kami/samples/iron-front-sim-lod.edn",
+            "head-tree-entry": "100644 blob 476893a15e5f003e8bd111fecab1a97edba02f54\tresources/kami/samples/iron-front-sim-lod.edn",
+            "landed-commit": "0ea58a1ae39b33a5edb179d71e918a9e969fd430"
+          },
+          {
+            "path": "resources/kami/samples/isekai-dominion-sim-lod.edn",
+            "head-tree-entry": "100644 blob 48d42468afb799552dff3de7e44d15c6ac928c44\tresources/kami/samples/isekai-dominion-sim-lod.edn",
+            "landed-commit": "0ea58a1ae39b33a5edb179d71e918a9e969fd430"
+          },
+          {
+            "path": "resources/kami/samples/isekai-swarm.edn",
+            "head-tree-entry": "100644 blob ba5096c85427818df06fd0299e2de0588f287f51\tresources/kami/samples/isekai-swarm.edn",
+            "landed-commit": "67f87b90ff062767b08f4eed967850186e0cd669"
+          },
+          {
+            "path": "src/kami/benchmark.cljc",
+            "head-tree-entry": "100644 blob 6c592e7ed0b10eec665428a0da11e4a4fad8e5ef\tsrc/kami/benchmark.cljc",
+            "landed-commit": "67f87b90ff062767b08f4eed967850186e0cd669"
+          },
+          {
+            "path": "src/kami/sim_lod.cljc",
+            "head-tree-entry": "100644 blob 24dd9645709c102b7504e4780bd3880b78912c4b\tsrc/kami/sim_lod.cljc",
+            "landed-commit": "8033c426b5274fdea0691faf7ffe8bb22b3a24af"
+          },
+          {
+            "path": "test/kami/benchmark_test.cljc",
+            "head-tree-entry": "100644 blob 43c6d2fdcc5fff03b48786e09d6f7798d998da59\ttest/kami/benchmark_test.cljc",
+            "landed-commit": "67f87b90ff062767b08f4eed967850186e0cd669"
+          },
+          {
+            "path": "test/kami/sim_lod_test.cljc",
+            "head-tree-entry": "100644 blob 009ff7a3da8868ed245cbf072eaa0d4a302b51e6\ttest/kami/sim_lod_test.cljc",
+            "landed-commit": "8033c426b5274fdea0691faf7ffe8bb22b3a24af"
+          }
+        ],
+        "unmatched": [
+          {
+            "path": "README.md",
+            "tree-entry": "100644 blob 16dcbc5f578e1dd7364832fb94156d34f13039dc\tREADME.md"
+          }
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-sdk",
+      "head": "3ac8bdb33deb62943409fef413e4192299ee6267",
+      "reviewed-default": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "merge-base": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+      "all-original-history-and-refs-retained": true,
+      "decision": "functional-postimages-landed-documentation-superseded",
+      "reason": "Every changed implementation/test/sample postimage is bound to the same path and an ancestor of the reviewed default. SDK branch README notes are retained in history; its current README already documents benchmark and M5 authoring APIs. No proposed runtime behavior is omitted.",
+      "evidence": {
+        "repository": "kotoba-lang/kami-engine-sdk",
+        "head": "3ac8bdb33deb62943409fef413e4192299ee6267",
+        "reviewed-default": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+        "postimages": [
+          {
+            "path": "src/kami/sample_manifest.cljc",
+            "head-tree-entry": "100644 blob c5abc915b5255b2cb1d26178033f2b5cbf79243a\tsrc/kami/sample_manifest.cljc",
+            "landed-commit": "b5e93ff43e0ee9c20373eb56b54984eac862a9e2"
+          },
+          {
+            "path": "test/kami/sample_manifest_test.cljc",
+            "head-tree-entry": "100644 blob 6fe853240322cbd37133013a83267afcd3a9f98e\ttest/kami/sample_manifest_test.cljc",
+            "landed-commit": "8033c426b5274fdea0691faf7ffe8bb22b3a24af"
+          }
+        ],
+        "unmatched": [
+          {
+            "path": "README.md",
+            "tree-entry": "100644 blob 415869a8e2a37593a2468cfd3281c2b2196a11b1\tREADME.md"
+          }
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-vehicle-designer",
+      "head": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "reviewed-default": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "merge-base": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "all-original-history-and-refs-retained": true,
+      "decision": "documentation-renames-present-in-current-default",
+      "reason": "This branch changes only links and renamed component labels. The reviewed default already names the current langgraph/Isaac/FEA owners; retain its newer docs rather than reintroducing the historical README.",
+      "evidence": {
+        "current-README-tree-entry": "100644 blob 5d33aa1d728fd2112985f925688ab61c941de2ce\tREADME.md",
+        "reviewed-paths": [
+          "README.md"
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-web",
+      "head": "e73534c7c88ceeb8fa01d5daf6ec3b6bf22f4379",
+      "reviewed-default": "1bc9526d3c1aad1222744c32e39e499b2850c49a",
+      "merge-base": "b20f9021e170bef768bbda4b2fe490835ff59a6b",
+      "all-original-history-and-refs-retained": true,
+      "decision": "superseded-empty-scaffold-retirement",
+      "reason": "The branch repairs CI/test aliases and a namespace-load test for an ns-only scaffold. The reviewed default explicitly retired that scaffold, leaving no behavior to port; do not resurrect the empty namespace or disabled CI.",
+      "evidence": {
+        "empty-namespace-tree-entry": "100644 blob f5582bfe4c1c5287dfcbfab2d1ec937726ca4837\tsrc/kami_engine_web.cljc",
+        "retirement-ADR-tree-entry": "100644 blob 5149eab63b3381c8e4dc4b84767160f6ea13c9f5\tdocs/adr/0001-retire-empty-cljc-scaffold.md",
+        "default-files": [
+          ".github/workflows/ci.yml",
+          ".gitignore",
+          "LICENSE",
+          "README.md",
+          "docs/adr/0001-retire-empty-cljc-scaffold.md"
+        ]
+      }
+    },
+    {
+      "repository": "kotoba-lang/kami-nv-compat",
+      "head": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "reviewed-default": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "merge-base": "d61569ee9de69ef328cdf567a6e4caffd515c8b1",
+      "all-original-history-and-refs-retained": true,
+      "decision": "exact-postimages-landed-in-default-history",
+      "reason": "Every changed implementation/test/sample postimage is bound to the same path and an ancestor of the reviewed default. SDK branch README notes are retained in history; its current README already documents benchmark and M5 authoring APIs. No proposed runtime behavior is omitted.",
+      "evidence": {
+        "repository": "kotoba-lang/kami-nv-compat",
+        "head": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+        "reviewed-default": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+        "postimages": [
+          {
+            "path": "src/kotoba/lang/kami_nv_compat/warp/warp.clj",
+            "head-tree-entry": "100644 blob d0ddf2bbeacf2abd24ed721c3acaa18425eec7bf\tsrc/kotoba/lang/kami_nv_compat/warp/warp.clj",
+            "landed-commit": "c081f3958b82214c8a2c4cb92c6cf1cf9930759d"
+          },
+          {
+            "path": "test/kotoba/lang/kami_nv_compat/warp/warp_test.clj",
+            "head-tree-entry": "100644 blob 450d4ee29a5a3e0ca15be6a1a95ce408237076b7\ttest/kotoba/lang/kami_nv_compat/warp/warp_test.clj",
+            "landed-commit": "c081f3958b82214c8a2c4cb92c6cf1cf9930759d"
+          }
+        ],
+        "unmatched": []
+      }
+    }
+  ],
+  "remaining-functional-proposals": [
+    {
+      "repository": "kotoba-lang/kami-engine-echem",
+      "default": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f",
+      "head": "f9b8c1a4e9a7d0b21f76d83b05b8c6f8abd06e3b",
+      "base": "8dc5685b401800e3b4a92a59357cf5dc6ae8336f",
+      "diffstat": " src/echem/solver.cljc            | 29 +++++++++++++++++++++++++++\n test/echem/run_at_power_test.clj | 42 ++++++++++++++++++++++++++++++++++++++++\n 2 files changed, 71 insertions(+)\n"
+    },
+    {
+      "repository": "kotoba-lang/kami-engine-vehicle-designer",
+      "default": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "head": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "base": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "diffstat": " src/vdesign/dc_bus.cljk       | 92 +++++++++++++++++++++++++++++++++++++------\n test/vdesign/dc_bus_test.cljk | 91 +++++++++++++++++++++++++++++++++++++++++-\n 2 files changed, 171 insertions(+), 12 deletions(-)\n"
+    }
+  ]
+}

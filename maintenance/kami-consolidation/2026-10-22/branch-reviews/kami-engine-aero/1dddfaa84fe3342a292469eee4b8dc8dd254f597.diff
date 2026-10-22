@@ -1,0 +1,691 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index a407693..59f4431 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -43,3 +43,5 @@ jobs:
+ 
+       - name: Run tests
+         run: clojure -M:test
++      - name: Lint
++        run: clojure -M:lint
+diff --git a/.gitignore b/.gitignore
+index d2400ff..fbbf973 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,4 @@
+ .cpcache/
+ .clj-kondo/.cache/
+ .lsp/
++.nbb/
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..57bc88a
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,202 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
+diff --git a/README.md b/README.md
+index 3610e95..7814aef 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,6 @@
+-# aero-clj
++# kami-engine-aero
+ 
+-[![CI](https://github.com/kotoba-lang/aero/actions/workflows/ci.yml/badge.svg)](https://github.com/kotoba-lang/aero/actions/workflows/ci.yml)
++[![CI](https://github.com/kotoba-lang/kami-engine-aero/actions/workflows/ci.yml/badge.svg)](https://github.com/kotoba-lang/kami-engine-aero/actions/workflows/ci.yml)
+ 
+ Reduced-order **aerodynamic drag (Cd) solver** for clean-sheet vehicles, in
+ portable Clojure (`.cljc`). It replaces the *fixed Cd prior* the
+@@ -33,8 +33,9 @@ exactly like `vehicle-design-actor`'s `powertrain/tech`.
+ ## Run
+ 
+ ```bash
+-clojure -M:run     # Cd for the same sedan as BEV vs FCEV + the range loop
+-clojure -M:test    # the aero contract (band, monotonicity, BEV<FCEV, datoms)
++kbb -M:run     # Cd for the same sedan as BEV vs FCEV + the range loop
++kbb -M:test    # the aero contract (band, monotonicity, BEV<FCEV, datoms)
++kbb -M:lint
+ ```
+ 
+ Demo result (sedan, 120 km/h cruise, prior Cd 0.24):
+@@ -62,18 +63,24 @@ loop without a hard cross-repo dependency. Result is datafied:
+ 
+ | File | Role |
+ |---|---|
+-| `src/aero/model.cljc` | edn-tunable build-up coefficients (the single table) |
+-| `src/aero/solver.cljc` | the `:rom-buildup` Cd solver (a `kami-cfd` LBM backend would share this contract) |
+-| `src/aero/case.cljc` | EDN case + class/powertrain → shape-descriptor priors |
+-| `src/aero/bridge.cljc` | Cd → road-load → range effect, datafied |
++| `src/aero/model.cljk` | edn-tunable build-up coefficients (the single table) |
++| `src/aero/solver.cljk` | the `:rom-buildup` Cd solver (a `kami-cfd` LBM backend would share this contract) |
++| `src/aero/case.cljk` | EDN case + class/powertrain → shape-descriptor priors |
++| `src/aero/bridge.cljk` | Cd → road-load → range effect, datafied |
++| `src/aero/native.cljk` | native backend descriptors (`kami-cfd` as adapter data, not authority) |
++| `src/aero/lbm.cljk` | `:lbm` backend — shells out to the `kami-cfd` (Rust LBM) binary, calibrated to the rom-buildup reference |
+ | `src/aero/datom.cljc` | kotoba Datom-log (EAVT) emission |
+ | `src/aero/cli.cljc` | demo |
+-| `test/aero/aero_test.clj` | the aero contract, executable |
++| `test/aero/aero_test.cljk` | the aero contract (band, monotonicity, BEV<FCEV, datoms) |
++| `test/aero/model_test.cljk` | `aero.model`'s coefficient-table invariants |
++| `test/aero/lbm_test.cljk` | `aero.lbm`'s shape mapping, calibration constants, and contract registration (no external binary invoked) |
++| `test/aero/native_test.cljk` | native backend/result contract |
+ 
+ ## Status
+ 
+ Working reduced-order reference. The `:rom-buildup` solver is engineering-useful
+ at concept stage; a validated `kami-cfd` (lattice-Boltzmann) backend implementing
+-the same `solve` contract is the next fidelity step. Constants in
++the same `solve` contract is the next fidelity step (registered on the shared
++contract via `aero.lbm`, calibrated but not yet the default). Constants in
+ `aero.model/default` are the single place to re-fit against CFD/wind-tunnel data.
+ See `docs/adr/0001-architecture.md`.
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..aa261bb
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,16 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/aero/bridge.cljk" ".cljc"
++  "src/aero/case.cljk" ".cljc"
++  "src/aero/cli.cljk" ".clj"
++  "src/aero/lbm.cljk" ".clj"
++  "src/aero/model.cljk" ".cljc"
++  "src/aero/native.cljk" ".cljc"
++  "src/aero/solver.cljk" ".cljc"
++  "test/aero/aero_test.cljk" ".clj"
++  "test/aero/lbm_test.cljk" ".clj"
++  "test/aero/model_test.cljk" ".clj"
++  "test/aero/native_test.cljk" ".clj"}}
+diff --git a/deps.edn b/deps.edn
+index f9aebc4..d86240f 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -4,17 +4,39 @@
+  ;;   vphysics   — road-load / aero force / range math
+  ;;   cae-solver — the solve dispatch contract (:rom-buildup ↔ :lbm)
+  ;; A future kami-cfd (Rust LBM) registers :lbm on the same contract.
+- :deps {io.github.kotoba-lang/datom      {:git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
+-        io.github.kotoba-lang/vphysics   {:git/sha "32c2329ed6bd1074b2d0d3dab17f3440477cbbc3"}
+-        io.github.kotoba-lang/cae-solver {:git/sha "53e27f18ddcf10615a8a17adbb78018b1ab64a17"}}
++ :deps {
++        ;; kotoba.io replaced clojure.java.io / java.io.File here (2026-09-24).
++        ;; An explicit floor: the java.io.File method functions (exists?, file?,
++        ;; parent-file, canonical-path, mkdirs, list-files ...) are in kotoba.io
++        ;; from this sha, and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "1b60ca825c1e705bd195f857ca4549133653a9f3"}
++        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
++        ;; only from nbb.edn, so every project file this repo has names it.
++        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
++       ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       io.github.kotoba-lang/datom                {:git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
++        io.github.kotoba-lang/kami-engine-vphysics   {:git/sha "32c2329ed6bd1074b2d0d3dab17f3440477cbbc3"}
++        io.github.kotoba-lang/kami-engine-cae-solver {:git/sha "53e27f18ddcf10615a8a17adbb78018b1ab64a17"}}
+  :aliases
+  {:run  {:main-opts ["-m" "aero.cli"]}
+   :test {:extra-paths ["test"]
+          :extra-deps {io.github.cognitect-labs/test-runner
+-                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+          :main-opts ["-m" "cognitect.test-runner"]
+          :exec-fn cognitect.test-runner.api/test}
+   ;; local sibling checkouts for workspace development (CI uses the git-sha deps above)
+-  :dev {:override-deps {io.github.kotoba-lang/datom      {:local/root "../datom"}
+-                        io.github.kotoba-lang/vphysics   {:local/root "../vphysics"}
+-                        io.github.kotoba-lang/cae-solver {:local/root "../cae-solver"}}}}}
++  :dev {:override-deps {io.github.kotoba-lang/datom                {:local/root "../datom"}
++                        io.github.kotoba-lang/kami-engine-vphysics   {:local/root "../kami-engine-vphysics"}
++                        io.github.kotoba-lang/kami-engine-cae-solver {:local/root "../kami-engine-cae-solver"}}}
++  ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
++  :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
++         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test"
++                     "--fail-level" "error"]}}}
+diff --git a/docs/adr/0001-architecture.md b/docs/adr/0001-architecture.md
+index 9d9d678..d9fe4d9 100644
+--- a/docs/adr/0001-architecture.md
++++ b/docs/adr/0001-architecture.md
+@@ -34,7 +34,7 @@ kami-genesis と同じ clean-room パターンで、**reduced-order ソルバを
+ 
+ - 同一セダンで BEV Cd 0.248 / FCEV 0.267 を計算（afterbody が支配）。FCEV は床下粗さ
+   ＋冷却開口で +19 カウント → 航続 −4.3%。BEV 0.248 は設計 prior 0.24 を 3% 以内で**検証**。
+-- 検証は `test/aero/aero_test.clj`（7 tests / 11 assertions, green）: 現実 Cd 帯・各レバー
++- 検証は `test/aero/aero_test.cljk`（7 tests / 11 assertions, green）: 現実 Cd 帯・各レバー
+   単調性・BEV<FCEV・afterbody 支配・決定論・datom 化・ループ方向。
+ - 依存ゼロの純 clj（JVM/SCI/CLJS/GraalVM 可搬）。係数 re-fit と kami-cfd 配線が次段。
+ 
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..4c08271
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,18 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src"]
++ :deps {
++        ;; kotoba.io replaced clojure.java.io / java.io.File here (2026-09-24).
++        ;; An explicit floor: the java.io.File method functions (exists?, file?,
++        ;; parent-file, canonical-path, mkdirs, list-files ...) are in kotoba.io
++        ;; from this sha, and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "1b60ca825c1e705bd195f857ca4549133653a9f3"}
++        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
++        ;; only from nbb.edn, so every project file this repo has names it.
++        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
++       ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/aero/bridge.cljc b/src/aero/bridge.cljk
+similarity index 100%
+rename from src/aero/bridge.cljc
+rename to src/aero/bridge.cljk
+diff --git a/src/aero/case.cljc b/src/aero/case.cljk
+similarity index 98%
+rename from src/aero/case.cljc
+rename to src/aero/case.cljk
+index 7e37f5b..0b96241 100644
+--- a/src/aero/case.cljc
++++ b/src/aero/case.cljk
+@@ -6,7 +6,7 @@
+   fixed prior. The BEV/FCEV split is real: a BEV's flat battery floor and small
+   cooling area give a smoother, lower-drag underbody than an FCEV/ICE that must
+   feed a radiator and route exhaust/tanks."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ ;; Body geometry per class (frontal area A, ref length L, and an aero shape
+ ;; template). Shape descriptors ∈ [0,1]; higher = more drag-favourable EXCEPT
+diff --git a/src/aero/cli.cljc b/src/aero/cli.cljk
+similarity index 98%
+rename from src/aero/cli.cljc
+rename to src/aero/cli.cljk
+index 3bd641b..f07bf1e 100644
+--- a/src/aero/cli.cljc
++++ b/src/aero/cli.cljk
+@@ -3,7 +3,7 @@
+   build-up, show the component decomposition, and feed each Cd back into the
+   range loop against vehicle-design-actor's fixed prior (Cd 0.24).
+ 
+-  Run: clojure -M:run"
++  Run: kbb -M:run"
+   (:require [aero.case :as case]
+             [aero.solver :as solver]
+             [aero.bridge :as bridge]))
+diff --git a/src/aero/lbm.clj b/src/aero/lbm.cljk
+similarity index 95%
+rename from src/aero/lbm.clj
+rename to src/aero/lbm.cljk
+index 34a5e5d..b842688 100644
+--- a/src/aero/lbm.clj
++++ b/src/aero/lbm.cljk
+@@ -11,10 +11,10 @@
+   constant to map it to a vehicle-scale Cd (full 3D Cd needs the D3Q19
+   extension — calibration is the honest interim bridge)."
+   (:require [cae.solver :as cae]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.shell :as sh]
+-            [clojure.java.io :as io]
+-            [clojure.string :as str]))
++            [kotoba.io :as io]
++            [kotoba.lang.text :as str]))
+ 
+ ;; kami-cfd returns drag inflated by the coarse domain (2D sectional, or 3D
+ ;; frontal-area-normalised but high-blockage). These constants anchor each mode
+@@ -33,7 +33,7 @@
+       (->> ["../kami-cfd/target/aarch64-apple-darwin/release/kami-cfd"
+             "../kami-cfd/target/release/kami-cfd"
+             "kami-cfd"]
+-           (filter #(or (= % "kami-cfd") (.exists (io/file %))))
++           (filter #(or (= % "kami-cfd") (io/exists? (io/file %))))
+            first)))
+ 
+ (defn- shape-of
+diff --git a/src/aero/model.cljc b/src/aero/model.cljk
+similarity index 97%
+rename from src/aero/model.cljc
+rename to src/aero/model.cljk
+index 9e7be2f..76735fb 100644
+--- a/src/aero/model.cljc
++++ b/src/aero/model.cljk
+@@ -10,7 +10,7 @@
+   Retune here as the body family or the reference data changes; a future
+   high-fidelity `kami-cfd` (lattice-Boltzmann) backend plugs in behind the
+   same case/datom interface and can re-fit these coefficients."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (def ^:const rho-air 1.225)   ; kg/m^3
+ (def ^:const mu-air  1.81e-5) ; Pa·s
+diff --git a/src/aero/native.cljk b/src/aero/native.cljk
+new file mode 100644
+index 0000000..35d2423
+--- /dev/null
++++ b/src/aero/native.cljk
+@@ -0,0 +1,67 @@
++(ns aero.native
++  "Native backend descriptors for aero solvers.
++
++  The Rust `kami-engine-cfd` crate is a backend implementation, not the source
++  of truth for the aero contract. This namespace keeps the backend boundary as
++  CLJC data so hosts can choose a native executable/adapter without changing the
++  case or result shape used by `aero.solver`."
++  (:require [kotoba.lang.text :as str]))
++
++(def kami-cfd-backend
++  {:backend/id :kami-cfd/lbm
++   :backend/name "kami-cfd lattice-Boltzmann"
++   :backend/class :native
++   :backend/repo "kotoba-lang/kami-engine-cfd"
++   :backend/solver :lbm
++   :backend/input-contract :aero/case
++   :backend/output-contract :aero/result
++   :backend/host-capabilities #{:native/process :fs/read :fs/write}
++   :backend/status :adapter-required})
++
++(def backends
++  {:rom-buildup {:backend/id :aero/rom-buildup
++                 :backend/name "aero component build-up"
++                 :backend/class :cljc
++                 :backend/solver :rom-buildup
++                 :backend/input-contract :aero/case
++                 :backend/output-contract :aero/result
++                 :backend/host-capabilities #{}
++                 :backend/status :available}
++   :lbm kami-cfd-backend})
++
++(def required-result-keys
++  #{:Cd :CdA :Re :breakdown :fluid :solver})
++
++(defn backend [solver]
++  (get backends solver))
++
++(defn native-backend? [descriptor]
++  (= :native (:backend/class descriptor)))
++
++(defn validate-result
++  "Validate the shared aero result envelope that both CLJC and native backends
++  must return. Returns {:ok? boolean :missing #{...} :solver keyword}."
++  [result]
++  (let [ks (set (keys result))
++        missing (set (remove ks required-result-keys))]
++    {:ok? (empty? missing)
++     :missing missing
++     :solver (:solver result)}))
++
++(defn host-command
++  "Produce a host-adapter command descriptor for a native backend. This is data,
++  not execution; a CLI/process host can interpret it."
++  [{:backend/keys [id solver repo]} case-path result-path]
++  {:command/kind :native-process
++   :command/backend id
++   :command/repo repo
++   :command/argv ["kami-cfd" "solve" "--solver" (name solver)
++                  "--case" case-path "--out" result-path]
++   :command/produces :aero/result})
++
++(defn valid-command? [cmd]
++  (and (= :native-process (:command/kind cmd))
++       (seq (:command/argv cmd))
++       (every? string? (:command/argv cmd))
++       (str/ends-with? (last (:command/argv cmd)) ".edn")))
++
+diff --git a/src/aero/solver.cljc b/src/aero/solver.cljk
+similarity index 100%
+rename from src/aero/solver.cljc
+rename to src/aero/solver.cljk
+diff --git a/test/aero/aero_test.clj b/test/aero/aero_test.cljk
+similarity index 98%
+rename from test/aero/aero_test.clj
+rename to test/aero/aero_test.cljk
+index 345ae32..2f6213c 100644
+--- a/test/aero/aero_test.clj
++++ b/test/aero/aero_test.cljk
+@@ -2,7 +2,7 @@
+   "Aero-clj contract: the build-up lands in a realistic Cd band, is monotone in
+   each shape lever, splits BEV<FCEV, is deterministic, and the range loop moves
+   the right way."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [aero.case :as case]
+             [aero.solver :as solver]
+             [aero.bridge :as bridge]))
+diff --git a/test/aero/lbm_test.cljk b/test/aero/lbm_test.cljk
+new file mode 100644
+index 0000000..313e60a
+--- /dev/null
++++ b/test/aero/lbm_test.cljk
+@@ -0,0 +1,48 @@
++(ns aero.lbm-test
++  "`aero.lbm` shells out to an external `kami-cfd` binary, so these tests
++  do not invoke `solve` (no binary is guaranteed to be present, and a
++  unit test must not depend on one). They cover the pure decision logic
++  around it: the fastback/box vs teardrop/block shape mapping, the
++  calibration constants that anchor kami-cfd's raw Cd to the rom-buildup
++  reference, and that :lbm is actually registered on the shared
++  `cae.solver` contract."
++  (:require [kotoba.test :refer [deftest is testing]]
++            [aero.lbm :as lbm]
++            [cae.solver :as cae]))
++
++(def ^:private shape-of #'lbm/shape-of)
++(def ^:private resolve-bin #'lbm/resolve-bin)
++
++(deftest shape-of-picks-3d-profile-by-taper
++  (testing "taper >= 0.5 is a streamlined fastback in 3D"
++    (is (= "fastback3d" (shape-of {:shape {:taper 0.5}} 3)))
++    (is (= "fastback3d" (shape-of {:shape {:taper 1.0}} 3))))
++  (testing "taper < 0.5 falls back to the bluff squareback box in 3D"
++    (is (= "box3d" (shape-of {:shape {:taper 0.0}} 3)))
++    (is (= "box3d" (shape-of {:shape {:taper 0.49}} 3)))))
++
++(deftest shape-of-picks-2d-profile-by-taper
++  (is (= "teardrop" (shape-of {:shape {:taper 0.5}} 2)))
++  (is (= "block" (shape-of {:shape {:taper 0.0}} 2))))
++
++(deftest shape-of-defaults-taper-to-streamlined-when-absent
++  (testing "a case with no :shape/:taper defaults to 0.5, which is >= 0.5 (streamlined)"
++    (is (= "fastback3d" (shape-of {} 3)))
++    (is (= "teardrop" (shape-of {} 2)))))
++
++(deftest calibration-constants-are-positive-and-3d-exceeds-2d
++  (testing "documented anchor values: 2D sectional needs a smaller multiplier than the
++less-confined 3D LES run"
++    (is (pos? lbm/calibration-2d))
++    (is (pos? lbm/calibration-3d))
++    (is (< lbm/calibration-2d lbm/calibration-3d))))
++
++(deftest resolve-bin-always-yields-a-usable-command
++  (testing "even with no KAMI_CFD_BIN env var and no local kami-cfd build, resolve-bin
++falls back to the bare \"kami-cfd\" command name so PATH resolution can still work"
++    (is (some? (resolve-bin)))
++    (is (string? (resolve-bin)))))
++
++(deftest lbm-is-registered-on-the-shared-cae-solver-contract
++  (testing "cae.solver/solve dispatches :lbm to aero.lbm/solve, not the rom-buildup default"
++    (is (some #{:lbm} (keys (methods cae/solve))))))
+diff --git a/test/aero/model_test.cljk b/test/aero/model_test.cljk
+new file mode 100644
+index 0000000..9e4ffab
+--- /dev/null
++++ b/test/aero/model_test.cljk
+@@ -0,0 +1,33 @@
++(ns aero.model-test
++  "`aero.model` is a pure edn-tunable coefficient table with no functions
++  — the failure mode here isn't logic bugs, it's a future retune silently
++  breaking the documented invariants (`aero.solver` trusts `:max` to be a
++  worst-case bound and shape descriptors to live in [0,1])."
++  (:require [kotoba.lang.text :as str]
++            [kotoba.test :refer [deftest is testing]]
++            [aero.model :as model]))
++
++(deftest air-properties-are-standard-sea-level-values
++  (is (= 1.225 model/rho-air))
++  (is (= 1.81e-5 model/mu-air)))
++
++(deftest every-component-with-a-shape-lever-has-a-max-and-a-k-in-unit-range
++  (testing "forebody/afterbody/wheels/underbody all have a positive :max and a :*-k in [0,1]"
++    (doseq [[component coeffs] (select-keys model/default [:forebody :afterbody :wheels :underbody])]
++      (is (pos? (:max coeffs)) (str component " :max should be positive"))
++      (let [k-key (first (filter #(str/ends-with? (name %) "-k") (keys coeffs)))
++            k (get coeffs k-key)]
++        (is (some? k-key) (str component " is missing its shape-descriptor -k coefficient"))
++        (is (<= 0.0 k 1.0) (str component " " k-key "=" k " out of [0,1]"))))))
++
++(deftest afterbody-is-the-largest-single-max-contribution
++  (testing "matches the domain claim that afterbody/boat-tail dominates drag build-up"
++    (is (= :afterbody (key (apply max-key (comp :max val)
++                                   (select-keys model/default [:forebody :afterbody :wheels :underbody])))))))
++
++(deftest cooling-and-friction-and-induced-coefficients-are-positive
++  (is (pos? (:per-open (:cooling model/default))))
++  (is (pos? (:cf-a (:friction model/default))))
++  (is (neg? (:cf-re-exp (:friction model/default))) "turbulent Cf decreases with Re")
++  (is (pos? (:wet-over-frontal (:friction model/default))))
++  (is (pos? (:k (:induced model/default)))))
+diff --git a/test/aero/native_test.cljk b/test/aero/native_test.cljk
+new file mode 100644
+index 0000000..6773b47
+--- /dev/null
++++ b/test/aero/native_test.cljk
+@@ -0,0 +1,24 @@
++(ns aero.native-test
++  (:require [kotoba.test :refer [deftest is]]
++            [aero.case :as case]
++            [aero.native :as native]
++            [aero.solver :as solver]))
++
++(deftest kami-cfd-is-native-adapter-not-authority
++  (let [b (native/backend :lbm)]
++    (is (= :native (:backend/class b)))
++    (is (= "kotoba-lang/kami-engine-cfd" (:backend/repo b)))
++    (is (= :adapter-required (:backend/status b)))))
++
++(deftest rom-result-satisfies-native-result-contract
++  (let [result (solver/solve (case/for-vehicle {:class :sedan :powertrain :bev}))]
++    (is (:ok? (native/validate-result result)))
++    (is (= :rom-buildup (:solver result)))))
++
++(deftest native-host-command-is-data
++  (let [cmd (native/host-command (native/backend :lbm) "case.edn" "result.edn")]
++    (is (native/valid-command? cmd))
++    (is (= :aero/result (:command/produces cmd)))
++    (is (= ["kami-cfd" "solve" "--solver" "lbm" "--case" "case.edn" "--out" "result.edn"]
++           (:command/argv cmd)))))
++

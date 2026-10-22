@@ -1,0 +1,5 @@
+{:deps true
+ :builds
+ {:verify {:target :node-script
+           :output-to "out/verify.js"
+           :main verify.core/-main}}}

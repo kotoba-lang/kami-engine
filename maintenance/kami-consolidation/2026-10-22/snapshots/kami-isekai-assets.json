@@ -1,0 +1,181 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTLpNTQ",
+    "databaseId": 1287277901,
+    "nameWithOwner": "kotoba-lang/kami-isekai-assets",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-11T09:28:25Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962"
+      }
+    },
+    "heads": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "chore/bb-to-nbb-wave3",
+          "target": {
+            "oid": "c868bf88025ce7a369c4f63a93825d79f4173f35"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 6
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-isekai-assets\nHEAD d50bfe0f4ed4d02b63ddda8623bd39eff0378962\ndetached",
+    "refs": "refs/audit/forest-maintenance/default d50bfe0f4ed4d02b63ddda8623bd39eff0378962\nrefs/heads/main 8945b4d10d80234dba6221151420fdb88f69c7c7\nrefs/heads/manifest-rev d50bfe0f4ed4d02b63ddda8623bd39eff0378962\nrefs/remotes/origin/HEAD d50bfe0f4ed4d02b63ddda8623bd39eff0378962\nrefs/remotes/origin/chore/bb-to-nbb-wave3 c868bf88025ce7a369c4f63a93825d79f4173f35\nrefs/remotes/origin/cljk-rename-20260911 cfec4407a9b8fc4085022540e07e85aac1f1e57c\nrefs/remotes/origin/jv/deps-repair ee4a80fec0ac55196a2c1df4c38ed1238f17edca\nrefs/remotes/origin/jv/drop-nbb-cache 6af65d3c6e0b7dfea0ebfa03b9e9f2c9d6a598b2\nrefs/remotes/origin/jv/kotoba-text 9c9aa855dfe1753ee424ff99dddf0290e0403540\nrefs/remotes/origin/jv/kotoba-text-cljs 032f6b99f0cf73924f8a1f18bc4ad01fec57ccb3\nrefs/remotes/origin/jv/nbb-declaration 8601d91614c658151bff5108ba7d3b18d9ce9520\nrefs/remotes/origin/kbb-cutover-20260911 fbf3334e802519306bb5c51ef708c668dad76397\nrefs/remotes/origin/main d50bfe0f4ed4d02b63ddda8623bd39eff0378962"
+  },
+  "local-after-preservation": {
+    "HEAD": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-isekai-assets\nHEAD d50bfe0f4ed4d02b63ddda8623bd39eff0378962\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "refs/heads/main": "8945b4d10d80234dba6221151420fdb88f69c7c7",
+      "refs/heads/manifest-rev": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "refs/preservation/kami-monorepo-20261022/heads/chore/bb-to-nbb-wave3": "c868bf88025ce7a369c4f63a93825d79f4173f35",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "af7299211500090e8b35ac6967d355bedefed0e2",
+      "refs/preservation/kami-monorepo-20261022/pull-2": "929c5d3ab64925762d36cbd408f56ea617187fe0",
+      "refs/preservation/kami-monorepo-20261022/pull-3": "679b697061d73c25ed5eb0a45f96c94ef179b15e",
+      "refs/preservation/kami-monorepo-20261022/pull-4": "5d8d20883f04cff7ba16e35ff7127062a8a9bc08",
+      "refs/preservation/kami-monorepo-20261022/pull-5": "4ce4469c86122c5d964c3bf749a7b2e4e47c9e9a",
+      "refs/preservation/kami-monorepo-20261022/pull-6": "93654094e07cc1b91a458343479a14fc9ced200c",
+      "refs/remotes/origin/HEAD": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "refs/remotes/origin/chore/bb-to-nbb-wave3": "c868bf88025ce7a369c4f63a93825d79f4173f35",
+      "refs/remotes/origin/cljk-rename-20260911": "cfec4407a9b8fc4085022540e07e85aac1f1e57c",
+      "refs/remotes/origin/jv/deps-repair": "ee4a80fec0ac55196a2c1df4c38ed1238f17edca",
+      "refs/remotes/origin/jv/drop-nbb-cache": "6af65d3c6e0b7dfea0ebfa03b9e9f2c9d6a598b2",
+      "refs/remotes/origin/jv/kotoba-text": "9c9aa855dfe1753ee424ff99dddf0290e0403540",
+      "refs/remotes/origin/jv/kotoba-text-cljs": "032f6b99f0cf73924f8a1f18bc4ad01fec57ccb3",
+      "refs/remotes/origin/jv/nbb-declaration": "8601d91614c658151bff5108ba7d3b18d9ce9520",
+      "refs/remotes/origin/kbb-cutover-20260911": "fbf3334e802519306bb5c51ef708c668dad76397",
+      "refs/remotes/origin/main": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "feat(render): first real pixel of a composed entity on screen, pixel-verified",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "feat/render-adapter-poc",
+      "headRefOid": "af7299211500090e8b35ac6967d355bedefed0e2",
+      "baseRefName": "main",
+      "baseRefOid": "8945b4d10d80234dba6221151420fdb88f69c7c7",
+      "mergeCommit": {
+        "oid": "c5070045b4120953d4444c9b5bf8e3b85478a12f"
+      },
+      "mergedAt": "2026-07-08T06:55:04Z",
+      "url": "https://github.com/kotoba-lang/kami-isekai-assets/pull/1"
+    },
+    {
+      "number": 2,
+      "title": "ci: add a minimal GitHub Actions workflow (bb test)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "feat/ci-bb-test",
+      "headRefOid": "929c5d3ab64925762d36cbd408f56ea617187fe0",
+      "baseRefName": "main",
+      "baseRefOid": "8945b4d10d80234dba6221151420fdb88f69c7c7",
+      "mergeCommit": {
+        "oid": "42ab54f36ff0257e3c51e41c06e487e509a99611"
+      },
+      "mergedAt": "2026-07-08T06:55:22Z",
+      "url": "https://github.com/kotoba-lang/kami-isekai-assets/pull/2"
+    },
+    {
+      "number": 3,
+      "title": "ci: wire bb render-test into CI as render-verify job",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "ci/wire-render-test",
+      "headRefOid": "679b697061d73c25ed5eb0a45f96c94ef179b15e",
+      "baseRefName": "main",
+      "baseRefOid": "42ab54f36ff0257e3c51e41c06e487e509a99611",
+      "mergeCommit": {
+        "oid": "30bb8f16630618d5cb36b664d260621f8f0af0ab"
+      },
+      "mergedAt": "2026-07-08T07:02:47Z",
+      "url": "https://github.com/kotoba-lang/kami-isekai-assets/pull/3"
+    },
+    {
+      "number": 4,
+      "title": "feat(render): pixel-verify a real composed party via presets->scene",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "feat/render-adapter-more-entities",
+      "headRefOid": "5d8d20883f04cff7ba16e35ff7127062a8a9bc08",
+      "baseRefName": "main",
+      "baseRefOid": "30bb8f16630618d5cb36b664d260621f8f0af0ab",
+      "mergeCommit": {
+        "oid": "7e0909defebcb91e4a073db7dd66c7f3bce6598d"
+      },
+      "mergedAt": "2026-07-08T07:29:53Z",
+      "url": "https://github.com/kotoba-lang/kami-isekai-assets/pull/4"
+    },
+    {
+      "number": 5,
+      "title": "feat: add :pixel8 quantized retro variant + walk-cycle motion helper",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "feature/pixel8-8bit-variant",
+      "headRefOid": "4ce4469c86122c5d964c3bf749a7b2e4e47c9e9a",
+      "baseRefName": "main",
+      "baseRefOid": "b0e37f58f157000640da104d3c073418a1e25118",
+      "mergeCommit": {
+        "oid": "04a28a1e51f097a065b25a20e5ed75a87482889a"
+      },
+      "mergedAt": "2026-07-23T03:50:06Z",
+      "url": "https://github.com/kotoba-lang/kami-isekai-assets/pull/5"
+    },
+    {
+      "number": 6,
+      "title": "fix(ci): repair test/render-test CI after bb.edn retirement",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "fix/ci-nbb-migration",
+      "headRefOid": "93654094e07cc1b91a458343479a14fc9ced200c",
+      "baseRefName": "main",
+      "baseRefOid": "04a28a1e51f097a065b25a20e5ed75a87482889a",
+      "mergeCommit": {
+        "oid": "c9ab01f092202eed6c68ff326945f63e55f4e7ed"
+      },
+      "mergedAt": "2026-07-23T08:50:40Z",
+      "url": "https://github.com/kotoba-lang/kami-isekai-assets/pull/6"
+    }
+  ]
+}

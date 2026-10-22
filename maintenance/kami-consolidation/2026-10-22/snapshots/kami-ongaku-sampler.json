@@ -1,0 +1,88 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTV92HA",
+    "databaseId": 1298101788,
+    "nameWithOwner": "kotoba-lang/kami-ongaku-sampler",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-23T10:38:05Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "8248fc145061373698d42d2ebd4518a94e3d397d"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "8248fc145061373698d42d2ebd4518a94e3d397d"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 1
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "8248fc145061373698d42d2ebd4518a94e3d397d",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-ongaku-sampler\nHEAD 8248fc145061373698d42d2ebd4518a94e3d397d\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 8248fc145061373698d42d2ebd4518a94e3d397d\nrefs/heads/manifest-rev 6a1a355362b26f724ba3984719ea3fa5c6673a5a\nrefs/remotes/kotoba-lang/HEAD 8248fc145061373698d42d2ebd4518a94e3d397d\nrefs/remotes/kotoba-lang/cljk-rename-20260911 a1ee9d1be50d41c9daebc3e6be180bd390fa6ecf\nrefs/remotes/kotoba-lang/jv/full-sha 45a4bd7eefb892e4c227d8dbb72f9ff3e38d317b\nrefs/remotes/kotoba-lang/kbb-cutover-20260911 def812ea499217b186f05f96b72ce658bbb2971d\nrefs/remotes/kotoba-lang/main 8248fc145061373698d42d2ebd4518a94e3d397d"
+  },
+  "local-after-preservation": {
+    "HEAD": "8248fc145061373698d42d2ebd4518a94e3d397d",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-ongaku-sampler\nHEAD 8248fc145061373698d42d2ebd4518a94e3d397d\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "8248fc145061373698d42d2ebd4518a94e3d397d",
+      "refs/heads/manifest-rev": "6a1a355362b26f724ba3984719ea3fa5c6673a5a",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "8248fc145061373698d42d2ebd4518a94e3d397d",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "d293135bca530c1d79b7320a3d0fa07969359627",
+      "refs/remotes/kotoba-lang/HEAD": "8248fc145061373698d42d2ebd4518a94e3d397d",
+      "refs/remotes/kotoba-lang/cljk-rename-20260911": "a1ee9d1be50d41c9daebc3e6be180bd390fa6ecf",
+      "refs/remotes/kotoba-lang/jv/full-sha": "45a4bd7eefb892e4c227d8dbb72f9ff3e38d317b",
+      "refs/remotes/kotoba-lang/kbb-cutover-20260911": "def812ea499217b186f05f96b72ce658bbb2971d",
+      "refs/remotes/kotoba-lang/main": "8248fc145061373698d42d2ebd4518a94e3d397d"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "test(e2e): scope the E2E namespace to kami.ongaku.sampler.e2e",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "rename/scope-e2e-ns",
+      "headRefOid": "d293135bca530c1d79b7320a3d0fa07969359627",
+      "baseRefName": "main",
+      "baseRefOid": "6d2abf0a6f341df8b06e3444eabb412a4d02b2fc",
+      "mergeCommit": {
+        "oid": "94015ccb258d21c6efbea8c0e791bddbd1fa017b"
+      },
+      "mergedAt": "2026-08-12T09:06:30Z",
+      "url": "https://github.com/kotoba-lang/kami-ongaku-sampler/pull/1"
+    }
+  ]
+}

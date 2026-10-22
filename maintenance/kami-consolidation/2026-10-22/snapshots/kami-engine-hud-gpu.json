@@ -1,0 +1,93 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTKW5Ow",
+    "databaseId": 1285929275,
+    "nameWithOwner": "kotoba-lang/kami-engine-hud-gpu",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-24T06:36:38Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "16076705114bdef321ef50a285020f2aa142f7dc"
+      }
+    },
+    "heads": {
+      "totalCount": 3,
+      "nodes": [
+        {
+          "name": "agent/hud-merge-note",
+          "target": {
+            "oid": "9ab7a750b6b0e49c12b8726a93ecd1277a872928"
+          }
+        },
+        {
+          "name": "fix/test-alias-and-ci",
+          "target": {
+            "oid": "d770f1046f4543444bb385c4055970bcf5e8f413"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "16076705114bdef321ef50a285020f2aa142f7dc"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 0
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "16076705114bdef321ef50a285020f2aa142f7dc",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-hud-gpu\nHEAD 16076705114bdef321ef50a285020f2aa142f7dc\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 16076705114bdef321ef50a285020f2aa142f7dc\nrefs/heads/main a26001418f0b07e42a1b756af3fe28b72d1d0a80\nrefs/heads/manifest-rev 16076705114bdef321ef50a285020f2aa142f7dc\nrefs/remotes/kotoba-lang/HEAD 2c6e9cf1519bd510aa6c89fab861031bcbc9b19d\nrefs/remotes/kotoba-lang/agent/hud-merge-note 9ab7a750b6b0e49c12b8726a93ecd1277a872928\nrefs/remotes/kotoba-lang/fix/test-alias-and-ci d770f1046f4543444bb385c4055970bcf5e8f413\nrefs/remotes/kotoba-lang/jv/full-sha c95c54eae6dcc7f440cba4589170c9c1f2075036\nrefs/remotes/kotoba-lang/main 2c6e9cf1519bd510aa6c89fab861031bcbc9b19d\nrefs/remotes/kotoba-lang/maturity-loop-persistent-toast-bug 0a78aab669d89b38db1f13967fe1354365f06c1d\nrefs/remotes/origin/HEAD 16076705114bdef321ef50a285020f2aa142f7dc\nrefs/remotes/origin/agent/hud-merge-note 9ab7a750b6b0e49c12b8726a93ecd1277a872928\nrefs/remotes/origin/cljk-rename-20260911 b5d6079afe0afd18ab1f73d8ec1e03e796c64f77\nrefs/remotes/origin/fix/test-alias-and-ci d770f1046f4543444bb385c4055970bcf5e8f413\nrefs/remotes/origin/kbb-cutover-20260911 3e1ec193a9382a2278e553081b384a0be25250a9\nrefs/remotes/origin/main 16076705114bdef321ef50a285020f2aa142f7dc"
+  },
+  "local-after-preservation": {
+    "HEAD": "16076705114bdef321ef50a285020f2aa142f7dc",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-hud-gpu\nHEAD 16076705114bdef321ef50a285020f2aa142f7dc\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "refs/heads/main": "a26001418f0b07e42a1b756af3fe28b72d1d0a80",
+      "refs/heads/manifest-rev": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/hud-merge-note": "9ab7a750b6b0e49c12b8726a93ecd1277a872928",
+      "refs/preservation/kami-monorepo-20261022/heads/fix/test-alias-and-ci": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "refs/remotes/kotoba-lang/HEAD": "2c6e9cf1519bd510aa6c89fab861031bcbc9b19d",
+      "refs/remotes/kotoba-lang/agent/hud-merge-note": "9ab7a750b6b0e49c12b8726a93ecd1277a872928",
+      "refs/remotes/kotoba-lang/fix/test-alias-and-ci": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "refs/remotes/kotoba-lang/jv/full-sha": "c95c54eae6dcc7f440cba4589170c9c1f2075036",
+      "refs/remotes/kotoba-lang/main": "2c6e9cf1519bd510aa6c89fab861031bcbc9b19d",
+      "refs/remotes/kotoba-lang/maturity-loop-persistent-toast-bug": "0a78aab669d89b38db1f13967fe1354365f06c1d",
+      "refs/remotes/origin/HEAD": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "refs/remotes/origin/agent/hud-merge-note": "9ab7a750b6b0e49c12b8726a93ecd1277a872928",
+      "refs/remotes/origin/cljk-rename-20260911": "b5d6079afe0afd18ab1f73d8ec1e03e796c64f77",
+      "refs/remotes/origin/fix/test-alias-and-ci": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "refs/remotes/origin/kbb-cutover-20260911": "3e1ec193a9382a2278e553081b384a0be25250a9",
+      "refs/remotes/origin/main": "16076705114bdef321ef50a285020f2aa142f7dc"
+    }
+  },
+  "historical-pulls": []
+}

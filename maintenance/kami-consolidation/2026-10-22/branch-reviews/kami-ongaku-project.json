@@ -1,0 +1,49 @@
+{
+  "repository": "kotoba-lang/kami-ongaku-project",
+  "default": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "commit": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "commit": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "6a14e1814a893f690aa0133ecbceff7478ca7f41",
+      "commit": "6a14e1814a893f690aa0133ecbceff7478ca7f41",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "commit": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "commit": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "commit": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "commit": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

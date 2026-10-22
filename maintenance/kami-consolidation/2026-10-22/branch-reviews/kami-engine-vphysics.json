@@ -1,0 +1,309 @@
+{
+  "repository": "kotoba-lang/kami-engine-vphysics",
+  "default": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "commit": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "commit": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "dc2126eede706fe297568747c81a7ad97317785f",
+      "commit": "dc2126eede706fe297568747c81a7ad97317785f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "ec873b32cdb654acfeca6f4fbea48b206fd5164e",
+      "commit": "ec873b32cdb654acfeca6f4fbea48b206fd5164e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/chore/maturity-ci",
+      "object": "f4629d1d56cbdd9722823ca3d14c6dbe016823a5",
+      "commit": "f4629d1d56cbdd9722823ca3d14c6dbe016823a5",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-engine-vphysics/pull/1",
+        "head": "f4629d1d56cbdd9722823ca3d14c6dbe016823a5",
+        "merge": "32c2329ed6bd1074b2d0d3dab17f3440477cbbc3",
+        "merge-base": "a551a4dc6a30084fdeb6d34a03d710c93ec40c82",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a4076931c687d51e307090925403b2daa14b9847"
+            }
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "87b936035b7335858eaea30a57e3ccc7a9c01b2c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "commit": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "f4629d1d56cbdd9722823ca3d14c6dbe016823a5",
+      "commit": "f4629d1d56cbdd9722823ca3d14c6dbe016823a5",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-engine-vphysics/pull/1",
+        "head": "f4629d1d56cbdd9722823ca3d14c6dbe016823a5",
+        "merge": "32c2329ed6bd1074b2d0d3dab17f3440477cbbc3",
+        "merge-base": "a551a4dc6a30084fdeb6d34a03d710c93ec40c82",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a4076931c687d51e307090925403b2daa14b9847"
+            }
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "87b936035b7335858eaea30a57e3ccc7a9c01b2c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "4442ee681b83776bf044afab6f89339334535279",
+      "commit": "4442ee681b83776bf044afab6f89339334535279",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 2,
+        "url": "https://github.com/kotoba-lang/kami-engine-vphysics/pull/2",
+        "head": "4442ee681b83776bf044afab6f89339334535279",
+        "merge": "28d4692cde550b8d8af0b663e1a7b7d8d91c6332",
+        "merge-base": "dc2126eede706fe297568747c81a7ad97317785f",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "82982f9d6596e89be0aea5b3e1e404c0cca2feeb"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "35fdab871e427fdf0516d46007eab312b70baaff"
+            }
+          },
+          {
+            "path": "src/vphysics/backend.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fdc5394ef8696804e05524b0297b5359f94e0596"
+            }
+          },
+          {
+            "path": "test/vphysics/backend_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f5eb103b44556b4a589ce79dcb87f70596a3719d"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
+      "object": "4740d2233dce4e4517fe0eecedb2086251028c6a",
+      "commit": "4740d2233dce4e4517fe0eecedb2086251028c6a",
+      "decision": "cherry-picked-exact-patch-and-postimages",
+      "proof": {
+        "original": "4740d2233dce4e4517fe0eecedb2086251028c6a",
+        "landed": "f6b5936c5009b61c681f7926a0ab10c0030841b6",
+        "patch-id": "a7628a6ac46f3f4194fa1651ed987d7688bedf2a",
+        "changed-postimages": [
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "d634f8385ec794803c72c2d2ae31949255582ae6"
+            }
+          },
+          {
+            "path": "src/vphysics/backend.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "b90695b5a896beac940513af7ea9d1cc20d227ad"
+            }
+          },
+          {
+            "path": "test/vphysics/backend_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c71a99822d8ae05679d1c1a3ac238e65d61a3739"
+            }
+          }
+        ],
+        "landed-is-ancestor-of-current-default": true
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-4",
+      "object": "f6b5936c5009b61c681f7926a0ab10c0030841b6",
+      "commit": "f6b5936c5009b61c681f7926a0ab10c0030841b6",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "commit": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "commit": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-vphysics/pull/1",
+      "head": "f4629d1d56cbdd9722823ca3d14c6dbe016823a5",
+      "merge": "32c2329ed6bd1074b2d0d3dab17f3440477cbbc3",
+      "merge-base": "a551a4dc6a30084fdeb6d34a03d710c93ec40c82",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a4076931c687d51e307090925403b2daa14b9847"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "87b936035b7335858eaea30a57e3ccc7a9c01b2c"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-engine-vphysics/pull/2",
+      "head": "4442ee681b83776bf044afab6f89339334535279",
+      "merge": "28d4692cde550b8d8af0b663e1a7b7d8d91c6332",
+      "merge-base": "dc2126eede706fe297568747c81a7ad97317785f",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "82982f9d6596e89be0aea5b3e1e404c0cca2feeb"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "35fdab871e427fdf0516d46007eab312b70baaff"
+          }
+        },
+        {
+          "path": "src/vphysics/backend.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "fdc5394ef8696804e05524b0297b5359f94e0596"
+          }
+        },
+        {
+          "path": "test/vphysics/backend_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "f5eb103b44556b4a589ce79dcb87f70596a3719d"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 4,
+      "url": "https://github.com/kotoba-lang/kami-engine-vphysics/pull/4",
+      "head": "f6b5936c5009b61c681f7926a0ab10c0030841b6",
+      "merge": "df468adb83d527524d2c89f33a9ea5eb26e24d61",
+      "merge-base": "28d4692cde550b8d8af0b663e1a7b7d8d91c6332",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d634f8385ec794803c72c2d2ae31949255582ae6"
+          }
+        },
+        {
+          "path": "src/vphysics/backend.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b90695b5a896beac940513af7ea9d1cc20d227ad"
+          }
+        },
+        {
+          "path": "test/vphysics/backend_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c71a99822d8ae05679d1c1a3ac238e65d61a3739"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,29 @@
 # kami-engine
 
+Portable-family consolidation is being qualified under
+[ADR 2610220800](90-docs/adr/2610220800-portable-kami-source-monorepo.md).
+`packages/catalog.json` names the selected portable projects and exact legacy
+aliases. `node scripts/kami-sources.mjs --json kotoba.kami.engine.animation`
+reads a source descriptor; it does not activate a runtime or provider. Native
+foundations and product deployment boundaries remain separate. Qualification
+and retirement are still in progress.
+
+The migration target is host-independent Kotoba components. Source co-location
+and historical JVM/SCI/CLJS test results do not prove that target. Follow the
+[native migration decision](90-docs/adr/261022-native-kami-migration.md) and
+[per-project inventory](maintenance/kami-native-migration.json). The normal
+build and runtime must qualify through Amu selfhost-produced loaderless
+artifacts without JVM, GraalVM, CLJS/Node, nbb or C compiler/loader/runtime,
+for the complete selected component and its dependency closure. CLJK sources
+and hosted test commands are migration inventory, not required final surfaces.
+
+The source catalog contains 70 canonical dotted IDs and 152 exact aliases.
+IDs follow the Kotoba naming Spec; multiword segments use lowerCamelCase.
+Fifteen earlier draft IDs remain explicit aliases, for example
+`kotoba.kami.mangaka.scene-author` selects `kotoba.kami.mangaka.sceneAuthor`.
+Source paths and Lisp namespace APIs are declared separately and unchanged.
+See `maintenance/kami-source-id-migrations.json` for the complete mapping.
+
 `kami-physics` integrates the shared Kotoba physics scene contract with
 realtime rigid bodies, vehicle reduced-order models and high-fidelity CAE.
 Game and spatial-authoring callers use one CLJC router while fidelity remains
@@ -32,7 +56,7 @@ here.
   `:kotoba.webgpu/capture-presence-evidence-v2` queue-submit evidence schema
   (WebGPU merge `247ae4b`); adapters must not rename or synthesize this value.
 
-## Verify
+## Historical compatibility/oracle checks
 
 ```bash
 kbb -M scripts/wit_test.cljk            # wit/kami-interface.edn is the ONE source; world.wit must agree
@@ -55,9 +79,10 @@ time at best and at link time in the browser at worst.
 These were `bb scripts/…` until 2026-08-13. babashka was retired as this
 workspace's script host by ADR-2607173000 and that conversion left
 `scripts/tasks.edn` a literal empty registry, so both gates were documented but
-unrunnable for four weeks (ADR-2608131600). They now run under JVM Clojure —
+unrunnable for four weeks (ADR-2608131600). The historical JVM Clojure run was
 measured 2026-08-13 as "EDN IDL: 40 host functions across 7 interfaces / ✓ EDN
 IDL and world.wit agree" and "ok docs/adapter-registry.edn contracts 3".
+That observation is not native migration evidence.
 
 The default path should not contain `Cargo.toml`, `Cargo.lock`, `.rs`,
 `rust-toolchain*`, or `.cargo/` files.

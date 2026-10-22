@@ -1,0 +1,98 @@
+(ns cam-scene-test
+  "Tests for `cam-scene`, 1:1 ported from the original Rust
+  `#[cfg(test)] mod tests` in kami-cam-scene/src/lib.rs and the parity
+  suite kami-cam-scene/tests/materials_parity.rs (kotoba-lang/kami-engine,
+  deleted PR #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [cam-scene :as cam-scene]
+            [kotoba.cam.stock :as stock]))
+
+;; ---------------------------------------------------------------------
+;; Smoke test
+;; ---------------------------------------------------------------------
+
+(deftest namespace-loads-smoke-test
+  (is (some? cam-scene/materials-edn))
+  (is (some? cam-scene/all-material-ids)))
+
+;; ---------------------------------------------------------------------
+;; Ported from src/lib.rs #[cfg(test)] mod tests
+;; ---------------------------------------------------------------------
+
+(deftest shipped-has-all-materials
+  (let [result (cam-scene/shipped-materials)]
+    (is (:ok result) "materials.edn parses")
+    (is (= 5 (count (:ok result))))
+    (doseq [id cam-scene/all-material-ids]
+      (is (contains? (:ok result) id) (str id " present in EDN")))))
+
+(deftest unknown-builtin-material-is-none
+  (is (nil? (cam-scene/builtin-material "unobtainium"))))
+
+(deftest unknown-material-from-edn-is-an-error
+  (let [result (cam-scene/material-from-edn cam-scene/materials-edn "unobtainium")]
+    (is (= :material-not-found (:error result)))
+    (is (= "unobtainium" (:id result)))))
+
+(deftest non-map-root-is-an-error
+  (is (= {:error :not-a-map} (cam-scene/materials-from-edn "42"))))
+
+(deftest missing-materials-table-is-an-error
+  (is (= {:error :no-materials} (cam-scene/materials-from-edn "{:other 1}"))))
+
+(deftest int-coerces-to-float
+  ;; `:density 7` (an int) coerces to 7.0.
+  (let [result (cam-scene/materials-from-edn
+                "{:cam/materials {:x {:name \"X\" :density 7 :hardness 100}}}")
+        m (:ok result)]
+    (is (= 7.0 (:density (get m "x"))))
+    (is (= 100.0 (:hardness (get m "x"))))))
+
+(deftest missing-fields-fall-back
+  (let [result (cam-scene/materials-from-edn
+                "{:cam/materials {:bare {:name \"Bare\"}}}")
+        m (:ok result)]
+    (is (= "Bare" (:name (get m "bare"))))
+    (is (= 0.0 (:density (get m "bare"))) "absent density -> 0")
+    (is (= 0.0 (:hardness (get m "bare"))) "absent hardness -> 0")))
+
+;; ---------------------------------------------------------------------
+;; Ported from tests/materials_parity.rs
+;; ---------------------------------------------------------------------
+
+(defn- oracle
+  "The hardcoded `kotoba.cam.stock` material for an id — the parity oracle
+  (real Clojure fn calls, not copied numbers)."
+  [id]
+  (case id
+    "aluminum-6061" (stock/aluminum-6061)
+    "steel-1045" (stock/steel-1045)
+    "titanium-ti6al4v" (stock/titanium-ti6al4v)
+    "abs-plastic" (stock/abs-plastic)
+    "wood-oak" (stock/wood-oak)
+    (throw (ex-info (str "no oracle for " id) {:id id}))))
+
+(deftest materials-edn-matches-builtin
+  (let [loaded (:ok (cam-scene/materials-from-edn cam-scene/materials-edn))]
+    (is (= 5 (count loaded)) "all five materials present in EDN")
+    (doseq [id cam-scene/all-material-ids]
+      (let [o (oracle id)
+            got (get loaded id)]
+        (is (= o got) (str id ": full CamMaterialSpec parity")))
+      ;; The `builtin-material` oracle helper agrees with what we read off
+      ;; the struct.
+      (let [built (cam-scene/builtin-material id)]
+        (is (= (get loaded id) built) (str id ": EDN == builtin-material"))))
+    ;; The shipped-materials convenience loader yields the same thing.
+    (let [shipped (:ok (cam-scene/shipped-materials))]
+      (doseq [id cam-scene/all-material-ids]
+        (is (= (get shipped id) (get loaded id)) (str id ": shipped == loaded"))))))
+
+(deftest spec-to-cam-material-matches-hardcoded
+  (let [loaded (:ok (cam-scene/materials-from-edn cam-scene/materials-edn))]
+    (doseq [id cam-scene/all-material-ids]
+      (let [m (cam-scene/spec-to-cam-material (get loaded id))
+            o (oracle id)]
+        (is (= (:name o) (:name m)) (str id ": name"))
+        (is (= (:density o) (:density m)) (str id ": density (exact double)"))
+        (is (= (:hardness o) (:hardness m)) (str id ": hardness (exact double)"))))))

@@ -1,0 +1,203 @@
+(ns game-scene.item-catalog
+  "Item-catalog data tier — `game`'s Sabiotoshi (rust-restoration game)
+  item catalog (`game.sabiotoshi/default-item-catalog`) as parity-tested
+  EDN. Restored from the legacy kami-engine/kami-game-scene Rust crate's
+  `item_catalog.rs` (deleted in kotoba-lang/kami-engine PR #82) as part of
+  the clj-wgsl migration (ADR-2607010930, com-junkawasaki/root).
+
+  The restoration simulation (rust removal, tool effectiveness, scoring)
+  stays native `game.sabiotoshi`; only the init-time **description** — the
+  item table (SDF model, rust zones, disassembly steps, PBR metal,
+  CPC/UNSPSC codes) — moves to EDN (ADR-0046 / ADR-0038).
+  [[items-from-edn]] rebuilds the real `game.sabiotoshi` item list,
+  asserted item-for-item `=` the compiled-in `default-item-catalog` in
+  `test/game_scene/item_catalog_test.cljk`.
+
+  `game.sabiotoshi` represents 3-vectors (rust-zone `:center`/`:extent`,
+  disassembly-step `:detach-offset`) as `{:x :y :z}` maps (its local
+  `glam::Vec3` duck-type), NOT plain `[x y z]` vectors — unlike
+  `:metal-color`, which stays a plain `[r g b]` vector (matching the
+  original Rust, where `metal_color` is a plain `[f32; 3]` but
+  `center`/`extent`/`detach_offset` are `glam::Vec3`). [[vec3->v3]] bridges
+  `scene/vec3`'s `[x y z]` result to that map shape.
+
+  Zero-dep portable CLJC."
+  (:require [scene :as scene]
+            [game.sabiotoshi :as sabiotoshi]))
+
+(def item-catalog-edn
+  "The canonical item-catalog CONFIG shipped with this crate. Embedded as a
+  literal string; kept byte-identical to
+  `resources/game_scene/item_catalog.edn`."
+";; item_catalog.edn — canonical CONFIG/DATA for kami-game's Sabiotoshi (rust-restoration
+;; game) item catalog (`sabiotoshi::default_item_catalog()`).
+;;
+;; ADR-0046 / ADR-0038: the restoration simulation (rust removal, tool effectiveness,
+;; scoring) stays native Rust; only the init-time DESCRIPTION — the item table (SDF model,
+;; rust zones, disassembly steps, PBR metal, CPC/UNSPSC codes) — moves to EDN here.
+;; kami-game is untouched; `default_item_catalog()` stays the builtin fallback AND the
+;; parity oracle (asserted item-for-item `==` it, in order, in tests/item_catalog_parity.rs).
+;;
+;; :rust-type ∈ {:surface :deep :pitted :patina}; a zone :current-level defaults to its
+;; :initial-level; :nerf is the optional NeRF density-grid index (absent → None). Vec3s are
+;; [x y z]. A step :required-tool is an optional ToolKind keyword id (absent → None).
+{:game/item-catalog
+ [{:id \"wrench\" :name \"Vintage Wrench\" :name-ja \"ヴィンテージレンチ\"
+   :difficulty 1 :base-score 100 :perfect-bonus 50
+   :sdf-desc \"smooth_union(box(0.8,0.1,0.08), cylinder(0.15,0.3))\"
+   :entity-ids [\"wrench_body\" \"wrench_jaw\"]
+   :zones [{:id \"head\"   :center [-0.3 0.0 0.0] :extent [0.15 0.08 0.06] :rust-type :surface :initial-level 0.8}
+           {:id \"shaft\"  :center [0.1 0.0 0.0]  :extent [0.25 0.04 0.04] :rust-type :surface :initial-level 0.4}
+           {:id \"handle\" :center [0.4 0.0 0.0]  :extent [0.12 0.06 0.06] :rust-type :surface :initial-level 0.3}]
+   :disassembly-steps []
+   :cpc-code \"42322\" :unspsc-code \"27111700\" :metal-color [0.7 0.7 0.72] :metallic 0.85 :roughness 0.35}
+
+  {:id \"skeleton_key\" :name \"Skeleton Key\" :name-ja \"アンティーク鍵\"
+   :difficulty 2 :base-score 200 :perfect-bonus 100
+   :sdf-desc \"union(torus(0.12,0.03), cylinder(0.02,0.4), box(0.08,0.06,0.02))\"
+   :entity-ids [\"key_bow\" \"key_shaft\" \"key_bit\"]
+   :zones [{:id \"bow\"   :center [-0.2 0.0 0.0]  :extent [0.12 0.12 0.03] :rust-type :deep    :initial-level 0.9  :nerf 0}
+           {:id \"shaft\" :center [0.05 0.0 0.0]  :extent [0.18 0.02 0.02] :rust-type :surface :initial-level 0.5}
+           {:id \"bit\"   :center [0.25 0.0 0.0]  :extent [0.08 0.06 0.02] :rust-type :pitted  :initial-level 0.85 :nerf 1}]
+   :disassembly-steps []
+   :cpc-code \"42995\" :unspsc-code \"46171500\" :metal-color [0.72 0.53 0.04] :metallic 0.9 :roughness 0.25}
+
+  {:id \"pocket_watch\" :name \"Pocket Watch\" :name-ja \"懐中時計\"
+   :difficulty 4 :base-score 500 :perfect-bonus 250
+   :sdf-desc \"smooth_union(cylinder(0.25,0.06), cylinder(0.03,0.04, translate(0,0.06,0)))\"
+   :entity-ids [\"watch_case\" \"watch_face\" \"watch_crown\" \"watch_back\"]
+   :zones [{:id \"case_front\"  :center [0.0 0.03 0.0]  :extent [0.24 0.03 0.24] :rust-type :deep   :initial-level 0.75 :nerf 2}
+           {:id \"case_back\"   :center [0.0 -0.03 0.0] :extent [0.24 0.03 0.24] :rust-type :deep   :initial-level 0.75 :nerf 3}
+           {:id \"crown\"       :center [0.0 0.08 0.0]  :extent [0.03 0.03 0.03] :rust-type :pitted :initial-level 0.9}
+           {:id \"face_hidden\" :center [0.0 0.01 0.0]  :extent [0.18 0.01 0.18] :rust-type :patina :initial-level 0.45}]
+   :disassembly-steps [{:id \"open_case\" :name \"Open Case Back\" :name-ja \"裏蓋を開ける\"
+                        :part-ids [\"watch_back\"] :revealed-zones [\"face_hidden\"] :completed false
+                        :detach-offset [0.0 -0.4 0.0]}]
+   :cpc-code \"45121\" :unspsc-code \"54111600\" :metal-color [0.75 0.75 0.78] :metallic 0.92 :roughness 0.15}
+
+  {:id \"katana_tsuba\" :name \"Katana Tsuba\" :name-ja \"刀の鍔\"
+   :difficulty 5 :base-score 600 :perfect-bonus 300
+   :sdf-desc \"difference(smooth_union(box(0.18,0.01,0.14), box(0.14,0.012,0.18)), box(0.02,0.02,0.06))\"
+   :entity-ids [\"tsuba_body\" \"tsuba_rim\" \"tsuba_nakago\"]
+   :zones [{:id \"face_a\"            :center [-0.06 0.005 0.0]  :extent [0.08 0.006 0.12] :rust-type :surface :initial-level 0.65 :nerf 4}
+           {:id \"face_b\"            :center [0.06 0.005 0.0]   :extent [0.08 0.006 0.12] :rust-type :surface :initial-level 0.65 :nerf 5}
+           {:id \"rim\"               :center [0.0 0.0 0.0]      :extent [0.18 0.01 0.14]  :rust-type :deep    :initial-level 0.8}
+           {:id \"nakago_ana\"        :center [0.0 0.0 0.0]      :extent [0.02 0.01 0.05]  :rust-type :pitted  :initial-level 0.95}
+           {:id \"engraving_hidden\"  :center [-0.04 -0.005 0.03] :extent [0.03 0.004 0.06] :rust-type :patina :initial-level 0.5}]
+   :disassembly-steps [{:id \"flip_tsuba\" :name \"Flip Tsuba\" :name-ja \"鍔を裏返す\"
+                        :part-ids [] :revealed-zones [\"engraving_hidden\"] :completed false
+                        :detach-offset [0.0 0.0 0.0]}]
+   :cpc-code \"42925\" :unspsc-code \"46181500\" :metal-color [0.25 0.25 0.28] :metallic 0.95 :roughness 0.2}]}
+")
+
+;; ── enum id maps ────────────────────────────────────────────────────────
+;; `game.sabiotoshi`'s rust-type/tool-kind keywords are already hyphenated
+;; ids (e.g. `:squash-stretch`-style `:pitted`/`:wire-brush`), so id<->kw
+;; is just `name`/`keyword`; explicit valid-sets give tolerant fallback.
+
+(def ^:private rust-types #{:surface :deep :pitted :patina})
+(defn rust-type-id [t] (name t))
+(defn rust-type-from-id [id]
+  (let [k (keyword id)] (if (contains? rust-types k) k :surface)))
+
+(def ^:private tool-kinds
+  #{:pressure-washer :wire-brush :sandpaper :chemical-solvent :polishing-cloth :ultrasonic})
+(defn tool-kind-id [t] (name t))
+(defn tool-kind-from-id [id]
+  (let [k (keyword id)] (if (contains? tool-kinds k) k :pressure-washer)))
+
+;; ── tolerant readers ────────────────────────────────────────────────────
+
+(defn- str-at [m key] (or (scene/mget m key) ""))
+(defn- int-at [m key] (let [v (scene/mget m key)] (if (integer? v) v 0)))
+(defn- strings [m key] (->> (scene/mget m key) (filter string?) vec))
+(defn- maps-at [m key] (->> (scene/mget m key) (filter map?) vec))
+(defn- vec3->v3
+  "Bridge `scene/vec3`'s `[x y z]` result to `game.sabiotoshi`'s `{:x :y
+  :z}` Vec3 duck-type."
+  [v]
+  (let [[x y z] (scene/vec3 v)]
+    (sabiotoshi/v3 x y z)))
+
+;; ── rust zone / disassembly step / item ────────────────────────────────
+
+(defn rust-zone-from-map
+  "Build one `game.sabiotoshi/rust-zone` from its EDN map (tolerant:
+  `:current-level` defaults to `:initial-level`, matching the builtin)."
+  [m]
+  (let [initial (scene/num (scene/mget m "initial-level"))
+        current (let [v (scene/mget m "current-level")]
+                  (if (some? v) (scene/num v) initial))
+        nerf (let [v (scene/mget m "nerf")] (when (integer? v) (max 0 v)))]
+    (sabiotoshi/rust-zone
+     {:id (str-at m "id") :center (vec3->v3 (scene/mget m "center")) :extent (vec3->v3 (scene/mget m "extent"))
+      :rust-type (rust-type-from-id (or (scene/kw-key (scene/mget m "rust-type")) ""))
+      :initial-level initial :current-level current :nerf-grid-idx nerf})))
+
+(defn disassembly-step-from-map
+  "Build one `game.sabiotoshi/disassembly-step` from its EDN map."
+  [m]
+  (sabiotoshi/disassembly-step
+   {:id (str-at m "id") :name (str-at m "name") :name-ja (str-at m "name-ja")
+    :part-ids (strings m "part-ids") :revealed-zones (strings m "revealed-zones")
+    :completed (boolean (scene/mget m "completed"))
+    :required-tool (scene/kw-key (scene/mget m "required-tool"))
+    :detach-offset (vec3->v3 (scene/mget m "detach-offset"))}))
+
+(defn item-from-map
+  "Build one restorable item (a `game.sabiotoshi` default-item-catalog
+  entry-shaped map) from its EDN map."
+  [m]
+  {:id (str-at m "id") :name (str-at m "name") :name-ja (str-at m "name-ja")
+   :difficulty (min 255 (max 0 (int-at m "difficulty")))
+   :base-score (max 0 (int-at m "base-score"))
+   :perfect-bonus (max 0 (int-at m "perfect-bonus"))
+   :sdf-desc (str-at m "sdf-desc")
+   :entity-ids (strings m "entity-ids")
+   :zones (mapv rust-zone-from-map (maps-at m "zones"))
+   :disassembly-steps (mapv disassembly-step-from-map (maps-at m "disassembly-steps"))
+   :cpc-code (str-at m "cpc-code") :unspsc-code (str-at m "unspsc-code")
+   :metal-color (scene/vec3 (scene/mget m "metal-color"))
+   :metallic (scene/num (scene/mget m "metallic"))
+   :roughness (scene/num (scene/mget m "roughness"))})
+
+(defn spec-to-item
+  "Reconstruct the real item map from a spec. Since a spec IS already an
+  item-catalog-entry-shaped map (see namespace docstring), this is
+  `identity`, kept for API parity with the original `spec_to_item`."
+  [spec]
+  spec)
+
+(defn item-specs-from-edn
+  "Parse the `:game/item-catalog` table from EDN `src` into ordered item
+  maps.
+
+  Throws `ex-info` with `:game-scene.item-catalog/error` of `:not-a-map`
+  or `:no-table` — mirroring the original `ItemCatalogError::NotAMap` /
+  `ItemCatalogError::NoTable`."
+  [src]
+  (let [root (scene/root-map src)]
+    (when (nil? root)
+      (throw (ex-info "item-catalog EDN root is not a map" {:game-scene.item-catalog/error :not-a-map})))
+    (let [items (scene/mget root "game/item-catalog")]
+      (when-not (vector? items)
+        (throw (ex-info "`:game/item-catalog` missing or not a vector" {:game-scene.item-catalog/error :no-table})))
+      (mapv item-from-map (filter map? items)))))
+
+(defn items-from-edn
+  "Parse the table from EDN `src` into the real item list. Same shape as
+  [[item-specs-from-edn]] here; kept as a distinct fn for API parity with
+  the original `items_from_edn`."
+  [src]
+  (item-specs-from-edn src))
+
+(defn builtin-item-specs
+  "The compiled-in oracle: `default-item-catalog` (already item-shaped, so
+  no projection is needed)."
+  []
+  (sabiotoshi/default-item-catalog))
+
+(defn shipped-items
+  "Convenience: the items from the crate-shipped [[item-catalog-edn]]."
+  []
+  (items-from-edn item-catalog-edn))

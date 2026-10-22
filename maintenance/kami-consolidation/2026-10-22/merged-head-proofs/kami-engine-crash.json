@@ -1,0 +1,79 @@
+{
+  "repository": "kotoba-lang/kami-engine-crash",
+  "default": "849a2be18a1c1442fc28983629b655e9d355835f",
+  "heads": {
+    "378906bdc5cd77e55e7855aa05231672786b4b0d": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-engine-crash/pull/1",
+        "head": "378906bdc5cd77e55e7855aa05231672786b4b0d",
+        "merge": "fa29f4e0282c5ab00741084dc9492b5fe76e5b1a",
+        "merge-base": "20166fff676297427b0ac77a3680a0fc05c06c09",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3531ea01bc26c206029acb0cc4d2b5b5c0d8a9da"
+            }
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "af5a35fdc672ea66c8d7c709323abc909bed3e31"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a39a330b33225d31df220096031077ac17fec96b"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-crash/pull/1",
+      "head": "378906bdc5cd77e55e7855aa05231672786b4b0d",
+      "merge": "fa29f4e0282c5ab00741084dc9492b5fe76e5b1a",
+      "merge-base": "20166fff676297427b0ac77a3680a0fc05c06c09",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3531ea01bc26c206029acb0cc4d2b5b5c0d8a9da"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "af5a35fdc672ea66c8d7c709323abc909bed3e31"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a39a330b33225d31df220096031077ac17fec96b"
+          }
+        }
+      ]
+    }
+  ]
+}

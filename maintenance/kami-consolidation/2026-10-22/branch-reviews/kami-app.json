@@ -1,0 +1,189 @@
+{
+  "repository": "kotoba-lang/kami-app",
+  "default": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "commit": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "commit": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "e21bc366a6523e78c2d5a687c4e835fd002300fc",
+      "commit": "e21bc366a6523e78c2d5a687c4e835fd002300fc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "commit": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "commit": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "20bb28cd91bd24fa51d5d38cae848876d8ca9db9",
+      "commit": "20bb28cd91bd24fa51d5d38cae848876d8ca9db9",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-app/pull/1",
+        "head": "20bb28cd91bd24fa51d5d38cae848876d8ca9db9",
+        "merge": "4ae4615811e1320f96fbeea2c20a550207aacc5e",
+        "merge-base": "e21bc366a6523e78c2d5a687c4e835fd002300fc",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "df8bb449e684ace26d6480c08078e7671d2c984b"
+            }
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "db4b2fc17c1d363f9422a3c3dd2ad90b55e95936"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": null
+          },
+          {
+            "path": "docs/adr/0001-retire-empty-cljc-scaffold.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "d044c2ad763f9058301d619b0e69d77594af5671"
+            }
+          },
+          {
+            "path": "src/kami_app.cljc",
+            "entry": null
+          },
+          {
+            "path": "test/kami_app_test.cljc",
+            "entry": null
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "commit": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/add/ci-lint-gate",
+      "object": "a2aacc08a7769cc71f31273c4d99f91349f111a3",
+      "commit": "a2aacc08a7769cc71f31273c4d99f91349f111a3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/fix/test-alias-and-ci",
+      "object": "0aa838f6f269c1043fe67e32baec23ba659ed89a",
+      "commit": "0aa838f6f269c1043fe67e32baec23ba659ed89a",
+      "decision": "superseded-empty-scaffold-retirement",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "0aa838f6f269c1043fe67e32baec23ba659ed89a"
+      }
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "commit": "a5d45befd7dd25696d956388917a3bdd2dda4622",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [
+    {
+      "commit": "0aa838f6f269c1043fe67e32baec23ba659ed89a",
+      "to-default-diff": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-app/0aa838f6f269c1043fe67e32baec23ba659ed89a.diff",
+      "diff-sha256": "44c6143fdca21a3a8be3c192703350801c1fef75dfbaac1cc0b64ea2bb939575",
+      "changed-paths": [
+        ".github/workflows/ci.yml",
+        "LICENSE",
+        "README.md",
+        "deps.edn",
+        "docs/adr/0001-retire-empty-cljc-scaffold.md",
+        "src/kami_app.cljc",
+        "test/kami_app_test.cljc"
+      ],
+      "unique-nonmerge-commits": [
+        "0aa838f6f269c1043fe67e32baec23ba659ed89a"
+      ],
+      "log": [
+        "0aa838f fix(deps): broken :test alias + smoke-test bug; add CI+lint"
+      ],
+      "refs": [
+        "refs/remotes/kotoba-lang/fix/test-alias-and-ci"
+      ]
+    }
+  ],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-app/pull/1",
+      "head": "20bb28cd91bd24fa51d5d38cae848876d8ca9db9",
+      "merge": "4ae4615811e1320f96fbeea2c20a550207aacc5e",
+      "merge-base": "e21bc366a6523e78c2d5a687c4e835fd002300fc",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "df8bb449e684ace26d6480c08078e7671d2c984b"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "db4b2fc17c1d363f9422a3c3dd2ad90b55e95936"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": null
+        },
+        {
+          "path": "docs/adr/0001-retire-empty-cljc-scaffold.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d044c2ad763f9058301d619b0e69d77594af5671"
+          }
+        },
+        {
+          "path": "src/kami_app.cljc",
+          "entry": null
+        },
+        {
+          "path": "test/kami_app_test.cljc",
+          "entry": null
+        }
+      ]
+    }
+  ]
+}

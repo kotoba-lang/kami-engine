@@ -1,0 +1,125 @@
+{
+  "repository": "kotoba-lang/kami-engine-crash",
+  "default": "849a2be18a1c1442fc28983629b655e9d355835f",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "commit": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "commit": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "043dba140810e7ef03a1b8965ed4111eabe11d9f",
+      "commit": "043dba140810e7ef03a1b8965ed4111eabe11d9f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "1efa15efbd426ff8aff7ee4c15c6ddfe308c8331",
+      "commit": "1efa15efbd426ff8aff7ee4c15c6ddfe308c8331",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "commit": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "378906bdc5cd77e55e7855aa05231672786b4b0d",
+      "commit": "378906bdc5cd77e55e7855aa05231672786b4b0d",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-engine-crash/pull/1",
+        "head": "378906bdc5cd77e55e7855aa05231672786b4b0d",
+        "merge": "fa29f4e0282c5ab00741084dc9492b5fe76e5b1a",
+        "merge-base": "20166fff676297427b0ac77a3680a0fc05c06c09",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3531ea01bc26c206029acb0cc4d2b5b5c0d8a9da"
+            }
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "af5a35fdc672ea66c8d7c709323abc909bed3e31"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a39a330b33225d31df220096031077ac17fec96b"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "commit": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "commit": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-crash/pull/1",
+      "head": "378906bdc5cd77e55e7855aa05231672786b4b0d",
+      "merge": "fa29f4e0282c5ab00741084dc9492b5fe76e5b1a",
+      "merge-base": "20166fff676297427b0ac77a3680a0fc05c06c09",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3531ea01bc26c206029acb0cc4d2b5b5c0d8a9da"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "af5a35fdc672ea66c8d7c709323abc909bed3e31"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a39a330b33225d31df220096031077ac17fec96b"
+          }
+        }
+      ]
+    }
+  ]
+}

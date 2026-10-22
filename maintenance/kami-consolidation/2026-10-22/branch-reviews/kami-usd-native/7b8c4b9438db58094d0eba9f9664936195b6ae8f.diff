@@ -1,0 +1,562 @@
+diff --git a/.gitignore b/.gitignore
+index bd04223..05e79af 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,2 @@
+ .cpcache/
++.nbb/
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..57bc88a
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,202 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
+diff --git a/README.md b/README.md
+index 1abb3fc..ac868b1 100644
+--- a/README.md
++++ b/README.md
+@@ -74,7 +74,7 @@ plus a smoke test.
+ ## Testing
+ 
+ ```sh
+-clojure -M:test
++kbb -M:test
+ ```
+ 
+ ## License
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..cf16905
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,8 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/usd_native.cljk" ".cljc"
++  "test/usd_native/core_test.cljk" ".clj"
++  "test/usd_native/parity_test.cljk" ".clj"}}
+diff --git a/deps.edn b/deps.edn
+index e20e78e..2beb449 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -1,13 +1,36 @@
+ {:paths ["src"]
+- :deps {org.clojure/clojure {:mvn/version "1.12.0"}
+-        io.github.kotoba-lang/compiler
+-        {:git/url "https://github.com/kotoba-lang/compiler.git"
+-         :git/sha "abf9e5b8125040b1c32956ed5af133f5f962298b"}}
++ :deps {
++        ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
++        ;; floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
++        ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
++        ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
++        ;; and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       org.clojure/clojure {:mvn/version "1.12.0"}}
+  :aliases {:test {:extra-paths ["test"]
++                  ;; kotoba-lang/amu is a TEST-ONLY dependency: it is needed by
++                  ;; the tests that compile src/usd_native.kotoba and require it to
++                  ;; agree with src/usd_native.cljk (ADR 0001 as amended, and
++                  ;; ADR-2608134800 in com-junkawasaki/root). Consumers require only
++                  ;; the .cljc and must not be made to drag the compiler in behind it
++                  ;; — kotoba-lang/css, /dsl-core, /async and /postfx set the same
++                  ;; boundary.
+                   :extra-deps {io.github.cognitect-labs/test-runner
+-                               {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                               {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}
++                               io.github.kotoba-lang/amu
++                               {:git/url "https://github.com/kotoba-lang/amu.git"
++                                :git/sha "abf9e5b8125040b1c32956ed5af133f5f962298b"}}
+                   :main-opts ["-m" "cognitect.test-runner"]}
+-                ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
+-                :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
+-                  :main-opts ["-m" "clj-kondo.main" "--lint" "test"
++           ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
++           :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
++                  :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test"
+                               "--fail-level" "error"]}}}
+diff --git a/docs/adr/0001-kotoba-source-authority.md b/docs/adr/0001-kotoba-source-authority.md
+index e8f1d4a..0dac500 100644
+--- a/docs/adr/0001-kotoba-source-authority.md
++++ b/docs/adr/0001-kotoba-source-authority.md
+@@ -19,3 +19,42 @@ restricted JavaScript, and instantiated typed Wasm. Compatibility is semantic
+ and ABI-based, not Wasm byte identity.
+ 
+ The JVM is permitted only as compiler/test infrastructure.
++
++
++## Amendment — 2026-08-13: authority and load path are different things
++
++The migration that this ADR records deleted `src/usd_native.cljk` and left only
++`src/usd_native.kotoba`. A `.kotoba` file is on no Clojure classpath, so from that
++commit onward `usd-native` could not be loaded by ANY runtime this workspace
++ranks above the native path (`kotoba wasm` > `clojurewasm` > ClojureScript > nbb,
++and the JVM below them). "Production `.clj`/`.cljc`/`.cljs` sources are forbidden"
++was read as "delete the load path", and the two are not the same requirement.
++
++`src/usd_native.cljk` is restored beside the `.kotoba`, and:
++
++* **the `.kotoba` remains the sole semantic authority.** Nothing about the migration
++  is reverted. The restored file is a load path, not a second design.
++* **a parity gate holds the two equal.** `test/usd_native/parity_test.cljk` compiles the
++  `.kotoba` here and runs it through the reference evaluator in the same JVM,
++  asserting agreement value by value. Where agreement is impossible it says so in a
++  named test rather than dropping the case from the comparison.
++* **`kotoba-lang/compiler` moved from `:deps` to the `:test` alias.** A consumer that
++  requires the `.cljc` must not drag a compiler in behind it. `kotoba-lang/css`,
++  `/dsl-core`, `/async` and `/postfx` set the same boundary.
++* **`production-source-authority` is narrowed, not deleted.** `src/` is exactly two
++  files. A third file, or a second `.cljc`, is still a fork of the authority and
++  still fails.
++
++**Semantics: verbatim.** The restored file is `e56fffc2^` unchanged. The divergence
++worth naming is that this guest has no sequences: `nv-compat-targets` and
++`supported-formats` were flattened into positional exports (`nv-compat-target-0/1/2`,
++`supported-format-0/1/2`). The parity test compares element by element and pins each
++length, so a fourth element cannot appear without a guest export behind it — but the
++sequence itself has no counterpart, and the test says so.
++
++**Removal condition.** The `.cljc` comes out when consumers have a load path that does
++not require it — for the native route, ADR-2607279200 W4 in `com-junkawasaki/root`.
++Until then, removing it is not a step of the migration; it is an outage.
++
++Recorded in `com-junkawasaki/root` as ADR-2608134800, which follows ADR-2608130900
++(`dsl-core`, `async`) and ADR-2608133600 (`postfx`, `cartpole-math`).
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..203555d
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,16 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src"]
++ :deps {
++        ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
++        ;; floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
++        ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
++        ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
++        ;; and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/usd_native.cljk b/src/usd_native.cljk
+new file mode 100644
+index 0000000..161fb41
+--- /dev/null
++++ b/src/usd_native.cljk
+@@ -0,0 +1,43 @@
++(ns usd-native
++  "kami-usd-native — from-scratch Rust USD parser + composition engine
++  path-reservation constants.
++
++  R1.0 path reservation per ADR-2605261800 §D10.4.
++  **Contingent fallback** — activated only if tinyusdz WASM fails the R1.1
++  viability gate (iPhone 12+ 10MB USD parse ≤2s). Activation requires
++  Council Lv6+ ≥3 attestation per §D10.2.
++
++  In the original Rust crate this module contained ONLY these constants —
++  no parser, no composition engine, no FFI/native bindings of any kind. The
++  crate was a reserved path/placeholder awaiting a future activation
++  decision, not yet implemented. All content here is a direct, faithful,
++  1:1 port of that constants-only stub."
++  (:refer-clojure :exclude [name]))
++
++(def adr
++  "ADR governing this crate's contingent-fallback status."
++  "ADR-2605261800")
++
++(def phase
++  "Current lifecycle phase of this crate."
++  "R1.0-path-reservation")
++
++(def kami-name
++  "The kami-* facade name of this crate."
++  "kami-usd-native")
++
++(def status
++  "Activation status: pending the tinyusdz WASM viability gate outcome."
++  "contingent-fallback-pending-viability-gate")
++
++(def triggered-by
++  "The condition that would trigger activation of this crate."
++  "tinyusdz WASM gate fail (R1.1)")
++
++(def nv-compat-targets
++  "NVIDIA/Pixar API surfaces this crate would mirror if activated."
++  ["omni.usd" "pxr.Usd" "pxr.UsdGeom"])
++
++(def supported-formats
++  "USD file formats this crate would support if activated."
++  ["usda" "usdc" "usdz"])
+diff --git a/test/usd_native/core_test.clj b/test/usd_native/core_test.cljk
+similarity index 79%
+rename from test/usd_native/core_test.clj
+rename to test/usd_native/core_test.cljk
+index 34ec422..92551b2 100644
+--- a/test/usd_native/core_test.clj
++++ b/test/usd_native/core_test.cljk
+@@ -1,8 +1,8 @@
+ (ns usd-native.core-test
+-  (:require [clojure.java.io :as io]
+-            [clojure.java.shell :as shell]
+-            [clojure.string :as str]
+-            [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.bytes :as kbytes] [clojure.java.io :as io]
++            [kotoba.process :as shell]
++            [kotoba.lang.text :as str]
++            [kotoba.test :refer [deftest is testing]]
+             [kotoba.compiler.core :as compiler]
+             [kotoba.compiler.ir :as ir]))
+ 
+@@ -24,7 +24,7 @@
+   (nth (iterate #(.getParent ^java.nio.file.Path %)
+                 (java.nio.file.Path/of (.toURI (io/resource "kotoba/compiler/core.clj"))))
+        4))
+-(defn base64 [value] (.encodeToString (java.util.Base64/getEncoder) value))
++(defn base64 [value] (kbytes/base64-encode value))
+ 
+ (deftest reference-preserves-all-reservation-metadata
+   (let [artifact (compiler/compile-source source :js-kotoba-v1)]
+@@ -35,7 +35,7 @@
+ (deftest restricted-javascript-and-typed-wasm-conform
+   (let [javascript (compiler/compile-source source :js-kotoba-v1)
+         wasm (compiler/compile-source source :wasm32-browser-kotoba-v1)
+-        js64 (base64 (.getBytes ^String (:source javascript) "UTF-8"))
++        js64 (base64 (kbytes/utf8-bytes ^String (:source javascript)))
+         wasm64 (base64 ^bytes (:bytes wasm))
+         expected-js (str "{" (str/join "," (map (fn [[function value]]
+                                                     (str (pr-str (name function)) ":" (pr-str value)))
+@@ -57,7 +57,12 @@
+            (mapv #(bit-and (int %) 255) (take 4 (:bytes wasm)))))))
+ 
+ (deftest production-source-authority
+-  (is (= ["src/usd_native.kotoba"]
++  ;; NARROWED, not deleted (ADR 0001 as amended; ADR-2608130900 took the same
++  ;; step in dsl-core and async). src/ is exactly two files: the .kotoba authority
++  ;; and the .cljc load path the parity test holds equal to it. A third file, or a
++  ;; second .cljc, would be a fork of the authority and still fails here.
++  (is (= ["src/usd_native.cljk"
++          "src/usd_native.kotoba"]
+          (->> (file-seq (io/file "src"))
+               (filter #(.isFile %))
+               (map str)
+diff --git a/test/usd_native/parity_test.cljk b/test/usd_native/parity_test.cljk
+new file mode 100644
+index 0000000..a9b47f7
+--- /dev/null
++++ b/test/usd_native/parity_test.cljk
+@@ -0,0 +1,95 @@
++(ns usd-native.parity-test
++  "Parity gate between `src/usd_native.kotoba` (the semantic authority) and
++  `src/usd_native.cljk` (the load path a Clojure/ClojureScript consumer requires).
++
++  Shape follows `kotoba-lang/css` (`css.kotoba-parity-test`), `kotoba-lang/dsl-core`
++  and `kotoba-lang/async` (ADR-2608130900), and `kotoba-lang/postfx` (ADR-2608133600):
++  the `.kotoba` is compiled here and executed through the reference evaluator in this
++  same JVM, so nothing crosses a runtime boundary, and `kotoba-lang/compiler` stays a
++  test-only dependency.
++
++  WHY THE .cljc EXISTS AT ALL. `e56fffc2` (2026-07-20) deleted `src/usd_native.cljk`
++  and put the `.kotoba` at that path. A `.kotoba` is on no Clojure classpath, so
++  `usd-native` stopped being loadable by every runtime this workspace ranks above the
++  native path. The `.cljc` restored beside it is the load path; the `.kotoba` remains
++  the authority.
++
++  SEMANTICS DECISION: VERBATIM. Every value the guest exports is byte-identical to
++  the corresponding value in the pre-migration `.cljc`, so the restored file is the
++  pre-migration file unchanged (`e56fffc2^`). Unlike `dsl-core`/`async`, the guest did
++  not alter meaning here; this test is what makes \"unchanged\" a checked claim.
++
++  WHAT THIS DOES NOT CLAIM — the divergences, asserted rather than hidden.
++
++  1. `def` vs nullary function. Kotoba has no top-level value bindings, so every
++     constant crosses as a nullary export. Value is compared; the binding form is not.
++
++  2. THE GUEST HAS NO VECTORS HERE. `nv-compat-targets` and `supported-formats` are
++     Clojure vectors; the migration flattened each into positional scalar exports
++     (`nv-compat-target-0/1/2`, `supported-format-0/1/2`), because this guest's ABI
++     carries `:string` and not a sequence. The two
++     `…-is-exactly-the-positional-guest-exports` tests compare element by element AND
++     pin the length, so a fourth element cannot be added to the load path without a
++     guest export behind it — but the *sequence itself* has no counterpart to compare
++     against, and that is stated here rather than passed over.
++
++  3. `main` is a wasm entry point, not library API, and is not mirrored."
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kotoba.compiler.core :as compiler]
++            [kotoba.compiler.ir :as ir]
++            [usd-native :as usd]))
++
++(def ^:private source (slurp "src/usd_native.kotoba"))
++
++(def ^:private kir (delay (:kir (compiler/compile-source source :js-kotoba-v1))))
++
++(defn- call [f & args] (ir/execute @kir f (vec args)))
++
++;; Each pair is [guest export, the var the .cljc load path publishes].
++(def ^:private constants
++  [['adr-value          #'usd/adr]
++   ['phase-value        #'usd/phase]
++   ['kami-name-value    #'usd/kami-name]
++   ['status-value       #'usd/status]
++   ['triggered-by-value #'usd/triggered-by]])
++
++(deftest every-guest-constant-has-an-equal-load-path-constant
++  (doseq [[guest-fn v] constants]
++    (testing (str guest-fn)
++      (is (= (call guest-fn) @v)
++          (str "the guest's " guest-fn " and this namespace's " (symbol v)
++               " must carry the same string")))))
++
++(deftest nv-compat-targets-is-exactly-the-positional-guest-exports
++  (testing "the guest exports the elements, not the sequence"
++    (is (= [(call 'nv-compat-target-0)
++            (call 'nv-compat-target-1)
++            (call 'nv-compat-target-2)]
++           usd/nv-compat-targets)))
++  (testing "a fourth element would have no guest export behind it"
++    (is (= 3 (count usd/nv-compat-targets)))))
++
++(deftest supported-formats-is-exactly-the-positional-guest-exports
++  (testing "the guest exports the elements, not the sequence"
++    (is (= [(call 'supported-format-0)
++            (call 'supported-format-1)
++            (call 'supported-format-2)]
++           usd/supported-formats)))
++  (testing "a fourth element would have no guest export behind it"
++    (is (= 3 (count usd/supported-formats)))))
++
++(deftest the-load-path-adds-no-constant-the-guest-does-not-back
++  (testing "every public string var and every vector element is a guest export"
++    (is (= (into (set (map (comp call first) constants))
++                 (map call ['nv-compat-target-0 'nv-compat-target-1 'nv-compat-target-2
++                            'supported-format-0 'supported-format-1 'supported-format-2]))
++           (->> (ns-publics 'usd-native)
++                vals
++                (map deref)
++                (mapcat #(if (string? %) [%] (filter string? %)))
++                set)))))
++
++(deftest the-guest-exports-no-effects
++  (is (= #{} (set (:effects @kir)))
++      "this namespace is pure data; an effect here would mean the guest grew a
++       capability the .cljc load path cannot carry"))

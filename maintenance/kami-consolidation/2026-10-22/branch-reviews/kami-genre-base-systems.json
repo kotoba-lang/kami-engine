@@ -1,0 +1,79 @@
+{
+  "repository": "kotoba-lang/kami-genre-base-systems",
+  "default": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "1159c7349c5bc2b7bb64fb3cbb6cbf22071e73d5",
+      "commit": "1159c7349c5bc2b7bb64fb3cbb6cbf22071e73d5",
+      "decision": "default-tree-identical"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "afeaebc5d82ad4d87247d13c3236373be41ad7e6",
+      "commit": "afeaebc5d82ad4d87247d13c3236373be41ad7e6",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/edn-datomize-fanout",
+      "object": "9f744c55df0eec671be77d859a804a7a0fcf4f80",
+      "commit": "9f744c55df0eec671be77d859a804a7a0fcf4f80",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "afeaebc5d82ad4d87247d13c3236373be41ad7e6",
+      "commit": "afeaebc5d82ad4d87247d13c3236373be41ad7e6",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "910419a47dced6c63293a9fbb35fbaeed35d6fd1",
+      "commit": "910419a47dced6c63293a9fbb35fbaeed35d6fd1",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "53295eeef96c8e71dcb1e3fcbcf252bb3ea0f21f",
+      "commit": "53295eeef96c8e71dcb1e3fcbcf252bb3ea0f21f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

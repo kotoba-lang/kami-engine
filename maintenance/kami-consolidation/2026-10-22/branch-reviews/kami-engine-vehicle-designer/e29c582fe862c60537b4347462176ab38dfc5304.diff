@@ -1,0 +1,1637 @@
+diff --git a/.gitignore b/.gitignore
+index d2400ff..fbbf973 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,4 @@
+ .cpcache/
+ .clj-kondo/.cache/
+ .lsp/
++.nbb/
+diff --git a/README.md b/README.md
+index e50eb5e..5d33aa1 100644
+--- a/README.md
++++ b/README.md
+@@ -4,10 +4,10 @@ A **clean-sheet vehicle design** actor — given requirements (class, range,
+ payload, top speed) it designs a car *from zero* and sizes its energy
+ system for **either a battery-electric (BEV) or a hydrogen fuel-cell
+ (FCEV)** powertrain. Built on this workspace's
+-[`langgraph-clj`](https://github.com/com-junkawasaki/langgraph-clj)
++[`langgraph-clj`](https://github.com/kotoba-lang/langgraph)
+ StateGraph runtime (portable `.cljc`, supervised superstep loop,
+ interrupts, Datomic/in-mem checkpoints) — the same runtime the
+-[`robotaxi-actor`](../robotaxi-actor) rides on.
++`robotaxi-actor` rides on.
+ 
+ > **Why an actor layer at all?** A generative design proposer (LLM /
+ > CAD agent) is a brilliant *concept generator* but it does **not respect
+@@ -57,8 +57,8 @@ manufacturable spec — and the **mass spiral** (heavier car → bigger store
+ ## Run
+ 
+ ```bash
+-clojure -M:dev:run     # clean-sheet a sedan as BEV and FCEV, then reject an over-reach
+-clojure -M:dev:test    # the closure contract as executable tests
++kbb -M:dev:run     # clean-sheet a sedan as BEV and FCEV, then reject an over-reach
++kbb -M:dev:test    # the closure contract as executable tests
+ ```
+ 
+ Demo output clean-sheets the **same** 500 km sedan as a BEV (~67 kWh,
+@@ -85,18 +85,18 @@ out of identical requirements as physically distinct vehicles.
+ 
+ | File | Actor / role |
+ |---|---|
+-| `src/vdesign/proposer.cljc` | **DesignProposer** — the contained concept generator (heuristic mock) |
+-| `src/vdesign/physics.cljc` | **PhysicsGovernor** — mass closure · energy balance · packaging gates |
+-| `src/vdesign/powertrain.cljc` | BEV / FCEV energy-system models (the only powertrain branch) |
+-| `src/vdesign/simverify.cljc` | **(a) SimGovernor** — structural · clash · axle on the Isaac/genesis-compat surface + per-env DR |
+-| `src/vdesign/process.cljc` | **(b) ProcessPlanner** — BOM → CAM (G-code) → 4D assembly order |
+-| `src/vdesign/datom.cljc` | kotoba Datom-log (EAVT) representation — verification + mfg as facts |
+-| `src/vdesign/design.cljc` | **VehicleDesignActor** — the langgraph-clj StateGraph (1 run = 1 design pass) |
+-| `src/vdesign/sim.cljc` | demo driver |
+-| `src/vdesign/simphysics.cljc` | **real time-stepped physics** — `physics-2d`-backed frontal-crash rigid-body simulation |
+-| `src/vdesign/scene.cljc` | bridges tessellated geometry + the physics trajectory into `kami.webgpu.mesh`'s real input shape |
+-| `src/vdesign/motionplan.cljc` | extends the 4D assembly order into Cartesian assembly-station waypoints |
+-| `test/vdesign/closure_contract_test.clj` | the closure + verify + process invariants, executable |
++| `src/vdesign/proposer.cljk` | **DesignProposer** — the contained concept generator (heuristic mock) |
++| `src/vdesign/physics.cljk` | **PhysicsGovernor** — mass closure · energy balance · packaging gates |
++| `src/vdesign/powertrain.cljk` | BEV / FCEV energy-system models (the only powertrain branch) |
++| `src/vdesign/simverify.cljk` | **(a) SimGovernor** — structural · clash · axle on the Isaac/genesis-compat surface + per-env DR |
++| `src/vdesign/process.cljk` | **(b) ProcessPlanner** — BOM → CAM (G-code) → 4D assembly order |
++| `src/vdesign/datom.cljk` | kotoba Datom-log (EAVT) representation — verification + mfg as facts |
++| `src/vdesign/design.cljk` | **VehicleDesignActor** — the `langgraph` StateGraph (1 run = 1 design pass) |
++| `src/vdesign/sim.cljk` | demo driver |
++| `src/vdesign/simphysics.cljk` | **real time-stepped physics** — `physics-2d`-backed frontal-crash rigid-body simulation |
++| `src/vdesign/scene.cljk` | bridges tessellated geometry + the physics trajectory into `kami.webgpu.mesh`'s real input shape |
++| `src/vdesign/motionplan.cljk` | extends the 4D assembly order into Cartesian assembly-station waypoints |
++| `test/vdesign/closure_contract_test.cljk` | the closure + verify + process invariants, executable |
+ 
+ ## (a) Simulate, (b) datafy the build — the kami-engine bridge
+ 
+@@ -105,8 +105,11 @@ the workspace's simulation and manufacturing fabric:
+ 
+ - **(a) `simverify` → Isaac / Cosmos sim.** The released spec is verified
+   for crash-load paths, package clash and axle loading against the
+-  **kami-genesis** (`isaacsim.core.api`) / **kami-cae** surface, then
+-  hardened with **kami-shugyo-style per-env domain randomization** (mass
++  [**com-nvidia-isaac-sim**](https://github.com/kotoba-lang/com-nvidia-isaac-sim)
++  (`isaacsim.core.api`, formerly kami-genesis) /
++  [**fea**](https://github.com/kotoba-lang/fea) (formerly kami-cae) surface, then
++  hardened with **[com-nvidia-isaac-lab](https://github.com/kotoba-lang/com-nvidia-isaac-lab)-style
++  (formerly kami-shugyo) per-env domain randomization** (mass
+   ±8 %, structure ±6 %, crash pulse ±10 %) for a sim-to-real margin — the
+   same clean-room Isaac-compat stack kami-engine matured in ADR-0034. A
+   structural failure downgrades even a physics-closed design to *rejected*
+@@ -176,7 +179,7 @@ no new physics engine, CAD kernel, or renderer, and no new Rust:
+   inverse-kinematics solver or a robot-controller driver — a plausible,
+   honestly-simplified straight-line station layout.
+ 
+-Run `clojure -M:test` (or `:dev:test` inside the monorepo checkout) —
++Run `kbb -M:test` (or `:dev:test` inside the monorepo checkout) —
+ these three namespaces' tests are part of the same suite.
+ 
+ ## Status
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..0519cbd
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,50 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/vdesign/bev_store.cljk" ".cljc"
++  "src/vdesign/cad.cljk" ".cljc"
++  "src/vdesign/cartridge.cljk" ".cljc"
++  "src/vdesign/cartridge_fcev.cljk" ".cljc"
++  "src/vdesign/cartridge_geometry.cljk" ".cljc"
++  "src/vdesign/cartridge_volume.cljk" ".cljc"
++  "src/vdesign/datom.cljk" ".cljc"
++  "src/vdesign/dc_bus.cljk" ".cljc"
++  "src/vdesign/design.cljk" ".cljc"
++  "src/vdesign/dutycycle.cljk" ".cljc"
++  "src/vdesign/endurance.cljk" ".cljc"
++  "src/vdesign/hydrogen.cljk" ".cljc"
++  "src/vdesign/motionplan.cljk" ".cljc"
++  "src/vdesign/physics.cljk" ".cljc"
++  "src/vdesign/powertrain.cljk" ".cljc"
++  "src/vdesign/process.cljk" ".cljc"
++  "src/vdesign/proposer.cljk" ".cljc"
++  "src/vdesign/reactor_heat.cljk" ".cljc"
++  "src/vdesign/scene.cljk" ".cljc"
++  "src/vdesign/sim.cljk" ".cljc"
++  "src/vdesign/simphysics.cljk" ".cljc"
++  "src/vdesign/simverify.cljk" ".cljc"
++  "src/vdesign/swap_schedule.cljk" ".cljc"
++  "src/vdesign/swap_station.cljk" ".cljc"
++  "src/vdesign/vehicle.cljk" ".cljc"
++  "test/vdesign/bev_store_test.cljk" ".cljc"
++  "test/vdesign/cad_bridge_test.cljk" ".clj"
++  "test/vdesign/cartridge_fcev_test.cljk" ".clj"
++  "test/vdesign/cartridge_geometry_test.cljk" ".cljc"
++  "test/vdesign/cartridge_test.cljk" ".cljc"
++  "test/vdesign/cartridge_volume_test.cljk" ".cljc"
++  "test/vdesign/closure_contract_test.cljk" ".clj"
++  "test/vdesign/dc_bus_test.cljk" ".cljc"
++  "test/vdesign/dutycycle_test.cljk" ".cljc"
++  "test/vdesign/endurance_test.cljk" ".cljc"
++  "test/vdesign/hydrogen_test.cljk" ".cljc"
++  "test/vdesign/motionplan_test.cljk" ".cljc"
++  "test/vdesign/powertrain_test.cljk" ".clj"
++  "test/vdesign/process_test.cljk" ".clj"
++  "test/vdesign/reactor_heat_test.cljk" ".cljc"
++  "test/vdesign/scene_test.cljk" ".cljc"
++  "test/vdesign/simphysics_test.cljk" ".cljc"
++  "test/vdesign/swap_schedule_test.cljk" ".cljc"
++  "test/vdesign/swap_station_test.cljk" ".cljc"
++  "test/vdesign/vehicle_test.cljk" ".clj"}}
+diff --git a/deps.edn b/deps.edn
+index 577efc3..f15febe 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -2,11 +2,20 @@
+  ;; langgraph brings langchain transitively (both zero-/single-dep,
+  ;; all .cljc → portable to JVM / SCI / ClojureScript / GraalVM). Same runtime
+  ;; the robotaxi-actor rides on; a vehicle DESIGN is just another StateGraph.
+- :deps {io.github.kotoba-lang/langgraph  {:git/url "https://github.com/kotoba-lang/langgraph.git"
+-                                          :sha "5b4e5e70837b849b14b6a5800894e3be202ad5fa"}
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       io.github.kotoba-lang/langgraph  {:git/url "https://github.com/kotoba-lang/langgraph.git"
++                                          :git/sha "5b4e5e70837b849b14b6a5800894e3be202ad5fa"}
+         ;; shared, purpose-split libraries (commonized out of this actor)
+         io.github.kotoba-lang/datom       {:git/url "https://github.com/kotoba-lang/datom.git"
+-                                           :sha "d27a5833d59d909367956705f2ec931399c891ee"}
++                                           :git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
+         io.github.kotoba-lang/kami-engine-vphysics
+         {:git/url "https://github.com/kotoba-lang/kami-engine-vphysics.git"
+          :git/sha "f6b5936c5009b61c681f7926a0ab10c0030841b6"}
+@@ -17,39 +26,39 @@
+         ;;   aero  → Cd (range), crash → structural SF (simverify),
+         ;;   echem → FCEV stack efficiency (H2 consumption)
+         io.github.kotoba-lang/kami-engine-aero        {:git/url "https://github.com/kotoba-lang/kami-engine-aero.git"
+-                                           :sha "7151ae056b8dcd8338c9717d932e347c1817ba66"}
++                                           :git/sha "7151ae056b8dcd8338c9717d932e347c1817ba66"}
+         io.github.kotoba-lang/kami-engine-crash       {:git/url "https://github.com/kotoba-lang/kami-engine-crash.git"
+-                                           :sha "fa29f4e0282c5ab00741084dc9492b5fe76e5b1a"}
++                                           :git/sha "fa29f4e0282c5ab00741084dc9492b5fe76e5b1a"}
+         io.github.kotoba-lang/kami-engine-echem       {:git/url "https://github.com/kotoba-lang/kami-engine-echem.git"
+-                                           :sha "2a6b330a876515c8625bac70edd44a6dc8960c6e"}
++                                           :git/sha "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f"}
+         io.github.kotoba-lang/kami-engine-motor       {:git/url "https://github.com/kotoba-lang/kami-engine-motor.git"
+-                                           :sha "d49a16e7563ef230531b3b0c7f3152f5f9d2ce8c"}
++                                           :git/sha "d49a16e7563ef230531b3b0c7f3152f5f9d2ce8c"}
+         ;; CAD/CAM bridge (vdesign.cad / vdesign.process): org-iso-10303
+         ;; (renamed from brep) = BREP kernel + STEP I/O, org-iso-6983
+         ;; (renamed from cnc) = real toolpath/G-code engine, cad =
+         ;; kotoba-lang's artifact-registry/maturity-scoring layer (NOT a
+         ;; geometry kernel despite the name; see vdesign.cad docstring)
+         io.github.kotoba-lang/org-iso-10303 {:git/url "https://github.com/kotoba-lang/org-iso-10303.git"
+-                                             :sha "36d50ebe65d07e4ba5714388c8863e7dfa98becc"}
++                                             :git/sha "36d50ebe65d07e4ba5714388c8863e7dfa98becc"}
+         io.github.kotoba-lang/org-iso-6983  {:git/url "https://github.com/kotoba-lang/org-iso-6983.git"
+-                                             :sha "e1998926e70c3707b2dcb751df0f1380dd86c0bc"}
++                                             :git/sha "e1998926e70c3707b2dcb751df0f1380dd86c0bc"}
+         io.github.kotoba-lang/cad  {:git/url "https://github.com/kotoba-lang/cad.git"
+-                                    :sha "8473733293c090e6509f6cb30a5890661d279e40"}
++                                    :git/sha "dd15140fa962d3f7276b26f8cc1fe172a3f30bca"}
+         ;; Real time-stepped 2D rigid-body physics (vdesign.simphysics,
+         ;; ADR-2607151600) — a genuine, tested impulse-based solver restored
+         ;; 1:1 from the deleted kami-physics-2d Rust crate, NOT a new engine
+         ;; written for this actor.
+         io.github.kotoba-lang/physics-2d {:git/url "https://github.com/kotoba-lang/physics-2d.git"
+-                                          :sha "03b6c23c8d9aa36b92a8130fd3e37fc2548b4d26"}}
++                                          :git/sha "03b6c23c8d9aa36b92a8130fd3e37fc2548b4d26"}}
+  :aliases
+  {;; offline workspace dev — pin transitive langchain to local checkout
+   :dev {:override-deps
+         {io.github.kotoba-lang/langchain {:local/root "../langchain"}}}
+-  ;; clojure -M:dev:run  → clean-sheet a BEV and an FCEV from one spec, compare
++  ;; kbb -M:dev:run  → clean-sheet a BEV and an FCEV from one spec, compare
+   :run {:main-opts ["-m" "vdesign.sim"]}
+   :test {:extra-paths ["test"]
+          :extra-deps {io.github.cognitect-labs/test-runner
+-                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+          :main-opts ["-m" "cognitect.test-runner"]
+          :exec-fn cognitect.test-runner.api/test}
+   ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
+diff --git a/docs/adr/0001-architecture.md b/docs/adr/0001-architecture.md
+index 98f5180..011e22a 100644
+--- a/docs/adr/0001-architecture.md
++++ b/docs/adr/0001-architecture.md
+@@ -70,7 +70,7 @@ glider・路面荷重・包絡は powertrain 非依存。`vdesign.powertrain` 
+   エッジのみ）と、物理的に正直な spec を両立。
+ - 定数は `vdesign.powertrain/tech` と `vdesign.proposer/classes` に集約（~2026
+   量産技術）。セル/タンク進歩はここを retune するだけ。
+-- 検証は `test/vdesign/closure_contract_test.clj`（閉包収束・両 powertrain 差・
++- 検証は `test/vdesign/closure_contract_test.cljk`（閉包収束・両 powertrain 差・
+   過大要求 reject・エネルギー単調性・「未閉包は release しない」不変条件）。
+ 
+ ## 却下案
+diff --git a/docs/adr/0002-sim-verify-and-datafied-process.md b/docs/adr/0002-sim-verify-and-datafied-process.md
+index ac97e7a..00853d1 100644
+--- a/docs/adr/0002-sim-verify-and-datafied-process.md
++++ b/docs/adr/0002-sim-verify-and-datafied-process.md
+@@ -70,5 +70,5 @@ Isaac-compat スタック（ADR-0034）と同じ不変条件を維持。本ア
+ 
+ - **物理閉包と構造検証を1ゲートに統合**: 「存在」と「耐久」は別問題。分けることで
+   構造不合格＝第2の MRC を独立に表現でき、監査台帳も clean。
+-- **工程を非構造の添付（PDF/CAD バイナリ）で持つ**: clone を重くし（CLAUDE.md の
++- **工程を非構造の添付（PDF/CAD バイナリ）で持つ**: clone を重くし（AGENTS.md の
+   大容量バイナリ方針に反する）、クエリ不能。datom 化が source of truth。
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..af416ec
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,9 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src"]
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/vdesign/bev_store.cljc b/src/vdesign/bev_store.cljk
+similarity index 99%
+rename from src/vdesign/bev_store.cljc
+rename to src/vdesign/bev_store.cljk
+index a7b1770..77bbb8e 100644
+--- a/src/vdesign/bev_store.cljc
++++ b/src/vdesign/bev_store.cljk
+@@ -41,7 +41,7 @@
+ 
+   Refusals: non-numeric demand entries, empty profile, non-positive
+   `:dt-s` or `:usable-capacity-kwh`, initial soc outside [0, capacity]."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn- require-positive-number [x k]
+   (when-not (and (number? x) (pos? x))
+diff --git a/src/vdesign/cad.cljc b/src/vdesign/cad.cljk
+similarity index 99%
+rename from src/vdesign/cad.cljc
+rename to src/vdesign/cad.cljk
+index ab1a3e9..cd643ea 100644
+--- a/src/vdesign/cad.cljc
++++ b/src/vdesign/cad.cljk
+@@ -17,7 +17,7 @@
+   work-around for the kernel's current maturity, not a hidden one."
+   (:require [brep.feature :as feat]
+             [brep.tessellate :as tess]
+-            [clojure.string :as str]
++            [kotoba.lang.text :as str]
+             [kotoba.cad.core :as cad-core]
+             [kotoba.cad.runner :as cad-runner]))
+ 
+diff --git a/src/vdesign/cartridge.cljc b/src/vdesign/cartridge.cljk
+similarity index 100%
+rename from src/vdesign/cartridge.cljc
+rename to src/vdesign/cartridge.cljk
+diff --git a/src/vdesign/cartridge_fcev.cljc b/src/vdesign/cartridge_fcev.cljk
+similarity index 100%
+rename from src/vdesign/cartridge_fcev.cljc
+rename to src/vdesign/cartridge_fcev.cljk
+diff --git a/src/vdesign/cartridge_geometry.cljc b/src/vdesign/cartridge_geometry.cljk
+similarity index 100%
+rename from src/vdesign/cartridge_geometry.cljc
+rename to src/vdesign/cartridge_geometry.cljk
+diff --git a/src/vdesign/cartridge_volume.cljc b/src/vdesign/cartridge_volume.cljk
+similarity index 100%
+rename from src/vdesign/cartridge_volume.cljc
+rename to src/vdesign/cartridge_volume.cljk
+diff --git a/src/vdesign/datom.cljc b/src/vdesign/datom.cljk
+similarity index 100%
+rename from src/vdesign/datom.cljc
+rename to src/vdesign/datom.cljk
+diff --git a/src/vdesign/dc_bus.cljc b/src/vdesign/dc_bus.cljk
+similarity index 100%
+rename from src/vdesign/dc_bus.cljc
+rename to src/vdesign/dc_bus.cljk
+diff --git a/src/vdesign/design.cljc b/src/vdesign/design.cljk
+similarity index 100%
+rename from src/vdesign/design.cljc
+rename to src/vdesign/design.cljk
+diff --git a/src/vdesign/dutycycle.cljc b/src/vdesign/dutycycle.cljk
+similarity index 99%
+rename from src/vdesign/dutycycle.cljc
+rename to src/vdesign/dutycycle.cljk
+index 0c3ab82..428520d 100644
+--- a/src/vdesign/dutycycle.cljc
++++ b/src/vdesign/dutycycle.cljk
+@@ -38,7 +38,7 @@
+   negative non-negative-quantities (crr, cd, frontal-area, aux), and
+   `:regen-frac` outside [0, 1]. Negative electrical demand is REPORTED,
+   never clipped or silently absorbed."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (def ^:const g 9.81)           ; m/s^2 — same value as vphysics.core/g
+ (def ^:const rho-air 1.225)    ; kg/m^3 — same value as vphysics.core/rho-air
+diff --git a/src/vdesign/endurance.cljc b/src/vdesign/endurance.cljk
+similarity index 100%
+rename from src/vdesign/endurance.cljc
+rename to src/vdesign/endurance.cljk
+diff --git a/src/vdesign/fatigue.cljk b/src/vdesign/fatigue.cljk
+new file mode 100644
+index 0000000..a8cc3ab
+--- /dev/null
++++ b/src/vdesign/fatigue.cljk
+@@ -0,0 +1,152 @@
++(ns vdesign.fatigue
++  "Vibration-fatigue screening for a design's structural load paths — the
++  vehicle-plane answer to *how much of this path's fatigue life does a
++  given duty-cycle load spectrum consume*.
++
++  System boundary advanced: `:vibration-fatigue-and-safety` design domain
++  (scripts/hermes-magnesium-systems-bots/system-scope.edn on origin/main).
++  The workspace has endurance/energy/structural-verifier contracts but NO
++  contract anywhere accumulates cycle fatigue damage; this is that
++  smallest upstream step. It composes BY DATA ONLY — nothing from any
++  unlanded dependency, no new material constant.
++
++  Inputs (all caller-supplied, provenance-bearing, fail-closed):
++    - `:sn-curve` — a measured S-N curve for the specific material/
++      condition of the checked path: a non-empty vector of
++      `{:stress-mpa <> :cycles <>}` points, same stress convention
++      (amplitude) as `:load-spectrum`, from any cyclic testing basis the
++      caller declares. MUST carry `:sn-source` (non-blank provenance,
++      e.g. a handbook entry, a test report, or an explicitly synthetic
++      fixture). The curve is used only INSIDE its own stress range —
++      log-log piecewise-linear interpolation between points; NO
++      extrapolation (a bin outside the curve's stress range is a
++      refusal, because real S-N curves have knees and endurances this
++      contract does not model).
++    - `:load-spectrum` — a non-empty vector of rainflow-reduced bins
++      `{:stress-amp-mpa <positive> :cycles <positive>}`, on the same
++      amplitude convention as the S-N curve, plus `:spectrum-source`.
++      A natural upstream is the caller's duty cycle (e.g.
++      `vdesign.dutycycle`) evaluated against the path's section
++      properties; this contract converts no geometry and assumes none.
++
++  Physics (Miner linear damage rule, exact arithmetic, SI):
++      N-fail(S) = exp( lin-in-lnS( ln N vs ln S ) )   ; inside curve range
++      D-bin     = cycles / N-fail(S-amp)
++      D-total   = Σ D-bin
++      verdict   = :exceeded if D > 1, :at-limit if D = 1 (±1e-12),
++                  :ok if D < 1
++
++  Miner's rule is a screening hypothesis, not a life prediction: mean
++  stress, temperature, sequence effects, scatter and surface condition
++  are NOT modeled here. Every result carries `:unmeasured` with exactly
++  those factors so downstream consumers cannot read :ok as a life
++  guarantee. Refusals (fail-closed): blank provenance, empty curve or
++  spectrum, non-finite or non-positive quantities, duplicate curve
++  stresses, bins outside the curve's stress range, non-increasing
++  curve order."
++  (:require [kotoba.lang.text :as str]))
++
++(def ^:private at-limit-eps 1e-9)
++
++(defn- finite? [x]
++  (and (number? x)
++       (not (or #?(:clj (Double/isNaN (double x))
++                   :cljs (js/isNaN (double x)))
++                #?(:clj (Double/isInfinite (double x))
++                   :cljs (not (js/isFinite (double x))))))))
++
++(defn- pos-num? [x] (and (finite? x) (pos? x)))
++
++(defn- require-nonblank! [m k]
++  (let [v (get m k)]
++    (when (or (not (string? v)) (str/blank? v))
++      (throw (ex-info (str "fatigue: missing/blank provenance field " k)
++                      {:field k :value v})))))
++
++(defn- require-curve!
++  [m k]
++  (let [pts (get m k)]
++    (when (or (not (vector? pts)) (empty? pts))
++      (throw (ex-info (str "fatigue: " k " must be a non-empty vector") {:field k})))
++    (doseq [p pts]
++      (when-not (and (pos-num? (:stress-mpa p)) (pos-num? (:cycles p)))
++        (throw (ex-info "fatigue: curve point needs positive finite :stress-mpa/:cycles"
++                        {:point p}))))
++    ;; strictly increasing in stress, no duplicates
++    (let [ss (mapv :stress-mpa pts)]
++      (when-not (apply < ss)
++        (throw (ex-info "fatigue: :sn-curve must be strictly increasing in :stress-mpa (no duplicate stresses)"
++                        {:stresses ss}))))
++    pts))
++
++(defn- require-spectrum! [m k]
++  (let [bins (get m k)]
++    (when (or (not (vector? bins)) (empty? bins))
++      (throw (ex-info (str "fatigue: " k " must be a non-empty vector") {:field k})))
++    (doseq [b bins]
++      (when-not (and (pos-num? (:stress-amp-mpa b)) (pos-num? (:cycles b)))
++        (throw (ex-info "fatigue: spectrum bin needs positive finite :stress-amp-mpa/:cycles"
++                        {:bin b}))))
++    bins))
++
++(defn- cycles-to-fail
++  "Log-log piecewise-linear interpolation of the S-N curve at stress S.
++  `pts` is strictly increasing in :stress-mpa. Returns nil when S is
++  outside the curve's stress range (never extrapolated)."
++  [pts s]
++  (let [s0 (:stress-mpa (first pts)) sN (:stress-mpa (peek pts))]
++    (when (and (>= s s0) (<= s sN))
++      ;; exact measured-point hit → return the MEASURED cycles verbatim
++      (or (some #(when (= (:stress-mpa %) s) (:cycles %)) pts)
++      (loop [[a & rest-pts] pts]
++        (let [b (first rest-pts)]
++          (cond
++            (nil? b)    (:cycles a)
++            (<= (:stress-mpa a) s (:stress-mpa b))
++            (let [l1 (Math/log (:stress-mpa a)) l2 (Math/log (:stress-mpa b))
++                  m1 (Math/log (double (:cycles a)))  m2 (Math/log (double (:cycles b)))
++                  t  (/ (- (Math/log s) l1) (- l2 l1))
++                  lm (+ m1 (* t (- m2 m1)))]
++              (Math/exp lm))
++            :else (recur rest-pts))))))))
++
++(defn fatigue-screen
++  "Miner-rule fatigue damage screening. See namespace docstring for the
++  full input contract. Returns a map with :bins (per-bin N-fail and
++  damage), :damage-total, :verdict, :sn-source, :spectrum-source, and
++  :unmeasured (the list of fatigue effects this screening does NOT
++  model). Throws on any refusal above."
++  [{:keys [sn-curve sn-source load-spectrum spectrum-source]}]
++  (require-nonblank! {:sn-source sn-source} :sn-source)
++  (require-nonblank! {:spectrum-source spectrum-source} :spectrum-source)
++  (let [curve (require-curve! {:sn-curve sn-curve} :sn-curve)
++        bins  (require-spectrum! {:load-spectrum load-spectrum} :load-spectrum)
++        s0    (:stress-mpa (first curve))
++        sN    (:stress-mpa (peek curve))
++        out-bins
++        (mapv (fn [b]
++                (let [s    (:stress-amp-mpa b)
++                      n    (:cycles b)
++                      nf   (or (cycles-to-fail curve s)
++                               (throw (ex-info
++                                        (str "fatigue: bin stress " s
++                                             " outside S-N curve range [" s0 "," sN
++                                             "] — no extrapolation; extend the curve with a MEASURED point")
++                                        {:bin b :curve-range [s0 sN]})))
++                      d    (/ (double n) nf)]
++                  {:stress-amp-mpa s :cycles n :cycles-to-failure nf :damage d}))
++              bins)
++        d-total (reduce + (map :damage out-bins))
++        verdict (cond
++                  (> d-total 1.0)                    :exceeded
++                  (< (Math/abs (- d-total 1.0)) at-limit-eps) :at-limit
++                  :else                              :ok)]
++    {:bins out-bins
++     :damage-total d-total
++     :verdict verdict
++     :sn-source sn-source
++     :spectrum-source spectrum-source
++     :sn-stress-range-mpa [s0 sN]
++     :unmeasured [:mean-stress-effects :temperature-effects
++                  :load-sequence-effects :scatter/life-factor
++                  :surface-and-notch-effects :creep-corrosion-effects]}))
+diff --git a/src/vdesign/hydrogen.cljc b/src/vdesign/hydrogen.cljk
+similarity index 50%
+rename from src/vdesign/hydrogen.cljc
+rename to src/vdesign/hydrogen.cljk
+index 5d3ffbc..d924009 100644
+--- a/src/vdesign/hydrogen.cljc
++++ b/src/vdesign/hydrogen.cljk
+@@ -43,7 +43,12 @@
+   `vdesign.dc-bus`'s deficit handling."
+ 
+   (:require [vdesign.powertrain :as pt]
+-            [vdesign.cartridge :as cartridge]))
++            [vdesign.cartridge :as cartridge]
++            [kotoba.lang.text :as str]
++            ;; upstream :rom-fc-profile duty-cycle contract (echem PR#5):
++            ;; the per-sample operating points consumed below. Required so the
++            ;; dependency is explicit on the vehicle plane, not incidental.
++            [echem.profile :as eprof]))
+ 
+ (def LHV-H2-J pt/LHV-H2-J)   ; J/kg, LHV — re-export for callers composing units
+ 
+@@ -134,7 +139,8 @@
+         depleted-at (some (fn [{:keys [h2-shortfall-kg i]}]
+                             (when (pos? h2-shortfall-kg) i))
+                           rows)]
+-    {:intervals rows
++    {:kind :hydrogen-consumption
++     :intervals rows
+      :h2 {:total-kg (:h2-total out)
+           :total-mgh2-kg (:mgh2-total out)
+           :total-e-kwh (:e-total out)
+@@ -176,3 +182,155 @@
+                           :dt-s dt
+                           :fc-elec-eff fc-elec-eff
+                           :store-h2-kg store-h2-kg})))
++
++(defn- require-profile-result [p]
++  (when-not (and (map? p)
++                 (= :rom-fc-profile (:solver p))
++                 (sequential? (:points p))
++                 (seq (:points p))
++                 (map? (:provenance p))
++                 (number? (:dt-s p)) (pos? (:dt-s p)))
++    (throw (ex-info "expected an echem.profile/demand-profile result"
++                    {:received (select-keys p [:solver :samples :dt-s])}))))
++
++(defn- require-source-string [x]
++  (when-not (and (string? x) (not (str/blank? x)))
++    (throw (ex-info "non-blank provenance string required"
++                    {:profile-source x}))))
++
++(defn consumption-from-duty-profile
++  "Compose with the echem plane's duty-profile integration: take an
++  `echem.profile/demand-profile` result (per-sample ROM operating points
++  from the polarization curve + caller-supplied BoP group) and convert its
++  trapezoid-integrated H2 demand into the cartridge-depletion bookkeeping
++  this namespace owns (exact MgH2 stoichiometry, store tracking, shortfall).
++
++  This removes the remaining downstream block on the vehicle plane: before
++  this contract, a duty-cycle consumption claim could only be made through
++  `consumption-profile`'s scalar :fc-elec-eff — a single operating point
++  silently applied across a profile the ROM resolves per sample. Here the
++  per-sample H2 rates come from the ROM chain itself; this namespace adds
++  NO efficiency, NO H2 constant, and NO reactor behavior of its own.
++
++  Inputs:
++    profile — an echem.profile/demand-profile result (validated:
++              :solver :rom-fc-profile, feasible :points, :dt-s)
++    opts:
++      :store-h2-kg  — optional cartridge H2 capacity (kg), as in
++                      consumption-profile
++      :profile-source — required provenance echo for the duty cycle the
++                      profile was computed over (cross-checked against the
++                      profile result's own :provenance when present)
++      :allow-gaps   — default false: refuse when the profile result reports
++                      skipped/infeasible intervals (a duty cycle with gaps
++                      is not a consumption claim); with true, only covered
++                      intervals are consumed and the gap is reported.
++
++  Interval H2 demand follows the upstream trapezoid exactly:
++    m-h2(i) = dt-s · (ṁ(i) + ṁ(i+1)) / 2     over adjacent feasible samples
++  MgH2 conversion uses the same exact stoichiometric mass fraction
++  (w-h2-in-mgh2) as consumption-profile — identical arithmetic, not a copy.
++
++  Refusals: non-profile input, blank :profile-source, infeasible gaps
++  without :allow-gaps, non-positive :store-h2-kg. A depleted cartridge is a
++  reported shortfall, never an exception.
++
++  Unmeasured: everything upstream declares (transients, thermal lag,
++  purge, DC/DC part-load, trapezoid error) PLUS desorption kinetics, heat
++  of desorption, plateau pressure, min recirculation — the reactor is not
++  simulated here."
++  [profile {:keys [store-h2-kg profile-source allow-gaps]}]
++  (require-profile-result profile)
++  (require-source-string profile-source)
++  (let [upstream-source (get-in profile [:provenance :profile-source])]
++    (when (and (some? upstream-source) (not= upstream-source profile-source))
++      (throw (ex-info ":profile-source does not match the duty profile's own provenance — refusing (a consumption result must not be attributed to a different duty cycle)"
++                      {:profile-source profile-source
++                       :upstream-profile-source upstream-source}))))
++  (when (and (some? store-h2-kg)
++             (not (and (number? store-h2-kg) (pos? store-h2-kg))))
++    (throw (ex-info "store-h2-kg must be a positive number (kg)"
++                    {:store-h2-kg store-h2-kg})))
++  (let [skipped (:skipped-interval-indices profile)]
++    (when (and (not allow-gaps) (seq skipped))
++      (throw (ex-info "duty profile has skipped/infeasible intervals — refusing (pass :allow-gaps true to consume covered intervals only)"
++                      {:skipped-interval-indices skipped
++                       :infeasible-count (:infeasible-count profile)}))))
++  (let [dt      (:dt-s profile)
++        skipped (:skipped-interval-indices profile)
++        wh2     (w-h2-in-mgh2)
++        pts     (:points profile)
++        step    (fn [{:keys [remaining] :as acc} [a b]]
++                  (let [h2-demand (* dt (/ (+ (:h2-kg-per-s a) (:h2-kg-per-s b)) 2.0))
++                        h2-used   (if remaining (min h2-demand remaining) h2-demand)
++                        shortfall (- h2-demand h2-used)
++                        remaining' (when remaining (- remaining h2-used))
++                        row {:i (:sample a)
++                             :i-next (:sample b)
++                             :p-net-kw-start (:p-net-kw-target a)
++                             :p-net-kw-end (:p-net-kw-target b)
++                             :eta-sys-start (:eta-sys a)
++                             :eta-sys-end (:eta-sys b)
++                             :h2-kg h2-demand
++                             :mgh2-kg (/ h2-demand wh2)
++                             :store-remaining-kg remaining'
++                             :h2-shortfall-kg shortfall}]
++                    (-> acc
++                        (update :intervals conj row)
++                        (update :h2-total + h2-demand)
++                        (update :mgh2-total + (/ h2-demand wh2))
++                        (update :shortfall + shortfall)
++                        (assoc :remaining remaining'))))
++        init   {:intervals [] :h2-total 0.0 :mgh2-total 0.0 :shortfall 0.0
++                :remaining (some-> store-h2-kg double)}
++        ;; Only ORIGINAL adjacent intervals with two feasible endpoints are
++        ;; consumed — a skipped sample never bridges a gap (same discipline
++        ;; as the upstream trapezoid over :points' :sample indices).
++        covered (filterv (fn [[a b]] (= (:sample b) (inc (:sample a))))
++                         (map vector pts (rest pts)))
++        out    (reduce step init covered)
++        rows   (:intervals out)
++        total  (:h2-total out)
++        ;; cross-check against the upstream integration's own :h2-kg
++        upstream-h2 (:h2-kg profile)
++        consistent (if (zero? upstream-h2)
++                     (zero? total)
++                     (< (Math/abs (- total upstream-h2))
++                        (* 1.0e-9 upstream-h2)))
++        depleted-at (some (fn [row]
++                            (when (pos? (:h2-shortfall-kg row))
++                              (:i row)))
++                          rows)
++        upstream-up (:unmeasured profile)]
++    (when-not consistent
++      (throw (ex-info "interval consumption does not reproduce the upstream trapezoid integral — refusing"
++                      {:h2-total-kg total :upstream-h2-kg upstream-h2})))
++    {:kind :hydrogen-duty-consumption
++     :intervals rows
++     :h2 {:total-kg total
++          :total-mgh2-kg (:mgh2-total out)
++          :total-shortfall-kg (:shortfall out)
++          :upstream-h2-kg upstream-h2
++          :integration-consistent consistent}
++     :store (when store-h2-kg
++              {:start-kg store-h2-kg
++               :end-kg (:remaining out)
++               :depleted-at-i depleted-at})
++     :gaps (when allow-gaps
++             {:skipped-interval-indices skipped
++              :infeasible-count (:infeasible-count profile)})
++     :provenance {:profile-source profile-source
++                  :upstream-profile-source (get-in profile [:provenance :profile-source])
++                  ;; full upstream ROM / polarization / BoP basis, so the
++                  ;; per-interval H2 rates stay reproducible from this result
++                  :upstream-provenance (:provenance profile)
++                  :dt-s dt
++                  :w-h2-mgh2 wh2
++                  :eta-sys-min (:eta-sys-min profile)
++                  :eta-sys-max (:eta-sys-max profile)
++                  :store-h2-kg store-h2-kg}
++     :unmeasured (merge upstream-up
++                        {:desorption-kinetics true
++                         :heat-of-desorption true
++                         :plateau-pressure true
++                         :min-h2-recirculation true})}))
+diff --git a/src/vdesign/motionplan.cljc b/src/vdesign/motionplan.cljk
+similarity index 100%
+rename from src/vdesign/motionplan.cljc
+rename to src/vdesign/motionplan.cljk
+diff --git a/src/vdesign/physics.cljc b/src/vdesign/physics.cljk
+similarity index 100%
+rename from src/vdesign/physics.cljc
+rename to src/vdesign/physics.cljk
+diff --git a/src/vdesign/powertrain.cljc b/src/vdesign/powertrain.cljk
+similarity index 100%
+rename from src/vdesign/powertrain.cljc
+rename to src/vdesign/powertrain.cljk
+diff --git a/src/vdesign/process.cljc b/src/vdesign/process.cljk
+similarity index 99%
+rename from src/vdesign/process.cljc
+rename to src/vdesign/process.cljk
+index 5e526b0..719e5d3 100644
+--- a/src/vdesign/process.cljc
++++ b/src/vdesign/process.cljk
+@@ -23,7 +23,7 @@
+             [kotoba.cam.toolpath :as ktoolpath]
+             [kotoba.cam.gcode :as kgcode]
+             [kotoba.cam.vec3 :as kvec3]
+-            [clojure.string :as str]))
++            [kotoba.lang.text :as str]))
+ 
+ (def ^:const module-kWh 5.0)    ; battery module granularity
+ (def ^:const tank-kg    3.0)    ; usable H2 per 700-bar cylinder
+diff --git a/src/vdesign/proposer.cljc b/src/vdesign/proposer.cljk
+similarity index 99%
+rename from src/vdesign/proposer.cljc
+rename to src/vdesign/proposer.cljk
+index 87454f7..13d24f7 100644
+--- a/src/vdesign/proposer.cljc
++++ b/src/vdesign/proposer.cljk
+@@ -13,7 +13,7 @@
+   the requested range. Every concept it emits is a *proposal*, never a
+   spec — `vdesign.physics` (the PhysicsGovernor) censors it. So the
+   proposer is free to be bold; the governor makes it honest."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ ;; Class library: propulsion-agnostic glider + envelope priors. A glider
+ ;; is the vehicle MINUS its energy store and motor — body, chassis,
+diff --git a/src/vdesign/reactor_heat.cljk b/src/vdesign/reactor_heat.cljk
+new file mode 100644
+index 0000000..d7d557b
+--- /dev/null
++++ b/src/vdesign/reactor_heat.cljk
+@@ -0,0 +1,214 @@
++(ns vdesign.reactor-heat
++  "REACTOR DESORPTION-HEAT DEMAND over a landed MgH2 consumption profile —
++  the smallest upstream contract that turns the `:controlled-hydrogen-
++  reactor` boundary from an unmeasured flag into a VERIFIABLE thermal
++  load case (system-scope.edn on origin/main).
++
++  What existed before this contract:
++
++    - `vdesign.hydrogen/consumption-profile` and
++      `vdesign.swap-schedule/swap-schedule` both convert a fuel-cell
++      electrical profile into per-interval MgH2 desorbed (`:mgh2-kg`),
++      but both carry `:unmeasured {:heat-of-desorption true ...}` —
++      desorbing H2 from MgH2 is ENDOTHERMIC, so every gram desorbed
++      demands heat from somewhere, and NO contract on main says how
++      much or whether a declared heater can supply it. A reactor/thermal
++      designer (or the heater-sizing side of the
++      :cartridge-dry-inert-handling cell) had nothing to compose against.
++
++  This namespace closes that gap BY COMPOSITION + DECLARED INPUT ONLY:
++
++      per interval:  Q[J] = mgh2[kg] · dh-J-per-kg      (desorption heat)
++                     P-heat[kW] = Q / dt
++      totals:        Q-total = Σ Q ; P-peak = max P-heat
++
++  where `:dh-j-per-kg-mgh2` (positive, the enthalpy of desorption per kg
++  of MgH2) is a DECLARED caller input with a non-blank provenance string
++  — a measured material property this workspace does not measure. A
++  silently-assumed enthalpy would bias every heater verdict, so this
++  contract refuses LOUDLY (ex-info) unless both are declared. (For
++  orientation only, never defaulted: published MgH2 enthalpies are
++  O(10^6 J per kg) — the caller's measured figure is the ONLY number
++  used.)
++
++  Optionally the caller declares a heater capacity (`:heater-kw`, with
++  provenance); each interval then gets the standard deficit discipline:
++  heat demand above capacity is REPORTED as `:shortfall-kj` — never
++  clipped, never silently absorbed — and `:adequate?` is true iff every
++  interval's shortfall is zero. A shortfall means the declared heater
++  cannot sustain the desorption rate at the declared enthalpy; the
++  caller may reduce the demand, enlarge the heater, or add thermal
++  storage — the contract records the arithmetic, not the remedy.
++
++  Accepted upstream results (kind-guarded, fail-closed):
++    - a `vdesign.swap-schedule/swap-schedule` result
++      (`:kind :cartridge-swap-schedule`)
++    - a `vdesign.hydrogen/consumption-profile` result
++      (`:kind :hydrogen-consumption`)
++  Both carry `:intervals [{:mgh2-kg ..} ...]` and `:provenance :dt-s`,
++  which is the only upstream data consumed. A `:kind` other than these
++  two is a refusal — a 700-bar tank or BEV result can never silently
++  flow into a hydride-bed thermal contract.
++
++  Explicitly unmeasured, carried on every result: the enthalpy itself
++  (declared-by-caller), desorption kinetics / plateau pressure (the bed
++  is treated as quasi-steady at the interval scale), bed temperature
++  dynamics and heat losses to containment/ambient, regenerative heat
++  from absorption during refilling, and heat recycled between cartridges.
++  No Mg/MgH2, PEM, or vehicle performance constant is invented here: the
++  only arithmetic is multiplication by the declared enthalpy and a unit
++  conversion.
++
++  Refusals: non-matching upstream `:kind`, non-positive/non-finite
++  enthalpy, blank enthalpy provenance, a declared heater that is not a
++  positive finite number, blank heater provenance, missing or
++  non-positive upstream `:provenance :dt-s`, a non-numeric or negative
++  `:mgh2-kg` in any interval."
++  )
++
++(defn- finite? [x]
++  (and (number? x) (not (or #?(:clj (Double/isNaN (double x))
++                               :cljs (js/isNaN (double x)))
++                            #?(:clj (Double/isInfinite (double x))
++                               :cljs (not (js/isFinite (double x))))))))
++
++(defn- require-nonblank [v what]
++  (when-not (and (string? v) (re-find #"\S" v))
++    (throw (ex-info (str "reactor-heat: " what " must be a non-blank provenance string")
++                    {what v}))))
++
++(defn- heat-demand-j
++  "One interval's desorption heat demand [J] at the declared enthalpy."
++  [mgh2-kg dh-j-per-kg]
++  (* (double mgh2-kg) (double dh-j-per-kg)))
++
++(defn reactor-heat
++  "Compute the per-interval desorption-heat demand implied by a landed
++  MgH2 consumption result, and (optionally) check a declared heater
++  against it.
++
++  Inputs:
++    consumption — a `:cartridge-swap-schedule` (vdesign.swap-schedule)
++                  or `:hydrogen-consumption` (vdesign.hydrogen) result;
++                  its `:intervals` `:mgh2-kg` column and its
++                  `:provenance` `:dt-s` are consumed, both echoed in
++                  provenance.
++
++    heat        — map (all fail-closed):
++      :dh-j-per-kg-mgh2   positive finite number — the DECLARED enthalpy
++                          of desorption per kg of MgH2 (a measured
++                          material property the caller owns; nothing is
++                          assumed here)
++      :dh-source          non-blank string — WHO measured/declared it
++                          and on what basis
++      :heater-kw          optional positive finite number — the declared
++                          continuous heat-input capability of the
++                          reactor's heater
++      :heater-source      non-blank string; required iff :heater-kw given
++      :label / :case/id   optional echo for the datom log
++
++  Returns
++    {:kind :reactor-heat-demand
++     :intervals [{:i :mgh2-kg :heat-kj :heat-kw :shortfall-kj} ...]
++     :heat {:total-kj :total-kwh :peak-kw}
++     :adequate?  boolean (only with :heater-kw; true iff zero shortfall
++                 in every interval)
++     :heater {:kw :total-shortfall-kj :first-shortfall-at}
++     :provenance {:dh-j-per-kg-mgh2 .. :dh-source .. :heater-kw ..
++                  :heater-source .. :dt-s .. :source-kind ..}
++     :unmeasured {:desorption-enthalpy true
++                  :desorption-kinetics true
++                  :plateau-pressure true
++                  :bed-temperature true
++                  :containment-heat-losses true
++                  :refill-absorption-heat true
++                  :inter-cartridge-heat-recovery true}}"
++  [consumption {:keys [dh-j-per-kg-mgh2 dh-source heater-kw heater-source
++                       label case/id]}]
++  (when-not (and (map? consumption)
++                 (#{:cartridge-swap-schedule :hydrogen-consumption
++                    :hydrogen-duty-consumption}
++                  (:kind consumption)))
++    (throw (ex-info
++            "reactor-heat: expects a vdesign.swap-schedule (:cartridge-swap-schedule) or vdesign.hydrogen (:hydrogen-consumption / :hydrogen-duty-consumption) result"
++            {:kind (:kind consumption)})))
++  (when-not (and (finite? dh-j-per-kg-mgh2)
++                 (pos? (double dh-j-per-kg-mgh2)))
++    (throw (ex-info
++            "dh-j-per-kg-mgh2 must be a positive DECLARED number — the enthalpy of desorption is a measured material property unmeasured in this workspace, and assuming one would silently bias every heater verdict"
++            {:dh-j-per-kg-mgh2 dh-j-per-kg-mgh2})))
++  (require-nonblank dh-source :dh-source)
++  (when (and (nil? heater-kw) (some? heater-source))
++    (throw (ex-info "reactor-heat: heater-source given without heater-kw"
++                    {:heater-kw heater-kw})))
++  (when (and (some? heater-kw)
++             (or (not (finite? heater-kw))
++                 (not (pos? (double heater-kw)))))
++    (throw (ex-info "reactor-heat: heater-kw must be a positive number when declared"
++                    {:heater-kw heater-kw})))
++  (when (some? heater-kw)
++    (require-nonblank heater-source :heater-source))
++  (let [dt (get-in consumption [:provenance :dt-s])]
++    (when-not (and (finite? dt) (pos? (double dt)))
++      (throw (ex-info
++              "reactor-heat: upstream result lacks a usable positive :provenance :dt-s"
++              {:dt-s dt})))
++    (doseq [[i m] (map-indexed vector (:intervals consumption))]
++      (when-not (and (finite? (:mgh2-kg m)) (not (neg? (double (:mgh2-kg m)))))
++        (throw (ex-info
++                "reactor-heat: every upstream interval must carry a non-negative finite :mgh2-kg"
++                {:index i :mgh2-kg (:mgh2-kg m)}))))
++    (let [dh      (double dh-j-per-kg-mgh2)
++          dts     (double dt)
++          heater-w (when heater-kw (* (double heater-kw) 1000.0))
++          q-js    (mapv (fn [m] (heat-demand-j (:mgh2-kg m) dh))
++                        (:intervals consumption))
++          rows    (mapv (fn [{:keys [i mgh2-kg]} q-j]
++                          (let [short-w (when heater-w
++                                          (max 0.0 (- q-j (* heater-w dts))))]
++                            {:i            i
++                             :mgh2-kg      mgh2-kg
++                             :heat-kj      (/ q-j 1000.0)
++                             :heat-kw      (/ q-j dts 1000.0)
++                             :shortfall-kj (some-> short-w (/ 1000.0))}))
++                        (:intervals consumption)
++                        q-js)
++          total-j  (reduce + 0.0 q-js)
++          peak-w   (reduce (fn [acc q-j] (max acc q-j)) 0.0 q-js)
++          first-short (some (fn [r]
++                              (when (and (:shortfall-kj r)
++                                         (pos? (:shortfall-kj r)))
++                                (:i r)))
++                            rows)
++          total-shortfall-j (when heater-w
++                              (reduce + 0.0
++                                      (map (fn [q-j]
++                                             (max 0.0 (- q-j (* heater-w dts))))
++                                           q-js)))]
++      (cond-> {:kind :reactor-heat-demand
++               :intervals rows
++               :heat {:total-kj  (/ total-j 1000.0)
++                      :total-kwh (/ total-j 3.6e6)
++                      :peak-kw   (/ peak-w dts 1000.0)}
++               :provenance {:dh-j-per-kg-mgh2 dh-j-per-kg-mgh2
++                            :dh-source dh-source
++                            :heater-kw heater-kw
++                            :heater-source (when heater-kw heater-source)
++                            :dt-s dt
++                            :source-kind (:kind consumption)
++                            :basis "Q = m-MgH2 · dh (declared enthalpy of desorption), quasi-steady per interval"}
++               :unmeasured {:desorption-enthalpy true
++                            :desorption-kinetics true
++                            :plateau-pressure true
++                            :bed-temperature true
++                            :containment-heat-losses true
++                            :refill-absorption-heat true
++                            :inter-cartridge-heat-recovery true}}
++        heater-kw
++        (assoc :adequate? (nil? first-short)
++               :heater {:kw (double heater-kw)
++                        :total-shortfall-kj (/ total-shortfall-j 1000.0)
++                        :first-shortfall-at first-short})
++        label (assoc :label label)
++        id    (assoc :case/id id))))
++)
+diff --git a/src/vdesign/scene.cljc b/src/vdesign/scene.cljk
+similarity index 100%
+rename from src/vdesign/scene.cljc
+rename to src/vdesign/scene.cljk
+diff --git a/src/vdesign/sim.cljc b/src/vdesign/sim.cljk
+similarity index 98%
+rename from src/vdesign/sim.cljc
+rename to src/vdesign/sim.cljk
+index abdf841..0ad941e 100644
+--- a/src/vdesign/sim.cljc
++++ b/src/vdesign/sim.cljk
+@@ -7,9 +7,9 @@
+     pass 2  sedan 500 km · FCEV   → closes → engineer sign-off → released
+     pass 3  city  1500 km · BEV   → mass spiral RUNS AWAY → rejected (MRC)
+ 
+-  Run: clojure -M:dev:run"
++  Run: kbb -M:dev:run"
+   (:require [langgraph.graph :as g]
+-            [clojure.string :as str]
++            [kotoba.lang.text :as str]
+             [vdesign.design :as design]))
+ 
+ (defn- line [& xs] (println (apply str xs)))
+diff --git a/src/vdesign/simphysics.cljc b/src/vdesign/simphysics.cljk
+similarity index 100%
+rename from src/vdesign/simphysics.cljc
+rename to src/vdesign/simphysics.cljk
+diff --git a/src/vdesign/simverify.cljc b/src/vdesign/simverify.cljk
+similarity index 100%
+rename from src/vdesign/simverify.cljc
+rename to src/vdesign/simverify.cljk
+diff --git a/src/vdesign/swap_schedule.cljc b/src/vdesign/swap_schedule.cljk
+similarity index 100%
+rename from src/vdesign/swap_schedule.cljc
+rename to src/vdesign/swap_schedule.cljk
+diff --git a/src/vdesign/swap_station.cljc b/src/vdesign/swap_station.cljk
+similarity index 100%
+rename from src/vdesign/swap_station.cljc
+rename to src/vdesign/swap_station.cljk
+diff --git a/src/vdesign/vehicle.cljc b/src/vdesign/vehicle.cljk
+similarity index 100%
+rename from src/vdesign/vehicle.cljc
+rename to src/vdesign/vehicle.cljk
+diff --git a/test/vdesign/bev_store_test.cljc b/test/vdesign/bev_store_test.cljk
+similarity index 99%
+rename from test/vdesign/bev_store_test.cljc
+rename to test/vdesign/bev_store_test.cljk
+index 55cc573..c87af74 100644
+--- a/test/vdesign/bev_store_test.cljc
++++ b/test/vdesign/bev_store_test.cljk
+@@ -1,5 +1,5 @@
+ (ns vdesign.bev-store-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.bev-store :as store]
+             [vdesign.dutycycle :as dc]))
+ 
+diff --git a/test/vdesign/cad_bridge_test.clj b/test/vdesign/cad_bridge_test.cljk
+similarity index 98%
+rename from test/vdesign/cad_bridge_test.clj
+rename to test/vdesign/cad_bridge_test.cljk
+index 43770c2..96bf62e 100644
+--- a/test/vdesign/cad_bridge_test.clj
++++ b/test/vdesign/cad_bridge_test.cljk
+@@ -5,8 +5,8 @@
+   suite's `release` helper predates `:geometry` and never sets it, so this
+   suite runs through the real StateGraph (`vdesign.design/build`), whose
+   `spec` always attaches `:geometry` (see design.cljc)."
+-  (:require [clojure.test :refer [deftest is testing]]
+-            [clojure.string :as str]
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kotoba.lang.text :as str]
+             [langgraph.graph :as g]
+             [vdesign.design :as design]
+             [vdesign.proposer :as proposer]
+diff --git a/test/vdesign/cartridge_fcev_test.clj b/test/vdesign/cartridge_fcev_test.cljk
+similarity index 98%
+rename from test/vdesign/cartridge_fcev_test.clj
+rename to test/vdesign/cartridge_fcev_test.cljk
+index 92737f6..77d90d0 100644
+--- a/test/vdesign/cartridge_fcev_test.clj
++++ b/test/vdesign/cartridge_fcev_test.cljk
+@@ -3,7 +3,7 @@
+   MgH2 store participates in the SAME bounded mass spiral as the 700-bar
+   tank path, refuses unprovenanced overhead loudly, and reports its
+   unmeasured volume as an UNVERIFIED gate — never a silent pass."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.proposer :as proposer]
+             [vdesign.physics :as physics]
+             [vdesign.powertrain :as pt]
+diff --git a/test/vdesign/cartridge_geometry_test.cljc b/test/vdesign/cartridge_geometry_test.cljk
+similarity index 99%
+rename from test/vdesign/cartridge_geometry_test.cljc
+rename to test/vdesign/cartridge_geometry_test.cljk
+index 44778e1..26dee57 100644
+--- a/test/vdesign/cartridge_geometry_test.cljc
++++ b/test/vdesign/cartridge_geometry_test.cljk
+@@ -3,7 +3,7 @@
+   closure, fail-closed parameter validation, and the system-rule-7
+   replaceable/non-load-bearing invariant. No material or performance
+   constant appears anywhere — only π and caller-supplied dimensions."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.cartridge-geometry :as cg]))
+ 
+ (def ^:const pi #?(:clj Math/PI :cljs js/Math.PI))
+diff --git a/test/vdesign/cartridge_test.cljc b/test/vdesign/cartridge_test.cljk
+similarity index 98%
+rename from test/vdesign/cartridge_test.cljc
+rename to test/vdesign/cartridge_test.cljk
+index 5219abf..c3d1c1c 100644
+--- a/test/vdesign/cartridge_test.cljc
++++ b/test/vdesign/cartridge_test.cljk
+@@ -2,7 +2,7 @@
+   "MgH2 cartridge stoichiometry: exact identities and mass conservation —
+   no tolerance bands where the chemistry closes by identity. All
+   performance-shaped properties remain explicitly :unmeasured."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.proposer :as proposer]
+             [vdesign.powertrain :as pt]
+             [vdesign.cartridge :as cart]))
+diff --git a/test/vdesign/cartridge_volume_test.cljc b/test/vdesign/cartridge_volume_test.cljk
+similarity index 99%
+rename from test/vdesign/cartridge_volume_test.cljc
+rename to test/vdesign/cartridge_volume_test.cljk
+index 85f6669..3250585 100644
+--- a/test/vdesign/cartridge_volume_test.cljc
++++ b/test/vdesign/cartridge_volume_test.cljk
+@@ -4,7 +4,7 @@
+   test input, never a workspace constant). The packaging verdict on the
+   cartridge-fed path becomes VERIFIABLE, the bed-volume identity closes
+   exactly, and every invented-constant shortcut is refused loudly."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.proposer :as proposer]
+             [vdesign.cartridge-fcev :as cfc]
+             [vdesign.cartridge-volume :as cv]))
+diff --git a/test/vdesign/closure_contract_test.clj b/test/vdesign/closure_contract_test.cljk
+similarity index 98%
+rename from test/vdesign/closure_contract_test.clj
+rename to test/vdesign/closure_contract_test.cljk
+index 997bf96..a7c6de3 100644
+--- a/test/vdesign/closure_contract_test.clj
++++ b/test/vdesign/closure_contract_test.cljk
+@@ -7,8 +7,8 @@
+     3. An over-reach spec DIVERGES and is REJECTED — the proposer can NEVER
+        ship a design the PhysicsGovernor hasn't closed.
+     4. Energy balance scales monotonically with range (no free energy)."
+-  (:require [clojure.test :refer [deftest is testing]]
+-            [clojure.string :as str]
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kotoba.lang.text :as str]
+             [langgraph.graph :as g]
+             [vdesign.proposer :as proposer]
+             [vdesign.physics :as physics]
+diff --git a/test/vdesign/dc_bus_test.cljc b/test/vdesign/dc_bus_test.cljk
+similarity index 99%
+rename from test/vdesign/dc_bus_test.cljc
+rename to test/vdesign/dc_bus_test.cljk
+index 28a85c6..21bc9dc 100644
+--- a/test/vdesign/dc_bus_test.cljc
++++ b/test/vdesign/dc_bus_test.cljk
+@@ -1,5 +1,5 @@
+ (ns vdesign.dc-bus-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.dc-bus :as dc]))
+ 
+ (defn- close? [a b] (< (Math/abs (- a b)) 1e-6))
+diff --git a/test/vdesign/dutycycle_test.cljc b/test/vdesign/dutycycle_test.cljk
+similarity index 98%
+rename from test/vdesign/dutycycle_test.cljc
+rename to test/vdesign/dutycycle_test.cljk
+index 7fcde19..c26e97d 100644
+--- a/test/vdesign/dutycycle_test.cljc
++++ b/test/vdesign/dutycycle_test.cljk
+@@ -1,5 +1,5 @@
+ (ns vdesign.dutycycle-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.dutycycle :as dc]))
+ 
+ (def glider {:crr 0.010 :cd 0.30 :frontal-area 2.2})
+diff --git a/test/vdesign/endurance_test.cljc b/test/vdesign/endurance_test.cljk
+similarity index 99%
+rename from test/vdesign/endurance_test.cljc
+rename to test/vdesign/endurance_test.cljk
+index 3c45f9a..c106445 100644
+--- a/test/vdesign/endurance_test.cljc
++++ b/test/vdesign/endurance_test.cljk
+@@ -2,7 +2,7 @@
+   "Tests for vdesign.endurance — exact identities on synthetic fixtures
+   (fixture numbers carry fixture provenance; no Mg/MgH2, PEM, or vehicle
+   constant is measured or invented here)."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.endurance :as e]
+             [vdesign.powertrain :as pt]))
+ 
+diff --git a/test/vdesign/fatigue_test.cljk b/test/vdesign/fatigue_test.cljk
+new file mode 100644
+index 0000000..735f2e3
+--- /dev/null
++++ b/test/vdesign/fatigue_test.cljk
+@@ -0,0 +1,84 @@
++(ns vdesign.fatigue-test
++  "Tests for vdesign.fatigue — exact identities on synthetic fixtures
++  (fixture numbers carry fixture provenance; no Mg/MgH2, PEM, vehicle,
++  or material constant is measured or invented here)."
++  (:require [kotoba.test :refer [deftest is testing]]
++            [vdesign.fatigue :as f]))
++
++(def ^:private sn-src "fixture: synthetic S-N curve for tests only")
++(def ^:private spec-src "fixture: synthetic load spectrum for tests only")
++
++;; log-log exact by construction: (100,1e6) → (200,1e4). Two decades of
++;; stress, four decades of life.
++(def ^:private curve
++  [{:stress-mpa 100.0 :cycles 1.0e6}
++   {:stress-mpa 200.0 :cycles 1.0e4}])
++
++(defn- screen [curve bins]
++  (f/fatigue-screen {:sn-curve curve :sn-source sn-src
++                     :load-spectrum bins :spectrum-source spec-src}))
++
++(defn- throws? [f]
++  (try (f) false (catch :default _ true)))
++
++(deftest log-log-interpolation-is-exact-at-curve-points
++  (let [r (screen curve [{:stress-amp-mpa 200.0 :cycles 5.0e3}])]
++    (is (< (Math/abs (- (:cycles-to-failure (nth (:bins r) 0)) 1.0e4)) 1e-9))
++    (is (< (Math/abs (- (:damage-total r) 0.5)) 1e-12))
++    (is (= :ok (:verdict r)))))
++
++(deftest geometric-midpoint-interpolates-to-geometric-mean-life
++  (let [s (Math/sqrt (* 100.0 200.0))       ; log-midpoint of the curve
++        r (screen curve [{:stress-amp-mpa s :cycles 1.0e5}])]
++    (is (< (Math/abs (- (:cycles-to-failure (nth (:bins r) 0)) 1.0e5)) 1e-6))
++    (is (< (Math/abs (- (:damage-total r) 1.0)) 1e-12))
++    (is (= :at-limit (:verdict r)))))
++
++(deftest multi-bin-damage-sums-and-exceeds
++  ;; 1 damage unit total: 0.25 at 200 MPa + 0.75 at ~141.42 MPa
++  (let [s (Math/sqrt (* 100.0 200.0))
++        r (screen curve [{:stress-amp-mpa 200.0 :cycles 2.5e3}
++                         {:stress-amp-mpa s :cycles 7.5e4}])]
++    (is (= 2 (count (:bins r))))
++    (is (< (Math/abs (- (:damage-total r) 1.0)) 1e-12))
++    (is (= :at-limit (:verdict r))))
++  (let [s (Math/sqrt (* 100.0 200.0))
++        r (screen curve [{:stress-amp-mpa 200.0 :cycles 5.0e3}
++                         {:stress-amp-mpa s :cycles 1.5e5}])]
++    (is (> (:damage-total r) 1.0))
++    (is (= :exceeded (:verdict r)))))
++
++(deftest curve-point-at-low-end-is-honoured
++  (let [r (screen curve [{:stress-amp-mpa 100.0 :cycles 1.0e6}])]
++    (is (< (Math/abs (- (:damage-total r) 1.0)) 1e-12))
++    (is (= :at-limit (:verdict r)))))
++
++(deftest provenance-is-echoed-and-unmeasured-listed
++  (let [r (screen curve [{:stress-amp-mpa 200.0 :cycles 1.0}])]
++    (is (= sn-src (:sn-source r)))
++    (is (= spec-src (:spectrum-source r)))
++    (is (= [100.0 200.0] (:sn-stress-range-mpa r)))
++    (is (contains? (set (:unmeasured r)) :mean-stress-effects))
++    (is (contains? (set (:unmeasured r)) :scatter/life-factor))))
++
++(deftest refuses-extrapolation-outside-curve-range
++  (is (throws? #(screen curve [{:stress-amp-mpa 300.0 :cycles 1.0e3}])))
++  (is (throws? #(screen curve [{:stress-amp-mpa  50.0 :cycles 1.0e6}]))))
++
++(deftest refuses-blank-or-missing-provenance
++  (is (throws? #(f/fatigue-screen {:sn-curve curve :sn-source "  "
++                                   :load-spectrum [{:stress-amp-mpa 200.0 :cycles 1.0}]
++                                   :spectrum-source spec-src})))
++  (is (throws? #(f/fatigue-screen {:sn-curve curve
++                                   :load-spectrum [{:stress-amp-mpa 200.0 :cycles 1.0}]
++                                   :spectrum-source spec-src}))))
++
++(deftest refuses-empty-and-malformed-inputs
++  (is (throws? #(screen [] [{:stress-amp-mpa 200.0 :cycles 1.0}])))
++  (is (throws? #(screen curve [])))
++  (is (throws? #(screen [{:stress-mpa 200.0 :cycles 1.0e4}
++                         {:stress-mpa 200.0 :cycles 1.0e4}] ; duplicate stress
++                        [{:stress-amp-mpa 200.0 :cycles 1.0}])))
++  (is (throws? #(screen curve [{:stress-amp-mpa 200.0 :cycles 0.0}])))
++  (is (throws? #(screen curve [{:stress-amp-mpa -1.0 :cycles 1.0}])))
++  (is (throws? #(screen curve [{:stress-amp-mpa (Math/NaN) :cycles 1.0}]))))
+diff --git a/test/vdesign/hydrogen_test.cljc b/test/vdesign/hydrogen_test.cljk
+similarity index 50%
+rename from test/vdesign/hydrogen_test.cljc
+rename to test/vdesign/hydrogen_test.cljk
+index 688985a..a9b7a84 100644
+--- a/test/vdesign/hydrogen_test.cljc
++++ b/test/vdesign/hydrogen_test.cljk
+@@ -1,9 +1,12 @@
+ (ns vdesign.hydrogen-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.hydrogen :as h]
+             [vdesign.dc-bus :as dc]
+             [vdesign.cartridge :as cartridge]
+-            [vdesign.powertrain :as pt]))
++            [vdesign.powertrain :as pt]
++            [echem.profile :as prof]
++            [echem.system :as es]
++            [vdesign.reactor-heat :as rh]))
+ 
+ (defn- close? [a b] (< (Math/abs (- a b)) 1e-9))
+ 
+@@ -115,3 +118,105 @@
+     (is (throws? #(h/consumption-profile {:fc-profile-kw [1.0] :dt-s 1.0
+                                           :fc-elec-eff 0.5
+                                           :store-h2-kg -2.0})))))
++;; ---------------------------------------------------------------------
++;; consumption-from-duty-profile — composition with echem.profile
++;; (requires the echem git dep pinned past :rom-fc-profile, PR#5)
++
++(def echem-case {:bop-frac 0.15 :bop-source "fixture: synthetic screening value"})
++
++(defn- duty-profile [p-net-kw]
++  (prof/demand-profile
++   echem-case
++   {:p-net-kw p-net-kw :dt-s 10.0
++    :profile-source "fixture: synthetic constant duty cycle"}))
++
++(deftest duty-consumption-constant-profile-closed-form
++  (testing "constant net demand → per-interval H2 = ṁ·dt, upstream total reproduced"
++    (let [prof (duty-profile [80.0 80.0 80.0 80.0])
++          rate (:h2-kg-per-s (es/demand-point echem-case 80.0))
++          r    (h/consumption-from-duty-profile
++                prof {:profile-source "fixture: synthetic constant duty cycle"})]
++      (is (= 3 (count (:intervals r))))
++      (doseq [row (:intervals r)]
++        (is (close? (* rate 10.0) (:h2-kg row)))
++        (is (pos? (:eta-sys-start row)))
++        (is (pos? (:eta-sys-end row))))
++      (is (close? (:h2-kg prof) (get-in r [:h2 :total-kg])))
++      (is (get-in r [:h2 :integration-consistent]))
++      (is (pos? (get-in r [:provenance :eta-sys-min])))
++      (is (pos? (get-in r [:provenance :eta-sys-max])))
++      (is (= "fixture: synthetic constant duty cycle"
++             (get-in r [:provenance :profile-source]))))))
++
++(deftest duty-consumption-mgh2-stoichiometry-identity
++  (testing "per-interval MgH2 = H2 / w-h2(MgH2), same arithmetic as consumption-profile"
++    (let [prof (duty-profile [80.0 80.0])
++          r    (h/consumption-from-duty-profile prof {:profile-source "fixture: synthetic constant duty cycle"})
++          wh2  (:w-h2-mgh2 (:provenance (h/consumption-profile
++                                          {:fc-profile-kw [1.0] :dt-s 1.0
++                                           :fc-elec-eff 0.5})))]
++      (doseq [row (:intervals r)]
++        (is (close? (/ (:h2-kg row) wh2) (:mgh2-kg row)))))))
++
++(deftest duty-consumption-depleted-store-is-a-reported-shortfall
++  (testing "a store that runs out mid-profile is reported, never thrown"
++    (let [prof (duty-profile [80.0 80.0 80.0 80.0])
++          full (h/consumption-from-duty-profile
++                prof {:profile-source "fixture: synthetic constant duty cycle" :store-h2-kg 1.0e9})
++          tiny (h/consumption-from-duty-profile
++                prof {:profile-source "fixture: synthetic constant duty cycle"
++                      :store-h2-kg (get-in full [:intervals 0 :h2-kg])})]
++      (is (close? 0.0 (get-in full [:h2 :total-shortfall-kg])))
++      (is (pos? (get-in tiny [:h2 :total-shortfall-kg])))
++      (is (= 1 (get-in tiny [:store :depleted-at-i])))
++      (is (close? 0.0 (get-in tiny [:store :end-kg])))
++      (is (close? (get-in tiny [:store :start-kg])
++                  (+ (get-in tiny [:store :end-kg])
++                     (- (get-in tiny [:h2 :total-kg])
++                        (get-in tiny [:h2 :total-shortfall-kg]))))))))
++
++(deftest duty-consumption-refusals
++  (testing "fail closed: non-profile input, blank provenance, missing store form"
++    (is (throws? #(h/consumption-from-duty-profile
++                   {:solver :nope :points [] :dt-s 1.0 :provenance {}}
++                   {:profile-source "x"})))
++    (is (throws? #(h/consumption-from-duty-profile
++                   (duty-profile [80.0 80.0]) {:profile-source " "})))
++    (is (throws? #(h/consumption-from-duty-profile
++                   (duty-profile [80.0 80.0]) {})))
++    (is (throws? #(h/consumption-from-duty-profile
++                   (duty-profile [80.0 80.0]) {:profile-source "fixture: synthetic constant duty cycle" :store-h2-kg 0.0})))))
++
++(deftest duty-consumption-gaps-skip-and-refuse
++  (testing "infeasible sample: refuse by default; :allow-gaps consumes only covered intervals"
++    (let [gappy (prof/demand-profile
++                 echem-case
++                 {:p-net-kw [80.0 1.0e6 80.0 80.0] :dt-s 10.0
++                  :profile-source "fixture: synthetic gappy duty cycle"
++                  :on-infeasible :skip})]
++      (is (throws? #(h/consumption-from-duty-profile gappy {:profile-source "fixture: synthetic gappy duty cycle"})))
++      (let [r (h/consumption-from-duty-profile
++               gappy {:profile-source "fixture: synthetic gappy duty cycle" :allow-gaps true})]
++        (is (pos? (count (get-in r [:gaps :skipped-interval-indices]))))
++        ;; only the single covered 80→80 pair is consumed; the gap never bridges
++        (is (= 1 (count (:intervals r))))
++        (is (pos? (:infeasible-count gappy)))))))
++
++(deftest duty-consumption-refuses-mismatched-provenance
++  (testing ":profile-source must match the duty profile's own provenance"
++    (is (throws? #(h/consumption-from-duty-profile
++                   (duty-profile [80.0 80.0]) {:profile-source "some other duty cycle"})))
++    (let [prof (duty-profile [80.0 80.0])
++          r    (h/consumption-from-duty-profile prof {:profile-source "fixture: synthetic constant duty cycle"})]
++      (is (= (:provenance prof) (get-in r [:provenance :upstream-provenance]))))))
++
++(deftest duty-consumption-feeds-reactor-heat
++  (testing "the duty-consumption result composes with vdesign.reactor-heat"
++    (let [r  (h/consumption-from-duty-profile
++              (duty-profile [80.0 80.0 80.0])
++              {:profile-source "fixture: synthetic constant duty cycle"})
++          rh (rh/reactor-heat r {:dh-j-per-kg-mgh2 1.0e6
++                                 :dh-source "fixture: synthetic declared enthalpy"})]
++      (is (= :reactor-heat-demand (:kind rh)))
++      (is (= (count (:intervals r)) (count (:intervals rh))))
++      (is (= :hydrogen-duty-consumption (get-in rh [:provenance :source-kind]))))))
+diff --git a/test/vdesign/motionplan_test.cljc b/test/vdesign/motionplan_test.cljk
+similarity index 97%
+rename from test/vdesign/motionplan_test.cljc
+rename to test/vdesign/motionplan_test.cljk
+index 1ab6225..414335d 100644
+--- a/test/vdesign/motionplan_test.cljc
++++ b/test/vdesign/motionplan_test.cljk
+@@ -1,7 +1,7 @@
+ (ns vdesign.motionplan-test
+   "vdesign.motionplan's Cartesian-waypoint extension of vdesign.process's
+   real BOM + 4D assembly order."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [langgraph.graph :as g]
+             [vdesign.design :as design]
+             [vdesign.process :as process]
+diff --git a/test/vdesign/powertrain_test.clj b/test/vdesign/powertrain_test.cljk
+similarity index 98%
+rename from test/vdesign/powertrain_test.clj
+rename to test/vdesign/powertrain_test.cljk
+index 3317462..fad2fd5 100644
+--- a/test/vdesign/powertrain_test.clj
++++ b/test/vdesign/powertrain_test.cljk
+@@ -2,7 +2,7 @@
+   "size-fcev's mass-breakdown arithmetic: :tank-mass-kg is already the FULL
+   tank-system mass (grav-frac = usable-H2 / tank-system-mass), so
+   :store-mass-kg / :mass-kg must not add h2-kg a second time."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.proposer :as proposer]
+             [vdesign.powertrain :as pt]))
+ 
+diff --git a/test/vdesign/process_test.clj b/test/vdesign/process_test.cljk
+similarity index 97%
+rename from test/vdesign/process_test.clj
+rename to test/vdesign/process_test.cljk
+index f311e9f..19ac982 100644
+--- a/test/vdesign/process_test.clj
++++ b/test/vdesign/process_test.cljk
+@@ -2,7 +2,7 @@
+   "bom's apportioned part masses must sum back to the mass-budget totals
+   they were split from -- no double-counting a component that already has
+   its own dedicated BOM line."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.process :as process]))
+ 
+ (def ^:private bom* #'process/bom)
+diff --git a/test/vdesign/reactor_heat_test.cljk b/test/vdesign/reactor_heat_test.cljk
+new file mode 100644
+index 0000000..a896bb0
+--- /dev/null
++++ b/test/vdesign/reactor_heat_test.cljk
+@@ -0,0 +1,133 @@
++(ns vdesign.reactor-heat-test
++  "Tests for vdesign.reactor-heat — declared-enthalpy arithmetic, heater
++  deficit discipline, and fail-closed validation on synthetic fixtures
++  (fixture numbers carry fixture provenance; no Mg/MgH2, hydrogen, or
++  code constant is measured or invented here)."
++  (:require [kotoba.test :refer [deftest is testing]]
++            [vdesign.hydrogen :as hyd]
++            [vdesign.swap-schedule :as ss]
++            [vdesign.reactor-heat :as rh]
++            [vdesign.powertrain :as pt]))
++
++(def ^:private eff-src "fixture: synthetic efficiency for tests only")
++(def ^:private cart-src "fixture: synthetic cartridge capacity for tests only")
++(def ^:private dh-src "fixture: synthetic desorption enthalpy for tests only")
++(def ^:private heater-src "fixture: synthetic heater capability for tests only")
++(def ^:private dh 2.0e6)  ; fixture enthalpy, J/kg MgH2 — synthetic, unmeasured
++
++(defn- schedule [& kg-per-interval]
++  (ss/swap-schedule
++    {:fc-profile-kw (mapv (fn [kg] (/ (* kg 0.5 pt/LHV-H2-J) (* 1000.0 3600.0))) kg-per-interval)
++     :dt-s 3600.0
++     :fc-elec-eff 0.5 :eff-source eff-src
++     :cartridge-h2-kg 10.0 :cartridge-source cart-src
++     :spare-cartridges (count kg-per-interval)}))
++
++(defn- consumption [kw-profile]
++  (hyd/consumption-profile
++    {:fc-profile-kw kw-profile :dt-s 3600.0
++     :fc-elec-eff 0.5}))
++
++(def ^:private heat-opts
++  {:dh-j-per-kg-mgh2 dh :dh-source dh-src})
++
++(defn- approx= [a b]
++  (< (Math/abs (- (double a) (double b))) (* 1e-9 (max 1.0 (Math/abs (double a))))))
++
++(deftest heat-arithmetic-is-exact-declared-multiplication
++  (testing "per-interval heat = mgh2-kg · declared dh, dt-scaled power"
++    (let [c (consumption [1.0 1.0])
++          r (rh/reactor-heat c heat-opts)
++          ;; interval draw: E = 1 kW·3600 s = 3.6 MJ elec; H2 = E/(0.5·LHV)
++          h2-kg (/ (* 1.0 3600.0 1000.0) (* 0.5 pt/LHV-H2-J))
++          wh2 (/ (* 2.0 1.008) (+ 24.305 (* 2.0 1.008)))
++          mgh2 (/ h2-kg wh2)]
++      (is (= :reactor-heat-demand (:kind r)))
++      (is (= 2 (count (:intervals r))))
++      (is (approx= (* mgh2 dh 2) (* 1000.0 (get-in r [:heat :total-kj]))))
++      (is (approx= (/ (* mgh2 dh) 3600.0 1000.0) (get-in r [:heat :peak-kw])))
++      ;; every row carries its declared-input arithmetic
++      (is (approx= (/ (* mgh2 dh) 1000.0) (:heat-kj (first (:intervals r))))))))
++
++(deftest kind-guard-refuses-non-consumption-inputs
++  (testing "a result with neither accepted kind is refused loudly"
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat {:kind :bev-pack} heat-opts)))
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat nil heat-opts)))))
++
++(deftest works-from-both-accepted-upstream-kinds
++  (testing "swap-schedule results are accepted"
++    (let [r (rh/reactor-heat (schedule 1.0 1.0) heat-opts)]
++      (is (= :cartridge-swap-schedule (get-in r [:provenance :source-kind])))
++      (is (= 2 (count (:intervals r))))))
++  (testing "hydrogen-consumption results are accepted"
++    (let [r (rh/reactor-heat (consumption [1.0]) heat-opts)]
++      (is (= :hydrogen-consumption (get-in r [:provenance :source-kind]))))))
++
++(deftest heater-deficit-discipline
++  (testing "an adequate declared heater reports zero shortfall and adequate?"
++    (let [c (schedule 1.0 1.0)
++          ;; demand = 2 intervals · 0.5 kg-ish desorption each — size the
++          ;; heater from the contract's own output, then re-declare it
++          probe (rh/reactor-heat c heat-opts)
++          pk (get-in probe [:heat :peak-kw])
++          r (rh/reactor-heat c (assoc heat-opts
++                                      :heater-kw (* 2.0 pk)
++                                      :heater-source heater-src))]
++      (is (true? (:adequate? r)))
++      (is (zero? (get-in r [:heater :total-shortfall-kj])))
++      (is (nil? (get-in r [:heater :first-shortfall-at])))
++      (is (every? #(or (nil? (:shortfall-kj %)) (zero? (:shortfall-kj %)))
++                  (:intervals r)))))
++  (testing "an undersized heater reports the shortfall, never clips it"
++    (let [c (schedule 1.0 1.0)
++          probe (rh/reactor-heat c heat-opts)
++          pk (get-in probe [:heat :peak-kw])
++          r (rh/reactor-heat c (assoc heat-opts
++                                      :heater-kw (* 0.5 pk)
++                                      :heater-source heater-src))]
++      (is (false? (:adequate? r)))
++      (is (pos? (get-in r [:heater :total-shortfall-kj])))
++      (is (= 0 (get-in r [:heater :first-shortfall-at])))
++      (is (pos? (:shortfall-kj (first (:intervals r))))))))
++
++(deftest no-heater-omits-verdict-keys
++  (testing "without :heater-kw there is no adequacy claim at all"
++    (let [r (rh/reactor-heat (consumption [1.0]) heat-opts)]
++      (is (not (contains? r :adequate?)))
++      (is (not (contains? r :heater)))
++      (is (every? (fn [row] (nil? (:shortfall-kj row))) (:intervals r))))))
++
++(deftest unmeasured-carried
++  (testing "the honest gap list rides every result"
++    (let [r (rh/reactor-heat (consumption [1.0]) heat-opts)]
++      (is (true? (get-in r [:unmeasured :desorption-enthalpy])))
++      (is (true? (get-in r [:unmeasured :desorption-kinetics])))
++      (is (true? (get-in r [:unmeasured :refill-absorption-heat])))
++      (is (= dh (get-in r [:provenance :dh-j-per-kg-mgh2])))
++      (is (= dh-src (get-in r [:provenance :dh-source]))))))
++
++(deftest fail-closed-input-validation
++  (testing "non-positive or absent enthalpy is refused loudly"
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat (consumption [1.0])
++                                            {:dh-j-per-kg-mgh2 nil :dh-source dh-src})))
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat (consumption [1.0])
++                                            {:dh-j-per-kg-mgh2 0.0 :dh-source dh-src})))
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat (consumption [1.0])
++                                            {:dh-j-per-kg-mgh2 -1.0 :dh-source dh-src}))))
++  (testing "blank provenance is refused loudly"
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat (consumption [1.0])
++                                            {:dh-j-per-kg-mgh2 dh :dh-source ""})))
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat (consumption [1.0])
++                                            (assoc heat-opts :heater-kw 1.0 :heater-source "  ")))))
++  (testing "heater-source without heater-kw is refused"
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat (consumption [1.0])
++                                            (assoc heat-opts :heater-source heater-src)))))
++  (testing "non-positive heater-kw is refused"
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat (consumption [1.0])
++                                            (assoc heat-opts :heater-kw 0.0 :heater-source heater-src))))
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat (consumption [1.0])
++                                            (assoc heat-opts :heater-kw -3.0 :heater-source heater-src)))))
++  (testing "upstream missing dt-s is refused"
++    (is (thrown? #?(:clj Exception :cljs js/Error) (rh/reactor-heat {:kind :cartridge-swap-schedule
++                                             :intervals [] :provenance {}}
++                                            heat-opts)))))
+diff --git a/test/vdesign/scene_test.cljc b/test/vdesign/scene_test.cljk
+similarity index 98%
+rename from test/vdesign/scene_test.cljc
+rename to test/vdesign/scene_test.cljk
+index 6d6bfaa..f5a6579 100644
+--- a/test/vdesign/scene_test.cljc
++++ b/test/vdesign/scene_test.cljk
+@@ -3,7 +3,7 @@
+   vdesign.simphysics's trajectory into kami.webgpu.mesh's real input
+   shape, asserted for well-formedness (no browser/WebGPU device is
+   available in this repo — see vdesign.scene's docstring)."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [langgraph.graph :as g]
+             [vdesign.design :as design]
+             [vdesign.simphysics :as simphysics]
+diff --git a/test/vdesign/simphysics_test.cljc b/test/vdesign/simphysics_test.cljk
+similarity index 98%
+rename from test/vdesign/simphysics_test.cljc
+rename to test/vdesign/simphysics_test.cljk
+index 284c1d5..6dc6ecb 100644
+--- a/test/vdesign/simphysics_test.cljc
++++ b/test/vdesign/simphysics_test.cljk
+@@ -2,7 +2,7 @@
+   "vdesign.simphysics's physics_2d-backed time-stepped simulation,
+   exercised against real released designs (via the real StateGraph, the
+   same pattern vdesign.cad-bridge-test uses)."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [langgraph.graph :as g]
+             [vdesign.design :as design]
+             [vdesign.simphysics :as simphysics]))
+diff --git a/test/vdesign/swap_schedule_test.cljc b/test/vdesign/swap_schedule_test.cljk
+similarity index 99%
+rename from test/vdesign/swap_schedule_test.cljc
+rename to test/vdesign/swap_schedule_test.cljk
+index b4b2873..0590b9d 100644
+--- a/test/vdesign/swap_schedule_test.cljc
++++ b/test/vdesign/swap_schedule_test.cljk
+@@ -4,7 +4,7 @@
+   or vehicle constant is measured or invented here). Demands are stated
+   in kg of H2 per interval and converted to kW by the EXACT identity the
+   contract itself uses, so the assertions read in kg."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.swap-schedule :as ss]
+             [vdesign.powertrain :as pt]
+             [vdesign.cartridge :as cart]))
+diff --git a/test/vdesign/swap_station_test.cljc b/test/vdesign/swap_station_test.cljk
+similarity index 99%
+rename from test/vdesign/swap_station_test.cljc
+rename to test/vdesign/swap_station_test.cljk
+index 076ed28..d08ba99 100644
+--- a/test/vdesign/swap_station_test.cljc
++++ b/test/vdesign/swap_station_test.cljk
+@@ -3,7 +3,7 @@
+   audit-log behavior on synthetic fixtures (fixture numbers carry
+   fixture provenance; no Mg/MgH2, hydrogen, or code constant is
+   measured or invented here)."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [vdesign.swap-schedule :as ss]
+             [vdesign.swap-station :as station]
+             [vdesign.powertrain :as pt]))
+diff --git a/test/vdesign/vehicle_test.clj b/test/vdesign/vehicle_test.cljk
+similarity index 96%
+rename from test/vdesign/vehicle_test.clj
+rename to test/vdesign/vehicle_test.cljk
+index b4cd292..01c09b8 100644
+--- a/test/vdesign/vehicle_test.clj
++++ b/test/vdesign/vehicle_test.cljk
+@@ -1,5 +1,5 @@
+ (ns vdesign.vehicle-test
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.test :refer [deftest is]]
+             [kotoba.physics.contract :as contract]
+             [kotoba.physics.vehicle :as shared]
+             [vdesign.physics :as physics]

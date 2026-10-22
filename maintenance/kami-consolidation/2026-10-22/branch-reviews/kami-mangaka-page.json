@@ -1,0 +1,473 @@
+{
+  "repository": "kotoba-lang/kami-mangaka-page",
+  "default": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "commit": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "commit": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "3ace76d0d5ad76a64c09d22098ecfdc1646eb1f5",
+      "commit": "3ace76d0d5ad76a64c09d22098ecfdc1646eb1f5",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "776fb42585b38939315aa479617841af431c74eb",
+      "commit": "776fb42585b38939315aa479617841af431c74eb",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/chore/bb-to-nbb-wave3",
+      "object": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75",
+      "commit": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "commit": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "acc1612eac1e1bd8fc3e83c7fff334a8667681c3",
+      "commit": "acc1612eac1e1bd8fc3e83c7fff334a8667681c3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "commit": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 2,
+        "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/2",
+        "head": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+        "merge": "b99c4023c2d283e17741e9acbefbd929c0cde2df",
+        "merge-base": "d4b578d6025601d49b167c7372a5af3613954332",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/kami/mangaka/page.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "4227cd70db42e9cb621036295fbcb429ae95756d"
+            }
+          },
+          {
+            "path": "test/kami/mangaka/page_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "25d13ead7cb9371844ccfc60860be3468d1a96b2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
+      "object": "8218d21d061130c5d55b65d0ea6ede57fda41cbe",
+      "commit": "8218d21d061130c5d55b65d0ea6ede57fda41cbe",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-4",
+      "object": "c93b5e2d80ccad7e82466a2864b252c54e258b9e",
+      "commit": "c93b5e2d80ccad7e82466a2864b252c54e258b9e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-5",
+      "object": "6f9390048acc698e5f0dbe17be94718bfcc6b387",
+      "commit": "6f9390048acc698e5f0dbe17be94718bfcc6b387",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-6",
+      "object": "55860eef17b1608a49e8990fce803e90e919ff8d",
+      "commit": "55860eef17b1608a49e8990fce803e90e919ff8d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-7",
+      "object": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "commit": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 2,
+        "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/2",
+        "head": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+        "merge": "b99c4023c2d283e17741e9acbefbd929c0cde2df",
+        "merge-base": "d4b578d6025601d49b167c7372a5af3613954332",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/kami/mangaka/page.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "4227cd70db42e9cb621036295fbcb429ae95756d"
+            }
+          },
+          {
+            "path": "test/kami/mangaka/page_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "25d13ead7cb9371844ccfc60860be3468d1a96b2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "commit": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/bubble-placement-score",
+      "object": "6f9390048acc698e5f0dbe17be94718bfcc6b387",
+      "commit": "6f9390048acc698e5f0dbe17be94718bfcc6b387",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/dialogue-font-role-and-tight-fit",
+      "object": "c93b5e2d80ccad7e82466a2864b252c54e258b9e",
+      "commit": "c93b5e2d80ccad7e82466a2864b252c54e258b9e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/dialogue-sfx-fit",
+      "object": "8218d21d061130c5d55b65d0ea6ede57fda41cbe",
+      "commit": "8218d21d061130c5d55b65d0ea6ede57fda41cbe",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/komawari-artist-styles",
+      "object": "4b09611f9fe52bd9ca530d27177c4be9a6f52e5a",
+      "commit": "4b09611f9fe52bd9ca530d27177c4be9a6f52e5a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/sheared-row-governor",
+      "object": "197220e9ed244fccc33b0ec79e0bbfff3e5bedfd",
+      "commit": "197220e9ed244fccc33b0ec79e0bbfff3e5bedfd",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/text-sha-refresh",
+      "object": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "commit": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 2,
+        "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/2",
+        "head": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+        "merge": "b99c4023c2d283e17741e9acbefbd929c0cde2df",
+        "merge-base": "d4b578d6025601d49b167c7372a5af3613954332",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/kami/mangaka/page.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "4227cd70db42e9cb621036295fbcb429ae95756d"
+            }
+          },
+          {
+            "path": "test/kami/mangaka/page_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "25d13ead7cb9371844ccfc60860be3468d1a96b2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/chore/bb-to-nbb-wave3",
+      "object": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75",
+      "commit": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/effectlines-gaze-20260709",
+      "object": "8bd8e7921e315ee305301f6236745f55af3f3343",
+      "commit": "8bd8e7921e315ee305301f6236745f55af3f3343",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/drop-nbb-cache",
+      "object": "a9a838c817d1985474f47f2bc79d49e18bf6cb20",
+      "commit": "a9a838c817d1985474f47f2bc79d49e18bf6cb20",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "61a7036b038de66602d358eef0ab50ca69e73003",
+      "commit": "61a7036b038de66602d358eef0ab50ca69e73003",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text",
+      "object": "4098f1dd186e2ad9274c634bff95173203199874",
+      "commit": "4098f1dd186e2ad9274c634bff95173203199874",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text-cljs",
+      "object": "ebe1bf058d1e4ea5fe51e6a9ecfd4ea43ede17e9",
+      "commit": "ebe1bf058d1e4ea5fe51e6a9ecfd4ea43ede17e9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/nbb-declaration",
+      "object": "e5383effde9b0068c3a6a8b2a0a23619897029e2",
+      "commit": "e5383effde9b0068c3a6a8b2a0a23619897029e2",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "commit": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "commit": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/text-sha-refresh",
+      "object": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "commit": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 2,
+        "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/2",
+        "head": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+        "merge": "b99c4023c2d283e17741e9acbefbd929c0cde2df",
+        "merge-base": "d4b578d6025601d49b167c7372a5af3613954332",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/kami/mangaka/page.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "4227cd70db42e9cb621036295fbcb429ae95756d"
+            }
+          },
+          {
+            "path": "test/kami/mangaka/page_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "25d13ead7cb9371844ccfc60860be3468d1a96b2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/chore/bb-to-nbb-wave3",
+      "object": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75",
+      "commit": "40cdf7274bf15bdee0161fe8da1eab915d2f1d75",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "676266066e01168fad166981f929bd016e8ea170",
+      "commit": "676266066e01168fad166981f929bd016e8ea170",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "022043cbefa2aaec589b6c42519e310fabdcf787",
+      "commit": "022043cbefa2aaec589b6c42519e310fabdcf787",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "commit": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/1",
+      "head": "acc1612eac1e1bd8fc3e83c7fff334a8667681c3",
+      "merge": "45148cdf8858818815043b2f9df76a208d1060f0",
+      "merge-base": "c416dd96dfefc251d0c66eb87999fb258f7ad315",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kami/mangaka/page.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "054011f419bf037bb5eaef83dca3e2aa07151dcd"
+          }
+        },
+        {
+          "path": "test/kami/mangaka/page_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2e571514496bd4f951e148f6c186ce4d2db9798f"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/2",
+      "head": "bbb023f49581f8cfb31e41006e4ebcb4c4e5a490",
+      "merge": "b99c4023c2d283e17741e9acbefbd929c0cde2df",
+      "merge-base": "d4b578d6025601d49b167c7372a5af3613954332",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kami/mangaka/page.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "4227cd70db42e9cb621036295fbcb429ae95756d"
+          }
+        },
+        {
+          "path": "test/kami/mangaka/page_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "25d13ead7cb9371844ccfc60860be3468d1a96b2"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/3",
+      "head": "8218d21d061130c5d55b65d0ea6ede57fda41cbe",
+      "merge": "33aba144d5b59c7ddb1038d06e42b5a64ef4f02d",
+      "merge-base": "b99c4023c2d283e17741e9acbefbd929c0cde2df",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kami/mangaka/page.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "90f6d2730450b6d9338682528a9895c0f96d6cf0"
+          }
+        },
+        {
+          "path": "test/kami/mangaka/page_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2b60c3e315cc13d19aab9c690a114d877a68bd07"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 4,
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/4",
+      "head": "c93b5e2d80ccad7e82466a2864b252c54e258b9e",
+      "merge": "71f139f852e572fcf0c5861f3821e0ab8e1ed039",
+      "merge-base": "33aba144d5b59c7ddb1038d06e42b5a64ef4f02d",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kami/mangaka/page.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "7c33c8f7f40c96b746df30b94a13e63154cd4be2"
+          }
+        },
+        {
+          "path": "test/kami/mangaka/page_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "fac9f658e4c7af1dcc90dcf01a1363dc27b99a0a"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 5,
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/5",
+      "head": "6f9390048acc698e5f0dbe17be94718bfcc6b387",
+      "merge": "de175762204200766b8f9007f064da7d4e40cf25",
+      "merge-base": "71f139f852e572fcf0c5861f3821e0ab8e1ed039",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kami/mangaka/page.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "737b2664b42c698e6334ca7894c444cf3b902765"
+          }
+        },
+        {
+          "path": "test/kami/mangaka/page_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d8dd01e1a6dc8d0be11f5e2fc3537fd996a3f881"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 6,
+      "url": "https://github.com/kotoba-lang/kami-mangaka-page/pull/6",
+      "head": "55860eef17b1608a49e8990fce803e90e919ff8d",
+      "merge": "7244f8d37aac9c92ee98abd471d9ffb31e9a093f",
+      "merge-base": "de175762204200766b8f9007f064da7d4e40cf25",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kami/mangaka/page.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d9feac6377abc30c09eda1b0c260037dfdf572bd"
+          }
+        },
+        {
+          "path": "test/kami/mangaka/page_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "ab61316ef48dbffd601985d3dc9e72f99d6a0663"
+          }
+        }
+      ]
+    }
+  ]
+}

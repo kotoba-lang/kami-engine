@@ -1,0 +1,23 @@
+{:paths ["src"]
+ ;; Reduced-order lithium battery PACK solver on the shared, purpose-split libs.
+ ;; Registers :rom-pack on the cae-solver contract. kami-engine-echem is a PEM
+ ;; fuel cell, not a battery; this is the missing store for electric aircraft,
+ ;; and unlike a fixed pack-Wh/kg table it carries the rate effects that
+ ;; dominate at the 3-15C a rotorcraft actually flies at.
+ :deps {
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}io.github.kotoba-lang/datom                  {:git/sha "3a45462b3b6da018e24c65d12f8f3d3250a0c38e"}
+        io.github.kotoba-lang/kami-engine-cae-solver {:git/sha "214a1907890b75cbb5ed6781cf3dea8cba0f4351"}}
+ :aliases
+ {:test {:extra-paths ["test"]
+         :extra-deps {io.github.cognitect-labs/test-runner
+                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+         :main-opts ["-m" "cognitect.test-runner"]
+         :exec-fn cognitect.test-runner.api/test}
+  :dev {:override-deps {io.github.kotoba-lang/datom                  {:local/root "../datom"}
+                        io.github.kotoba-lang/kami-engine-cae-solver {:local/root "../kami-engine-cae-solver"}}}
+  :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
+         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test"
+                     "--fail-level" "error"]}}}

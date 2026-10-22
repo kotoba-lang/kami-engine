@@ -1,0 +1,73 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTLU8Yw",
+    "databaseId": 1286945891,
+    "nameWithOwner": "kotoba-lang/kami-game-scene",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-24T06:38:41Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 0
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-game-scene\nHEAD f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41\ndetached",
+    "refs": "refs/audit/forest-maintenance/default f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41\nrefs/heads/main abb115d044e98c7111ddafe1de7ceeb93afd181d\nrefs/heads/manifest-rev df21039144a48b2d154acac10e5dd79f511000d9\nrefs/remotes/kotoba-lang/HEAD f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41\nrefs/remotes/kotoba-lang/cljk-rename-20260911 2f4c88c52e12a0098be4912bf4a5919c784e70be\nrefs/remotes/kotoba-lang/jv/full-sha 56a712fe7da58a294c8bc651ec7341fa5c5ea08d\nrefs/remotes/kotoba-lang/jv/kotoba-text 8eb82237f3e59c2892e80c4195e2004f8699fc5f\nrefs/remotes/kotoba-lang/kbb-cutover-20260911 bfd52eb35c3e6321bdcc5399b7321783ec1b6983\nrefs/remotes/kotoba-lang/main f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41"
+  },
+  "local-after-preservation": {
+    "HEAD": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-game-scene\nHEAD f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "refs/heads/main": "abb115d044e98c7111ddafe1de7ceeb93afd181d",
+      "refs/heads/manifest-rev": "df21039144a48b2d154acac10e5dd79f511000d9",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "refs/remotes/kotoba-lang/HEAD": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "refs/remotes/kotoba-lang/cljk-rename-20260911": "2f4c88c52e12a0098be4912bf4a5919c784e70be",
+      "refs/remotes/kotoba-lang/jv/full-sha": "56a712fe7da58a294c8bc651ec7341fa5c5ea08d",
+      "refs/remotes/kotoba-lang/jv/kotoba-text": "8eb82237f3e59c2892e80c4195e2004f8699fc5f",
+      "refs/remotes/kotoba-lang/kbb-cutover-20260911": "bfd52eb35c3e6321bdcc5399b7321783ec1b6983",
+      "refs/remotes/kotoba-lang/main": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41"
+    }
+  },
+  "historical-pulls": []
+}

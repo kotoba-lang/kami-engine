@@ -1,0 +1,61 @@
+{
+  "repository": "kotoba-lang/kami-ongaku-plugin-host",
+  "default": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "commit": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "commit": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "86654255566cc1c06ece90f4fe2772b65bb359f9",
+      "commit": "86654255566cc1c06ece90f4fe2772b65bb359f9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "commit": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "commit": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/cljk-rename-20260911",
+      "object": "7c578ac8d04918d131e093bf6f978fcc57eab787",
+      "commit": "7c578ac8d04918d131e093bf6f978fcc57eab787",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "65802c353e4bbbf29ee25cea4f2173e09280ff37",
+      "commit": "65802c353e4bbbf29ee25cea4f2173e09280ff37",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/kbb-cutover-20260911",
+      "object": "93537a5071c54c320d15de33d2109398d0c8a968",
+      "commit": "93537a5071c54c320d15de33d2109398d0c8a968",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "commit": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

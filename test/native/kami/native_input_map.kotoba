@@ -1,0 +1,84 @@
+(ns kami.native-input-map
+  (:export [main malformed-touch malformed-buttons])
+  (:require [input-map :as im]))
+
+(defn- at [d :document i :i64] :document
+  (option-or (document-vector-at d i) (document-null)))
+(defn- field [d :document k :keyword] :document
+  (option-or (document-get d k) (document-null)))
+(defn- f [d :document] :f64
+  (option-value-of [:option :f64] (document-f64-value d) 999.0))
+(defn- point [x :f64 y :f64] :document
+  (document-vector (document-f64 x) (document-f64 y)))
+(defn- close? [x :f64 y :f64] :bool
+  (f64-lt (f64-abs (f64-sub x y)) 0.000000000001))
+(defn- pair-close? [d :document x :f64 y :f64] :bool
+  (and (close? (f (at d 0)) x) (close? (f (at d 1)) y)))
+(defn- s [] :document (im/stick (point 100.0 100.0) 50.0))
+
+(defn- center-and-dead [] :bool
+  (and (pair-close? (im/axes (s) (point 100.0 100.0)) 0.0 0.0)
+       (pair-close? (im/axes (s) (point 104.0 100.0)) 0.0 0.0)
+       (pair-close? (im/axes (s) (point 107.5 100.0)) 0.0 0.0)))
+(defn- directions [] :bool
+  (and (pair-close? (im/axes (s) (point 150.0 100.0)) 1.0 0.0)
+       (pair-close? (im/axes (s) (point 100.0 50.0)) 0.0 1.0)
+       (pair-close? (im/axes (s) (point 50.0 100.0)) -1.0 0.0)
+       (pair-close? (im/axes (s) (point 100.0 150.0)) 0.0 -1.0)))
+(defn- clamps [] :bool
+  (let [a (im/apply-dead-zone 1.0 1.0 0.0)
+        mag (f64-sqrt (f64-add (f64-mul (f (at a 0)) (f (at a 0)))
+                               (f64-mul (f (at a 1)) (f (at a 1)))))]
+    (and (pair-close? (im/axes (s) (point 300.0 100.0)) 1.0 0.0)
+         (pair-close? (im/apply-dead-zone 0.05 0.0 0.1) 0.0 0.0)
+         (pair-close? (im/apply-dead-zone 1.0 0.0 0.1) 1.0 0.0)
+         (close? mag 1.0))))
+(defn- smooth-and-fallback [] :bool
+  (and (pair-close? (im/axes (s) (point 125.0 100.0)) 0.4117647058823529 0.0)
+       (pair-close? (im/axes (im/stick (point 0.0 0.0) 0.0) (point 0.5 0.0)) 0.4117647058823529 0.0)
+       (pair-close? (im/axes (im/stick (point 0.0 0.0) -5.0) (point 0.5 0.0)) 0.4117647058823529 0.0)
+       (pair-close? (im/apply-dead-zone 0.5 0.0 -1.0) 0.5 0.0)
+       (pair-close? (im/apply-dead-zone 0.9 0.0 1.0) 0.0 0.0)))
+(defn- edges [] :bool
+  (let [original (im/button-edges)
+        first (im/update original (document-vector (document-string "Jump")))
+        same (im/update (at first 1) (document-vector (document-string "Jump")))
+        released (im/update (at same 1) (document-vector))]
+    (and (document-equal? original (document-map :prev (document-set)))
+         (document-equal? (field (at first 0) :pressed) (document-vector (document-string "Jump")))
+         (document-equal? (at same 0) (document-map :pressed (document-vector) :released (document-vector)))
+         (document-equal? (field (at released 0) :released) (document-vector (document-string "Jump")))
+         (document-equal? (field (at released 1) :prev) (document-set)))))
+(defn- multiple-actions [] :bool
+  (let [one (im/update (im/button-edges) (document-list (document-string "Fire")))
+        two (im/update (at one 1) (document-set (document-string "Fire") (document-string "Jump")))
+        three (im/update (at two 1) (document-vector (document-string "Jump")))]
+    (and (document-equal? (field (at one 0) :pressed) (document-vector (document-string "Fire")))
+         (document-equal? (at two 0) (document-map :pressed (document-vector (document-string "Jump")) :released (document-vector)))
+         (document-equal? (at three 0) (document-map :pressed (document-vector) :released (document-vector (document-string "Fire")))))))
+(defn- ordering-and-set-state [] :bool
+  (let [result (im/update (im/button-edges)
+                 (document-vector (document-string "Z") (document-string "AA") (document-string "😀")
+                                  (document-string "猫") (document-string "") (document-string "AA")))]
+    (and (document-equal? (field (at result 0) :pressed)
+           (document-vector (document-string "AA") (document-string "Z") (document-string "猫") (document-string "😀") (document-string "")))
+         (document-equal? (field (at result 1) :prev)
+           (document-set (document-string "Z") (document-string "AA") (document-string "猫") (document-string "") (document-string "😀"))))))
+(defn- escaping-and-coercion [] :bool
+  (let [r (im/update (im/button-edges)
+            (document-vector (document-string "a\"b") (document-string "a\\b") (document-string "line\n")
+                             (document-i64 1) (document-string "1") (document-null)
+                             (document-keyword :Jump) (document-bool true)))
+        all-released (im/update (at r 1) (document-null))]
+    (and (= 7 (document-count (field (at r 0) :pressed)))
+         (document-equal? (field (at r 0) :pressed) (field (at all-released 0) :released))
+         (document-equal? (field (at all-released 1) :prev) (document-set)))))
+(defn main [] :i64
+  (+ (if (center-and-dead) 1 0) (if (directions) 2 0)
+     (if (clamps) 4 0) (if (smooth-and-fallback) 8 0)
+     (if (edges) 16 0) (if (multiple-actions) 32 0)
+     (if (ordering-and-set-state) 64 0) (if (escaping-and-coercion) 128 0)))
+(defn malformed-touch [] :i64
+  (document-count (im/axes (s) (document-vector (document-f64 1.0)))))
+(defn malformed-buttons [] :i64
+  (document-count (im/update (im/button-edges) (document-i64 42))))

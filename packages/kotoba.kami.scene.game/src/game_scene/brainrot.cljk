@@ -1,0 +1,175 @@
+(ns game-scene.brainrot
+  "Brainrot-evolution data tier — `game`'s Pokemon-style evolution chains
+  (`game.island-gen/brainrot-evolution-chains`) as parity-tested EDN.
+  Restored from the legacy kami-engine/kami-game-scene Rust crate's
+  `brainrot.rs` (deleted in kotoba-lang/kami-engine PR #82) as part of the
+  clj-wgsl migration (ADR-2607010930, com-junkawasaki/root).
+
+  Evolution dispatch / mesh generation stays native `game.brainrot-mesh`;
+  only the init-time **description** — the per-character stage table
+  (gates, scale, appearance overrides) — moves to EDN (ADR-0046 /
+  ADR-0038). [[chains-from-edn]] rebuilds the real
+  `game.island-gen/brainrot-evolution` list, asserted chain-for-chain,
+  stage-for-stage `=` the compiled-in `brainrot-evolution-chains` in
+  `test/game_scene/brainrot_test.cljk`.
+
+  Simplification vs the original Rust: `BrainrotEvolution`/`EvolutionStage`
+  derived no `PartialEq` there, so the crate carried local
+  `EvolutionChainSpec`/`EvolutionStageSpec` mirrors. Clojure maps compare
+  structurally, so the loaded chains here are already
+  `game.island-gen/brainrot-evolution`-shaped maps — no mirror type is
+  needed; [[spec-to-chain]] is kept (as `identity`) for API parity.
+
+  Zero-dep portable CLJC."
+  (:require [scene :as scene]
+            [game.island-gen :as island-gen]))
+
+(def brainrot-evolution-edn
+  "The canonical brainrot-evolution CONFIG shipped with this crate.
+  Embedded as a literal string; kept byte-identical to
+  `resources/game_scene/brainrot_evolution.edn`."
+";; brainrot_evolution.edn — canonical CONFIG/DATA for kami-game's Pokémon-style brainrot
+;; evolution chains (`island_gen::brainrot_evolution_chains()`).
+;;
+;; ADR-0046 / ADR-0038: evolution dispatch / mesh generation stays native Rust; only the
+;; init-time DESCRIPTION — the per-character stage table (gates + scale + appearance
+;; overrides) — moves to EDN here. kami-game is untouched; `brainrot_evolution_chains()`
+;; stays the builtin fallback AND the parity oracle (the loaded list is asserted
+;; chain-for-chain, stage-for-stage `==` it, in order, in tests/brainrot_parity.rs).
+;;
+;; Each stage gate: social-gate (Well-Becoming rank) + domain-gate (achievement) must both
+;; be met. `:character` is a hyphenated keyword id for the `BrainrotCharacter` enum. Empty
+;; gates are \"\" ; a stage with no :body / :accessory override leaves it None.
+{:game/brainrot-evolution
+ [{:character-id \"char-skibidi-commander\" :character :skibidi
+   :stages
+   [{:stage 0 :form \"Mini Toilet\"          :social-gate \"\"     :domain-gate \"\"                 :scale 0.6}
+    {:stage 1 :form \"Skibidi Soldier\"       :social-gate \"kyu4\" :domain-gate \"boss_kills>=50\"    :scale 1.0 :body \"stocky\" :accessory \"sunglasses\"}
+    {:stage 2 :form \"Skibidi Tank\"          :social-gate \"kyu1\" :domain-gate \"a2a_raids>=10\"     :scale 1.8 :body \"stocky\" :accessory \"sunglasses\"}
+    {:stage 3 :form \"Skibidi Titan\"         :social-gate \"dan3\" :domain-gate \"all_brainrot_a2a\"  :scale 3.0 :body \"stocky\" :accessory \"mask\"}]}
+
+  {:character-id \"char-sigma-male\" :character :sigma
+   :stages
+   [{:stage 0 :form \"Scrawny Kid\"           :social-gate \"\"     :domain-gate \"\"                       :scale 0.7 :body \"slim\"}
+    {:stage 1 :form \"Gym Bro\"               :social-gate \"kyu5\" :domain-gate \"streak>=7\"              :scale 1.0 :body \"athletic\" :accessory \"sunglasses\"}
+    {:stage 2 :form \"Sigma Male\"            :social-gate \"kyu3\" :domain-gate \"streak>=30,pr>=10\"      :scale 1.1 :body \"athletic\" :accessory \"sunglasses\"}
+    {:stage 3 :form \"Gigachad\"              :social-gate \"kyu1\" :domain-gate \"agents_trained>=5\"      :scale 1.3 :body \"stocky\"   :accessory \"sunglasses\"}
+    {:stage 4 :form \"Sigma Ascended\"        :social-gate \"dan5\" :domain-gate \"streak>=100,all_follow\" :scale 1.5 :body \"tall\"}]}
+
+  {:character-id \"char-ohio-boss\" :character :ohio
+   :stages
+   [{:stage 0 :form \"Ohio Anomaly\"          :social-gate \"\"     :domain-gate \"\"                          :scale 1.0 :body \"tall\" :accessory \"mask\"}
+    {:stage 1 :form \"Ohio Nightmare\"        :social-gate \"kyu3\" :domain-gate \"anomaly_types>=12\"         :scale 2.0 :body \"tall\" :accessory \"mask\"}
+    {:stage 2 :form \"Ohio Eldritch\"         :social-gate \"dan2\" :domain-gate \"survival_rate<20,all_export\" :scale 4.0 :body \"tall\" :accessory \"mask\"}]}
+
+  {:character-id \"char-grimace\" :character :grimace
+   :stages
+   [{:stage 0 :form \"Purple Puddle\"         :social-gate \"\"     :domain-gate \"\"                     :scale 0.5 :body \"stocky\"}
+    {:stage 1 :form \"Grimace Blob\"          :social-gate \"kyu4\" :domain-gate \"recipes>=5\"           :scale 1.0 :body \"stocky\"}
+    {:stage 2 :form \"Grimace Tide\"          :social-gate \"kyu1\" :domain-gate \"poison_supply>=10\"    :scale 1.8 :body \"stocky\"}
+    {:stage 3 :form \"Grimace Singularity\"   :social-gate \"dan4\" :domain-gate \"all_agent_chaos_event\" :scale 2.5 :body \"stocky\"}]}
+
+  {:character-id \"char-rizz-master\" :character :rizz
+   :stages
+   [{:stage 0 :form \"Awkward Kid\"           :social-gate \"\"     :domain-gate \"\"                    :scale 0.8 :body \"slim\"}
+    {:stage 1 :form \"Rizz Master\"           :social-gate \"kyu3\" :domain-gate \"like_rate>=30\"       :scale 1.0 :body \"slim\" :accessory \"earring\"}
+    {:stage 2 :form \"Rizz Sensei\"           :social-gate \"dan1\" :domain-gate \"agents_promoted>=5\"  :scale 1.1 :body \"slim\" :accessory \"earring\"}]}
+
+  {:character-id \"char-fanum\" :character :fanum
+   :stages
+   [{:stage 0 :form \"Street Kid\"            :social-gate \"\"     :domain-gate \"\"                                       :scale 0.8 :body \"average\" :accessory \"hat\"}
+    {:stage 1 :form \"Tax Collector\"         :social-gate \"kyu4\" :domain-gate \"food_types>=10\"                         :scale 1.0 :body \"average\" :accessory \"hat\"}
+    {:stage 2 :form \"Tax Baron\"             :social-gate \"kyu1\" :domain-gate \"all_supply_chain\"                       :scale 1.1 :body \"stocky\"  :accessory \"hat\"}
+    {:stage 3 :form \"Fanum Mogul\"           :social-gate \"dan3\" :domain-gate \"economy_volume_threshold,redistribute>=100\" :scale 1.4 :body \"stocky\" :accessory \"hat\"}]}]}
+")
+
+(def ^:private character-ids
+  "The hyphenated `:character` keyword id for each `BrainrotCharacter`
+  keyword. `game.island-gen`'s character-enum keywords are already
+  hyphenated ids (e.g. `:skibidi`), so id<->keyword is just `name`/
+  `keyword`, but we keep an explicit valid-set here for tolerant fallback."
+  #{:skibidi :sigma :ohio :grimace :rizz :fanum})
+
+(defn character-id
+  "The hyphenated `:character` keyword id for a `BrainrotCharacter`
+  keyword."
+  [c]
+  (name c))
+
+(defn character-from-id
+  "Inverse of [[character-id]]; unknown ids fall back to `:skibidi`
+  (tolerant)."
+  [id]
+  (let [k (keyword id)]
+    (if (contains? character-ids k) k :skibidi)))
+
+(defn- opt-str [m key] (scene/mget m key))
+(defn- str-or-empty [m key] (or (opt-str m key) ""))
+(defn- stage-num-at [m]
+  (let [v (scene/mget m "stage")]
+    (if (integer? v) (max 0 (min 255 v)) 0)))
+
+(defn evolution-stage-from-map
+  "Build one `game.island-gen/evo-stage` from one stage's EDN map
+  (tolerant: missing -> default/nil)."
+  [m]
+  (island-gen/evo-stage
+   (stage-num-at m)
+   (str-or-empty m "form")
+   (str-or-empty m "social-gate")
+   (str-or-empty m "domain-gate")
+   (scene/num (scene/mget m "scale"))
+   (opt-str m "body")
+   (opt-str m "accessory")))
+
+(defn evolution-chain-from-map
+  "Build one `game.island-gen/brainrot-evolution` from one chain's EDN
+  map."
+  [m]
+  (let [stages (->> (scene/mget m "stages") (filter map?) (mapv evolution-stage-from-map))]
+    (island-gen/brainrot-evolution
+     (str-or-empty m "character-id")
+     (character-from-id (or (scene/kw-key (scene/mget m "character")) ""))
+     stages)))
+
+(defn spec-to-chain
+  "Reconstruct the real chain from a spec. Since a spec IS already a
+  `brainrot-evolution`-shaped map (see namespace docstring), this is
+  `identity`, kept for API parity with the original `spec_to_chain`."
+  [spec]
+  spec)
+
+(defn chain-specs-from-edn
+  "Parse the `:game/brainrot-evolution` table from EDN `src` into ordered
+  chain maps.
+
+  Throws `ex-info` with `:game-scene.brainrot/error` of `:not-a-map` or
+  `:no-table` — mirroring the original `BrainrotError::NotAMap` /
+  `BrainrotError::NoTable`."
+  [src]
+  (let [root (scene/root-map src)]
+    (when (nil? root)
+      (throw (ex-info "brainrot-evolution EDN root is not a map" {:game-scene.brainrot/error :not-a-map})))
+    (let [chains (scene/mget root "game/brainrot-evolution")]
+      (when-not (vector? chains)
+        (throw (ex-info "`:game/brainrot-evolution` missing or not a vector" {:game-scene.brainrot/error :no-table})))
+      (mapv evolution-chain-from-map (filter map? chains)))))
+
+(defn chains-from-edn
+  "Parse the table from EDN `src` into the real chain list. Same shape as
+  [[chain-specs-from-edn]] here; kept as a distinct fn for API parity with
+  the original `chains_from_edn`."
+  [src]
+  (chain-specs-from-edn src))
+
+(defn builtin-chain-specs
+  "The compiled-in oracle: `brainrot-evolution-chains` (already
+  `brainrot-evolution`-shaped, so no projection is needed)."
+  []
+  (island-gen/brainrot-evolution-chains))
+
+(defn shipped-chains
+  "Convenience: the chains from the crate-shipped
+  [[brainrot-evolution-edn]]."
+  []
+  (chains-from-edn brainrot-evolution-edn))

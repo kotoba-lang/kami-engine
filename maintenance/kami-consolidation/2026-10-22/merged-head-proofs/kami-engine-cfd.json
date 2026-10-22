@@ -1,0 +1,273 @@
+{
+  "repository": "kotoba-lang/kami-engine-cfd",
+  "default": "45bdf336d5cf5c92a075cc27a4da0b1e035d2a2f",
+  "heads": {
+    "32e1422c19f99d30d250475a970d1e29a61fdc6e": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-engine-cfd/pull/1",
+        "head": "32e1422c19f99d30d250475a970d1e29a61fdc6e",
+        "merge": "755fa138b0d810d97b290eea86d11871ae0c1f4a",
+        "merge-base": "2958ba88f2b30a616c3191454a25af4e9c3960b9",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5243b9dbdf695e651bc33a6d4ad4e1500cd34f15"
+            }
+          },
+          {
+            "path": ".gitignore",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "bd04223d8ee9148d51effa34756817f1e1c3771b"
+            }
+          },
+          {
+            "path": "Cargo.lock",
+            "entry": null
+          },
+          {
+            "path": "Cargo.toml",
+            "entry": null
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fdc2f2e277a1f433f3fa522b28d8e1a95f5cd998"
+            }
+          },
+          {
+            "path": "bb.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3b2b2b43fc185a6ffbfddf2d2cef98838ac02811"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "0e037898881817fe0845d2d0bdb027b71c75c048"
+            }
+          },
+          {
+            "path": "docs/adr/0001-lbm-solver.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fe538c6561564365ef1876e45341d227d9f9cc09"
+            }
+          },
+          {
+            "path": "src/d3.rs",
+            "entry": null
+          },
+          {
+            "path": "src/kami_engine/cfd/contract.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "7e2384436ef8c08ef6c74df4d106cf0173a9242f"
+            }
+          },
+          {
+            "path": "src/lib.rs",
+            "entry": null
+          },
+          {
+            "path": "src/main.rs",
+            "entry": null
+          },
+          {
+            "path": "src/mesh.rs",
+            "entry": null
+          },
+          {
+            "path": "test/kami_engine/cfd/contract_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "7940089223d57f5ca0f95d7b055fc1a77fcdf636"
+            }
+          },
+          {
+            "path": "tests/drag.rs",
+            "entry": null
+          },
+          {
+            "path": "tests/drag3d.rs",
+            "entry": null
+          },
+          {
+            "path": "tests/mesh.rs",
+            "entry": null
+          }
+        ]
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-cfd/pull/1",
+      "head": "32e1422c19f99d30d250475a970d1e29a61fdc6e",
+      "merge": "755fa138b0d810d97b290eea86d11871ae0c1f4a",
+      "merge-base": "2958ba88f2b30a616c3191454a25af4e9c3960b9",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "5243b9dbdf695e651bc33a6d4ad4e1500cd34f15"
+          }
+        },
+        {
+          "path": ".gitignore",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "bd04223d8ee9148d51effa34756817f1e1c3771b"
+          }
+        },
+        {
+          "path": "Cargo.lock",
+          "entry": null
+        },
+        {
+          "path": "Cargo.toml",
+          "entry": null
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "fdc2f2e277a1f433f3fa522b28d8e1a95f5cd998"
+          }
+        },
+        {
+          "path": "bb.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3b2b2b43fc185a6ffbfddf2d2cef98838ac02811"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "0e037898881817fe0845d2d0bdb027b71c75c048"
+          }
+        },
+        {
+          "path": "docs/adr/0001-lbm-solver.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "fe538c6561564365ef1876e45341d227d9f9cc09"
+          }
+        },
+        {
+          "path": "src/d3.rs",
+          "entry": null
+        },
+        {
+          "path": "src/kami_engine/cfd/contract.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "7e2384436ef8c08ef6c74df4d106cf0173a9242f"
+          }
+        },
+        {
+          "path": "src/lib.rs",
+          "entry": null
+        },
+        {
+          "path": "src/main.rs",
+          "entry": null
+        },
+        {
+          "path": "src/mesh.rs",
+          "entry": null
+        },
+        {
+          "path": "test/kami_engine/cfd/contract_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "7940089223d57f5ca0f95d7b055fc1a77fcdf636"
+          }
+        },
+        {
+          "path": "tests/drag.rs",
+          "entry": null
+        },
+        {
+          "path": "tests/drag3d.rs",
+          "entry": null
+        },
+        {
+          "path": "tests/mesh.rs",
+          "entry": null
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-engine-cfd/pull/3",
+      "head": "fe8e98ee0f64d62856b8c1816507b05ce2781b9a",
+      "merge": "45bdf336d5cf5c92a075cc27a4da0b1e035d2a2f",
+      "merge-base": "44f80b03964914af1325e3abe7b67ae1c417aa90",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "0b564e864fea27d69a2044c2bc8614fe198ef4b1"
+          }
+        },
+        {
+          "path": "src/kami_cfd.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "279d6142d778358f8fd47b50e59195c7a56c340c"
+          }
+        },
+        {
+          "path": "src/kami_cfd/d3.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "f45171bf9857c20c20ac09467d88d3b23d81d2a2"
+          }
+        },
+        {
+          "path": "src/kami_cfd/mesh.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "81a305adc042e377eb4f2c84bb88ecad9049f89a"
+          }
+        }
+      ]
+    }
+  ]
+}

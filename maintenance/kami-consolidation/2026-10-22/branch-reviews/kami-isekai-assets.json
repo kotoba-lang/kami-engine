@@ -1,0 +1,139 @@
+{
+  "repository": "kotoba-lang/kami-isekai-assets",
+  "default": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "commit": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "commit": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "8945b4d10d80234dba6221151420fdb88f69c7c7",
+      "commit": "8945b4d10d80234dba6221151420fdb88f69c7c7",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "commit": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/chore/bb-to-nbb-wave3",
+      "object": "c868bf88025ce7a369c4f63a93825d79f4173f35",
+      "commit": "c868bf88025ce7a369c4f63a93825d79f4173f35",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "commit": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "af7299211500090e8b35ac6967d355bedefed0e2",
+      "commit": "af7299211500090e8b35ac6967d355bedefed0e2",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "929c5d3ab64925762d36cbd408f56ea617187fe0",
+      "commit": "929c5d3ab64925762d36cbd408f56ea617187fe0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
+      "object": "679b697061d73c25ed5eb0a45f96c94ef179b15e",
+      "commit": "679b697061d73c25ed5eb0a45f96c94ef179b15e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-4",
+      "object": "5d8d20883f04cff7ba16e35ff7127062a8a9bc08",
+      "commit": "5d8d20883f04cff7ba16e35ff7127062a8a9bc08",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-5",
+      "object": "4ce4469c86122c5d964c3bf749a7b2e4e47c9e9a",
+      "commit": "4ce4469c86122c5d964c3bf749a7b2e4e47c9e9a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-6",
+      "object": "93654094e07cc1b91a458343479a14fc9ced200c",
+      "commit": "93654094e07cc1b91a458343479a14fc9ced200c",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "commit": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/chore/bb-to-nbb-wave3",
+      "object": "c868bf88025ce7a369c4f63a93825d79f4173f35",
+      "commit": "c868bf88025ce7a369c4f63a93825d79f4173f35",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "cfec4407a9b8fc4085022540e07e85aac1f1e57c",
+      "commit": "cfec4407a9b8fc4085022540e07e85aac1f1e57c",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/deps-repair",
+      "object": "ee4a80fec0ac55196a2c1df4c38ed1238f17edca",
+      "commit": "ee4a80fec0ac55196a2c1df4c38ed1238f17edca",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/drop-nbb-cache",
+      "object": "6af65d3c6e0b7dfea0ebfa03b9e9f2c9d6a598b2",
+      "commit": "6af65d3c6e0b7dfea0ebfa03b9e9f2c9d6a598b2",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/kotoba-text",
+      "object": "9c9aa855dfe1753ee424ff99dddf0290e0403540",
+      "commit": "9c9aa855dfe1753ee424ff99dddf0290e0403540",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/kotoba-text-cljs",
+      "object": "032f6b99f0cf73924f8a1f18bc4ad01fec57ccb3",
+      "commit": "032f6b99f0cf73924f8a1f18bc4ad01fec57ccb3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/nbb-declaration",
+      "object": "8601d91614c658151bff5108ba7d3b18d9ce9520",
+      "commit": "8601d91614c658151bff5108ba7d3b18d9ce9520",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "fbf3334e802519306bb5c51ef708c668dad76397",
+      "commit": "fbf3334e802519306bb5c51ef708c668dad76397",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "commit": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

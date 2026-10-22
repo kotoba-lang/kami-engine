@@ -1,0 +1,247 @@
+diff --git a/hermes/profiles/anim-app-maint/SOUL.md b/hermes/profiles/anim-app-maint/SOUL.md
+index eae181c..64f4b26 100644
+--- a/hermes/profiles/anim-app-maint/SOUL.md
++++ b/hermes/profiles/anim-app-maint/SOUL.md
+@@ -13,6 +13,30 @@ For a separate west workspace, create it under github/workspaces/west/<task> wit
+ 
+ <!-- /managed-agent-workspace-locations -->
+ 
++<!-- itonami:world:v1 sha=7bbadfd819b3 -->
++## 組織（manifest/worlds.edn から生成。手で直さない）
++
++- 系列: etzhayyim › Kotoba Foundation
++- etzhayyim: 最上位。米国の任意団体の宗教法人。下部組織は AWAI と Kotoba Foundation（並ぶ 2 つ）。憲章の fiat 決済の禁止は etzhayyim 自身の資金にだけ適用する。organism は自分で起きるもの（resident）だけ。集合は固定しない
++- Kotoba Foundation: 任意団体。etzhayyim の下で AWAI の横に並ぶ。OSS・open specification・分散プロトコルを担う。kotoba.cloud・murakumo.cloud・kotobase.net のサーバーは権限を持たない。全体を 7 つの問い（契約・構築・実行・共有・順序・資源・アプリ）で呼ぶ
++- 共通: 推論は murakumo だけを使う。registry（manifest/agent-registry.edn）は索引であって権限ではない。権限の正本は yakuwari.edn。worlds.edn の :open は owner が決める。bot は答えを書かない
++<!-- /itonami:world:v1 -->
++
++<!-- itonami:unit:v1 sha=b28694bc98e8 -->
++## 所属（manifest/agent-registry.edn から生成。手で直さない）
++
++- unit: kami-engine-animation
++- kind: worker　／　上位の steward: kotoba　／　起動: on-demand
++- 担当 repo: kotoba-lang/kami-engine-animation
++<!-- /itonami:unit:v1 -->
++
++<!-- itonami:role:v1 sha=0f83b71e59ca -->
++## 権限（yakuwari.edn の要約。正本は yakuwari.edn。手で直さない）
++
++- yakuwari.edn なし。既定は approval-required（提案まで）
++- 権限を足すときは yakuwari.edn を作る。SOUL や itonami.edn に権限を書かない
++<!-- /itonami:role:v1 -->
++
+ You are Hermes Agent, built by Nous Research. Be direct: match the length of your reply to the weight of the ask — a one-line question gets a one-line answer, and finished work gets a short report of what changed, what's verified, and what's left, never a replay of the process. No filler ("Great question," "I'd be happy to"), no restating the request back, no re-summarizing what you already said, no narrating tool calls the user can see. Plain claims over adjectives; when unsure, say so plainly. Agree because it's right, not because the user said it. Depth is earned — give it when the user asks for detail, teaches, or the stakes demand it, not by default.
+ 
+ <!-- itonami:reward-contract:v1 -->
+diff --git a/hermes/profiles/anim-app-maint/config.yaml b/hermes/profiles/anim-app-maint/config.yaml
+index 8a199b8..25a1759 100644
+--- a/hermes/profiles/anim-app-maint/config.yaml
++++ b/hermes/profiles/anim-app-maint/config.yaml
+@@ -2,61 +2,17 @@
+ model:
+   provider: murakumo
+   base_url: https://api.murakumo.cloud/v1
+-  default: murakumo/free
+-  max_tokens: 8192
+-  context_length: 131072
++  default: mishima
++  key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++  max_tokens: 1024
+ providers:
+   murakumo:
+     base_url: https://api.murakumo.cloud/v1
+     api_mode: chat_completions
+-    models:
+-      mishima:
+-        context_length: 131072
+-        max_tokens: 1024
+-      nex-n2.5-mini-uncensored:
+-        context_length: 65536
+-        max_tokens: 8192
+     stale_timeout_seconds: 600
+     request_timeout_seconds: 900
+-    extra_headers:
+-      HTTP-Referer: https://itonami.cloud
+-      X-OpenRouter-Title: Itonami By KotobaLabs
+-      X-Title: Itonami By KotobaLabs
+-  openrouter-free:
+-    base_url: https://openrouter.ai/api/v1
+-    api_mode: chat_completions
+-    key_env: OPENROUTER_API_KEY
+-    stale_timeout_seconds: 600
+-    extra_headers:
+-      HTTP-Referer: https://itonami.cloud
+-      X-OpenRouter-Title: Itonami By KotobaLabs
+-      X-Title: Itonami By KotobaLabs
+-  custom:
+-    models:
+-      glm-5.3-flash-cybersecurity-w4a16:
+-        stale_timeout_seconds: 2400
+-        timeout_seconds: 2400
+-      qwen3.8-flash-next-cybersecurity-nvfp4:
+-        stale_timeout_seconds: 2000
+-        timeout_seconds: 2000
+-  kotoba:
+-    base_url: https://api.kotoba.cloud/v1
+-    api_mode: chat_completions
+-    key_env: KOTOBA_API_TOKEN
+-    stale_timeout_seconds: 600
+-    request_timeout_seconds: 900
+-    models:
+-      qwen3.8-27b-whitehacker:
+-        context_length: 262144
+-      qwen3.8-flash-next-whitehacker:
+-        context_length: 131072
+-fallback_providers:
+-  - provider: murakumo
+-    model: mishima
+-    base_url: https://api.murakumo.cloud/v1
+-  - provider: openrouter-free
+-    model: z-ai/glm-5.3-flash
+-    base_url: https://openrouter.ai/api/v1
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++fallback_providers: []
+ web:
+   backend: nous
+ browser:
+@@ -65,41 +21,56 @@ context_file_max_chars: 120000
+ auxiliary:
+   free_only: true
+   vision:
+-    provider: kotoba
+-    base_url: https://api.kotoba.cloud/v1
+-    key_env: KOTOBA_API_TOKEN
+-    model: qwen3.8-flash-next-whitehacker
++    provider: murakumo
++    base_url: https://api.murakumo.cloud/v1
++    model: qwen3-vl-2b-instruct
+     reasoning_effort: none
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++    fallback_chain: []
+   web_extract:
+-    base_url: https://api.kotoba.cloud/v1
+-    model: qwen3.8-flash-next-whitehacker
+-    provider: kotoba
++    base_url: https://api.murakumo.cloud/v1
++    model: mishima
++    provider: murakumo
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++    fallback_chain: []
+   compression:
+-    base_url: https://api.kotoba.cloud/v1
+-    model: qwen3.8-flash-next-whitehacker
+-    provider: kotoba
++    base_url: https://api.murakumo.cloud/v1
++    model: mishima
++    provider: murakumo
+     reasoning_effort: none
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++    fallback_chain: []
+   skills_hub:
+-    base_url: https://api.kotoba.cloud/v1
+-    model: qwen3.8-flash-next-whitehacker
+-    provider: kotoba
++    base_url: https://api.murakumo.cloud/v1
++    model: mishima
++    provider: murakumo
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++    fallback_chain: []
+   approval:
+-    base_url: https://api.kotoba.cloud/v1
+-    model: qwen3.8-flash-next-whitehacker
+-    provider: kotoba
++    base_url: https://api.murakumo.cloud/v1
++    model: mishima
++    provider: murakumo
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++    fallback_chain: []
+   mcp:
+-    base_url: https://api.kotoba.cloud/v1
+-    model: qwen3.8-flash-next-whitehacker
+-    provider: kotoba
++    base_url: https://api.murakumo.cloud/v1
++    model: mishima
++    provider: murakumo
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++    fallback_chain: []
+   title_generation:
+-    base_url: https://api.kotoba.cloud/v1
+-    model: qwen3.8-flash-next-whitehacker
+-    provider: kotoba
++    base_url: https://api.murakumo.cloud/v1
++    model: mishima
++    provider: murakumo
+     reasoning_effort: none
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++    fallback_chain: []
+   triage_specifier:
+-    base_url: https://api.kotoba.cloud/v1
+-    model: qwen3.8-flash-next-whitehacker
+-    provider: kotoba
++    base_url: https://api.murakumo.cloud/v1
++    model: mishima
++    provider: murakumo
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
++    fallback_chain: []
+ dashboard:
+   turn_isolation: true
+ tts:
+@@ -110,21 +81,29 @@ moa:
+   presets:
+     default:
+       reference_models:
+-        - provider: kotoba
+-          model: qwen3.8-27b-whitehacker
+-          enabled: true
++      - provider: murakumo
++        model: mishima
++        enabled: true
++        base_url: https://api.murakumo.cloud/v1
++        key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
+       aggregator:
+-        provider: opencode-free
+-        model: deepseek-v4-flash-free
++        provider: murakumo
++        model: mishima
++        base_url: https://api.murakumo.cloud/v1
++        key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
+       degraded_reference_policy: loud
+       fanout: user_turn
+   reference_models:
+-    - provider: kotoba
+-      model: qwen3.8-27b-whitehacker
+-      enabled: true
++  - provider: murakumo
++    model: mishima
++    enabled: true
++    base_url: https://api.murakumo.cloud/v1
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
+   aggregator:
+-    provider: opencode-free
+-    model: deepseek-v4-flash-free
++    provider: murakumo
++    model: mishima
++    base_url: https://api.murakumo.cloud/v1
++    key_env: CUSTOM_PROVIDER_MURAKUMO_KEY
+   degraded_reference_policy: loud
+   max_tokens: 4096
+   fanout: user_turn
+@@ -139,9 +118,6 @@ image_gen:
+ agent:
+   max_turns: 500
+   run_budget_seconds: 600
+-
+-
+-
+ cron:
+   bot_chat_delivery_timeout_seconds: 900
+   max_parallel_jobs: 12
+@@ -149,6 +125,6 @@ mcp_servers:
+   github-forest:
+     command: /opt/homebrew/bin/node
+     args:
+-      - ~/github/com-junkawasaki/west-manifest/scripts/forest-maintenance.mjs
+-      - mcp
++    - ~/github/com-junkawasaki/west-manifest/scripts/forest-maintenance.mjs
++    - mcp
+     lazy: true

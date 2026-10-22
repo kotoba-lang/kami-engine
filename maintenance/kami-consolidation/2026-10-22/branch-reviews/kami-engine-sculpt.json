@@ -1,0 +1,67 @@
+{
+  "repository": "kotoba-lang/kami-engine-sculpt",
+  "default": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "commit": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "commit": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "df4d5bd0fe4858ef70392a34843bfd33751b03c3",
+      "commit": "df4d5bd0fe4858ef70392a34843bfd33751b03c3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "49075df50ded33f65db7b2c011af1ee473facc7c",
+      "commit": "49075df50ded33f65db7b2c011af1ee473facc7c",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "commit": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "commit": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "ab0eca8f8395d2b4829f63881eccacaccab9b1c5",
+      "commit": "ab0eca8f8395d2b4829f63881eccacaccab9b1c5",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/full-sha",
+      "object": "a67ab53c5a1cde0c57e042ba6f4df59df69e1ef0",
+      "commit": "a67ab53c5a1cde0c57e042ba6f4df59df69e1ef0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/kotoba-text",
+      "object": "5cf8ed7258292576234518fe1ba1ad7eb2e7473a",
+      "commit": "5cf8ed7258292576234518fe1ba1ad7eb2e7473a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "commit": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

@@ -1,0 +1,710 @@
+diff --git a/.gitignore b/.gitignore
+index 54a603c..d8b317b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,3 +3,4 @@
+ target/
+ *.class
+ .DS_Store
++.nbb/
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..57bc88a
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,202 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
+diff --git a/README.md b/README.md
+index a1f686c..5ce20db 100644
+--- a/README.md
++++ b/README.md
+@@ -1,17 +1,46 @@
+-# kotoba-lang/ui-gpu
++> **Note (ADR-2607102200 addendum 2):** sibling `kami-engine-hud` (`kotoba.ui`)
++> is merged into `kami-engine-app-sdk`. This GPU backend package is unchanged.
++
++# kotoba-lang/kami-engine-hud-gpu
+ 
+ Zero-dep portable `.cljc` — restored from the legacy `kami-engine/kami-ui-gpu` Rust crate
+-(deleted in the kotoba-lang Rust removal) as part of the **clj-wgsl migration** (ADR-2607010930,
+-`com-junkawasaki/root`).
++(`src/lib.rs`, 354 lines; deleted in `kotoba-lang/kami-engine` PR #82 "Remove Rust workspace
++from kami-engine") as part of the **clj-wgsl migration** (ADR-2607010930,
++`com-junkawasaki/root`). GPU rendering backend for
++[`kami-engine-hud`](https://github.com/kotoba-lang/kami-engine-hud) (`kotoba.ui`),
++renamed from `kotoba-lang/ui-gpu` to avoid collision with the `kotoba-ui`/`appkit`/
++`uikit` app design-system family, which is an unrelated stack (see
++`90-docs/adr/2607051200-kotoba-lang-ui-family-rename.md` in `com-junkawasaki/root`).
+ 
+ ## Status
+ 
+-Scaffold only — the CLJC restoration is pending. This repo provides the home for the
+-zero-dep portable `.cljc` contracts / data interpreters / EDN IR that replace the deleted
+-Rust crate. Native execution (wgpu / wasmtime / wasmi) stays substrate.
++Restored. `src/ui_gpu.cljk` ports every public struct/enum/fn from the original crate as
++pure data (plain maps with keyword keys) + pure functions:
++
++- `UiRect` / `UiText` / `UiColorGlyph` GPU instance shapes (`ui-rect`, `ui-text`,
++  `ui-color-glyph`)
++- `GradientDir` enum -> `gradient-dir-values` set
++- `UiCommand` enum -> tagged command maps (`:rect` / `:text` / `:color-glyph` /
++  `:circle` / `:gradient`)
++- `UiLayer` command batcher (`ui-layer`, `rect`, `rounded-rect`, `bordered-rect`,
++  `circle`, `text`, `color-glyph`) and its flattening functions (`to-instances`,
++  `to-text-instances`, `to-color-glyph-instances`, `circle->rect`)
++- `ToastLevel` enum -> `toast-level-values` set + `toast-level-color`
++- `Toast` / `ToastStack` notification-queue primitive (`toast-stack`,
++  `toast-stack-push`, `toast-stack-tick`, `toast-stack-render`)
++
++There is no literal wgpu pipeline/shader/device code in the original file — it is a
++pure instance-buffer-layout and command-batching module, so everything ported is
++portable computational/data-shape logic. Native GPU submission (wgpu / wasmtime /
++wasmi) stays substrate and is out of scope for this namespace.
++
++All 3 original Rust `#[test]`s (`test_toast_stack`, `test_toast_level_colors`,
++`test_ui_layer`) are ported 1:1 to `test/ui_gpu_test.cljk`, plus the `namespace-loads`
++smoke test and one additional test covering `bordered-rect` and gradient-command
++flattening. **5 tests / 14 assertions, 0 failures, 0 errors.**
+ 
+ ## Develop
+ 
+ ```bash
+-clojure -M:test
++kbb -M:test
+ ```
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..49afa46
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,8 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/ui_gpu.cljk" ".cljc"
++  "test/run_portable.cljk" ".cljs"
++  "test/ui_gpu_test.cljk" ".cljc"}}
+diff --git a/deps.edn b/deps.edn
+index d679ec6..1191bea 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -1,9 +1,13 @@
+-{:paths ["src" "test"]
++{:deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}
++ :paths ["src" "test"]
+  :aliases {:test {:extra-paths ["test"]
+                   :extra-deps {io.github.cognitect-labs/test-runner
+-                               {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+-                  :main-opts ["-m" "cognitect.test-runner"]
+-                  :exec-fn cognitect.test-runner.api/test}
++                               {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
++                  :main-opts ["-m" "cognitect.test-runner"]}
+            ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
+            :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
+                   :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test"
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..52b6bdc
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,9 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src" "test"]
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/ui_gpu.cljc b/src/ui_gpu.cljc
+deleted file mode 100644
+index 538b435..0000000
+--- a/src/ui_gpu.cljc
++++ /dev/null
+@@ -1,5 +0,0 @@
+-(ns ui_gpu
+-  "Zero-dep portable CLJC. Restored from the legacy kami-engine/kami-ui-gpu Rust crate
+-  (deleted in kotoba-lang/kotoba #259 / kami-engine Rust removal) as part of the clj-wgsl
+-  migration (ADR-2607010930, com-junkawasaki/root). Native execution stays substrate;
+-  this namespace owns the CLJC contracts / data interpreters / EDN IR for the domain.")
+diff --git a/src/ui_gpu.cljk b/src/ui_gpu.cljk
+new file mode 100644
+index 0000000..62b052e
+--- /dev/null
++++ b/src/ui_gpu.cljk
+@@ -0,0 +1,251 @@
++(ns ui_gpu
++  "Zero-dep portable CLJC. Restored from the legacy kami-engine/kami-ui-gpu Rust crate
++  (`kami-ui-gpu/src/lib.rs`, 354 lines; deleted in kotoba-lang/kami-engine PR #82
++  \"Remove Rust workspace from kami-engine\") as part of the clj-wgsl migration
++  (ADR-2607010930, com-junkawasaki/root).
++
++  Purpose: GPU-instanced UI primitives for wgpu. The original crate defined instance
++  buffer layouts (`UiRect` / `UiText` / `UiColorGlyph`) and a `UiLayer` command batcher
++  that flattens draw commands (rect / rounded-rect / bordered-rect / circle / gradient /
++  text / color-glyph) into per-kind instance vectors ready for GPU upload, plus a
++  reusable `ToastStack` notification-queue primitive (push / tick / render) built on top
++  of the layer. This namespace ports all of that as pure data (plain maps with keyword
++  keys) + pure functions: instance construction, command batching, and the
++  circle->rect / gradient->rect flattening math. There is no literal wgpu pipeline,
++  shader, or device code in the original file to skip — everything here is portable
++  logic. Native GPU submission (wgpu / wasmtime / wasmi) stays substrate and is out of
++  scope for this namespace.")
++
++;; ── UI element instance shapes (documented as plain maps) ──────────────
++;;
++;; UiRect   :: {:position [x y] :size [w h] :color [r g b a]
++;;              :border-color [r g b a] :corner-radius px :border-width px}
++;; UiText   :: {:position [x y] :size [w h] :uv-rect [u0 v0 u1 v1] :color [r g b a]}
++;; UiColorGlyph :: {:position [x y] :size [w h] :uv-rect [u0 v0 u1 v1]}
++;;
++;; (The Rust `_pad` field exists only for GPU struct alignment / `bytemuck::Pod`
++;; layout and has no portable logic; it is omitted here.)
++
++(defn ui-rect
++  "Construct a UiRect instance map. Defaults border-color to transparent black,
++  corner-radius/border-width to 0.0, matching the Rust `UiRect` field defaults used
++  by `UiLayer/rect`."
++  [{:keys [position size color border-color corner-radius border-width]
++    :or {border-color [0.0 0.0 0.0 0.0]
++         corner-radius 0.0
++         border-width 0.0}}]
++  {:position position
++   :size size
++   :color color
++   :border-color border-color
++   :corner-radius corner-radius
++   :border-width border-width})
++
++(defn ui-text
++  "Construct a UiText instance map."
++  [position size uv-rect color]
++  {:position position :size size :uv-rect uv-rect :color color})
++
++(defn ui-color-glyph
++  "Construct a UiColorGlyph instance map."
++  [position size uv-rect]
++  {:position position :size size :uv-rect uv-rect})
++
++;; ── Gradient direction ──────────────────────────────────────────────────
++
++(def gradient-dir-values
++  "Valid values for `:direction` on a `:gradient` UiCommand (Rust `GradientDir` enum)."
++  #{:horizontal :vertical :diagonal})
++
++;; ── UI draw commands (Rust `UiCommand` enum -> tagged maps) ─────────────
++;;
++;; {:kind :rect :rect <UiRect>}
++;; {:kind :text :text <UiText>}
++;; {:kind :color-glyph :glyph <UiColorGlyph>}
++;; {:kind :circle :center [x y] :radius r :color [r g b a]}
++;; {:kind :gradient :rect <UiRect> :color-end [r g b a] :direction <gradient-dir>}
++
++;; ── UiLayer: batched draw commands for a single render pass ─────────────
++
++(defn ui-layer
++  "Create an empty UiLayer. Mirrors Rust `UiLayer::new(w, h)`."
++  [screen-width screen-height]
++  {:commands []
++   :screen-width screen-width
++   :screen-height screen-height})
++
++(defn add-command
++  "Append a draw command map to a UiLayer's command vector."
++  [layer command]
++  (update layer :commands conj command))
++
++(defn rect
++  "Append a sharp-cornered, borderless filled rect. Mirrors `UiLayer::rect`."
++  [layer x y w h color]
++  (add-command layer
++               {:kind :rect
++                :rect (ui-rect {:position [x y] :size [w h] :color color})}))
++
++(defn rounded-rect
++  "Append a rounded filled rect. Mirrors `UiLayer::rounded_rect`."
++  [layer x y w h color radius]
++  (add-command layer
++               {:kind :rect
++                :rect (ui-rect {:position [x y] :size [w h] :color color
++                                 :corner-radius radius})}))
++
++(defn bordered-rect
++  "Append a filled + bordered rect. Mirrors `UiLayer::bordered_rect`."
++  [layer x y w h color border bw radius]
++  (add-command layer
++               {:kind :rect
++                :rect (ui-rect {:position [x y] :size [w h] :color color
++                                 :border-color border :border-width bw
++                                 :corner-radius radius})}))
++
++(defn circle
++  "Append a circle command. Mirrors `UiLayer::circle`."
++  [layer cx cy r color]
++  (add-command layer {:kind :circle :center [cx cy] :radius r :color color}))
++
++(defn text
++  "Append a text command. Mirrors `UiLayer::text`."
++  [layer position size uv-rect color]
++  (add-command layer {:kind :text :text (ui-text position size uv-rect color)}))
++
++(defn color-glyph
++  "Append a color-glyph command. Mirrors `UiLayer::color_glyph`."
++  [layer position size uv-rect]
++  (add-command layer {:kind :color-glyph :glyph (ui-color-glyph position size uv-rect)}))
++
++(defn circle->rect
++  "Flatten a `:circle` command into the equivalent bounding UiRect instance
++  (square bounding box, `:corner-radius` = radius so a round-rect shader can render
++  it as a circle). Mirrors the `UiCommand::Circle` arm of Rust `to_instances`."
++  [{:keys [center radius color]}]
++  (let [[cx cy] center]
++    (ui-rect {:position [(- cx radius) (- cy radius)]
++              :size [(* radius 2.0) (* radius 2.0)]
++              :color color
++              :corner-radius radius})))
++
++(defn to-instances
++  "Flatten all commands to UiRect instances for GPU upload: `:rect` commands pass
++  their rect through, `:circle` commands flatten via `circle->rect`, `:gradient`
++  commands pass their `:rect` through (color-end/direction are shader concerns, not
++  instance-buffer concerns), and `:text` / `:color-glyph` commands are dropped.
++  Mirrors Rust `UiLayer::to_instances`."
++  [layer]
++  (into []
++        (keep (fn [{:keys [kind] :as cmd}]
++                (case kind
++                  :rect (:rect cmd)
++                  :circle (circle->rect cmd)
++                  :gradient (:rect cmd)
++                  (:text :color-glyph) nil)))
++        (:commands layer)))
++
++(defn to-text-instances
++  "Flatten all `:text` commands to UiText instances. Mirrors `UiLayer::to_text_instances`."
++  [layer]
++  (into [] (keep (fn [{:keys [kind text]}] (when (= kind :text) text))) (:commands layer)))
++
++(defn to-color-glyph-instances
++  "Flatten all `:color-glyph` commands to UiColorGlyph instances.
++  Mirrors `UiLayer::to_color_glyph_instances`."
++  [layer]
++  (into [] (keep (fn [{:keys [kind glyph]}] (when (= kind :color-glyph) glyph))) (:commands layer)))
++
++;; ── Notification / Toast primitives ──────────────────────────────────────
++;; Reusable toast rendering state for any KAMI app.
++
++(def toast-level-values
++  "Valid values for toast severity (Rust `ToastLevel` enum)."
++  #{:info :success :warning :error})
++
++(defn toast-level-color
++  "Fill color for a toast severity level (Nintendo-style pastels).
++  Mirrors Rust `ToastLevel::color`."
++  [level]
++  (case level
++    :info [0.36 0.58 0.95 0.95]
++    :success [0.42 0.82 0.52 0.95]
++    :warning [0.98 0.82 0.28 0.95]
++    :error [0.95 0.42 0.42 0.95]))
++
++(defn toast
++  "Construct a Toast notification map. `remaining-ms` 0 means persistent.
++  Mirrors the Rust `Toast` struct."
++  [title body level remaining-ms anim-offset-y]
++  {:title title :body body :level level
++   :remaining-ms remaining-ms :anim-offset-y anim-offset-y})
++
++(defn toast-stack
++  "Create a ToastStack with Nintendo-style defaults. Mirrors `ToastStack::new`
++  (also the `Default` impl)."
++  []
++  {:toasts []
++   :max-visible 5
++   :toast-width 320.0
++   :toast-height 72.0
++   :gap 8.0
++   :margin-right 16.0
++   :margin-top 16.0})
++
++(defn toast-stack-push
++  "Push a new toast onto the front of the stack (most-recent-first), starting its
++  entrance animation offset above the stack and auto-trimming to `:max-visible`.
++  Mirrors `ToastStack::push`."
++  [stack title body level duration-ms]
++  (let [t (toast title body level duration-ms (- (:toast-height stack)))
++        toasts (into [t] (:toasts stack))
++        max-visible (:max-visible stack)]
++    (assoc stack :toasts
++           (if (> (count toasts) max-visible)
++             (subvec toasts 0 max-visible)
++             toasts))))
++
++(defn- tick-toast
++  "Advance one toast's entrance animation (spring-like ease toward 0) and countdown
++  timer by `dt-ms`. Mirrors the per-toast body of Rust `ToastStack::tick`."
++  [dt-ms {:keys [remaining-ms anim-offset-y] :as t}]
++  (let [offset' (* anim-offset-y 0.85)
++        abs-offset' #?(:clj (Math/abs ^double offset') :cljs (js/Math.abs offset'))
++        offset' (if (< abs-offset' 0.5) 0.0 offset')
++        remaining' (if (pos? remaining-ms)
++                     (max 0 (- remaining-ms dt-ms))
++                     remaining-ms)]
++    (assoc t :anim-offset-y offset' :remaining-ms remaining')))
++
++(defn toast-stack-tick
++  "Advance toast timers and animations by `dt-ms` (frame delta in ms), then remove
++  toasts that just expired this tick (`:remaining-ms` was positive before ticking
++  and reached 0). A toast pushed with `duration-ms` 0 is persistent (see `toast`)
++  and is never removed here -- `tick-toast` never decrements a non-positive
++  `:remaining-ms`, so distinguishing \"freshly expired\" from \"persistent\" requires
++  the pre-tick value, not just the post-tick 0. Mirrors `ToastStack::tick`."
++  [stack dt-ms]
++  (update stack :toasts
++          (fn [toasts]
++            (into [] (comp (map (fn [t] [(:remaining-ms t) (tick-toast dt-ms t)]))
++                            (filter (fn [[remaining-before ticked]]
++                                      (or (zero? remaining-before)
++                                          (pos? (:remaining-ms ticked)))))
++                            (map second))
++                  toasts))))
++
++(defn toast-stack-render
++  "Render the toast stack's rounded-rect backgrounds into a UiLayer, stacked
++  top-right using the stack's margins/gap and each toast's current animation
++  offset. Mirrors `ToastStack::render`."
++  [stack layer]
++  (let [x (- (:screen-width layer) (:toast-width stack) (:margin-right stack))]
++    (reduce
++     (fn [layer [i t]]
++       (let [y (+ (:margin-top stack)
++                  (* i (+ (:toast-height stack) (:gap stack)))
++                  (:anim-offset-y t))]
++         (rounded-rect layer x y (:toast-width stack) (:toast-height stack)
++                       (toast-level-color (:level t)) 12.0)))
++     layer
++     (map-indexed vector (:toasts stack)))))
+diff --git a/test/run_portable.cljk b/test/run_portable.cljk
+new file mode 100644
+index 0000000..884b244
+--- /dev/null
++++ b/test/run_portable.cljk
+@@ -0,0 +1,23 @@
++#!/usr/bin/env kbb
++;; The portable suite on nbb — no build step, no JVM.
++;;
++;; Until this file existed, every namespace below ran under
++;; `kbb -M:test` and nowhere else, so a defect in the ClojureScript
++;; half of a `.cljc` was invisible here. This project needs no classpath
++;; beyond its own source:
++;;
++;;   kbb --backend sci --classpath src:test test/run_portable.cljk
++;;
++;; Every `deftest`-bearing portable namespace has to be named here AND in
++;; the `run-tests` call: requiring a test namespace registers its vars,
++;; only `run-tests` runs them, and a runner naming a subset prints the
++;; same `Ran N tests` shape as one naming all of them (ADR-2608170300).
++;; `scripts/verify-cljs-runner-completeness.cljs` checks this file
++;; against the tree.
++(require '[cljs.test :as t]
++         '[ui_gpu-test])
++
++(defmethod t/report [:cljs.test/default :end-run-tests] [m]
++  (when-not (t/successful? m) (set! (.-exitCode js/process) 1)))
++
++(t/run-tests 'ui_gpu-test)
+diff --git a/test/ui_gpu_test.cljc b/test/ui_gpu_test.cljc
+deleted file mode 100644
+index 73d8e3a..0000000
+--- a/test/ui_gpu_test.cljc
++++ /dev/null
+@@ -1,6 +0,0 @@
+-(ns ui_gpu-test
+-  (:require [clojure.test :refer [deftest is testing]]
+-            [ui_gpu]))
+-(deftest namespace-loads
+-  (testing "the restored CLJC namespace loads"
+-    (is (some? (find-ns 'ui_gpu)))))
+diff --git a/test/ui_gpu_test.cljk b/test/ui_gpu_test.cljk
+new file mode 100644
+index 0000000..00286c2
+--- /dev/null
++++ b/test/ui_gpu_test.cljk
+@@ -0,0 +1,69 @@
++(ns ui_gpu-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [ui_gpu :as ui]))
++
++(deftest namespace-loads
++  (testing "the restored CLJC namespace loads"
++    (is (some? (find-ns 'ui_gpu)))))
++
++;; Ported 1:1 from kami-ui-gpu/src/lib.rs `#[cfg(test)] mod tests`.
++
++(deftest test-toast-stack
++  (let [stack (ui/toast-stack)
++        stack (ui/toast-stack-push stack "Title" "Body" :success 3000)]
++    (is (= 1 (count (:toasts stack))))
++
++    (let [stack (ui/toast-stack-tick stack 1000)]
++      (is (= 2000 (:remaining-ms (first (:toasts stack)))))
++
++      (let [stack (ui/toast-stack-tick stack 2500)]
++        (is (empty? (:toasts stack)) "toast should have expired")))))
++
++;; Additional coverage beyond the original Rust tests.
++
++(deftest persistent-toast-survives-ticking
++  (testing "a toast pushed with duration-ms 0 is persistent (per `toast`'s own
++            docstring) and must never be removed by toast-stack-tick, however
++            many ticks pass"
++    (let [stack (ui/toast-stack-push (ui/toast-stack) "Title" "Body" :info 0)
++          stack (ui/toast-stack-tick stack 1000)]
++      (is (= 1 (count (:toasts stack))) "persistent toast survives one tick")
++      (is (= 0 (:remaining-ms (first (:toasts stack)))))
++      (let [stack (ui/toast-stack-tick stack 999999)]
++        (is (= 1 (count (:toasts stack)))
++            "persistent toast survives an arbitrarily large tick too")))))
++
++(deftest test-toast-level-colors
++  (is (= 0.95 (nth (ui/toast-level-color :info) 3)))
++  (is (not= (ui/toast-level-color :error) (ui/toast-level-color :success))))
++
++(deftest test-ui-layer
++  (let [layer (-> (ui/ui-layer 1920.0 1080.0)
++                   (ui/rect 10.0 10.0 200.0 40.0 [1.0 1.0 1.0 0.9])
++                   (ui/rounded-rect 10.0 60.0 200.0 40.0 [0.2 0.7 0.9 1.0] 12.0)
++                   (ui/circle 100.0 200.0 20.0 [1.0 0.4 0.4 1.0])
++                   (ui/text [12.0 12.0] [8.0 16.0] [0.0 0.0 0.1 0.2] [1.0 1.0 1.0 1.0])
++                   (ui/color-glyph [24.0 24.0] [16.0 16.0] [0.0 0.0 0.2 0.2]))
++        instances (ui/to-instances layer)]
++    (is (= 3 (count instances)))
++    (is (= 12.0 (:corner-radius (nth instances 1))))
++    (is (= 1 (count (ui/to-text-instances layer))))
++    (is (= 1 (count (ui/to-color-glyph-instances layer))))))
++
++;; Additional coverage beyond the original Rust tests.
++
++(deftest test-bordered-rect-and-gradient-flattening
++  (let [layer (-> (ui/ui-layer 800.0 600.0)
++                   (ui/bordered-rect 5.0 5.0 100.0 50.0 [1.0 0.0 0.0 1.0]
++                                     [0.0 0.0 0.0 1.0] 2.0 4.0)
++                   (ui/add-command {:kind :gradient
++                                     :rect (ui/ui-rect {:position [0.0 0.0]
++                                                         :size [10.0 10.0]
++                                                         :color [1.0 1.0 1.0 1.0]})
++                                     :color-end [0.0 0.0 0.0 1.0]
++                                     :direction :horizontal}))
++        instances (ui/to-instances layer)]
++    (is (= 2 (count instances)))
++    (is (= 4.0 (:corner-radius (first instances))))
++    (is (= 2.0 (:border-width (first instances))))
++    (is (= [0.0 0.0] (:position (second instances))))))
