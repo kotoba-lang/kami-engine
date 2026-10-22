@@ -126,13 +126,14 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-app.json",
       "github-sha256": "3ac07272a1d72b2324947a07d176307ebf256e665fdf280ea38783946b4271b3",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-app.json",
-      "branch-review-sha256": "ccba13e993a59b6abb123238c08dd02917e6b6bf33b56e60f13ae1efc9adb524",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "b2ef03e3a357188e9e3e1aeb4c9cda91ff7ce27b1974784b29239f2c481bfc60",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 1,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-app.json",
-      "merged-head-proofs-sha256": "b50312a6a71155efa753b0050053b88901a8f722ac4191b941f5407c23500286"
+      "merged-head-proofs-sha256": "b50312a6a71155efa753b0050053b88901a8f722ac4191b941f5407c23500286",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-app-fixtures",
@@ -1146,7 +1147,7 @@
     },
     {
       "repository": "kotoba-lang/kami-cad-import",
-      "source-id": "kotoba.kami.cad-import",
+      "source-id": "kotoba.kami.cadImport",
       "destination": "packages/kotoba.kami.cad-import",
       "commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
       "tree": "e0c4a98dcce9bf73e96f39f8251a872da412cc04",
@@ -1974,7 +1975,7 @@
     },
     {
       "repository": "kotoba-lang/kami-eng-web",
-      "source-id": "kotoba.kami.eng-web",
+      "source-id": "kotoba.kami.engWeb",
       "destination": "packages/kotoba.kami.eng-web",
       "commit": "17a53ad6fb9d9d67c59aa2ffa2d85d552d221628",
       "tree": "69fb7aa0728f38b5a70da8202ca776ebcc145cdd",
@@ -2349,7 +2350,7 @@
     },
     {
       "repository": "kotoba-lang/kami-engine-app-sdk",
-      "source-id": "kotoba.kami.engine.app-sdk",
+      "source-id": "kotoba.kami.engine.appSdk",
       "destination": "packages/kotoba.kami.engine.app-sdk",
       "commit": "efe8f6ce35c7db866819c2ddded6a886ef4f9823",
       "tree": "a2fb20abbaea07c6d22d647f8152b1367d146234",
@@ -2690,7 +2691,7 @@
     },
     {
       "repository": "kotoba-lang/kami-engine-cae-solver",
-      "source-id": "kotoba.kami.engine.cae-solver",
+      "source-id": "kotoba.kami.engine.caeSolver",
       "destination": "packages/kotoba.kami.engine.cae-solver",
       "commit": "92dcd10b8d56d721073131d005d944077605bc5e",
       "tree": "2a1536b7c7d96c84cbf6db921b90ecb8e6103a34",
@@ -7506,13 +7507,14 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-cfd.json",
       "github-sha256": "53d8bb6ad2538f6ae84aebfe0fdf09eb20dbf998c6ff14b1f3d02005956f3952",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-cfd.json",
-      "branch-review-sha256": "d536e85b41b91ac74d49d1582fc2ab108db1ddddcaf3983970d6b40562133ab4",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "618b89b06dd0291387509c7b17bd54ee87a43dd7caefa7d0277e886c1f9c9dc0",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 1,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-cfd.json",
-      "merged-head-proofs-sha256": "c3fc00df8eb93295ad9cf722ea162d5613109bd96a51d5925e4e3d1f7d4db6d6"
+      "merged-head-proofs-sha256": "c3fc00df8eb93295ad9cf722ea162d5613109bd96a51d5925e4e3d1f7d4db6d6",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-engine-core",
@@ -7614,13 +7616,14 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-core.json",
       "github-sha256": "a6f16fc0389b6f4acf57a17436563dbd25c4ded06fe52f23e5c98e0549e8d396",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-core.json",
-      "branch-review-sha256": "e550cab80ffbace33d9f2be0aa81e1bcebb648e97e1bb06d953aacbf70e443ef",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "de1744a0cbe01b44d2c22d6f15631ed78402329972aa3e0d50968ec2eb1c1989",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 0,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-core.json",
-      "merged-head-proofs-sha256": "310dc508aa3b47ca554bd58d48dda942736fc2d27fe7d70cac113aed9902740c"
+      "merged-head-proofs-sha256": "310dc508aa3b47ca554bd58d48dda942736fc2d27fe7d70cac113aed9902740c",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-engine-crash",
@@ -8132,17 +8135,18 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-engine.json",
       "github-sha256": "7cf839afd0dffea5c22d2d0f2a9c34f1f2e9dab4690bee1da8221442dd25a53b",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-engine.json",
-      "branch-review-sha256": "5d353be93f390b92e5fd6e6b508915a16c397b2e6a428c4dd19e755e41c79cec",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "9faaea8adfde9feb62f6f2ad33c2da1d2348c228df1d7ad4dcdd27a9f48e7362",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 0,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-engine.json",
-      "merged-head-proofs-sha256": "a2e204fc75d3debc9e957a1125f5819e1bd7454ebf9a7fbda8f4336113b6bcd5"
+      "merged-head-proofs-sha256": "a2e204fc75d3debc9e957a1125f5819e1bd7454ebf9a7fbda8f4336113b6bcd5",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-engine-hud-gpu",
-      "source-id": "kotoba.kami.engine.hud-gpu",
+      "source-id": "kotoba.kami.engine.hudGpu",
       "destination": "packages/kotoba.kami.engine.hud-gpu",
       "commit": "16076705114bdef321ef50a285020f2aa142f7dc",
       "tree": "dd56d88db1eee0387d8f9c4548402b119e8dbb59",
@@ -8270,17 +8274,18 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-hud-gpu.json",
       "github-sha256": "b9d12931277778545855ac91e0269efdca1399c7e3e65bc70ed3611cfe83d291",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-hud-gpu.json",
-      "branch-review-sha256": "2ff283dc30ebfbf3fa786b58aff70a910fae44ed96b54c8cb6ad5e06e87d8d68",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "ff3229be510ba0e8726855c0604349e9b124ae5e749a49250b383eabd898f866",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 0,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-hud-gpu.json",
-      "merged-head-proofs-sha256": "4fd275920c98340b6c56668679e75e11bbddce3571bb32b8282d04d0ce0e2374"
+      "merged-head-proofs-sha256": "4fd275920c98340b6c56668679e75e11bbddce3571bb32b8282d04d0ce0e2374",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-engine-input-map",
-      "source-id": "kotoba.kami.engine.input-map",
+      "source-id": "kotoba.kami.engine.inputMap",
       "destination": "packages/kotoba.kami.engine.input-map",
       "commit": "9841302680163b7aafb760cd1d21de809d172084",
       "tree": "b1fd3cfe77b90a1c57b7f9b35d8c9d380d685655",
@@ -8530,13 +8535,14 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-io.json",
       "github-sha256": "9c5c096dceee7b894e9e3783416b143ef7aca30fe252982bdc1bb4ae403888cd",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-io.json",
-      "branch-review-sha256": "604edab53d497a506e9e429cc3bd98be30ad66d7c6819829353ff5a0aca8c4a6",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "da2aea30fa191e39358bb84b942077e32811d7a60742cc2e7c740a4ae5fc4782",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 0,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-io.json",
-      "merged-head-proofs-sha256": "11c854f560b2f342b0e09387e1918d05ad21e3853f55f5a4cd54e5aca32836ca"
+      "merged-head-proofs-sha256": "11c854f560b2f342b0e09387e1918d05ad21e3853f55f5a4cd54e5aca32836ca",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-engine-modeling",
@@ -9369,13 +9375,14 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-render.json",
       "github-sha256": "dc02e94d506f608e14523df980f519c6c2fb3c6dc3779ddab8c06ff3a6d1a054",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-render.json",
-      "branch-review-sha256": "18db57b1a5414d4fd5564d88117821350003465d1cc4e4604afb89cf3936bd4c",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "fb67dfcab990723d37dca6b6309f527535f7d16665d60d7857d51f1c23e11b2b",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 0,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-render.json",
-      "merged-head-proofs-sha256": "2976370418be64b23c5b25f2649e44e40bb2df5c20a8ee32eac179b0d34108c3"
+      "merged-head-proofs-sha256": "2976370418be64b23c5b25f2649e44e40bb2df5c20a8ee32eac179b0d34108c3",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-engine-rotor",
@@ -9558,13 +9565,14 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-script-runtime.json",
       "github-sha256": "19bbd30f8e9e6a4bbf742c0be52b0ec658005173077f4f104896ce0163d7ca38",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-script-runtime.json",
-      "branch-review-sha256": "6336bfd0d529affa776487870bcfaf02ce2e4c261628e1d6f82788c516427c8d",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "4b0e43e656d3a938d75ee7438742dea1a30d0d675705e15eb43aeb1068a9dbcc",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 0,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-script-runtime.json",
-      "merged-head-proofs-sha256": "8913024bb37975dfdd9572a7bec934dedca67753383dbe379fbe9cc58aa8b092"
+      "merged-head-proofs-sha256": "8913024bb37975dfdd9572a7bec934dedca67753383dbe379fbe9cc58aa8b092",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-engine-sculpt",
@@ -10383,17 +10391,18 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-sdk.json",
       "github-sha256": "b9c85b0a48dbc09555a8cc151500ac750c39542b5533b4c31b7ec2379a4c38c7",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-sdk.json",
-      "branch-review-sha256": "ccce39ad2b4d054973643669a1eccc1ad655d1e520e0a132cbf92ff7d0e3acbc",
-      "pending-nonancestor-commits": 3,
+      "branch-review-sha256": "43471e5f505f606227f2277ff737f558aefd8e235d38f57c65831ba8cf50cb0d",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 3,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-sdk.json",
-      "merged-head-proofs-sha256": "1192bf75ab629d3b82f068745ba93f8af06df473ab8885e96fb50f0e2c9a2e65"
+      "merged-head-proofs-sha256": "1192bf75ab629d3b82f068745ba93f8af06df473ab8885e96fb50f0e2c9a2e65",
+      "manually-reviewed-nonancestor-commits": 3
     },
     {
       "repository": "kotoba-lang/kami-engine-vehicle-designer",
-      "source-id": "kotoba.kami.engine.vehicle-designer",
+      "source-id": "kotoba.kami.engine.vehicleDesigner",
       "destination": "packages/kotoba.kami.engine.vehicle-designer",
       "commit": "84da8aed92b359d70725fce3850cdddc313be8f8",
       "tree": "b0bc0d0344d65c9d77796b1506c04c895e81ef27",
@@ -12047,13 +12056,14 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-vehicle-designer.json",
       "github-sha256": "328d337eeb6e1cf5453338cda1495f9f62439fcd511660547ae50cdf49a840bf",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-vehicle-designer.json",
-      "branch-review-sha256": "447a75db382c704d4a5deb7e4c6dbb10f3ed20fe74ae2fb5c9433c3a4638b5e1",
-      "pending-nonancestor-commits": 2,
+      "branch-review-sha256": "bc5026829231410682fffeb97299e588d0e165a78f521023329993e198ceaba0",
+      "pending-nonancestor-commits": 1,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 13,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-vehicle-designer.json",
-      "merged-head-proofs-sha256": "8995ba1d4a875f51737e5bbd3e06471310782a4e9d2f3a305b6ef5bbc18a9a40"
+      "merged-head-proofs-sha256": "8995ba1d4a875f51737e5bbd3e06471310782a4e9d2f3a305b6ef5bbc18a9a40",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-engine-vphysics",
@@ -12383,13 +12393,14 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-engine-web.json",
       "github-sha256": "a7dbf729e1252e045f3bba4ba08275d5665932f891b97cabafb14e16f1482333",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-web.json",
-      "branch-review-sha256": "83446b833b53db67c6d17dc146112593e4a5311652e3a7b7c06c8fffed4096bd",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "dc2a5b00e40a58a0442f387e518f70e8980b5e06b6cd945b19eb0f977a12c97e",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 0,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-engine-web.json",
-      "merged-head-proofs-sha256": "190242a0fc8c0b3641b2227bc69a5b6dcb71389ff510719d04f0303a21bc54c2"
+      "merged-head-proofs-sha256": "190242a0fc8c0b3641b2227bc69a5b6dcb71389ff510719d04f0303a21bc54c2",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-flow",
@@ -12945,7 +12956,7 @@
     },
     {
       "repository": "kotoba-lang/kami-gen-sdf-agent",
-      "source-id": "kotoba.kami.gen.sdf-agent",
+      "source-id": "kotoba.kami.gen.sdfAgent",
       "destination": "packages/kotoba.kami.gen.sdf-agent",
       "commit": "b9074f7f47df244e1f23aed7424d4772a5fe0deb",
       "tree": "8fe1f633cb356db98187766f3953d1824a0942ff",
@@ -13026,7 +13037,7 @@
     },
     {
       "repository": "kotoba-lang/kami-genre-base-systems",
-      "source-id": "kotoba.kami.genre-base-systems",
+      "source-id": "kotoba.kami.genreBaseSystems",
       "destination": "packages/kotoba.kami.genre-base-systems",
       "commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
       "tree": "52734f8aff99af9bb3dac8de52ba61f78b8c487a",
@@ -14299,7 +14310,7 @@
     },
     {
       "repository": "kotoba-lang/kami-mangaka-scene-author",
-      "source-id": "kotoba.kami.mangaka.scene-author",
+      "source-id": "kotoba.kami.mangaka.sceneAuthor",
       "destination": "packages/kotoba.kami.mangaka.scene-author",
       "commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
       "tree": "08fe870f555df86376bf4838bcc4cd9002635acc",
@@ -14539,7 +14550,7 @@
     },
     {
       "repository": "kotoba-lang/kami-nv-compat",
-      "source-id": "kotoba.kami.nv-compat",
+      "source-id": "kotoba.kami.nvCompat",
       "destination": "packages/kotoba.kami.nv-compat",
       "commit": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
       "tree": "f68d7a7cfb5681db5716a86e077f81f0876e50d0",
@@ -14691,13 +14702,14 @@
       "github-snapshot": "maintenance/kami-consolidation/2026-10-22/snapshots/kami-nv-compat.json",
       "github-sha256": "d201316ca15b7b68565b742f0368a510a134cd4e46f641cd2599a3ac2ac9f7bf",
       "branch-review": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-nv-compat.json",
-      "branch-review-sha256": "1af4f56788d6559b8374a9fa8ff6114eb3e9cf12384ee2b0ae9c02339139e5ef",
-      "pending-nonancestor-commits": 1,
+      "branch-review-sha256": "1676ebc69db882df47c76373fbd471ead0409ff69e6152bfc9bfa154d01718e1",
+      "pending-nonancestor-commits": 0,
       "archived": false,
       "archive-status": "requires all source/branch/WIP/host/main gates; no archive yet",
       "proven-nonancestor-commits": 0,
       "merged-head-proofs": "maintenance/kami-consolidation/2026-10-22/merged-head-proofs/kami-nv-compat.json",
-      "merged-head-proofs-sha256": "0f2d33ce7234afaf127730fcd76c489a7c29ad322094ac6fc0b85be6bfcd4e2a"
+      "merged-head-proofs-sha256": "0f2d33ce7234afaf127730fcd76c489a7c29ad322094ac6fc0b85be6bfcd4e2a",
+      "manually-reviewed-nonancestor-commits": 1
     },
     {
       "repository": "kotoba-lang/kami-ongaku-notation",
@@ -14770,7 +14782,7 @@
     },
     {
       "repository": "kotoba-lang/kami-ongaku-plugin-host",
-      "source-id": "kotoba.kami.ongaku.plugin-host",
+      "source-id": "kotoba.kami.ongaku.pluginHost",
       "destination": "packages/kotoba.kami.ongaku.plugin-host",
       "commit": "7d86077d019a66cff33e7d1ee37155f93696ec49",
       "tree": "4b3e6d0f9970702006d920315a1e1ba1bd97b7ff",
@@ -15226,7 +15238,7 @@
     },
     {
       "repository": "kotoba-lang/kami-sensor-sim",
-      "source-id": "kotoba.kami.sensor-sim",
+      "source-id": "kotoba.kami.sensorSim",
       "destination": "packages/kotoba.kami.sensor-sim",
       "commit": "caae6787e8a07fa8e6613e52412bc94878cca094",
       "tree": "af4d4ba4e16e215fe2f42e471c8fe7f293f1c2ad",
@@ -15382,7 +15394,7 @@
     },
     {
       "repository": "kotoba-lang/kami-solar-helix-scene",
-      "source-id": "kotoba.kami.scene.solar-helix",
+      "source-id": "kotoba.kami.scene.solarHelix",
       "destination": "packages/kotoba.kami.scene.solar-helix",
       "commit": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
       "tree": "2653f1da9eb51225223d7be90c3293a4d11626e2",
@@ -15556,7 +15568,7 @@
     },
     {
       "repository": "kotoba-lang/kami-usd-native",
-      "source-id": "kotoba.kami.usd-native",
+      "source-id": "kotoba.kami.usdNative",
       "destination": "packages/kotoba.kami.usd-native",
       "commit": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
       "tree": "5584fede7c98ae7c523976536a7919a31b953414",
@@ -16212,7 +16224,10 @@
   "merged-head-proof-summary": {
     "initial-pending": 107,
     "proven-heads": 91,
-    "remaining-pending": 16,
-    "merged-PR-proofs": 135
-  }
+    "remaining-pending": 2,
+    "merged-PR-proofs": 135,
+    "manually-reviewed-heads": 14
+  },
+  "manual-branch-reviews": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+  "manual-branch-reviews-sha256": "e165569f62ada442068b3e69f98b1554cf603ac7f24c9ef05fa7d22efed7d905"
 }

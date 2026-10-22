@@ -1,5 +1,7 @@
 (ns kami.modeling-cae-test
-  (:require [kotoba.test :refer [deftest is]] [kotoba.io :as io] [kami.modeling.cae :as cae]
+  (:require [kotoba.test :refer [deftest is]]
+            #?(:clj [kotoba.io :as io] :cljs ["fs" :as fs])
+            [kami.modeling.cae :as cae]
             [kami.modeling.document :as document] [num.cpu :as num-cpu]))
 
 (def uid #(document/stable-uuid "cae-test" %))
@@ -110,7 +112,9 @@
   (let [study (bar-study 8)
         candidate (cae/solve-linear-static-bar study)
         reference (cae/import-calculix-frd-displacements
-                   (slurp (io/file "test/fixtures/calculix/uniaxial-bar-8.frd"))
+                   ;; The same measured solver fixture, with explicit host I/O.
+                   #?(:clj (slurp (io/file "test/fixtures/calculix/uniaxial-bar-8.frd"))
+                      :cljs (fs/readFileSync "test/fixtures/calculix/uniaxial-bar-8.frd" "utf8"))
                    {:adapter/id "calculix.ccx" :adapter/version "2.16"
                     :adapter/image-digest "sha256:b18b56fec00ad965d85e091454f26195d62115ee9a05feb4c130fa15406b6f7a"})
         comparison (cae/compare-result-fields candidate reference :result/displacement 1.0e-12 1.0e-8)

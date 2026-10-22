@@ -54,7 +54,11 @@
       "ref": "refs/remotes/kotoba-lang/fix/test-alias-and-ci",
       "object": "e25c4fd9ce60c26aab6f0d20a9b988073df71660",
       "commit": "e25c4fd9ce60c26aab6f0d20a9b988073df71660",
-      "decision": "pending-semantic-review"
+      "decision": "superseded-empty-scaffold-retirement",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "e25c4fd9ce60c26aab6f0d20a9b988073df71660"
+      }
     },
     {
       "ref": "refs/remotes/kotoba-lang/main",

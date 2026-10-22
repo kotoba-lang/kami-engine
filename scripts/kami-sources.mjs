@@ -3,7 +3,7 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const dottedID = /^kotoba(?:\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*)+$/;
+const dottedID = /^kotoba(?:\.[a-z][A-Za-z0-9]*)+$/;
 const existingProjects = new Map([
   ['kotoba.kami.gameplay', 'kami-gameplay'],
   ['kotoba.kami.render', 'kami-render'],
@@ -28,6 +28,11 @@ export function createSourceRegistry(directory = repositoryRoot) {
   const root = realpathSync(directory);
   const catalog = JSON.parse(readFileSync(join(root, 'packages/catalog.json'), 'utf8'));
   const provenance = JSON.parse(readFileSync(join(root, 'maintenance/kami-source-imports.json'), 'utf8'));
+  const migrations = JSON.parse(readFileSync(join(root, 'maintenance/kami-source-id-migrations.json'), 'utf8'));
+  requireValue(migrations.schema === 'kotoba.kami.source-id-migrations.v1' && migrations.migrations.length === 15, 'Unknown explicit source ID migration');
+  const byID = new Map(migrations.migrations.map(row => [row.after, row]));
+  requireValue(byID.size === 15 && new Set(migrations.migrations.map(row => row.before)).size === 15, 'Ambiguous source ID migration');
+  requireValue(migrations.migrations.every(row => dottedID.test(row.after) && !dottedID.test(row.before)), 'Invalid source ID migration');
   requireValue(catalog.schema === 'kotoba.kami.source-catalog.v1' && catalog.owner === 'kotoba-lang/kami-engine', 'Unknown Kami source catalog');
   requireValue(provenance.schema === 'kotoba.kami.source-imports.v1' && provenance.owner === catalog.owner, 'Unknown source provenance');
   const imported = new Map(provenance.repositories.filter(row => row['source-id']).map(row => [row['source-id'], row]));
@@ -42,8 +47,10 @@ export function createSourceRegistry(directory = repositoryRoot) {
     const source = imported.get(entry.id);
     if (source) {
       const name = source.repository.split('/')[1];
+      const migration = byID.get(entry.id);
+      if (migration) requireValue(migration.repository === source.repository, 'ID migration changes source ownership');
       requireValue(entry.path === source.destination && entry['source-repository'] === source.repository && entry['source-commit'] === source.commit, 'Source identity does not match imported provenance');
-      requireValue(JSON.stringify(entry.aliases) === JSON.stringify([name, `io.github.kotoba-lang/${name}`]), 'Legacy aliases must match the original repository exactly');
+      requireValue(JSON.stringify(entry.aliases) === JSON.stringify([name, `io.github.kotoba-lang/${name}`, ...(migration ? [migration.before] : [])]), 'Legacy aliases must match the original repository and explicit ID migration exactly');
     } else {
       requireValue(existingProjects.get(entry.id) === entry.path && entry['source-repository'] === catalog.owner && entry['source-commit'] === provenance['owner-base'], 'Unknown owner project');
       requireValue(JSON.stringify(entry.aliases) === JSON.stringify([entry.path]), 'Unexpected owner project alias');
@@ -58,6 +65,7 @@ export function createSourceRegistry(directory = repositoryRoot) {
     }
   }
   requireValue([...imported.keys(), ...existingProjects.keys()].every(id => ids.has(id)), 'Missing source project');
+  requireValue([...byID.keys()].every(id => imported.has(id) && ids.has(id)), 'Source ID migration has no imported project');
   const retired = new Map(catalog['retired-reservations'].map(row => [row['legacy-name'], row]));
   requireValue(retired.size === 7, 'Missing retired reservation documentation');
   for (const [name, row] of retired) {

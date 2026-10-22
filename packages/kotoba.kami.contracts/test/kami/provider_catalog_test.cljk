@@ -9,8 +9,18 @@
   (.exists (apply io/file parts)))
 
 (defn- local-split-contract-file [split-to]
-  (io/file ".." (last (str/split split-to #"/"))
-           "resources" "kami" "provider" "split_contract.edn"))
+  ;; Monorepo qualification: selected fixtures are local source; the separate
+  ;; Giemon provider contributes only an immutable, licensed contract snapshot.
+  (case (last (str/split split-to #"/"))
+    "kami-app-fixtures" (io/file "../kotoba.kami.app.fixtures/resources/kami/provider/split_contract.edn")
+    "giemon" (io/file "test/fixtures/provider-contracts/giemon.edn")
+    (throw (ex-info "provider has no reviewed contract input" {:split-to split-to}))))
+
+(defn- read-split-contract [file]
+  (let [data (edn/read-string (slurp file))]
+    (if (and (vector? data) (= 1 (count data)) (map? (first data)))
+      (dissoc (first data) :db/id)
+      data)))
 
 (def materialized-split-kinds
   #{:wasm-component-provider :component-runtime-provider :edn-fixture-provider})
@@ -110,5 +120,5 @@
               :let [file (local-split-contract-file (:kami/split-to split-repo))]]
         (is (.exists file) (str "missing local split contract: " (.getPath file)))
         (when (.exists file)
-          (is (= split-repo (edn/read-string (slurp file)))
+          (is (= split-repo (read-split-contract file))
               (str "local split contract drifted: " (.getPath file))))))))

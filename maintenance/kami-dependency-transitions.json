@@ -774,5 +774,53 @@
         ":local/root" : "../packages/kotoba.kami.engine.cae-solver"
       }
     } ]
-  } ]
+  } ],
+  "option-transitions": [
+    {
+      "file": "packages/kotoba.kami.app.fixtures/deps.edn",
+      "site": [
+        ":aliases",
+        ":check-engine-mirror",
+        ":main-opts"
+      ],
+      "target-repository": "kotoba-lang/kami-engine",
+      "kind": "fixture-owner-root-relocation",
+      "before": [
+        "-m",
+        "kami.app-fixtures",
+        "--engine-root",
+        "../kami-engine"
+      ],
+      "after": [
+        "-m",
+        "kami.app-fixtures",
+        "--engine-root",
+        "../.."
+      ]
+    },
+    {
+      "file": "packages/kotoba.kami.app.fixtures/deps.edn",
+      "site": [
+        ":aliases",
+        ":sync-engine-mirror",
+        ":main-opts"
+      ],
+      "target-repository": "kotoba-lang/kami-engine",
+      "kind": "fixture-owner-root-relocation",
+      "before": [
+        "-m",
+        "kami.app-fixtures",
+        "--write",
+        "--engine-root",
+        "../kami-engine"
+      ],
+      "after": [
+        "-m",
+        "kami.app-fixtures",
+        "--write",
+        "--engine-root",
+        "../.."
+      ]
+    }
+  ]
 }

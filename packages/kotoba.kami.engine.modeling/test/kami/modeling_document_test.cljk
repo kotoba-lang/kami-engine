@@ -74,9 +74,16 @@
   ;; until the two sides met. These frozen values are the JVM ones.
   (let [doc (document/document (document/stable-uuid "t" "doc") :mm 0.001)]
     (testing "frozen revision for a fixed empty document"
-      (is (= "k1-urrmhc" (:document/revision doc))))
+      (is (= "k1-urrmhc" (:document/revision doc)))
+      (is (= "k1-urrmhc" (binding [*print-namespace-maps* false] (document/revision-id doc))))
+      (is (= "k1-urrmhc" (binding [*print-namespace-maps* true] (document/revision-id doc)))))
     (testing "the document validates against its own revision"
       (is (document/valid-document? doc)))
     (testing "a different document gets a different revision"
       (is (not= (:document/revision doc)
                 (:document/revision (document/document (document/stable-uuid "t" "doc") :m 0.001)))))))
+
+(deftest canonical-text-retains-the-existing-namespaced-map-format
+  (is (= "#:example{:value 1}"
+         (binding [*print-namespace-maps* false]
+           (document/canonical-text {:example/value 1})))))

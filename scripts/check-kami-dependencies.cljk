@@ -12,6 +12,8 @@
 (def changes (read-json "maintenance/kami-dependency-transitions.json"))
 (def transitions (get changes "transitions"))
 (def by-file (group-by #(get % "file") transitions))
+(def option-transitions (get changes "option-transitions" []))
+(def options-by-file (group-by #(get % "file") option-transitions))
 (def by-repository (into {} (for [row (get imports "repositories")
                                 :when (get row "source-id")]
                             [(get row "repository") row])))
@@ -63,14 +65,31 @@
   (let [before (display-value (edn/read-string original-text))
         actual (display-value (edn/read-string (.readFileSync fs (.join path root relative) "utf8")))
         selected (get by-file relative [])
-        expected
+        dependencies
         (reduce
          (fn [value transition]
            (let [site (conj (get transition "site") (get transition "coordinate"))]
              (assert (= (get transition "before") (get-in value site))
                      (str "Dependency preimage mismatch: " relative " " site))
              (validate-transition relative repository original-file transition)
-             (assoc-in value site (get transition "after")))) before selected)]
+             (assoc-in value site (get transition "after")))) before selected)
+        expected
+        (reduce
+         (fn [value transition]
+           (let [site (get transition "site") before (get transition "before")
+                 after (get transition "after")
+                 owner-relative (.relative path (.dirname path (.join path root relative)) root)]
+             (assert (= "kotoba-lang/kami-app-fixtures" repository))
+             (assert (= "fixture-owner-root-relocation" (get transition "kind")))
+             (assert (= "kotoba-lang/kami-engine" (get transition "target-repository")))
+             (assert (contains? #{[":aliases" ":check-engine-mirror" ":main-opts"]
+                                 [":aliases" ":sync-engine-mirror" ":main-opts"]} site))
+             (assert (= before (get-in value site)))
+             (assert (and (vector? before) (= "../kami-engine" (last before))
+                          (= "--engine-root" (nth before (- (count before) 2)))))
+             (assert (= after (assoc before (dec (count before)) owner-relative))))
+           (assoc-in value (get transition "site") (get transition "after")))
+         dependencies (get options-by-file relative []))]
     (assert (= expected actual)
             (str "An undeclared dependency, alias, option or path changed: " relative))
     (swap! seen conj relative)))
@@ -84,7 +103,8 @@
         relative (str (get row "destination") "/" original-file)
         saved (.join path root "maintenance/kami-original-configs" name original-file)
         original (.readFileSync fs (if (.existsSync fs saved) saved (.join path root relative)) "utf8")]
-    (assert (or (.existsSync fs saved) (empty? (get by-file relative)))
+    (assert (or (.existsSync fs saved)
+                (and (empty? (get by-file relative)) (empty? (get options-by-file relative))))
             "Changed configuration has no saved original")
     (validate-config relative repository original-file original)))
 
@@ -94,7 +114,9 @@
   (validate-config file "kotoba-lang/kami-engine" file
                    (.readFileSync fs (.join path root "maintenance/kami-original-configs/kami-engine" file) "utf8")))
 (assert (every? @seen (keys by-file)) "Dependency substitutions outside reviewed project manifests")
+(assert (every? @seen (keys options-by-file)) "Option relocations outside reviewed project manifests")
 (assert (= [] (:paths (edn/read-string (.readFileSync fs (.join path root "deps.edn") "utf8"))))
         "The owner must not acquire an implicit aggregate classpath")
 (println "Kami dependency contracts:" (count @seen) "literal manifests," (count transitions)
-         "explicit relocations; every other external floor, alias and option is unchanged")
+         "explicit dependency relocations," (count option-transitions)
+         "fixture owner option relocations; every other external floor, alias and option is unchanged")

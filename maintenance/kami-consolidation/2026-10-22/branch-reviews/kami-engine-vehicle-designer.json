@@ -42,7 +42,11 @@
       "ref": "refs/heads/docs/stale-followup",
       "object": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
       "commit": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
-      "decision": "pending-semantic-review"
+      "decision": "documentation-renames-present-in-current-default",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0"
+      }
     },
     {
       "ref": "refs/heads/main",
@@ -346,7 +350,11 @@
       "ref": "refs/preservation/kami-monorepo-20261022/heads/docs/stale-followup",
       "object": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
       "commit": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
-      "decision": "pending-semantic-review"
+      "decision": "documentation-renames-present-in-current-default",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0"
+      }
     },
     {
       "ref": "refs/preservation/kami-monorepo-20261022/heads/energyflow/h2-consumption-profile",
@@ -742,7 +750,11 @@
       "ref": "refs/preservation/kami-monorepo-20261022/pull-21",
       "object": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
       "commit": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
-      "decision": "pending-semantic-review"
+      "decision": "documentation-renames-present-in-current-default",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0"
+      }
     },
     {
       "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
@@ -1504,7 +1516,11 @@
       "ref": "refs/remotes/origin/docs/stale-followup",
       "object": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
       "commit": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
-      "decision": "pending-semantic-review"
+      "decision": "documentation-renames-present-in-current-default",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0"
+      }
     },
     {
       "ref": "refs/remotes/origin/energyflow/h2-consumption-profile",

@@ -1,5 +1,7 @@
 (ns kami.app-fixtures-test
   (:require [kotoba.test :refer [deftest is run-tests testing]]
+            [clojure.java.io :as io]
+            [kotoba.lang.text :as str]
             [kami.app-fixtures :as fixtures]
             [kami.provider.contract-test]))
 
@@ -33,8 +35,25 @@
 (deftest engine-fixtures-are-mirrors
   (testing "remaining legacy kami-engine fixture files mirror this repo's authority copy"
     (let [catalog (fixtures/fixtures)]
+      ;; Do not let a nonexistent old split-repo path make this check vacuous.
+      (is (= 12 (count (mapcat fixtures/fixture-paths catalog))))
+      (is (every? #(.isFile (io/file "../.." %))
+                  (mapcat fixtures/fixture-paths catalog)))
       (is (= {:valid? true :errors []}
-             (fixtures/validate-engine-mirror catalog "../kami-engine"))))))
+             (fixtures/validate-engine-mirror catalog)))
+      (is (false? (:valid? (fixtures/validate-engine-mirror catalog "missing-engine-root")))))))
+
+(deftest legacy-source-extensions-remain-readable
+  (let [legacy (mapv (fn [fixture]
+                       (reduce (fn [result key]
+                                 (if (contains? result key)
+                                   (update result key #(str/replace % #"\.cljk$" ".clj"))
+                                   result))
+                               fixture [:kami.fixture/logic :kami.fixture/author]))
+                     (fixtures/fixtures))]
+    (is (:valid? (fixtures/validate-local-files legacy)))
+    (is (:valid? (fixtures/validate-source-coverage legacy)))
+    (is (:valid? (fixtures/validate-engine-mirror legacy)))))
 
 (deftest app-fixture-catalog-rejects-native-authority
   (let [result (fixtures/validate-catalog

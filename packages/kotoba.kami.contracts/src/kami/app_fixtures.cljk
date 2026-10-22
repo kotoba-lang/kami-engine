@@ -4,6 +4,7 @@
   Native Rust players consume these fixtures; scene.edn and logic.clj are the
   portable content authority until they are moved into dedicated fixture repos."
   (:require [kotoba.lang.coll :as set]
+            [kotoba.lang.text :as str]
             #?(:clj [kotoba.lang.edn :as edn])
             #?(:clj [kotoba.io :as io])))
 
@@ -121,13 +122,21 @@
 
 #?(:clj
    (defn validate-fixture-files
-     ([fixtures] (validate-fixture-files fixtures "../kami-app-fixtures/resources/kami/app"))
+     ([fixtures] (validate-fixture-files fixtures "../kotoba.kami.app.fixtures/resources/kami/app"))
      ([fixtures fixture-root]
+      ;; Monorepo qualification: resolve exact legacy source-extension aliases
+      ;; without restoring a second .clj source tree.
       (let [root (io/file fixture-root)
-           exists? (fn [path] (io/exists? (io/file root path)))
+            local (fn [path]
+                    (let [file (io/file root path)]
+                      (if (and (string? path) (re-find #"\.clj[sc]?$" path)
+                               (not (io/exists? file)))
+                        (io/file root (str/replace path #"\.clj[sc]?$" ".cljk"))
+                        file)))
+           exists? (fn [path] (io/exists? (local path)))
            read-edn (fn [path]
                       (try
-                        (edn/read-string (slurp (io/file root path)))
+                        (edn/read-string (slurp (local path)))
                         nil
                         (catch Exception e
                           (err [:file path] (str "invalid EDN: " (ex-message e))))))

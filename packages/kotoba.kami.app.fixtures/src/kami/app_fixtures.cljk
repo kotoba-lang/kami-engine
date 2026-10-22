@@ -6,6 +6,7 @@
 
 (def catalog-resource "kami/app_fixtures.edn")
 (def app-root-resource "kami/app")
+(def default-engine-root "../..")
 
 #?(:clj
    (defn resource-edn [path]
@@ -115,7 +116,13 @@
 
 #?(:clj
    (defn- local-file [path]
-     (io/file (io/resource app-root-resource) path)))
+     ;; Monorepo qualification: retain old catalog .clj/.cljs/.cljc spellings
+     ;; as input aliases while the authority files use their actual .cljk name.
+     (let [root (io/file (io/resource app-root-resource))
+           file (io/file root path)]
+       (if (and (string? path) (re-find #"\.clj[sc]?$" path) (not (.exists file)))
+         (io/file root (str/replace path #"\.clj[sc]?$" ".cljk"))
+         file))))
 
 #?(:clj
    (defn- app-root-dir []
@@ -133,7 +140,7 @@
        (->> (file-seq root)
             (filter #(.isFile %))
             (filter #(some (fn [suffix] (str/ends-with? (.getName %) suffix))
-                           [".edn" ".clj"]))
+                           [".edn" ".cljk" ".clj" ".cljs" ".cljc"]))
             (remove #(= "deps.edn" (.getName %)))
             (map #(rel-path root %))
             sort
@@ -167,10 +174,10 @@
 
 #?(:clj
    (defn validate-engine-mirror
-     ([fixtures] (validate-engine-mirror fixtures "../kami-engine"))
+     ([fixtures] (validate-engine-mirror fixtures default-engine-root))
      ([fixtures engine-root]
       (let [local (fn [path] (local-file path))
-            engine (fn [path] (io/file engine-root path))
+            engine (fn [path] (io/file engine-root (rel-path (app-root-dir) (local path))))
             checked-paths (fn [fixture]
                             (cond-> [(:kami.fixture/scene fixture)
                                      (:kami.fixture/logic fixture)]
@@ -178,6 +185,8 @@
                               (conj (:kami.fixture/author fixture))))
             errors
             (apply collect-errors
+                   (when-not (.isDirectory (io/file engine-root))
+                     [(err [:engine-root] "engine mirror root is missing")])
                    (for [[index fixture] (map-indexed vector fixtures)
                          path (checked-paths fixture)
                          :let [local-file (local path)
@@ -198,7 +207,8 @@
 
 #?(:clj
    (defn validate-source-coverage [fixtures]
-     (let [cataloged (set (mapcat fixture-paths fixtures))
+     (let [cataloged (set (map #(if (string? %) (rel-path (app-root-dir) (local-file %)) %)
+                              (mapcat fixture-paths fixtures)))
            present (set (authority-source-paths))
            generated (set (mapcat :kami.fixture/generated fixtures))
            errors
@@ -213,12 +223,12 @@
 
 #?(:clj
    (defn sync-engine-mirror!
-     ([fixtures] (sync-engine-mirror! fixtures "../kami-engine"))
+     ([fixtures] (sync-engine-mirror! fixtures default-engine-root))
      ([fixtures engine-root]
       (doseq [fixture fixtures
               path (fixture-paths fixture)
               :let [source (local-file path)
-                    target (io/file engine-root path)]]
+                    target (io/file engine-root (rel-path (app-root-dir) source))]]
         (io/make-parents target)
         (spit target (slurp source)))
       {:synced (count (mapcat fixture-paths fixtures))
@@ -239,7 +249,7 @@
 #?(:clj
    (defn -main [& args]
      (let [fs (fixtures)
-           engine-root (arg-value args "--engine-root" "../kami-engine")
+           engine-root (arg-value args "--engine-root" default-engine-root)
            write? (some #{"--write"} args)
            result (if write?
                     (do (sync-engine-mirror! fs engine-root)

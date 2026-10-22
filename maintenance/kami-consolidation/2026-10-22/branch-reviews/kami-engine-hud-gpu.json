@@ -36,7 +36,11 @@
       "ref": "refs/preservation/kami-monorepo-20261022/heads/fix/test-alias-and-ci",
       "object": "d770f1046f4543444bb385c4055970bcf5e8f413",
       "commit": "d770f1046f4543444bb385c4055970bcf5e8f413",
-      "decision": "pending-semantic-review"
+      "decision": "superseded-by-current-test-host-configuration",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "d770f1046f4543444bb385c4055970bcf5e8f413"
+      }
     },
     {
       "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
@@ -60,7 +64,11 @@
       "ref": "refs/remotes/kotoba-lang/fix/test-alias-and-ci",
       "object": "d770f1046f4543444bb385c4055970bcf5e8f413",
       "commit": "d770f1046f4543444bb385c4055970bcf5e8f413",
-      "decision": "pending-semantic-review"
+      "decision": "superseded-by-current-test-host-configuration",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "d770f1046f4543444bb385c4055970bcf5e8f413"
+      }
     },
     {
       "ref": "refs/remotes/kotoba-lang/jv/full-sha",
@@ -102,7 +110,11 @@
       "ref": "refs/remotes/origin/fix/test-alias-and-ci",
       "object": "d770f1046f4543444bb385c4055970bcf5e8f413",
       "commit": "d770f1046f4543444bb385c4055970bcf5e8f413",
-      "decision": "pending-semantic-review"
+      "decision": "superseded-by-current-test-host-configuration",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "d770f1046f4543444bb385c4055970bcf5e8f413"
+      }
     },
     {
       "ref": "refs/remotes/origin/kbb-cutover-20260911",

@@ -21,11 +21,16 @@ not transfer provider, compiler, service or application authority to the root.
 ## Decision
 
 1. Co-locate 67 independently selectable portable source projects at
-   `packages/<dotted-id>/`. Preserve their complete upstream tracked trees,
+   the explicitly cataloged `packages/<source-directory>/` paths. Preserve their complete upstream tracked trees,
    license/notice files, original manifests and byte/mode provenance.
 2. Include the three existing `kami-gameplay`, `kami-render` and `kami-physics`
    projects in the same source catalog. The 70 IDs start with `kotoba.`; the
-   137 exact legacy aliases remain lookup aliases. A dotted source ID is neither
+   152 exact aliases include the 137 original repository selectors and 15
+   previous draft IDs. Canonical segments follow the naming Spec's
+   `[a-z][A-Za-z0-9]*` grammar, using lowerCamelCase for multiword segments.
+   `maintenance/kami-source-id-migrations.json` binds the explicit corrections
+   to the pinned Spec; lookup never converts hyphens/case implicitly. Directory
+   paths and Lisp namespace APIs remain separate. A dotted source ID is neither
    a field traversal nor an event subject.
 3. Keep classpaths project-scoped. `kami.scene` has an identical contract mirror
    in two projects, and the two `kami.app-fixtures` surfaces differ. Catalog
@@ -93,6 +98,43 @@ The initial JVM probe is diagnostic, not completion evidence: 54 of 70 project
 suites passed and 16 exposed unresolved host, fixture, dependency or model
 issues. Repairs must be rerun against their actual consumers. A passing local
 suite does not qualify an unmeasured native/GPU/live provider.
+
+The subsequent targeted repairs now pass JVM fixture/provider contracts and
+JVM/SCI/compiled Node modeling and scene-author tests. The compiled host exposed
+a namespaced-map printer default that changed revision/signature bytes; explicit
+canonical printing preserves the existing JVM `k1` identities. The UUID exchange
+reader admits only well-formed UUID tags with all bounded-reader checks retained.
+Whole doubles and fractional JSON values follow the decoded-value wire contract.
+Canonical fixture catalogs name real CLJK files while validators accept old
+source-extension aliases. Their engine mirror tests inspect all12 real files.
+
+The two-project host matrix is deliberately partial:
+
+```sh
+python3 scripts/test-kami-compiled.py /absolute/github/workspaces/codex/TASK/compiled --project kotoba.kami.engine.modeling
+python3 scripts/test-kami-compiled.py /absolute/github/workspaces/codex/TASK/compiled --project kotoba.kami.mangaka.sceneAuthor
+python3 scripts/test-kami-compiled.py /absolute/github/workspaces/codex/TASK/compiled --project kotoba.kami.mangaka.sceneAuthor --plant-failure
+KOTOBA_CLI=/absolute/path/to/kotoba/bin/kotoba node scripts/test-kami-imports.mjs /absolute/github/workspaces/codex/TASK/import-probes
+```
+
+The runner hashes every source view and changes only selected tests' macro
+require to the shared pinned compiled bridge. Production bytes and assertion
+bodies are unchanged by that host wiring. The planted failure/error must exit1.
+The separate import probes invoke the real public Kotoba CLI with explicit
+source roots, asserting the frozen revision/UUID round-trip and fractional JSON
+value plus every implementation origin inside the selected owner package.
+Java Ed25519 tests remain JVM-only with a checked import; the nine CAE tests now
+run on both Node hosts using the same measured fixture. Giemon stays separate:
+only its immutable Apache-licensed provider-contract test data is included.
+All56 dependency relocations remain unchanged, with two separately validated
+CLI option changes pointing fixture mirror operations at the actual owner.
+
+Fourteen of the16 remaining branch heads now have pinned semantic decisions:
+seven retired ns-only scaffolds, the Rust-retirement rescue, the already-fixed
+HUD smoke test, three SDK heads with exact historical implementation/test/sample
+postimages and superseded README notes, the NV fix, and current vehicle docs.
+The Echem power-run and vehicle-regeneration proposals contain novel behavior
+and remain under review rather than being labeled merged or discarded.
 
 Do not archive a source repository until its source/branch/dependency and
 declared-host gates pass on actual owner main, followed by fresh remote and

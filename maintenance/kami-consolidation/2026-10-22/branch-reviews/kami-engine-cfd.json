@@ -152,7 +152,11 @@
       "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
       "object": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479",
       "commit": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479",
-      "decision": "pending-semantic-review"
+      "decision": "superseded-by-portable-default-and-Rust-retirement",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479"
+      }
     },
     {
       "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
@@ -182,7 +186,11 @@
       "ref": "refs/remotes/com-junkawasaki/rescue/wip-20260718",
       "object": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479",
       "commit": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479",
-      "decision": "pending-semantic-review"
+      "decision": "superseded-by-portable-default-and-Rust-retirement",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479"
+      }
     },
     {
       "ref": "refs/remotes/origin/HEAD",
@@ -224,7 +232,11 @@
       "ref": "refs/remotes/origin/rescue/wip-20260718",
       "object": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479",
       "commit": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479",
-      "decision": "pending-semantic-review"
+      "decision": "superseded-by-portable-default-and-Rust-retirement",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "be7df5bb9dc2ef293b3d3694d76dcfa9798dd479"
+      }
     }
   ],
   "pending-semantic-review": [

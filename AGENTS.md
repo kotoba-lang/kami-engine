@@ -56,7 +56,7 @@ or application deployment ownership. Source discovery grants no admission.
 | `kami-engine-sdk` | gitlink (no `.gitmodules`); the SDK is a separate repo |
 | `hermes/` | resident-bot profiles for this repo |
 | `scripts/` | gates (`wit_test.cljk`, `check_adapter_registry.cljk`, `guest_lint.cljk`), task runner (`run-task.cljk` + `scripts/tasks.edn`) |
-| `packages/<dotted-id>/`, `packages/catalog.json` | selected portable projects and exact old-name aliases; use isolated classpaths |
+| `packages/<source-directory>/`, `packages/catalog.json` | selected portable projects, explicit paths and exact old-name aliases; use isolated classpaths |
 | `retired-reservations/` | retired empty scaffold documentation; never executable packages |
 | `maintenance/kami-*` | original file/configuration provenance, branch/history recovery and consolidation gates |
 | `edn-datomize.cljk`, `schema.edn` | EDN → datom conversion; `schema.edn` is generated |
@@ -98,11 +98,16 @@ CI does not run the gameplay/render/physics suites.
   (`kami-mangaka-reader-clj` keeps only its built `dist/`). `kami-ui-sdk` JS is
   retired: CLJC lives in `kotoba-lang/kami-engine-app-sdk`, the game host
   surface in `kotoba-lang/host`.
-- For the explicitly cataloged portable projects, `packages/<dotted-id>` is
+- For the explicitly cataloged portable projects, the declared `packages/` path is
   the new consolidation location. Keep the legacy pointer/artifact paths
   intact rather than restoring code there. The old SDK gitlink remains a
   compatibility marker, not a second maintained source tree. The guest
   compiler and native runtime foundations remain separate repositories.
+- Canonical source IDs follow the Kotoba naming Spec: dot-separated named
+  levels and lowerCamelCase multiword segments, without hyphens/underscores.
+  The 15 earlier draft spellings remain exact aliases in
+  `maintenance/kami-source-id-migrations.json`. Do not normalize lookup inputs
+  or rewrite Lisp namespace APIs or filesystem paths from an ID.
 - Preserve original source/license/notice bytes and record every migration
   change in `maintenance/kami-source-imports.json`. Keep pending branch,
   dependency and host qualification explicit; do not archive to hide a

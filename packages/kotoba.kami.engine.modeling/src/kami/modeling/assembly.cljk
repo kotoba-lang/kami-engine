@@ -3,7 +3,7 @@
   deterministic translational solving. Rotational/kinematic mate expansion
   builds on the same explicit constraint graph."
   (:require [kami.modeling.document :as document]
-            #?(:clj [kotoba.lang.edn :as edn] :cljs [cljs.reader :as edn])))
+            [kotoba.lang.edn :as edn]))
 
 (def mate-kinds #{:coincident :distance :parallel :concentric :angle :gear :rack-pinion :limit})
 (def joint-kinds #{:fixed :revolute :prismatic})
@@ -78,10 +78,21 @@
      :assembly-package/payload payload}))
 
 (defn encode-package [assembly]
-  (pr-str (document/canonical-form (export-package assembly))))
+  (document/canonical-text (export-package assembly)))
+
+;; Monorepo qualification: schema 1 already writes #uuid identities. Admit
+;; only that explicit data reader on both hosts; retain all EDN size limits
+;; and the strict default rejection of other tags and executable dispatch.
+(defn- read-exchange-uuid [value]
+  (when-not (and (string? value)
+                 (re-matches #"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" value))
+    (throw (ex-info "invalid assembly exchange UUID" {:value value})))
+  #?(:clj (java.util.UUID/fromString value) :cljs (uuid value)))
 
 (defn import-package [encoded]
-  (let [package (if (string? encoded) (edn/read-string encoded) encoded)
+  (let [package (if (string? encoded)
+                  (edn/read-string {:readers {'uuid read-exchange-uuid}} encoded)
+                  encoded)
         payload (:assembly-package/payload package)
         expected (document/revision-id {:assembly (document/canonical-form payload)})]
     (when-not (= assembly-exchange-schema (:assembly-package/schema package))

@@ -8,6 +8,13 @@ reads a source descriptor; it does not activate a runtime or provider. Native
 foundations and product deployment boundaries remain separate. Qualification
 and retirement are still in progress.
 
+The source catalog contains 70 canonical dotted IDs and 152 exact aliases.
+IDs follow the Kotoba naming Spec; multiword segments use lowerCamelCase.
+Fifteen earlier draft IDs remain explicit aliases, for example
+`kotoba.kami.mangaka.scene-author` selects `kotoba.kami.mangaka.sceneAuthor`.
+Source paths and Lisp namespace APIs are declared separately and unchanged.
+See `maintenance/kami-source-id-migrations.json` for the complete mapping.
+
 `kami-physics` integrates the shared Kotoba physics scene contract with
 realtime rigid bodies, vehicle reduced-order models and high-fidelity CAE.
 Game and spatial-authoring callers use one CLJC router while fidelity remains

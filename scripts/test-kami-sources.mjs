@@ -19,9 +19,9 @@ for (const entry of registry.catalog.libraries) {
     lookups++;
   }
 }
-assert.equal(lookups, 207);
+assert.equal(lookups, 222);
 for (const row of registry.catalog['retired-reservations']) assert.throws(() => registry.lookup(row['legacy-name']), /Retired empty scaffold/);
-for (const value of ['', ' kotoba.kami.contracts', 'kotoba.kami.contracts ', 'kotoba.kami.*', 'kami contracts', 'app.kotoba.contracts']) assert.throws(() => registry.lookup(value));
+for (const value of ['', ' kotoba.kami.contracts', 'kotoba.kami.contracts ', 'kotoba.kami.*', 'kami contracts', 'app.kotoba.contracts', 'kotoba.kami.engine-modeling', 'kotoba.kami.usdnative']) assert.throws(() => registry.lookup(value));
 
 const fixture = join(workspace, 'owner');
 mkdirSync(join(fixture, 'packages'), { recursive: true });
@@ -29,6 +29,7 @@ mkdirSync(join(fixture, 'maintenance'), { recursive: true });
 const catalogFile = join(fixture, 'packages/catalog.json');
 const originalCatalog = readFileSync(join(repositoryRoot, 'packages/catalog.json'), 'utf8');
 writeFileSync(join(fixture, 'maintenance/kami-source-imports.json'), readFileSync(join(repositoryRoot, 'maintenance/kami-source-imports.json')));
+writeFileSync(join(fixture, 'maintenance/kami-source-id-migrations.json'), readFileSync(join(repositoryRoot, 'maintenance/kami-source-id-migrations.json')));
 for (const row of registry.catalog.libraries) {
   mkdirSync(join(fixture, row.path), { recursive: true });
   for (const path of row.sourcePaths) mkdirSync(join(fixture, row.path, path), { recursive: true });
@@ -39,6 +40,8 @@ assert.equal(createSourceRegistry(fixture).catalog.libraries.length, 70);
 let negatives = 0;
 for (const mutate of [
   catalog => { catalog.libraries[1].id = catalog.libraries[0].id; },
+  catalog => { catalog.libraries[0].id = 'kotoba.kami.invalid-id'; },
+  catalog => { catalog.libraries[0].id = 'kotoba.kami.invalid_id'; },
   catalog => { catalog.libraries[0].aliases[0] = 'unexpected-alias'; },
   catalog => { catalog.libraries[0].admission = 'granted'; },
   catalog => { catalog.libraries[0].sourcePaths = ['/tmp']; },
@@ -72,6 +75,6 @@ const descriptor = JSON.parse(cli.stdout);
 assert.equal(descriptor.id, 'kotoba.kami.contracts');
 assert.equal(descriptor.admission, 'not-granted');
 assert(descriptor.path.startsWith(join(repositoryRoot, 'packages') + '/'));
-const result = { exactLookups: lookups, sourceIDs: 70, exactAliases: 137, retiredScaffoldRefusals: 7, catalogAndSymlinkRefusals: negatives, externalCWD: true, admission: 'not-granted' };
+const result = { exactLookups: lookups, sourceIDs: 70, exactAliases: 152, explicitDraftIDMigrations: 15, retiredScaffoldRefusals: 7, catalogAndSymlinkRefusals: negatives, externalCWD: true, admission: 'not-granted' };
 writeFileSync(join(workspace, 'results.json'), JSON.stringify(result, null, 2) + '\n');
 console.log(JSON.stringify(result));

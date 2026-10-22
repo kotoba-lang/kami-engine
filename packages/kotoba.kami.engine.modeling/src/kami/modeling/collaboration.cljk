@@ -123,7 +123,7 @@
 
 (defn operation-payload [op]
   ;; Stable canonical payload; signature bytes/strings are deliberately outside it.
-  (pr-str (document/canonical-form (dissoc op :operation/signature :operation/signature-envelope))))
+  (document/canonical-text (dissoc op :operation/signature :operation/signature-envelope)))
 
 (defn sign-operation [op signer]
   (when-not (ifn? signer) (throw (ex-info "signature adapter must be callable" {})))

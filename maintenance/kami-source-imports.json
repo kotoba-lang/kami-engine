@@ -172,8 +172,84 @@
       "source-id": "kotoba.kami.app.fixtures",
       "commit": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
       "tree": "f4687b9232d2894b385c1cc1be19e2cdc2880a4a",
-      "source-and-test-changes": [],
-      "config-changes": [],
+      "source-and-test-changes": [
+        {
+          "path": "packages/kotoba.kami.app.fixtures/resources/kami/app_fixtures.edn",
+          "original-sha256": "5ed30f08dc1e387904d5256ba4ebb41ec82e2b8cc232f8928371b295f450e249",
+          "rewritten-sha256": "94dfbf71d424ba165864e191aafad277408f4d9bf843aa96601c6c2cfa4512b8",
+          "reason": "Catalog references now use existing physical CLJK names; validators retain legacy input spellings.",
+          "kind": "existing-source-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.app.fixtures/src/kami/app_fixtures.cljk",
+          "original-sha256": "5fc2f1aa33c5c720a83f9711f569bc59058039a96374af331e9672cb05057765",
+          "rewritten-sha256": "60318ba8b26c11ac00e7648a0ff5fb37a73159994f2ba27e56b6417ef8c1d22d",
+          "reason": "Resolve legacy source extensions to actual CLJK files, include CLJK in authority coverage, use the owner mirror root, and reject missing mirror roots.",
+          "kind": "existing-source-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.app.fixtures/test/kami/app_fixtures_test.cljk",
+          "original-sha256": "9e7d5ac9e46c9fd571def0e4b50c36f567efa5e6745b13258e2335554b8e6c46",
+          "rewritten-sha256": "d51d9301c6337181b535c298ffd1e753adaaa6d5fcaa4269356638604665f937",
+          "reason": "Prove all12 mirror inputs exist in the actual owner and retain legacy aliases plus missing-root refusal.",
+          "kind": "existing-test-host-compatibility"
+        }
+      ],
+      "config-changes": [
+        {
+          "path": "packages/kotoba.kami.app.fixtures/deps.edn",
+          "original-sha256": "d9bc632683ef7f4aa843f86848987154bd06b56dd514806131600d7f1350c78a",
+          "rewritten-sha256": "ad2aa26e29696f66faf9a3d33da2c857aa63ee4fea8a10d597e892d36e741e66",
+          "option-transitions": [
+            {
+              "file": "packages/kotoba.kami.app.fixtures/deps.edn",
+              "site": [
+                ":aliases",
+                ":check-engine-mirror",
+                ":main-opts"
+              ],
+              "target-repository": "kotoba-lang/kami-engine",
+              "kind": "fixture-owner-root-relocation",
+              "before": [
+                "-m",
+                "kami.app-fixtures",
+                "--engine-root",
+                "../kami-engine"
+              ],
+              "after": [
+                "-m",
+                "kami.app-fixtures",
+                "--engine-root",
+                "../.."
+              ]
+            },
+            {
+              "file": "packages/kotoba.kami.app.fixtures/deps.edn",
+              "site": [
+                ":aliases",
+                ":sync-engine-mirror",
+                ":main-opts"
+              ],
+              "target-repository": "kotoba-lang/kami-engine",
+              "kind": "fixture-owner-root-relocation",
+              "before": [
+                "-m",
+                "kami.app-fixtures",
+                "--write",
+                "--engine-root",
+                "../kami-engine"
+              ],
+              "after": [
+                "-m",
+                "kami.app-fixtures",
+                "--write",
+                "--engine-root",
+                "../.."
+              ]
+            }
+          ]
+        }
+      ],
       "original-files": [
         {
           "path": ".github/workflows/ci.yml",
@@ -1077,7 +1153,7 @@
       "role": "portable-domain-library",
       "destination": "packages/kotoba.kami.cad-import",
       "repository": "kotoba-lang/kami-cad-import",
-      "source-id": "kotoba.kami.cad-import",
+      "source-id": "kotoba.kami.cadImport",
       "commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
       "tree": "e0c4a98dcce9bf73e96f39f8251a872da412cc04",
       "source-and-test-changes": [
@@ -1562,7 +1638,36 @@
       "source-id": "kotoba.kami.contracts",
       "commit": "43811a845c8a31708f38e2375769e36fb74287f9",
       "tree": "93ac417321fef4c1d961df123568506a0ef3903b",
-      "source-and-test-changes": [],
+      "source-and-test-changes": [
+        {
+          "path": "packages/kotoba.kami.contracts/resources/kami/app_fixtures.edn",
+          "original-sha256": "0faf9e6d8380e175c573d9b80ae2304a2c972a805445eb88f8e93668b00051e0",
+          "rewritten-sha256": "e976e45280f3cb2bf0a58329f7dbd9731528284d39fe09b68777494ace1d6e8d",
+          "reason": "Catalog references now use existing physical CLJK names; validators retain legacy input spellings.",
+          "kind": "existing-source-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.contracts/src/kami/app_fixtures.cljk",
+          "original-sha256": "c31b6247882bbd4c1712bff7aa9f99e00f85ce1c4e0875443beb89485fa39cec",
+          "rewritten-sha256": "3def06c8e3a3a9db5639122678346b681b5143418a458b01ba661c13fd7f42f6",
+          "reason": "Validate against the monorepo fixture authority while retaining legacy source-extension aliases.",
+          "kind": "existing-source-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.contracts/test/kami/app_fixtures_test.cljk",
+          "original-sha256": "b44377b908ca20079ae1b056affe02f732eacf7f6950f97d9acd39d319231cea",
+          "rewritten-sha256": "39be3a14fca4b0e4a5cc173705752d10b2b7577bceadcef0018207cdc2dd193a",
+          "reason": "Exercise the relocated fixture authority and reject a missing legacy source path.",
+          "kind": "existing-test-host-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.contracts/test/kami/provider_catalog_test.cljk",
+          "original-sha256": "c1046acd42fa2bbf96a3563cccd6c74e99f380b269a3b96693b3aa7f81763963",
+          "rewritten-sha256": "43f13092c964d032ed033cc831db325210a99fa902e77863ec7748ee8f2f904b",
+          "reason": "Use the selected fixture package and a pinned licensed provider contract, stripping datom entity metadata before exact contract equality.",
+          "kind": "existing-test-host-compatibility"
+        }
+      ],
       "config-changes": [],
       "original-files": [
         {
@@ -1788,6 +1893,20 @@
           "git-blob": "95461d259fd3f35b083cbf29fac05567180db6ef",
           "sha256": "65a81c89a41ac7a22bd9adaab367ea3350bd3c4272711d44c2d213e23f7500d6",
           "bytes": 866
+        }
+      ],
+      "added-files": [
+        {
+          "path": "test/fixtures/provider-contracts/giemon.edn",
+          "sha256": "7b12442fa4faea14a748354ec71e53c6aff49f74f6c36f8e3f32708a2e63240c",
+          "mode": "100644",
+          "kind": "licensed-external-contract-test-input"
+        },
+        {
+          "path": "test/fixtures/provider-contracts/giemon.LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "mode": "100644",
+          "kind": "licensed-external-contract-test-input"
         }
       ]
     },
@@ -2286,7 +2405,7 @@
       "role": "portable-client-contract-and-optional-host-adapter",
       "destination": "packages/kotoba.kami.eng-web",
       "repository": "kotoba-lang/kami-eng-web",
-      "source-id": "kotoba.kami.eng-web",
+      "source-id": "kotoba.kami.engWeb",
       "commit": "17a53ad6fb9d9d67c59aa2ffa2d85d552d221628",
       "tree": "69fb7aa0728f38b5a70da8202ca776ebcc145cdd",
       "source-and-test-changes": [],
@@ -2754,7 +2873,7 @@
       "role": "client-ui-sdk-with-injected-host",
       "destination": "packages/kotoba.kami.engine.app-sdk",
       "repository": "kotoba-lang/kami-engine-app-sdk",
-      "source-id": "kotoba.kami.engine.app-sdk",
+      "source-id": "kotoba.kami.engine.appSdk",
       "commit": "efe8f6ce35c7db866819c2ddded6a886ef4f9823",
       "tree": "a2fb20abbaea07c6d22d647f8152b1367d146234",
       "source-and-test-changes": [],
@@ -3016,7 +3135,7 @@
       "role": "portable-domain-library",
       "destination": "packages/kotoba.kami.engine.cae-solver",
       "repository": "kotoba-lang/kami-engine-cae-solver",
-      "source-id": "kotoba.kami.engine.cae-solver",
+      "source-id": "kotoba.kami.engine.caeSolver",
       "commit": "92dcd10b8d56d721073131d005d944077605bc5e",
       "tree": "2a1536b7c7d96c84cbf6db921b90ecb8e6103a34",
       "source-and-test-changes": [
@@ -4614,7 +4733,7 @@
       "role": "portable-domain-library",
       "destination": "packages/kotoba.kami.engine.hud-gpu",
       "repository": "kotoba-lang/kami-engine-hud-gpu",
-      "source-id": "kotoba.kami.engine.hud-gpu",
+      "source-id": "kotoba.kami.engine.hudGpu",
       "commit": "16076705114bdef321ef50a285020f2aa142f7dc",
       "tree": "dd56d88db1eee0387d8f9c4548402b119e8dbb59",
       "source-and-test-changes": [],
@@ -4696,7 +4815,7 @@
       "role": "portable-domain-library",
       "destination": "packages/kotoba.kami.engine.input-map",
       "repository": "kotoba-lang/kami-engine-input-map",
-      "source-id": "kotoba.kami.engine.input-map",
+      "source-id": "kotoba.kami.engine.inputMap",
       "commit": "9841302680163b7aafb760cd1d21de809d172084",
       "tree": "b1fd3cfe77b90a1c57b7f9b35d8c9d380d685655",
       "source-and-test-changes": [],
@@ -4834,6 +4953,55 @@
           "original-sha256": "790b719ee182f416181c51de0fa8025912f5a01f1f1faf6201bd89d822d2bb98",
           "rewritten-sha256": "98afc185d7e6e8a6252ddcab11c7c274dd3fec30d16808a705a509f28280d810",
           "reason": "11 exception class references use explicit CLJ/CLJS reader conditions; assertions and tested behavior are unchanged",
+          "kind": "existing-test-host-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.engine.modeling/src/kami/modeling/assembly.cljk",
+          "original-sha256": "919a0d9445b6d758765736f4228f901f03b0b47e60fea0a12c9d59fc11e9b276",
+          "rewritten-sha256": "a420433d1eabeee9deb1f5d662704164fbe34e6064c29731e42d75ae94ebc14a",
+          "reason": "Schema1 already emits UUID identities. Both hosts use the bounded EDN reader with only an explicit canonical UUID reader, and canonical wire text retains the original JVM namespaced-map format. Other tags/dispatch remain refused.",
+          "kind": "existing-source-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.engine.modeling/test/kami/modeling_assembly_test.cljk",
+          "original-sha256": "de85242d14831b3b1027f29f21fa8a48aea34fb0124fc6bc076e692f24c42e22",
+          "rewritten-sha256": "716134a0540041d28962fc6cf29ae7b082ed1e56e83809cf7eb6f202d217be62",
+          "reason": "Exercise UUID round-trip, malformed UUID/tag/dispatch refusals, and unchanged strict default EDN behavior.",
+          "kind": "existing-test-host-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.engine.modeling/test/kami/modeling_cae_test.cljk",
+          "original-sha256": "ea013abf2a26aa1c25f3e7d487703f5ba005c56d6a56c2ffa4c26afc83bd7247",
+          "rewritten-sha256": "b9e0eadb0f65e1298ac45496b2dafe6198818da325eb3767579d2c7a315df29f",
+          "reason": "Read the identical measured CAE fixture with explicit JVM/Node file I/O so all nine solver suites execute portably.",
+          "kind": "existing-test-host-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.engine.modeling/test/run_portable.cljk",
+          "original-sha256": "52ee57c2fc181c528a5652b8fb210ff98ccca0098bef6bc4c59d58e6df481efe",
+          "rewritten-sha256": "9b827ed591261ca57b8f7d27700e690099c68c087f17dd54a0271ba5c82da295",
+          "reason": "Include the now-portable CAE suite and bind the remaining Java Ed25519 exclusion to its actual import.",
+          "kind": "existing-test-host-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.engine.modeling/src/kami/modeling/collaboration.cljk",
+          "original-sha256": "82fca9fdbeccd00adb6901b50b970217677a87e4996a0deecc85080508ac3cb6",
+          "rewritten-sha256": "c28ed7a8f6fefe3e9bacc0f96d12805e8703b79c80d2d13e7f7bfd780dbc8f85",
+          "reason": "Use the same canonical text for signed operation payloads so compiled CLJS and JVM/SCI sign identical bytes.",
+          "kind": "existing-source-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.engine.modeling/src/kami/modeling/document.cljk",
+          "original-sha256": "84c5df032121e29d72907676fc31775d477c2538d5e9eaa0ffa5260fed70b1af",
+          "rewritten-sha256": "09846948d259508f96d1f3ab5f102af97fe037d6603fea31b27c2470a83523a6",
+          "reason": "Bind the namespaced-map printer flag for canonical revision text and set ordering, preserving existing JVM k1 IDs under compiled CLJS and caller printer bindings.",
+          "kind": "existing-source-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.engine.modeling/test/kami/modeling_document_test.cljk",
+          "original-sha256": "2585c5757776e905b16fb55244964d2774c4764f544b020deec4db83fb757b54",
+          "rewritten-sha256": "76ab89fd3111ad1de024da4e8a31824dc90f631ac011d2a8c4197931b39156da",
+          "reason": "Retain frozen JVM revision IDs and test exact canonical text under both printer bindings on all hosts.",
           "kind": "existing-test-host-compatibility"
         }
       ],
@@ -6407,7 +6575,7 @@
       "role": "portable-domain-library",
       "destination": "packages/kotoba.kami.engine.vehicle-designer",
       "repository": "kotoba-lang/kami-engine-vehicle-designer",
-      "source-id": "kotoba.kami.engine.vehicle-designer",
+      "source-id": "kotoba.kami.engine.vehicleDesigner",
       "commit": "84da8aed92b359d70725fce3850cdddc313be8f8",
       "tree": "b0bc0d0344d65c9d77796b1506c04c895e81ef27",
       "source-and-test-changes": [
@@ -7752,7 +7920,7 @@
       "role": "optional-asset-generation-adapter",
       "destination": "packages/kotoba.kami.gen.sdf-agent",
       "repository": "kotoba-lang/kami-gen-sdf-agent",
-      "source-id": "kotoba.kami.gen.sdf-agent",
+      "source-id": "kotoba.kami.gen.sdfAgent",
       "commit": "b9074f7f47df244e1f23aed7424d4772a5fe0deb",
       "tree": "8fe1f633cb356db98187766f3953d1824a0942ff",
       "source-and-test-changes": [],
@@ -7855,7 +8023,7 @@
       "role": "reference-programs-and-action-systems",
       "destination": "packages/kotoba.kami.genre-base-systems",
       "repository": "kotoba-lang/kami-genre-base-systems",
-      "source-id": "kotoba.kami.genre-base-systems",
+      "source-id": "kotoba.kami.genreBaseSystems",
       "commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
       "tree": "52734f8aff99af9bb3dac8de52ba61f78b8c487a",
       "source-and-test-changes": [],
@@ -9852,10 +10020,25 @@
       "role": "scene-data-loader-and-authoring",
       "destination": "packages/kotoba.kami.mangaka.scene-author",
       "repository": "kotoba-lang/kami-mangaka-scene-author",
-      "source-id": "kotoba.kami.mangaka.scene-author",
+      "source-id": "kotoba.kami.mangaka.sceneAuthor",
       "commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
       "tree": "08fe870f555df86376bf4838bcc4cd9002635acc",
-      "source-and-test-changes": [],
+      "source-and-test-changes": [
+        {
+          "path": "packages/kotoba.kami.mangaka.scene-author/src/kami/mangaka/scene.cljk",
+          "original-sha256": "e0fac63c77afa0830307a9f02f01c5d78a402f90d76f79dbd5caf7caf69ad3ce",
+          "rewritten-sha256": "4f8e9866eb19d880903edba361ee41dd98180f2ab2b615e6826bf6131a09ff13",
+          "reason": "Document the pinned Kotoba JSON serializer and decoded-value wire contract instead of a retired data.json lexical promise.",
+          "kind": "existing-source-compatibility"
+        },
+        {
+          "path": "packages/kotoba.kami.mangaka.scene-author/test/kami/mangaka/scene_test.cljk",
+          "original-sha256": "0e2d6e823aebd95c62eb89f4c273d1b210b222453a8ea2a7f243d8439d974336",
+          "rewritten-sha256": "21b7c368e249af2da1b7a63a67317b59497bd18aa6fa177261891d6b9efaf3ae",
+          "reason": "Check JSON numeric value and fractional precision across hosts rather than a retired whole-double marker.",
+          "kind": "existing-test-host-compatibility"
+        }
+      ],
       "config-changes": [],
       "original-files": [
         {
@@ -10044,7 +10227,7 @@
       "role": "portable-provider-facade-and-status-contracts",
       "destination": "packages/kotoba.kami.nv-compat",
       "repository": "kotoba-lang/kami-nv-compat",
-      "source-id": "kotoba.kami.nv-compat",
+      "source-id": "kotoba.kami.nvCompat",
       "commit": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
       "tree": "f68d7a7cfb5681db5716a86e077f81f0876e50d0",
       "source-and-test-changes": [
@@ -11392,7 +11575,7 @@
       "role": "media-authoring-library",
       "destination": "packages/kotoba.kami.ongaku.plugin-host",
       "repository": "kotoba-lang/kami-ongaku-plugin-host",
-      "source-id": "kotoba.kami.ongaku.plugin-host",
+      "source-id": "kotoba.kami.ongaku.pluginHost",
       "commit": "7d86077d019a66cff33e7d1ee37155f93696ec49",
       "tree": "4b3e6d0f9970702006d920315a1e1ba1bd97b7ff",
       "source-and-test-changes": [],
@@ -12386,7 +12569,7 @@
       "role": "portable-domain-library",
       "destination": "packages/kotoba.kami.sensor-sim",
       "repository": "kotoba-lang/kami-sensor-sim",
-      "source-id": "kotoba.kami.sensor-sim",
+      "source-id": "kotoba.kami.sensorSim",
       "commit": "caae6787e8a07fa8e6613e52412bc94878cca094",
       "tree": "af4d4ba4e16e215fe2f42e471c8fe7f293f1c2ad",
       "source-and-test-changes": [],
@@ -12648,7 +12831,7 @@
       "role": "scene-data-loader-and-authoring",
       "destination": "packages/kotoba.kami.scene.solar-helix",
       "repository": "kotoba-lang/kami-solar-helix-scene",
-      "source-id": "kotoba.kami.scene.solar-helix",
+      "source-id": "kotoba.kami.scene.solarHelix",
       "commit": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
       "tree": "2653f1da9eb51225223d7be90c3293a4d11626e2",
       "source-and-test-changes": [],
@@ -12833,7 +13016,7 @@
       "role": "portable-provider-facade-and-status-contracts",
       "destination": "packages/kotoba.kami.usd-native",
       "repository": "kotoba-lang/kami-usd-native",
-      "source-id": "kotoba.kami.usd-native",
+      "source-id": "kotoba.kami.usdNative",
       "commit": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
       "tree": "5584fede7c98ae7c523976536a7919a31b953414",
       "source-and-test-changes": [
@@ -13936,5 +14119,72 @@
       "reason": "4 exception class references use explicit CLJ/CLJS reader conditions; assertions and tested behavior are unchanged",
       "kind": "existing-test-host-compatibility"
     }
-  ]
+  ],
+  "external-provider-contract-inputs": [
+    {
+      "repository": "kotoba-lang/giemon",
+      "commit": "0eb965a7e36385b4a4d967e027a89367e490c656",
+      "tree": "6e7c2a399d3b856677e3968e48b32e847d7a2ab2",
+      "files": [
+        {
+          "source": "resources/kami/provider/split_contract.edn",
+          "path": "giemon-provider-contract.edn",
+          "git-blob": "8df2c7def4b89f03e754321da5f538b27ab4cc1f",
+          "sha256": "7b12442fa4faea14a748354ec71e53c6aff49f74f6c36f8e3f32708a2e63240c"
+        },
+        {
+          "source": "LICENSE",
+          "path": "giemon-provider-contract.LICENSE",
+          "git-blob": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        }
+      ],
+      "repository-id": 1286093129,
+      "visibility": "public",
+      "purpose": "Test-only contract; no implementation, admission or foundation transfer",
+      "destination": "packages/kotoba.kami.contracts/test/fixtures/provider-contracts",
+      "data-file": "giemon.edn",
+      "license-file": "giemon.LICENSE"
+    }
+  ],
+  "imported-production-source-changes": [
+    {
+      "path": "packages/kotoba.kami.engine.modeling/src/kami/modeling/assembly.cljk",
+      "reason": "Schema1 already emits UUID identities. Both hosts use the bounded EDN reader with only an explicit canonical UUID reader, and canonical wire text retains the original JVM namespaced-map format. Other tags/dispatch remain refused."
+    },
+    {
+      "path": "packages/kotoba.kami.engine.modeling/src/kami/modeling/document.cljk",
+      "reason": "Bind the namespaced-map printer flag for canonical revision text and set ordering, preserving existing JVM k1 IDs under compiled CLJS and caller printer bindings."
+    },
+    {
+      "path": "packages/kotoba.kami.engine.modeling/src/kami/modeling/collaboration.cljk",
+      "reason": "Use the same canonical text for signed operation payloads so compiled CLJS and JVM/SCI sign identical bytes."
+    },
+    {
+      "path": "packages/kotoba.kami.mangaka.scene-author/src/kami/mangaka/scene.cljk",
+      "reason": "Document the pinned Kotoba JSON serializer and decoded-value wire contract instead of a retired data.json lexical promise."
+    },
+    {
+      "path": "packages/kotoba.kami.app.fixtures/src/kami/app_fixtures.cljk",
+      "reason": "Resolve legacy source extensions to actual CLJK files, include CLJK in authority coverage, use the owner mirror root, and reject missing mirror roots."
+    },
+    {
+      "path": "packages/kotoba.kami.contracts/src/kami/app_fixtures.cljk",
+      "reason": "Validate against the monorepo fixture authority while retaining legacy source-extension aliases."
+    }
+  ],
+  "source-id-migrations": "maintenance/kami-source-id-migrations.json",
+  "owner-test-additions": [
+    {
+      "path": "test/imports/modeling.cljk",
+      "sha256": "7d086a3c0ee1ec33b01ef086a2b24230217c2148c2b75618f94298ad8e8cec9b",
+      "kind": "public-source-import-probe"
+    },
+    {
+      "path": "test/imports/scene_author.cljk",
+      "sha256": "1230ac02e3b1639048eb98d7a74680872e6c6d36a19be9d3a6de4f3b29b4a7d7",
+      "kind": "public-source-import-probe"
+    }
+  ],
+  "test-host-matrix": "maintenance/kami-test-hosts.json"
 }

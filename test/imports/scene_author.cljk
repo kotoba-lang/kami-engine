@@ -1,0 +1,10 @@
+(ns kami.imports.scene-author
+  (:require [kami.mangaka.scene :as scene]))
+
+(defn main []
+  (let [value (scene/set-camera (scene/scene)
+                                (scene/camera {:eye [0 0 5] :target [0 0 0]
+                                               :fov-deg 35.25}))
+        parsed (js->clj (js/JSON.parse (scene/->json value)))]
+    {:fov (get-in parsed ["camera" "fov_deg"])
+     :origins {:scene (:file (meta #'scene/->json))}}))

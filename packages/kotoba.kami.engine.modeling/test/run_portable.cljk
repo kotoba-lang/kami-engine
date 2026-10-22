@@ -23,13 +23,11 @@
 ;; requires and in the `run-tests` call: requiring registers the vars, only
 ;; `run-tests` runs them.
 ;;
-;; TWO namespaces are deliberately absent, and the runner PRINTS that before
+;; ONE namespace is deliberately absent, and the runner PRINTS that before
 ;; the results so `Ran N tests` can never be read as "everything ran":
-;;   kami.modeling-crypto-test  — `.clj`, JVM-only by extension
-;;   kami.modeling-cae-test     — `.cljc`, but requires `clojure.java.io`
-;;                                unconditionally, so it is JVM-only in fact.
-;;                                Making it portable is a separate change; it
-;;                                is named here so it is not silently lost.
+;;   kami.modeling-crypto-test — imports java.security for its real Ed25519 gate.
+;; The CAE fixture reader now selects explicit JVM/Node file I/O, so its nine
+;; solver tests join the portable suite during monorepo qualification.
 
 (require '[kotoba.lang.text] '["node:fs" :as fs])
 
@@ -47,14 +45,8 @@
   exclusion is re-checked: if someone gives `modeling_crypto_test` a `.cljc`,
   the reason `\".clj, JVM-only by extension\"` has stopped being true."
   '{kami.modeling-crypto-test
-    {:file "test/kami/modeling_crypto_test.cljc" :absent true
-     :because ".clj, JVM-only by extension"}
-
-    kami.modeling-cae-test
-    {:file "test/kami/modeling_cae_test.cljk" :still-contains "clojure.java.io"
-     :because "requires clojure.java.io unconditionally, so it is JVM-only in
-               fact even though the extension says otherwise. Making it
-               portable is a separate change."}})
+    {:file "test/kami/modeling_crypto_test.cljk" :still-contains "(:import [java.security"
+     :because "uses java.security KeyPairGenerator/Signature for real Ed25519 verification"}})
 
 (println (str "SKIPPED " (kotoba.lang.text/join " " (map str (keys excluded)))
               " -- declared in `excluded`, and each reason re-checked below"))
@@ -89,6 +81,7 @@
          '[kami.modeling-test]
          '[kami.modeling-assembly-test]
          '[kami.modeling-brep-test]
+         '[kami.modeling-cae-test]
          '[kami.modeling-collaboration-test]
          '[kami.modeling-document-test]
          '[kami.modeling-drawing-test]
@@ -105,6 +98,7 @@
 (t/run-tests 'kami.modeling-test
              'kami.modeling-assembly-test
              'kami.modeling-brep-test
+             'kami.modeling-cae-test
              'kami.modeling-collaboration-test
              'kami.modeling-document-test
              'kami.modeling-sheet-metal-test

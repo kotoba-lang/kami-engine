@@ -50,6 +50,25 @@ for (const row of metadata.repositories) {
 }
 requireValue(files === 1677, 'Original tracked file coverage changed');
 requireValue(catalog.libraries.length === 70, 'Catalog coverage changed');
+for (const input of metadata['external-provider-contract-inputs'] || []) {
+  requireValue(input.repository === 'kotoba-lang/giemon' && /^[0-9a-f]{40}$/.test(input.commit), 'Unreviewed external provider input');
+  requireValue(input.destination === 'packages/kotoba.kami.contracts/test/fixtures/provider-contracts', 'External implementation cannot enter runtime source');
+  requireValue(input.files.length === 2 && new Set(input.files.map(file => file.source)).size === 2 && input.files.some(file => file.source === 'LICENSE'), 'Pinned provider contract and license must both be present');
+  for (const file of input.files) {
+    const name = file.source === 'LICENSE' ? input['license-file'] : input['data-file'];
+    requireValue(file.source === 'LICENSE' || file.source === 'resources/kami/provider/split_contract.edn', 'Only the provider contract and its license are imported');
+    const bytes = readFileSync(join(repositoryRoot, input.destination, name));
+    requireValue(hash(bytes) === file.sha256, 'External provider input digest mismatch');
+    const blob = createHash('sha1').update(Buffer.from(`blob ${bytes.length}\0`)).update(bytes).digest('hex');
+    requireValue(blob === file['git-blob'], 'External provider input differs from its pinned Git blob');
+  }
+}
+for (const file of metadata['owner-test-additions'] || []) {
+  requireValue(/^test\/imports\/[a-z_]+\.cljk$/.test(file.path), 'Source import probes must remain test-only');
+  const disk = join(repositoryRoot, file.path);
+  requireValue(lstatSync(disk).isFile() && !lstatSync(disk).isSymbolicLink(), 'Source import probe changed file type');
+  requireValue(hash(readFileSync(disk)) === file.sha256, 'Unreviewed source import probe drift');
+}
 for (const change of metadata['owner-test-changes'] || []) {
   requireValue(/^(kami-gameplay|kami-render|kami-physics)\/test\//.test(change.path), 'Owner production source cannot be changed by a test-host exception');
   requireValue(change.kind === 'existing-test-host-compatibility' && change.reason, 'Unexplained owner test change');

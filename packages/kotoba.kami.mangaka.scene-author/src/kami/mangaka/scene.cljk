@@ -19,28 +19,23 @@
   ClojureScript → nbb, with the JVM last, and an authoring tier that projects
   EDN to JSON is precisely the thing a browser-side editor wants to run.
 
-  Exactly one line was runtime-specific: `json.data-json`, which has no
-  ClojureScript build. `->json` now dispatches on the reader conditional and
-  each runtime uses its own audited serializer. `test/run_portable.cljk` runs
+  `->json` dispatches on the reader conditional: the JVM uses the pinned
+  Kotoba `json.data-json` compatibility surface and CLJS uses JSON.stringify.
+  `test/run_portable.cljk` runs
   the same `deftest`s under nbb so that this is measured and not merely
   claimed by a rename.
 
-  ## The one place the two runtimes do not agree, and why it cannot be fixed
+  ## JSON number compatibility
 
-  `(->json …)` emits `\"fov_deg\":35.0` on the JVM and `\"fov_deg\":35` under
-  ClojureScript. This is not a bug in the branch: **ClojureScript has no
-  distinct double type**. `1.0` and `1` are the same `js/Number`, `(integer?
-  1.0)` is `true`, and `(pr-str 1.0)` is `\"1\"` — measured 2026-08-18. No
-  serializer running there can recover the distinction, so no amount of
-  care in this file would produce `35.0`.
+  Monorepo qualification confirmed that the pinned Kotoba compatibility
+  serializer emits whole doubles as `35`, like JSON.stringify. The former
+  clojure.data.json implementation emitted `35.0`. Both spellings denote
+  the same JSON number consumed by the scene facade's f64 fields.
 
-  Both spellings are the same JSON number and both deserialize into the Rust
-  `f64` fields of `MangakaScene::from_jsonld`, so the CONSUMER is unaffected.
-  What is affected is anything that hashes or diffs the TEXT: do not digest
-  the output of `->json` and expect the digest to be stable across runtimes.
-  `scene-test/json-text-differs-between-runtimes-on-whole-doubles` asserts
-  this divergence in both directions so that it stays a known property
-  rather than a surprise."
+  The contract is the decoded JSON-LD value, including fractional numbers,
+  strings and nulls. It does not guarantee identical text across serializer
+  versions or runtimes. Do not use `->json` text as a cross-runtime content
+  identity without a separate canonical encoding contract."
   (:require #?(:clj [json.data-json :as json])
             [kotoba.lang.text :as str]))
 
@@ -209,11 +204,9 @@
 (defn ->json
   "JSON string ready to hand to the Rust facade / composeScene3d XRPC.
 
-  Each runtime uses its own serializer: `json.data-json` has no
-  ClojureScript build, and `js/JSON.stringify` has no JVM one. The JSON-LD
-  value handed to both is produced by the one portable `->jsonld`, so the
-  only thing that can differ is number spelling — see the namespace
-  docstring."
+  Both serializers consume the portable `->jsonld` value. Decoded JSON-LD
+  values are the compatibility contract; textual number spellings and object
+  ordering are not a cross-runtime content identity."
   [s]
   #?(:clj  (json/write-str (->jsonld s))
      :cljs (js/JSON.stringify (clj->js (->jsonld s)))))

@@ -25,9 +25,9 @@
  {:test {:extra-paths ["test"]
          :main-opts ["-m" "kami.app-fixtures-test"]}
   :check-engine-mirror
-  {:main-opts ["-m" "kami.app-fixtures" "--engine-root" "../kami-engine"]}
+  {:main-opts ["-m" "kami.app-fixtures" "--engine-root" "../.."]}
   :sync-engine-mirror
-  {:main-opts ["-m" "kami.app-fixtures" "--write" "--engine-root" "../kami-engine"]}
+  {:main-opts ["-m" "kami.app-fixtures" "--write" "--engine-root" "../.."]}
   ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
   :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
          :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test"

@@ -1,5 +1,6 @@
 (ns kami.app-fixtures-test
   (:require [kotoba.test :refer [deftest is testing]]
+            [kotoba.lang.text :as str]
             [kami.app-fixtures :as fixtures]))
 
 (deftest app-fixture-contract
@@ -27,4 +28,15 @@
   (testing "cataloged fixtures exist in kami-app-fixtures and scene.edn parses"
     (let [catalog (fixtures/load-app-fixtures)]
       (is (= {:valid? true :errors []}
-             (fixtures/validate-fixture-files catalog "../kami-app-fixtures/resources/kami/app"))))))
+             (fixtures/validate-fixture-files catalog))))))
+
+(deftest fixture-source-extension-aliases
+  (let [catalog (fixtures/load-app-fixtures)
+        legacy (mapv (fn [fixture]
+                       (reduce (fn [m k]
+                                 (if (contains? m k)
+                                   (update m k #(str/replace % #"\.cljk$" ".clj")) m))
+                               fixture [:kami.fixture/logic :kami.fixture/author])) catalog)]
+    (is (:valid? (fixtures/validate-fixture-files legacy)))
+    (is (false? (:valid? (fixtures/validate-fixture-files
+                          (assoc-in legacy [0 :kami.fixture/logic] "missing.clj")))))))

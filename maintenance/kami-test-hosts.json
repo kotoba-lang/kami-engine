@@ -1,0 +1,124 @@
+{
+  "schema": "kotoba.kami.test-hosts.v1",
+  "scope": "Two repaired projects only; remaining project host declarations/qualification are pending",
+  "compiled-test-bridge": {
+    "repository": "kotoba-lang/kotoba",
+    "revision": "f0ecb24b722664b825ab89992e9cc98c37ecaaf0",
+    "deps-root": "lib/kotoba.test/compiled"
+  },
+  "projects": [
+    {
+      "id": "kotoba.kami.engine.modeling",
+      "path": "packages/kotoba.kami.engine.modeling",
+      "tests": [
+        {
+          "path": "test/kami/modeling_assembly_test.cljk",
+          "namespace": "kami.modeling-assembly-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_brep_test.cljk",
+          "namespace": "kami.modeling-brep-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_cae_test.cljk",
+          "namespace": "kami.modeling-cae-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_collaboration_test.cljk",
+          "namespace": "kami.modeling-collaboration-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_crypto_test.cljk",
+          "namespace": "kami.modeling-crypto-test",
+          "JVM": true,
+          "SCI": false,
+          "compiled-CLJS": false,
+          "reason": "Java KeyPairGenerator/Signature verifies real Ed25519; portable collaboration tests cover injected verification separately",
+          "still-contains": "(:import [java.security"
+        },
+        {
+          "path": "test/kami/modeling_document_test.cljk",
+          "namespace": "kami.modeling-document-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_drawing_test.cljk",
+          "namespace": "kami.modeling-drawing-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_feature_graph_test.cljk",
+          "namespace": "kami.modeling-feature-graph-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_large_scene_test.cljk",
+          "namespace": "kami.modeling-large-scene-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_nurbs_test.cljk",
+          "namespace": "kami.modeling-nurbs-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_sheet_metal_test.cljk",
+          "namespace": "kami.modeling-sheet-metal-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_step_test.cljk",
+          "namespace": "kami.modeling-step-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        },
+        {
+          "path": "test/kami/modeling_test.cljk",
+          "namespace": "kami.modeling-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        }
+      ]
+    },
+    {
+      "id": "kotoba.kami.mangaka.sceneAuthor",
+      "path": "packages/kotoba.kami.mangaka.scene-author",
+      "tests": [
+        {
+          "path": "test/kami/mangaka/scene_test.cljk",
+          "namespace": "kami.mangaka.scene-test",
+          "JVM": true,
+          "SCI": true,
+          "compiled-CLJS": true
+        }
+      ],
+      "previous-source-selector": "kotoba.kami.mangaka.scene-author"
+    }
+  ]
+}

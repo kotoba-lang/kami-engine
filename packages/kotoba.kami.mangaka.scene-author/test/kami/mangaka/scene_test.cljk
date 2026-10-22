@@ -145,21 +145,23 @@
         parsed (parse-json (s/->json sc))]
     (is (= "a\"b\\c\nd" (get-in parsed ["environment" "biome"])))))
 
-(deftest json-text-differs-between-runtimes-on-whole-doubles
-  ;; Documented divergence, asserted in BOTH directions so it cannot rot into
-  ;; a surprise. ClojureScript has no distinct double type -- `1.0` and `1`
-  ;; are one `js/Number` -- so no serializer running there can emit `35.0`.
-  ;; The parsed NUMBER is identical either way, which is what the Rust
-  ;; consumer sees; only the text differs, which is what a digest would see.
+(deftest json-numbers-preserve-the-consumer-value
+  ;; Monorepo qualification: the pinned Kotoba json.data-json compatibility
+  ;; serializer also emits whole doubles as 35. Assert the JSON number and
+  ;; fractional precision consumed by the scene facade, not a retired host's
+  ;; textual double marker.
   (let [txt (s/->json (-> (s/scene)
                           (s/set-camera (s/camera {:eye [0 0 5] :target [0 0 0]}))))
         parsed (parse-json txt)]
     (is (= 35.0 (double (get-in parsed ["camera" "fov_deg"])))
         "the VALUE is the same on both runtimes")
-    #?(:clj  (is (str/includes? txt "\"fov_deg\":35.0")
-                 "data.json keeps the double marker")
-       :cljs (is (str/includes? txt "\"fov_deg\":35")
-                 "JSON.stringify cannot know it was a double"))))
+    (is (re-find #"\"fov_deg\":35(?:\.0)?[,}]" txt)
+        "the JSON token is the whole number 35")
+    (let [fractional (s/->json (s/set-camera (s/scene)
+                                           (s/camera {:eye [0 0 5] :target [0 0 0]
+                                                      :fov-deg 35.25})))]
+      (is (= 35.25 (get-in (parse-json fractional) ["camera" "fov_deg"]))
+          "fractional camera values must not be rounded"))))
 
 (deftest expression-of-normalizes-case-and-falls-back
   ;; `case` over string literals is not the same construct on both runtimes

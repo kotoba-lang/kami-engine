@@ -48,13 +48,21 @@
       "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
       "object": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
       "commit": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
-      "decision": "pending-semantic-review"
+      "decision": "exact-postimages-landed-in-default-history",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "a662f037d95c2674b8f2e6d831c6f6b45faf090a"
+      }
     },
     {
       "ref": "refs/preservation/kami-monorepo-20261022/pull-4",
       "object": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
       "commit": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
-      "decision": "pending-semantic-review"
+      "decision": "exact-postimages-landed-in-default-history",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "a662f037d95c2674b8f2e6d831c6f6b45faf090a"
+      }
     },
     {
       "ref": "refs/remotes/kotoba-lang/HEAD",
@@ -90,7 +98,11 @@
       "ref": "refs/remotes/kotoba-lang/kami-warp-fix",
       "object": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
       "commit": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
-      "decision": "pending-semantic-review"
+      "decision": "exact-postimages-landed-in-default-history",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "a662f037d95c2674b8f2e6d831c6f6b45faf090a"
+      }
     },
     {
       "ref": "refs/remotes/kotoba-lang/main",
@@ -126,7 +138,11 @@
       "ref": "refs/remotes/origin/kami-warp-fix",
       "object": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
       "commit": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
-      "decision": "pending-semantic-review"
+      "decision": "exact-postimages-landed-in-default-history",
+      "manual-review": {
+        "file": "maintenance/kami-consolidation/2026-10-22/manual-branch-reviews.json",
+        "head": "a662f037d95c2674b8f2e6d831c6f6b45faf090a"
+      }
     },
     {
       "ref": "refs/remotes/origin/kbb-cutover-20260911",

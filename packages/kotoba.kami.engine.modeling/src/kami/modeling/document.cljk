@@ -97,12 +97,20 @@
   (cond
     (map? x) (into (sorted-map-by #(compare (str %1) (str %2)))
                    (map (fn [[k v]] [k (canonical-form v)])) x)
-    (set? x) (vec (sort-by pr-str (map canonical-form x)))
+    (set? x) (vec (sort-by #(binding [*print-namespace-maps* true] (pr-str %))
+                         (map canonical-form x)))
     (sequential? x) (mapv canonical-form x)
     :else x))
 
+;; JVM and SCI default this printer flag to true; compiled CLJS defaults it to
+;; false. Bind it explicitly so the existing k1 revisions/signatures retain
+;; their canonical JVM text on every host and under caller printer bindings.
+(defn canonical-text [value]
+  (binding [*print-namespace-maps* true]
+    (pr-str (canonical-form value))))
+
 (defn revision-id [document]
-  (hash-text (pr-str (canonical-form (dissoc document :document/revision :document/provenance)))))
+  (hash-text (canonical-text (dissoc document :document/revision :document/provenance))))
 
 (defn valid-document? [document]
   (let [nodes (:document/nodes document) roots (:document/roots document)]

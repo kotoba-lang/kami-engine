@@ -83,10 +83,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.cad-import",
+      "id": "kotoba.kami.cadImport",
       "aliases": [
         "kami-cad-import",
-        "io.github.kotoba-lang/kami-cad-import"
+        "io.github.kotoba-lang/kami-cad-import",
+        "kotoba.kami.cad-import"
       ],
       "path": "packages/kotoba.kami.cad-import",
       "sourcePaths": [
@@ -192,10 +193,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.eng-web",
+      "id": "kotoba.kami.engWeb",
       "aliases": [
         "kami-eng-web",
-        "io.github.kotoba-lang/kami-eng-web"
+        "io.github.kotoba-lang/kami-eng-web",
+        "kotoba.kami.eng-web"
       ],
       "path": "packages/kotoba.kami.eng-web",
       "sourcePaths": [
@@ -239,10 +241,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.engine.app-sdk",
+      "id": "kotoba.kami.engine.appSdk",
       "aliases": [
         "kami-engine-app-sdk",
-        "io.github.kotoba-lang/kami-engine-app-sdk"
+        "io.github.kotoba-lang/kami-engine-app-sdk",
+        "kotoba.kami.engine.app-sdk"
       ],
       "path": "packages/kotoba.kami.engine.app-sdk",
       "sourcePaths": [
@@ -270,10 +273,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.engine.cae-solver",
+      "id": "kotoba.kami.engine.caeSolver",
       "aliases": [
         "kami-engine-cae-solver",
-        "io.github.kotoba-lang/kami-engine-cae-solver"
+        "io.github.kotoba-lang/kami-engine-cae-solver",
+        "kotoba.kami.engine.cae-solver"
       ],
       "path": "packages/kotoba.kami.engine.cae-solver",
       "sourcePaths": [
@@ -332,10 +336,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.engine.hud-gpu",
+      "id": "kotoba.kami.engine.hudGpu",
       "aliases": [
         "kami-engine-hud-gpu",
-        "io.github.kotoba-lang/kami-engine-hud-gpu"
+        "io.github.kotoba-lang/kami-engine-hud-gpu",
+        "kotoba.kami.engine.hud-gpu"
       ],
       "path": "packages/kotoba.kami.engine.hud-gpu",
       "sourcePaths": [
@@ -348,10 +353,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.engine.input-map",
+      "id": "kotoba.kami.engine.inputMap",
       "aliases": [
         "kami-engine-input-map",
-        "io.github.kotoba-lang/kami-engine-input-map"
+        "io.github.kotoba-lang/kami-engine-input-map",
+        "kotoba.kami.engine.input-map"
       ],
       "path": "packages/kotoba.kami.engine.input-map",
       "sourcePaths": [
@@ -471,10 +477,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.engine.vehicle-designer",
+      "id": "kotoba.kami.engine.vehicleDesigner",
       "aliases": [
         "kami-engine-vehicle-designer",
-        "io.github.kotoba-lang/kami-engine-vehicle-designer"
+        "io.github.kotoba-lang/kami-engine-vehicle-designer",
+        "kotoba.kami.engine.vehicle-designer"
       ],
       "path": "packages/kotoba.kami.engine.vehicle-designer",
       "sourcePaths": [
@@ -586,10 +593,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.gen.sdf-agent",
+      "id": "kotoba.kami.gen.sdfAgent",
       "aliases": [
         "kami-gen-sdf-agent",
-        "io.github.kotoba-lang/kami-gen-sdf-agent"
+        "io.github.kotoba-lang/kami-gen-sdf-agent",
+        "kotoba.kami.gen.sdf-agent"
       ],
       "path": "packages/kotoba.kami.gen.sdf-agent",
       "sourcePaths": [
@@ -601,10 +609,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.genre-base-systems",
+      "id": "kotoba.kami.genreBaseSystems",
       "aliases": [
         "kami-genre-base-systems",
-        "io.github.kotoba-lang/kami-genre-base-systems"
+        "io.github.kotoba-lang/kami-genre-base-systems",
+        "kotoba.kami.genre-base-systems"
       ],
       "path": "packages/kotoba.kami.genre-base-systems",
       "sourcePaths": [
@@ -744,10 +753,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.mangaka.scene-author",
+      "id": "kotoba.kami.mangaka.sceneAuthor",
       "aliases": [
         "kami-mangaka-scene-author",
-        "io.github.kotoba-lang/kami-mangaka-scene-author"
+        "io.github.kotoba-lang/kami-mangaka-scene-author",
+        "kotoba.kami.mangaka.scene-author"
       ],
       "path": "packages/kotoba.kami.mangaka.scene-author",
       "sourcePaths": [
@@ -774,10 +784,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.nv-compat",
+      "id": "kotoba.kami.nvCompat",
       "aliases": [
         "kami-nv-compat",
-        "io.github.kotoba-lang/kami-nv-compat"
+        "io.github.kotoba-lang/kami-nv-compat",
+        "kotoba.kami.nv-compat"
       ],
       "path": "packages/kotoba.kami.nv-compat",
       "sourcePaths": [
@@ -804,10 +815,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.ongaku.plugin-host",
+      "id": "kotoba.kami.ongaku.pluginHost",
       "aliases": [
         "kami-ongaku-plugin-host",
-        "io.github.kotoba-lang/kami-ongaku-plugin-host"
+        "io.github.kotoba-lang/kami-ongaku-plugin-host",
+        "kotoba.kami.ongaku.plugin-host"
       ],
       "path": "packages/kotoba.kami.ongaku.plugin-host",
       "sourcePaths": [
@@ -896,10 +908,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.sensor-sim",
+      "id": "kotoba.kami.sensorSim",
       "aliases": [
         "kami-sensor-sim",
-        "io.github.kotoba-lang/kami-sensor-sim"
+        "io.github.kotoba-lang/kami-sensor-sim",
+        "kotoba.kami.sensor-sim"
       ],
       "path": "packages/kotoba.kami.sensor-sim",
       "sourcePaths": [
@@ -928,10 +941,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.scene.solar-helix",
+      "id": "kotoba.kami.scene.solarHelix",
       "aliases": [
         "kami-solar-helix-scene",
-        "io.github.kotoba-lang/kami-solar-helix-scene"
+        "io.github.kotoba-lang/kami-solar-helix-scene",
+        "kotoba.kami.scene.solar-helix"
       ],
       "path": "packages/kotoba.kami.scene.solar-helix",
       "sourcePaths": [
@@ -960,10 +974,11 @@
       "admission": "not-granted"
     },
     {
-      "id": "kotoba.kami.usd-native",
+      "id": "kotoba.kami.usdNative",
       "aliases": [
         "kami-usd-native",
-        "io.github.kotoba-lang/kami-usd-native"
+        "io.github.kotoba-lang/kami-usd-native",
+        "kotoba.kami.usd-native"
       ],
       "path": "packages/kotoba.kami.usd-native",
       "sourcePaths": [

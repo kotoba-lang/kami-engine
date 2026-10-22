@@ -1,5 +1,6 @@
 (ns kami.modeling-assembly-test
   (:require [kotoba.test :refer [deftest is]] [kami.modeling.assembly :as assembly]
+            [kotoba.lang.edn :as edn]
             [kami.modeling.document :as document]))
 
 (def uid #(document/stable-uuid "assembly-test" %))
@@ -135,6 +136,16 @@
                           (assembly/import-package
                            (assoc-in package [:assembly-package/payload :assembly/configurations]
                                      {:tampered {}}))))))
+
+;; Monorepo qualification: UUID wire support does not grant arbitrary EDN tags.
+(deftest exchange-reader-admits-only-well-formed-uuid-tags
+  (doseq [encoded ["#uuid \"bad\"" "#uuid \"1-1-1-1-1\"" "#uuid 42"
+                   "#inst \"2026-01-01\"" "#unknown {:payload 1}"
+                   "#=(+ 1 2)"]]
+    (is (thrown? #?(:clj Exception :cljs js/Error)
+                 (assembly/import-package encoded))))
+  (is (thrown? #?(:clj Exception :cljs js/Error)
+               (edn/read-string "#uuid \"00000000-0000-0000-0000-000000000001\""))))
 
 (deftest duplicate-identities-fail-closed
   (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) #"duplicate occurrence identity"
