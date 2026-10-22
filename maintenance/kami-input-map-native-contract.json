@@ -2,7 +2,7 @@
   "schema": "kotoba.kami.input-map-native-contract.v1",
   "source-id": "kotoba.kami.engine.inputMap",
   "namespace": "input-map",
-  "state": "native source candidate updated; historical compiler refusal retained; upstream source lowering uncompiled and unqualified",
+  "state": "native source candidate updated; historical compiler refusal retained; upstream decimal/document/x86 float source lowering uncompiled and unqualified",
   "owner-main-qualified": false,
   "runtime-admission": "not-granted",
   "source": "packages/kotoba.kami.engine.input-map/src/input_map.kotoba",
@@ -138,7 +138,7 @@
       }
     ]
   },
-  "next-required-work": "Qualify exact literal and document candidates through complete loaderless Amu selfhost; implement remaining x86 float/runtime and complete compile/link/package/launch closure; run the unchanged full input-map semantic/refusal/fuel corpus. No repository retirement before merged owner-main evidence.",
+  "next-required-work": "Qualify decimal/document/x86 float candidates through complete loaderless Amu selfhost compiler, runtime, project/link, package and launch closure; run all native positive/refusal/fuel/ABI controls and unchanged full input-map semantic corpus. No repository retirement before merged owner-main evidence.",
   "tracking": [
     "https://linear.app/com-junkawasaki/issue/JUN-198",
     "https://linear.app/com-junkawasaki/issue/JUN-269",
@@ -146,7 +146,7 @@
   ],
   "current-upstream-source-observation": {
     "repository": "kotoba-lang/amu",
-    "main": "5c5d9bced26393b2f78dd59c167af640f70a807a",
+    "main": "3d96e43b191755813b5ef276d414eec98cc5eb2d",
     "path": "seed/21-check.kotoba",
     "git-blob": "2328702571350e8bcde7652e6d5b5e51faa4c248",
     "sha256": "4228b2afeb923ea0cf5dd6e07205b03716ff830cbea340b1b231eef38dd9ba2f",
@@ -175,11 +175,12 @@
   "upstream-implementation-candidate": {
     "repository": "kotoba-lang/amu",
     "pull-request": 1443,
-    "head": "c2cbd2560a872f1e00e85bfdc4566a4f157b602f",
-    "scope": "native document source lowering plus exact compile-time decimal expression bits; all native type/build/run qualification pending",
+    "head": "d6cab8fb077baa27ae7277a9074cb8624990ea98",
+    "scope": "native decimal/document lowering and all 36 existing x86 floating SIR tags; source candidate only, all native type/selfbuild/run qualification pending",
     "source-contract": "seed/runtime/document-runtime.json",
     "qualification": "not achieved",
-    "literal-contract": "seed/decimal-literals.json"
+    "literal-contract": "seed/decimal-literals.json",
+    "x86-floating-SIR-contract": "seed/x86-float.json"
   },
   "set-state-ordering": {
     "source": "document-vector-sort before EDN set reframe and codec validation",
@@ -197,5 +198,15 @@
     "upstream-candidate": "canonical exact integer parser at compile time; raw binary64 carrier constant; up to64 bytes and3 exponent digits",
     "native-verdict": "not measured",
     "test-narrowing": false
+  },
+  "compiler-floating-SIR": {
+    "source-contract": "seed/x86-float.json",
+    "tags": 36,
+    "implementation": "x86 SSE2 with existing GPR carriers, scoped MXCSR, NaN/signed-zero minmax and saturating truncation",
+    "boundaries": "public scalar main()->i64 unchanged; integer-only kernel object route refuses all floating SIR; extra scratch counted in existing frame bound",
+    "source-review": "complete cross-source call/arity closure; independent hand-assembled opcode disassembly only",
+    "native-typecheck-build-run": "not performed",
+    "actual-generated-artifacts-checked": false,
+    "unchanged-component-gate": "full five-API/eight-group fixture; no test narrowing"
   }
 }
