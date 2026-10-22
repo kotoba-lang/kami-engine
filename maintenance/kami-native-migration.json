@@ -1,0 +1,1353 @@
+{
+  "schema": "kotoba.kami.native-migration-inventory.v1",
+  "authority": "2026-10-22 owner steering: remove JVM and CLJS/Node dependence; Kotoba is primary, CLJK remains compatibility input",
+  "owner-base": "c7f86b7de720976f9b0083018d16e721b1fd94ba",
+  "catalog-head": "e570ec69a0c66302c6520a6b2cab56bc63620d72",
+  "state": "incomplete; source co-location and hosted oracle results do not satisfy native migration",
+  "acceptance": {
+    "normal-build-and-runtime": "Amu-produced Kotoba native artifacts; JVM/GraalVM/CLJS/Node/nbb unavailable",
+    "component-scope": "the selected component public API and its complete dependency closure; a scalar kernel or source suffix is insufficient",
+    "verification": "actual compile, link and execution with source/tool digests, semantic/authority/resource refusals and hosted-executable denial controls",
+    "compatibility": "existing CLJK APIs, aliases, data and historical tests remain explicit compatibility inputs; hosted oracle results alone cannot clear a native migration hold",
+    "fallback": "unsupported native behavior remains an open blocker; no implicit hosted fallback or replacement with an easier subset",
+    "repository-boundary": "Amu and execution foundations remain separate; no Actions settings, pin holds or deployments are changed"
+  },
+  "current-toolchain-reference": {
+    "repository": "kotoba-lang/kotoba",
+    "commit": "2de9ccd18a2e559dbb75019968d413435fb0a087",
+    "policy": "docs/native-cli-migration.md",
+    "gate": "scripts/build-selfhost-toolchain.sh and scripts/test-native-libraries.sh",
+    "qualification-boundary": "macOS arm64 compiler/runtime and declared library fixtures; public CLI cutover and all70 Kami components are not proved"
+  },
+  "observed-launcher": {
+    "path": "kotoba-lang/kotoba/bin/kotoba",
+    "route": "most commands exec bin/kotoba-clj, which execs clojure",
+    "runtime-sci": "selects the guest host; does not remove JVM from the public launcher"
+  },
+  "summary": {
+    "projects": 70,
+    "whole-component-native-proofs-recorded-in-this-wave": 0,
+    "native-source-files": 4,
+    "projects-with-native-source": 3
+  },
+  "projects": [
+    {
+      "id": "kotoba.kami.app.fixtures",
+      "path": "packages/kotoba.kami.app.fixtures",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 9,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.articulated",
+      "path": "packages/kotoba.kami.articulated",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 2,
+        ".cljk": 5,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [
+        {
+          "path": "packages/kotoba.kami.articulated/src/articulated_transform_golden.kotoba",
+          "sha256": "445659b0c54971d24433f194dbe0a6b88b090a1ead25592b331456a600156d5b"
+        },
+        {
+          "path": "packages/kotoba.kami.articulated/src/urdf_query.kotoba",
+          "sha256": "3ef72243cf945c4a1efb028cad222c69963f69f48e063ea2eef45059318d3b1a"
+        }
+      ],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.atmosphere",
+      "path": "packages/kotoba.kami.scene.atmosphere",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.autodrive",
+      "path": "packages/kotoba.kami.autodrive",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 39,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.autodrive",
+      "path": "packages/kotoba.kami.scene.autodrive",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.cadImport",
+      "path": "packages/kotoba.kami.cad-import",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 1,
+        ".cljk": 25,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [
+        {
+          "path": "packages/kotoba.kami.cad-import/src/cad_transform_golden.kotoba",
+          "sha256": "64d311724af7cf6da734d99028cd0956b3e41e9b6918d5baf1d33aaad179e558"
+        }
+      ],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.cam",
+      "path": "packages/kotoba.kami.scene.cam",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.character",
+      "path": "packages/kotoba.kami.scene.character",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 6,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.contracts",
+      "path": "packages/kotoba.kami.contracts",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 12,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.eizo.compositor",
+      "path": "packages/kotoba.kami.eizo.compositor",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 5,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.eizo.grade",
+      "path": "packages/kotoba.kami.eizo.grade",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 6,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.eizo.timeline",
+      "path": "packages/kotoba.kami.eizo.timeline",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engWeb",
+      "path": "packages/kotoba.kami.eng-web",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 11,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.aero",
+      "path": "packages/kotoba.kami.engine.aero",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 7,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.animation",
+      "path": "packages/kotoba.kami.engine.animation",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.appSdk",
+      "path": "packages/kotoba.kami.engine.app-sdk",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 17,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.cad",
+      "path": "packages/kotoba.kami.engine.cad",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.caeSolver",
+      "path": "packages/kotoba.kami.engine.cae-solver",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 37,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.cfd",
+      "path": "packages/kotoba.kami.engine.cfd",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 9,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.crash",
+      "path": "packages/kotoba.kami.engine.crash",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.echem",
+      "path": "packages/kotoba.kami.engine.echem",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 4,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.hudGpu",
+      "path": "packages/kotoba.kami.engine.hud-gpu",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 3,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.inputMap",
+      "path": "packages/kotoba.kami.engine.input-map",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 3,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.modeling",
+      "path": "packages/kotoba.kami.engine.modeling",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 27,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.motor",
+      "path": "packages/kotoba.kami.engine.motor",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 5,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.multirotor",
+      "path": "packages/kotoba.kami.engine.multirotor",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.pack",
+      "path": "packages/kotoba.kami.engine.pack",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.rotor",
+      "path": "packages/kotoba.kami.engine.rotor",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.sculpt",
+      "path": "packages/kotoba.kami.engine.sculpt",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.sdk",
+      "path": "packages/kotoba.kami.engine.sdk",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 24,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.vehicleDesigner",
+      "path": "packages/kotoba.kami.engine.vehicle-designer",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 26,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.engine.vphysics",
+      "path": "packages/kotoba.kami.engine.vphysics",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.flow",
+      "path": "packages/kotoba.kami.flow",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 6,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.game",
+      "path": "packages/kotoba.kami.scene.game",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 7,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.gen.hybrid",
+      "path": "packages/kotoba.kami.gen.hybrid",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 5,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.gen.ml3d",
+      "path": "packages/kotoba.kami.gen.ml3d",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 3,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.gen.procedural",
+      "path": "packages/kotoba.kami.gen.procedural",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.gen.sdfAgent",
+      "path": "packages/kotoba.kami.gen.sdf-agent",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 5,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.genreBaseSystems",
+      "path": "packages/kotoba.kami.genre-base-systems",
+      "source-paths": [
+        "games/platformer/src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 5,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.input",
+      "path": "packages/kotoba.kami.scene.input",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.isekai.assets",
+      "path": "packages/kotoba.kami.isekai.assets",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 14,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.mangaka.expression",
+      "path": "packages/kotoba.kami.mangaka.expression",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.mangaka.page",
+      "path": "packages/kotoba.kami.mangaka.page",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.mangaka.qa",
+      "path": "packages/kotoba.kami.mangaka.qa",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 6,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.mangaka.reader",
+      "path": "packages/kotoba.kami.mangaka.reader",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 3,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.mangaka.render",
+      "path": "packages/kotoba.kami.mangaka.render",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.mangaka.scene",
+      "path": "packages/kotoba.kami.mangaka.scene",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 14,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.mangaka.sceneAuthor",
+      "path": "packages/kotoba.kami.mangaka.scene-author",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.mangaka.text",
+      "path": "packages/kotoba.kami.mangaka.text",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.nvCompat",
+      "path": "packages/kotoba.kami.nv-compat",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 56,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.ongaku.notation",
+      "path": "packages/kotoba.kami.ongaku.notation",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 7,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.ongaku.pluginHost",
+      "path": "packages/kotoba.kami.ongaku.plugin-host",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.ongaku.project",
+      "path": "packages/kotoba.kami.ongaku.project",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.ongaku.sampler",
+      "path": "packages/kotoba.kami.ongaku.sampler",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.ongaku.sequencer",
+      "path": "packages/kotoba.kami.ongaku.sequencer",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.postfx",
+      "path": "packages/kotoba.kami.scene.postfx",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 2,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.contracts",
+      "path": "packages/kotoba.kami.scene.contracts",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 4,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.sensorSim",
+      "path": "packages/kotoba.kami.sensor-sim",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 11,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.skeleton",
+      "path": "packages/kotoba.kami.scene.skeleton",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 8,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.solarHelix",
+      "path": "packages/kotoba.kami.scene.solar-helix",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.terrain",
+      "path": "packages/kotoba.kami.scene.terrain",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 4,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.usdNative",
+      "path": "packages/kotoba.kami.usd-native",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 1,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [
+        {
+          "path": "packages/kotoba.kami.usd-native/src/usd_native.kotoba",
+          "sha256": "e0060550c3737dec50235414147b93fa1d70f40f39a3d0d8da08605271bb8226"
+        }
+      ],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.vegetation",
+      "path": "packages/kotoba.kami.scene.vegetation",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.vehicle",
+      "path": "packages/kotoba.kami.vehicle",
+      "source-paths": [
+        "src",
+        "test"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 35,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.scene.vehicle",
+      "path": "packages/kotoba.kami.scene.vehicle",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 3,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.web",
+      "path": "packages/kotoba.kami.web",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 5,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.webvr",
+      "path": "packages/kotoba.kami.webvr",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 4,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.gameplay",
+      "path": "kami-gameplay",
+      "source-paths": [
+        "src",
+        "resources"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 17,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.render",
+      "path": "kami-render",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 13,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    },
+    {
+      "id": "kotoba.kami.physics",
+      "path": "kami-physics",
+      "source-paths": [
+        "src"
+      ],
+      "source-file-counts": {
+        ".kotoba": 0,
+        ".cljk": 1,
+        ".clj": 0,
+        ".cljc": 0,
+        ".cljs": 0
+      },
+      "native-sources": [],
+      "native-component-proof": "not-recorded-in-this-wave",
+      "native-status": "unverified",
+      "compatibility-source-does-not-prove-native-migration": true
+    }
+  ],
+  "tracking": [
+    "https://linear.app/com-junkawasaki/issue/JUN-269",
+    "https://linear.app/kotobalabs/issue/AWAI-53"
+  ]
+}
