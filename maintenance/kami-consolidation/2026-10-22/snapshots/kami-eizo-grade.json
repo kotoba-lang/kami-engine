@@ -1,0 +1,72 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTWAd6w",
+    "databaseId": 1298144747,
+    "nameWithOwner": "kotoba-lang/kami-eizo-grade",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-23T10:43:13Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "f960c23a14f52041e2c7ae600675295126b96072"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "f960c23a14f52041e2c7ae600675295126b96072"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 0
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "f960c23a14f52041e2c7ae600675295126b96072",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-eizo-grade\nHEAD f960c23a14f52041e2c7ae600675295126b96072\ndetached",
+    "refs": "refs/audit/forest-maintenance/default f960c23a14f52041e2c7ae600675295126b96072\nrefs/heads/manifest-rev 45e96f5997fa93f9d8aee4008102f122f7390c58\nrefs/remotes/kotoba-lang/HEAD f960c23a14f52041e2c7ae600675295126b96072\nrefs/remotes/kotoba-lang/cljk-rename-20260911 cee5395e44a766f366ecb43b07a9ecd87194e073\nrefs/remotes/kotoba-lang/jv/full-sha 50999e9d7572aaf6cd445e60b5448ebb0ddf3f46\nrefs/remotes/kotoba-lang/jv/kotoba-text 03db74dc709ed3def944e6c6b85cbc8130fc7840\nrefs/remotes/kotoba-lang/kbb-cutover-20260911 6058fe7d7627f4f3a9eb0f8d3aad471490a91487\nrefs/remotes/kotoba-lang/main f960c23a14f52041e2c7ae600675295126b96072"
+  },
+  "local-after-preservation": {
+    "HEAD": "f960c23a14f52041e2c7ae600675295126b96072",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-eizo-grade\nHEAD f960c23a14f52041e2c7ae600675295126b96072\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "f960c23a14f52041e2c7ae600675295126b96072",
+      "refs/heads/manifest-rev": "45e96f5997fa93f9d8aee4008102f122f7390c58",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "f960c23a14f52041e2c7ae600675295126b96072",
+      "refs/remotes/kotoba-lang/HEAD": "f960c23a14f52041e2c7ae600675295126b96072",
+      "refs/remotes/kotoba-lang/cljk-rename-20260911": "cee5395e44a766f366ecb43b07a9ecd87194e073",
+      "refs/remotes/kotoba-lang/jv/full-sha": "50999e9d7572aaf6cd445e60b5448ebb0ddf3f46",
+      "refs/remotes/kotoba-lang/jv/kotoba-text": "03db74dc709ed3def944e6c6b85cbc8130fc7840",
+      "refs/remotes/kotoba-lang/kbb-cutover-20260911": "6058fe7d7627f4f3a9eb0f8d3aad471490a91487",
+      "refs/remotes/kotoba-lang/main": "f960c23a14f52041e2c7ae600675295126b96072"
+    }
+  },
+  "historical-pulls": []
+}

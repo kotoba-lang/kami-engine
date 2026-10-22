@@ -1,0 +1,153 @@
+{
+  "schema": "kotoba.kami.qualification-status.v1",
+  "state": "draft; source and preserved history prepared; qualification incomplete",
+  "tracking": "https://linear.app/kotobalabs/issue/JUN-267",
+  "scope": {
+    "family-review": 97,
+    "source-imports": 67,
+    "retired-doc-trees": 7,
+    "catalog-projects": 70,
+    "exact-aliases": 137
+  },
+  "source-cli": {
+    "exact-lookups": 207,
+    "retired-refusals": 7,
+    "catalog-and-symlink-refusals": 10,
+    "external-cwd": true,
+    "admission": "not-granted"
+  },
+  "provenance": {
+    "original-files": 1677,
+    "complete-histories-restored-fsck": 74,
+    "refs": 1174,
+    "historical-PR-heads": 181,
+    "nonancestor-heads": 107,
+    "strongly-proven-merged-heads": 91,
+    "pending-manual-decisions": 16
+  },
+  "dependency-validation": {
+    "literal-manifests": 161,
+    "internal-relocations": 42,
+    "external-canonical-path-relocations": 14,
+    "other-external-Git-floors": "unchanged",
+    "root-default-paths": []
+  },
+  "initial-JVM-probe": {
+    "projects": 70,
+    "passed": 54,
+    "no-declared-JVM-tests": 0,
+    "needs-repair": 16,
+    "probe-only": "Host declarations and remaining runtimes are still required before qualification/main/archive"
+  },
+  "first-repair-suites": [
+    {
+      "id": "kotoba.kami.engine.cae-solver",
+      "exit": 0,
+      "passed": true,
+      "tests": 176,
+      "assertions": 813,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.articulated",
+      "exit": 0,
+      "passed": true,
+      "tests": 12,
+      "assertions": 63,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.engine.modeling",
+      "exit": 1,
+      "passed": false,
+      "tests": 100,
+      "assertions": 724,
+      "failures": 0,
+      "errors": 1
+    },
+    {
+      "id": "kotoba.kami.engine.sdk",
+      "exit": 0,
+      "passed": true,
+      "tests": 95,
+      "assertions": 407,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.engine.vehicle-designer",
+      "exit": 1,
+      "passed": false
+    },
+    {
+      "id": "kotoba.kami.nv-compat",
+      "exit": 0,
+      "passed": true,
+      "tests": 482,
+      "assertions": 2746,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.usd-native",
+      "exit": 0,
+      "passed": true,
+      "tests": 8,
+      "assertions": 26,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.gameplay",
+      "exit": 0,
+      "passed": true,
+      "tests": 151,
+      "assertions": 71397,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "id": "kotoba.kami.cad-import",
+      "exit": 1,
+      "passed": false,
+      "tests": 55,
+      "assertions": 1189,
+      "failures": 1,
+      "errors": 0
+    }
+  ],
+  "first-repair-wrapper": "Known missing ML3D classpath aborted aggregate report;9 completed per-project results recovered,6 pass. This is partial evidence, not whole-wave qualification.",
+  "pending": [
+    "Complete remaining16 branch decisions; retain obsolete/unadopted proposals explicitly",
+    "Review internal revision advances; original CAD declared vehicle floor passes its regression test but latest imported vehicle changes the result",
+    "Resolve fixture-path and canonical-source-extension consumers",
+    "Resolve the private-provider assembly without copying private source/revision details or invoking live inference",
+    "Complete JVM repairs, declared SCI/compiled hosts and native goldens; repair wrapper aggregation",
+    "Complete actual-main qualification and fresh preservation guards before any archive"
+  ],
+  "Actions": "Existing kami-engine Actions are disabled and remain unchanged; no CI success claimed",
+  "main-merged": false,
+  "repositories-archived": 0,
+  "repositories-deleted": 0,
+  "deployment-and-runtime-admission": "not performed",
+  "existing-owner-gates": {
+    "command": "kbb -M scripts/<gate>.cljk",
+    "results": [
+      {
+        "gate": "wit_test",
+        "exit": 0
+      },
+      {
+        "gate": "check_adapter_registry",
+        "exit": 0
+      },
+      {
+        "gate": "guest_lint",
+        "exit": 0
+      }
+    ],
+    "initial-invocation-error": "Adding --backend sci before -M passed -M as a filename; corrected to documented invocation, all3 actual gates pass"
+  }
+}

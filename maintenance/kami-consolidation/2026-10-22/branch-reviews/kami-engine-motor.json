@@ -1,0 +1,633 @@
+{
+  "repository": "kotoba-lang/kami-engine-motor",
+  "default": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "commit": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "commit": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "120562a70354eeab27614b1ea9fcf24d119716cc",
+      "commit": "120562a70354eeab27614b1ea9fcf24d119716cc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "commit": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/bot/dcbus-balance-20260907",
+      "object": "d7397a5e056b4261501e2042d8eece5c1f7819df",
+      "commit": "d7397a5e056b4261501e2042d8eece5c1f7819df",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/6",
+        "head": "d7397a5e056b4261501e2042d8eece5c1f7819df",
+        "merge": "e8f3f64bd85865237565f11efabf816adc40b2af",
+        "merge-base": "9229ac574cf3068f952dea698879ed0b4782f91c",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/motor/dcbus.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "ac7c9b0ce16b916722fbbeff820e6dd94be7db2c"
+            }
+          },
+          {
+            "path": "test/motor/dcbus_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "664627eddfdb7d1b18baecf3e36407c2f606b044"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/bot/esc-feasibility-20260903",
+      "object": "45e3bf9d6c8aeb0aea2cb5be64fff9348df42070",
+      "commit": "45e3bf9d6c8aeb0aea2cb5be64fff9348df42070",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 5,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/5",
+        "head": "45e3bf9d6c8aeb0aea2cb5be64fff9348df42070",
+        "merge": "d3b68c8a839eb663755476823b28721d3f13550c",
+        "merge-base": "1dccf82dcf42a4622a77e615a0532ba247f5d3b8",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/motor/esc.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "345bcd2bf2f142e355734f941385f5525d556706"
+            }
+          },
+          {
+            "path": "test/motor/esc_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "58efcda5eae8edce494581f7886a26b4ce56b579"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "commit": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/motor/dcbus-balance",
+      "object": "98a475ecb09aa0c4bacf085ea8effe4960786edc",
+      "commit": "98a475ecb09aa0c4bacf085ea8effe4960786edc",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 4,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/4",
+        "head": "98a475ecb09aa0c4bacf085ea8effe4960786edc",
+        "merge": "9229ac574cf3068f952dea698879ed0b4782f91c",
+        "merge-base": "d3b68c8a839eb663755476823b28721d3f13550c",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "8148b484098403cfbdecfaf889bf4c3d0a6fd794"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/motor/torque-speed-envelope",
+      "object": "7c78f6414d4fc417a8cc86dde56d1d58746dc5a9",
+      "commit": "7c78f6414d4fc417a8cc86dde56d1d58746dc5a9",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 3,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/3",
+        "head": "7c78f6414d4fc417a8cc86dde56d1d58746dc5a9",
+        "merge": "6246374e33eefa168292150a5a12ab7e383329d5",
+        "merge-base": "1dccf82dcf42a4622a77e615a0532ba247f5d3b8",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "9c26949a69cf8b214ac5f8f4fe0c03285b6218bc"
+            }
+          },
+          {
+            "path": "src/motor/envelope.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "4c6c79e45331046e544675260e3c9a8df82ea342"
+            }
+          },
+          {
+            "path": "test/motor/envelope_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "56593dcd2862707547ab6197efc1431dbb5bba31"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/rom-motor-run-dispatch-fix",
+      "object": "6135cf340330bf998d0a3ded7cda962ea8d23f41",
+      "commit": "6135cf340330bf998d0a3ded7cda962ea8d23f41",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 2,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/2",
+        "head": "6135cf340330bf998d0a3ded7cda962ea8d23f41",
+        "merge": "89a067248e05c8c14d43e8b2526d6edb83da2604",
+        "merge-base": "1dccf82dcf42a4622a77e615a0532ba247f5d3b8",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/motor/solver.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "10befec0ee0a35b6f2383fcbf920341f30674c7c"
+            }
+          },
+          {
+            "path": "test/motor/solver_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3e01090a91671d977116120ba388be73592bd86c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "84d147cde4a4678d9f0f7cc2eef2e45b949cd516",
+      "commit": "84d147cde4a4678d9f0f7cc2eef2e45b949cd516",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/1",
+        "head": "84d147cde4a4678d9f0f7cc2eef2e45b949cd516",
+        "merge": "d49a16e7563ef230531b3b0c7f3152f5f9d2ce8c",
+        "merge-base": "2a240f6a8a808a03f06e2d3eaf71286582331770",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3531ea01bc26c206029acb0cc4d2b5b5c0d8a9da"
+            }
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c4587de4f3407d819b3c2bedc5e3eb2eba0b9613"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "b4502757135882dc4a169e49a027821004d83444"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "6135cf340330bf998d0a3ded7cda962ea8d23f41",
+      "commit": "6135cf340330bf998d0a3ded7cda962ea8d23f41",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 2,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/2",
+        "head": "6135cf340330bf998d0a3ded7cda962ea8d23f41",
+        "merge": "89a067248e05c8c14d43e8b2526d6edb83da2604",
+        "merge-base": "1dccf82dcf42a4622a77e615a0532ba247f5d3b8",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/motor/solver.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "10befec0ee0a35b6f2383fcbf920341f30674c7c"
+            }
+          },
+          {
+            "path": "test/motor/solver_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3e01090a91671d977116120ba388be73592bd86c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
+      "object": "7c78f6414d4fc417a8cc86dde56d1d58746dc5a9",
+      "commit": "7c78f6414d4fc417a8cc86dde56d1d58746dc5a9",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 3,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/3",
+        "head": "7c78f6414d4fc417a8cc86dde56d1d58746dc5a9",
+        "merge": "6246374e33eefa168292150a5a12ab7e383329d5",
+        "merge-base": "1dccf82dcf42a4622a77e615a0532ba247f5d3b8",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "9c26949a69cf8b214ac5f8f4fe0c03285b6218bc"
+            }
+          },
+          {
+            "path": "src/motor/envelope.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "4c6c79e45331046e544675260e3c9a8df82ea342"
+            }
+          },
+          {
+            "path": "test/motor/envelope_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "56593dcd2862707547ab6197efc1431dbb5bba31"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-4",
+      "object": "98a475ecb09aa0c4bacf085ea8effe4960786edc",
+      "commit": "98a475ecb09aa0c4bacf085ea8effe4960786edc",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 4,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/4",
+        "head": "98a475ecb09aa0c4bacf085ea8effe4960786edc",
+        "merge": "9229ac574cf3068f952dea698879ed0b4782f91c",
+        "merge-base": "d3b68c8a839eb663755476823b28721d3f13550c",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "8148b484098403cfbdecfaf889bf4c3d0a6fd794"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-5",
+      "object": "45e3bf9d6c8aeb0aea2cb5be64fff9348df42070",
+      "commit": "45e3bf9d6c8aeb0aea2cb5be64fff9348df42070",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 5,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/5",
+        "head": "45e3bf9d6c8aeb0aea2cb5be64fff9348df42070",
+        "merge": "d3b68c8a839eb663755476823b28721d3f13550c",
+        "merge-base": "1dccf82dcf42a4622a77e615a0532ba247f5d3b8",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/motor/esc.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "345bcd2bf2f142e355734f941385f5525d556706"
+            }
+          },
+          {
+            "path": "test/motor/esc_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "58efcda5eae8edce494581f7886a26b4ce56b579"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-6",
+      "object": "d7397a5e056b4261501e2042d8eece5c1f7819df",
+      "commit": "d7397a5e056b4261501e2042d8eece5c1f7819df",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/6",
+        "head": "d7397a5e056b4261501e2042d8eece5c1f7819df",
+        "merge": "e8f3f64bd85865237565f11efabf816adc40b2af",
+        "merge-base": "9229ac574cf3068f952dea698879ed0b4782f91c",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/motor/dcbus.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "ac7c9b0ce16b916722fbbeff820e6dd94be7db2c"
+            }
+          },
+          {
+            "path": "test/motor/dcbus_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "664627eddfdb7d1b18baecf3e36407c2f606b044"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-7",
+      "object": "846fc6de84ee5c9e77f2ddb4ba643ee14b9d2623",
+      "commit": "846fc6de84ee5c9e77f2ddb4ba643ee14b9d2623",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 7,
+        "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/7",
+        "head": "846fc6de84ee5c9e77f2ddb4ba643ee14b9d2623",
+        "merge": "de56f955d477c079141afe8c1de4a7605702c418",
+        "merge-base": "e8f3f64bd85865237565f11efabf816adc40b2af",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/motor/esc.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "46ab72571644ac12eaf741e2ef29a503411b9898"
+            }
+          },
+          {
+            "path": "test/motor/esc_drive_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f32423da0ba8b99fa9400b3b1d8107c43a6c3d17"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "commit": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "commit": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/1",
+      "head": "84d147cde4a4678d9f0f7cc2eef2e45b949cd516",
+      "merge": "d49a16e7563ef230531b3b0c7f3152f5f9d2ce8c",
+      "merge-base": "2a240f6a8a808a03f06e2d3eaf71286582331770",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3531ea01bc26c206029acb0cc4d2b5b5c0d8a9da"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c4587de4f3407d819b3c2bedc5e3eb2eba0b9613"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b4502757135882dc4a169e49a027821004d83444"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/2",
+      "head": "6135cf340330bf998d0a3ded7cda962ea8d23f41",
+      "merge": "89a067248e05c8c14d43e8b2526d6edb83da2604",
+      "merge-base": "1dccf82dcf42a4622a77e615a0532ba247f5d3b8",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/motor/solver.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "10befec0ee0a35b6f2383fcbf920341f30674c7c"
+          }
+        },
+        {
+          "path": "test/motor/solver_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3e01090a91671d977116120ba388be73592bd86c"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/3",
+      "head": "7c78f6414d4fc417a8cc86dde56d1d58746dc5a9",
+      "merge": "6246374e33eefa168292150a5a12ab7e383329d5",
+      "merge-base": "1dccf82dcf42a4622a77e615a0532ba247f5d3b8",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "9c26949a69cf8b214ac5f8f4fe0c03285b6218bc"
+          }
+        },
+        {
+          "path": "src/motor/envelope.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "4c6c79e45331046e544675260e3c9a8df82ea342"
+          }
+        },
+        {
+          "path": "test/motor/envelope_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "56593dcd2862707547ab6197efc1431dbb5bba31"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 4,
+      "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/4",
+      "head": "98a475ecb09aa0c4bacf085ea8effe4960786edc",
+      "merge": "9229ac574cf3068f952dea698879ed0b4782f91c",
+      "merge-base": "d3b68c8a839eb663755476823b28721d3f13550c",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "8148b484098403cfbdecfaf889bf4c3d0a6fd794"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 5,
+      "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/5",
+      "head": "45e3bf9d6c8aeb0aea2cb5be64fff9348df42070",
+      "merge": "d3b68c8a839eb663755476823b28721d3f13550c",
+      "merge-base": "1dccf82dcf42a4622a77e615a0532ba247f5d3b8",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/motor/esc.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "345bcd2bf2f142e355734f941385f5525d556706"
+          }
+        },
+        {
+          "path": "test/motor/esc_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "58efcda5eae8edce494581f7886a26b4ce56b579"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 6,
+      "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/6",
+      "head": "d7397a5e056b4261501e2042d8eece5c1f7819df",
+      "merge": "e8f3f64bd85865237565f11efabf816adc40b2af",
+      "merge-base": "9229ac574cf3068f952dea698879ed0b4782f91c",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/motor/dcbus.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "ac7c9b0ce16b916722fbbeff820e6dd94be7db2c"
+          }
+        },
+        {
+          "path": "test/motor/dcbus_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "664627eddfdb7d1b18baecf3e36407c2f606b044"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 7,
+      "url": "https://github.com/kotoba-lang/kami-engine-motor/pull/7",
+      "head": "846fc6de84ee5c9e77f2ddb4ba643ee14b9d2623",
+      "merge": "de56f955d477c079141afe8c1de4a7605702c418",
+      "merge-base": "e8f3f64bd85865237565f11efabf816adc40b2af",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/motor/esc.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "46ab72571644ac12eaf741e2ef29a503411b9898"
+          }
+        },
+        {
+          "path": "test/motor/esc_drive_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "f32423da0ba8b99fa9400b3b1d8107c43a6c3d17"
+          }
+        }
+      ]
+    }
+  ]
+}

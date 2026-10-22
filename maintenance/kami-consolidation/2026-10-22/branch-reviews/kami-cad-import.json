@@ -1,0 +1,375 @@
+{
+  "repository": "kotoba-lang/kami-cad-import",
+  "default": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "a86c8945adac53141b1890a20fe27d1235cc8646",
+      "commit": "a86c8945adac53141b1890a20fe27d1235cc8646",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "44c7b4e9b8cce522924ea54b0915aad156a59dcf",
+      "commit": "44c7b4e9b8cce522924ea54b0915aad156a59dcf",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/kotoba-cad-transform-golden-v1",
+      "object": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "commit": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-cad-import/pull/1",
+        "head": "b769490cc89ae796c51e29a693030aa2bee909ca",
+        "merge": "592e937601e6a219db2991dce7630a9dae23edd9",
+        "merge-base": "f253cbb9f8ca242b435690788fb392522ea95cc5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "429cfea67fab7ddec65afabc13d29d9a4f91ad0b"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5b375ecd62603aa7d00746f5b14bfaf4e7bb1747"
+            }
+          },
+          {
+            "path": "src/cad_transform_golden.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f5e2c0fbe98ffb1afcef8c6e28ae0a2626fb1695"
+            }
+          },
+          {
+            "path": "test/cad_import/cad_transform_kotoba_golden_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3561c973a1a513a55f1ad9ea799da60407c78569"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "commit": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-cad-import/pull/1",
+        "head": "b769490cc89ae796c51e29a693030aa2bee909ca",
+        "merge": "592e937601e6a219db2991dce7630a9dae23edd9",
+        "merge-base": "f253cbb9f8ca242b435690788fb392522ea95cc5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "429cfea67fab7ddec65afabc13d29d9a4f91ad0b"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5b375ecd62603aa7d00746f5b14bfaf4e7bb1747"
+            }
+          },
+          {
+            "path": "src/cad_transform_golden.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f5e2c0fbe98ffb1afcef8c6e28ae0a2626fb1695"
+            }
+          },
+          {
+            "path": "test/cad_import/cad_transform_kotoba_golden_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3561c973a1a513a55f1ad9ea799da60407c78569"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "commit": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-cad-import/pull/1",
+        "head": "b769490cc89ae796c51e29a693030aa2bee909ca",
+        "merge": "592e937601e6a219db2991dce7630a9dae23edd9",
+        "merge-base": "f253cbb9f8ca242b435690788fb392522ea95cc5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "429cfea67fab7ddec65afabc13d29d9a4f91ad0b"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5b375ecd62603aa7d00746f5b14bfaf4e7bb1747"
+            }
+          },
+          {
+            "path": "src/cad_transform_golden.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f5e2c0fbe98ffb1afcef8c6e28ae0a2626fb1695"
+            }
+          },
+          {
+            "path": "test/cad_import/cad_transform_kotoba_golden_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3561c973a1a513a55f1ad9ea799da60407c78569"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/kotoba-cad-transform-golden-v1",
+      "object": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "commit": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-cad-import/pull/1",
+        "head": "b769490cc89ae796c51e29a693030aa2bee909ca",
+        "merge": "592e937601e6a219db2991dce7630a9dae23edd9",
+        "merge-base": "f253cbb9f8ca242b435690788fb392522ea95cc5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "429cfea67fab7ddec65afabc13d29d9a4f91ad0b"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5b375ecd62603aa7d00746f5b14bfaf4e7bb1747"
+            }
+          },
+          {
+            "path": "src/cad_transform_golden.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f5e2c0fbe98ffb1afcef8c6e28ae0a2626fb1695"
+            }
+          },
+          {
+            "path": "test/cad_import/cad_transform_kotoba_golden_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3561c973a1a513a55f1ad9ea799da60407c78569"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "756ae7a7a465c2b9d237483b246090fa84bf67bd",
+      "commit": "756ae7a7a465c2b9d237483b246090fa84bf67bd",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text",
+      "object": "479a1df9761acdc9fc03fd89808546da12751a6a",
+      "commit": "479a1df9761acdc9fc03fd89808546da12751a6a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/maturity-loop-cad-import-json-escape",
+      "object": "aa34040b0ad75223b4e0dba4fe7e602454f0bcc3",
+      "commit": "aa34040b0ad75223b4e0dba4fe7e602454f0bcc3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/kotoba-cad-transform-golden-v1",
+      "object": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "commit": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-cad-import/pull/1",
+        "head": "b769490cc89ae796c51e29a693030aa2bee909ca",
+        "merge": "592e937601e6a219db2991dce7630a9dae23edd9",
+        "merge-base": "f253cbb9f8ca242b435690788fb392522ea95cc5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "429cfea67fab7ddec65afabc13d29d9a4f91ad0b"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5b375ecd62603aa7d00746f5b14bfaf4e7bb1747"
+            }
+          },
+          {
+            "path": "src/cad_transform_golden.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f5e2c0fbe98ffb1afcef8c6e28ae0a2626fb1695"
+            }
+          },
+          {
+            "path": "test/cad_import/cad_transform_kotoba_golden_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3561c973a1a513a55f1ad9ea799da60407c78569"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "0d246a12723376d77a9f8c2c78f326ee0ccdcadd",
+      "commit": "0d246a12723376d77a9f8c2c78f326ee0ccdcadd",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "fc0cdc4f5bbaba7d4494f60350912a49e1c13270",
+      "commit": "fc0cdc4f5bbaba7d4494f60350912a49e1c13270",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-cad-import/pull/1",
+      "head": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "merge": "592e937601e6a219db2991dce7630a9dae23edd9",
+      "merge-base": "f253cbb9f8ca242b435690788fb392522ea95cc5",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "429cfea67fab7ddec65afabc13d29d9a4f91ad0b"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "5b375ecd62603aa7d00746f5b14bfaf4e7bb1747"
+          }
+        },
+        {
+          "path": "src/cad_transform_golden.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "f5e2c0fbe98ffb1afcef8c6e28ae0a2626fb1695"
+          }
+        },
+        {
+          "path": "test/cad_import/cad_transform_kotoba_golden_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3561c973a1a513a55f1ad9ea799da60407c78569"
+          }
+        }
+      ]
+    }
+  ]
+}

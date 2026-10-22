@@ -1,0 +1,28 @@
+{:paths ["src"]
+ ;; The multirotor mass spiral, over the three sizing solvers. Thrust equals
+ ;; weight on a rotorcraft, so mass appears on both sides of the loop and the
+ ;; fixed point is not guaranteed to exist — this library's job is to find it
+ ;; when it does and to REFUSE when it does not.
+ :deps {
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}io.github.kotoba-lang/datom                  {:git/sha "3a45462b3b6da018e24c65d12f8f3d3250a0c38e"}
+        io.github.kotoba-lang/kami-engine-cae-solver {:git/sha "214a1907890b75cbb5ed6781cf3dea8cba0f4351"}
+        io.github.kotoba-lang/kami-engine-rotor      {:git/sha "fd8ea447f6bc4df64ea4c33a771fd10a7739ad82"}
+        io.github.kotoba-lang/kami-engine-pack       {:git/sha "ed2ff2d7ccca44656352c832f0e46a44f19d48fe"}
+        io.github.kotoba-lang/kami-engine-motor      {:git/sha "1dccf82dcf42a4622a77e615a0532ba247f5d3b8"}}
+ :aliases
+ {:test {:extra-paths ["test"]
+         :extra-deps {io.github.cognitect-labs/test-runner
+                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+         :main-opts ["-m" "cognitect.test-runner"]
+         :exec-fn cognitect.test-runner.api/test}
+  :dev {:override-deps {io.github.kotoba-lang/datom                  {:local/root "../datom"}
+                        io.github.kotoba-lang/kami-engine-cae-solver {:local/root "../kami-engine-cae-solver"}
+                        io.github.kotoba-lang/kami-engine-rotor      {:local/root "../kami-engine-rotor"}
+                        io.github.kotoba-lang/kami-engine-pack       {:local/root "../kami-engine-pack"}
+                        io.github.kotoba-lang/kami-engine-motor      {:local/root "../kami-engine-motor"}}}
+  :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
+         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test"
+                     "--fail-level" "error"]}}}

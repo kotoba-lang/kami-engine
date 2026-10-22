@@ -1,0 +1,92 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTLU10w",
+    "databaseId": 1286944211,
+    "nameWithOwner": "kotoba-lang/kami-vehicle-scene",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-24T06:42:16Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "da9a156e021df92b86fc7f6b522f22349e74d66f"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "da9a156e021df92b86fc7f6b522f22349e74d66f"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 1
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "da9a156e021df92b86fc7f6b522f22349e74d66f",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-vehicle-scene\nHEAD da9a156e021df92b86fc7f6b522f22349e74d66f\ndetached",
+    "refs": "refs/audit/forest-maintenance/default da9a156e021df92b86fc7f6b522f22349e74d66f\nrefs/heads/main 2cf57c470ee67129e6d247b40dfc7bc4f4eadafe\nrefs/heads/manifest-rev e60127b6c8e8670a7dd0ce308333270d6d082fe0\nrefs/remotes/kotoba-lang/HEAD da9a156e021df92b86fc7f6b522f22349e74d66f\nrefs/remotes/kotoba-lang/jv/full-sha 84e70a04911354fbb547683222ae456ab3a876c4\nrefs/remotes/kotoba-lang/jv/kotoba-text d7cea2b60443ddf871e25ef9eabcb68171bb3e79\nrefs/remotes/kotoba-lang/main da9a156e021df92b86fc7f6b522f22349e74d66f\nrefs/remotes/origin/HEAD da9a156e021df92b86fc7f6b522f22349e74d66f\nrefs/remotes/origin/cljk-rename-20260911 b3d3f86a56baa07c7a8b68ce71e8cc5b57fe4fff\nrefs/remotes/origin/kbb-cutover-20260911 61feb3015a2135c94b51d737850b6b2d8ae97e04\nrefs/remotes/origin/main da9a156e021df92b86fc7f6b522f22349e74d66f"
+  },
+  "local-after-preservation": {
+    "HEAD": "da9a156e021df92b86fc7f6b522f22349e74d66f",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-vehicle-scene\nHEAD da9a156e021df92b86fc7f6b522f22349e74d66f\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "da9a156e021df92b86fc7f6b522f22349e74d66f",
+      "refs/heads/main": "2cf57c470ee67129e6d247b40dfc7bc4f4eadafe",
+      "refs/heads/manifest-rev": "e60127b6c8e8670a7dd0ce308333270d6d082fe0",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "da9a156e021df92b86fc7f6b522f22349e74d66f",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "e215572dbe3e4a3d5a4d98272beb3626727f57a7",
+      "refs/remotes/kotoba-lang/HEAD": "da9a156e021df92b86fc7f6b522f22349e74d66f",
+      "refs/remotes/kotoba-lang/jv/full-sha": "84e70a04911354fbb547683222ae456ab3a876c4",
+      "refs/remotes/kotoba-lang/jv/kotoba-text": "d7cea2b60443ddf871e25ef9eabcb68171bb3e79",
+      "refs/remotes/kotoba-lang/main": "da9a156e021df92b86fc7f6b522f22349e74d66f",
+      "refs/remotes/origin/HEAD": "da9a156e021df92b86fc7f6b522f22349e74d66f",
+      "refs/remotes/origin/cljk-rename-20260911": "b3d3f86a56baa07c7a8b68ce71e8cc5b57fe4fff",
+      "refs/remotes/origin/kbb-cutover-20260911": "61feb3015a2135c94b51d737850b6b2d8ae97e04",
+      "refs/remotes/origin/main": "da9a156e021df92b86fc7f6b522f22349e74d66f"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "integrate shared vehicle documents",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/shared-vehicle-scene",
+      "headRefOid": "e215572dbe3e4a3d5a4d98272beb3626727f57a7",
+      "baseRefName": "main",
+      "baseRefOid": "2cf57c470ee67129e6d247b40dfc7bc4f4eadafe",
+      "mergeCommit": {
+        "oid": "99ace8fd38ca1f6733d1e280ad95930d3b847e53"
+      },
+      "mergedAt": "2026-07-14T07:41:09Z",
+      "url": "https://github.com/kotoba-lang/kami-vehicle-scene/pull/1"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "repository": "kotoba-lang/kami-sensor-sim",
+  "default": "caae6787e8a07fa8e6613e52412bc94878cca094",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "commit": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "commit": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "1e2d62ac60ce568508f0ff10000669f4e33de966",
+      "commit": "1e2d62ac60ce568508f0ff10000669f4e33de966",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "commit": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "commit": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/cljk-rename-20260911",
+      "object": "5697d027a596f07ad9648c8954cace37a0d4f81f",
+      "commit": "5697d027a596f07ad9648c8954cace37a0d4f81f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "4fc2f6b37ba5637358da71919dd377ac9040da03",
+      "commit": "4fc2f6b37ba5637358da71919dd377ac9040da03",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/kbb-cutover-20260911",
+      "object": "384586d2e9e4adf9c0f7a04e020fb4b9a3fffc95",
+      "commit": "384586d2e9e4adf9c0f7a04e020fb4b9a3fffc95",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "commit": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

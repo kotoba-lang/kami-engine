@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: DeLaGuardo/setup-clojure@13.4
+        with:
+          cli: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Enforce Kotoba production source authority
+        shell: bash
+        run: |
+          if find src -type f \( -name '*.clj' -o -name '*.cljc' -o -name '*.cljs' \) -print -quit | grep -q .; then
+            echo 'Production Clojure-family source must use .kotoba.' >&2
+            exit 1
+          fi
+          test "$(find src -type f -name '*.kotoba' | wc -l)" -eq 1
+      - run: clojure -M:test
+      - run: clojure -M:lint

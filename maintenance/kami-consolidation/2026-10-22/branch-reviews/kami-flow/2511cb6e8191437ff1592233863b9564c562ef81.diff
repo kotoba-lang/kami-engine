@@ -1,0 +1,193 @@
+diff --git a/.gitignore b/.gitignore
+index bd04223..05e79af 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,2 @@
+ .cpcache/
++.nbb/
+diff --git a/README.md b/README.md
+index 2a4604d..236771a 100644
+--- a/README.md
++++ b/README.md
+@@ -53,7 +53,7 @@ never a dedicated `kami-sta`/`kami-drc` crate).
+ 
+ ## Compressible choked-flow contract (`flow.choked`)
+ 
+-`src/flow/choked.cljc` removes the demonstrated block recorded by the
++`src/flow/choked.cljk` removes the demonstrated block recorded by the
+ open `flow.pressure` contract: its incompressible `restriction-mass-flow`
+ is explicitly valid only for small pressure ratios and under-predicts
+ choked flow. Cartridge / reactor / PEMFC hydrogen leak paths routinely
+@@ -92,13 +92,13 @@ silently corrected.
+ 
+ ## Size / tests
+ 
+-- `src/flow.cljc`: 392 lines.
+-- `test/flow_test.cljc`: 5 tests / 23 assertions (all 4 original Rust
++- `src/flow.cljk`: 392 lines.
++- `test/flow_test.cljk`: 5 tests / 23 assertions (all 4 original Rust
+   `#[test]`s ported 1:1, plus a namespace-loads smoke test) — 0 failures,
+   0 errors.
+ 
+ ```
+-clojure -M:test
++kbb -M:test
+ ```
+ ## Fluid-pressure contract (`flow.pressure`)
+ `src/flow/pressure.cljc` is an executable contract for the
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..ee4d788
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,11 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/flow.cljk" ".cljc"
++  "src/flow/choked.cljk" ".cljc"
++  "src/flow/pump.cljk" ".cljc"
++  "test/flow/choked_test.cljk" ".cljc"
++  "test/flow/pump_test.cljk" ".cljc"
++  "test/flow_test.cljk" ".cljc"}}
+diff --git a/deps.edn b/deps.edn
+index 45d229a..568b074 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -1,5 +1,14 @@
+ {:paths ["src" "test"]
+- :deps {gftd/rtl {:git/url "https://github.com/kotoba-lang/rtl.git" :sha "4c2d6d5340a47cd310028482c6195c59d100de4d"}
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       gftd/rtl {:git/url "https://github.com/kotoba-lang/rtl.git" :sha "4c2d6d5340a47cd310028482c6195c59d100de4d"}
+         gftd/pnr {:git/url "https://github.com/kotoba-lang/pnr.git" :sha "294a5e26ac54cea653540632f5aa7c2f72ee32c6"}
+         gftd/model-checking {:git/url "https://github.com/kotoba-lang/model-checking.git" :sha "7595e47d44caec9600f260261cc8cab4c1a30a7e"}
+         gftd/power {:git/url "https://github.com/kotoba-lang/power.git" :sha "3038529b859a34f4299a6301b3bf8d0cac49c0fe"}
+@@ -8,7 +17,7 @@
+         gftd/yield {:git/url "https://github.com/kotoba-lang/yield.git" :sha "31ee270a574da18bb602d58f8422f1350cdd11f4"}}
+  :aliases {:test {:extra-paths ["test"]
+                   :extra-deps {io.github.cognitect-labs/test-runner
+-                               {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                               {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+                   :main-opts ["-m" "cognitect.test-runner"]}
+            ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
+            :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..52b6bdc
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,9 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src" "test"]
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/flow.cljc b/src/flow.cljk
+similarity index 99%
+rename from src/flow.cljc
+rename to src/flow.cljk
+index 3e275e6..52af592 100644
+--- a/src/flow.cljc
++++ b/src/flow.cljk
+@@ -42,7 +42,7 @@
+   `pr-str` (EDN) for JSON serialization throughout — the hash and JSON
+   fields are semantically equivalent (deterministic serialization of the
+   same input) but not byte-identical to the Rust JSON output."
+-  (:require [clojure.string :as str]
++  (:require [kotoba.lang.text :as str]
+             [rtl.hdl :as hdl]
+             [pnr.floorplan :as floorplan]
+             [pnr.gdsii :as gdsii]
+@@ -163,7 +163,7 @@
+   \"Inconclusive\"."
+   [k]
+   (let [s (name k)]
+-    (str (str/upper-case (subs s 0 1)) (subs s 1))))
++    (str (str/upper (subs s 0 1)) (subs s 1))))
+ 
+ ;; ---------------------------------------------------------------------------
+ ;; Per-stage runners
+diff --git a/src/flow/choked.cljc b/src/flow/choked.cljk
+similarity index 100%
+rename from src/flow/choked.cljc
+rename to src/flow/choked.cljk
+diff --git a/src/flow/pump.cljc b/src/flow/pump.cljk
+similarity index 100%
+rename from src/flow/pump.cljc
+rename to src/flow/pump.cljk
+diff --git a/test/flow/choked_test.cljc b/test/flow/choked_test.cljk
+similarity index 99%
+rename from test/flow/choked_test.cljc
+rename to test/flow/choked_test.cljk
+index 5aacb83..951078c 100644
+--- a/test/flow/choked_test.cljc
++++ b/test/flow/choked_test.cljk
+@@ -6,7 +6,7 @@
+   caller input: the hydrogen values used in a couple of tests are
+   textbook ideal-gas values supplied BY the test as provenance, not
+   defaults inside `flow.choked`."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [flow.choked :as choked]))
+ 
+ (defn- approx=
+diff --git a/test/flow/pump_test.cljc b/test/flow/pump_test.cljk
+similarity index 98%
+rename from test/flow/pump_test.cljc
+rename to test/flow/pump_test.cljk
+index 1886f6f..234e65e 100644
+--- a/test/flow/pump_test.cljc
++++ b/test/flow/pump_test.cljk
+@@ -3,7 +3,7 @@
+   All numeric expectations are computed from the caller-supplied curve
+   coefficients by hand in the test bodies; no constants are baked into
+   the implementation under test."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [flow.pump :as pump]))
+ 
+ (defn- approx=
+diff --git a/test/flow_test.cljc b/test/flow_test.cljk
+similarity index 81%
+rename from test/flow_test.cljc
+rename to test/flow_test.cljk
+index 6b5ef8a..046fb50 100644
+--- a/test/flow_test.cljc
++++ b/test/flow_test.cljk
+@@ -2,7 +2,7 @@
+   "Tests for `flow` — ported 1:1 from the original Rust `kami-flow`
+   `#[cfg(test)] mod tests` (kotoba-lang/kami-engine, deleted PR #82),
+   plus a namespace-loads smoke test."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.lang.text] [kotoba.test :refer [deftest is testing]]
+             [flow :as flow]))
+ 
+ (deftest namespace-loads-smoke-test
+@@ -42,8 +42,8 @@
+ (deftest signoff-html-contains-summary
+   (let [[_tag report] (flow/run-minimal-flow (flow/flow-input))
+         html (flow/render-signoff-html report)]
+-    (is (clojure.string/includes? html "KAMI P10 Signoff Report"))
+-    (is (clojure.string/includes? html "STA Setup Slack"))
+-    (is (clojure.string/includes? html "DRC Violations"))
+-    (is (clojure.string/includes? html "LVS Mismatches"))
+-    (is (clojure.string/includes? html "Run ID"))))
++    (is (kotoba.lang.text/includes? html "KAMI P10 Signoff Report"))
++    (is (kotoba.lang.text/includes? html "STA Setup Slack"))
++    (is (kotoba.lang.text/includes? html "DRC Violations"))
++    (is (kotoba.lang.text/includes? html "LVS Mismatches"))
++    (is (kotoba.lang.text/includes? html "Run ID"))))

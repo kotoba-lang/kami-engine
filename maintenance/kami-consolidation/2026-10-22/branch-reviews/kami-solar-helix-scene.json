@@ -1,0 +1,79 @@
+{
+  "repository": "kotoba-lang/kami-solar-helix-scene",
+  "default": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "commit": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "commit": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "57852eee1685faab7b22a3565ef361fb9123d719",
+      "commit": "57852eee1685faab7b22a3565ef361fb9123d719",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "ae2d713b5c866ee1b64b740a7eae424a4dd1cd56",
+      "commit": "ae2d713b5c866ee1b64b740a7eae424a4dd1cd56",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "commit": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "commit": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/chore-bump-scene-pin",
+      "object": "5e6e4bf39b8e2ddee22d46919d6aa6e73ddb33d9",
+      "commit": "5e6e4bf39b8e2ddee22d46919d6aa6e73ddb33d9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "c642ee69816e934e0515e745a9cb4be9f139cce6",
+      "commit": "c642ee69816e934e0515e745a9cb4be9f139cce6",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/full-sha",
+      "object": "cd3a139e030dac4f05d52b2fe1c474195c160198",
+      "commit": "cd3a139e030dac4f05d52b2fe1c474195c160198",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "54ef10f9b5eaf5b601987995708caa1966e00b6d",
+      "commit": "54ef10f9b5eaf5b601987995708caa1966e00b6d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "commit": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/maturity-loop-bodies-from-edn-skip",
+      "object": "8ee9b9b8c31abc3e0e09a6cae756dc2e9f3c93af",
+      "commit": "8ee9b9b8c31abc3e0e09a6cae756dc2e9f3c93af",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

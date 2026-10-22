@@ -1,0 +1,49 @@
+{
+  "repository": "kotoba-lang/kami-eizo-timeline",
+  "default": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "commit": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "commit": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "c0116940f19eb1ca70a8f050c9f22d0513e3b8a7",
+      "commit": "c0116940f19eb1ca70a8f050c9f22d0513e3b8a7",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "c19ae03fb1297f1099a82bfc87dc123b77d7d77f",
+      "commit": "c19ae03fb1297f1099a82bfc87dc123b77d7d77f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "commit": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "commit": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "commit": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

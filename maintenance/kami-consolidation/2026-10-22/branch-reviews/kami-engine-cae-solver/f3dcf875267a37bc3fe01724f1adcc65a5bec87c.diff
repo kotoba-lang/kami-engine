@@ -1,0 +1,1858 @@
+diff --git a/.github/workflows/pages.yml b/.github/workflows/pages.yml
+index d4b6544..1fe7b3f 100644
+--- a/.github/workflows/pages.yml
++++ b/.github/workflows/pages.yml
+@@ -39,7 +39,7 @@ jobs:
+           clojure -M:pages -m cljs.main -O simple -t browser \
+             -d dist/cljs-out -o dist/kami-cae-webgpu.js -c cae.webgpu
+       - name: Verify advanced 3D scene contract
+-        run: node scripts/verify_advanced_scenes.mjs dist/index.html src/cae/webgpu.cljs
++        run: node scripts/verify_advanced_scenes.mjs dist/index.html src/cae/webgpu.cljk
+       - uses: actions/upload-pages-artifact@v3
+         with:
+           path: dist
+diff --git a/.gitignore b/.gitignore
+index 944e243..7d0cfc4 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -4,3 +4,4 @@
+ .lsp/
+ .DS_Store
+ dist/
++.nbb/
+diff --git a/README.md b/README.md
+index 996392f..4078572 100644
+--- a/README.md
++++ b/README.md
+@@ -68,7 +68,7 @@ the study remains valid when a host replaces a screening model with a dedicated
+ CAE adapter.
+ 
+ Part of the clean-sheet vehicle-design / CAE stack (purpose-split shared libs).
+-Zero-dep portable `.cljc`. Run `clojure -M:test`.
++Zero-dep portable `.cljc`. Run `kbb -M:test`.
+ 
+ ## CLJS / Node smoke test
+ 
+@@ -76,7 +76,7 @@ The same source executes under ClojureScript through NBB (no JVM solver
+ fallback). With [NBB](https://github.com/babashka/nbb) installed, run:
+ 
+ ```sh
+-nbb -cp src:test -e "(require '[cae.cljs-smoke-test])"
++kbb --backend sci -cp src:test -e "(require '[cae.cljs-smoke-test])"
+ ```
+ 
+ It executes CFD (fittings + combustion), FEM beam, Arrhenius materials,
+@@ -117,7 +117,7 @@ verification, experimental validation, software quality and integration on a
+ 0--5 score and percentage.  The current evidence-backed aggregate is
+ `2.40/5.00` (`48.0%`); this is not an industrial-readiness claim.
+ 
+-Run `clojure -M:dataset -m report-maturity` to emit the full numeric EDN report.
++Run `kbb -M:dataset -m report-maturity` to emit the full numeric EDN report.
+ `cae.maturity/tx-data` emits portable entity maps accepted by DataScript and
+ Datomic.  The committed schemas are `cae/maturity-datascript-schema.edn` and
+ `cae/maturity-datomic-schema.edn`; `all-components-query` and
+@@ -189,7 +189,7 @@ iterative residual.
+ `resources/cae/datasets.edn` pins Hugging Face repositories to immutable
+ 40-character revisions and records license, origin, intended use, commercial
+ permission, validation independence, citation, split, byte size and SHA-256.
+-`clojure -M:dataset -m verify-external-dataset aethron-cfd-pinn` downloads only the
++`kbb -M:dataset -m verify-external-dataset aethron-cfd-pinn` downloads only the
+ manifested files and rejects any size/hash drift. CI executes this byte-level
+ check on JDK 21.
+ 
+@@ -204,7 +204,7 @@ in CI, but remains training-only synthetic data.
+ 
+ The registry also content-pins the NIST MIDAS experimental compression data
+ for annealed AISI 1045 steel. Run
+-`clojure -M:dataset -m verify-external-dataset nist-midas-1045-dynamic-plasticity`
++`kbb -M:dataset -m verify-external-dataset nist-midas-1045-dynamic-plasticity`
+ to download the NIST CSV over HTTPS, reject byte/hash drift, parse its experiment
+ blocks, and reproduce paired published-model residual statistics. The source
+ does not publish per-sample measurement uncertainty, so the resulting report is
+@@ -236,7 +236,7 @@ surface records. `cae.sbse-geometry` independently implements the published
+ triangulated STL. This establishes geometry provenance; it does not yet prove
+ an as-built CMM match, volume-mesh quality or RANS accuracy.
+ 
+-`clojure -M:dataset -m run-openfoam-sbse-mesh-evidence` generates a body-fitted
++`kbb -M:dataset -m run-openfoam-sbse-mesh-evidence` generates a body-fitted
+ 3D structured-Hex test-section mesh directly from that parametric surface. The
+ first accepted grid contains 27,648 cells and passes full OpenFOAM topology and
+ geometry checks with one region, positive volume, 34.21-degree maximum
+@@ -244,7 +244,7 @@ non-orthogonality and 0.4456 maximum skewness. Every generated dictionary and
+ `polyMesh` file is hashed. This is the coarse RANS grid; y+ suitability, grid
+ convergence and experimental correlation remain separate required gates.
+ 
+-`clojure -M:dataset -m run-openfoam-sbse-rans-evidence` now generates and
++`kbb -M:dataset -m run-openfoam-sbse-rans-evidence` now generates and
+ executes a real 3D OpenFOAM v2506 k-omega SST case on that grid. The inlet uses
+ the Mach 0.1 OFI header values (`Uinf=34.59 m/s`, `P=99 kPa`, `T=21.3 C`,
+ `RH=81%`); moist-air density, Sutherland viscosity, Reynolds number, `k` and
+@@ -271,7 +271,7 @@ and a potential-flow initializer. The first steady coarse attempt remained
+ above the declared residual limits, so no grid-convergence or validation claim
+ is made; transient URANS time averaging is the next required solve path.
+ 
+-`clojure -M:dataset -m run-openfoam-sbse-urans-evidence` implements that path
++`kbb -M:dataset -m run-openfoam-sbse-urans-evidence` implements that path
+ with adaptive PIMPLE, Euler time integration, strict final pressure correction,
+ low-Re SST, `fieldAverage`, area-averaged wall-shear time series and optional
+ OpenMPI decomposition. A short 0.002 s coarse-grid pilot completes 200 stable
+@@ -303,7 +303,7 @@ execution testing, but cannot obtain temporal-coverage or stationarity
+ qualification from that waiver.
+ 
+ As a reproducible RANS baseline,
+-`clojure -M:dataset -m run-openfoam-bump-rans-evidence` executes the official
++`kbb -M:dataset -m run-openfoam-bump-rans-evidence` executes the official
+ NASA TMR 2D bump verification case with OpenFOAM v2506 and k-omega SST. Kotoba
+ statically expands the NASA analytic bump into 100 spline points, eliminating
+ the tutorial's runtime C++ `codeStream`. The 13,770-cell solve converges in
+@@ -315,7 +315,7 @@ an experimental validation claim.
+ ## Real external solver execution
+ 
+ `resources/cae/external-solvers.edn` pins OpenFOAM v2506 to an ARM64 OCI image
+-digest. `clojure -M:dataset -m run-openfoam-evidence` copies the image's own
++digest. `kbb -M:dataset -m run-openfoam-evidence` copies the image's own
+ `icoFoam/cavity` tutorial, hashes every input dictionary, executes the real
+ `blockMesh` and `icoFoam` binaries, parses residual/Courant/continuity records,
+ hashes the logs and final fields, verifies the local image digest, and emits an
+@@ -331,7 +331,7 @@ excludes an accuracy or design-signoff claim.
+ The same evidence path now executes CalculiX 2.21 from a locally built ARM64
+ container whose Ubuntu base digest and `calculix-ccx=2.21-1` package version are
+ fixed in `containers/calculix/Dockerfile`. Run
+-`clojure -M:dataset -m run-calculix-evidence` to solve the committed C3D8 unit
++`kbb -M:dataset -m run-calculix-evidence` to solve the committed C3D8 unit
+ cube, hash its INP/log/FRD/STA/CVG files, parse the actual FRD displacement
+ field, and compare maximum axial displacement with the closed-form 0.001 m
+ answer. The committed run has eight nodal samples and zero relative error for
+@@ -339,7 +339,7 @@ that quantity. This narrowly verifies linear, small-strain axial response; it
+ does not qualify nonlinear contact, plasticity, large deformation, fracture,
+ or arbitrary industrial models.
+ 
+-`clojure -M:dataset -m run-mpi-evidence` verifies a real four-rank OpenMPI
++`kbb -M:dataset -m run-mpi-evidence` verifies a real four-rank OpenMPI
+ 4.1.6 runtime in a digest-pinned ARM64 container. The clean-room Kotoba worker
+ distributes one million midpoint-integration samples, performs real
+ `MPI_Allreduce` and `MPI_Gather` collectives, and emits one audit record per
+@@ -350,7 +350,7 @@ absolute error of about `1.10e-13`. This proves single-container multi-process
+ execution only; multi-node networking, scaling efficiency, failure recovery,
+ and production CFD/FEM decomposition remain outside the qualified scope.
+ 
+-`clojure -M:dataset -m run-calculix-contact-evidence` executes a separate 3D
++`kbb -M:dataset -m run-calculix-contact-evidence` executes a separate 3D
+ geometrically nonlinear contact case. Two C3D8 blocks start with a gap; a
+ prescribed `-0.2` displacement closes it and compresses the pair using
+ surface-to-surface penalty contact. The evidence parser requires every one of
+@@ -362,7 +362,7 @@ relative balance error of zero. This verifies this frictionless elastic block
+ case only; it does not validate friction, plasticity, self-contact, impact,
+ mesh convergence, or general production assemblies.
+ 
+-`clojure -M:dataset -m run-calculix-plastic-evidence` executes a material-
++`kbb -M:dataset -m run-calculix-plastic-evidence` executes a material-
+ nonlinear C3D8 load/unload cycle with bilinear isotropic hardening. The
+ piecewise amplitude rises beyond yield and returns to zero; the parser joins 42
+ DAT history snapshots and requires every increment to converge, positive PEEQ
+@@ -373,7 +373,7 @@ is a constrained uniaxial-strain material verification, not calibration for a
+ specific production alloy; cyclic hardening, anisotropy, damage, rate and
+ temperature dependence still require independent material data and validation.
+ 
+-`clojure -M:dataset -m run-calculix-mesh-study` generates and executes four
++`kbb -M:dataset -m run-calculix-mesh-study` generates and executes four
+ consistently refined C3D8 meshes for a 3D NLGEOM cantilever: 10, 80, 640 and
+ 5,120 elements. It hashes every generated INP and solver output, requires all
+ real runs to complete, and evaluates rolling three-grid Richardson/GCI studies.
+@@ -383,7 +383,7 @@ GCI falls from `6.709%` to `1.2839%`, a `5.225x` reduction that passes the
+ declared 3% study target. This target applies only to this response and case;
+ it is not a universal mesh-independent or industrial-accuracy claim.
+ 
+-`clojure -M:dataset -m run-calculix-contact-mesh-study` executes three tilted
++`kbb -M:dataset -m run-calculix-contact-mesh-study` executes three tilted
+ surface-to-surface contact meshes and deliberately separates global equilibrium
+ from local pressure qualification. All runs balance top reaction and integrated
+ contact force to the printed precision, but maximum CSTR is `1850.36`,
+@@ -392,7 +392,7 @@ GCI are undefined. The evidence run passes as a sensitivity audit while the
+ local-pressure scope fails closed as `:local-pressure-not-qualified`. A correct
+ total force must never be used to claim a converged local contact maximum.
+ 
+-`clojure -M:dataset -m run-calculix-plastic-mesh-study` applies a controlled
++`kbb -M:dataset -m run-calculix-plastic-mesh-study` applies a controlled
+ strain gradient to three bilinear-isotropic-hardening C3D8 meshes and parses
+ every final PEEQ integration-point value. Maximum PEEQ increases monotonically
+ from `0.0017421` through `0.0018330` to `0.0018788`; the observed order is
+@@ -401,7 +401,7 @@ qualifies maximum PEEQ only for this smooth gradient case. It does not cover
+ notches, singularities, damage, fracture, another geometry, or an uncalibrated
+ production material.
+ 
+-`clojure -M:dataset -m run-calculix-thermoplastic-evidence` executes a real
++`kbb -M:dataset -m run-calculix-thermoplastic-evidence` executes a real
+ CalculiX 2.21 3D coupled temperature-displacement step with temperature-dependent
+ elastic/plastic tables, thermal expansion and conduction. The pinned run solves
+ an interior temperature between 293.15 K and 773.15 K, activates nonzero heat
+@@ -410,7 +410,7 @@ the coupled kernels for this two-element reference case only; mesh convergence,
+ transient accuracy, experimental correlation and production material validity
+ remain excluded.
+ 
+-`clojure -M:dataset -m run-calculix-thermoplastic-mesh-study` repeats the
++`kbb -M:dataset -m run-calculix-thermoplastic-mesh-study` repeats the
+ coupled case with 2, 4 and 8 through-thickness elements. All three real runs
+ converge, but the midpoint temperature is `321.0526`, `289.1376`, then
+ `292.6594` K; maximum heat flux is `35.90498`, `61.0368`, then `86.0267`; and
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..3b91cd3
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,93 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"scripts/build_pages_report.cljk" ".clj"
++  "scripts/report_maturity.cljk" ".clj"
++  "scripts/run_calculix_contact_evidence.cljk" ".clj"
++  "scripts/run_calculix_contact_mesh_study.cljk" ".clj"
++  "scripts/run_calculix_evidence.cljk" ".clj"
++  "scripts/run_calculix_mesh_study.cljk" ".clj"
++  "scripts/run_calculix_plastic_evidence.cljk" ".clj"
++  "scripts/run_calculix_plastic_mesh_study.cljk" ".clj"
++  "scripts/run_calculix_thermoplastic_evidence.cljk" ".clj"
++  "scripts/run_calculix_thermoplastic_mesh_study.cljk" ".clj"
++  "scripts/run_mpi_evidence.cljk" ".clj"
++  "scripts/run_openfoam_bump_rans_evidence.cljk" ".clj"
++  "scripts/run_openfoam_evidence.cljk" ".clj"
++  "scripts/run_openfoam_sbse_mesh_evidence.cljk" ".clj"
++  "scripts/run_openfoam_sbse_rans_evidence.cljk" ".clj"
++  "scripts/run_openfoam_sbse_urans_evidence.cljk" ".clj"
++  "scripts/verify_external_dataset.cljk" ".clj"
++  "src/cae/adapter.cljk" ".cljc"
++  "src/cae/advanced.cljk" ".cljc"
++  "src/cae/assessment.cljk" ".cljc"
++  "src/cae/backend.cljk" ".cljc"
++  "src/cae/calculix_contact_mesh.cljk" ".clj"
++  "src/cae/calculix_mesh.cljk" ".clj"
++  "src/cae/calculix_plastic_mesh.cljk" ".clj"
++  "src/cae/calculix_thermoplastic_mesh.cljk" ".clj"
++  "src/cae/case_writer.cljk" ".cljc"
++  "src/cae/dataset.cljk" ".cljc"
++  "src/cae/external_evidence.cljk" ".cljc"
++  "src/cae/h2_heat_demand.cljk" ".cljc"
++  "src/cae/h2_heater_limit.cljk" ".cljc"
++  "src/cae/h2_kinetics.cljk" ".cljc"
++  "src/cae/h2_line_drop.cljk" ".cljc"
++  "src/cae/h2_tank_storage.cljk" ".cljc"
++  "src/cae/high_fidelity.cljk" ".cljc"
++  "src/cae/host.cljk" ".cljc"
++  "src/cae/industrial.cljk" ".cljc"
++  "src/cae/interchange.cljk" ".cljc"
++  "src/cae/material_card.cljk" ".cljc"
++  "src/cae/maturity.cljk" ".cljc"
++  "src/cae/nonlinear.cljk" ".cljc"
++  "src/cae/openfoam_bump.cljk" ".clj"
++  "src/cae/orchestration.cljk" ".cljc"
++  "src/cae/protocol.cljk" ".cljc"
++  "src/cae/result_reader.cljk" ".cljc"
++  "src/cae/sbse_block_mesh.cljk" ".clj"
++  "src/cae/sbse_geometry.cljk" ".cljc"
++  "src/cae/sbse_grid_study.cljk" ".clj"
++  "src/cae/sbse_rans.cljk" ".clj"
++  "src/cae/sbse_urans.cljk" ".clj"
++  "src/cae/solver.cljk" ".cljc"
++  "src/cae/study.cljk" ".cljc"
++  "src/cae/verification.cljk" ".cljc"
++  "src/cae/vv.cljk" ".cljc"
++  "src/cae/webgpu.cljk" ".cljs"
++  "test/cae/assessment_test.cljk" ".clj"
++  "test/cae/backend_test.cljk" ".cljc"
++  "test/cae/calculix_contact_mesh_test.cljk" ".clj"
++  "test/cae/calculix_mesh_test.cljk" ".clj"
++  "test/cae/calculix_plastic_mesh_test.cljk" ".clj"
++  "test/cae/calculix_thermoplastic_mesh_test.cljk" ".clj"
++  "test/cae/cljs_smoke_test.cljk" ".cljs"
++  "test/cae/dataset_test.cljk" ".clj"
++  "test/cae/external_evidence_fixture_test.cljk" ".clj"
++  "test/cae/external_evidence_test.cljk" ".cljc"
++  "test/cae/h2_desorption_test.cljk" ".clj"
++  "test/cae/h2_heat_demand_test.cljk" ".clj"
++  "test/cae/h2_heater_limit_test.cljk" ".clj"
++  "test/cae/h2_kinetics_test.cljk" ".clj"
++  "test/cae/h2_line_drop_test.cljk" ".clj"
++  "test/cae/h2_tank_storage_test.cljk" ".clj"
++  "test/cae/high_fidelity_test.cljk" ".clj"
++  "test/cae/industrial_test.cljk" ".clj"
++  "test/cae/interchange_test.cljk" ".clj"
++  "test/cae/material_card_test.cljk" ".clj"
++  "test/cae/maturity_test.cljk" ".clj"
++  "test/cae/openfoam_bump_test.cljk" ".clj"
++  "test/cae/orchestration_test.cljk" ".clj"
++  "test/cae/qualification_matrix_test.cljk" ".clj"
++  "test/cae/sbse_block_mesh_test.cljk" ".clj"
++  "test/cae/sbse_geometry_test.cljk" ".clj"
++  "test/cae/sbse_grid_study_test.cljk" ".clj"
++  "test/cae/sbse_rans_test.cljk" ".clj"
++  "test/cae/sbse_urans_test.cljk" ".clj"
++  "test/cae/solver_test.cljk" ".clj"
++  "test/cae/study_test.cljk" ".clj"
++  "test/cae/thermoplastic_evidence_test.cljk" ".clj"
++  "test/cae/thermoplastic_sensitivity_test.cljk" ".clj"
++  "test/cae/vv_test.cljk" ".cljc"}}
+diff --git a/deps.edn b/deps.edn
+index 4c174f7..aad5ded 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -4,12 +4,37 @@
+  ;; backend (:cfd/:fem/:process/:materials/:emag/:production-des) today and a
+  ;; high-fidelity host adapter tomorrow with no caller change. Purpose: SOLVER DISPATCH only (no physics,
+  ;; no datoms — those are vphysics-clj and datom-clj).
+- :deps {io.github.kotoba-lang/i18n
++ :deps {
++        ;; kotoba.lang.error replaced clojure.lang.ExceptionInfo here (2026-09-25).
++        ;; An explicit floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/error {:git/sha "838dec56c9a5b74f9eec825a2fb28bda157f8cd3"}
++        ;; kotoba.io replaced clojure.java.io / java.io.File here (2026-09-24).
++        ;; An explicit floor: the java.io.File method functions (exists?, file?,
++        ;; parent-file, canonical-path, mkdirs, list-files ...) are in kotoba.io
++        ;; from this sha, and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
++        ;; kotoba.json replaced clojure.data.json here (2026-09-24). An explicit
++        ;; floor: kotoba.json/read-str and /write-str first exist at 9c11ad1, and
++        ;; tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/json {:git/sha "9c11ad189e64907700e8b4eb9b26f40336bffa01"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       io.github.kotoba-lang/i18n
+         {:git/url "https://github.com/kotoba-lang/i18n.git"
+          :git/sha "277cb404928392e01b257cbc0c48a2a304e2a6d1"}
+         io.github.kotoba-lang/physics
+         {:git/url "https://github.com/kotoba-lang/physics.git"
+-         :git/sha "30278f1f54ecf1de1f5da5242cae2bd9cc71aa38"}}
++         :git/sha "30278f1f54ecf1de1f5da5242cae2bd9cc71aa38"}
++        ;; Replaces ad-hoc clojure.edn usage with the bounded, hardened EDN reader.
++        io.github.kotoba-lang/edn
++        {:git/url "https://github.com/kotoba-lang/edn.git"
++         :git/sha "250f4dafa5f5c7fb3109703496a52866e2a62dcd"}}
+  :aliases
+  {:dataset {:extra-paths ["scripts"]}
+   :pages {:extra-paths ["scripts"]
+@@ -20,7 +45,7 @@
+   :test {:extra-paths ["test"]
+          :extra-deps {datascript/datascript {:mvn/version "1.7.8"}
+                       io.github.cognitect-labs/test-runner
+-                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+          :main-opts ["-m" "cognitect.test-runner"]
+          :exec-fn cognitect.test-runner.api/test}
+ 
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..b064a20
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,25 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src" "resources"]
++ :deps {
++        ;; kotoba.lang.error replaced clojure.lang.ExceptionInfo here (2026-09-25).
++        ;; An explicit floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/error {:git/sha "838dec56c9a5b74f9eec825a2fb28bda157f8cd3"}
++        ;; kotoba.io replaced clojure.java.io / java.io.File here (2026-09-24).
++        ;; An explicit floor: the java.io.File method functions (exists?, file?,
++        ;; parent-file, canonical-path, mkdirs, list-files ...) are in kotoba.io
++        ;; from this sha, and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
++        ;; kotoba.json replaced clojure.data.json here (2026-09-24). An explicit
++        ;; floor: kotoba.json/read-str and /write-str first exist at 9c11ad1, and
++        ;; tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/json {:git/sha "9c11ad189e64907700e8b4eb9b26f40336bffa01"}
++        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
++        ;; only from nbb.edn, so every project file this repo has names it.
++        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
++       ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/resources/cae/maturity.edn b/resources/cae/maturity.edn
+index 8de10d5..fb40371 100644
+--- a/resources/cae/maturity.edn
++++ b/resources/cae/maturity.edn
+@@ -35,11 +35,11 @@
+   {:id :cae/electromagnetics :repo "kotoba-lang/kami-engine-cae-solver" :domain :electromagnetics
+    :scores {:implementation 2 :numerical-verification 2 :experimental-validation 0
+             :software-quality 3 :integration 3}
+-   :evidence ["src/cae/high_fidelity.cljc"]}
++   :evidence ["src/cae/high_fidelity.cljk"]}
+   {:id :cae/production :repo "kotoba-lang/kami-engine-cae-solver" :domain :production-simulation
+    :scores {:implementation 2 :numerical-verification 2 :experimental-validation 0
+             :software-quality 3 :integration 3}
+-   :evidence ["src/cae/high_fidelity.cljc"]}
++   :evidence ["src/cae/high_fidelity.cljk"]}
+   {:id :physics/contract :repo "kotoba-lang/physics" :domain :shared-contract
+    :scores {:implementation 4 :numerical-verification 3 :experimental-validation 0
+             :software-quality 4 :integration 4}
+diff --git a/scripts/build_pages_report.clj b/scripts/build_pages_report.cljk
+similarity index 99%
+rename from scripts/build_pages_report.clj
+rename to scripts/build_pages_report.cljk
+index 91d0e3d..74de1c8 100644
+--- a/scripts/build_pages_report.clj
++++ b/scripts/build_pages_report.cljk
+@@ -6,8 +6,8 @@
+             [cae.verification]
+             [cae.vv]
+             [cae.solver :as solver]
+-            [clojure.data.json :as json]
+-            [clojure.java.io :as io]
++            [kotoba.json :as json]
++            [kotoba.io :as io]
+             [hiccup2.core :as h]
+             [shadow.css :refer [css]]
+             [shadow.css.build :as css-build]))
+@@ -164,7 +164,7 @@
+         report {:runtime "ClojureScript / WebGPU" :solver-fidelity :realtime-reference
+                 :status :screening-only :qualification qualification :metrics rows}
+         report-json (json/write-str report)]
+-    (.mkdirs (io/file "dist"))
++    (io/mkdirs (io/file "dist"))
+     (write-css!)
+     (spit "dist/index.html"
+           (str "<!doctype html>"
+diff --git a/scripts/download_hf_datasets.sh b/scripts/download_hf_datasets.sh
+index 3cf0af0..9c2fc3b 100755
+--- a/scripts/download_hf_datasets.sh
++++ b/scripts/download_hf_datasets.sh
+@@ -3,4 +3,4 @@ set -euo pipefail
+ 
+ # Only audited manifest IDs are accepted. The Clojure verifier resolves every
+ # file through its immutable 40-character revision and rejects hash/size drift.
+-exec clojure -M:dataset -m verify-external-dataset "${1:-aethron-cfd-pinn}"
++exec kbb -M:dataset -m verify-external-dataset "${1:-aethron-cfd-pinn}"
+diff --git a/scripts/report_maturity.clj b/scripts/report_maturity.cljk
+similarity index 100%
+rename from scripts/report_maturity.clj
+rename to scripts/report_maturity.cljk
+diff --git a/scripts/run_calculix_contact_evidence.clj b/scripts/run_calculix_contact_evidence.cljk
+similarity index 99%
+rename from scripts/run_calculix_contact_evidence.clj
+rename to scripts/run_calculix_contact_evidence.cljk
+index a857f52..e90eac6 100644
+--- a/scripts/run_calculix_contact_evidence.clj
++++ b/scripts/run_calculix_contact_evidence.cljk
+@@ -1,7 +1,7 @@
+ (ns run-calculix-contact-evidence
+   "Run a real 3D NLGEOM contact case and emit convergence/force-balance evidence."
+   (:require [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_calculix_contact_mesh_study.clj b/scripts/run_calculix_contact_mesh_study.cljk
+similarity index 99%
+rename from scripts/run_calculix_contact_mesh_study.clj
+rename to scripts/run_calculix_contact_mesh_study.cljk
+index 06c9889..7c8600d 100644
+--- a/scripts/run_calculix_contact_mesh_study.clj
++++ b/scripts/run_calculix_contact_mesh_study.cljk
+@@ -2,7 +2,7 @@
+   "Execute three tilted-contact meshes and separate global from local convergence."
+   (:require [cae.calculix-contact-mesh :as mesh]
+             [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_calculix_evidence.clj b/scripts/run_calculix_evidence.cljk
+similarity index 98%
+rename from scripts/run_calculix_evidence.clj
+rename to scripts/run_calculix_evidence.cljk
+index d216069..85ef16a 100644
+--- a/scripts/run_calculix_evidence.clj
++++ b/scripts/run_calculix_evidence.cljk
+@@ -1,7 +1,7 @@
+ (ns run-calculix-evidence
+   "Run digest-pinned CalculiX and emit input/result/analytic evidence."
+   (:require [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_calculix_mesh_study.clj b/scripts/run_calculix_mesh_study.cljk
+similarity index 99%
+rename from scripts/run_calculix_mesh_study.clj
+rename to scripts/run_calculix_mesh_study.cljk
+index b61a4f7..26ef1c9 100644
+--- a/scripts/run_calculix_mesh_study.clj
++++ b/scripts/run_calculix_mesh_study.cljk
+@@ -2,7 +2,7 @@
+   "Run three real C3D8 cantilever meshes and emit Richardson/GCI evidence."
+   (:require [cae.calculix-mesh :as mesh]
+             [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_calculix_plastic_evidence.clj b/scripts/run_calculix_plastic_evidence.cljk
+similarity index 98%
+rename from scripts/run_calculix_plastic_evidence.clj
+rename to scripts/run_calculix_plastic_evidence.cljk
+index c1a456e..96e59de 100644
+--- a/scripts/run_calculix_plastic_evidence.clj
++++ b/scripts/run_calculix_plastic_evidence.cljk
+@@ -1,7 +1,7 @@
+ (ns run-calculix-plastic-evidence
+   "Run a real elastoplastic load/unload cycle and emit residual-state evidence."
+   (:require [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_calculix_plastic_mesh_study.clj b/scripts/run_calculix_plastic_mesh_study.cljk
+similarity index 99%
+rename from scripts/run_calculix_plastic_mesh_study.clj
+rename to scripts/run_calculix_plastic_mesh_study.cljk
+index f643879..869a651 100644
+--- a/scripts/run_calculix_plastic_mesh_study.clj
++++ b/scripts/run_calculix_plastic_mesh_study.cljk
+@@ -2,7 +2,7 @@
+   "Execute three gradient-plastic meshes and audit maximum PEEQ sensitivity."
+   (:require [cae.calculix-plastic-mesh :as mesh]
+             [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_calculix_thermoplastic_evidence.clj b/scripts/run_calculix_thermoplastic_evidence.cljk
+similarity index 99%
+rename from scripts/run_calculix_thermoplastic_evidence.clj
+rename to scripts/run_calculix_thermoplastic_evidence.cljk
+index 80f3ee5..eaa53e8 100644
+--- a/scripts/run_calculix_thermoplastic_evidence.clj
++++ b/scripts/run_calculix_thermoplastic_evidence.cljk
+@@ -1,7 +1,7 @@
+ (ns run-calculix-thermoplastic-evidence
+   "Execute the real CalculiX coupled thermoplastic reference case."
+   (:require [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_calculix_thermoplastic_mesh_study.clj b/scripts/run_calculix_thermoplastic_mesh_study.cljk
+similarity index 99%
+rename from scripts/run_calculix_thermoplastic_mesh_study.clj
+rename to scripts/run_calculix_thermoplastic_mesh_study.cljk
+index 016ec16..58c4ed8 100644
+--- a/scripts/run_calculix_thermoplastic_mesh_study.clj
++++ b/scripts/run_calculix_thermoplastic_mesh_study.cljk
+@@ -2,7 +2,7 @@
+   "Execute 2/4/8-layer coupled thermoplastic meshes and audit each response."
+   (:require [cae.calculix-thermoplastic-mesh :as mesh]
+             [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_mpi_evidence.clj b/scripts/run_mpi_evidence.cljk
+similarity index 98%
+rename from scripts/run_mpi_evidence.clj
+rename to scripts/run_mpi_evidence.cljk
+index f5181ea..dfd8806 100644
+--- a/scripts/run_mpi_evidence.clj
++++ b/scripts/run_mpi_evidence.cljk
+@@ -1,7 +1,7 @@
+ (ns run-mpi-evidence
+   "Execute two identical real OpenMPI runs and emit fail-closed rank evidence."
+   (:require [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_openfoam_bump_rans_evidence.clj b/scripts/run_openfoam_bump_rans_evidence.cljk
+similarity index 98%
+rename from scripts/run_openfoam_bump_rans_evidence.clj
+rename to scripts/run_openfoam_bump_rans_evidence.cljk
+index e30c170..ccdaa20 100644
+--- a/scripts/run_openfoam_bump_rans_evidence.clj
++++ b/scripts/run_openfoam_bump_rans_evidence.cljk
+@@ -1,9 +1,9 @@
+ (ns run-openfoam-bump-rans-evidence
+   "Execute the digest-pinned OpenFOAM NASA TMR 2D bump k-omega SST case."
+   (:require [cae.openfoam-bump :as bump]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io]
+-            [clojure.string :as str])
++            [kotoba.lang.text :as str])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+ 
+diff --git a/scripts/run_openfoam_evidence.clj b/scripts/run_openfoam_evidence.cljk
+similarity index 98%
+rename from scripts/run_openfoam_evidence.clj
+rename to scripts/run_openfoam_evidence.cljk
+index dfd28af..31ce8b6 100644
+--- a/scripts/run_openfoam_evidence.clj
++++ b/scripts/run_openfoam_evidence.cljk
+@@ -1,7 +1,7 @@
+ (ns run-openfoam-evidence
+   "Run a digest-pinned OpenFOAM tutorial and emit hash-complete EDN evidence."
+   (:require [cae.external-evidence :as evidence]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+diff --git a/scripts/run_openfoam_sbse_mesh_evidence.clj b/scripts/run_openfoam_sbse_mesh_evidence.cljk
+similarity index 98%
+rename from scripts/run_openfoam_sbse_mesh_evidence.clj
+rename to scripts/run_openfoam_sbse_mesh_evidence.cljk
+index b08ddff..fca2a83 100644
+--- a/scripts/run_openfoam_sbse_mesh_evidence.clj
++++ b/scripts/run_openfoam_sbse_mesh_evidence.cljk
+@@ -1,9 +1,9 @@
+ (ns run-openfoam-sbse-mesh-evidence
+   "Generate and verify the first body-fitted 3D NASA SBSE OpenFOAM volume mesh."
+   (:require [cae.sbse-block-mesh :as mesh]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io]
+-            [clojure.string :as str])
++            [kotoba.lang.text :as str])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+ 
+diff --git a/scripts/run_openfoam_sbse_rans_evidence.clj b/scripts/run_openfoam_sbse_rans_evidence.cljk
+similarity index 99%
+rename from scripts/run_openfoam_sbse_rans_evidence.clj
+rename to scripts/run_openfoam_sbse_rans_evidence.cljk
+index 842ebbd..4ec504d 100644
+--- a/scripts/run_openfoam_sbse_rans_evidence.clj
++++ b/scripts/run_openfoam_sbse_rans_evidence.cljk
+@@ -3,9 +3,9 @@
+   (:require [cae.sbse-block-mesh :as mesh]
+             [cae.sbse-grid-study :as grid-study]
+             [cae.sbse-rans :as rans]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io]
+-            [clojure.string :as str])
++            [kotoba.lang.text :as str])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+ 
+diff --git a/scripts/run_openfoam_sbse_urans_evidence.clj b/scripts/run_openfoam_sbse_urans_evidence.cljk
+similarity index 99%
+rename from scripts/run_openfoam_sbse_urans_evidence.clj
+rename to scripts/run_openfoam_sbse_urans_evidence.cljk
+index d79e1e4..37e9b2a 100644
+--- a/scripts/run_openfoam_sbse_urans_evidence.clj
++++ b/scripts/run_openfoam_sbse_urans_evidence.cljk
+@@ -4,9 +4,9 @@
+             [cae.sbse-grid-study :as grid-study]
+             [cae.sbse-rans :as rans]
+             [cae.sbse-urans :as urans]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io]
+-            [clojure.string :as str])
++            [kotoba.lang.text :as str])
+   (:import [java.security MessageDigest]
+            [java.time Instant]))
+ 
+diff --git a/scripts/verify_advanced_scenes.mjs b/scripts/verify_advanced_scenes.mjs
+index 8e2344d..406764a 100644
+--- a/scripts/verify_advanced_scenes.mjs
++++ b/scripts/verify_advanced_scenes.mjs
+@@ -1,7 +1,7 @@
+ import fs from "node:fs";
+ 
+ const html = fs.readFileSync(process.argv[2] || "dist/index.html", "utf8");
+-const cljs = fs.readFileSync(process.argv[3] || "src/cae/webgpu.cljs", "utf8");
++const cljs = fs.readFileSync(process.argv[3] || "src/cae/webgpu.cljk", "utf8");
+ const css = fs.readFileSync(process.argv[4] || "dist/css/main.css", "utf8");
+ const ids = [...html.matchAll(/data-kami-scene="(\d+)"/g)].map((m) => Number(m[1]));
+ const expected = Array.from({length: 15}, (_, i) => i);
+diff --git a/scripts/verify_external_dataset.clj b/scripts/verify_external_dataset.cljk
+similarity index 99%
+rename from scripts/verify_external_dataset.clj
+rename to scripts/verify_external_dataset.cljk
+index 08a094f..a00a1d7 100644
+--- a/scripts/verify_external_dataset.clj
++++ b/scripts/verify_external_dataset.cljk
+@@ -2,7 +2,7 @@
+   "Download immutable external CAE evidence and verify every byte."
+   (:require [cae.dataset :as dataset]
+             [cae.sbse-geometry :as sbse]
+-            [clojure.edn :as edn]
++            [kotoba.lang.edn :as edn]
+             [clojure.java.io :as io])
+   (:import [java.net URI]
+            [java.net.http HttpClient HttpClient$Redirect HttpRequest HttpResponse$BodyHandlers]
+diff --git a/src/cae/adapter.cljc b/src/cae/adapter.cljk
+similarity index 100%
+rename from src/cae/adapter.cljc
+rename to src/cae/adapter.cljk
+diff --git a/src/cae/advanced.cljc b/src/cae/advanced.cljk
+similarity index 100%
+rename from src/cae/advanced.cljc
+rename to src/cae/advanced.cljk
+diff --git a/src/cae/assessment.cljc b/src/cae/assessment.cljk
+similarity index 100%
+rename from src/cae/assessment.cljc
+rename to src/cae/assessment.cljk
+diff --git a/src/cae/backend.cljc b/src/cae/backend.cljk
+similarity index 100%
+rename from src/cae/backend.cljc
+rename to src/cae/backend.cljk
+diff --git a/src/cae/calculix_contact_mesh.clj b/src/cae/calculix_contact_mesh.cljk
+similarity index 98%
+rename from src/cae/calculix_contact_mesh.clj
+rename to src/cae/calculix_contact_mesh.cljk
+index 520bb72..b2b616d 100644
+--- a/src/cae/calculix_contact_mesh.clj
++++ b/src/cae/calculix_contact_mesh.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.calculix-contact-mesh
+   "Generate paired structured C3D8 blocks for contact-pressure mesh studies."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn- nid [n offset layer i j]
+   (+ offset 1 (* layer (inc n) (inc n)) (* i (inc n)) j))
+diff --git a/src/cae/calculix_mesh.clj b/src/cae/calculix_mesh.cljk
+similarity index 98%
+rename from src/cae/calculix_mesh.clj
+rename to src/cae/calculix_mesh.cljk
+index b847051..12c24f2 100644
+--- a/src/cae/calculix_mesh.clj
++++ b/src/cae/calculix_mesh.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.calculix-mesh
+   "Clean-room structured C3D8 CalculiX mesh/case generation for convergence studies."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn node-id [ny nz i j k]
+   (inc (+ (* i (inc ny) (inc nz)) (* j (inc nz)) k)))
+diff --git a/src/cae/calculix_plastic_mesh.clj b/src/cae/calculix_plastic_mesh.cljk
+similarity index 98%
+rename from src/cae/calculix_plastic_mesh.clj
+rename to src/cae/calculix_plastic_mesh.cljk
+index 84a6eab..042d748 100644
+--- a/src/cae/calculix_plastic_mesh.clj
++++ b/src/cae/calculix_plastic_mesh.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.calculix-plastic-mesh
+   "Generate C3D8 material-nonlinearity meshes with a controlled strain gradient."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn- nid [n layer i j] (inc (+ (* layer (inc n) (inc n)) (* i (inc n)) j)))
+ (defn- csv [xs] (str/join ", " xs))
+diff --git a/src/cae/calculix_thermoplastic_mesh.clj b/src/cae/calculix_thermoplastic_mesh.cljk
+similarity index 98%
+rename from src/cae/calculix_thermoplastic_mesh.clj
+rename to src/cae/calculix_thermoplastic_mesh.cljk
+index 3ad3181..0c7a8b9 100644
+--- a/src/cae/calculix_thermoplastic_mesh.clj
++++ b/src/cae/calculix_thermoplastic_mesh.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.calculix-thermoplastic-mesh
+   "Generate consistently refined 1x1xN coupled thermoplastic C3D8 meshes."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn- node-id [layer corner] (+ 1 (* 4 layer) corner))
+ (defn- csv [xs] (str/join ", " xs))
+diff --git a/src/cae/case_writer.cljc b/src/cae/case_writer.cljk
+similarity index 97%
+rename from src/cae/case_writer.cljc
+rename to src/cae/case_writer.cljk
+index c8a1234..e9e932b 100644
+--- a/src/cae/case_writer.cljc
++++ b/src/cae/case_writer.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.case-writer
+   "Clean-room writers for interoperable OpenFOAM and CalculiX case inputs."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn- lines [& xs] (str (str/join "\n" xs) "\n"))
+ 
+diff --git a/src/cae/dataset.cljc b/src/cae/dataset.cljk
+similarity index 99%
+rename from src/cae/dataset.cljc
+rename to src/cae/dataset.cljk
+index bda5359..18aaf0c 100644
+--- a/src/cae/dataset.cljc
++++ b/src/cae/dataset.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.dataset
+   "License-aware, solver-neutral dataset manifests and sample normalization."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn manifest [{:keys [id revision license domain files source]}]
+   {:dataset/id (str id) :revision revision :license license :domain (keyword domain) :files (vec files) :source source :status :unverified})
+@@ -211,5 +211,5 @@
+     {:dataset/id (:dataset/id sample) :field field :count (count values) :values (vec (map double values)) :units nil :status :unverified}))
+ 
+ (defn file-kind [path]
+-  (let [p (str/lower-case (str path))]
++  (let [p (str/lower (str path))]
+     (cond (str/ends-with? p ".h5") :hdf5 (str/ends-with? p ".vtu") :vtu (str/ends-with? p ".vtk") :vtk (str/ends-with? p ".msh") :gmsh (str/ends-with? p ".inp") :calculix :else :unknown)))
+diff --git a/src/cae/external_evidence.cljc b/src/cae/external_evidence.cljk
+similarity index 100%
+rename from src/cae/external_evidence.cljc
+rename to src/cae/external_evidence.cljk
+diff --git a/src/cae/h2_heat_demand.cljc b/src/cae/h2_heat_demand.cljk
+similarity index 100%
+rename from src/cae/h2_heat_demand.cljc
+rename to src/cae/h2_heat_demand.cljk
+diff --git a/src/cae/h2_heater_limit.cljk b/src/cae/h2_heater_limit.cljk
+new file mode 100644
+index 0000000..7167cf0
+--- /dev/null
++++ b/src/cae/h2_heater_limit.cljk
+@@ -0,0 +1,108 @@
++(ns cae.h2-heater-limit
++  "Metal-hydride HEATER-LIMITED H2 SUPPLY FEASIBILITY (steady screening gate).
++
++  System context: the magnesium-hydrogen-PEMFC electric-drive boundary
++  (scripts/hermes-magnesium-systems-bots/system-scope.edn) names a
++  `:controlled-hydrogen-reactor` and a replaceable Mg/MgH2 cartridge. The
++  heat-demand contract (`:h2-desorption-heat-demand`) answers *how much
++  heat power a given H2 rate costs*, but not whether the reactor's heater
++  can actually PAY that bill — the vehicle-plane consumers (e.g.
++  kami-engine-vehicle-designer `vdesign.hydrogen/consumption-profile`)
++  emit an H2 demand schedule and currently have no contract that answers
++  *is this rate heat-feasible at all, and if not, what is the shortfall?*
++  This contract is the smallest composition step between those two: it
++  reuses the heat-demand contract verbatim (same provenance discipline,
++  same unmeasured envelope) and compares its total heat power against a
++  caller-supplied heater power cap.
++
++  Genericity / provenance discipline (mirrors `cae.h2-heat-demand`):
++  - Desorption enthalpy `:heat-of-desorption-J-mol` (per mol H2), H2 molar
++    mass `:molar-mass-h2-kg-mol` and the heater cap `:heater-power-W` are
++    CALLER-SUPPLIED. The mandatory non-blank `:heat-source` provenance
++    string covers the enthalpy and molar mass; the heater cap carries its
++    own `:heater-source` provenance string. Both fail closed: a heater cap
++    without provenance is as unusable as an unprovenanced enthalpy.
++  - No Mg/MgH2, burner, or heater-efficiency constant is baked in here.
++  - The optional bed sensible-heat group passes through verbatim to the
++    heat-demand contract (all-or-none, additive).
++
++  Model (steady over the window — a screening assumption carried on every
++  result):
++      Q-tot  [W] = heat-demand contract (:h2-desorption-heat-demand)
++      m-max  [kg H2/s] = P-heater · M-H2 / ΔH-des   (heat-limited rate)
++      feasible?     = Q-tot ≤ P-heater
++      shortfall [kg/s] = max(0, m-dot-demand − m-max)
++  Shortfall is REPORTED, never thrown — the deficit discipline the
++  vehicle plane already uses. Every result carries the heat-demand
++  contract's unmeasured envelope plus this contract's own (heater
++  transient/thermal-mass limits, control dynamics)."
++  (:require [cae.h2-heat-demand :as heat]
++            [cae.solver :as cae.solver]))
++
++(defn- finite-number? [x]
++  (and (number? x)
++       #?(:clj (Double/isFinite (double x))
++          :cljs (js/isFinite x))))
++
++(defn- positive! [input ks]
++  (doseq [k ks]
++    (when-not (and (finite-number? (get input k)) (pos? (double (get input k))))
++      (throw (ex-info "h2-heater-limit input must be a finite positive number"
++                      {:field k :value (get input k)})))))
++
++(defn- nonblank-string! [input k]
++  (let [v (get input k)]
++    (when-not (and (string? v) (re-find #"\S" v))
++      (throw (ex-info "h2-heater-limit input must be a non-blank string"
++                      {:field k :value v})))))
++
++(defn h2-desorption-heater-limit
++  "Is a demanded H2 rate heat-feasible under a heater power cap, and how
++  much is short if not?
++
++  Case keys:
++  - `:h2-mass-flow-kg-s` — demanded H2 production rate (required, positive).
++    Typically from a fuel-cell demand schedule (e.g. the vehicle plane's
++    per-interval consumption profile).
++  - `:heater-power-W` — reactor heater power cap (required, positive).
++  - `:heat-of-desorption-J-mol` — enthalpy of desorption, per mol H2
++    (required, positive; caller-supplied).
++  - `:molar-mass-h2-kg-mol` — hydrogen molar mass (required, positive).
++  - `:heat-source` — non-blank provenance string for ΔH-des and M-H2
++    (required; fail-closed without it).
++  - `:heater-source` — non-blank provenance string for `:heater-power-W`
++    (required; fail-closed without it).
++  - Optional bed sensible-heat group (all-or-none, passed through to the
++    heat-demand contract): `:bed-mass-kg`, `:bed-specific-heat-J-kgK`,
++    `:bed-ramp-K-s`.
++
++  Returns a `:screening-only` result echoing the full heat-demand fields,
++  plus `:heat-limited-max-h2-flow-kg-s`, `:feasible?`,
++  `:h2-shortfall-kg-s` (0.0 when feasible — never an exception), the
++  caller's provenance echoed, and the explicit unmeasured envelope."
++  [{:keys [heater-power-W heater-source h2-mass-flow-kg-s] :as input}]
++  (positive! input [:heater-power-W :h2-mass-flow-kg-s])
++  (nonblank-string! input :heater-source)
++  (let [inner (heat/h2-desorption-heat-demand input)
++        m-max (/ (* (double heater-power-W)
++                    (double (:molar-mass-h2-kg-mol input)))
++                 (double (:heat-of-desorption-J-mol input)))
++        q-tot (:total-heat-W inner)
++        feasible? (<= (double h2-mass-flow-kg-s) m-max)
++        shortfall (if feasible? 0.0 (max 0.0 (- (double h2-mass-flow-kg-s) m-max)))]
++    (-> inner
++        (assoc :solver :h2-desorption-heater-limit
++               :model "heater-limited supply gate: m-max = P·M/ΔH; feasible? ⇔ Q-tot ≤ P"
++               :heater-power-W heater-power-W
++               :heater-source heater-source
++               :heat-limited-max-h2-flow-kg-s m-max
++               :feasible? feasible?
++               :h2-shortfall-kg-s shortfall
++               :composed-from :h2-desorption-heat-demand)
++        (update :unmeasured assoc
++                :heater-transient-limits true
++                :heater-thermal-mass true
++                :control-dynamics true))))
++
++(defmethod cae.solver/solve :h2-desorption-heater-limit [case]
++  (h2-desorption-heater-limit case))
+diff --git a/src/cae/h2_kinetics.cljc b/src/cae/h2_kinetics.cljk
+similarity index 100%
+rename from src/cae/h2_kinetics.cljc
+rename to src/cae/h2_kinetics.cljk
+diff --git a/src/cae/h2_line_drop.cljc b/src/cae/h2_line_drop.cljk
+similarity index 100%
+rename from src/cae/h2_line_drop.cljc
+rename to src/cae/h2_line_drop.cljk
+diff --git a/src/cae/h2_tank_storage.cljc b/src/cae/h2_tank_storage.cljk
+similarity index 100%
+rename from src/cae/h2_tank_storage.cljc
+rename to src/cae/h2_tank_storage.cljk
+diff --git a/src/cae/high_fidelity.cljc b/src/cae/high_fidelity.cljk
+similarity index 100%
+rename from src/cae/high_fidelity.cljc
+rename to src/cae/high_fidelity.cljk
+diff --git a/src/cae/host.cljc b/src/cae/host.cljk
+similarity index 100%
+rename from src/cae/host.cljc
+rename to src/cae/host.cljk
+diff --git a/src/cae/industrial.cljc b/src/cae/industrial.cljk
+similarity index 100%
+rename from src/cae/industrial.cljc
+rename to src/cae/industrial.cljk
+diff --git a/src/cae/interchange.cljc b/src/cae/interchange.cljk
+similarity index 98%
+rename from src/cae/interchange.cljc
+rename to src/cae/interchange.cljk
+index 87e7855..3ffc1f5 100644
+--- a/src/cae/interchange.cljc
++++ b/src/cae/interchange.cljk
+@@ -5,7 +5,7 @@
+   USDA files. Format parsers remain the authority for their own standards;
+   CAE needs a small, validated reference that makes a result reproducible and
+   tells an orchestration host exactly which scene asset and prim were used."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (def supported-sources #{:cad :bim :equipment :openusd})
+ (def supported-up-axes #{:y-up :z-up})
+diff --git a/src/cae/material_card.cljc b/src/cae/material_card.cljk
+similarity index 99%
+rename from src/cae/material_card.cljc
+rename to src/cae/material_card.cljk
+index 715d38d..e05d4b5 100644
+--- a/src/cae/material_card.cljc
++++ b/src/cae/material_card.cljk
+@@ -2,7 +2,7 @@
+   "Fail-closed provenance and applicability checks for analysis material data.
+ 
+   Passing these checks establishes traceability, not physical validation."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (def ^:private sha256-pattern #"^[0-9a-f]{64}$")
+ (def ^:private allowed-units
+diff --git a/src/cae/maturity.cljc b/src/cae/maturity.cljk
+similarity index 97%
+rename from src/cae/maturity.cljc
+rename to src/cae/maturity.cljk
+index 4923c52..88975c5 100644
+--- a/src/cae/maturity.cljc
++++ b/src/cae/maturity.cljk
+@@ -1,7 +1,7 @@
+ (ns cae.maturity
+   "Repo-wide numerical maturity model and DataScript/Datomic transaction data."
+-  #?(:clj (:require [clojure.edn :as edn]
+-                    [clojure.java.io :as io])))
++  #?(:clj (:require [kotoba.lang.edn :as edn]
++                    [kotoba.io :as io])))
+ 
+ (def score-attributes
+   {:implementation :maturity/implementation
+diff --git a/src/cae/nonlinear.cljc b/src/cae/nonlinear.cljk
+similarity index 100%
+rename from src/cae/nonlinear.cljc
+rename to src/cae/nonlinear.cljk
+diff --git a/src/cae/openfoam_bump.clj b/src/cae/openfoam_bump.cljk
+similarity index 97%
+rename from src/cae/openfoam_bump.clj
+rename to src/cae/openfoam_bump.cljk
+index 72a72fe..ded256c 100644
+--- a/src/cae/openfoam_bump.clj
++++ b/src/cae/openfoam_bump.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.openfoam-bump
+   "Static, auditable generation of the NASA TMR 2D bump spline for OpenFOAM."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn bump-height [x]
+   (if (<= 0.3 x 1.2)
+diff --git a/src/cae/orchestration.cljc b/src/cae/orchestration.cljk
+similarity index 100%
+rename from src/cae/orchestration.cljc
+rename to src/cae/orchestration.cljk
+diff --git a/src/cae/protocol.cljc b/src/cae/protocol.cljk
+similarity index 98%
+rename from src/cae/protocol.cljc
+rename to src/cae/protocol.cljk
+index 99cb10c..d78a4b4 100644
+--- a/src/cae/protocol.cljc
++++ b/src/cae/protocol.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.protocol
+   "Clean-room, serializable protocols for MPI jobs, mesh exchange and coupling."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn mpi-message [{:keys [source target tag payload]}]
+   {:source (long source) :target (long target) :tag (keyword tag) :payload payload :protocol :mpi-like-v1})
+diff --git a/src/cae/result_reader.cljc b/src/cae/result_reader.cljk
+similarity index 97%
+rename from src/cae/result_reader.cljc
+rename to src/cae/result_reader.cljk
+index 4276f14..52f40ca 100644
+--- a/src/cae/result_reader.cljc
++++ b/src/cae/result_reader.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.result-reader
+   "Small, format-oriented readers for host solver result interchange."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (defn- number [s]
+   #?(:clj (Double/parseDouble s) :cljs (js/parseFloat s)))
+diff --git a/src/cae/sbse_block_mesh.clj b/src/cae/sbse_block_mesh.cljk
+similarity index 99%
+rename from src/cae/sbse_block_mesh.clj
+rename to src/cae/sbse_block_mesh.cljk
+index 8555f25..3b027fb 100644
+--- a/src/cae/sbse_block_mesh.clj
++++ b/src/cae/sbse_block_mesh.cljk
+@@ -1,7 +1,7 @@
+ (ns cae.sbse-block-mesh
+   "Body-fitted multi-block Hex mesh for the NASA SBSE ideal test section."
+   (:require [cae.sbse-geometry :as sbse]
+-            [clojure.string :as str]))
++            [kotoba.lang.text :as str]))
+ 
+ (defn- join-lines [xs] (str/join "\n" xs))
+ (defn- face [ids] (str "        (" (str/join " " ids) ")"))
+diff --git a/src/cae/sbse_geometry.cljc b/src/cae/sbse_geometry.cljk
+similarity index 98%
+rename from src/cae/sbse_geometry.cljc
+rename to src/cae/sbse_geometry.cljk
+index 63a36fd..e700cb0 100644
+--- a/src/cae/sbse_geometry.cljc
++++ b/src/cae/sbse_geometry.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.sbse-geometry
+   "NASA/Boeing Smooth-Body Separation Experiment parametric surface."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (def parameters
+   {:L-m 0.9144 :x0-over-L 0.195 :z0-over-L 0.06 :h-over-L 0.085
+diff --git a/src/cae/sbse_grid_study.clj b/src/cae/sbse_grid_study.cljk
+similarity index 100%
+rename from src/cae/sbse_grid_study.clj
+rename to src/cae/sbse_grid_study.cljk
+diff --git a/src/cae/sbse_rans.clj b/src/cae/sbse_rans.cljk
+similarity index 99%
+rename from src/cae/sbse_rans.clj
+rename to src/cae/sbse_rans.cljk
+index bade4af..b3b9df4 100644
+--- a/src/cae/sbse_rans.clj
++++ b/src/cae/sbse_rans.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.sbse-rans
+   "Auditable OpenFOAM k-omega SST case generation for the NASA SBSE tunnel."
+-  (:require [clojure.string :as str]))
++  (:require [kotoba.lang.text :as str]))
+ 
+ (def default-experiment
+   {:velocity-m-s 34.59 :pressure-pa 99000.0 :temperature-c 21.3
+diff --git a/src/cae/sbse_urans.clj b/src/cae/sbse_urans.cljk
+similarity index 100%
+rename from src/cae/sbse_urans.clj
+rename to src/cae/sbse_urans.cljk
+diff --git a/src/cae/solver.cljc b/src/cae/solver.cljk
+similarity index 100%
+rename from src/cae/solver.cljc
+rename to src/cae/solver.cljk
+diff --git a/src/cae/study.cljc b/src/cae/study.cljk
+similarity index 100%
+rename from src/cae/study.cljc
+rename to src/cae/study.cljk
+diff --git a/src/cae/verification.cljc b/src/cae/verification.cljk
+similarity index 100%
+rename from src/cae/verification.cljc
+rename to src/cae/verification.cljk
+diff --git a/src/cae/vv.cljc b/src/cae/vv.cljk
+similarity index 100%
+rename from src/cae/vv.cljc
+rename to src/cae/vv.cljk
+diff --git a/src/cae/webgpu.cljs b/src/cae/webgpu.cljk
+similarity index 100%
+rename from src/cae/webgpu.cljs
+rename to src/cae/webgpu.cljk
+diff --git a/test/cae/assessment_test.clj b/test/cae/assessment_test.cljk
+similarity index 87%
+rename from test/cae/assessment_test.clj
+rename to test/cae/assessment_test.cljk
+index 72710b7..8cc8625 100644
+--- a/test/cae/assessment_test.clj
++++ b/test/cae/assessment_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.assessment-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.lang.error :as kerror] [kotoba.test :refer [deftest is testing]]
+             [cae.assessment :as assessment]
+             [cae.industrial]
+             [cae.solver :as solver]))
+@@ -26,11 +26,11 @@
+ 
+ (deftest invalid-acceptance-configuration-is-rejected-before-assessment
+   (testing "bad configuration is distinct from an engineering failure"
+-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"must be finite"
++    (is (thrown-with-msg? kerror/ExceptionInfo #"must be finite"
+                           (assessment/assess {} {:stress-Pa {:max ##NaN}})))
+-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"cannot exceed"
++    (is (thrown-with-msg? kerror/ExceptionInfo #"cannot exceed"
+                           (assessment/assess {} {:stress-Pa {:min 10 :max 1}})))
+-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"must be a keyword"
++    (is (thrown-with-msg? kerror/ExceptionInfo #"must be a keyword"
+                           (assessment/assess {} {"stress-Pa" {:max 1}})))))
+ 
+ (deftest an-assessment-can-be-attached-to-a-result
+diff --git a/test/cae/backend_test.cljc b/test/cae/backend_test.cljk
+similarity index 97%
+rename from test/cae/backend_test.cljc
+rename to test/cae/backend_test.cljk
+index eb6e925..fc434cb 100644
+--- a/test/cae/backend_test.cljc
++++ b/test/cae/backend_test.cljk
+@@ -1,7 +1,7 @@
+ (ns cae.backend-test
+   (:require [cae.backend :as backend]
+             [cae.solver :as cae]
+-            [clojure.test :refer [deftest is]]
++            [kotoba.test :refer [deftest is]]
+             [kotoba.physics.contract :as contract]))
+ 
+ (defmethod cae/solve :contract-test [_]
+diff --git a/test/cae/calculix_contact_mesh_test.clj b/test/cae/calculix_contact_mesh_test.cljk
+similarity index 90%
+rename from test/cae/calculix_contact_mesh_test.clj
+rename to test/cae/calculix_contact_mesh_test.cljk
+index fe0fb70..cd43ea4 100644
+--- a/test/cae/calculix_contact_mesh_test.clj
++++ b/test/cae/calculix_contact_mesh_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.calculix-contact-mesh-test
+   (:require [cae.calculix-contact-mesh :as contact]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest contact-mesh-counts-and-nonuniform-loading
+   (let [case (contact/contact-blocks-input {:divisions 4})]
+diff --git a/test/cae/calculix_mesh_test.clj b/test/cae/calculix_mesh_test.cljk
+similarity index 93%
+rename from test/cae/calculix_mesh_test.clj
+rename to test/cae/calculix_mesh_test.cljk
+index 348d829..2a7ba28 100644
+--- a/test/cae/calculix_mesh_test.clj
++++ b/test/cae/calculix_mesh_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.calculix-mesh-test
+   (:require [cae.calculix-mesh :as mesh]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest structured-c3d8-has-conforming-counts-and-boundaries
+   (let [case (mesh/cantilever-input {:nx 4 :ny 2 :nz 2})]
+diff --git a/test/cae/calculix_plastic_mesh_test.clj b/test/cae/calculix_plastic_mesh_test.cljk
+similarity index 90%
+rename from test/cae/calculix_plastic_mesh_test.clj
+rename to test/cae/calculix_plastic_mesh_test.cljk
+index 5bda6e0..d1bc1f7 100644
+--- a/test/cae/calculix_plastic_mesh_test.clj
++++ b/test/cae/calculix_plastic_mesh_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.calculix-plastic-mesh-test
+   (:require [cae.calculix-plastic-mesh :as plastic]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest gradient-plastic-mesh-has-controlled-resolution-and-loading
+   (let [case (plastic/gradient-plastic-input {:divisions 4})]
+diff --git a/test/cae/calculix_thermoplastic_mesh_test.clj b/test/cae/calculix_thermoplastic_mesh_test.cljk
+similarity index 94%
+rename from test/cae/calculix_thermoplastic_mesh_test.clj
+rename to test/cae/calculix_thermoplastic_mesh_test.cljk
+index 029f4d7..d5fa282 100644
+--- a/test/cae/calculix_thermoplastic_mesh_test.clj
++++ b/test/cae/calculix_thermoplastic_mesh_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.calculix-thermoplastic-mesh-test
+   (:require [cae.calculix-thermoplastic-mesh :as mesh]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest coupled-mesh-refines-only-the-through-thickness-direction
+   (let [case (mesh/coupled-input {:layers 4})]
+diff --git a/test/cae/cljs_smoke_test.cljs b/test/cae/cljs_smoke_test.cljk
+similarity index 99%
+rename from test/cae/cljs_smoke_test.cljs
+rename to test/cae/cljs_smoke_test.cljk
+index e400d37..5ac0e08 100644
+--- a/test/cae/cljs_smoke_test.cljs
++++ b/test/cae/cljs_smoke_test.cljk
+@@ -2,7 +2,7 @@
+   "NBB/Node execution smoke test for the portable `.cljc` CAE surface.
+ 
+   Run with:
+-    nbb -cp src:test -e \"(require '[cae.cljs-smoke-test])\""
++    kbb --backend sci -cp src:test -e \"(require '[cae.cljs-smoke-test])\""
+   (:require [cae.assessment :as assessment]
+             [cae.industrial]
+             [cae.interchange :as interchange]
+diff --git a/test/cae/dataset_test.clj b/test/cae/dataset_test.cljk
+similarity index 98%
+rename from test/cae/dataset_test.clj
+rename to test/cae/dataset_test.cljk
+index db62230..5806a00 100644
+--- a/test/cae/dataset_test.clj
++++ b/test/cae/dataset_test.cljk
+@@ -1,8 +1,8 @@
+ (ns cae.dataset-test
+   (:require [cae.dataset :as dataset]
+-            [clojure.edn :as edn]
+-            [clojure.java.io :as io]
+-            [clojure.test :refer [deftest is testing]]))
++            [kotoba.lang.edn :as edn]
++            [kotoba.io :as io]
++            [kotoba.test :refer [deftest is testing]]))
+ 
+ (def catalog (-> "cae/datasets.edn" io/resource slurp edn/read-string))
+ (def quarantine (-> "cae/dataset-quarantine.edn" io/resource slurp edn/read-string))
+diff --git a/test/cae/external_evidence_fixture_test.clj b/test/cae/external_evidence_fixture_test.cljk
+similarity index 98%
+rename from test/cae/external_evidence_fixture_test.clj
+rename to test/cae/external_evidence_fixture_test.cljk
+index c527ee6..ff3d479 100644
+--- a/test/cae/external_evidence_fixture_test.clj
++++ b/test/cae/external_evidence_fixture_test.cljk
+@@ -1,7 +1,7 @@
+ (ns cae.external-evidence-fixture-test
+-  (:require [clojure.edn :as edn]
+-            [clojure.java.io :as io]
+-            [clojure.test :refer [deftest is]]))
++  (:require [kotoba.lang.edn :as edn]
++            [kotoba.io :as io]
++            [kotoba.test :refer [deftest is]]))
+ 
+ (defn fixture [path] (-> path io/resource slurp edn/read-string))
+ 
+diff --git a/test/cae/external_evidence_test.cljc b/test/cae/external_evidence_test.cljk
+similarity index 99%
+rename from test/cae/external_evidence_test.cljc
+rename to test/cae/external_evidence_test.cljk
+index f54bb6f..b7bf0b0 100644
+--- a/test/cae/external_evidence_test.cljc
++++ b/test/cae/external_evidence_test.cljk
+@@ -1,7 +1,7 @@
+ (ns cae.external-evidence-test
+   (:require [cae.external-evidence :as evidence]
+-            [clojure.string :as str]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.lang.text :as str]
++            [kotoba.test :refer [deftest is]]))
+ 
+ (def log-sample
+   "Time = 0.5\nCourant Number mean: 0.22 max: 0.85\nsmoothSolver:  Solving for Ux, Initial residual = 2.3e-07, Final residual = 2.3e-07, No Iterations 0\ntime step continuity errors : sum local = 8.8e-09, global = -1.4e-19, cumulative = -4.1e-18\nEnd\n")
+diff --git a/test/cae/h2_desorption_test.clj b/test/cae/h2_desorption_test.cljk
+similarity index 96%
+rename from test/cae/h2_desorption_test.clj
+rename to test/cae/h2_desorption_test.cljk
+index c7c011e..e2c8ae4 100644
+--- a/test/cae/h2_desorption_test.clj
++++ b/test/cae/h2_desorption_test.cljk
+@@ -1,7 +1,7 @@
+ (ns cae.h2-desorption-test
+   "Generic metal-hydride desorption equilibrium (van't Hoff) contract.
+   Every test supplies its own hydride data — no Mg/MgH2 constants live here."
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.lang.error :as kerror] [kotoba.test :refer [deftest is]]
+             [cae.industrial]
+             [cae.solver :as cae]))
+ 
+@@ -16,7 +16,7 @@
+ 
+ (defn- failure [f]
+   (try (f) nil
+-       (catch clojure.lang.ExceptionInfo e (ex-data e))))
++       (catch kerror/ExceptionInfo e (ex-data e))))
+ 
+ (defn- approx? [a b tol]
+   (< (Math/abs (- (double a) (double b))) tol))
+diff --git a/test/cae/h2_heat_demand_test.clj b/test/cae/h2_heat_demand_test.cljk
+similarity index 98%
+rename from test/cae/h2_heat_demand_test.clj
+rename to test/cae/h2_heat_demand_test.cljk
+index c4f522b..6d4dba4 100644
+--- a/test/cae/h2_heat_demand_test.clj
++++ b/test/cae/h2_heat_demand_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.h2-heat-demand-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [cae.h2-heat-demand]
+             [cae.solver :as cae]))
+ 
+diff --git a/test/cae/h2_heater_limit_test.cljk b/test/cae/h2_heater_limit_test.cljk
+new file mode 100644
+index 0000000..51a5ce3
+--- /dev/null
++++ b/test/cae/h2_heater_limit_test.cljk
+@@ -0,0 +1,97 @@
++(ns cae.h2-heater-limit-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [cae.h2-heater-limit]
++            [cae.solver :as cae]))
++
++;; Heater cap is a test-fixture number with fixture provenance; it is NOT a
++;; repo measurement of any real reactor. ΔH-des and M-H2 likewise.
++(def ^:private base
++  {:case/id "mg-h2-heater-limit-screen-1"
++   :h2-mass-flow-kg-s 1.0e-4
++   :heat-of-desorption-J-mol 75000.0
++   :molar-mass-h2-kg-mol 2.016e-3
++   :heat-source "caller-provided provenance (test fixture; not a repo measurement)"
++   :heater-power-W 5000.0
++   :heater-source "caller-provided provenance (test fixture; not a repo measurement)"})
++
++(defn- close? [a b]
++  (< (Math/abs (- (double a) (double b))) (* 1.0e-12 (max 1.0 (Math/abs (double b))))))
++
++(defn- solve [case] (cae/solve (assoc-in case [:solver :kind] :h2-desorption-heater-limit)))
++
++(deftest registers-on-the-shared-contract
++  (is (cae/registered? :h2-desorption-heater-limit)))
++
++(deftest heat-limited-rate-is-the-exact-identity
++  ;; m-max = P · M-H2 / ΔH-des — an exact identity at machine precision.
++  ;; No material or heater constant is asserted by this test.
++  (let [r (solve base)
++        q-expected (/ (* 1.0e-4 75000.0) 2.016e-3)]
++    (is (close? (:heat-limited-max-h2-flow-kg-s r)
++                (/ (* 5000.0 2.016e-3) 75000.0)))
++    (is (close? (:desorption-heat-W r) q-expected))
++    (is (close? (:total-heat-W r) q-expected))
++    (is (true? (:feasible? r)))
++    (is (close? (:h2-shortfall-kg-s r) 0.0))
++    (is (= :screening-only (:status r)))
++    (is (= :SI (:units r)))
++    (is (= :h2-desorption-heat-demand (:composed-from r)))))
++
++(deftest boundary-demand-is-exactly-feasible
++  ;; m-dot = m-max ⇒ Q-tot = P-heater exactly ⇒ feasible, no shortfall.
++  (let [m-max (/ (* 5000.0 2.016e-3) 75000.0)
++        r (solve (assoc base :h2-mass-flow-kg-s m-max))]
++    (is (close? (:total-heat-W r) 5000.0))
++    (is (true? (:feasible? r)))
++    (is (close? (:h2-shortfall-kg-s r) 0.0))))
++
++(deftest over-cap-demand-reports-shortfall-and-never-throws
++  ;; 2× the heat-limited rate ⇒ half the demand is short. The deficit is
++  ;; REPORTED (the vehicle plane's shortfall discipline), not an exception.
++  (let [m-max (/ (* 5000.0 2.016e-3) 75000.0)
++        r (solve (assoc base :h2-mass-flow-kg-s (* 2.0 m-max)))]
++    (is (false? (:feasible? r)))
++    (is (close? (:h2-shortfall-kg-s r) m-max))
++    (is (close? (:total-heat-W r) (* 2.0 5000.0)))))
++
++(deftest sensible-heat-group-passes-through-into-the-gate
++  ;; m·cp·dT/dt adds to Q-tot and can flip feasibility on its own.
++  (let [r (solve (assoc base
++                        :bed-mass-kg 5.0
++                        :bed-specific-heat-J-kgK 1400.0
++                        :bed-ramp-K-s 0.05))]
++    (is (close? (:sensible-heat-W r) (* 5.0 1400.0 0.05)))
++    (is (close? (:total-heat-W r)
++                (+ (:desorption-heat-W r) (:sensible-heat-W r))))
++    (testing "partial group is refused (all-or-none, from the heat-demand contract)"
++      (is (thrown? Exception (solve (assoc base :bed-mass-kg 5.0)))))))
++
++(deftest fails-closed-without-provenance
++  (is (thrown? Exception (solve (dissoc base :heat-source))))
++  (is (thrown? Exception (solve (assoc base :heat-source "  "))))
++  (is (thrown? Exception (solve (dissoc base :heater-source))))
++  (is (thrown? Exception (solve (assoc base :heater-source "")))))
++
++(deftest refuses-non-physical-inputs
++  (doseq [k [:heater-power-W :h2-mass-flow-kg-s]]
++    (testing (name k)
++      (is (thrown? Exception (solve (assoc base k 0.0))))
++      (is (thrown? Exception (solve (assoc base k -1.0))))
++      (is (thrown? Exception (solve (assoc base k "x")))))))
++
++(deftest carries-the-explicit-unmeasured-envelope
++  (let [r (solve base)]
++    (is (true? (get-in r [:unmeasured :heat-transfer-coupling])))
++    (is (true? (get-in r [:unmeasured :kinetic-coupling])))
++    (is (true? (get-in r [:unmeasured :heater-transient-limits])))
++    (is (true? (get-in r [:unmeasured :control-dynamics])))))
++
++(deftest echoes-case-identity-and-provenance-when-present
++  (let [r (solve base)]
++    (is (= "mg-h2-heater-limit-screen-1" (:case/id r)))
++    (is (= 5000.0 (:heater-power-W r)))
++    (is (string? (:heat-source r)))
++    (is (= "caller-provided provenance (test fixture; not a repo measurement)"
++           (:heater-source r))))
++  (let [r (solve (assoc base :case/provenance {:source "fixture"}))]
++    (is (= {:source "fixture"} (:case/provenance r)))))
+diff --git a/test/cae/h2_kinetics_test.clj b/test/cae/h2_kinetics_test.cljk
+similarity index 95%
+rename from test/cae/h2_kinetics_test.clj
+rename to test/cae/h2_kinetics_test.cljk
+index 37ee08b..940cb23 100644
+--- a/test/cae/h2_kinetics_test.clj
++++ b/test/cae/h2_kinetics_test.cljk
+@@ -1,7 +1,7 @@
+ (ns cae.h2-kinetics-test
+   "Generic metal-hydride desorption kinetics contract. Every test supplies
+   its own hydride data — no Mg/MgH2 constants live here."
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.lang.error :as kerror] [kotoba.test :refer [deftest is]]
+             [cae.h2-kinetics]
+             [cae.solver :as cae]))
+ 
+@@ -20,7 +20,7 @@
+ 
+ (defn- failure [f]
+   (try (f) nil
+-       (catch clojure.lang.ExceptionInfo e (ex-data e))))
++       (catch kerror/ExceptionInfo e (ex-data e))))
+ 
+ (defn- approx? [a b tol]
+   (< (Math/abs (- (double a) (double b))) tol))
+@@ -81,7 +81,7 @@
+ (deftest fails-closed-without-kinetics-provenance
+   (is (= "h2-kinetics input must be a non-blank string"
+          (try (cae/solve (assoc (base-case) :kinetics-source " ")) nil
+-              (catch clojure.lang.ExceptionInfo e (.getMessage e))))))
++              (catch kerror/ExceptionInfo e (.getMessage e))))))
+ 
+ (deftest invalid-inputs-are-refused
+   (is (some? (failure #(cae/solve (assoc (base-case) :temperature-K 0.0)))))
+diff --git a/test/cae/h2_line_drop_test.clj b/test/cae/h2_line_drop_test.cljk
+similarity index 98%
+rename from test/cae/h2_line_drop_test.clj
+rename to test/cae/h2_line_drop_test.cljk
+index 673a8d7..27f769f 100644
+--- a/test/cae/h2_line_drop_test.clj
++++ b/test/cae/h2_line_drop_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.h2-line-drop-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [cae.h2-line-drop]
+             [cae.solver :as cae]))
+ 
+diff --git a/test/cae/h2_tank_storage_test.clj b/test/cae/h2_tank_storage_test.cljk
+similarity index 98%
+rename from test/cae/h2_tank_storage_test.clj
+rename to test/cae/h2_tank_storage_test.cljk
+index 71175a1..f3b9649 100644
+--- a/test/cae/h2_tank_storage_test.clj
++++ b/test/cae/h2_tank_storage_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.h2-tank-storage-test
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.test :refer [deftest is]]
+             [cae.h2-tank-storage]
+             [cae.solver :as cae]))
+ 
+diff --git a/test/cae/high_fidelity_test.clj b/test/cae/high_fidelity_test.cljk
+similarity index 97%
+rename from test/cae/high_fidelity_test.clj
+rename to test/cae/high_fidelity_test.cljk
+index 2dc5101..870355e 100644
+--- a/test/cae/high_fidelity_test.clj
++++ b/test/cae/high_fidelity_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.high-fidelity-test
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.test :refer [deftest is]]
+             [cae.solver :as s]
+             [cae.high-fidelity]
+             [cae.verification]))
+diff --git a/test/cae/industrial_test.clj b/test/cae/industrial_test.cljk
+similarity index 98%
+rename from test/cae/industrial_test.clj
+rename to test/cae/industrial_test.cljk
+index d2c73dd..db0e688 100644
+--- a/test/cae/industrial_test.clj
++++ b/test/cae/industrial_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.industrial-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.lang.error :as kerror] [kotoba.test :refer [deftest is testing]]
+             [cae.industrial]
+             [cae.solver :as cae]))
+ 
+@@ -205,7 +205,7 @@
+ 
+ (deftest invalid-or-inconsistent-cases-fail-with-actionable-data
+   (letfn [(failure [f]
+-            (try (f) nil (catch clojure.lang.ExceptionInfo e (ex-data e))))]
++            (try (f) nil (catch kerror/ExceptionInfo e (ex-data e))))]
+     (is (= :flow-m3-s
+            (:field (failure #(cae/solve {:solver {:kind :cfd} :flow-m3-s ##NaN
+                                           :duct-diameter-m 0.4 :duct-length-m 10.0})))))
+diff --git a/test/cae/interchange_test.clj b/test/cae/interchange_test.cljk
+similarity index 91%
+rename from test/cae/interchange_test.clj
+rename to test/cae/interchange_test.cljk
+index 0976f95..6c840c9 100644
+--- a/test/cae/interchange_test.clj
++++ b/test/cae/interchange_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.interchange-test
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.lang.error :as kerror] [kotoba.test :refer [deftest is]]
+             [cae.industrial]
+             [cae.interchange :as interchange]
+             [cae.solver :as solver]))
+@@ -25,7 +25,7 @@
+ (deftest provenance-rejects-ambiguous-or-invalid-references
+   (letfn [(error-data [provenance]
+             (try (interchange/validate-provenance provenance) nil
+-                 (catch clojure.lang.ExceptionInfo error (ex-data error))))]
++                 (catch kerror/ExceptionInfo error (ex-data error))))]
+     (is (= :source (:field (error-data {:source :mesh :asset-uri "file:///a"}))))
+     (is (= :asset-uri (:field (error-data {:source :cad :asset-uri "  "}))))
+     (is (= :prim-path (:field (error-data {:source :openusd :asset-uri "file:///a.usda"}))))
+diff --git a/test/cae/material_card_test.clj b/test/cae/material_card_test.cljk
+similarity index 90%
+rename from test/cae/material_card_test.clj
+rename to test/cae/material_card_test.cljk
+index 55ae31b..736212d 100644
+--- a/test/cae/material_card_test.clj
++++ b/test/cae/material_card_test.cljk
+@@ -1,14 +1,14 @@
+ (ns cae.material-card-test
+-  (:require [clojure.edn :as edn]
+-            [clojure.java.io :as io]
+-            [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.lang.error :as kerror] [kotoba.lang.edn :as edn]
++            [kotoba.io :as io]
++            [kotoba.test :refer [deftest is testing]]
+             [cae.material-card :as material]))
+ 
+ (def card (-> "cae/materials/synthetic-steel-reference.edn" io/resource slurp edn/read-string))
+ 
+ (defn reasons [c]
+   (try (material/audit c) nil
+-       (catch clojure.lang.ExceptionInfo e (:reasons (ex-data e)))))
++       (catch kerror/ExceptionInfo e (:reasons (ex-data e)))))
+ 
+ (deftest traceable-material-card-is-audited-and-attached
+   (is (= :metadata-audited (:status (material/audit card))))
+diff --git a/test/cae/maturity_test.clj b/test/cae/maturity_test.cljk
+similarity index 93%
+rename from test/cae/maturity_test.clj
+rename to test/cae/maturity_test.cljk
+index 5fdbe69..12a3601 100644
+--- a/test/cae/maturity_test.clj
++++ b/test/cae/maturity_test.cljk
+@@ -1,8 +1,8 @@
+ (ns cae.maturity-test
+   (:require [cae.maturity :as maturity]
+-            [clojure.edn :as edn]
+-            [clojure.java.io :as io]
+-            [clojure.test :refer [deftest is testing]]
++            [kotoba.lang.edn :as edn]
++            [kotoba.io :as io]
++            [kotoba.test :refer [deftest is testing]]
+             [datascript.core :as d]))
+ 
+ (def model (maturity/load-model))
+diff --git a/test/cae/openfoam_bump_test.clj b/test/cae/openfoam_bump_test.cljk
+similarity index 92%
+rename from test/cae/openfoam_bump_test.clj
+rename to test/cae/openfoam_bump_test.cljk
+index 51b1997..1772fb4 100644
+--- a/test/cae/openfoam_bump_test.clj
++++ b/test/cae/openfoam_bump_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.openfoam-bump-test
+   (:require [cae.openfoam-bump :as bump]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest nasa-bump-profile-and-static-edge-generation
+   (is (< (abs (- 0.05 (bump/bump-height 0.75))) 1.0e-14))
+diff --git a/test/cae/orchestration_test.clj b/test/cae/orchestration_test.cljk
+similarity index 92%
+rename from test/cae/orchestration_test.clj
+rename to test/cae/orchestration_test.cljk
+index 9805f10..61794fc 100644
+--- a/test/cae/orchestration_test.clj
++++ b/test/cae/orchestration_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.orchestration-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.lang.error :as kerror] [kotoba.test :refer [deftest is testing]]
+             [cae.industrial]
+             [cae.orchestration :as orchestration]))
+ 
+@@ -33,5 +33,5 @@
+                                               :temperature-K 900 :time-s 60}])]
+       (is (= [:failed :succeeded] (mapv :status batch)))
+       (is (= 1 (:succeeded (orchestration/summary batch))))))
+-  (is (thrown-with-msg? clojure.lang.ExceptionInfo #"sequential"
++  (is (thrown-with-msg? kerror/ExceptionInfo #"sequential"
+                         (orchestration/run-cases {:solver {:kind :cfd}}))))
+diff --git a/test/cae/qualification_matrix_test.clj b/test/cae/qualification_matrix_test.cljk
+similarity index 85%
+rename from test/cae/qualification_matrix_test.clj
+rename to test/cae/qualification_matrix_test.cljk
+index 280306a..c851083 100644
+--- a/test/cae/qualification_matrix_test.clj
++++ b/test/cae/qualification_matrix_test.cljk
+@@ -1,7 +1,7 @@
+ (ns cae.qualification-matrix-test
+-  (:require [clojure.edn :as edn]
+-            [clojure.java.io :as io]
+-            [clojure.test :refer [deftest is]]))
++  (:require [kotoba.lang.edn :as edn]
++            [kotoba.io :as io]
++            [kotoba.test :refer [deftest is]]))
+ 
+ (def matrix (-> "cae/qualification-matrix.edn" io/resource slurp edn/read-string))
+ 
+diff --git a/test/cae/sbse_block_mesh_test.clj b/test/cae/sbse_block_mesh_test.cljk
+similarity index 96%
+rename from test/cae/sbse_block_mesh_test.clj
+rename to test/cae/sbse_block_mesh_test.cljk
+index 3948b50..85174d0 100644
+--- a/test/cae/sbse_block_mesh_test.clj
++++ b/test/cae/sbse_block_mesh_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.sbse-block-mesh-test
+   (:require [cae.sbse-block-mesh :as mesh]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest structured-volume-mesh-has-consistent-counts-and-patches
+   (let [generated (mesh/block-mesh-dict {:nx 4 :ny 5 :nz 2})
+diff --git a/test/cae/sbse_geometry_test.clj b/test/cae/sbse_geometry_test.cljk
+similarity index 95%
+rename from test/cae/sbse_geometry_test.clj
+rename to test/cae/sbse_geometry_test.cljk
+index a2d0c84..c67a00b 100644
+--- a/test/cae/sbse_geometry_test.clj
++++ b/test/cae/sbse_geometry_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.sbse-geometry-test
+   (:require [cae.sbse-geometry :as sbse]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest nasa-parametric-bump-has-declared-scale-and-symmetry
+   (let [h (* 0.9144 0.085)]
+diff --git a/test/cae/sbse_grid_study_test.clj b/test/cae/sbse_grid_study_test.cljk
+similarity index 95%
+rename from test/cae/sbse_grid_study_test.clj
+rename to test/cae/sbse_grid_study_test.cljk
+index e7eaa27..0a51d59 100644
+--- a/test/cae/sbse_grid_study_test.clj
++++ b/test/cae/sbse_grid_study_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.sbse-grid-study-test
+   (:require [cae.sbse-grid-study :as study]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest wall-resolved-family-refines-all-directions
+   (let [[coarse medium fine] (study/family)]
+diff --git a/test/cae/sbse_rans_test.clj b/test/cae/sbse_rans_test.cljk
+similarity index 97%
+rename from test/cae/sbse_rans_test.clj
+rename to test/cae/sbse_rans_test.cljk
+index f3c20e3..ad4c596 100644
+--- a/test/cae/sbse_rans_test.clj
++++ b/test/cae/sbse_rans_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.sbse-rans-test
+   (:require [cae.sbse-rans :as rans]
+-            [clojure.test :refer [deftest is testing]]))
++            [kotoba.test :refer [deftest is testing]]))
+ 
+ (deftest experiment-condition-derivation
+   (let [c (rans/flow-conditions rans/default-experiment)]
+diff --git a/test/cae/sbse_urans_test.clj b/test/cae/sbse_urans_test.cljk
+similarity index 97%
+rename from test/cae/sbse_urans_test.clj
+rename to test/cae/sbse_urans_test.cljk
+index 62d7fde..0097196 100644
+--- a/test/cae/sbse_urans_test.clj
++++ b/test/cae/sbse_urans_test.cljk
+@@ -1,7 +1,7 @@
+ (ns cae.sbse-urans-test
+   (:require [cae.sbse-rans :as rans]
+             [cae.sbse-urans :as urans]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest urans-case-has-adaptive-pimple-and-averaging
+   (let [{:keys [files]} (urans/case-files rans/default-experiment)
+diff --git a/test/cae/solver_test.clj b/test/cae/solver_test.cljk
+similarity index 92%
+rename from test/cae/solver_test.clj
+rename to test/cae/solver_test.cljk
+index 450f616..1ce2b5b 100644
+--- a/test/cae/solver_test.clj
++++ b/test/cae/solver_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.solver-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [cae.solver :as s]))
+ 
+ (defmethod s/solve ::dummy [case] {:ok? true :v (get-in case [:solver :v])})
+diff --git a/test/cae/study_test.clj b/test/cae/study_test.cljk
+similarity index 80%
+rename from test/cae/study_test.clj
+rename to test/cae/study_test.cljk
+index 6609c27..fa1cc39 100644
+--- a/test/cae/study_test.clj
++++ b/test/cae/study_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.study-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.lang.error :as kerror] [kotoba.test :refer [deftest is testing]]
+             [cae.industrial]
+             [cae.study :as study]))
+ 
+@@ -25,14 +25,14 @@
+ 
+ (deftest studies-reject-invalid-configuration-instead-of-silently-changing-it
+   (testing "sweep configuration"
+-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"non-empty vector"
++    (is (thrown-with-msg? kerror/ExceptionInfo #"non-empty vector"
+                           (study/parameter-sweep duct-case [:flow-m3-s "bad"] [1.0])))
+-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"cannot be empty"
++    (is (thrown-with-msg? kerror/ExceptionInfo #"cannot be empty"
+                           (study/parameter-sweep duct-case [:flow-m3-s] []))))
+   (testing "sensitivity configuration"
+-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"positive"
++    (is (thrown-with-msg? kerror/ExceptionInfo #"positive"
+                           (study/central-sensitivity duct-case [:flow-m3-s] :pressure-drop-Pa 0.0)))
+-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"finite"
++    (is (thrown-with-msg? kerror/ExceptionInfo #"finite"
+                           (study/central-sensitivity duct-case [:unknown] :pressure-drop-Pa 0.1)))
+-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"finite result metric"
++    (is (thrown-with-msg? kerror/ExceptionInfo #"finite result metric"
+                           (study/central-sensitivity duct-case [:flow-m3-s] :unknown 0.1)))))
+diff --git a/test/cae/thermoplastic_evidence_test.clj b/test/cae/thermoplastic_evidence_test.cljk
+similarity index 96%
+rename from test/cae/thermoplastic_evidence_test.clj
+rename to test/cae/thermoplastic_evidence_test.cljk
+index b773d0f..a20cfb0 100644
+--- a/test/cae/thermoplastic_evidence_test.clj
++++ b/test/cae/thermoplastic_evidence_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.thermoplastic-evidence-test
+   (:require [cae.external-evidence :as evidence]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (def log-text (str "Nonlinear material laws are taken into account\n"
+                    "Nonlinear geometric effects are taken into account\n"
+diff --git a/test/cae/thermoplastic_sensitivity_test.clj b/test/cae/thermoplastic_sensitivity_test.cljk
+similarity index 97%
+rename from test/cae/thermoplastic_sensitivity_test.clj
+rename to test/cae/thermoplastic_sensitivity_test.cljk
+index bd8de81..c6e1382 100644
+--- a/test/cae/thermoplastic_sensitivity_test.clj
++++ b/test/cae/thermoplastic_sensitivity_test.cljk
+@@ -1,6 +1,6 @@
+ (ns cae.thermoplastic-sensitivity-test
+   (:require [cae.external-evidence :as evidence]
+-            [clojure.test :refer [deftest is]]))
++            [kotoba.test :refer [deftest is]]))
+ 
+ (deftest independent-response-gates-do-not-hide-local-nonconvergence
+   (let [levels [{:id :coarse :h-relative 4.0 :passed? true
+diff --git a/test/cae/vv_test.cljc b/test/cae/vv_test.cljk
+similarity index 97%
+rename from test/cae/vv_test.cljc
+rename to test/cae/vv_test.cljk
+index ad731a9..db9785e 100644
+--- a/test/cae/vv_test.cljc
++++ b/test/cae/vv_test.cljk
+@@ -1,5 +1,5 @@
+ (ns cae.vv-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [cae.solver :as solver]
+             [cae.vv :as vv]))
+ 
+@@ -121,10 +121,10 @@
+ (deftest manufactured-solution-refuses-what-it-cannot-read-an-order-from
+   (testing "meshes that are not successive halvings"
+     (is (thrown-with-msg?
+-         #?(:clj clojure.lang.ExceptionInfo :cljs js/Error) #"twice the previous"
++         js/Error #"twice the previous"
+          (solver/solve {:solver {:kind :manufactured-solution} :element-counts [8 12]}))))
+   (testing "a single mesh, from which no order can be read at all"
+-    (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error)
++    (is (thrown? js/Error
+                  (solver/solve {:solver {:kind :manufactured-solution} :element-counts [16]}))))
+   (testing "an unknown family, named against the ones that exist"
+     (let [d (try (solver/solve {:solver {:kind :manufactured-solution} :family :no-such})

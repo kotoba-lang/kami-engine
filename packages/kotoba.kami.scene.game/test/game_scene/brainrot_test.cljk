@@ -1,0 +1,62 @@
+(ns game-scene.brainrot-test
+  "Tests for `game-scene.brainrot`, ported 1:1 from the original
+  `kami-game-scene` Rust crate's `src/brainrot.rs` `#[cfg(test)]` module AND
+  `tests/brainrot_parity.rs` (both deleted in kotoba-lang/kami-engine PR
+  #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [game-scene.brainrot :as brainrot]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'game-scene.brainrot)))))
+
+;; ── brainrot.rs #[cfg(test)] ────────────────────────────────────────────
+
+;; Rust: shipped_has_six_chains
+(deftest shipped-has-six-chains
+  (let [specs (brainrot/chain-specs-from-edn brainrot/brainrot-evolution-edn)]
+    (is (= 6 (count specs)))
+    (is (= (count specs) (count (brainrot/builtin-chain-specs))))
+    (is (= 23 (reduce + (map #(count (:stages %)) specs))) "23 stages across all chains")))
+
+;; Rust: character_id_round_trips
+(deftest character-id-round-trips
+  (doseq [c [:skibidi :sigma :ohio :grimace :rizz :fanum]]
+    (is (= c (brainrot/character-from-id (brainrot/character-id c))))))
+
+;; Rust: non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try (brainrot/chain-specs-from-edn "42") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :not-a-map (:game-scene.brainrot/error err)))))
+
+;; Rust: missing_table_is_an_error
+(deftest missing-table-is-an-error
+  (let [err (try (brainrot/chain-specs-from-edn "{:x 1}") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :no-table (:game-scene.brainrot/error err)))))
+
+;; ── tests/brainrot_parity.rs ────────────────────────────────────────────
+
+;; Rust: brainrot_edn_matches_builtin
+(deftest brainrot-edn-matches-builtin
+  (let [loaded (brainrot/chain-specs-from-edn brainrot/brainrot-evolution-edn)
+        builtin (brainrot/builtin-chain-specs)]
+    (is (= (count loaded) (count builtin)) "chain count")
+    (is (= 6 (count loaded)) "all 6 chains present")
+    (doseq [[i g w] (map vector (range) loaded builtin)]
+      (is (= (:character-id g) (:character-id w)) (str "chain[" i "] character-id"))
+      (is (= (:character-enum g) (:character-enum w)) (str "chain[" i "] character"))
+      (is (= (count (:stages g)) (count (:stages w))) (str "chain[" i "] (" (:character-id w) ") stage count"))
+      (doseq [[j gs ws] (map vector (range) (:stages g) (:stages w))]
+        (is (= gs ws) (str "chain[" i "].stage[" j "] (gates/scale/overrides)")))
+      (is (= g w) (str "chain[" i "] full parity")))
+    (is (= loaded builtin) "full brainrot-evolution parity (ordered)")))
+
+;; Rust: spec_round_trips_through_chain
+(deftest spec-round-trips-through-chain
+  (let [loaded (brainrot/chain-specs-from-edn brainrot/brainrot-evolution-edn)
+        builtin (brainrot/builtin-chain-specs)]
+    (doseq [[spec want] (map vector loaded builtin)]
+      (let [chain (brainrot/spec-to-chain spec)]
+        (is (= chain want) (str (:character-id want) ": chain round-trips through spec"))))))

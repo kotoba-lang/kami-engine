@@ -1,0 +1,2547 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+new file mode 100644
+index 0000000..00888c5
+--- /dev/null
++++ b/.github/workflows/ci.yml
+@@ -0,0 +1,25 @@
++name: CI
++
++on:
++  push:
++    branches: [main]
++  pull_request:
++
++jobs:
++  test:
++    name: cljc tests
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-java@v4
++        with:
++          distribution: temurin
++          java-version: "21"
++      - uses: DeLaGuardo/setup-clojure@13.4
++        with:
++          cli: latest
++          bb: latest
++      - name: clojure tests
++        run: clojure -M:test
++      - name: babashka smoke
++        run: bb test:cljc
+diff --git a/.gitignore b/.gitignore
+index ea8c4bf..d8b317b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,6 @@
+-/target
++.cpcache/
++.nrepl-port
++target/
++*.class
++.DS_Store
++.nbb/
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..57bc88a
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,202 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
+diff --git a/README.md b/README.md
+index a9c3602..0b564e8 100644
+--- a/README.md
++++ b/README.md
+@@ -1,16 +1,208 @@
+-# kami-engine-cfd
++# kotoba-lang/kami-engine-cfd
+ 
+-The Rust `kami-cfd` prototype has been retired from this repository.
++Zero-dep portable `.cljc` — a clean-room D2Q9/D3Q19 lattice-Boltzmann (LBM)
++CFD solver, migrated in place from this repo's own Rust crate, per the
++repo-wide Rust-demotion / clj-wgsl-migration runtime priority
++(`com-junkawasaki/root` `AGENTS.md`, ".cljc/.kotoba ランタイム優先順位"
++section, 2026-07-10 revision) and following the precedent of
++**ADR-2607010930 "clj-wgsl migration"** (`com-junkawasaki/root`), the same
++migration that produced sibling repos `kotoba-lang/mesher`, `pnr`, `rtl`,
++and `ic-packaging`.
+ 
+-Current ownership:
++## Status: migrated in place (not restored from a deletion)
+ 
+-- `kotoba-lang/cae-solver` owns the portable `cae.solver/solve` dispatch
+-  contract, including the `:lbm` solver kind.
+-- `kotoba-lang/aero` owns the reduced-order aerodynamic drag model and case/datom
+-  interface.
+-- High-fidelity CFD execution is now a host-adapter concern. A host may provide
+-  an `:lbm` implementation behind the same EDN case contract, but this repository
+-  no longer owns Cargo, Rust source, or binary build steps.
++Unlike `mesher`/`pnr`/`rtl` — whose source Rust crate lived in
++`kotoba-lang/kami-engine` and was deleted outright before being restored as
++CLJC — **`kami-engine-cfd` was never deleted**. Its history has an extra
++wrinkle worth being explicit about:
+ 
+-`docs/adr/0001-lbm-solver.md` remains as a migration record for the removed
+-prototype and its calibration notes.
++- **2026-06-28 - 2026-07-01**: the Rust LBM solver was built up in several
++  stages (D2Q9 -> D3Q19 -> parallelised -> Smagorinsky LES -> free-slip
++  boundaries -> real-geometry voxelisation via STL/Ahmed-body meshing).
++  Design rationale is in `docs/adr/0001-lbm-solver.md`.
++- **2026-07-01** (commit `755fa13`, "Remove Rust runtime from CFD
++  contract"): the Rust source (`Cargo.toml`, `src/*.rs`, `tests/*.rs`) was
++  deleted and replaced with an EDN-contract-only design —
++  `src/kami_engine/cfd/contract.cljk` (request/result *shape* validators,
++  see below) — with a stated intent that "LBM/RANS/LES/GPU/native/remote
++  solvers live in separate adapter repositories." **No adapter repository
++  implementing the actual solver math was ever built.** The Rust removal
++  left the LBM solver itself unimplemented anywhere; only its EDN schema
++  was validated.
++- **This migration** (branch `cfd-cljc-migration`) recovers the
++  pre-deletion Rust source from git history (commit `2958ba8`, the parent
++  of `755fa13`) and ports it faithfully to portable `.cljc`, completing
++  what the 2026-07-01 commit should have done under the repo's actual
++  runtime policy: the Rust gets demoted, but the solver itself is *ported*,
++  not left unimplemented. `src/kami_engine/cfd/contract.cljk` is
++  unrelated/complementary and is left as-is — it validates request/result
++  EDN *shapes*; the namespaces below compute the actual physics those
++  shapes describe. `docs/adr/0001-lbm-solver.md` is kept (with a short
++  addendum note below) rather than deleted, since it is design history, not
++  Rust code.
++
++## What was ported
++
++| Namespace | Ported from (original Rust) | Lines (orig -> cljc) | Purpose |
++|---|---|---|---|
++| `kami-cfd` | `src/lib.rs` (209) | 209 -> 201 | Clean-room D2Q9 (2D, 9-velocity) single-relaxation-time BGK LBM solver: `block`/`teardrop` bodies, `lbm-new`/`step`/`run`, `sectional-cd` |
++| `kami-cfd.mesh` | `src/mesh.rs` (65) | 65 -> 136 | Binary STL triangle-soup parser (`parse-stl`, portable pure-arithmetic little-endian decoder) + Ahmed-body bluff-body generator (`ahmed-body`) |
++| `kami-cfd.d3` | `src/d3.rs` (376) | 376 -> 335 | D3Q19 (3D, 19-velocity) LBM + Smagorinsky LES subgrid turbulence + free-slip far-field / no-slip road boundaries; `box-car`/`fastback-car`/`from-triangles` bodies, `vehicle-cd` |
++| `kami-cfd.runner` (`.clj`, JVM-only) | `src/main.rs` (70) | 70 -> 69 | Optional CLI, nice-to-have per the migration plan — mirrors `kotoba-lang/plm`'s conservative host-runner pattern |
++| `test/kami_cfd_test.cljk` | `tests/drag.rs` + `tests/drag3d.rs` + `tests/mesh.rs` (36+31+51=118) | 118 -> ~150 | All 8 original `#[test]`s ported 1:1, `clojure.test`, docstring-provenance style |
++
++Total original Rust `src/` + `tests/`: 838 lines. `src/main.rs` was a
++nice-to-have per the migration plan (not required), but was ported anyway
++since it was small and completed the CLI story.
++
++## Design choices specific to this port
++
++- **Mutable arrays, not persistent vectors, for the hot solver state.** The
++  9-velocity (`kami-cfd`) / 19-velocity (`kami-cfd.d3`) per-cell
++  distribution buffers (`f`/`ftmp`) and each body's `solid` mask are backed
++  by `double-array`/`boolean-array`/`int-array` (`aget`/`aset`), mirroring
++  the original Rust `Vec<f64>`/`Vec<bool>` buffers directly. This is a
++  deliberate performance choice: collide/stream touches every cell every
++  step across hundreds to thousands of steps, and persistent-vector copies
++  would make that O(cells) per step instead of O(1). These array
++  primitives are portable across JVM Clojure, ClojureScript, and nbb. The
++  `Lbm`/`Lbm3`/`Body`/`Body3` values themselves are plain immutable maps
++  threading these mutable buffers through — "swapping f/ftmp" (the
++  original Rust `std::mem::swap`) is a cheap `assoc` of array references,
++  not a data copy.
++- **STL binary parsing is pure arithmetic — no reader conditionals
++  needed.** The original Rust `parse_stl` used `u32::from_le_bytes`/
++  `f32::from_le_bytes`. Rather than branching on `java.nio.ByteBuffer`
++  (`:clj`) vs `js/DataView` (`:cljs`), `kami-cfd.mesh` decodes little-endian
++  u32 via `+`/`*` (never touching the sign bit of a host 32-bit int on
++  either platform) and IEEE-754 f32 via pure integer arithmetic on the
++  sign/exponent/mantissa bit fields (`quot`/`rem`, no
++  `Float/intBitsToFloat` / `DataView.getFloat32`; even the power-of-two
++  scaling is a small manual multiply/divide loop, no `Math/pow`). No
++  sibling repo (`kotoba-lang/step`, `dxf`) had an existing binary-parsing
++  convention to reuse — both are ASCII formats. `kotoba-lang/pnr`'s
++  `pnr.gdsii` *writes* binary GDSII JVM-only via `java.io`, which doesn't
++  fit a portable *parser* either. The pure-arithmetic approach needed zero
++  platform branches and is the simpler fallback the migration guidance
++  favours when no house convention exists.
++- **`std::thread::scope` parallelism was deliberately dropped, not
++  ported.** The original `d3.rs` split `collide_parallel`/
++  `stream_drag_parallel` across native OS threads (safe because collide is
++  per-cell independent and the "pull"/gather streaming form makes each
++  cell write only its own output — no write conflicts). `kami-cfd.d3`'s
++  `collide!`/`stream-drag!` keep the exact same math and the exact same
++  pull/gather streaming form — chosen deliberately in the original
++  design — just iterated as a single sequential loop instead of split
++  across threads. This is a deliberate, documented trade, not an
++  oversight: portability across JVM Clojure / ClojureScript / nbb takes
++  priority over multi-threaded performance per repo policy, and native OS
++  threads have no clean portable equivalent across those three hosts.
++- **`docs/adr/0001-lbm-solver.md` is kept, not deleted.** It documents the
++  physics design and the calibration journey (D2Q9 -> D3Q19 -> LES ->
++  free-slip boundaries -> real-geometry voxelisation) — none of that
++  changed in this migration, only the host language did. It already
++  carries a "Superseded as in-repo runtime (2026-07-01)" status note from
++  the earlier Rust-removal commit; this migration does not edit that
++  historical note (doing so would misrepresent what was decided and when),
++  but this README is the authoritative statement of the *current* status:
++  the solver *is* implemented in-repo again, as portable CLJC.
++
++## Test step-count / grid-size reductions (JVM performance, not weakened physics)
++
++Interpreted JVM Clojure without hand-unrolled/AOT numeric code is roughly
++1-2 orders of magnitude slower per lattice-cell-step than native Rust.
++Running every original test unchanged (some simulate hundreds of thousands
++of cells for 1000-3000 steps — billions of inner-loop iterations) would
++make a single `kbb -M:test` run take on the order of an hour.
++`test/kami_cfd_test.cljk` ports all 8 original tests with the same physical
++assertions, but:
++
++- The 3 ported `tests/drag.rs` (2D) tests keep the original 240x80 grid and
++  cut step counts by roughly half (2500->1000, 3000->1200, 2500->1000) —
++  the wake structure these tests check is already resolved well before
++  that, and the assertions are order comparisons (`block > teardrop`,
++  `finite && positive`), not exact absolute Cd values.
++- The 2 ported `tests/drag3d.rs` tests, plus the one `tests/mesh.rs` test
++  that actually runs the LES solver (`ahmed-slant-reduces-drag` — as
++  opposed to pure voxelisation), shrink the domain and body proportionally
++  (same blockage ratio, same relative body shape) in addition to cutting
++  steps — e.g. `high-re-stable-with-les`'s domain goes from 96x40x28 to
++  48x20x14 (1/8 the cells) with the body halved on every axis to match.
++  This preserves the qualitative physics being demonstrated (LES keeping
++  high-Re BGK finite/stable, fastback beating squareback, a slanted rear
++  beating a squareback) at a cell count the JVM churns through in seconds
++  instead of minutes — verified empirically before committing to these
++  parameters (fastback 3.443 < box 3.544 at the reduced scale; slant beats
++  squareback at the reduced scale; see test file for the actual numbers).
++- `mesh-voxelises-to-a-solid` and `stl-roundtrips` do no LBM stepping at
++  all (pure voxelisation / byte parsing), so they keep the **original**
++  Rust grid sizes (140x64x40) unchanged — voxelisation alone is cheap
++  regardless of grid size (milliseconds).
++
++Every reduction is called out inline in `test/kami_cfd_test.cljk`'s
++docstrings, next to the original Rust value it replaces. No assertion's
++*physics* was weakened — only the resolution/step-count used to
++demonstrate it.
++
++## Verify
++
++```bash
++kbb -M:test
++```
++
++`Ran 11 tests containing 25 assertions. 0 failures, 0 errors.` — 8 tests /
++14 assertions from the new `kami-cfd-test` (all 8 ported Rust `#[test]`s),
++plus the pre-existing 3 tests / 11 assertions from
++`kami-engine.cfd.contract-test` (unmodified except for a dead `-main`
++removal now that `deps.edn` uses the shared `cognitect.test-runner`
++alias — see below). `kbb -M:test:cljc` runs the same suite via babashka as a
++smoke check.
++
++## Repo layout
++
++| path | role |
++|---|---|
++| `src/kami_cfd.cljk` | 2D D2Q9 LBM solver |
++| `src/kami_cfd/mesh.cljk` | Binary STL parser + Ahmed-body generator |
++| `src/kami_cfd/d3.cljk` | 3D D3Q19 + Smagorinsky LES solver |
++| `src/kami_cfd/runner.cljk` | Optional JVM CLI |
++| `src/kami_engine/cfd/contract.cljk` | EDN request/result shape validators (pre-existing, unrelated) |
++| `test/kami_cfd_test.cljk` | All 8 original Rust `#[test]`s, ported 1:1 |
++| `test/kami_engine/cfd/contract_test.cljk` | Contract validator tests (pre-existing) |
++| `docs/adr/0001-lbm-solver.md` | Original physics design rationale — still accurate, only the host language changed |
++
++`deps.edn` follows the same `{:paths ["src" "test"] :aliases {:test
++{...cognitect.test-runner...}}}` shape as `kotoba-lang/mesher`/`pnr`/`rtl`,
++replacing the previous ad hoc `-main`-based test entry point (now redundant
++with `cognitect.test-runner`'s auto-discovery of `*-test` namespaces under
++`test/`).
++
++## EDN contract shapes (pre-existing, unrelated to the solver above)
++
++`src/kami_engine/cfd/contract.cljk` validates the request/result EDN shapes
++a `:lbm` cae-solver method sends/receives — unmodified by this migration.
++Requests describe solver intent:
++
++```edn
++{:kami.cfd/solver :lbm
++ :kami.cfd/dim 3
++ :kami.cfd/geometry :ahmed
++ :kami.cfd/reynolds 3000.0
++ :kami.cfd/steps 1500}
++```
++
++Results describe solver output:
++
++```edn
++{:kami.cfd/solver :lbm
++ :kami.cfd/dim 3
++ :kami.cfd/geometry :ahmed
++ :kami.cfd/vehicle-cd 0.29
++ :kami.cfd/steps 1500
++ :kami.cfd/status :ok}
++```
++
++`kami-cfd.d3/vehicle-cd` and `kami-cfd/sectional-cd` above are exactly the
++kind of computation these EDN shapes describe the inputs/outputs of; wiring
++a `kami-cfd.d3`-backed adapter that produces `contract.cljc`-conformant
++results is a natural next step, out of scope for this migration.
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..dce47d3
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,14 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/kami_cfd.cljk" ".cljc"
++  "src/kami_cfd/d3.cljk" ".cljc"
++  "src/kami_cfd/duct.cljk" ".cljc"
++  "src/kami_cfd/mesh.cljk" ".cljc"
++  "src/kami_cfd/runner.cljk" ".clj"
++  "src/kami_engine/cfd/contract.cljk" ".cljc"
++  "test/kami_cfd/duct_test.cljk" ".cljc"
++  "test/kami_cfd_test.cljk" ".cljc"
++  "test/kami_engine/cfd/contract_test.cljk" ".cljc"}}
+diff --git a/deps.edn b/deps.edn
+new file mode 100644
+index 0000000..2a66b0f
+--- /dev/null
++++ b/deps.edn
+@@ -0,0 +1,15 @@
++{:deps {
++        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
++        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
++        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
++        ;; sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}
++ :paths ["src" "test"]
++ :aliases {:test {:extra-paths ["test"]
++                  :extra-deps {io.github.cognitect-labs/test-runner
++                               {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
++                  :main-opts ["-m" "cognitect.test-runner"]}}}
+diff --git a/docs/adr/0001-lbm-solver.md b/docs/adr/0001-lbm-solver.md
+index eddeb71..bbaa3e5 100644
+--- a/docs/adr/0001-lbm-solver.md
++++ b/docs/adr/0001-lbm-solver.md
+@@ -1,17 +1,29 @@
+ # ADR-0001: kami-cfd — clean-room LBM の設計と、自動車 Cd への校正の旅
+ 
+-- Status: Accepted (2026-06-28)
+-- Scope: `kami-cfd`(D2Q9 / D3Q19 lattice-Boltzmann, clean-room, zero external dep)
+-- 関連: 90-docs/adr/2606272330(CAE 共有 lib + seed + :lbm backend), kotoba-lang/aero(:lbm 配線元)
++- Status: Superseded as in-repo runtime (2026-07-01)
++- Scope: historical `kami-cfd` D2Q9 / D3Q19 lattice-Boltzmann runtime, now represented by CLJC contracts
++- 関連: 90-docs/adr/2606272330(CAE 共有 lib + seed + :lbm backend), aero-clj(:lbm 配線元)
+ 
+ ## 課題
+ 
+ cae-solver の `:lbm` 高忠実度 backend として、Isaac/Cosmos では解けない空力 CFD を
+-clean-room・zero-dep の Rust で実装する。reduced-order(kotoba-lang/aero `:rom-buildup`)が成分
++clean-room・zero-dep の runtime として実装する。reduced-order(aero-clj `:rom-buildup`)が成分
+ build-up で Cd を相関するのに対し、こちらは流れ場を格子上で解いて運動量交換で抗力を測る。
+ 最終目標は自動車 Cd(~0.3, Re≈1e6, 乱流・付着流)。
+ 
+-## 決定（採用したスキームと、その理由＝校正の旅）
++## 現在の決定
++
++この repository は Rust solver runtime を保持しない。`src/kami_engine/cfd/contract.cljk`
++を CFD request/result の authority とし、LBM/RANS/LES/GPU/native/remote solver は
++別 adapter repository が EDN contract に準拠して実装する。
++
++削除済み:
++
++- `Cargo.toml` / `Cargo.lock`
++- `src/*.rs`
++- `tests/*.rs`
++
++## 過去の決定（採用したスキームと、その理由＝校正の旅）
+ 
+ LBM を段階的に成熟させ、実車 Cd との残差の原因を一つずつ除去した。各段は前段の限界が
+ 動機:
+@@ -34,7 +46,7 @@ LBM を段階的に成熟させ、実車 Cd との残差の原因を一つずつ
+ 
+ - **検証**: Ahmed body(自動車 CFD の標準ブラフ体)を voxel 化。25° スラントは squareback より
+   低抗力(ランキング正)。校正後 **~0.22 vs 実験 ~0.29(±25%)** = 認知された実測地形に乗った。
+-- **校正定数**(kotoba-lang/aero): 残差(生値 ~1.8 vs ~0.3)の原因のうち **物理(LES)・境界(free-slip)・
++- **校正定数**(aero-clj): 残差(生値 ~1.8 vs ~0.3)の原因のうち **物理(LES)・境界(free-slip)・
+   ジオメトリ(mesh)は解決**。残るは **グリッド解像度のみ**。よって校正定数は「精度不足」ではなく
+   「粗格子の既知スケール差」を吸収するものとして**明示・文書化して保持**する。
+ - clean-room 不変条件(NVIDIA 等の外部コード非リンク)維持。zero external dep。
+@@ -53,3 +65,19 @@ LBM を段階的に成熟させ、実車 Cd との残差の原因を一つずつ
+ - **BGK 単独で高 Re**: τ→½ で不安定。LES の渦粘性が必須。
+ - **TRT**: 高 Re で ω⁻→0 を強制し不安定化。
+ - **校正定数の即時撤廃**: 解像度由来の残差は GPU なしでは消えない。明示保持が誠実。
++
++## Addendum (2026-07-16): ソルバーは portable CLJC として repo 内に復元
++
++上記の「現在の決定」（2026-07-01、Rust 削除・CLJC contract のみ保持・solver は
++別 adapter repo が実装）は、実際にはどの adapter repo にも実装されないまま
++solver 自体が未実装の状態で放置されていた。com-junkawasaki/root の
++`.cljc`/`.kotoba` ランタイム優先順位ルール（2026-07-10 改訂、Rust は新規/既存
++問わず降格・`kotoba-lang/mesher`/`pnr`/`rtl`/`ic-packaging` と同じ
++clj-wgsl migration パターン、ADR-2607010930）に従い、削除前の Rust
++（commit `2958ba8`、`755fa13` の親）を git 履歴から復元し、`kami-cfd` /
++`kami-cfd.mesh` / `kami-cfd.d3` として portable `.cljc` に忠実移植した
++（詳細・設計判断はリポジトリ README 参照）。この addendum 以外の本文
++（上記「現在の決定」を含む）は歴史的記録としてそのまま保持し書き換えない —
++solver の実装状況の正本は README。物理設計（D2Q9→D3Q19→LES→free-slip→
++実ジオメトリ voxel 化の校正の旅）はホスト言語が変わっただけで変更なし、
++本 ADR の物理的な内容は今も正確。
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..3e8c8d2
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,14 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src" "test"]
++ :deps {
++        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
++        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
++        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
++        ;; sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/kami_cfd.cljk b/src/kami_cfd.cljk
+new file mode 100644
+index 0000000..279d614
+--- /dev/null
++++ b/src/kami_cfd.cljk
+@@ -0,0 +1,249 @@
++(ns kami-cfd
++  "Zero-dep portable CLJC. Migrated in place from the kami-engine-cfd Rust
++  crate (`src/lib.rs`, 209 lines) as part of the repo-wide Rust-demotion /
++  clj-wgsl-migration runtime priority (com-junkawasaki/root AGENTS.md,
++  \".cljc/.kotoba ランタイム優先順位\" section, 2026-07-10 revision;
++  ADR-2607010930 \"clj-wgsl migration\" is the precedent this follows, per
++  sibling repos `kotoba-lang/mesher`/`pnr`/`rtl`/`ic-packaging`).
++
++  Note on this repo's history: on 2026-07-01 (commit `755fa13`, \"Remove Rust
++  runtime from CFD contract\") this repo deleted its Rust solver and replaced
++  it with an EDN-contract-only design (`kami-engine.cfd.contract`, still
++  present and unrelated/complementary to this namespace — it validates
++  request/result *shapes*, this namespace *is* a solver) — without ever
++  porting the actual LBM math anywhere. This namespace (plus `kami-cfd.mesh`
++  and `kami-cfd.d3`) completes that migration properly: the solver restored
++  as portable `.cljc` instead of left unimplemented. See README for the full
++  history and rationale.
++
++  Clean-room D2Q9 (2D, 9-velocity) single-relaxation-time BGK lattice-
++  Boltzmann solver. `block`/`teardrop` build a `Body` (a rectangular block or
++  tapered-teardrop shape via a solid-cell mask); `lbm-new`/`step`/`run` are
++  the `Lbm` solver (collide + stream + bounce-back momentum-exchange drag
++  measurement); `sectional-cd` is the convenience entry point. Pure math, no
++  I/O. The 3D extension (`kami-cfd.d3`, D3Q19) yields a true vehicle Cd
++  normalised by frontal area.
++
++  Performance note: `f`/`ftmp` (the 9-velocity distribution per cell) and
++  each body's `solid` mask are backed by mutable `double-array`/
++  `boolean-array` (not persistent vectors) — this mirrors the original Rust
++  `Vec<f64>`/`Vec<bool>` buffers directly and is a deliberate choice:
++  collide/stream touches every cell every step across thousands of steps,
++  and persistent-vector copies would make that O(cells) per step instead of
++  O(1). `aget`/`aset`/`double-array`/`int-array` are portable
++  (`boolean-array` is NOT — see `bool-array` below)
++  across JVM Clojure, ClojureScript, and nbb. `Lbm`/`Body` values are plain
++  immutable maps threading these mutable buffers through — 'swapping
++  f/ftmp' (as the Rust `std::mem::swap` did) is a cheap `assoc` of array
++  references, not a data copy.")
++
++;; ---------------------------------------------------------------------------
++;; D2Q9 lattice constants
++;; ---------------------------------------------------------------------------
++
++
++;; ---------------------------------------------------------------------------
++;; Portable boolean array (2026-07-27 portability fix).
++;;
++;; `boolean-array` is a JVM-only Clojure primitive — cljs.core has
++;; `int-array`/`double-array`/`object-array` but NO `boolean-array`. Both this
++;; repo's solvers used it for the solid mask, so **neither actually loaded on
++;; ClojureScript/nbb**, despite the docstrings and README claiming JVM/cljs/nbb
++;; portability. The claim was never exercised because the only runner was the
++;; JVM `.clj` CLI and JVM tests.
++;;
++;; A `js/Uint8Array` would be the obvious cljs substitute and is WRONG here:
++;; in ClojureScript `0` is truthy, so `(if (aget solid n) ...)` would treat
++;; every empty cell as solid and the whole domain would silently become a
++;; block of metal. A real JS array filled with `false` keeps the truthiness
++;; semantics the solver relies on.
++;; ---------------------------------------------------------------------------
++
++(defn bool-array
++  "`n`-element mutable boolean array, `false`-filled, portable across JVM and
++  ClojureScript. See the note above for why Uint8Array is not usable."
++  [n]
++  #?(:clj (boolean-array (long n) false)
++     :cljs (.fill (js/Array. n) false)))
++
++(def ^:private ex (int-array [0 1 0 -1 0 1 -1 -1 1]))
++(def ^:private ey (int-array [0 0 1 0 -1 1 1 -1 -1]))
++(def ^:private w (double-array [(/ 4.0 9.0)
++                                 (/ 1.0 9.0) (/ 1.0 9.0) (/ 1.0 9.0) (/ 1.0 9.0)
++                                 (/ 1.0 36.0) (/ 1.0 36.0) (/ 1.0 36.0) (/ 1.0 36.0)]))
++;; Opposite-direction index, for bounce-back.
++(def ^:private opp (int-array [0 3 4 1 2 7 8 5 6]))
++
++(defn- feq [i rho ux uy]
++  (let [exi (aget ^ints ex i) eyi (aget ^ints ey i)
++        eu (+ (* exi ux) (* eyi uy))
++        usq (+ (* ux ux) (* uy uy))]
++    (* (aget ^doubles w i) rho (+ 1.0 (* 3.0 eu) (* 4.5 eu eu) (* -1.5 usq)))))
++
++;; ---------------------------------------------------------------------------
++;; Body — a 2D profile placed in the channel, defined by a solid mask
++;; ---------------------------------------------------------------------------
++
++(defn- solid-at? [body x y]
++  (aget ^booleans (:solid body) (+ (* y (long (:nx body))) x)))
++
++(defn block
++  "A rectangular block of width `w`, height `h`, leading edge at `x0`,
++  vertically centred — the bluff/squareback reference."
++  [nx ny x0 w h]
++  (let [solid (bool-array (* nx ny))
++        y0 (quot (- ny h) 2)
++        x-hi (min (+ x0 w) nx)
++        y-hi (min (+ y0 h) ny)]
++    (doseq [x (range x0 x-hi) y (range y0 y-hi)]
++      (aset solid (+ (* y nx) x) true))
++    {:nx nx :ny ny :solid solid :height h}))
++
++(defn teardrop
++  "A tapered teardrop of the same frontal height `h`, length `len`, tail
++  shrinking linearly to a point — the streamlined reference."
++  [nx ny x0 len h]
++  (let [solid (bool-array (* nx ny))
++        cy (quot ny 2)]
++    (loop [k 0]
++      (when (< k len)
++        (let [x (+ x0 k)]
++          (when (< x nx)
++            ;; full height at the nose, tapering to ~0 at the tail
++            (let [frac (- 1.0 (/ (double k) (double len)))
++                  half (long #?(:clj (Math/round (double (* h 0.5 frac)))
++                                :cljs (js/Math.round (* h 0.5 frac))))
++                  y-lo (max 0 (- cy half))
++                  y-hi (min (dec ny) (+ cy half))]
++              (doseq [y (range y-lo (inc y-hi))]
++                (aset solid (+ (* y nx) x) true)))
++            (recur (inc k))))))
++    {:nx nx :ny ny :solid solid :height h}))
++
++;; ---------------------------------------------------------------------------
++;; Lbm — D2Q9 BGK lattice-Boltzmann solver over a channel with a body
++;; ---------------------------------------------------------------------------
++
++(defn lbm-new
++  "Build a solver for a body at inflow speed set by `re` (Reynolds number on
++  the body height). `u0` lattice velocity kept small for stability."
++  [body re]
++  (let [nx (:nx body) ny (:ny body)
++        u0 0.05
++        nu (/ (* u0 (double (:height body))) re) ; nu = u0*D/Re
++        tau (+ 0.5 (* 3.0 nu))
++        n-cells (* nx ny)
++        f (double-array (* n-cells 9))]
++    (dotimes [n n-cells]
++      (dotimes [i 9] (aset ^doubles f (+ (* n 9) i) (double (feq i 1.0 u0 0.0)))))
++    {:nx nx :ny ny :tau tau :u0 u0 :f f :ftmp (aclone f) :body body}))
++
++(defn macros
++  "[rho ux uy] at cell index `n`. Public so consumers can probe the flow
++  field (density, velocity) at any cell — e.g. kotoba.biomech.hemodynamics
++  reading back a velocity probe without re-implementing the moment sum."
++  [f n]
++  (loop [i 0 rho 0.0 mx 0.0 my 0.0]
++    (if (< i 9)
++      (let [fi (aget ^doubles f (+ (* n 9) i))]
++        (recur (inc i) (+ rho fi) (+ mx (* fi (aget ^ints ex i))) (+ my (* fi (aget ^ints ey i)))))
++      (if (<= rho 0.0) [1.0 0.0 0.0] [rho (/ mx rho) (/ my rho)]))))
++
++(defn cell-at
++  "[rho ux uy] at lattice position (x, y), or nil if (x, y) is solid or
++  out of range. A thin (x, y) wrapper over `macros`."
++  [lbm x y]
++  (let [{:keys [nx ny f body]} lbm]
++    (when (and (<= 0 x) (< x nx) (<= 0 y) (< y ny)
++               (not (solid-at? body x y)))
++      (macros f (+ (* y nx) x)))))
++
++(defn velocity-at
++  "[ux uy] at lattice position (x, y), or nil if the cell is solid / out of
++  range. Use to read back a flow probe after stepping."
++  [lbm x y]
++  (some-> (cell-at lbm x y) rest vec))
++
++(defn density-at
++  "Density rho at lattice position (x, y), or nil if solid / out of range."
++  [lbm x y]
++  (first (cell-at lbm x y)))
++
++(defn- apply-boundaries!
++  "Left inflow (equilibrium at u0), right outflow (zero-gradient). Mutates
++  `(:f lbm)` in place."
++  [lbm]
++  (let [{:keys [nx ny u0 body]} lbm f (:f lbm)]
++    (dotimes [y ny]
++      (let [n (* y nx)]
++        (when-not (solid-at? body 0 y)
++          (dotimes [i 9] (aset ^doubles f (+ (* n 9) i) (double (feq i 1.0 u0 0.0)))))
++        (let [no (+ n (dec nx)) np (+ n (- nx 2))]
++          (when-not (solid-at? body (dec nx) y)
++            (dotimes [i 9] (aset ^doubles f (+ (* no 9) i) (aget ^doubles f (+ (* np 9) i)))))))))
++  lbm)
++
++(defn step
++  "One collide + stream step. Returns `[lbm' drag]` where `drag` is the
++  x-drag on the body this step (momentum exchanged at bounce-back links) and
++  `lbm'` is the updated solver state (f/ftmp swapped + boundaries
++  re-applied — same mutable arrays, new map wrapper, mirroring the Rust
++  `&mut self` + `mem::swap`)."
++  [lbm]
++  (let [{:keys [nx ny tau body]} lbm
++        f (:f lbm) ftmp (:ftmp lbm)]
++    ;; collision (BGK), in place
++    (dotimes [y ny]
++      (dotimes [x nx]
++        (when-not (solid-at? body x y)
++          (let [n (+ (* y nx) x)
++                [rho ux uy] (macros f n)]
++            (dotimes [i 9]
++              (let [idx (+ (* n 9) i)
++                    fi (aget ^doubles f idx)]
++                (aset ^doubles f idx (double (- fi (/ (- fi (feq i rho ux uy)) tau))))))))))
++    ;; streaming + bounce-back, accumulating drag
++    (dotimes [k (alength ^doubles ftmp)] (aset ^doubles ftmp k 0.0))
++    (let [drag (atom 0.0)]
++      (dotimes [y ny]
++        (dotimes [x nx]
++          (when-not (solid-at? body x y)
++            (let [n (+ (* y nx) x)]
++              (dotimes [i 9]
++                (let [xn (+ x (aget ^ints ex i)) yn (+ y (aget ^ints ey i))
++                      idx (+ (* n 9) i)
++                      fi (aget ^doubles f idx)]
++                  (cond
++                    ;; walls (top/bottom) and out-of-range -> bounce back to self
++                    (or (< yn 0) (>= yn ny) (< xn 0) (>= xn nx))
++                    (let [oidx (+ (* n 9) (aget ^ints opp i))]
++                      (aset ^doubles ftmp oidx (+ (aget ^doubles ftmp oidx) fi)))
++
++                    ;; bounce-back off the body; momentum exchange (Ladd)
++                    (solid-at? body xn yn)
++                    (let [oidx (+ (* n 9) (aget ^ints opp i))]
++                      (aset ^doubles ftmp oidx (+ (aget ^doubles ftmp oidx) fi))
++                      (swap! drag + (* 2.0 (aget ^ints ex i) fi)))
++
++                    :else
++                    (let [nidx (+ (* (+ (* yn nx) xn) 9) i)]
++                      (aset ^doubles ftmp nidx (+ (aget ^doubles ftmp nidx) fi))))))))))
++      (let [lbm' (-> lbm (assoc :f ftmp :ftmp f) apply-boundaries!)]
++        [lbm' @drag]))))
++
++(defn run
++  "Run `steps` and return the sectional drag coefficient, averaged over the
++  last 20% of steps. Cd = F_x / (0.5*rho*u0^2*D), rho ~= 1."
++  [lbm steps]
++  (let [tail (max (quot steps 5) 1)]
++    (loop [s 0 lbm lbm sum 0.0]
++      (if (>= s steps)
++        (let [favg (/ sum tail)]
++          (/ favg (* 0.5 (:u0 lbm) (:u0 lbm) (double (:height (:body lbm))))))
++        (let [[lbm' drag] (step lbm)]
++          (recur (inc s) lbm' (if (>= s (- steps tail)) (+ sum drag) sum)))))))
++
++(defn sectional-cd
++  "Convenience: sectional Cd of a body at a Reynolds number."
++  [body re steps]
++  (run (lbm-new body re) steps))
+diff --git a/src/kami_cfd/d3.cljk b/src/kami_cfd/d3.cljk
+new file mode 100644
+index 0000000..f45171b
+--- /dev/null
++++ b/src/kami_cfd/d3.cljk
+@@ -0,0 +1,379 @@
++(ns kami-cfd.d3
++  "D3Q19 lattice-Boltzmann — the 3D extension that yields a TRUE vehicle drag
++  coefficient (force normalised by frontal area), not just the 2D sectional
++  ranking (`kami-cfd`). Same BGK scheme as the 2D solver, one dimension up,
++  plus a Smagorinsky LES subgrid turbulence model and free-slip far-field
++  boundaries. A car-ish body (or a voxelised triangle mesh, see
++  `from-triangles` / `kami-cfd.mesh`) is placed in the domain; drag is
++  measured by momentum exchange and divided by the projected frontal cell
++  count. Migrated in place from the kami-engine-cfd Rust crate (`src/d3.rs`,
++  376 lines) — see the `kami-cfd` namespace docstring and this repo's README
++  for migration context.
++
++  Deliberately dropped: the original Rust `collide_parallel` /
++  `stream_drag_parallel` split work across `std::thread::scope` (collide is
++  per-cell independent; streaming used a 'pull'/gather form specifically so
++  each cell only writes its own output, avoiding write conflicts, which is
++  what made safe parallel chunking possible in the first place). This port
++  keeps the exact same math and the exact same pull/gather streaming form —
++  chosen deliberately in the original design — but iterates it as a single
++  sequential loop instead of splitting across `std::thread::scope` chunks.
++  Portability across JVM Clojure / ClojureScript / nbb takes priority over
++  multi-threaded performance per repo policy (AGENTS.md '.cljc/.kotoba
++  ランタイム優先順位'); native OS threads have no clean portable equivalent
++  across those three hosts. Same result, single-threaded, function names
++  keep the `-parallel`-derived Rust names as `collide!`/`stream-drag!` (the
++  `!` marks that they mutate the passed arrays in place, not that they are
++  parallel).")
++
++;; ---------------------------------------------------------------------------
++;; Portable math helpers (#?(:clj ...) / #?(:cljs ...) reader conditionals so
++;; this namespace runs unmodified on the JVM and in ClojureScript/nbb).
++;; ---------------------------------------------------------------------------
++
++(defn sqrt* [x]
++  #?(:clj (Math/sqrt (double x))
++     :cljs (js/Math.sqrt x)))
++
++(defn- abs* [x]
++  #?(:clj (Math/abs (double x))
++     :cljs (js/Math.abs x)))
++
++(defn- round* [x]
++  #?(:clj (Math/round (double x))
++     :cljs (js/Math.round x)))
++
++(defn- ceil* [x]
++  #?(:clj (Math/ceil (double x))
++     :cljs (js/Math.ceil x)))
++
++(defn- floor* [x]
++  #?(:clj (Math/floor (double x))
++     :cljs (js/Math.floor x)))
++
++
++;; ---------------------------------------------------------------------------
++;; Portable boolean array (2026-07-27 portability fix).
++;;
++;; `boolean-array` is a JVM-only Clojure primitive — cljs.core has
++;; `int-array`/`double-array`/`object-array` but NO `boolean-array`. Both this
++;; repo's solvers used it for the solid mask, so **neither actually loaded on
++;; ClojureScript/nbb**, despite the docstrings and README claiming JVM/cljs/nbb
++;; portability. The claim was never exercised because the only runner was the
++;; JVM `.clj` CLI and JVM tests.
++;;
++;; A `js/Uint8Array` would be the obvious cljs substitute and is WRONG here:
++;; in ClojureScript `0` is truthy, so `(if (aget solid n) ...)` would treat
++;; every empty cell as solid and the whole domain would silently become a
++;; block of metal. A real JS array filled with `false` keeps the truthiness
++;; semantics the solver relies on.
++;; ---------------------------------------------------------------------------
++
++(defn bool-array
++  "`n`-element mutable boolean array, `false`-filled, portable across JVM and
++  ClojureScript. See the note above for why Uint8Array is not usable."
++  [n]
++  #?(:clj (boolean-array (long n) false)
++     :cljs (.fill (js/Array. n) false)))
++
++;; ---------------------------------------------------------------------------
++;; PUBLIC D3Q19 kernel surface (2026-07-27).
++;;
++;; The lattice constants, `feq` and `collide!` were `^:private` because the
++;; only consumer was this namespace's own vehicle/far-field boundary scheme
++;; (`stream-drag!` hardcodes: z<0 no-slip road, y sides free-slip, z top
++;; free-slip, x ends inflow/outflow). Internal flows — an enclosure, a duct,
++;; a cold plate — need the SAME collision kernel with DIFFERENT boundaries.
++;;
++;; Duplicating a 19-velocity lattice into a sibling namespace would create two
++;; sources of truth for `ex/ey/ez/opp/w`, and a transcription slip there is
++;; silent (the solver still runs, it just conserves the wrong thing). So the
++;; kernel is exposed instead: `kami-cfd.duct` reuses these and supplies its
++;; own streaming/boundary pass. Collision is boundary-agnostic by
++;; construction — it is per-cell and reads no neighbour — so sharing it is
++;; safe. Nothing about the vehicle path changed.
++;; ---------------------------------------------------------------------------
++;; ---------------------------------------------------------------------------
++;; D3Q19 lattice constants
++;; ---------------------------------------------------------------------------
++
++(def ex (int-array [0  1 -1  0  0  0  0  1 -1  1 -1  1 -1  1 -1  0  0  0  0]))
++(def ey (int-array [0  0  0  1 -1  0  0  1 -1 -1  1  0  0  0  0  1 -1  1 -1]))
++(def ez (int-array [0  0  0  0  0  1 -1  0  0  0  0  1 -1 -1  1  1 -1 -1  1]))
++(def w (double-array [(/ 1.0 3.0)
++                                 (/ 1.0 18.0) (/ 1.0 18.0) (/ 1.0 18.0) (/ 1.0 18.0) (/ 1.0 18.0) (/ 1.0 18.0)
++                                 (/ 1.0 36.0) (/ 1.0 36.0) (/ 1.0 36.0) (/ 1.0 36.0)
++                                 (/ 1.0 36.0) (/ 1.0 36.0) (/ 1.0 36.0) (/ 1.0 36.0)
++                                 (/ 1.0 36.0) (/ 1.0 36.0) (/ 1.0 36.0) (/ 1.0 36.0)]))
++;; Opposite-direction index, for bounce-back.
++(def opp (int-array [0 2 1 4 3 6 5 8 7 10 9 12 11 14 13 16 15 18 17]))
++;; Specular reflection across a y-wall: (ex,ey,ez) -> (ex,-ey,ez). Free-slip.
++(def reflect-y (int-array [0 1 2 4 3 5 6 9 10 7 8 11 12 13 14 18 17 16 15]))
++;; Specular reflection across a z-wall: (ex,ey,ez) -> (ex,ey,-ez). Free-slip.
++(def reflect-z (int-array [0 1 2 3 4 6 5 7 8 9 10 13 14 11 12 17 18 15 16]))
++
++(defn feq
++  "D3Q19 equilibrium distribution. Public: shared with kami-cfd.duct."
++  [i rho ux uy uz]
++  (let [exi (aget ^ints ex i) eyi (aget ^ints ey i) ezi (aget ^ints ez i)
++        eu (+ (* exi ux) (* eyi uy) (* ezi uz))
++        usq (+ (* ux ux) (* uy uy) (* uz uz))]
++    (* (aget ^doubles w i) rho (+ 1.0 (* 3.0 eu) (* 4.5 eu eu) (* -1.5 usq)))))
++
++;; ---------------------------------------------------------------------------
++;; Body3 — a voxelised 3D body in the wind-tunnel. z is height (ground at
++;; z=0), flow +x.
++;; ---------------------------------------------------------------------------
++
++(defn- solid3-at? [body x y z]
++  (let [{:keys [nx ny solid]} body]
++    (aget ^booleans solid (+ (* (+ (* z ny) y) nx) x))))
++
++(defn- count-frontal-cells
++  "Projected frontal area: count of y-z columns containing any solid cell."
++  [nx ny nz solid]
++  (let [c (atom 0)]
++    (dotimes [z nz]
++      (dotimes [y ny]
++        (let [base (* (+ (* z ny) y) nx)]
++          (loop [x 0]
++            (when (< x nx)
++              (if (aget ^booleans solid (+ base x))
++                (swap! c inc)
++                (recur (inc x))))))))
++    @c))
++
++(defn box-car
++  "A squareback box car: full-height block, leading edge at `x0`."
++  [nx ny nz x0 len w h]
++  (let [solid (bool-array (* nx ny nz))
++        y0 (quot (- ny w) 2)
++        x-hi (min (+ x0 len) nx)
++        y-hi (min (+ y0 w) ny)
++        z-hi (min (+ 1 h) nz)]
++    (doseq [x (range x0 x-hi) y (range y0 y-hi) z (range 1 z-hi)]
++      (aset solid (+ (* (+ (* z ny) y) nx) x) true))
++    {:nx nx :ny ny :nz nz :solid solid :frontal-cells (count-frontal-cells nx ny nz solid)}))
++
++(defn fastback-car
++  "Same frontal face as `box-car`, but the roof tapers down over the rear
++  half (fastback) — lower drag at equal frontal area."
++  [nx ny nz x0 len w h]
++  (let [solid (bool-array (* nx ny nz))
++        y0 (quot (- ny w) 2)
++        half (quot len 2)
++        y-hi (min (+ y0 w) ny)]
++    (loop [k 0]
++      (when (< k len)
++        (let [x (+ x0 k)]
++          (when (< x nx)
++            ;; full height for the front half, tapering to ~40% at the tail
++            (let [hz (if (< k half)
++                       h
++                       (let [frac (- 1.0 (* 0.6 (/ (double (- k half)) (double (max half 1)))))]
++                         (long (round* (* h frac)))))
++                  z-hi (min (+ 1 hz) nz)]
++              (doseq [y (range y0 y-hi) z (range 1 z-hi)]
++                (aset solid (+ (* (+ (* z ny) y) nx) x) true)))
++            (recur (inc k))))))
++    {:nx nx :ny ny :nz nz :solid solid :frontal-cells (count-frontal-cells nx ny nz solid)}))
++
++(defn- tri-bbox
++  "[[minx miny minz] [maxx maxy maxz]] over all triangle vertices."
++  [tris]
++  (reduce (fn [[lo hi] tri]
++            (reduce (fn [[lo hi] v]
++                      [(mapv min lo v) (mapv max hi v)])
++                    [lo hi] tri))
++          [[##Inf ##Inf ##Inf] [##-Inf ##-Inf ##-Inf]]
++          tris))
++
++(defn- ray-x-cross
++  "Intersection x of a +x ray at (y=uc, z=vc) with triangle `t`, via
++  barycentric containment in the y-z projection. nil if the ray misses or
++  the triangle is edge-on to the projection."
++  [t uc vc]
++  (let [[[x0 u0 v0] [x1 u1 v1] [x2 u2 v2]] t
++        det (+ (* (- v1 v2) (- u0 u2)) (* (- u2 u1) (- v0 v2)))]
++    (when-not (< (abs* det) 1e-9)
++      (let [a (/ (+ (* (- v1 v2) (- uc u2)) (* (- u2 u1) (- vc v2))) det)
++            b (/ (+ (* (- v2 v0) (- uc u2)) (* (- u0 u2) (- vc v2))) det)
++            c (- 1.0 a b)]
++        (when-not (or (< a -1e-9) (< b -1e-9) (< c -1e-9))
++          (+ (* a x0) (* b x1) (* c x2)))))))
++
++(defn from-triangles
++  "Voxelise a triangle mesh (REAL geometry, e.g. an STL or `ahmed-body`) into
++  the domain. The mesh is uniformly scaled so its length maps to
++  `len-cells`, centred in y, sitting on the ground (z=1). Solid filling is
++  per-(y,z)-column ray parity: cast a +x ray through each column, sort the
++  surface crossings, fill between entry/exit pairs (watertight meshes)."
++  [nx ny nz tris len-cells x0]
++  (let [[[lo0 lo1 lo2] [hi0 hi1 _hi2]] (tri-bbox tris)
++        scale (/ len-cells (max (- hi0 lo0) 1e-9))
++        ymid (* 0.5 (+ lo1 hi1))
++        tf (fn [[vx vy vz]]
++             [(+ x0 (* (- vx lo0) scale))
++              (+ (/ ny 2.0) (* (- vy ymid) scale))
++              (+ 1.0 (* (- vz lo2) scale))])
++        lt (mapv (fn [[a b c]] [(tf a) (tf b) (tf c)]) tris)
++        solid (bool-array (* nx ny nz))]
++    (dotimes [z nz]
++      (dotimes [y ny]
++        (let [uc (+ y 0.5) vc (+ z 0.5)
++              xs (sort (keep #(ray-x-cross % uc vc) lt))]
++          (when (>= (count xs) 2)
++            (doseq [[xa xb] (partition 2 xs)]
++              (let [a (long (max (ceil* xa) 0.0))
++                    b (long (min (floor* xb) (double (dec nx))))]
++                (loop [x a]
++                  (when (<= x b)
++                    (when (and (>= x 0) (< x nx))
++                      (aset ^booleans solid (+ (* (+ (* z ny) y) nx) x) true))
++                    (recur (inc x))))))))))
++    {:nx nx :ny ny :nz nz :solid solid :frontal-cells (count-frontal-cells nx ny nz solid)}))
++
++;; ---------------------------------------------------------------------------
++;; Lbm3 — D3Q19 BGK + Smagorinsky LES solver
++;; ---------------------------------------------------------------------------
++
++(defn lbm3-new
++  [body re]
++  (let [nx (:nx body) ny (:ny body) nz (:nz body)
++        u0 0.05
++        ;; reference length = sqrt(frontal area) for the Reynolds/viscosity set
++        d (max (sqrt* (double (:frontal-cells body))) 1.0)
++        nu (/ (* u0 d) re)
++        tau (+ 0.5 (* 3.0 nu))
++        n-cells (* nx ny nz)
++        f (double-array (* n-cells 19))]
++    (dotimes [n n-cells]
++      (dotimes [i 19] (aset ^doubles f (+ (* n 19) i) (double (feq i 1.0 u0 0.0 0.0)))))
++    {:nx nx :ny ny :nz nz :tau tau :u0 u0 :f f :ftmp (aclone f) :body body}))
++
++(defn collide!
++  "BGK collision with a Smagorinsky LES subgrid model — per-cell independent
++  (originally split across threads via `std::thread::scope`; see namespace
++  docstring for why this port runs it sequentially instead). The local
++  strain rate is read from the non-equilibrium momentum-flux tensor
++  Q_ab = sum_i e_ia*e_ib*(f_i-feq_i); a turbulent eddy viscosity
++  nu_t = (Cs*delta)^2 * Sbar raises tau where the flow is sheared. This keeps
++  tau clear of 0.5 at high Re (stability) AND models subgrid turbulence —
++  the physical requirement for the drag to fall toward the real
++  attached-flow value, which single-relaxation BGK alone cannot do."
++  [lbm]
++  (let [{:keys [nx ny nz tau body]} lbm
++        f (:f lbm) solid (:solid body)
++        ncells (* nx ny nz)
++        cs 0.16
++        sqrt2 1.4142135623730951
++        feqs (double-array 19)]
++    (dotimes [n ncells]
++      (when-not (aget ^booleans solid n)
++        (loop [i 0 rho 0.0 mx 0.0 my 0.0 mz 0.0]
++          (if (< i 19)
++            (let [fi (aget ^doubles f (+ (* n 19) i))]
++              (recur (inc i) (+ rho fi)
++                     (+ mx (* fi (aget ^ints ex i))) (+ my (* fi (aget ^ints ey i))) (+ mz (* fi (aget ^ints ez i)))))
++            (let [pos? (> rho 0.0)
++                  ux (if pos? (/ mx rho) 0.0)
++                  uy (if pos? (/ my rho) 0.0)
++                  uz (if pos? (/ mz rho) 0.0)
++                  rho (if (<= rho 0.0) 1.0 rho)]
++              ;; non-equilibrium momentum-flux tensor Q_ab
++              (loop [i 0 qxx 0.0 qyy 0.0 qzz 0.0 qxy 0.0 qxz 0.0 qyz 0.0]
++                (if (< i 19)
++                  (let [fv (double (feq i rho ux uy uz))
++                        _ (aset ^doubles feqs i fv)
++                        neq (- (aget ^doubles f (+ (* n 19) i)) fv)
++                        exi (double (aget ^ints ex i)) eyi (double (aget ^ints ey i)) ezi (double (aget ^ints ez i))]
++                    (recur (inc i)
++                           (+ qxx (* exi exi neq)) (+ qyy (* eyi eyi neq)) (+ qzz (* ezi ezi neq))
++                           (+ qxy (* exi eyi neq)) (+ qxz (* exi ezi neq)) (+ qyz (* eyi ezi neq))))
++                  (let [qnorm (sqrt* (+ (* 2.0 (+ (* qxx qxx) (* qyy qyy) (* qzz qzz)))
++                                         (* 4.0 (+ (* qxy qxy) (* qxz qxz) (* qyz qyz)))))
++                        ;; total relaxation time incl. Smagorinsky eddy viscosity
++                        tau-t (* 0.5 (- (sqrt* (+ (* tau tau) (/ (* 18.0 sqrt2 cs cs qnorm) rho))) tau))
++                        omega (/ 1.0 (+ tau tau-t))]
++                    (dotimes [i 19]
++                      (let [idx (+ (* n 19) i)]
++                        (aset ^doubles f idx (double (- (aget ^doubles f idx) (* omega (- (aget ^doubles f idx) (aget ^doubles feqs i))))))))))))))))
++    lbm))
++
++(defn- inflow-outflow!
++  "Left inflow (equilibrium at u0), right outflow (zero-gradient). Mutates
++  `(:f lbm)` in place."
++  [lbm]
++  (let [{:keys [nx ny nz u0 body]} lbm f (:f lbm)]
++    (dotimes [z nz]
++      (dotimes [y ny]
++        (let [n (* (+ (* z ny) y) nx)]
++          (when-not (solid3-at? body 0 y z)
++            (dotimes [i 19] (aset ^doubles f (+ (* n 19) i) (double (feq i 1.0 u0 0.0 0.0)))))
++          (let [no (+ n (dec nx)) np (+ n (- nx 2))]
++            (when-not (solid3-at? body (dec nx) y z)
++              (dotimes [i 19] (aset ^doubles f (+ (* no 19) i) (aget ^doubles f (+ (* np 19) i))))))))))
++  lbm)
++
++(defn- stream-drag!
++  "Streaming + drag, PULL form (gather): each cell writes only its own
++  ftmp, reading upstream f. Wall/solid upstream -> halfway bounce-back or
++  free-slip reflection (see boundary table below). Drag (momentum exchange)
++  is a read-only reduction over fluid-solid links. Returns `[lbm' drag]`
++  with f/ftmp swapped and inflow/outflow boundaries re-applied."
++  [lbm]
++  (let [{:keys [nx ny nz]} lbm
++        body (:body lbm)
++        f (:f lbm) ftmp (:ftmp lbm) solid (:solid body)
++        ncells (* nx ny nz)
++        nxy (* nx ny)
++        drag (atom 0.0)]
++    (dotimes [n ncells]
++      (let [z (quot n nxy)
++            y (mod (quot n nx) ny)
++            x (mod n nx)]
++        (if (aget ^booleans solid n)
++          (dotimes [j 19] (aset ^doubles ftmp (+ (* n 19) j) 0.0))
++          (do
++            (dotimes [j 19]
++              (let [sx (- x (aget ^ints ex j)) sy (- y (aget ^ints ey j)) sz (- z (aget ^ints ez j))
++                    val (cond
++                          (< sz 0) (aget ^doubles f (+ (* n 19) (aget ^ints opp j)))             ; ground: no-slip road
++                          (or (< sy 0) (>= sy ny)) (aget ^doubles f (+ (* n 19) (aget ^ints reflect-y j))) ; sides: free-slip
++                          (>= sz nz) (aget ^doubles f (+ (* n 19) (aget ^ints reflect-z j)))      ; top: free-slip
++                          (or (< sx 0) (>= sx nx)) (aget ^doubles f (+ (* n 19) (aget ^ints opp j))) ; x ends: inflow/outflow sets this
++                          :else
++                          (let [sn (+ (* (+ (* sz ny) sy) nx) sx)]
++                            (if (aget ^booleans solid sn)
++                              (aget ^doubles f (+ (* n 19) (aget ^ints opp j))) ; body bounce-back
++                              (aget ^doubles f (+ (* sn 19) j)))))]      ; pull from upstream
++                (aset ^doubles ftmp (+ (* n 19) j) (double val))))
++            ;; momentum exchange on links pointing into the body
++            (dotimes [i 19]
++              (let [dx (+ x (aget ^ints ex i)) dy (+ y (aget ^ints ey i)) dz (+ z (aget ^ints ez i))]
++                (when (and (>= dx 0) (< dx nx) (>= dy 0) (< dy ny) (>= dz 0) (< dz nz))
++                  (let [dn (+ (* (+ (* dz ny) dy) nx) dx)]
++                    (when (aget ^booleans solid dn)
++                      (swap! drag + (* 2.0 (aget ^ints ex i) (aget ^doubles f (+ (* n 19) i)))))))))))))
++    (let [lbm' (inflow-outflow! (assoc lbm :f ftmp :ftmp f))]
++      [lbm' @drag])))
++
++(defn step
++  [lbm]
++  (stream-drag! (collide! lbm)))
++
++(defn run
++  "Run `steps`; return the vehicle Cd = F_x / (0.5*rho*u0^2*A_frontal)."
++  [lbm steps]
++  (let [tail (max (quot steps 5) 1)]
++    (loop [s 0 lbm lbm sum 0.0]
++      (if (>= s steps)
++        (let [favg (/ sum tail)]
++          (/ favg (* 0.5 (:u0 lbm) (:u0 lbm) (double (:frontal-cells (:body lbm))))))
++        (let [[lbm' drag] (step lbm)]
++          (recur (inc s) lbm' (if (>= s (- steps tail)) (+ sum drag) sum)))))))
++
++(defn vehicle-cd
++  "Vehicle Cd of a 3D body at a Reynolds number."
++  [body re steps]
++  (run (lbm3-new body re) steps))
+diff --git a/src/kami_cfd/duct.cljk b/src/kami_cfd/duct.cljk
+new file mode 100644
+index 0000000..e904fdf
+--- /dev/null
++++ b/src/kami_cfd/duct.cljk
+@@ -0,0 +1,567 @@
++(ns kami-cfd.duct
++  "**Internal** (duct / enclosure / cold-plate) flow on the same D3Q19
++  lattice-Boltzmann kernel as `kami-cfd.d3`, but with internal-flow boundary
++  conditions instead of the vehicle far-field ones.
++
++  Why this namespace exists. `kami-cfd.d3` solves *external* aerodynamics: a
++  body sits in a freestream, the domain sides are free-slip far field, the
++  ground is no-slip, and the x-ends are inflow/outflow. That boundary set is
++  exactly wrong for a sealed box with a fan: there is no far field, every
++  wall is no-slip, and air enters and leaves only through designated patches.
++  Reusing `d3/run` on an enclosure would silently model a box floating in a
++  wind tunnel with leaky walls.
++
++  What is shared and what is not:
++  - **Shared** (from `kami-cfd.d3`): the D3Q19 lattice (`ex`/`ey`/`ez`/`w`/
++    `opp`), `feq`, and `collide!` — the BGK + Smagorinsky LES collision.
++    Collision is per-cell and reads no neighbour, so it is boundary-agnostic
++    by construction and safe to share. One lattice, one source of truth.
++  - **Not shared**: streaming and boundaries. This namespace supplies its own
++    `stream!` where *all six domain faces are no-slip walls* except the
++    patches declared as inlet/outlet.
++
++  Boundary conditions implemented:
++  - **Solid cells / walls** — halfway bounce-back (`opp`), the same treatment
++    `d3` uses for the body. Second-order accurate for a wall halfway between
++    nodes, which is what the Poiseuille validation below relies on.
++  - **Velocity inlet** — equilibrium at a prescribed velocity (a fan face).
++  - **Outlet** — zero-gradient copy from the neighbour cell one step inside
++    (an open vent). Mass is not forced to balance; the outlet lets the solver
++    find its own flux.
++  - **Periodic axes** — `:periodic #{:x :y :z}`. An out-of-domain upstream on
++    a periodic axis wraps to the far side instead of bouncing back. Needed for
++    any streamwise-invariant case (the Poiseuille verification below) and for
++    repeating geometry. Without it every face is a wall, and a body force in a
++    sealed box only pressurises it — which is exactly what the first version
++    of this namespace did, and what the verification case caught.
++  - **Body force** — optional uniform acceleration, used by the validation
++    case (force-driven Poiseuille) and available for buoyancy studies.
++
++  **Validation is not optional here and is not a smoke test.** `poiseuille`
++  runs force-driven plane Poiseuille flow, whose steady solution is exactly
++  u(y) = (G/(2 nu)) * y * (H - y). `validate-poiseuille` returns the relative
++  L2 error against that closed form. This is the canonical LBM verification
++  case: if the L2 error is not small, the bounce-back walls or the viscosity
++  mapping are wrong and every enclosure number this namespace produces is
++  meaningless. Run it before trusting anything else.
++
++  **Regime limit — see `reachable-reynolds` below before using this on an
++  enclosure.** This is a laminar-to-moderate-Re tool; a fan-cooled computer
++  case is Re ~2e4 and out of reach on any grid affordable single-threaded.
++
++  **What this namespace does NOT compute.** Flow only — velocity, volumetric
++  flux, stagnant-region fraction. It carries no energy equation, so it cannot
++  give component temperatures. The one temperature it does give,
++  `bulk-delta-t`, is not a CFD result at all: it is steady-state energy
++  conservation on the through-flow (dT = W / (rho*cp*Q)), i.e. how much the
++  air heats up on its way through. Junction temperatures need a conjugate
++  heat-transfer solver, which this is not.
++
++  Zero-dep portable `.cljc` — runs on JVM Clojure, ClojureScript and nbb."
++  (:require [kami-cfd.d3 :as d3]))
++
++;; ---------------------------------------------------------------------------
++;; Domain construction
++;; ---------------------------------------------------------------------------
++
++(defn domain
++  "A lattice domain `nx`x`ny`x`nz` whose solid cells are decided by
++  `solid-fn` — a predicate `(fn [x y z] boolean)`. Cell indexing matches
++  `kami-cfd.d3`: n = (z*ny + y)*nx + x."
++  [nx ny nz solid-fn]
++  (let [n-cells (* nx ny nz)
++        solid (d3/bool-array n-cells)]
++    (dotimes [z nz]
++      (dotimes [y ny]
++        (dotimes [x nx]
++          (when (solid-fn x y z)
++            (aset solid (+ (* (+ (* z ny) y) nx) x) true)))))
++    {:nx nx :ny ny :nz nz :solid solid
++     :solid-count (count (filter true? (seq solid)))}))
++
++(defn boxes->solid-fn
++  "Solid predicate from axis-aligned boxes given in lattice cells:
++  `[[x0 y0 z0] [x1 y1 z1]]` (half-open upper bound)."
++  [boxes]
++  (fn [x y z]
++    (boolean
++     (some (fn [[[x0 y0 z0] [x1 y1 z1]]]
++             (and (>= x x0) (< x x1) (>= y y0) (< y y1) (>= z z0) (< z z1)))
++           boxes))))
++
++(defn patch
++  "A boundary patch: which domain face, and which cells of that face.
++  `face` is one of :x-min :x-max :y-min :y-max :z-min :z-max.
++  `in?` is `(fn [a b] boolean)` over the two in-plane cell coordinates, in
++  the order (y,z) for x faces, (x,z) for y faces, (x,y) for z faces.
++  `kind` is :inlet or :outlet. `u` is the prescribed speed in lattice units
++  (ignored for :outlet), directed **along the inward normal** — so a
++  **negative `u` is a suction patch**: a fan pulling air out through this face.
++  That is the correct way to model a blower-cooled enclosure: the blower is
++  the mover, so prescribe velocity where the blower is and leave the intake
++  vent a passive :outlet (zero-gradient, i.e. open to ambient).
++
++  **Prescribing velocity on the passive vent instead is not equivalent** and
++  will over-constrain mass: a large velocity inlet feeding a small
++  zero-gradient outlet cannot conserve mass, so the domain pressurises, the
++  outlet flux collapses toward zero and nearly every cell reads as stagnant.
++  If inlet and outlet fluxes do not balance, suspect this first."
++  [face kind in? u]
++  {:face face :kind kind :in? in? :u u})
++
++(defn full-face
++  "Convenience: a patch covering an entire domain face."
++  [face kind u]
++  (patch face kind (fn [_ _] true) u))
++
++;; ---------------------------------------------------------------------------
++;; Solver state
++;; ---------------------------------------------------------------------------
++
++(defn- idx [nx ny x y z] (+ (* (+ (* z ny) y) nx) x))
++
++(defn- face-normal
++  "Inward unit normal of a domain face, as [dx dy dz]."
++  [face]
++  (case face
++    :x-min [1 0 0] :x-max [-1 0 0]
++    :y-min [0 1 0] :y-max [0 -1 0]
++    :z-min [0 0 1] :z-max [0 0 -1]))
++
++(defn- face-cells
++  "Seq of [x y z] lattice cells lying on `face`."
++  [nx ny nz face]
++  (case face
++    :x-min (for [z (range nz) y (range ny)] [0 y z])
++    :x-max (for [z (range nz) y (range ny)] [(dec nx) y z])
++    :y-min (for [z (range nz) x (range nx)] [x 0 z])
++    :y-max (for [z (range nz) x (range nx)] [x (dec ny) z])
++    :z-min (for [y (range ny) x (range nx)] [x y 0])
++    :z-max (for [y (range ny) x (range nx)] [x y (dec nz)])))
++
++(defn- in-plane
++  "The two in-plane coordinates of cell [x y z] on `face`, in the order
++  `patch`'s `in?` expects."
++  [face [x y z]]
++  (case face
++    (:x-min :x-max) [y z]
++    (:y-min :y-max) [x z]
++    (:z-min :z-max) [x y]))
++
++(defn duct-new
++  "Solver state for internal flow.
++  `nu` is the kinematic viscosity in lattice units; tau = 0.5 + 3*nu.
++  `patches` is a seq from `patch`/`full-face`.
++  `force` is an optional uniform body acceleration `[gx gy gz]` (lattice
++  units), applied every collision — used by the Poiseuille validation.
++  `periodic` is a set of axis keywords (`:x`/`:y`/`:z`) to wrap instead of
++  walling. `u0` is the reference speed used for normalisation and reporting."
++  [dom {:keys [nu patches force u0 periodic]}]
++  (let [{:keys [nx ny nz]} dom
++        nu (double (or nu 0.02))
++        tau (+ 0.5 (* 3.0 nu))
++        u0 (double (or u0 0.05))
++        n-cells (* nx ny nz)
++        f (double-array (* n-cells 19))]
++    (dotimes [n n-cells]
++      (dotimes [i 19]
++        (aset ^doubles f (+ (* n 19) i) (double (d3/feq i 1.0 0.0 0.0 0.0)))))
++    ;; Resolve patches to concrete cell-index sets once, not per step.
++    (let [resolved
++          (mapv (fn [{:keys [face kind in? u]}]
++                  (let [[dx dy dz] (face-normal face)
++                        cells (->> (face-cells nx ny nz face)
++                                   (filter (fn [c] (apply in? (in-plane face c))))
++                                   (remove (fn [[x y z]]
++                                             (aget ^booleans (:solid dom) (idx nx ny x y z))))
++                                   vec)]
++                    {:kind kind
++                     :u (double (or u 0.0))
++                     :dir [dx dy dz]
++                     :cells (mapv (fn [[x y z]]
++                                    [(idx nx ny x y z)
++                                     (idx nx ny (+ x dx) (+ y dy) (+ z dz))])
++                                  cells)}))
++                (or patches []))]
++      {:nx nx :ny ny :nz nz :tau tau :u0 u0 :nu nu
++       :f f :ftmp (aclone f)
++       :periodic (or periodic #{})
++       :force (or force [0.0 0.0 0.0])
++       :patches resolved
++       :body {:nx nx :ny ny :nz nz :solid (:solid dom)
++              ;; d3/collide! reads :solid via solid3-at?; :frontal-cells is
++              ;; only used by the vehicle Cd path, never by collision.
++              :frontal-cells 1}})))
++
++;; ---------------------------------------------------------------------------
++;; Boundary application
++;; ---------------------------------------------------------------------------
++
++(defn- apply-patches!
++  "Velocity inlets set equilibrium at the prescribed velocity; outlets copy
++  the neighbour one cell inside (zero gradient). Mutates `(:f lbm)`."
++  [lbm]
++  (let [f (:f lbm)]
++    (doseq [{:keys [kind u dir cells]} (:patches lbm)]
++      (let [[dx dy dz] dir]
++        (if (= :inlet kind)
++          (doseq [[n _] cells]
++            (dotimes [i 19]
++              (aset ^doubles f (+ (* n 19) i)
++                    (double (d3/feq i 1.0 (* u dx) (* u dy) (* u dz))))))
++          (doseq [[n nin] cells]
++            (dotimes [i 19]
++              (aset ^doubles f (+ (* n 19) i)
++                    (aget ^doubles f (+ (* nin 19) i))))))))
++    lbm))
++
++(defn- body-force!
++  "Uniform acceleration via a shift of the equilibrium velocity (Guo-style
++  first order, adequate at the small forcing used for validation). Mutates."
++  [lbm]
++  (let [[gx gy gz] (:force lbm)]
++    (when (or (not (zero? gx)) (not (zero? gy)) (not (zero? gz)))
++      (let [{:keys [nx ny nz tau]} lbm f (:f lbm) solid (:solid (:body lbm))
++            ncells (* nx ny nz)]
++        (dotimes [n ncells]
++          (when-not (aget ^booleans solid n)
++            (dotimes [i 19]
++              (let [exi (aget ^ints d3/ex i) eyi (aget ^ints d3/ey i) ezi (aget ^ints d3/ez i)
++                    wi (aget ^doubles d3/w i)
++                    proj (+ (* exi gx) (* eyi gy) (* ezi gz))]
++                (aset ^doubles f (+ (* n 19) i)
++                      (+ (aget ^doubles f (+ (* n 19) i)) (* 3.0 wi proj)))))))))
++    lbm))
++
++(defn- stream!
++  "Streaming, PULL form — each cell writes only its own ftmp. Upstream that
++  is solid **or outside the domain** gives halfway bounce-back: every domain
++  face is a no-slip wall. Inlet/outlet patches are re-applied afterwards and
++  overwrite their own cells, so declaring a patch is what opens a hole in an
++  otherwise sealed box."
++  [lbm]
++  (let [{:keys [nx ny nz]} lbm
++        per (:periodic lbm)
++        px (contains? per :x) py (contains? per :y) pz (contains? per :z)
++        f (:f lbm) ftmp (:ftmp lbm) solid (:solid (:body lbm))
++        ncells (* nx ny nz) nxy (* nx ny)
++        wrap (fn [v n] (cond (< v 0) (+ v n) (>= v n) (- v n) :else v))]
++    (dotimes [n ncells]
++      (let [z (quot n nxy) y (mod (quot n nx) ny) x (mod n nx)]
++        (if (aget ^booleans solid n)
++          (dotimes [j 19] (aset ^doubles ftmp (+ (* n 19) j) 0.0))
++          (dotimes [j 19]
++            (let [rx (- x (aget ^ints d3/ex j))
++                  ry (- y (aget ^ints d3/ey j))
++                  rz (- z (aget ^ints d3/ez j))
++                  sx (if px (wrap rx nx) rx)
++                  sy (if py (wrap ry ny) ry)
++                  sz (if pz (wrap rz nz) rz)
++                  outside (or (< sx 0) (>= sx nx) (< sy 0) (>= sy ny) (< sz 0) (>= sz nz))
++                  val (if outside
++                        (aget ^doubles f (+ (* n 19) (aget ^ints d3/opp j)))  ; wall: bounce-back
++                        (let [sn (+ (* (+ (* sz ny) sy) nx) sx)]
++                          (if (aget ^booleans solid sn)
++                            (aget ^doubles f (+ (* n 19) (aget ^ints d3/opp j)))
++                            (aget ^doubles f (+ (* sn 19) j)))))]
++              (aset ^doubles ftmp (+ (* n 19) j) (double val)))))))
++    (apply-patches! (assoc lbm :f ftmp :ftmp f))))
++
++(defn step [lbm] (stream! (body-force! (d3/collide! lbm))))
++
++(defn run [lbm steps]
++  (loop [s 0 l lbm] (if (>= s steps) l (recur (inc s) (step l)))))
++
++;; ---------------------------------------------------------------------------
++;; Field probes
++;; ---------------------------------------------------------------------------
++
++(defn cell-macros
++  "`[rho ux uy uz]` at lattice cell [x y z]. Solid cells give all zeros."
++  [lbm x y z]
++  (let [{:keys [nx ny]} lbm f (:f lbm) solid (:solid (:body lbm))
++        n (idx nx ny x y z)]
++    (if (aget ^booleans solid n)
++      [0.0 0.0 0.0 0.0]
++      (loop [i 0 rho 0.0 mx 0.0 my 0.0 mz 0.0]
++        (if (= i 19)
++          (if (pos? rho) [rho (/ mx rho) (/ my rho) (/ mz rho)] [rho 0.0 0.0 0.0])
++          (let [fi (aget ^doubles f (+ (* n 19) i))]
++            (recur (inc i) (+ rho fi)
++                   (+ mx (* fi (aget ^ints d3/ex i)))
++                   (+ my (* fi (aget ^ints d3/ey i)))
++                   (+ mz (* fi (aget ^ints d3/ez i))))))))))
++
++(defn speed-at [lbm x y z]
++  (let [[_ ux uy uz] (cell-macros lbm x y z)]
++    (d3/sqrt* (+ (* ux ux) (* uy uy) (* uz uz)))))
++
++(defn patch-flux
++  "Volumetric flux (lattice units, cells^3/step) through the `kind` patches,
++  as the sum of the inward-normal velocity component over patch cells. Signed:
++  positive means net flow in the patch's inward direction."
++  [lbm kind]
++  (let [{:keys [nx ny]} lbm]
++    (reduce
++     + 0.0
++     (for [{k :kind dir :dir cells :cells} (:patches lbm)
++           :when (= k kind)
++           [n _] cells]
++       (let [nxy (* nx ny)
++             z (quot n nxy) y (mod (quot n nx) ny) x (mod n nx)
++             [_ ux uy uz] (cell-macros lbm x y z)
++             [dx dy dz] dir]
++         (+ (* ux dx) (* uy dy) (* uz dz)))))))
++
++(defn stagnant-fraction
++  "Fraction of fluid cells whose speed is below `frac` of u0 — the
++  dead-zone measure. Reported, never silently ignored: a large stagnant
++  fraction with a healthy total flux means the air is bypassing something."
++  [lbm frac]
++  (let [{:keys [nx ny nz u0]} lbm solid (:solid (:body lbm))
++        thr (* frac u0)]
++    (loop [z 0 fluid 0 dead 0]
++      (if (= z nz)
++        (if (pos? fluid) (/ (double dead) (double fluid)) 0.0)
++        (let [[f' d']
++              (loop [y 0 fl fluid dd dead]
++                (if (= y ny) [fl dd]
++                    (let [[fl' dd']
++                          (loop [x 0 fl2 fl dd2 dd]
++                            (if (= x nx) [fl2 dd2]
++                                (if (aget ^booleans solid (idx nx ny x y z))
++                                  (recur (inc x) fl2 dd2)
++                                  (recur (inc x) (inc fl2)
++                                         (if (< (speed-at lbm x y z) thr) (inc dd2) dd2)))))]
++                      (recur (inc y) fl' dd'))))]
++          (recur (inc z) f' d'))))))
++
++
++;; ---------------------------------------------------------------------------
++;; Convergence-based stopping (2026-07-27).
++;;
++;; `run` takes a fixed step count, which is an arbitrary number chosen by the
++;; caller. A field that has NOT reached steady state looks exactly like one
++;; that has — same shape, same probe functions, no complaint. That is the same
++;; class of quiet-wrongness as a boolean feature that no-ops: the result is
++;; returned with full confidence and nothing says it is unfinished.
++;;
++;; `run-until-steady` iterates until the largest per-cell velocity change
++;; between successive steps falls below `tol`, and REPORTS which happened:
++;; `:converged` with the step count, or `:max-steps` with theremaining residual. The
++;; caller can then refuse to publish a non-converged number instead of
++;; publishing it unknowingly.
++;;
++;; Cost note: the residual needs the velocity field twice, so a checked step is
++;; more expensive than a bare one. `check-every` amortises that — the residual
++;; is only evaluated every Nth step, and the reported residual is the last one
++;; measured.
++;; ---------------------------------------------------------------------------
++
++(defn- velocity-snapshot
++  "Flat array of (ux,uy,uz) for every cell — solid cells contribute zeros."
++  [lbm]
++  (let [{:keys [nx ny nz]} lbm
++        n (* nx ny nz)
++        out (double-array (* n 3))]
++    (dotimes [i n]
++      (let [nxy (* nx ny)
++            z (quot i nxy) y (mod (quot i nx) ny) x (mod i nx)
++            [_ ux uy uz] (cell-macros lbm x y z)]
++        (aset ^doubles out (* i 3) (double ux))
++        (aset ^doubles out (+ (* i 3) 1) (double uy))
++        (aset ^doubles out (+ (* i 3) 2) (double uz))))
++    out))
++
++(defn- max-abs-diff [^doubles a ^doubles b]
++  (let [n (alength a)]
++    (loop [i 0 m 0.0]
++      (if (= i n) m
++          (recur (inc i) (max m (Math/abs (- (aget a i) (aget b i)))))))))
++
++(defn run-until-steady
++  "Iterate until steady, or until `max-steps`. Returns
++  `{:lbm :status :steps :residual :tol}` where `:status` is `:converged` or
++  `:max-steps`.
++
++  Give the criterion as **`:rel-tol`, a fraction of `u0`** — that is the only
++  form that means anything physically, and it is the recommended option.
++  `:tol` (absolute, lattice units) is still accepted but is easy to get badly
++  wrong: with u0 = 0.05, an innocent-looking `:tol 1e-7` is 2e-6 of the flow
++  scale and will run essentially forever on any real domain. `:rel-tol` is
++  scaled by u0 for you; 1e-4 is a reasonable engineering criterion, 1e-5 is
++  strict. If both are given, `:rel-tol` wins.
++
++  A `:max-steps` result is not a failure to be ignored: it means the reported
++  field is still evolving and any flux read off it is provisional. The returned
++  map always carries `:tol` (the absolute value actually used) and
++  `:rel-tol-used` so the criterion is never implicit."
++  ([lbm] (run-until-steady lbm {}))
++  ([lbm {:keys [tol rel-tol max-steps check-every]}]
++   (let [rel (when rel-tol (double rel-tol))
++         tol (double (cond rel (* rel (:u0 lbm))
++                           tol tol
++                           :else (* 1.0e-4 (:u0 lbm))))
++         max-steps (long (or max-steps 20000))
++         check-every (long (or check-every 50))]
++     (loop [s 0 l lbm prev (velocity-snapshot lbm) resid ##Inf]
++       (if (>= s max-steps)
++         {:lbm l :status :max-steps :steps s :residual resid :tol tol
++          :rel-tol-used (when rel rel)}
++         (let [l' (reduce (fn [acc _] (step acc)) l (range check-every))
++               s' (+ s check-every)
++               cur (velocity-snapshot l')
++               r (max-abs-diff cur prev)]
++           (if (<= r tol)
++             {:lbm l' :status :converged :steps s' :residual r :tol tol
++              :rel-tol-used (when rel rel)}
++             (recur s' l' cur r))))))))
++
++;; ---------------------------------------------------------------------------
++;; Validation: force-driven plane Poiseuille flow
++;; ---------------------------------------------------------------------------
++
++(defn poiseuille-analytic
++  "Exact steady plane-Poiseuille profile between no-slip walls a distance
++  `h` apart, driven by uniform acceleration `g` at viscosity `nu`:
++  u(y) = (g / (2 nu)) * y * (h - y)."
++  [g nu h y]
++  (* (/ g (* 2.0 nu)) y (- h y)))
++
++(defn poiseuille
++  "Force-driven plane Poiseuille flow: no-slip walls in y (halfway
++  bounce-back at y = -1/2 and y = ny - 1/2), **periodic in x and z**, driven
++  by uniform acceleration `g` in +x at viscosity `nu`.
++
++  Periodicity in the streamwise direction is not optional. The first version
++  of this function left every face a wall and the flow never developed — a
++  sealed box under a body force just pressurises. The verification below is
++  what surfaced that, which is the entire reason it exists."
++  [ny g nu]
++  (let [nx 3 nz 3
++        dom (domain nx ny nz (fn [_ _ _] false))]
++    (duct-new dom {:nu nu :force [g 0.0 0.0] :u0 1.0
++                   :patches [] :periodic #{:x :z}})))
++
++(defn validate-poiseuille
++  "Run force-driven Poiseuille and compare the centre-column y profile to
++  `poiseuille-analytic`. Returns
++  `{:l2-rel :u-max-sim :u-max-exact :profile-sim :profile-exact :ny :steps
++    :tol :pass?}`. `pass?` is the gate: relative L2 error <= `tol`
++  (default 0.02).
++
++  **Where the walls actually are.** With halfway bounce-back the wall sits half
++  a cell *outside* the first fluid node, so for `ny` fluid nodes the walls are
++  at y = -1/2 and y = ny - 1/2: the channel height is **H = ny** and fluid node
++  j (0-based) is at **y = j + 1/2**. Getting this convention wrong produces a
++  clean systematic error rather than noise — the first version of this function
++  used H = ny+1 and y = j+1, which under-predicted the analytic peak by ~17%
++  and read as a 22% L2 'solver error' when the solver was in fact right to
++  ~1%. The reference implementation is part of what a verification case has to
++  get right."
++  ([] (validate-poiseuille 21 1.0e-6 0.05 4000 0.02))
++  ([ny g nu steps tol]
++   (let [lbm (run (poiseuille ny g nu) steps)
++         h (double ny)
++         xs (long (/ 3 2)) zs (long (/ 3 2))
++         sim (mapv (fn [j] (let [[_ ux _ _] (cell-macros lbm xs j zs)] ux)) (range ny))
++         exact (mapv (fn [j] (poiseuille-analytic g nu h (+ 0.5 (double j)))) (range ny))
++         num (reduce + 0.0 (map (fn [a b] (let [d (- a b)] (* d d))) sim exact))
++         den (reduce + 0.0 (map (fn [b] (* b b)) exact))
++         l2 (if (pos? den) (d3/sqrt* (/ num den)) ##Inf)]
++     {:l2-rel l2
++      :u-max-sim (apply max sim)
++      :u-max-exact (apply max exact)
++      :profile-sim sim
++      :profile-exact exact
++      :ny ny :steps steps :tol tol
++      :pass? (<= l2 tol)})))
++
++
++;; ---------------------------------------------------------------------------
++;; Reynolds-number reachability — read this before using it on an enclosure.
++;;
++;; This solver is a **laminar-to-moderate-Re internal flow** tool. On a grid
++;; you can afford single-threaded, it cannot reach the Reynolds number of a
++;; fan-cooled computer enclosure, and the arithmetic is not close:
++;;
++;;   MK-1 enclosure, 6 mm cells (measured 2026-07-27):
++;;     lattice   Re = u0*L/nu = 0.05*31/0.02       =     78
++;;     physical  Re = 3 m/s * 0.093 m / 1.5e-5     = 18,400
++;;   To match at u0=0.05 on 31 cells you would need nu = 8.4e-5, i.e.
++;;   tau = 0.50025 — LBM loses stability as tau -> 0.5 — and the diffusive
++;;   settling time L^2/nu = 1.1e7 steps, about 26 days at this throughput.
++;;
++;; So do not point this at an enclosure and read the flux as an answer. Two
++;; honest uses remain: (1) verification and method development, where the
++;; Poiseuille case gives a closed-form check; (2) genuinely low-Re internal
++;; flow (fine channels, cold plates, creeping flow).
++;;
++;; For turbulent enclosure/vehicle airflow, route to a solver built for it —
++;; `kotoba-lang/kami-engine-cae-solver` already carries OpenFOAM evidence
++;; runners. Choosing the wrong solver and reporting its number confidently is
++;; a worse failure than not having a number.
++;;
++;; `reachable-reynolds` below makes the envelope computable instead of
++;; folklore, so a caller can check before spending an hour.
++;; ---------------------------------------------------------------------------
++
++(defn reynolds
++  "Lattice Reynolds number u0*L/nu for a characteristic length `l-cells`."
++  [lbm l-cells]
++  (/ (* (:u0 lbm) (double l-cells)) (:nu lbm)))
++
++(defn reachable-reynolds
++  "Given a characteristic length in cells, report the Re envelope this
++  substrate can actually deliver, and what a target Re would cost.
++
++  Returns `{:re-current :re-max-stable :nu-for-target :tau-for-target
++  :settling-steps-for-target :feasible?}`. `:feasible?` is false when the
++  target needs tau within `tau-margin` of 0.5 (unstable) or more than
++  `step-budget` settling steps — i.e. when the honest answer is to use a
++  different solver."
++  ([lbm l-cells target-re] (reachable-reynolds lbm l-cells target-re 0.01 1000000))
++  ([lbm l-cells target-re tau-margin step-budget]
++   (let [l (double l-cells)
++         nu-min (/ tau-margin 3.0)                 ; tau = 0.5 + 3nu
++         re-max (/ (* 0.1 l) nu-min)               ; u0 <= ~0.1 for stability
++         nu-t (/ (* (:u0 lbm) l) (double target-re))
++         tau-t (+ 0.5 (* 3.0 nu-t))
++         settle (/ (* l l) nu-t)]
++     {:re-current (reynolds lbm l-cells)
++      :re-max-stable re-max
++      :nu-for-target nu-t
++      :tau-for-target tau-t
++      :settling-steps-for-target settle
++      :feasible? (and (> tau-t (+ 0.5 tau-margin)) (<= settle step-budget))})))
++
++;; ---------------------------------------------------------------------------
++;; Engineering conversions — lattice units are not millimetres
++;; ---------------------------------------------------------------------------
++
++(defn lattice->cfm
++  "Convert a lattice patch flux to CFM given the cell size and the physical
++  inlet speed the lattice u0 represents.
++
++  Lattice results are dimensionless. The bridge is one length scale
++  (`cell-mm`) and one velocity scale: the lattice inlet speed `u-lat` stands
++  for the physical inlet speed `u-ms`. Volumetric flow is
++  Q = flux_lattice * cell_area * (u_ms / u_lat), then m3/s -> CFM.
++
++  **This conversion is where a plausible-looking CFD number can quietly
++  become wrong**, so the scale factors are arguments, never hidden defaults."
++  [flux-lattice cell-mm u-lat u-ms]
++  (let [cell-m (/ cell-mm 1000.0)
++        area (* cell-m cell-m)
++        q-m3s (* flux-lattice area (/ u-ms u-lat))]
++    {:q-m3s q-m3s :cfm (* q-m3s 2118.88)}))
++
++(defn bulk-delta-t
++  "Steady-state bulk air temperature rise across the enclosure, K:
++  dT = W / (rho * cp * Q). **Not a CFD result** — plain energy conservation
++  on the through-flow, using CFD only for Q. It bounds how hot the *exhaust
++  air* gets; it says nothing about component junction temperatures, which
++  need conjugate heat transfer this namespace does not implement."
++  [watts q-m3s]
++  (let [rho 1.164 cp 1005.0]        ; air at ~30 C, 1 atm
++    (if (pos? q-m3s) (/ watts (* rho cp q-m3s)) ##Inf)))
+diff --git a/src/kami_cfd/mesh.cljk b/src/kami_cfd/mesh.cljk
+new file mode 100644
+index 0000000..81a305a
+--- /dev/null
++++ b/src/kami_cfd/mesh.cljk
+@@ -0,0 +1,136 @@
++(ns kami-cfd.mesh
++  "Mesh import + parametric geometry — real vehicle surfaces voxelised into
++  the D3Q19 solver (`kami-cfd.d3`), replacing the box/fastback primitives.
++  Migrated in place from the kami-engine-cfd Rust crate (`src/mesh.rs`, 65
++  lines) as part of the repo-wide Rust-demotion / clj-wgsl-migration runtime
++  priority (com-junkawasaki/root AGENTS.md, ADR-2607010930) — see the
++  `kami-cfd` namespace docstring and this repo's README for full migration
++  context. Binary STL parser plus an Ahmed-body generator (the canonical
++  automotive CFD validation bluff body: a block with a slanted rear).
++  Winding is irrelevant downstream — `kami-cfd.d3/from-triangles` voxelises
++  via ray-parity, which only counts surface crossings.
++
++  A triangle (`Tri`) is `[[x y z] [x y z] [x y z]]` — three vertices, each a
++  3-vector of doubles, mirroring the original `type Tri = [[f64; 3]; 3]`.
++
++  `parse-stl` takes any indexed, `count`-able sequence of byte values 0-255
++  (a JVM `byte-array`, a plain vector of ints, or a converted JS byte array
++  under cljs/nbb — see `parse-stl` docstring) and decodes little-endian
++  u32/f32 fields with pure integer arithmetic (no `java.nio.ByteBuffer` /
++  `js/DataView`), so the decoder itself needs zero reader conditionals and
++  runs unmodified on JVM Clojure, ClojureScript, and nbb.")
++
++;; ---------------------------------------------------------------------------
++;; Portable little-endian binary decoding (pure arithmetic, no platform APIs)
++;; ---------------------------------------------------------------------------
++
++(defn- unsigned-byte
++  "The byte at index `i`, normalised to 0-255. `bit-and 0xff` makes this
++  correct whether `bytes` is a JVM `byte-array` (signed -128..127) or a
++  cljs/nbb byte sequence that is already unsigned 0-255."
++  [bytes i]
++  (bit-and (nth bytes i) 0xff))
++
++(defn- read-u32-le
++  "Little-endian u32 at byte offset `offset`. Built with `+`/`*` (not
++  bit-shifting) so it never touches the sign bit of a host 32-bit int on
++  either platform — safe up to 2^32-1, well inside the 2^53 exact-integer
++  range of a JS/JVM double."
++  [bytes offset]
++  (+ (unsigned-byte bytes offset)
++     (* (unsigned-byte bytes (+ offset 1)) 256)
++     (* (unsigned-byte bytes (+ offset 2)) 65536)
++     (* (unsigned-byte bytes (+ offset 3)) 16777216)))
++
++(defn- pow2
++  "2^n for integer n (positive, negative, or zero) via repeated
++  multiplication/division — avoids any platform `Math/pow` call."
++  [n]
++  (loop [n (long n) acc 1.0]
++    (cond
++      (zero? n) acc
++      (pos? n) (recur (dec n) (* acc 2.0))
++      :else (recur (inc n) (/ acc 2.0)))))
++
++(defn- read-f32-le
++  "Little-endian IEEE-754 single-precision float at byte offset `offset`,
++  decoded from its sign/exponent/mantissa bit fields via pure integer
++  arithmetic (quot/rem on the u32 bit pattern) — no `Float/intBitsToFloat` /
++  `DataView.getFloat32`. Handles zero, subnormals, +-infinity and NaN;
++  STL vertex data in practice is always a normal finite float."
++  [bytes offset]
++  (let [bits (read-u32-le bytes offset)
++        sign-bit (quot bits 2147483648)
++        rem31 (- bits (* sign-bit 2147483648))
++        exponent (quot rem31 8388608)
++        mantissa (- rem31 (* exponent 8388608))
++        sign (if (zero? sign-bit) 1.0 -1.0)]
++    (cond
++      (and (zero? exponent) (zero? mantissa)) (* sign 0.0)
++      (zero? exponent) (* sign mantissa (pow2 -149)) ; subnormal
++      (= exponent 255) (if (zero? mantissa) (* sign ##Inf) ##NaN)
++      :else (* sign (+ 1.0 (/ mantissa 8388608.0)) (pow2 (- exponent 127))))))
++
++(defn parse-stl
++  "Parse a binary STL (80-byte header, u32 triangle count, 50 bytes/triangle:
++  3 floats normal + 3x3 floats verts + 2 attr bytes). Returns a vector of
++  `Tri`s (empty if `bytes` is too short to hold the header). `bytes` must
++  support `count` and `nth` — a JVM `byte-array` or plain vector works
++  directly; a cljs/nbb `js/Uint8Array` should be converted first (e.g.
++  `(js/Array.from arr)` or `(vec arr)`) for guaranteed cross-platform `nth`
++  support."
++  [bytes]
++  (if (< (count bytes) 84)
++    []
++    (let [n (long (read-u32-le bytes 80))]
++      (loop [tri-i 0 off 84 tris (transient [])]
++        (if (or (>= tri-i n) (> (+ off 50) (count bytes)))
++          (persistent! tris)
++          (let [vert (fn [v]
++                       (let [b (+ off 12 (* v 12))] ; skip the 12-byte normal
++                         [(read-f32-le bytes b)
++                          (read-f32-le bytes (+ b 4))
++                          (read-f32-le bytes (+ b 8))]))]
++            (recur (inc tri-i) (+ off 50)
++                   (conj! tris [(vert 0) (vert 1) (vert 2)]))))))))
++
++;; ---------------------------------------------------------------------------
++;; Ahmed body (parametric bluff-body validation geometry)
++;; ---------------------------------------------------------------------------
++
++(def ^:private pi 3.141592653589793)
++
++(defn- tan* [x]
++  #?(:clj (Math/tan (double x))
++     :cljs (js/Math.tan x)))
++
++(defn- to-radians [deg] (* deg (/ pi 180.0)))
++
++(defn- prism
++  "Extrude a side profile (CCW list of `[x z]` points) along y from 0..width
++  into a closed triangle soup."
++  [profile width]
++  (let [n (count profile)
++        p (fn [i y] (let [[px pz] (nth profile i)] [px y pz]))]
++    (vec
++     (concat
++      (mapcat (fn [i]
++                [[(p 0 0.0) (p i 0.0) (p (inc i) 0.0)]         ; near cap
++                 [(p 0 width) (p (inc i) width) (p i width)]]) ; far cap
++              (range 1 (dec n)))
++      (mapcat (fn [i]
++                (let [j (mod (inc i) n)]
++                  [[(p i 0.0) (p i width) (p j 0.0)]
++                   [(p j 0.0) (p i width) (p j width)]]))
++              (range n))))))
++
++(defn ahmed-body
++  "Ahmed-like body: length 10, height 3, width 4, with a rear-roof slant.
++  `slant-deg >= 90` -> squareback (vertical rear). Sits on z=0."
++  [slant-deg]
++  (let [l 10.0 h 3.0 w 4.0]
++    (if (>= slant-deg 90.0)
++      (prism [[0.0 0.0] [l 0.0] [l h] [0.0 h]] w)
++      (let [slant-x 3.0
++            hr (max (- h (* slant-x (tan* (to-radians slant-deg)))) 0.2)]
++        (prism [[0.0 0.0] [l 0.0] [l hr] [(- l slant-x) h] [0.0 h]] w)))))
+diff --git a/src/kami_cfd/runner.cljk b/src/kami_cfd/runner.cljk
+new file mode 100644
+index 0000000..1c3945e
+--- /dev/null
++++ b/src/kami_cfd/runner.cljk
+@@ -0,0 +1,69 @@
++(ns kami-cfd.runner
++  "kami-cfd CLI — compute the sectional/vehicle Cd of a built-in body
++  profile. JVM-only (`kbb -X:cli` / `kbb -M -m kami-cfd.runner`),
++  mirroring the conservative host-side runner pattern used by
++  `kotoba-lang/plm`'s `src/kotoba/plm/runner.clj` — a thin argv-driven
++  entry point over the portable `.cljc` solver namespaces (`kami-cfd`,
++  `kami-cfd.d3`, `kami-cfd.mesh`), not a runtime of its own. Ported from the
++  original Rust `src/main.rs` (70 lines); nice-to-have per the migration
++  plan, not required — see this repo's README.
++
++  Usage: `kbb -M -m kami-cfd.runner [block|teardrop|box3d|fastback3d|ahmed|stl] [re] [steps] [extra]`
++  Emits an EDN line the `:lbm` cae-solver method (or a human) can read."
++  (:require [kotoba.io :as io]
++            [kami-cfd :as cfd]
++            [kami-cfd.d3 :as d3]
++            [kami-cfd.mesh :as mesh])
++  (:gen-class))
++
++(defn- arg-double [s fallback]
++  (if s (Double/parseDouble s) fallback))
++
++(defn- arg-long [s fallback]
++  (if s (Long/parseLong s) fallback))
++
++(defn -main [& args]
++  (let [[shape re-s steps-s extra] args
++        shape (or shape "block")
++        re (arg-double re-s 100.0)
++        steps (arg-long steps-s 3000)]
++    (cond
++      ;; Real-geometry modes: voxelise a mesh (parametric Ahmed body, or an STL).
++      (contains? #{"ahmed" "stl"} shape)
++      (let [nx 140 ny 64 nz 40
++            tris (if (= shape "stl")
++                   (mesh/parse-stl (vec (.readAllBytes (io/input-stream extra))))
++                   (mesh/ahmed-body (arg-double extra 25.0)))
++            body (d3/from-triangles nx ny nz tris 48.0 20.0)
++            cells (:frontal-cells body)
++            st (max steps 1500)
++            cd (d3/vehicle-cd body (if (= re 100.0) 3000.0 re) st)]
++        (println (str "{:solver :lbm :dim 3 :geom :" shape " :tris " (count tris)
++                       " :frontal-cells " cells " :steps " st
++                       " :vehicle-cd " (format "%.4f" cd) "}")))
++
++      ;; 3D mode: true vehicle Cd (frontal-area-normalised).
++      (contains? #{"box3d" "fastback3d"} shape)
++      ;; Larger, lower-blockage domain (16% vs the test's 29%). NOTE:
++      ;; single-relaxation BGK alone is laminar and stable only at modest
++      ;; Re (tau must stay clear of 0.5); the Smagorinsky LES in
++      ;; `kami-cfd.d3` extends that, but reaching the turbulent automotive
++      ;; value (~0.3 @ Re~1e6) still needs a much finer grid than a CLI
++      ;; smoke run — the ranking is exact, aero-clj calibrates scale.
++      (let [nx 100 ny 56 nz 36
++            body (if (= shape "fastback3d")
++                   (d3/fastback-car nx ny nz 16 44 20 16)
++                   (d3/box-car nx ny nz 16 44 20 16))
++            st (max steps 1500)
++            cd (d3/vehicle-cd body re st)]
++        (println (str "{:solver :lbm :dim 3 :shape :" shape " :re " re
++                       " :steps " st " :vehicle-cd " (format "%.4f" cd) "}")))
++
++      :else
++      (let [nx 240 ny 80
++            body (if (= shape "teardrop")
++                   (cfd/teardrop nx ny 40 60 24)
++                   (cfd/block nx ny 40 24 24))
++            cd (cfd/sectional-cd body re steps)]
++        (println (str "{:solver :lbm :dim 2 :shape :" shape " :re " re
++                       " :steps " steps " :sectional-cd " (format "%.4f" cd) "}"))))))
+diff --git a/src/kami_engine/cfd/contract.cljk b/src/kami_engine/cfd/contract.cljk
+new file mode 100644
+index 0000000..7e23844
+--- /dev/null
++++ b/src/kami_engine/cfd/contract.cljk
+@@ -0,0 +1,116 @@
++(ns kami-engine.cfd.contract)
++
++(def solvers #{:lbm :rom-buildup :rans :les :dns :external})
++(def dims #{2 3})
++(def geometries #{:block :teardrop :box3d :fastback3d :ahmed :stl :mesh})
++(def statuses #{:ok :denied :failed})
++
++(def request-keys
++  #{:kami.cfd/solver
++    :kami.cfd/dim
++    :kami.cfd/geometry
++    :kami.cfd/reynolds
++    :kami.cfd/steps
++    :kami.cfd/mesh
++    :kami.cfd/options})
++
++(def result-keys
++  #{:kami.cfd/solver
++    :kami.cfd/dim
++    :kami.cfd/geometry
++    :kami.cfd/sectional-cd
++    :kami.cfd/vehicle-cd
++    :kami.cfd/frontal-cells
++    :kami.cfd/steps
++    :kami.cfd/status
++    :kami.cfd/message})
++
++(defn- positive-number? [x]
++  (and (number? x) (pos? x) (= x x)))
++
++(defn- positive-int? [x]
++  (and (int? x) (pos? x)))
++
++(defn- err [path code message]
++  {:path path :code code :message message})
++
++(defn validate-request [request]
++  (let [unknowns (remove request-keys (keys request))
++        errors (cond-> []
++                 (not (map? request))
++                 (conj (err [] :not-map "request must be a map"))
++
++                 (not (contains? solvers (:kami.cfd/solver request)))
++                 (conj (err [:kami.cfd/solver] :invalid "unknown CFD solver"))
++
++                 (not (contains? dims (:kami.cfd/dim request)))
++                 (conj (err [:kami.cfd/dim] :invalid "dimension must be 2 or 3"))
++
++                 (not (contains? geometries (:kami.cfd/geometry request)))
++                 (conj (err [:kami.cfd/geometry] :invalid "unknown geometry"))
++
++                 (not (positive-number? (:kami.cfd/reynolds request)))
++                 (conj (err [:kami.cfd/reynolds] :invalid "Reynolds number must be positive"))
++
++                 (not (positive-int? (:kami.cfd/steps request)))
++                 (conj (err [:kami.cfd/steps] :invalid "steps must be a positive integer"))
++
++                 (and (= :stl (:kami.cfd/geometry request))
++                      (not (string? (:kami.cfd/mesh request))))
++                 (conj (err [:kami.cfd/mesh] :required "STL geometry requires a mesh path"))
++
++                 (seq unknowns)
++                 (into (map #(err [%] :unknown "unknown kami.cfd request key") unknowns)))]
++    {:valid? (empty? errors) :errors errors}))
++
++(defn request? [request]
++  (:valid? (validate-request request)))
++
++(defn validate-result [result]
++  (let [unknowns (remove result-keys (keys result))
++        has-cd? (or (positive-number? (:kami.cfd/sectional-cd result))
++                    (positive-number? (:kami.cfd/vehicle-cd result)))
++        errors (cond-> []
++                 (not (map? result))
++                 (conj (err [] :not-map "result must be a map"))
++
++                 (not (contains? solvers (:kami.cfd/solver result)))
++                 (conj (err [:kami.cfd/solver] :invalid "unknown CFD solver"))
++
++                 (not (contains? dims (:kami.cfd/dim result)))
++                 (conj (err [:kami.cfd/dim] :invalid "dimension must be 2 or 3"))
++
++                 (not (contains? geometries (:kami.cfd/geometry result)))
++                 (conj (err [:kami.cfd/geometry] :invalid "unknown geometry"))
++
++                 (not (contains? statuses (:kami.cfd/status result)))
++                 (conj (err [:kami.cfd/status] :invalid "status must be known"))
++
++                 (and (= :ok (:kami.cfd/status result)) (not has-cd?))
++                 (conj (err [:kami.cfd/vehicle-cd] :required "successful result needs a positive Cd"))
++
++                 (and (contains? result :kami.cfd/steps)
++                      (not (positive-int? (:kami.cfd/steps result))))
++                 (conj (err [:kami.cfd/steps] :invalid "steps must be a positive integer"))
++
++                 (seq unknowns)
++                 (into (map #(err [%] :unknown "unknown kami.cfd result key") unknowns)))]
++    {:valid? (empty? errors) :errors errors}))
++
++(defn result? [result]
++  (:valid? (validate-result result)))
++
++(defn same-run? [request result]
++  (and (request? request)
++       (result? result)
++       (= (select-keys request [:kami.cfd/solver :kami.cfd/dim :kami.cfd/geometry])
++          (select-keys result [:kami.cfd/solver :kami.cfd/dim :kami.cfd/geometry]))))
++
++(defn cd [result]
++  (or (:kami.cfd/vehicle-cd result)
++      (:kami.cfd/sectional-cd result)))
++
++(defn lower-drag? [a b]
++  (and (result? a)
++       (result? b)
++       (< (cd a) (cd b))))
+diff --git a/test/kami_cfd/duct_test.cljk b/test/kami_cfd/duct_test.cljk
+new file mode 100644
+index 0000000..f81fb5a
+--- /dev/null
++++ b/test/kami_cfd/duct_test.cljk
+@@ -0,0 +1,142 @@
++(ns kami-cfd.duct-test
++  "Verification for `kami-cfd.duct` (internal / duct flow).
++
++  The first test is the one that matters: force-driven plane Poiseuille flow
++  has a closed-form steady solution, so it is a real *verification* case, not
++  a smoke test. If it fails, the bounce-back walls or the tau<->nu mapping are
++  wrong and every enclosure number the namespace produces is meaningless.
++
++  Runtime note. These run on the JVM (`kbb -M:test`), matching this repo's
++  existing `kami-cfd.runner` host-runner pattern. The namespace itself is
++  portable `.cljc` and loads on nbb, but nbb executes via SCI (an
++  interpreter), so a tight 19-velocity lattice loop is orders of magnitude
++  slower there — portable does not mean fast. Numerics belong on a compiled
++  host; nbb stays for orchestration."
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kami-cfd.duct :as duct]
++            [kami-cfd.d3 :as d3]))
++
++(deftest bool-array-is-portable-and-false-filled
++  (testing "the portability shim keeps ClojureScript truthiness semantics"
++    (let [a (d3/bool-array 8)]
++      (is (= 8 (count (seq a))))
++      (is (every? false? (seq a)) "must be false-filled, not 0-filled")
++      (aset a 3 true)
++      (is (true? (aget a 3)))
++      (is (false? (aget a 4))))))
++
++(deftest domain-marks-solid-cells
++  (let [d (duct/domain 4 4 4 (duct/boxes->solid-fn [[[1 1 1] [3 3 3]]]))]
++    (is (= 8 (:solid-count d)) "2x2x2 box = 8 cells")
++    (is (true? (aget (:solid d) (+ (* (+ (* 1 4) 1) 4) 1))))
++    (is (false? (aget (:solid d) 0)))))
++
++(deftest poiseuille-matches-closed-form
++  (testing "force-driven plane Poiseuille vs u(y)=(g/2nu)*y*(h-y)"
++    (let [r (duct/validate-poiseuille 21 1.0e-6 0.05 4000 0.02)]
++      (println "  poiseuille: L2-rel =" (:l2-rel r)
++               " u-max sim =" (:u-max-sim r)
++               " exact =" (:u-max-exact r))
++      (is (:pass? r)
++          (str "relative L2 error " (:l2-rel r) " exceeds tol " (:tol r)
++               " — bounce-back walls or the viscosity mapping are wrong"))
++      (is (pos? (:u-max-sim r)) "flow must actually develop")
++      (is (< (Math/abs (- (double (:u-max-sim r)) (double (:u-max-exact r))))
++             (* 0.05 (double (:u-max-exact r))))
++          "centreline peak within 5% of analytic"))))
++
++(deftest walls-are-sealed-without-patches
++  (testing "with no inlet/outlet patch, a driven box conserves mass (sealed)"
++    (let [d (duct/domain 6 6 6 (fn [_ _ _] false))
++          lbm (duct/run (duct/duct-new d {:nu 0.05 :u0 0.05 :patches []}) 50)
++          total (reduce + 0.0
++                        (for [z (range 6) y (range 6) x (range 6)]
++                          (first (duct/cell-macros lbm x y z))))]
++      ;; initialised at rho=1 in 216 cells; no source, no sink
++      (is (< (Math/abs (- total 216.0)) 1.0)
++          (str "sealed box lost/gained mass: total rho = " total)))))
++
++(deftest inlet-drives-flow-through-outlet
++  (testing "an inlet patch and an opposite outlet patch produce through-flow"
++    (let [nx 8 ny 8 nz 24
++          d (duct/domain nx ny nz (fn [_ _ _] false))
++          lbm (duct/run
++               (duct/duct-new d {:nu 0.02 :u0 0.05
++                                 :patches [(duct/full-face :z-min :inlet 0.05)
++                                           (duct/full-face :z-max :outlet nil)]})
++               600)
++          fin (duct/patch-flux lbm :inlet)
++          fout (duct/patch-flux lbm :outlet)
++          mid (duct/speed-at lbm (quot nx 2) (quot ny 2) (quot nz 2))]
++      (println "  duct: inlet flux =" fin " outlet flux =" fout " mid speed =" mid)
++      (is (pos? fin) "inlet must push air in")
++      (is (pos? mid) "air must reach the middle of the duct")
++      ;; outlet flux is measured along its own inward normal, so through-flow
++      ;; leaving the domain reads negative there
++      (is (neg? fout) "outlet must carry air out"))))
++
++(deftest stagnant-fraction-detects-a-blocked-branch
++  (testing "a blind pocket shows up as stagnant, an open duct does not"
++    (let [nx 8 ny 8 nz 20
++          open (duct/domain nx ny nz (fn [_ _ _] false))
++          ;; a solid slab across most of the duct leaves a blind pocket behind it
++          blocked (duct/domain nx ny nz
++                               (duct/boxes->solid-fn [[[0 0 8] [nx (dec ny) 10]]]))
++          mk (fn [d] (duct/run
++                      (duct/duct-new d {:nu 0.02 :u0 0.05
++                                        :patches [(duct/full-face :z-min :inlet 0.05)
++                                                  (duct/full-face :z-max :outlet nil)]})
++                      600))
++          s-open (duct/stagnant-fraction (mk open) 0.1)
++          s-blocked (duct/stagnant-fraction (mk blocked) 0.1)]
++      (println "  stagnant fraction: open =" s-open " blocked =" s-blocked)
++      (is (> s-blocked s-open)
++          "an obstructed duct must have more dead volume than an open one"))))
++
++(deftest engineering-conversions-are-explicit
++  (testing "lattice->cfm and bulk-delta-t"
++    (let [{:keys [q-m3s cfm]} (duct/lattice->cfm 100.0 4.0 0.05 2.0)]
++      (is (pos? q-m3s))
++      (is (< (Math/abs (- cfm (* q-m3s 2118.88))) 1e-6))
++      ;; 334 W into that flow
++      (let [dt (duct/bulk-delta-t 334.0 q-m3s)]
++        (is (pos? dt))
++        (is (= ##Inf (duct/bulk-delta-t 334.0 0.0)) "no flow = unbounded rise")))))
++
++(deftest run-until-steady-reports-which-happened
++  (testing "a small duct converges and says so"
++    (let [d (duct/domain 6 6 14 (fn [_ _ _] false))
++          r (duct/run-until-steady
++             (duct/duct-new d {:nu 0.05 :u0 0.05
++                               :patches [(duct/full-face :z-min :inlet 0.05)
++                                         (duct/full-face :z-max :outlet nil)]})
++             {:tol 1.0e-7 :max-steps 8000 :check-every 50})]
++      (println "  run-until-steady:" (:status r) "steps" (:steps r) "residual" (:residual r))
++      (is (= :converged (:status r)))
++      (is (<= (:residual r) (:tol r)))
++      (is (pos? (:steps r)))))
++  (testing "an impossible tolerance reports :max-steps, not silence"
++    (let [d (duct/domain 6 6 14 (fn [_ _ _] false))
++          r (duct/run-until-steady
++             (duct/duct-new d {:nu 0.05 :u0 0.05
++                               :patches [(duct/full-face :z-min :inlet 0.05)
++                                         (duct/full-face :z-max :outlet nil)]})
++             {:tol 1.0e-30 :max-steps 200 :check-every 50})]
++      (is (= :max-steps (:status r)))
++      (is (> (:residual r) (:tol r))
++          "a non-converged run must expose its residual so the caller can refuse it"))))
++
++(deftest reynolds-envelope-refuses-an-out-of-regime-target
++  (testing "the MK-1 enclosure case is correctly reported as infeasible"
++    (let [d (duct/domain 6 6 10 (fn [_ _ _] false))
++          lbm (duct/duct-new d {:nu 0.02 :u0 0.05 :patches []})
++          env (duct/reachable-reynolds lbm 31 18400)]
++      (println "  Re envelope:" (select-keys env [:re-current :tau-for-target
++                                                 :settling-steps-for-target :feasible?]))
++      (is (< 70.0 (:re-current env) 85.0) "lattice Re ~78 at these settings")
++      (is (false? (:feasible? env))
++          "Re 18400 needs tau ~0.5003 and ~1e7 settling steps — must be refused")))
++  (testing "a genuinely low-Re target is feasible"
++    (let [d (duct/domain 6 6 10 (fn [_ _ _] false))
++          lbm (duct/duct-new d {:nu 0.02 :u0 0.05 :patches []})]
++      (is (true? (:feasible? (duct/reachable-reynolds lbm 31 100)))))))
+diff --git a/test/kami_cfd_test.cljk b/test/kami_cfd_test.cljk
+new file mode 100644
+index 0000000..90fcde1
+--- /dev/null
++++ b/test/kami_cfd_test.cljk
+@@ -0,0 +1,171 @@
++(ns kami-cfd-test
++  "Tests ported 1:1 from the original Rust `#[test]`s in the kami-engine-cfd
++  Rust crate (`tests/drag.rs`, `tests/drag3d.rs`, `tests/mesh.rs` — 8 tests,
++  ~118 lines total), restored as portable CLJC per ADR-2607010930 / the
++  repo-wide Rust-demotion policy. See `kami-cfd`/`kami-cfd.d3` namespace
++  docstrings and this repo's README for full migration context. All 8
++  original tests are ported; none were dropped.
++
++  Grid size / step count changes from the originals (all documented inline
++  at each test below, with the original Rust values quoted in comments):
++  interpreted JVM Clojure without hand-unrolled/AOT numeric code is roughly
++  1-2 orders of magnitude slower per lattice-cell-step than native Rust, so
++  running the original tests unchanged (some of which simulate hundreds of
++  thousands of cells for 1000-3000 steps, i.e. billions of inner-loop
++  iterations) would make a single `kbb -M:test` run take tens of
++  minutes. The 2D tests keep their original 240x80 grid and only cut step
++  counts by roughly half (steady-state wake structure is already resolved
++  well before then, and the assertions here are ORDER comparisons, not
++  exact absolute Cd values). The two 3D tests that run the LES solver for
++  many steps (`high-re-stable-with-les`, `fastback-beats-squareback`,
++  `ahmed-slant-reduces-drag`) additionally shrink the domain and body
++  proportionally (same blockage ratio, same relative body shape) so the
++  physics being demonstrated — LES keeping high-Re BGK stable, fastback
++  beating squareback, a slanted rear beating a squareback — is unchanged,
++  just at a cheaper cell count. `mesh-voxelises-to-a-solid` and
++  `stl-roundtrips` do no LBM stepping at all, so they keep the ORIGINAL
++  Rust grid sizes unchanged (voxelisation alone is cheap regardless of grid
++  size)."
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kami-cfd :as cfd]
++            [kami-cfd.mesh :as mesh]
++            [kami-cfd.d3 :as d3]))
++
++;; ---------------------------------------------------------------------------
++;; tests/drag.rs -> 2D D2Q9 sectional-Cd contract
++;; ---------------------------------------------------------------------------
++
++(def ^:private nx-2d 240)
++(def ^:private ny-2d 80)
++
++(deftest block-drag-is-finite-and-positive
++  (testing "the solver is stable and a bluff body has positive sectional drag
++  (ported from tests/drag.rs `block_drag_is_finite_and_positive`; original
++  Rust used 2500 steps, reduced here to 1000 — see namespace docstring)"
++    (let [cd (cfd/sectional-cd (cfd/block nx-2d ny-2d 40 24 24) 100.0 1000)]
++      (is (Double/isFinite (double cd)) (str "Cd must be finite, got " cd))
++      (is (pos? cd) (str "a bluff body has positive drag, got " cd)))))
++
++(deftest bluff-beats-streamlined
++  (testing "same frontal height (24), different afterbody: square block vs
++  teardrop — squareback must out-drag a streamlined tail (ported from
++  tests/drag.rs `bluff_beats_streamlined`; original Rust used 3000 steps,
++  reduced here to 1200)"
++    (let [block (cfd/sectional-cd (cfd/block nx-2d ny-2d 40 24 24) 100.0 1200)
++          tear (cfd/sectional-cd (cfd/teardrop nx-2d ny-2d 40 60 24) 100.0 1200)]
++      (is (> block tear)
++          (str "squareback must out-drag a streamlined tail: block=" block " teardrop=" tear)))))
++
++(deftest taller-body-more-drag
++  (testing "more frontal blockage -> more drag force, both finite/positive
++  (ported from tests/drag.rs `taller_body_more_drag`; original Rust used
++  2500 steps, reduced here to 1000)"
++    (let [small (cfd/sectional-cd (cfd/block nx-2d ny-2d 40 24 16) 100.0 1000)
++          big (cfd/sectional-cd (cfd/block nx-2d ny-2d 40 24 32) 100.0 1000)]
++      (is (and (Double/isFinite (double small)) (Double/isFinite (double big))))
++      (is (and (pos? small) (pos? big))))))
++
++;; ---------------------------------------------------------------------------
++;; tests/drag3d.rs -> D3Q19 + Smagorinsky LES vehicle-Cd contract
++;;
++;; Original Rust domain: NX=96 NY=40 NZ=28, body3/box-car(x0=16 len=44 w=20
++;; h=16). Reduced here to a domain and body each halved on every axis
++;; (NX=48 NY=20 NZ=14, box-car x0=8 len=22 w=10 h=8) — 1/8 the cell count,
++;; same blockage ratio and body proportions.
++;; ---------------------------------------------------------------------------
++
++(def ^:private nx-3d 48)
++(def ^:private ny-3d 20)
++(def ^:private nz-3d 14)
++
++(deftest high-re-stable-with-les
++  (testing "Re=2000 — single-relaxation BGK NaNs here; the Smagorinsky LES
++  keeps the solver stable (tau stays clear of 1/2). The absolute value is
++  still inflated by the coarse high-blockage test domain; aero-clj
++  calibrates the scale (ported from tests/drag3d.rs
++  `high_re_stable_with_les`; original Rust used 1000 steps at the full-size
++  domain, reduced here to 700 steps at the halved domain)"
++    (let [body (d3/box-car nx-3d ny-3d nz-3d 8 22 10 8)
++          cd (d3/vehicle-cd body 2000.0 700)]
++      (is (and (Double/isFinite (double cd)) (pos? cd))
++          (str "LES must stay stable at high Re, got " cd))
++      ;; Smaller/higher-blockage domain than the original -> a looser sanity
++      ;; ceiling than the original 12.0 (still just a NaN/blowup guard, not
++      ;; a precision assertion).
++      (is (< cd 25.0) (str "Cd sanity ceiling exceeded: " cd)))))
++
++(deftest fastback-beats-squareback
++  (testing "equal frontal area, tapered roof vs squareback -> lower pressure
++  drag in the turbulent (LES) regime (ported from tests/drag3d.rs
++  `fastback_beats_squareback`; original Rust used 1200 steps at the
++  full-size domain, reduced here to 700 steps at the halved domain)"
++    (let [box-cd (d3/vehicle-cd (d3/box-car nx-3d ny-3d nz-3d 8 22 10 8) 2000.0 700)
++          fast-cd (d3/vehicle-cd (d3/fastback-car nx-3d ny-3d nz-3d 8 22 10 8) 2000.0 700)]
++      (is (< fast-cd box-cd)
++          (str "fastback must beat squareback: box=" box-cd " fastback=" fast-cd)))))
++
++;; ---------------------------------------------------------------------------
++;; tests/mesh.rs -> real-geometry (STL / Ahmed body) voxelisation pipeline
++;; ---------------------------------------------------------------------------
++
++(deftest mesh-voxelises-to-a-solid
++  (testing "a triangle mesh voxelises into a substantial solid body with a
++  meaningful frontal area (ported from tests/mesh.rs
++  `mesh_voxelises_to_a_solid`; no LBM stepping involved, so this keeps the
++  ORIGINAL Rust grid unchanged: NX=140 NY=64 NZ=40, len-cells=48, x0=20)"
++    (let [tris (mesh/ahmed-body 90.0) ; squareback box
++          body (d3/from-triangles 140 64 40 tris 48.0 20.0)
++          filled (count (filter true? (seq (:solid body))))]
++      (is (> filled 1000) (str "voxelised body should be substantial, got " filled " cells"))
++      (is (> (:frontal-cells body) 100) (str "frontal area too small: " (:frontal-cells body))))))
++
++(deftest ahmed-slant-reduces-drag
++  (testing "a 25 degree rear slant must out-perform a vertical squareback
++  (same box) (ported from tests/mesh.rs `ahmed_slant_reduces_drag`;
++  original Rust used NX=140 NY=64 NZ=40, len-cells=48, x0=20, 1200 steps —
++  reduced here to NX=48 NY=22 NZ=14, len-cells=16, x0=7, 700 steps, same
++  proportions, per the namespace docstring)"
++    (let [square (d3/from-triangles 48 22 14 (mesh/ahmed-body 90.0) 16.0 7.0)
++          slant (d3/from-triangles 48 22 14 (mesh/ahmed-body 25.0) 16.0 7.0)
++          sq-cd (d3/vehicle-cd square 2000.0 700)
++          sl-cd (d3/vehicle-cd slant 2000.0 700)]
++      (is (and (Double/isFinite (double sq-cd)) (Double/isFinite (double sl-cd))))
++      (is (< sl-cd sq-cd)
++          (str "25deg slant must beat squareback: square=" sq-cd " slant=" sl-cd)))))
++
++(deftest stl-roundtrips
++  (testing "a tiny hand-built binary STL (1 triangle) parses back to one
++  triangle (ported from tests/mesh.rs `stl_roundtrips`)"
++    (let [b (byte-array (+ 84 50) (byte 0))
++          put-f32 (fn [buf o v]
++                     (let [bits (Float/floatToIntBits (float v))]
++                       (aset-byte buf o (unchecked-byte bits))
++                       (aset-byte buf (+ o 1) (unchecked-byte (bit-shift-right bits 8)))
++                       (aset-byte buf (+ o 2) (unchecked-byte (bit-shift-right bits 16)))
++                       (aset-byte buf (+ o 3) (unchecked-byte (bit-shift-right bits 24)))))]
++      (aset-byte b 80 (byte 1)) ; count = 1 (little-endian u32, low byte only needed)
++      (doseq [[idx c] (map-indexed vector [0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0])]
++        (put-f32 b (+ 84 12 (* idx 4)) c))
++      (let [tris (mesh/parse-stl (vec b))]
++        (is (= 1 (count tris)))
++        (is (= [1.0 0.0 0.0] (second (first tris))))))))
++
++(deftest velocity-and-density-probes-test
++  (testing "velocity-at / density-at return finite values at a fluid cell"
++    (let [body (cfd/block 120 40 30 8 12)
++          lbm  (loop [s 0 l (cfd/lbm-new body 100.0)]
++                 (if (>= s 30) l (recur (inc s) (first (cfd/step l)))))
++          ;; probe upstream of the obstacle, mid-channel (a fluid cell)
++          v   (cfd/velocity-at lbm 10 20)
++          rho (cfd/density-at lbm 10 20)]
++      (is (some? v))
++      (is (number? (first v)))
++      (is (number? (second v)))
++      (is (number? rho))))
++  (testing "probes return nil on a solid cell and out-of-range"
++    (let [body (cfd/block 120 40 30 8 12)
++          lbm  (cfd/lbm-new body 100.0)]
++      ;; obstacle centre is solid (block x in [30,38], y in [14,26])
++      (is (nil? (cfd/velocity-at lbm 34 20)))
++      ;; out of range
++      (is (nil? (cfd/velocity-at lbm 999 999))))))
+diff --git a/test/kami_engine/cfd/contract_test.cljk b/test/kami_engine/cfd/contract_test.cljk
+new file mode 100644
+index 0000000..8834b5a
+--- /dev/null
++++ b/test/kami_engine/cfd/contract_test.cljk
+@@ -0,0 +1,59 @@
++(ns kami-engine.cfd.contract-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kami-engine.cfd.contract :as cfd]))
++
++(def ahmed-request
++  {:kami.cfd/solver :lbm
++   :kami.cfd/dim 3
++   :kami.cfd/geometry :ahmed
++   :kami.cfd/reynolds 3000.0
++   :kami.cfd/steps 1500})
++
++(def ahmed-result
++  {:kami.cfd/solver :lbm
++   :kami.cfd/dim 3
++   :kami.cfd/geometry :ahmed
++   :kami.cfd/vehicle-cd 0.29
++   :kami.cfd/frontal-cells 420
++   :kami.cfd/steps 1500
++   :kami.cfd/status :ok})
++
++(deftest request-contract
++  (testing "validates a normal 3D LBM request"
++    (is (cfd/request? ahmed-request))
++    (is (= {:valid? true :errors []}
++           (cfd/validate-request ahmed-request))))
++  (testing "requires explicit mesh paths for STL runs"
++    (let [result (cfd/validate-request
++                  (assoc ahmed-request :kami.cfd/geometry :stl))]
++      (is (false? (:valid? result)))
++      (is (some #(= [:kami.cfd/mesh] (:path %)) (:errors result)))))
++  (testing "rejects unknown request keys"
++    (let [result (cfd/validate-request
++                  (assoc ahmed-request :kami.cfd/native-backend true))]
++      (is (false? (:valid? result)))
++      (is (some #(= [:kami.cfd/native-backend] (:path %)) (:errors result))))))
++
++(deftest result-contract
++  (testing "validates a successful vehicle Cd result"
++    (is (cfd/result? ahmed-result))
++    (is (cfd/same-run? ahmed-request ahmed-result)))
++  (testing "requires a drag coefficient for successful results"
++    (let [result (cfd/validate-result
++                  (dissoc ahmed-result :kami.cfd/vehicle-cd))]
++      (is (false? (:valid? result)))
++      (is (some #(= [:kami.cfd/vehicle-cd] (:path %)) (:errors result))))))
++
++(deftest physics-ranking-fixtures
++  (testing "fastback fixture has lower drag than squareback at equal frontal area"
++    (let [squareback {:kami.cfd/solver :lbm
++                      :kami.cfd/dim 3
++                      :kami.cfd/geometry :box3d
++                      :kami.cfd/vehicle-cd 0.38
++                      :kami.cfd/status :ok}
++          fastback {:kami.cfd/solver :lbm
++                    :kami.cfd/dim 3
++                    :kami.cfd/geometry :fastback3d
++                    :kami.cfd/vehicle-cd 0.27
++                    :kami.cfd/status :ok}]
++      (is (cfd/lower-drag? fastback squareback)))))

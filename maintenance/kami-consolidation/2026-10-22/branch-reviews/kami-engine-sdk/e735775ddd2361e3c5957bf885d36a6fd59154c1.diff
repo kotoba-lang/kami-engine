@@ -1,0 +1,3096 @@
+diff --git a/.gitignore b/.gitignore
+index b614cd3..4df613c 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -8,3 +8,6 @@ out/
+ .nrepl-port
+ *.jar
+ node_modules/
++
++# nbb dependency cache -- a build artifact, not source
++.nbb/
+diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
+index fbc2f60..2a0cd8b 100644
+--- a/ARCHITECTURE.md
++++ b/ARCHITECTURE.md
+@@ -12,7 +12,7 @@ Status: **design + working core + GPU bridge** (2026-06-13). Verified slices:
+   61 assertions, all green** (§12).
+ - **Datomic two-layer** — full round-trip against a *real datalevin store*
+   (connect → tx → snapshot → ECS → render-IR → pack → commit, with ref resolution
+-  and persistence): `clojure -M:roundtrip` (`dev/roundtrip.clj`).
++  and persistence): `kbb -M:roundtrip` (`dev/roundtrip.cljk`).
+ - **clj ↔ Rust GPU bridge** — the Rust host `../kami-clj-host` decodes the *exact
+   bytes* `kami.ipc/pack` emits (cross-language fixture `frame.bin`): **4 Rust
+   tests green** (`cargo test -p kami-clj-host`). Its wasm-bindgen + wgpu GPU host
+@@ -65,7 +65,7 @@ is the正本 for the SDK's boundaries; it is the clj-side sibling of the engine'
+ ┌──────────────────────────────────────────────────────────────────────┐
+ │ L5  Game / authoring (your code)                                       │
+ │     scenes as Datomic tx-data · systems as pure fns over ECS snapshot  │
+-│     examples/hello_scene.cljc                                          │
++│     examples/hello_scene.cljk                                          │
+ └───────────────┬──────────────────────────────────────────────────────┘
+                 ▼
+ ┌──────────────────────────────────────────────────────────────────────┐
+@@ -365,7 +365,7 @@ with no DB at all.
+ 
+ ```bash
+ # 1. JVM authoring (Datomic source of truth, datalevin by default)
+-clj -M:dev                       # REPL
++kbb -M:dev                       # REPL
+ #   (require '[kami.db :as db] '[kami.scene :as scene])
+ #   (def conn (db/connect "/tmp/kami-db"))     ; datalevin dir
+ #   @(db/transact! conn my-scene-tx)
+@@ -377,20 +377,20 @@ wasm-pack build --target web --features host   # → pkg/kami_clj_host.js + _bg.
+ 
+ # 3. Browser runtime (ClojureScript → kami-clj-host WASM → kami-render → WebGPU)
+ cd ../kami-engine-sdk-clj
+-clj -M:shadow watch app          # shadow-cljs build :app
++kbb -M:shadow watch app          # shadow-cljs build :app
+ #   import KamiCljHost from kami-clj-host pkg, then:
+ #   (go (kami.sim/run! {:canvas "c" :snapshot snap
+ #                       :backend (<! (browser/make {:canvas "c"})) :systems [...]}))
+ 
+ # ── Verification (all runnable headless) ──────────────────────────────────
+ # clj contract layer — 16 tests / 61 assertions
+-clojure -Sdeps '{:paths ["src" "test"]}' \
++kbb -Sdeps '{:paths ["src" "test"]}' \
+   -M -e "(require '[clojure.test :as t] 'kami.contract-test 'kami.runtime-test) \
+          (t/run-tests 'kami.contract-test 'kami.runtime-test)"
+ # real-datalevin round-trip (connect→tx→snapshot→ecs→render-IR→pack→commit)
+-clj -M:roundtrip
++kbb -M:roundtrip
+ # regenerate the cross-language fixture after a format change
+-clojure -Sdeps '{:paths ["src" "dev"]}' -M -m gen-fixture
++kbb -Sdeps '{:paths ["src" "dev"]}' -M -m gen-fixture
+ # Rust decoder cross-language contract — 4 tests
+ ( cd .. && cargo test -p kami-clj-host --target aarch64-apple-darwin )
+ # Rust GPU host compiles for wasm
+@@ -429,7 +429,7 @@ IR is serializable for record/replay/golden tests (§7).
+ ---
+ 
+ ## 14. Prohibitions inherited from KAMI Engine
+-(see `../CLAUDE.md` — they apply to clj-authored scenes too)
++(see `../AGENTS.md` — they apply to clj-authored scenes too)
+ - **No Canvas 2D.** Rendering is wgpu via `kami-render` only.
+ - **No bespoke renderer.** `kami-render` pipelines + clj-authored WGSL registered
+   through §8 — nothing else.
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..57bc88a
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,202 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
+diff --git a/README.md b/README.md
+index dd08ada..723415a 100644
+--- a/README.md
++++ b/README.md
+@@ -1,4 +1,9 @@
+-# kami-engine-sdk-clj
++> **Renamed 2026-07-10 (ADR-2607102200 addendum):** `kotoba-lang/kami-engine-sdk` → `kotoba-lang/kami-engine-sdk`
++> (`-clj` suffix dropped — this is the only engine SDK). The former Svelte package
++> that briefly held the name `kami-engine-sdk` was renamed to
++> `kami-engine-sdk-svelte` and then **archived / pruned**.
++
++# kami-engine-sdk
+ 
+ KAMI Engine's Clojure/ClojureScript authoring SDK: author KAMI scenes, ECS,
+ and render pipelines in **Clojure/ClojureScript** with **Datomic-flavored
+@@ -31,14 +36,43 @@ In short:
+ - **`kami.benchmark`** — the shared sample-game benchmark contract: validates
+   2D/3D genre manifests, resolves `:playable` / `:showcase` / `:meltdown`
+   quality tiers, records portable telemetry frames, and drives capped meltdown
+-  load ramps. See `resources/kami/samples/isekai-swarm.edn` for a manifest that
+-  can be consumed unchanged by Studio, browser, native, and headless runners.
++  load ramps. It also validates fixed-step scenarios, runs pure headless
++  fixtures with a canonical deterministic digest, validates result envelopes,
++  and compares candidates to hardware-profile baselines (including the ADR's
++  10% p95 regression gate). See `resources/kami/samples/isekai-swarm.edn` for
++  a manifest and reduced-CI scenario that can be consumed unchanged by Studio,
++  browser, native, and headless runners. `deterministic-digest` is a portable
++  replay/correctness marker, not a cryptographic integrity hash.
++  It also validates Studio's `kami.performance-plan/v1` and runs its 2D/3D
++  saturation ramp through an injected host measurement adapter, computing p95
++  and stopping on the first frame-time or memory-budget violation.
++- **`kami.sample-manifest`** — pure-data M5 catalog authoring helpers. `scaffold`
++  creates schema-v2 EDN, `migrate-manifest` explicitly upgrades legacy v1 data,
++  and `valid?` checks capability, lifecycle, license, and public source/fork/
++  play/benchmark URLs. `valid-matrix?` gates 2D and 3D fixture coverage without
++  making performance or visual-quality claims. Persistence remains a Studio or
++  build-tool concern.
++- **`kami.network`** — the M2 multiplayer thin contract: versioned input
++  envelopes, per-client authoritative sequence acceptance, tick/client/sequence
++  total ordering, snapshots with acknowledgements, client reconciliation with
++  pending-input replay, and deterministic loss/delay/jitter injection. It is a
++  pure-data transport seam, not a production socket stack or an 8-player
++  performance claim. `resources/kami/samples/nightglass-strike-m2.edn` describes
++  the reduced eight-bot contract fixture used by tests.
++- **`kami.world-partition` / `kami.avatar`** — M3 portable thin contracts.
++  World partition provides deterministic distance LOD, explicit cell lifecycle,
++  and nearest-first estimated-byte budget planning. Avatar provides a bounded
++  distance/capacity quality sweep plus ordered, idempotent RTC peer-state data.
++  The Ashen Kingdom and Dream Stage fixtures under `resources/kami/samples/`
++  are reduced contract checks only: no world-streaming throughput, VRM visual
++  quality, WebRTC concurrency, frame-time, or other performance result has yet
++  been measured.
+ 
+ ## Origin
+ 
+ This repository was split out of
+ [`kotoba-lang/kami-engine`](https://github.com/kotoba-lang/kami-engine)'s
+-`kami-engine-sdk-clj/` subtree, following the same pattern previously used to
++`kami-engine-sdk/` subtree, following the same pattern previously used to
+ split `kami-mangaka-genko-clj` into
+ [`kotoba-lang/kami-genko`](https://github.com/kotoba-lang/kami-genko). This
+ was a live, working Clojure project inside the monorepo — not a restoration
+@@ -52,7 +86,7 @@ embeds). Do not confuse the two:
+ 
+ | Repo | What it is |
+ |---|---|
+-| `kotoba-lang/kami-engine-sdk-clj` (this repo) | Clojure/ClojureScript scene/ECS/render-IR/WIT contract SDK for kami-engine |
++| `kotoba-lang/kami-engine-sdk` (this repo) | Clojure/ClojureScript scene/ECS/render-IR/WIT contract SDK for kami-engine |
+ | `kotoba-lang/kami-engine-sdk` | Svelte 5 UI component library mirror (unrelated) |
+ 
+ ## Status
+@@ -76,7 +110,7 @@ breakage.
+ 
+ What does still reference the original monorepo (not exercised by `:test`,
+ documented rather than fixed here per the migration plan):
+-- `dev/gen_fixture.clj` / `dev/gen_demo.clj` write cross-language fixtures
++- `dev/gen_fixture.cljk` / `dev/gen_demo.cljk` write cross-language fixtures
+   intended for `../kami-clj-host/tests/fixtures/` and `../kami-clj-host/demo/`
+   in the monorepo — those paths do not exist in this standalone repo.
+ - `ARCHITECTURE.md` §12's Rust build/test steps (`kami-clj-host`,
+@@ -84,21 +118,21 @@ documented rather than fixed here per the migration plan):
+   here.
+ - `ARCHITECTURE.md` itself is the clj-side sibling of `kami-engine`'s
+   top-level `ARCHITECTURE.md` and references `../kami-clj`, `../kami-render`,
+-  `../kami-core`, `../CLAUDE.md`, etc. — all relative to the original
++  `../kami-core`, `../AGENTS.md`, etc. — all relative to the original
+   monorepo layout.
+ 
+ ## Running tests
+ 
+ ```bash
+-clojure -M:test
++kbb -M:test
+ ```
+ 
+ Verified on this standalone repo: **66 tests / 308 assertions, 0 failures,
+ 0 errors.**
+ 
+ Other aliases (see `deps.edn`):
+-- `clj -M:dev` — JVM authoring REPL (Datomic/datalevin source of truth)
+-- `clj -M:roundtrip` — real-datalevin round-trip (connect → tx → snapshot →
++- `kbb -M:dev` — JVM authoring REPL (Datomic/datalevin source of truth)
++- `kbb -M:roundtrip` — real-datalevin round-trip (connect → tx → snapshot →
+   ECS → render-IR → pack → commit)
+-- `clj -M:shadow watch app` — browser ClojureScript build (needs a
++- `kbb -M:shadow watch app` — browser ClojureScript build (needs a
+   `shadow-cljs.edn` build config, not included in this split)
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..9075702
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,46 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"dev/gen_demo.cljk" ".clj"
++  "dev/gen_fixture.cljk" ".clj"
++  "dev/roundtrip.cljk" ".clj"
++  "edn-datomize.cljk" ".cljs"
++  "examples/hello_scene.cljk" ".cljc"
++  "src/kami/avatar.cljk" ".cljc"
++  "src/kami/backend/browser.cljk" ".cljs"
++  "src/kami/backend/host.cljk" ".clj"
++  "src/kami/benchmark.cljk" ".cljc"
++  "src/kami/binaural.cljk" ".cljc"
++  "src/kami/db.cljk" ".clj"
++  "src/kami/ecs.cljk" ".cljc"
++  "src/kami/fsm.cljk" ".cljc"
++  "src/kami/gpu.cljk" ".cljc"
++  "src/kami/ipc.cljk" ".cljc"
++  "src/kami/math.cljk" ".cljc"
++  "src/kami/network.cljk" ".cljc"
++  "src/kami/physics_compute.cljk" ".cljc"
++  "src/kami/postfx.cljk" ".cljc"
++  "src/kami/render.cljk" ".cljc"
++  "src/kami/render/authority.cljk" ".cljc"
++  "src/kami/rt.cljk" ".cljc"
++  "src/kami/sample_manifest.cljk" ".cljc"
++  "src/kami/scene.cljk" ".cljc"
++  "src/kami/schedule.cljk" ".cljc"
++  "src/kami/sim.cljk" ".cljc"
++  "src/kami/sim_lod.cljk" ".cljc"
++  "src/kami/wgsl_emit.cljk" ".cljc"
++  "src/kami/world_partition.cljk" ".cljc"
++  "test/kami/avatar_test.cljk" ".cljc"
++  "test/kami/benchmark_test.cljk" ".cljc"
++  "test/kami/binaural_test.cljk" ".cljc"
++  "test/kami/contract_test.cljk" ".cljc"
++  "test/kami/dispatch_budget_test.cljk" ".cljc"
++  "test/kami/network_test.cljk" ".cljc"
++  "test/kami/rt_test.cljk" ".cljc"
++  "test/kami/runtime_test.cljk" ".cljc"
++  "test/kami/sample_manifest_test.cljk" ".cljc"
++  "test/kami/schedule_test.cljk" ".cljc"
++  "test/kami/sim_lod_test.cljk" ".cljc"
++  "test/kami/world_partition_test.cljk" ".cljc"}}
+diff --git a/deps.edn b/deps.edn
+index 11a1974..6858acc 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -1,4 +1,4 @@
+-;; kami-engine-sdk-clj — KAMI Engine Clojure SDK (clj + Datomic + WebGPU)
++;; kami-engine-sdk — KAMI Engine Clojure SDK (clj + Datomic + WebGPU)
+ ;; See ARCHITECTURE.md. clj is the brain; kami-render (Rust/wgpu) is the GPU arm.
+ ;;
+ ;; Datomic flavor is an open question (ADR-CLJ-02 / §13). The schema and kami.db
+@@ -7,8 +7,35 @@
+ ;; platform note. Swap the :datomic alias for Cloud/Peer if desired.
+ {:paths ["src" "resources"]
+ 
+- :deps {org.clojure/clojure       {:mvn/version "1.12.0"}
+-        com.cognitect/transit-clj {:mvn/version "1.0.333"}} ; snapshot transport (JVM↔browser)
++ :deps {
++        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
++        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
++        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
++        ;; sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
++        ;; kotoba.json replaced clojure.data.json here (2026-09-24). An explicit
++        ;; floor: kotoba.json/read-str and /write-str first exist at 9c11ad1, and
++        ;; tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/json {:git/sha "9c11ad189e64907700e8b4eb9b26f40336bffa01"}
++        ;; kotoba.lang.coll replaced clojure.set here (2026-09-24). An explicit
++        ;; floor: kotoba.lang.coll carries clojure.set's union/intersection/
++        ;; difference/map-invert from 0ffd5f6, and tools.deps takes the NEWEST
++        ;; sha it is shown.
++        io.github.kotoba-lang/coll {:git/sha "f74e248f0a07e8ae572885f50fab6bdb39dc24be"}
++        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
++        ;; only from nbb.edn, so every project file this repo has names it.
++        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
++       ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       org.clojure/clojure       {:mvn/version "1.12.0"}
++} ; snapshot transport (JVM↔browser)
+ 
+  :aliases
+  {;; ----- JVM authoring / Datomic source of truth -----------------------------
+@@ -20,7 +47,7 @@
+                            org.clojure/tools.namespace {:mvn/version "1.5.0"}}
+              :jvm-opts    ["--add-opens=java.base/java.nio=ALL-UNNAMED"
+                            "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"]
+-             :main-opts   ["-e" "(println \"kami-engine-sdk-clj dev REPL — see ARCHITECTURE.md §12\")"]}
++             :main-opts   ["-e" "(println \"kami-engine-sdk dev REPL — see ARCHITECTURE.md §12\")"]}
+ 
+   ;; Real-datalevin round-trip: connect → tx → snapshot → ECS → render-IR → pack → commit
+   :roundtrip {:extra-paths ["dev"]
+@@ -45,7 +72,7 @@
+   ;; ----- Contract tests (no GPU): render-IR golden, WGSL emit, IPC packing ---
+   :test     {:extra-paths ["test"]
+              :extra-deps  {io.github.cognitect-labs/test-runner
+-                           {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                           {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+              :main-opts   ["-m" "cognitect.test-runner"]}
+ 
+   ;; clj-kondo as a Clojars lib (no Homebrew/system install needed). --fail-level
+diff --git a/dev/gen_demo.clj b/dev/gen_demo.cljk
+similarity index 92%
+rename from dev/gen_demo.clj
+rename to dev/gen_demo.cljk
+index 6c18c6a..990a249 100644
+--- a/dev/gen_demo.clj
++++ b/dev/gen_demo.cljk
+@@ -6,13 +6,13 @@
+   KamiCljHost.submit_frame(frame.json, frame.bin) to prove the full Rust GPU path
+   (bootstrap → decode → instanced draw → present) on real WebGPU — no CLJS runtime.
+ 
+-  Run: clojure -Sdeps '{:paths [\"src\" \"dev\"]}' -M -m gen-demo <out-dir>"
++  Run: kbb -Sdeps '{:paths [\"src\" \"dev\"]}' -M -m gen-demo <out-dir>"
+   (:require [kami.scene  :as scene]
+             [kami.ecs    :as ecs]
+             [kami.render :as render]
+             [kami.ipc    :as ipc]
+-            [clojure.java.io :as io]
+-            [clojure.data.json :as json]))
++            [kotoba.io :as io]
++            [kotoba.json :as json]))
+ 
+ (def snap
+   (scene/build-snapshot
+diff --git a/dev/gen_fixture.clj b/dev/gen_fixture.cljk
+similarity index 94%
+rename from dev/gen_fixture.clj
+rename to dev/gen_fixture.cljk
+index e0d4a75..05f28a9 100644
+--- a/dev/gen_fixture.clj
++++ b/dev/gen_fixture.cljk
+@@ -3,12 +3,12 @@
+   decoder (kami-clj-host) can prove it parses the exact bytes kami.ipc/pack emits.
+   This is the cross-language contract anchor for the clj brain ↔ Rust GPU arm.
+ 
+-  Run: clojure -Sdeps '{:paths [\"src\" \"dev\"]}' -M -m gen-fixture <out-path>"
++  Run: kbb -Sdeps '{:paths [\"src\" \"dev\"]}' -M -m gen-fixture <out-path>"
+   (:require [kami.scene  :as scene]
+             [kami.ecs    :as ecs]
+             [kami.render :as render]
+             [kami.ipc    :as ipc]
+-            [clojure.java.io :as io]))
++            [kotoba.io :as io]))
+ 
+ (def cam  #uuid "00000000-0000-0000-0000-0000000000ca")
+ (def t1   #uuid "00000000-0000-0000-0000-00000000000a")
+diff --git a/dev/roundtrip.clj b/dev/roundtrip.cljk
+similarity index 97%
+rename from dev/roundtrip.clj
+rename to dev/roundtrip.cljk
+index d9fcd34..aec6f64 100644
+--- a/dev/roundtrip.clj
++++ b/dev/roundtrip.cljk
+@@ -2,7 +2,7 @@
+   "End-to-end round-trip against a REAL datalevin store (no GPU):
+    connect → transact schema+scene → snapshot → as-of undo →
+    ecs/load → render/frame → ipc/pack.
+-  Run: clojure -Sdeps '{:paths [\"src\" \"dev\"] :deps {datalevin/datalevin {:mvn/version \"0.9.22\"}}}' -M -m roundtrip"
++  Run: kbb -Sdeps '{:paths [\"src\" \"dev\"] :deps {datalevin/datalevin {:mvn/version \"0.9.22\"}}}' -M -m roundtrip"
+   (:require [kami.db     :as db]
+             [kami.scene  :as scene]
+             [kami.ecs    :as ecs]
+diff --git a/edn-datomize.bb b/edn-datomize.bb
+deleted file mode 100644
+index 291c080..0000000
+--- a/edn-datomize.bb
++++ /dev/null
+@@ -1,245 +0,0 @@
+-#!/usr/bin/env bb
+-;; edn-datomize.bb — EDN → Datomic/Datascript tx-data 変換ツール。
+-;; kami-engine-sdk-clj 用に com-junkawasaki/root superproject の
+-;; manifest/edn-datomize.bb (Phase 1/2 "EDN datomize" ワークストリーム) から
+-;; gftdcojp/net-kotobase の Phase 2 pilot 版経由で移植。schema-path をこの repo
+-;; のルート schema.edn に向けている以外はロジック同一。
+-;;
+-;; 「datomic/datascript query 可能」の定義: ファイルのトップレベルが
+-;; (d/transact conn (edn/read-string (slurp file))) にそのまま渡せる
+-;; tx-data ベクタ（entity-map のベクタ、各 map は :db/id を持つ）であること。
+-;;
+-;; マップ1個のファイルは [{...:db/id -1}] に包む。wrap-map はファイル種別ごとの
+-;; 名前空間を全キーに強制するが、wrap-generic は既に名前空間付きのキーはそのまま
+-;; 保持し、裸のキーにだけ default-ns を付与する（このリポジトリの
+-;; resources/kami/render/authority.edn のように idiomatic に :authority/*・
+-;; :render/* 等が付いている場合はこちらを使う）。値が Datomic の scalar
+-;; valueType（string/long/double/boolean/keyword、またはそれらの集合）に収まら
+-;; ないもの（入れ子 map、map を含む vector 等）は pr-str した文字列として保持
+-;; する（valueType=string の "blob" 属性にする — トップレベルの entity+attribute
+-;; 粒度でのクエリは常に有効、blob の中身は呼び出し側で edn/read-string すれば
+-;; 読める）。属性定義は schema.edn に自動登録する（Datomic/Datascript
+-;; 両対応、:db.install/_attribute 等の Datomic 固有キーは使わない）。
+-;;
+-;; 使い方:
+-;;   bb edn-datomize.bb wrap-map     <path> <ns>          — map 1個のファイルを変換
+-;;   bb edn-datomize.bb wrap-generic <path> <default-ns>  — 名前空間付きキー混在のファイルを変換
+-;;   bb edn-datomize.bb adr-dir  <dir>                     — ADR frontmatter/body を変換（このリポジトリでは未使用）
+-;;   bb edn-datomize.bb adr-file <path>                    — ADR 1ファイルを変換（このリポジトリでは未使用）
+-
+-(require '[clojure.edn :as edn]
+-         '[clojure.java.io :as io]
+-         '[clojure.java.shell :as shell]
+-         '[clojure.string :as str])
+-
+-(def root (str/trim (:out (shell/sh "git" "rev-parse" "--show-toplevel"))))
+-
+-;; net-kotobase (child repo) has no manifest/ dir — schema lives at repo root.
+-(defn schema-path [] (io/file root "schema.edn"))
+-
+-(defn slurp-edn [path] (edn/read-string (slurp path)))
+-
+-(defn leading-comment-block
+-  "ファイル先頭の ;; コメント行（source URL 等、raw-line 読み取り consumer が
+-   依存している場合がある）を、変換後も残せるよう捕捉して返す。無ければ nil。"
+-  [f]
+-  (let [lines (str/split-lines (slurp f))
+-        cmt (take-while #(str/starts-with? (str/triml %) ";") lines)]
+-    (when (seq cmt) (str (str/join "\n" cmt) "\n"))))
+-
+-(defn already-tx-data?
+-  "既に [{...:db/id ...} ...] 形式に変換済みか判定（再実行の冪等性用）。"
+-  [content]
+-  (and (vector? content) (seq content) (map? (first content)) (contains? (first content) :db/id)))
+-
+-(defn classify
+-  "値から Datomic :db/valueType + :db/cardinality を推定する。scalar に収まらない
+-   値（入れ子 map / map を含む vector 等）は :blob true を返す(pr-str して string 化)。"
+-  [v]
+-  (cond
+-    (string? v)  {:type :db.type/string  :card :db.cardinality/one}
+-    (boolean? v) {:type :db.type/boolean :card :db.cardinality/one}
+-    (integer? v) {:type :db.type/long    :card :db.cardinality/one}
+-    (double? v)  {:type :db.type/double  :card :db.cardinality/one}
+-    (keyword? v) {:type :db.type/keyword :card :db.cardinality/one}
+-    (nil? v)     {:type :db.type/string  :card :db.cardinality/one}
+-    (and (coll? v) (empty? v))
+-    {:type :db.type/string :card :db.cardinality/many}
+-    (and (coll? v) (every? string? v))  {:type :db.type/string  :card :db.cardinality/many}
+-    (and (coll? v) (every? keyword? v)) {:type :db.type/keyword :card :db.cardinality/many}
+-    (and (coll? v) (every? integer? v)) {:type :db.type/long    :card :db.cardinality/many}
+-    :else {:type :db.type/string :card :db.cardinality/one :blob true}))
+-
+-(defn attr-value [v]
+-  (let [{:keys [blob]} (classify v)]
+-    (if blob (pr-str v) v)))
+-
+-(defn namespaced-key [ns-name k]
+-  (keyword ns-name (name k)))
+-
+-(defn entity-from-map
+-  "トップレベル map の各キーに ns-name の名前空間を付け、:db/id を足した 1 entity にする。"
+-  [content ns-name]
+-  (into {:db/id -1}
+-        (map (fn [[k v]] [(namespaced-key ns-name k) (attr-value v)]))
+-        content))
+-
+-(defn schema-attrs
+-  [content ns-name]
+-  (for [[k v] content]
+-    (let [{:keys [type card]} (classify v)]
+-      {:db/ident (namespaced-key ns-name k)
+-       :db/valueType type
+-       :db/cardinality card})))
+-
+-(defn load-schema []
+-  (let [f (schema-path)]
+-    (if (.exists f) (slurp-edn f) [])))
+-
+-(defn merge-schema! [new-attrs]
+-  (let [existing (load-schema)
+-        by-ident (into {} (map (juxt :db/ident identity)) existing)
+-        merged-by-ident (reduce (fn [acc {:keys [db/ident] :as attr}]
+-                                   (if (contains? acc ident) acc (assoc acc ident attr)))
+-                                 by-ident
+-                                 new-attrs)
+-        merged (vec (sort-by (comp str :db/ident) (vals merged-by-ident)))]
+-    (spit (schema-path) (str ";; schema.edn — Datomic/Datascript 互換スキーマ定義（自動生成 by edn-datomize.bb）\n"
+-                              ";; :db/ident 属性定義のリスト。Datomic 固有キー(:db.install/_attribute 等)は使わない。\n"
+-                              ";; 手編集禁止 — 再生成すると上書きされる。\n\n"
+-                              (pr-str merged)
+-                              "\n"))
+-    merged))
+-
+-(defn wrap-map! [rel-path ns-name]
+-  (let [f (io/file root rel-path)
+-        content (slurp-edn f)
+-        cmt (leading-comment-block f)]
+-    (if (already-tx-data? content)
+-      (println "skip (already tx-data):" rel-path)
+-      (let [entity (entity-from-map content ns-name)
+-            attrs (schema-attrs content ns-name)]
+-        (spit f (str cmt (pr-str [entity]) "\n"))
+-        (merge-schema! attrs)
+-        (println "wrapped" rel-path "->" (count entity) "attrs, ns=" ns-name)))))
+-
+-;; ---------- generic (top-level map with keys already namespaced, e.g.
+-;; component/*.edn "source-of-truth contract" files: #:kotobase{...}, keys like
+-;; :kotobase.sdk/package) ----------
+-;;
+-;; Unlike wrap-map! (which forces every key under one new ns-name), wrap-generic!
+-;; keeps a key's existing namespace when it already has one (same policy as
+-;; adr-key below) and only assigns default-ns to genuinely bare keys. This avoids
+-;; renaming attributes that downstream code (component.cljc load-* fns,
+-;; worker/scripts/contract-check.cljc) destructures by their original
+-;; (already-meaningful) namespaced key.
+-
+-(defn generic-key [default-ns k]
+-  (if (namespace k) k (keyword default-ns (name k))))
+-
+-(defn entity-from-map-generic [content default-ns]
+-  (into {:db/id -1}
+-        (map (fn [[k v]] [(generic-key default-ns k) (attr-value v)]))
+-        content))
+-
+-(defn schema-attrs-generic [content default-ns]
+-  (for [[k v] content]
+-    (let [{:keys [type card]} (classify v)]
+-      {:db/ident (generic-key default-ns k)
+-       :db/valueType type
+-       :db/cardinality card})))
+-
+-(defn wrap-generic! [rel-path default-ns]
+-  (let [f (io/file root rel-path)
+-        content (slurp-edn f)
+-        cmt (leading-comment-block f)]
+-    (if (already-tx-data? content)
+-      (println "skip (already tx-data):" rel-path)
+-      (let [entity (entity-from-map-generic content default-ns)
+-            attrs (schema-attrs-generic content default-ns)]
+-        (spit f (str cmt (pr-str [entity]) "\n"))
+-        (merge-schema! attrs)
+-        (println "wrapped(generic)" rel-path "->" (count entity) "attrs, default-ns=" default-ns)))))
+-
+-;; ---------- ADR (90-docs/adr/*.edn) ----------
+-;;
+-;; 実測(2026-07-10): 458 ファイル中、トップレベル shape は :frontmatter+:body の
+-;; 単純形（約130件）から :frontmatter+(:problem/:decision/:consequences/...の
+-;; 多様な追加キー)、さらに :frontmatter を持たず :adr/id :adr/status 等を
+-;; 最初から名前空間付きで直接トップレベルに持つ別系統（fleet/governor 由来、
+-;; 90件超）まで極めて多様。個別 shape を全列挙するのではなく、
+-;; 汎用ルールで統一的に扱う: :frontmatter があればその中身をトップレベルへ
+-;; マージし、名前空間の無いキーには :adr/ を付与、既に名前空間付き(:adr/xxx等)の
+-;; キーはそのまま使う。値は classify/attr-value で scalar はそのまま、
+-;; 非scalar(入れ子 map/vector-of-map)は pr-str blob にする。
+-;; :related/:supersedes/:superseded_by は ADR-id と生ドキュメントパスが混在する
+-;; 実データ（例: 2607011345 の :related は ["CLAUDE.md" "....md" ...]）ため、
+-;; Datomic lookup-ref 化はせず素の文字列 vector のまま保持する。
+-
+-(defn adr-key [k]
+-  (if (namespace k) k (keyword "adr" (name k))))
+-
+-(defn transform-adr-generic [content]
+-  (let [fm (:frontmatter content)
+-        base (dissoc content :frontmatter)
+-        fm-entries (when (map? fm) (seq fm))
+-        entries (concat fm-entries (seq base))
+-        m (into {:db/id -1}
+-                (map (fn [[k v]] [(adr-key k) (attr-value v)]))
+-                entries)]
+-    [m]))
+-
+-(defn adr-schema-for [entity]
+-  (for [[k v] (dissoc entity :db/id)]
+-    (let [{:keys [type card]} (classify v)]
+-      {:db/ident k :db/valueType type :db/cardinality card})))
+-
+-(defn adr-file! [f report]
+-  (try
+-    (let [content (slurp-edn f)]
+-      (cond
+-        (already-tx-data? content)
+-        (do (println "skip (already tx-data):" (str f)) (swap! report update :skipped conj (str f)))
+-
+-        (not (map? content))
+-        (do (println "skip (not a frontmatter map, likely already data payload):" (str f))
+-            (swap! report update :skipped conj (str f)))
+-
+-        :else
+-        (let [tx (transform-adr-generic content)]
+-          (spit f (pr-str tx))
+-          (swap! report update :attrs into (mapcat adr-schema-for tx))
+-          (swap! report update :ok conj (str f)))))
+-    (catch Exception e
+-      (println "SKIP (parse/transform error):" (str f) "->" (.getMessage e))
+-      (swap! report update :errors conj [(str f) (.getMessage e)]))))
+-
+-(defn adr-dir! [dir]
+-  (let [files (->> (io/file root dir) file-seq (filter #(str/ends-with? (str %) ".edn")) sort)
+-        report (atom {:ok [] :skipped [] :errors [] :attrs []})]
+-    (doseq [f files] (adr-file! f report))
+-    (merge-schema! (:attrs @report))
+-    (println "done." (count files) "files:" (count (:ok @report)) "transformed,"
+-             (count (:skipped @report)) "skipped," (count (:errors @report)) "errors.")
+-    (when (seq (:errors @report))
+-      (println "=== ERRORS (left untouched, pre-existing data issues) ===")
+-      (doseq [[f m] (:errors @report)] (println " " f "->" m)))
+-    (when (seq (:skipped @report))
+-      (println "=== SKIPPED ===")
+-      (doseq [f (:skipped @report)] (println " " f)))
+-    @report))
+-
+-(defn -main [& args]
+-  (let [[mode a b] args]
+-    (case mode
+-      "wrap-map"     (wrap-map! a b)
+-      "wrap-generic" (wrap-generic! a b)
+-      "adr-dir"      (adr-dir! a)
+-      "adr-file"     (let [report (atom {:ok [] :skipped [] :errors [] :attrs []})]
+-                       (adr-file! (io/file root a) report)
+-                       (merge-schema! (:attrs @report))
+-                       (println @report))
+-      (do (println "usage: bb edn-datomize.bb [wrap-map <path> <ns> | wrap-generic <path> <default-ns> | adr-dir <dir> | adr-file <path>]")
+-          (System/exit 1)))))
+-
+-(apply -main *command-line-args*)
+diff --git a/edn-datomize.cljk b/edn-datomize.cljk
+new file mode 100644
+index 0000000..85166ad
+--- /dev/null
++++ b/edn-datomize.cljk
+@@ -0,0 +1,142 @@
++#!/usr/bin/env kbb
++;; Standalone nbb port of edn-datomize.cljk (ADR-2607173000 Wave 1).
++;; Schema lives at <git-root>/schema.edn (child-repo convention).
++;; Superproject uses manifest/edn-datomize.cljk (schema at manifest/schema.edn).
++;;
++;;   kbb --backend sci edn-datomize.cljk wrap-map <path> <ns>
++;;   kbb --backend sci edn-datomize.cljk wrap-map-keep-ns <path> <ns>
++;;   kbb --backend sci edn-datomize.cljk adr-dir <dir>
++;;   kbb --backend sci edn-datomize.cljk adr-file <path>
++(require '[kotoba.lang.edn :as edn]
++         '[kotoba.lang.text :as str])
++
++(def fs (js/require "node:fs"))
++(def path (js/require "node:path"))
++(def cp (js/require "node:child_process"))
++
++(defn- sh [& args]
++  (let [r (.spawnSync cp (first args) (to-array (rest args)) #js {:encoding "utf8"})]
++    {:exit (or (.-status r) 1) :out (or (.-stdout r) "") :err (or (.-stderr r) "")}))
++
++(defn- slurp [f] (.readFileSync fs (str f) "utf8"))
++(defn- spit [f s]
++  (.mkdirSync fs (.dirname path (str f)) #js {:recursive true})
++  (.writeFileSync fs (str f) (str s)))
++(defn- exists? [f] (.existsSync fs (str f)))
++(defn- file-join [& xs] (apply (.-join path) (map str xs)))
++
++(def root (str/trim (:out (sh "git" "rev-parse" "--show-toplevel"))))
++(defn schema-path [] (file-join root "schema.edn"))
++
++(defn slurp-edn [p] (edn/read-string (slurp p)))
++
++(defn already-tx-data? [content]
++  (and (vector? content) (seq content) (map? (first content)) (contains? (first content) :db/id)))
++
++(defn classify [v]
++  (cond
++    (string? v)  {:type :db.type/string  :card :db.cardinality/one}
++    (boolean? v) {:type :db.type/boolean :card :db.cardinality/one}
++    (integer? v) {:type :db.type/long    :card :db.cardinality/one}
++    (double? v)  {:type :db.type/double  :card :db.cardinality/one}
++    (keyword? v) {:type :db.type/keyword :card :db.cardinality/one}
++    (nil? v)     {:type :db.type/string  :card :db.cardinality/one}
++    (and (coll? v) (empty? v)) {:type :db.type/string :card :db.cardinality/many}
++    (and (coll? v) (every? string? v))  {:type :db.type/string  :card :db.cardinality/many}
++    (and (coll? v) (every? keyword? v)) {:type :db.type/keyword :card :db.cardinality/many}
++    (and (coll? v) (every? integer? v)) {:type :db.type/long    :card :db.cardinality/many}
++    :else {:type :db.type/string :card :db.cardinality/one :blob true}))
++
++(defn attr-value [v]
++  (let [{:keys [blob]} (classify v)]
++    (if blob (pr-str v) v)))
++
++(defn namespaced-key [ns-name k]
++  (keyword ns-name (name k)))
++
++(defn schema-attrs [content ns-name]
++  (into {}
++        (for [[k v] content
++              :let [{:keys [type card]} (classify v)
++                    a (namespaced-key ns-name k)]]
++          [a {:db/ident a :db/valueType type :db/cardinality card}])))
++
++(defn schema-attrs-keep-ns [content ns-name]
++  (into {}
++        (for [[k v] content
++              :let [{:keys [type card]} (classify v)
++                    a (if (namespace k) k (namespaced-key ns-name k))]]
++          [a {:db/ident a :db/valueType type :db/cardinality card}])))
++
++(defn load-schema []
++  (let [f (schema-path)]
++    (if (exists? f) (edn/read-string (slurp f)) [])))
++
++(defn merge-schema! [new-attrs]
++  (let [existing (load-schema)
++        by-ident (into {} (map (fn [a] [(:db/ident a) a]) existing))
++        merged (vals (merge by-ident new-attrs))]
++    (spit (schema-path)
++          (str ";; schema.edn — Datomic/Datascript compatible (auto-generated by edn-datomize.cljk)\n"
++               (pr-str (vec merged)) "\n"))))
++
++(defn wrap-map! [rel-path ns-name keep-ns?]
++  (let [f (if (.isAbsolute path rel-path) rel-path (file-join root rel-path))
++        content (slurp-edn f)]
++    (when-not (map? content)
++      (binding [*out* *err*] (println "not a map:" f))
++      (.exit js/process 1))
++    (if (already-tx-data? [content])
++      (println "already tx-data, skip" f)
++      (let [attrs (if keep-ns?
++                    (schema-attrs-keep-ns content ns-name)
++                    (schema-attrs content ns-name))
++            entity (into {:db/id -1}
++                         (for [[k v] content]
++                           [(if (and keep-ns? (namespace k)) k (namespaced-key ns-name k))
++                            (attr-value v)]))]
++        (merge-schema! attrs)
++        (spit f (str (pr-str [entity]) "\n"))
++        (println "wrote" f)))))
++
++(defn- parse-frontmatter [text]
++  (if-let [[_ fm body] (re-find #"(?s)^---\n(.*?)\n---\n?(.*)$" text)]
++    (let [pairs (for [line (str/split-lines fm)
++                      :when (str/includes? line ":")
++                      :let [[k & rest] (str/split line #":" 2)]]
++                  [(keyword (str/trim k)) (str/trim (str/join ":" rest))])]
++      [(into {} pairs) body])
++    [{} text]))
++
++(defn adr-file! [rel-path]
++  (let [f (if (.isAbsolute path rel-path) rel-path (file-join root rel-path))
++        text (slurp f)
++        [fm body] (parse-frontmatter text)
++        entity (into {:db/id -1
++                      :adr/path (str/replace (str f) (str root "/") "")
++                      :adr/body body}
++                     (for [[k v] fm]
++                       [(keyword "adr" (name k)) v]))]
++    (merge-schema! (schema-attrs (dissoc entity :db/id) "adr"))
++    (let [out (str f ".edn")]
++      (spit out (str (pr-str [entity]) "\n"))
++      (println "wrote" out))))
++
++(defn adr-dir! [rel]
++  (let [d (if (.isAbsolute path rel) rel (file-join root rel))
++        files (.readdirSync fs d)]
++    (doseq [name files
++            :when (or (str/ends-with? name ".md") (str/ends-with? name ".md.edn"))]
++      (adr-file! (file-join d name)))))
++
++(let [args (vec *command-line-args*)
++      args (if (and (seq args) (str/includes? (str (first args)) "edn-datomize"))
++             (subvec args 1) args)
++      [cmd a b] args]
++  (case cmd
++    "wrap-map" (wrap-map! a b false)
++    "wrap-map-keep-ns" (wrap-map! a b true)
++    "adr-file" (adr-file! a)
++    "adr-dir" (adr-dir! a)
++    (do (println "usage: edn-datomize.cljk wrap-map|wrap-map-keep-ns|adr-file|adr-dir ...")
++        (.exit js/process 2))))
+diff --git a/examples/hello_scene.cljc b/examples/hello_scene.cljk
+similarity index 100%
+rename from examples/hello_scene.cljc
+rename to examples/hello_scene.cljk
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..eeb93f9
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,34 @@
++;; nbb reads this file. It does NOT read deps.edn, and the
++;; .cljs here are run as bare `nbb <file>`, so a coordinate declared only
++;; there is invisible to them.
++;;
++;; :paths and every sha below are COPIED from deps.edn, not chosen here.
++{:paths ["src" "resources" "."]
++ :deps {
++        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
++        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
++        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
++        ;; sha it is shown.
++        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
++        ;; kotoba.json replaced clojure.data.json here (2026-09-24). An explicit
++        ;; floor: kotoba.json/read-str and /write-str first exist at 9c11ad1, and
++        ;; tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/json {:git/sha "9c11ad189e64907700e8b4eb9b26f40336bffa01"}
++        ;; kotoba.lang.coll replaced clojure.set here (2026-09-24). An explicit
++        ;; floor: kotoba.lang.coll carries clojure.set's union/intersection/
++        ;; difference/map-invert from 0ffd5f6, and tools.deps takes the NEWEST
++        ;; sha it is shown.
++        io.github.kotoba-lang/coll {:git/sha "f74e248f0a07e8ae572885f50fab6bdb39dc24be"}
++        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
++        ;; only from nbb.edn, so every project file this repo has names it.
++        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
++       ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; Declared HERE and not only in deps.edn: nbb reads nbb.edn and does NOT
++        ;; read deps.edn or bb.edn, and the .cljs in this repo are run as
++        ;; bare `nbb <file>`. A coordinate they cannot see is not a
++        ;; declaration. sha and :paths are COPIED from deps.edn.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}}}
+diff --git a/resources/kami/samples/ashen-kingdom-m3.edn b/resources/kami/samples/ashen-kingdom-m3.edn
+new file mode 100644
+index 0000000..c6287c4
+--- /dev/null
++++ b/resources/kami/samples/ashen-kingdom-m3.edn
+@@ -0,0 +1,15 @@
++{:sample/id :ashen-kingdom-m3
++ :sample/title "Ashen Kingdom — M3 reduced world-partition scenario"
++ :sample/status :contract-fixture
++ :scenario/observer [0 0 0]
++ :scenario/maximum-estimated-bytes 100
++ :scenario/cells
++ [{:cell/id :origin :cell/center [0 0 0] :cell/estimated-bytes 60
++   :cell/lod-distances [10 30 100]}
++  {:cell/id :east :cell/center [20 0 0] :cell/estimated-bytes 50
++   :cell/lod-distances [10 30 100]}
++  {:cell/id :far :cell/center [200 0 0] :cell/estimated-bytes 10
++   :cell/lod-distances [10 30 100]}]
++ :scenario/assertions [:deterministic-lod :explicit-cell-lifecycle
++                       :nearest-first-byte-budget]
++ :scenario/disclaimer "Reduced pure contract fixture; not an open-world streaming or throughput measurement."}
+diff --git a/resources/kami/samples/chronicle-city-sim-lod.edn b/resources/kami/samples/chronicle-city-sim-lod.edn
+new file mode 100644
+index 0000000..7ecd6e4
+--- /dev/null
++++ b/resources/kami/samples/chronicle-city-sim-lod.edn
+@@ -0,0 +1,10 @@
++{:sample/id :chronicle/city
++ :sample/fixture :simulation-lod
++ :sample/status :reduced-contract-fixture
++ :sample/performance :not-measured
++ :sim-lod/config {:tick 24 :observer [0 0] :visible-distance 30 :offscreen-cadence 12}
++ :sim-lod/entities
++ [{:entity/id :citizen/actor-0 :entity/index 0 :position [4 3] :schedule/id :citizen}
++  {:entity/id :citizen/actor-1 :entity/index 1 :position [90 20] :schedule/id :citizen}]
++ :schedule/period 6
++ :schedule/templates {:citizen [:sleep :commute :work :leisure]}}
+diff --git a/resources/kami/samples/dream-stage-m3.edn b/resources/kami/samples/dream-stage-m3.edn
+new file mode 100644
+index 0000000..f7b8c54
+--- /dev/null
++++ b/resources/kami/samples/dream-stage-m3.edn
+@@ -0,0 +1,11 @@
++{:sample/id :dream-stage-m3
++ :sample/title "Dream Stage — M3 reduced avatar/RTC scenario"
++ :sample/status :contract-fixture
++ :scenario/avatar-count 8
++ :scenario/quality-bands {:hero-distance 10 :animated-distance 25
++                          :impostor-distance 40}
++ :scenario/capacity {:hero 1 :animated 2 :impostor 3}
++ :scenario/rtc-peers 2
++ :scenario/assertions [:stable-avatar-quality-sweep :capacity-enforcement
++                       :ordered-idempotent-rtc-state]
++ :scenario/disclaimer "Reduced pure contract fixture; not a VRM render, WebRTC session, concurrency, or performance measurement."}
+diff --git a/resources/kami/samples/iron-front-sim-lod.edn b/resources/kami/samples/iron-front-sim-lod.edn
+new file mode 100644
+index 0000000..476893a
+--- /dev/null
++++ b/resources/kami/samples/iron-front-sim-lod.edn
+@@ -0,0 +1,12 @@
++{:sample/id :iron/front-2d
++ :sample/fixture :simulation-lod
++ :sample/status :reduced-contract-fixture
++ :sample/performance :not-measured
++ :sim-lod/config {:tick 16 :observer [0 0] :visible-distance 24 :offscreen-cadence 16}
++ :sim-lod/entities
++ [{:entity/id :hauler/unit-0 :entity/index 0 :position [8 8] :schedule/id :logistics}
++  {:entity/id :hauler/unit-1 :entity/index 1 :position [128 64] :schedule/id :logistics}
++  {:entity/id :assembler/unit-0 :entity/index 2 :position [160 64] :schedule/id :factory}]
++ :schedule/period 8
++ :schedule/templates {:logistics [:load :haul :unload :return]
++                      :factory [:idle :assemble]}}
+diff --git a/resources/kami/samples/isekai-dominion-sim-lod.edn b/resources/kami/samples/isekai-dominion-sim-lod.edn
+new file mode 100644
+index 0000000..48d4246
+--- /dev/null
++++ b/resources/kami/samples/isekai-dominion-sim-lod.edn
+@@ -0,0 +1,10 @@
++{:sample/id :isekai/dominion
++ :sample/fixture :simulation-lod
++ :sample/status :reduced-contract-fixture
++ :sample/performance :not-measured
++ :sim-lod/config {:tick 0 :observer [0 0] :visible-distance 40 :offscreen-cadence 8}
++ :sim-lod/entities
++ [{:entity/id :soldier/unit-0 :entity/index 0 :position [5 0] :formation/id :blue}
++  {:entity/id :soldier/unit-1 :entity/index 1 :position [60 0] :formation/id :blue}
++  {:entity/id :soldier/unit-2 :entity/index 2 :position [80 0] :formation/id :red}]
++ :formation/targets {:blue [100 0] :red [-100 0]}}
+diff --git a/resources/kami/samples/isekai-swarm.edn b/resources/kami/samples/isekai-swarm.edn
+index ba5096c..79f920c 100644
+--- a/resources/kami/samples/isekai-swarm.edn
++++ b/resources/kami/samples/isekai-swarm.edn
+@@ -2,6 +2,14 @@
+  :sample/title "Isekai Swarm"
+  :sample/dimension :2d
+  :sample/genre :action-roguelite
++ :sample/scenarios
++ [{:scenario/id :isekai-swarm/reduced-ci
++   :scenario/seed 7
++   :scenario/ticks 600
++   :scenario/fixed-step-ms 16.666667
++   :scenario/inputs [{:tick 30 :action :move :value [1 0]}
++                     {:tick 180 :action :ability/primary :value true}
++                     {:tick 181 :action :ability/primary :value false}]}]
+  :sample/metrics [:frame/fps :frame/cpu-ms :frame/gpu-ms
+                   :render/draw-calls :render/dispatch-calls
+                   :render/visible-entities :render/particles
+diff --git a/resources/kami/samples/nightglass-strike-m2.edn b/resources/kami/samples/nightglass-strike-m2.edn
+new file mode 100644
+index 0000000..f25341e
+--- /dev/null
++++ b/resources/kami/samples/nightglass-strike-m2.edn
+@@ -0,0 +1,17 @@
++{:sample/id :nightglass-strike-m2
++ :sample/title "Nightglass Strike — M2 reduced authority scenario"
++ :sample/status :contract-fixture
++ :scenario/tick-rate 30
++ :scenario/ticks 12
++ :scenario/clients [:bot-0 :bot-1 :bot-2 :bot-3 :bot-4 :bot-5 :bot-6 :bot-7]
++ :scenario/input-pattern {:command :move-x :value-cycle [-1 0 1]}
++ :scenario/impairment {:seed 260714
++                       :loss-permyriad 500
++                       :base-delay-ticks 1
++                       :jitter-ticks 1}
++ :scenario/assertions [:strict-per-client-sequence
++                       :duplicate-rejection
++                       :total-order-by-tick-client-sequence
++                       :snapshot-acknowledgement
++                       :replay-unacknowledged-input]
++ :scenario/disclaimer "Reduced deterministic contract fixture; not an 8-player performance measurement."}
+diff --git a/schema.edn b/schema.edn
+index f605b37..aed964c 100644
+--- a/schema.edn
++++ b/schema.edn
+@@ -1,4 +1,4 @@
+-;; schema.edn — Datomic/Datascript 互換スキーマ定義（自動生成 by edn-datomize.bb）
++;; schema.edn — Datomic/Datascript 互換スキーマ定義（自動生成 by edn-datomize.cljk）
+ ;; :db/ident 属性定義のリスト。Datomic 固有キー(:db.install/_attribute 等)は使わない。
+ ;; 手編集禁止 — 再生成すると上書きされる。
+ 
+diff --git a/src/kami/avatar.cljk b/src/kami/avatar.cljk
+new file mode 100644
+index 0000000..794dd8c
+--- /dev/null
++++ b/src/kami/avatar.cljk
+@@ -0,0 +1,87 @@
++(ns kami.avatar
++  "Portable M3 avatar quality-sweep and RTC presence contract.
++
++  The SDK selects deterministic quality bands and maintains signalling state;
++  hosts remain responsible for VRM animation, audio, WebRTC, and rendering.")
++
++(def quality-order [:hero :animated :impostor :hidden])
++
++(defn avatar-sweep
++  "Assign avatar quality by distance and per-band capacity. `bands` contains
++  `:hero-distance`, `:animated-distance`, and `:impostor-distance`; `capacity`
++  maps quality to maximum counts. Ties are broken by stable printed id."
++  [avatars observer bands capacity]
++  (let [{:keys [hero-distance animated-distance impostor-distance]} bands]
++    (when-not (and (vector? observer) (= 3 (count observer))
++                   (every? number? observer))
++      (throw (ex-info "avatar: observer must be a numeric vec3" {:observer observer})))
++    (when-not (every? #(nat-int? (get capacity %)) [:hero :animated :impostor])
++      (throw (ex-info "avatar: capacity values must be non-negative integers"
++                      {:capacity capacity})))
++    (when-not (and (every? #(and (number? %) (not (neg? %)))
++                            [hero-distance animated-distance impostor-distance])
++                   (<= hero-distance animated-distance impostor-distance))
++      (throw (ex-info "avatar: distances must be non-negative and ordered" {:bands bands})))
++    (let [ranked (sort-by (juxt :distance-squared (comp pr-str :avatar/id))
++                          (map (fn [{:avatar/keys [position] :as avatar}]
++                                 (when-not (and (some? (:avatar/id avatar))
++                                                (vector? position) (= 3 (count position))
++                                                (every? number? position))
++                                   (throw (ex-info "avatar: invalid avatar" {:avatar avatar})))
++                                 (assoc avatar :distance-squared
++                                        (reduce + (map (fn [x y] (let [d (- x y)] (* d d)))
++                                                       position observer))))
++                               avatars))]
++      (:assigned
++       (reduce (fn [{:keys [counts] :as result} avatar]
++                 (let [d2 (:distance-squared avatar)
++                       eligible (cond
++                                  (<= d2 (* hero-distance hero-distance)) [:hero :animated :impostor]
++                                  (<= d2 (* animated-distance animated-distance)) [:animated :impostor]
++                                  (<= d2 (* impostor-distance impostor-distance)) [:impostor]
++                                  :else [])
++                       quality (or (first (filter #(< (get counts % 0)
++                                                      (get capacity % 0)) eligible))
++                                   :hidden)]
++                   (-> result
++                       (update-in [:counts quality] (fnil inc 0))
++                       (update :assigned conj {:avatar/id (:avatar/id avatar)
++                                               :avatar/quality quality
++                                               :avatar/distance-squared d2}))))
++               {:counts {} :assigned []} ranked)))))
++
++(def rtc-states #{:offline :present :negotiating :connected :degraded})
++
++(defn rtc-room [] {:rtc/peers {} :rtc/revision 0})
++
++(def rtc-transitions
++  {:offline #{:present}
++   :present #{:negotiating :offline}
++   :negotiating #{:connected :degraded :offline}
++   :connected #{:degraded :offline}
++   :degraded #{:negotiating :connected :offline}})
++
++(defn update-peer
++  "Apply an ordered peer-state observation. Revision must strictly increase per
++  peer, making duplicate/out-of-order signalling a deterministic no-op."
++  [room {:peer/keys [id revision state muted?] :as observation}]
++  (when-not (and (some? id) (nat-int? revision) (rtc-states state)
++                 (or (nil? muted?) (boolean? muted?)))
++    (throw (ex-info "avatar: invalid RTC observation" {:observation observation})))
++  (let [previous (get-in room [:rtc/peers id] {:peer/revision -1 :peer/state :offline})]
++    (if (<= revision (:peer/revision previous))
++      room
++      (do
++        (when-not (contains? (get rtc-transitions (:peer/state previous) #{}) state)
++          (throw (ex-info "avatar: illegal RTC transition"
++                          {:peer/id id :from (:peer/state previous) :to state})))
++        (-> room
++            (assoc-in [:rtc/peers id] {:peer/revision revision :peer/state state
++                                      :peer/muted? (boolean muted?)})
++            (update :rtc/revision inc))))))
++
++(defn connected-peers [room]
++  (->> (:rtc/peers room)
++       (keep (fn [[id peer]] (when (= :connected (:peer/state peer)) id)))
++       (sort-by pr-str)
++       vec))
+diff --git a/src/kami/backend/browser.cljs b/src/kami/backend/browser.cljk
+similarity index 100%
+rename from src/kami/backend/browser.cljs
+rename to src/kami/backend/browser.cljk
+diff --git a/src/kami/backend/host.clj b/src/kami/backend/host.cljk
+similarity index 100%
+rename from src/kami/backend/host.clj
+rename to src/kami/backend/host.cljk
+diff --git a/src/kami/benchmark.cljc b/src/kami/benchmark.cljc
+deleted file mode 100644
+index 6c592e7..0000000
+--- a/src/kami/benchmark.cljc
++++ /dev/null
+@@ -1,109 +0,0 @@
+-(ns kami.benchmark
+-  "Portable benchmark contract for KAMI sample games.
+-
+-  A sample manifest declares genre, dimensions, supported quality tiers and
+-  measurable budgets.  Runtime telemetry uses the same keyword vocabulary on
+-  browser, native and headless hosts, making recordings comparable and safe to
+-  persist as EDN.  This namespace intentionally performs no clock or GPU calls."
+-  (:require [clojure.set :as set]))
+-
+-(def contract-version 1)
+-(def quality-tiers [:playable :showcase :meltdown])
+-
+-(def required-manifest-keys
+-  #{:sample/id :sample/title :sample/dimension :sample/genre
+-    :sample/tiers :sample/metrics})
+-
+-(def dimensions #{:2d :3d})
+-
+-(def metric-units
+-  {:frame/fps :hz
+-   :frame/cpu-ms :ms
+-   :frame/gpu-ms :ms
+-   :frame/p95-ms :ms
+-   :frame/p99-ms :ms
+-   :render/draw-calls :count
+-   :render/dispatch-calls :count
+-   :render/triangles :count
+-   :render/visible-entities :count
+-   :render/particles :count
+-   :memory/estimated-vram-mb :mb
+-   :asset/stream-bytes-sec :bytes-sec
+-   :network/rtt-ms :ms
+-   :network/jitter-ms :ms
+-   :network/packet-loss :ratio
+-   :network/rollback-count :count
+-   :script/cpu-ms :ms
+-   :script/gc-pause-ms :ms})
+-
+-(defn- fail [message data]
+-  (throw (ex-info (str "benchmark: " message) data)))
+-
+-(defn valid-manifest?
+-  "Validate a sample manifest and return true. Throws with useful ex-data.
+-
+-  Tier values are maps whose optional :budget map uses metrics declared in
+-  :sample/metrics. :meltdown may additionally define :load with :initial,
+-  :step and :maximum positive numeric values."
+-  [manifest]
+-  (let [missing (set/difference required-manifest-keys (set (keys manifest)))
+-        tiers (:sample/tiers manifest)
+-        metrics (set (:sample/metrics manifest))]
+-    (when (seq missing) (fail "manifest is missing required keys" {:missing missing}))
+-    (when-not (keyword? (:sample/id manifest))
+-      (fail ":sample/id must be a keyword" {:value (:sample/id manifest)}))
+-    (when-not (and (string? (:sample/title manifest)) (seq (:sample/title manifest)))
+-      (fail ":sample/title must be a non-empty string" {:value (:sample/title manifest)}))
+-    (when-not (dimensions (:sample/dimension manifest))
+-      (fail "unknown :sample/dimension" {:value (:sample/dimension manifest)
+-                                          :known dimensions}))
+-    (when-not (and (keyword? (:sample/genre manifest)) (seq metrics))
+-      (fail ":sample/genre must be a keyword and :sample/metrics must not be empty" {}))
+-    (when-let [unknown (seq (set/difference metrics (set (keys metric-units))))]
+-      (fail "manifest declares unknown metrics" {:unknown (set unknown)}))
+-    (when-not (= (set quality-tiers) (set (keys tiers)))
+-      (fail "manifest must declare all quality tiers"
+-            {:expected (set quality-tiers) :actual (set (keys tiers))}))
+-    (doseq [[tier {:keys [budget load]}] tiers]
+-      (when-let [unknown (seq (set/difference (set (keys budget)) metrics))]
+-        (fail "tier budget uses undeclared metrics" {:tier tier :unknown (set unknown)}))
+-      (when (and (= tier :meltdown) load)
+-        (doseq [k [:initial :step :maximum]]
+-          (when-not (pos? (get load k 0))
+-            (fail "meltdown load values must be positive" {:key k :load load})))
+-        (when (> (:initial load) (:maximum load))
+-          (fail "meltdown initial load exceeds maximum" {:load load}))))
+-    true))
+-
+-(defn quality-config
+-  "Return a validated tier configuration, suitable for handing to a host."
+-  [manifest tier]
+-  (valid-manifest? manifest)
+-  (or (get-in manifest [:sample/tiers tier])
+-      (fail "unknown quality tier" {:tier tier :known (set quality-tiers)})))
+-
+-(defn telemetry-frame
+-  "Create one serializable telemetry sample. Unknown metrics are rejected so
+-  dashboards do not silently fork their vocabulary."
+-  [manifest tier frame-n timestamp-ms measurements]
+-  (valid-manifest? manifest)
+-  (quality-config manifest tier)
+-  (let [declared (set (:sample/metrics manifest))
+-        unknown (set/difference (set (keys measurements)) declared)]
+-    (when (seq unknown)
+-      (fail "telemetry contains undeclared metrics" {:unknown unknown}))
+-    {:telemetry/contract contract-version
+-     :telemetry/sample (:sample/id manifest)
+-     :telemetry/tier tier
+-     :telemetry/frame frame-n
+-     :telemetry/timestamp-ms timestamp-ms
+-     :telemetry/measurements measurements}))
+-
+-(defn next-meltdown-load
+-  "Advance a meltdown load monotonically, capped at the declared maximum."
+-  [manifest current]
+-  (let [{:keys [initial step maximum]}
+-        (get-in (quality-config manifest :meltdown) [:load])]
+-    (when-not (and initial step maximum)
+-      (fail "meltdown tier has no :load ramp" {:sample (:sample/id manifest)}))
+-    (min maximum (+ (or current (- initial step)) step))))
+diff --git a/src/kami/benchmark.cljk b/src/kami/benchmark.cljk
+new file mode 100644
+index 0000000..dd97dd8
+--- /dev/null
++++ b/src/kami/benchmark.cljk
+@@ -0,0 +1,359 @@
++(ns kami.benchmark
++  "Portable benchmark contract for KAMI sample games.
++
++  A sample manifest declares genre, dimensions, supported quality tiers and
++  measurable budgets.  Runtime telemetry uses the same keyword vocabulary on
++  browser, native and headless hosts, making recordings comparable and safe to
++  persist as EDN.  This namespace intentionally performs no clock or GPU calls."
++  (:require [kotoba.lang.coll :as set]))
++
++(def contract-version 1)
++(def quality-tiers [:playable :showcase :meltdown])
++
++(def required-manifest-keys
++  #{:sample/id :sample/title :sample/dimension :sample/genre
++    :sample/tiers :sample/metrics})
++
++(def dimensions #{:2d :3d})
++(def performance-plan-schema "kami.performance-plan/v1")
++(def performance-dimensions #{"2d" "3d"})
++
++(def required-scenario-keys
++  #{:scenario/id :scenario/seed :scenario/ticks :scenario/fixed-step-ms
++    :scenario/inputs})
++
++(def required-result-keys
++  #{:result/sample :result/scenario :result/tier :result/build
++    :result/profile :result/measurements :result/simulation-digest})
++
++(def metric-units
++  {:frame/fps :hz
++   :frame/cpu-ms :ms
++   :frame/gpu-ms :ms
++   :frame/p95-ms :ms
++   :frame/p99-ms :ms
++   :render/draw-calls :count
++   :render/dispatch-calls :count
++   :render/triangles :count
++   :render/visible-entities :count
++   :render/particles :count
++   :memory/estimated-vram-mb :mb
++   :asset/stream-bytes-sec :bytes-sec
++   :network/rtt-ms :ms
++   :network/jitter-ms :ms
++   :network/packet-loss :ratio
++   :network/rollback-count :count
++   :script/cpu-ms :ms
++   :script/gc-pause-ms :ms})
++
++(defn- fail [message data]
++  (throw (ex-info (str "benchmark: " message) data)))
++
++(defn valid-performance-plan?
++  "Validate the portable Studio/SDK saturation contract. Throws with ex-data
++  rather than silently repairing a malformed ramp."
++  [plan]
++  (when-not (= performance-plan-schema (:schema plan))
++    (fail "unknown performance plan schema" {:schema (:schema plan)}))
++  (when-not (performance-dimensions (:dimension plan))
++    (fail "performance dimension must be 2d or 3d" {:dimension (:dimension plan)}))
++  (when-not (and (string? (:workload plan)) (seq (:workload plan)))
++    (fail "performance workload is required" {:workload (:workload plan)}))
++  (when-not (and (vector? (:samples plan)) (seq (:samples plan)))
++    (fail "performance samples must be a non-empty vector" {}))
++  (doseq [{:keys [entities durationMs warmupFrames] :as sample} (:samples plan)]
++    (when-not (and (pos-int? entities) (pos-int? durationMs)
++                   (int? warmupFrames) (not (neg? warmupFrames)))
++      (fail "invalid performance sample" {:sample sample})))
++  (let [{:keys [frameTimeP95Ms memoryMaxMiB]} (:budgets plan)]
++    (when-not (and (number? frameTimeP95Ms) (pos? frameTimeP95Ms)
++                   (number? memoryMaxMiB) (pos? memoryMaxMiB))
++      (fail "performance budgets must be positive" {:budgets (:budgets plan)})))
++  (when-not (true? (:stopOnFirstViolation plan))
++    (fail "performance plan must stop on first violation" {}))
++  true)
++
++(defn percentile
++  "Nearest-rank percentile for a non-empty numeric sample."
++  [values p]
++  (when-not (and (seq values) (every? number? values) (number? p) (< 0 p) (<= p 1))
++    (fail "invalid percentile sample" {:values values :percentile p}))
++  (let [ordered (vec (sort values))
++        index (dec (int (#?(:clj Math/ceil :cljs js/Math.ceil) (* p (count ordered)))))]
++    (nth ordered index)))
++
++(defn run-saturation
++  "Execute a performance plan through injected host measurement.
++
++  `measure-sample` receives one plan sample and returns
++  `{:frame-times-ms [...] :memory-max-mib n}`. The runner computes p95 itself,
++  records every attempted load, and stops at the first budget violation.
++
++  Each result row keeps `:frameTimesMs` — the readings the p95 was taken from,
++  not just the p95. A single reduced number cannot answer whether two runs
++  differ by more than their own spread, so discarding the readings here makes
++  every downstream gate unable to tell a real change from noise, no matter how
++  carefully it is written (`kotoba-lang/perfgate` refuses such a claim as
++  `:insufficient-samples`). Keeping them is additive: the schema stays
++  `kami.performance-result/v1` because readers name the keys they need, and
++  nothing that read a row before reads differently now."
++  [plan measure-sample]
++  (valid-performance-plan? plan)
++  (let [{:keys [frameTimeP95Ms frameIntervalP95Ms memoryMaxMiB]} (:budgets plan)]
++    (loop [remaining (:samples plan) results []]
++      (if-let [sample (first remaining)]
++        (let [{:keys [frame-times-ms frame-intervals-ms memory-max-mib] :as measured}
++              (measure-sample sample)]
++          (when-not (and (seq frame-times-ms) (every? number? frame-times-ms)
++                         (number? memory-max-mib) (not (neg? memory-max-mib)))
++            (fail "measurement adapter returned invalid data" {:measurement measured}))
++          (let [p95 (percentile frame-times-ms 0.95)
++                ;; The interval between frames, when the adapter reports it. This
++                ;; is what a "60fps" budget is about: `frame-times-ms` is CPU
++                ;; submit cost, which excludes GPU execution and pacing and
++                ;; therefore barely grows with load. Budgeting the wrong one is
++                ;; how a saturation ramp runs to its ceiling and reports the
++                ;; ceiling as the saturation point.
++                interval-p95 (when (and (seq frame-intervals-ms)
++                                        (every? number? frame-intervals-ms))
++                               (percentile frame-intervals-ms 0.95))
++                violations (cond-> []
++                             (> p95 frameTimeP95Ms) (conj :frame-time-p95)
++                             (and interval-p95 frameIntervalP95Ms
++                                  (> interval-p95 frameIntervalP95Ms))
++                             (conj :frame-interval-p95)
++                             (> memory-max-mib memoryMaxMiB) (conj :memory-max))
++                result {:entities (:entities sample)
++                        :frameTimeP95Ms p95 :memoryMaxMiB memory-max-mib
++                        :frameIntervalP95Ms interval-p95
++                        :frameIntervalsMs (when (seq frame-intervals-ms)
++                                            (vec frame-intervals-ms))
++                        :frameTimesMs (vec frame-times-ms)
++                        ;; The run parameters this row was produced under. They
++                        ;; are on the plan sample and were dropped here, so a
++                        ;; consumer could not tell how long the numbers were
++                        ;; watched for or how much warmup preceded them — which
++                        ;; is exactly what makes two rows comparable or not.
++                        :warmupFrames (:warmupFrames sample)
++                        :durationMs (:durationMs sample)
++                        ;; How warmup actually ended, when the adapter says so.
++                        ;; A warmup cut short by a wall-clock ceiling may not have
++                        ;; reached steady state, and a row that hides that is a
++                        ;; row nobody can compare safely.
++                        :warmupEndedBy (:warmup-ended-by measured)
++                        :warmupFramesRun (:warmup-frames-run measured)
++                        :warmupMs (:warmup-ms measured)
++                        :pass? (empty? violations) :violations violations}
++                results' (conj results result)]
++            (if (seq violations)
++              {:schema "kami.performance-result/v1" :status :violated
++               :dimension (:dimension plan) :workload (:workload plan)
++               :saturationEntities (some->> results (filter :pass?) last :entities)
++               :results results'}
++              (recur (next remaining) results'))))
++        {:schema "kami.performance-result/v1" :status :passed
++         :dimension (:dimension plan) :workload (:workload plan)
++         :saturationEntities (some->> results (filter :pass?) last :entities)
++         :results results}))))
++
++(defn valid-manifest?
++  "Validate a sample manifest and return true. Throws with useful ex-data.
++
++  Tier values are maps whose optional :budget map uses metrics declared in
++  :sample/metrics. :meltdown may additionally define :load with :initial,
++  :step and :maximum positive numeric values."
++  [manifest]
++  (let [missing (set/difference required-manifest-keys (set (keys manifest)))
++        tiers (:sample/tiers manifest)
++        metrics (set (:sample/metrics manifest))]
++    (when (seq missing) (fail "manifest is missing required keys" {:missing missing}))
++    (when-not (keyword? (:sample/id manifest))
++      (fail ":sample/id must be a keyword" {:value (:sample/id manifest)}))
++    (when-not (and (string? (:sample/title manifest)) (seq (:sample/title manifest)))
++      (fail ":sample/title must be a non-empty string" {:value (:sample/title manifest)}))
++    (when-not (dimensions (:sample/dimension manifest))
++      (fail "unknown :sample/dimension" {:value (:sample/dimension manifest)
++                                          :known dimensions}))
++    (when-not (and (keyword? (:sample/genre manifest)) (seq metrics))
++      (fail ":sample/genre must be a keyword and :sample/metrics must not be empty" {}))
++    (when-let [unknown (seq (set/difference metrics (set (keys metric-units))))]
++      (fail "manifest declares unknown metrics" {:unknown (set unknown)}))
++    (when-not (= (set quality-tiers) (set (keys tiers)))
++      (fail "manifest must declare all quality tiers"
++            {:expected (set quality-tiers) :actual (set (keys tiers))}))
++    (doseq [[tier {:keys [budget load]}] tiers]
++      (when-let [unknown (seq (set/difference (set (keys budget)) metrics))]
++        (fail "tier budget uses undeclared metrics" {:tier tier :unknown (set unknown)}))
++      (when (and (= tier :meltdown) load)
++        (doseq [k [:initial :step :maximum]]
++          (when-not (pos? (get load k 0))
++            (fail "meltdown load values must be positive" {:key k :load load})))
++        (when (> (:initial load) (:maximum load))
++          (fail "meltdown initial load exceeds maximum" {:load load}))))
++    true))
++
++(defn quality-config
++  "Return a validated tier configuration, suitable for handing to a host."
++  [manifest tier]
++  (valid-manifest? manifest)
++  (or (get-in manifest [:sample/tiers tier])
++      (fail "unknown quality tier" {:tier tier :known (set quality-tiers)})))
++
++(defn telemetry-frame
++  "Create one serializable telemetry sample. Unknown metrics are rejected so
++  dashboards do not silently fork their vocabulary."
++  [manifest tier frame-n timestamp-ms measurements]
++  (valid-manifest? manifest)
++  (quality-config manifest tier)
++  (let [declared (set (:sample/metrics manifest))
++        unknown (set/difference (set (keys measurements)) declared)]
++    (when (seq unknown)
++      (fail "telemetry contains undeclared metrics" {:unknown unknown}))
++    {:telemetry/contract contract-version
++     :telemetry/sample (:sample/id manifest)
++     :telemetry/tier tier
++     :telemetry/frame frame-n
++     :telemetry/timestamp-ms timestamp-ms
++     :telemetry/measurements measurements}))
++
++(defn next-meltdown-load
++  "Advance a meltdown load monotonically, capped at the declared maximum."
++  [manifest current]
++  (let [{:keys [initial step maximum]}
++        (get-in (quality-config manifest :meltdown) [:load])]
++    (when-not (and initial step maximum)
++      (fail "meltdown tier has no :load ramp" {:sample (:sample/id manifest)}))
++    (min maximum (+ (or current (- initial step)) step))))
++
++(defn valid-scenario?
++  "Validate a deterministic, host-independent benchmark scenario.
++
++  Inputs are a vector of maps with a non-negative :tick and an :action value.
++  Multiple inputs at one tick retain vector order. The runner never reads a
++  wall clock: :scenario/fixed-step-ms is the complete time source."
++  [scenario]
++  (let [missing (set/difference required-scenario-keys (set (keys scenario)))
++        inputs (:scenario/inputs scenario)]
++    (when (seq missing) (fail "scenario is missing required keys" {:missing missing}))
++    (when-not (keyword? (:scenario/id scenario))
++      (fail ":scenario/id must be a keyword" {:value (:scenario/id scenario)}))
++    (when-not (integer? (:scenario/seed scenario))
++      (fail ":scenario/seed must be an integer" {:value (:scenario/seed scenario)}))
++    (when-not (pos-int? (:scenario/ticks scenario))
++      (fail ":scenario/ticks must be a positive integer" {:value (:scenario/ticks scenario)}))
++    (when-not (and (number? (:scenario/fixed-step-ms scenario))
++                   (pos? (:scenario/fixed-step-ms scenario)))
++      (fail ":scenario/fixed-step-ms must be positive" {}))
++    (when-not (vector? inputs)
++      (fail ":scenario/inputs must be a vector" {:value inputs}))
++    (doseq [input inputs]
++      (when-not (and (map? input) (integer? (:tick input))
++                     (<= 0 (:tick input)) (< (:tick input) (:scenario/ticks scenario))
++                     (contains? input :action))
++        (fail "scenario input must contain an in-range :tick and :action"
++              {:input input :ticks (:scenario/ticks scenario)})))
++    true))
++
++(defn- canonical-value [value]
++  (cond
++    (map? value) (into (sorted-map-by #(compare (pr-str %1) (pr-str %2)))
++                       (map (fn [[k v]] [k (canonical-value v)])) value)
++    (set? value) [:set (->> value (map canonical-value) (sort-by pr-str) vec)]
++    (sequential? value) (mapv canonical-value value)
++    :else value))
++
++(defn deterministic-digest
++  "Return a portable signed 32-bit FNV-1a digest of EDN data.
++
++  Maps and sets are canonicalized first, so insertion/iteration order cannot
++  change the digest. This is a correctness/replay marker, not a security hash."
++  [value]
++  (reduce (fn [hash char]
++            (let [code #?(:clj (int char)
++                          :cljs (.charCodeAt char 0))
++                  mixed (bit-xor hash code)]
++              #?(:clj (unchecked-multiply-int (int mixed) (int 16777619))
++                 :cljs (js/Math.imul mixed 16777619))))
++          #?(:clj (unchecked-int 2166136261)
++             :cljs 2166136261)
++          (pr-str (canonical-value value))))
++
++(defn run-headless
++  "Execute scenario with pure `(step-fn state frame)` calls.
++
++  `initial-state-fn` receives the declared seed. Each frame contains :tick,
++  :dt-ms and the ordered :inputs for that tick. Returns final state and digest;
++  consumers may discard :headless/final-state when persisting evidence."
++  [scenario initial-state-fn step-fn]
++  (valid-scenario? scenario)
++  (let [by-tick (group-by :tick (:scenario/inputs scenario))
++        final-state
++        (reduce (fn [state tick]
++                  (step-fn state {:tick tick
++                                  :dt-ms (:scenario/fixed-step-ms scenario)
++                                  :inputs (vec (get by-tick tick []))}))
++                (initial-state-fn (:scenario/seed scenario))
++                (range (:scenario/ticks scenario)))]
++    {:headless/scenario (:scenario/id scenario)
++     :headless/ticks (:scenario/ticks scenario)
++     :headless/final-state final-state
++     :headless/simulation-digest (deterministic-digest final-state)}))
++
++(defn valid-result?
++  "Validate the machine-readable M0 result envelope against a manifest."
++  [manifest result]
++  (valid-manifest? manifest)
++  (let [missing (set/difference required-result-keys (set (keys result)))
++        measurements (:result/measurements result)
++        unknown (set/difference (set (keys measurements))
++                                (set (:sample/metrics manifest)))]
++    (when (seq missing) (fail "result is missing required keys" {:missing missing}))
++    (when-not (= (:sample/id manifest) (:result/sample result))
++      (fail "result sample does not match manifest" {:value (:result/sample result)}))
++    (quality-config manifest (:result/tier result))
++    (when-not (and (keyword? (:result/scenario result))
++                   (string? (:result/build result)) (seq (:result/build result))
++                   (keyword? (:result/profile result))
++                   (map? measurements)
++                   (integer? (:result/simulation-digest result)))
++      (fail "result envelope has invalid field types" {:result result}))
++    (when (seq unknown) (fail "result contains undeclared metrics" {:unknown unknown}))
++    (when-not (every? number? (vals measurements))
++      (fail "result measurements must be numeric" {:measurements measurements}))
++    true))
++
++(defn compare-results
++  "Compare candidate with a compatible baseline.
++
++  `thresholds` maps metrics to maximum relative regression ratios. Direction
++  defaults to :lower-is-better; use `higher-is-better` for FPS/throughput.
++  Digest mismatch is always a failure, independent of performance thresholds."
++  [manifest baseline candidate thresholds higher-is-better]
++  (valid-result? manifest baseline)
++  (valid-result? manifest candidate)
++  (doseq [key [:result/sample :result/scenario :result/tier :result/profile]]
++    (when-not (= (get baseline key) (get candidate key))
++      (fail "baseline and candidate are not comparable"
++            {:key key :baseline (get baseline key) :candidate (get candidate key)})))
++  (let [digest-match? (= (:result/simulation-digest baseline)
++                         (:result/simulation-digest candidate))
++        comparisons
++        (into (sorted-map)
++              (for [[metric threshold] thresholds]
++                (let [before (get-in baseline [:result/measurements metric])
++                      after (get-in candidate [:result/measurements metric])]
++                  (when-not (and (number? before) (number? after) (pos? before)
++                                 (number? threshold) (not (neg? threshold)))
++                    (fail "comparison requires positive baseline and threshold"
++                          {:metric metric :baseline before :candidate after
++                           :threshold threshold}))
++                  (let [regression (if (contains? higher-is-better metric)
++                                     (/ (- before after) before)
++                                     (/ (- after before) before))]
++                    [metric {:baseline before :candidate after
++                             :regression-ratio regression
++                             :threshold-ratio threshold
++                             :pass? (<= regression threshold)}]))))]
++    {:comparison/pass? (and digest-match? (every? :pass? (vals comparisons)))
++     :comparison/digest-match? digest-match?
++     :comparison/metrics comparisons}))
+diff --git a/src/kami/binaural.cljc b/src/kami/binaural.cljk
+similarity index 100%
+rename from src/kami/binaural.cljc
+rename to src/kami/binaural.cljk
+diff --git a/src/kami/db.clj b/src/kami/db.cljk
+similarity index 100%
+rename from src/kami/db.clj
+rename to src/kami/db.cljk
+diff --git a/src/kami/ecs.cljc b/src/kami/ecs.cljk
+similarity index 99%
+rename from src/kami/ecs.cljc
+rename to src/kami/ecs.cljk
+index 6ddfebf..d31d9a8 100644
+--- a/src/kami/ecs.cljc
++++ b/src/kami/ecs.cljk
+@@ -11,7 +11,7 @@
+   representation detail layered on top, not required for correctness.
+ 
+   Datomic is consulted only at load/save boundaries; a frame never queries it."
+-  (:require [clojure.set :as set]))
++  (:require [kotoba.lang.coll :as set]))
+ 
+ (defn world
+   "Create an empty ECS world."
+diff --git a/src/kami/fsm.cljc b/src/kami/fsm.cljk
+similarity index 100%
+rename from src/kami/fsm.cljc
+rename to src/kami/fsm.cljk
+diff --git a/src/kami/gpu.cljc b/src/kami/gpu.cljk
+similarity index 100%
+rename from src/kami/gpu.cljc
+rename to src/kami/gpu.cljk
+diff --git a/src/kami/input.cljc b/src/kami/input.cljc
+deleted file mode 100644
+index 283d2ee..0000000
+--- a/src/kami/input.cljc
++++ /dev/null
+@@ -1,75 +0,0 @@
+-(ns kami.input
+-  "L3 — data-first input action maps: a pure layer that turns a set of *held
+-  keys* into *action axes / events* via a declarative binding table.
+-
+-  The native `kami-input` crate owns OS event capture (keyboard/mouse/touch/
+-  gamepad) + the FocusManager. This namespace owns only the *binding* layer:
+-    (action-axes held-keys binding-table) -> {axis-name float}
+-  It runs on tiny data (a held-key set + a small binding table), never
+-  per-element, so it is wasmi-safe to compile via kotoba-clj and run as
+-  CLJ→WASM on iOS/console (ADR-0040 / clj-wgsl-ledger Phase 1.2).
+-
+-  Binding table shape:
+-    {:axes   [{:axis :move-x :positive :d :negative :a :scale 1.0}
+-              {:axis :move-y :positive :w :negative :s}]
+-     :actions #{:jump :fire}   ; any held key in this set → action active
+-     :triggers {:jump :space}} ; edge-triggered (handled via prev-held diff)
+-
+-  Pure — no IO. A `defsystem` reads the host-held key set (a host import) and
+-  calls `action-axes` / `active-actions` / `triggered-actions` once per tick."
+-  (:require [clojure.set :as set]))
+-
+-(defn- axis-value
+-  "Compute one axis' float in [-1,1] from held keys. :positive adds +scale,
+-  :negative adds -scale; both held → 0 (mutual cancellation, standard gamepad
+-  semantics). Supports :positive-set / :negative-set (multiple keys) too."
+-  [held {:keys [positive negative positive-set negative-set scale] :or {scale 1.0}}]
+-  (let [pos? (or (and positive (contains? held positive))
+-                 (and positive-set (seq (set/intersection held positive-set))))
+-        neg? (or (and negative (contains? held negative))
+-                 (and negative-set (seq (set/intersection held negative-set))))]
+-    (cond
+-      (and pos? neg?) 0.0
+-      pos?            (float scale)
+-      neg?            (float (- scale))
+-      :else           0.0)))
+-
+-(defn action-axes
+-  "Reduce `held` (a set of keys) through `table`'s :axes into a {axis-name float}
+-  map. Axes not declared in the table are absent from the result."
+-  [held table]
+-  (into {} (for [a (:axes table)] [(:axis a) (axis-value held a)])))
+-
+-(defn active-actions
+-  "The set of :actions currently held (any key in the action's :keys contributes).
+-  Returns #{} if none."
+-  [held table]
+-  (reduce
+-   (fn [acc {:keys [action keys]}]
+-     (let [keys (if (set? keys) keys #{keys})]
+-       (if (seq (set/intersection held keys))
+-         (conj acc action) acc)))
+-   #{} (:actions table)))
+-
+-(defn triggered-actions
+-  "Edge-triggered actions: those whose trigger key is in `held` but was NOT in
+-  `prev-held` (the previous tick's held set). Returns a set of trigger keys.
+-  A `defsystem` keeps the prev-held set in world state and calls this each tick."
+-  [held prev-held table]
+-  (let [trig (:triggers table)]
+-    (->> trig
+-         (filter (fn [[_ key]] (and (contains? held key)
+-                                    (not (contains? prev-held key)))))
+-         (map val)
+-         set)))
+-
+-(defn merge-held
+-  "Merge a new event's key set into the running held set. `event` is one of:
+-    {:press #{:a :d}}  → union into held
+-    {:release #{:a}}   → difference from held
+-  Pure — returns the new held set; the host owns the mutable accumulator."
+-  [held event]
+-  (cond
+-    (:press event)   (set/union held (:press event))
+-    (:release event) (set/difference held (:release event))
+-    :else            held))
+diff --git a/src/kami/ipc.cljc b/src/kami/ipc.cljk
+similarity index 100%
+rename from src/kami/ipc.cljc
+rename to src/kami/ipc.cljk
+diff --git a/src/kami/math.cljc b/src/kami/math.cljk
+similarity index 100%
+rename from src/kami/math.cljc
+rename to src/kami/math.cljk
+diff --git a/src/kami/network.cljk b/src/kami/network.cljk
+new file mode 100644
+index 0000000..1f2b6a9
+--- /dev/null
++++ b/src/kami/network.cljk
+@@ -0,0 +1,117 @@
++(ns kami.network
++  "M2 deterministic multiplayer contract.
++
++  This namespace deliberately owns no sockets or clocks. Hosts attach transport
++  and feed tick-stamped input envelopes through these pure functions, allowing
++  the same authority, impairment, snapshot, and reconciliation behaviour in
++  JVM headless tests and browser clients.")
++
++(def protocol-version 1)
++
++(defn input-envelope
++  "Create a versioned player input. `seq` is strictly increasing per client;
++  `tick` is the client's intended simulation tick."
++  [client-id seq tick commands]
++  {:net/version protocol-version
++   :input/client client-id
++   :input/seq seq
++   :input/tick tick
++   :input/commands (vec commands)})
++
++(defn valid-input?
++  [x]
++  (and (= protocol-version (:net/version x))
++       (some? (:input/client x))
++       (integer? (:input/seq x)) (not (neg? (:input/seq x)))
++       (integer? (:input/tick x)) (not (neg? (:input/tick x)))
++       (vector? (:input/commands x))))
++
++(defn authority
++  "Empty authoritative receive state."
++  [] {:authority/last-seq {} :authority/accepted [] :authority/rejected []})
++
++(defn receive-input
++  "Accept a valid, strictly newer per-client sequence exactly once. Invalid,
++  duplicate, and stale messages are retained as deterministic rejection data."
++  [state input]
++  (let [client (:input/client input)
++        previous (get-in state [:authority/last-seq client] -1)
++        reason (cond
++                 (not (valid-input? input)) :invalid
++                 (<= (:input/seq input) previous) :stale-or-duplicate)]
++    (if reason
++      (update state :authority/rejected conj {:reason reason :input input})
++      (-> state
++          (assoc-in [:authority/last-seq client] (:input/seq input))
++          (update :authority/accepted conj input)))))
++
++(defn drain-tick
++  "Return `[authority inputs]`, removing inputs due at or before `tick`.
++  Inputs have a total order independent of packet arrival order."
++  [state tick]
++  (let [{due true later false}
++        (group-by #(<= (:input/tick %) tick) (:authority/accepted state))]
++    [(assoc state :authority/accepted (vec later))
++     (vec (sort-by (juxt :input/tick (comp str :input/client) :input/seq) due))]))
++
++(defn snapshot
++  "Build an authoritative state snapshot acknowledging input sequences."
++  [tick world authority-state]
++  {:net/version protocol-version
++   :snapshot/tick tick
++   :snapshot/world world
++   :snapshot/ack (:authority/last-seq authority-state)})
++
++(defn reconcile
++  "Replace predicted state with a snapshot and replay unacknowledged local input.
++  `apply-input` is `(fn [world input] world)`. Returns the new client state and
++  retains only inputs newer than the authority acknowledgement."
++  [{:client/keys [id pending] :as client} snap apply-input]
++  (let [ack (get (:snapshot/ack snap) id -1)
++        pending' (->> pending
++                      (filter #(> (:input/seq %) ack))
++                      (sort-by :input/seq)
++                      vec)
++        world' (reduce apply-input (:snapshot/world snap) pending')]
++    (assoc client
++           :client/world world'
++           :client/pending pending'
++           :client/server-tick (:snapshot/tick snap))))
++
++(defn- mix32 [x]
++  ;; Integer-only avalanche, kept below signed overflow-sensitive arithmetic so
++  ;; CLJ and CLJS produce identical decisions.
++  (let [x (mod (+ (* 1664525 (mod x 4294967296)) 1013904223) 4294967296)] x))
++
++(defn impairment-decision
++  "Deterministically decide delivery for an input. Config uses integer units:
++  `:loss-permyriad` (0..10000), `:base-delay-ticks`, and `:jitter-ticks`.
++  The caller supplies a numeric seed; no wall clock or RNG state is consulted."
++  [{:keys [seed loss-permyriad base-delay-ticks jitter-ticks]
++    :or {seed 0 loss-permyriad 0 base-delay-ticks 0 jitter-ticks 0}}
++   input]
++  (let [char-code (fn [c] #?(:clj (int c) :cljs (.charCodeAt c 0)))
++        client-code (reduce (fn [n c] (mod (+ (* n 33) (char-code c)) 4294967296))
++                            5381 (str (:input/client input)))
++        sample (mix32 (+ seed client-code (* 97 (:input/seq input))))
++        dropped? (< (mod sample 10000) loss-permyriad)
++        jitter (if (pos? jitter-ticks)
++                 (- (mod (mix32 sample) (inc (* 2 jitter-ticks))) jitter-ticks)
++                 0)]
++    {:impairment/drop? dropped?
++     :impairment/deliver-tick (+ (:input/tick input)
++                                 (max 0 (+ base-delay-ticks jitter)))}))
++
++(defn impair
++  "Annotate and sort deliverable inputs; dropped inputs are returned separately."
++  [config inputs]
++  (let [annotated (mapv #(assoc % :input/impairment
++                               (impairment-decision config %)) inputs)]
++    {:deliver (->> annotated
++                   (remove #(get-in % [:input/impairment :impairment/drop?]))
++                   (sort-by (juxt #(get-in % [:input/impairment :impairment/deliver-tick])
++                                  (comp str :input/client) :input/seq))
++                   vec)
++     :drop (->> annotated
++                (filter #(get-in % [:input/impairment :impairment/drop?]))
++                vec)}))
+diff --git a/src/kami/physics_compute.cljc b/src/kami/physics_compute.cljk
+similarity index 100%
+rename from src/kami/physics_compute.cljc
+rename to src/kami/physics_compute.cljk
+diff --git a/src/kami/postfx.cljc b/src/kami/postfx.cljk
+similarity index 100%
+rename from src/kami/postfx.cljc
+rename to src/kami/postfx.cljk
+diff --git a/src/kami/render.cljc b/src/kami/render.cljk
+similarity index 100%
+rename from src/kami/render.cljc
+rename to src/kami/render.cljk
+diff --git a/src/kami/render/authority.cljc b/src/kami/render/authority.cljk
+similarity index 98%
+rename from src/kami/render/authority.cljc
+rename to src/kami/render/authority.cljk
+index 0871d1f..010e8ba 100644
+--- a/src/kami/render/authority.cljc
++++ b/src/kami/render/authority.cljk
+@@ -4,8 +4,8 @@
+   The EDN artifact describes the stable render-IR defaults and built-in pipeline
+   ids. Rust/wgpu remains the executor for :kami-render/scene-pipeline entries;
+   policy above that adapter boundary lives here."
+-  #?(:clj (:require [clojure.edn :as edn]
+-                    [clojure.java.io :as io])))
++  #?(:clj (:require [kotoba.lang.edn :as edn]
++                    [kotoba.io :as io])))
+ 
+ (def authority-edn
+   {:authority/id :kami.render/authority
+diff --git a/src/kami/rt.cljc b/src/kami/rt.cljk
+similarity index 100%
+rename from src/kami/rt.cljc
+rename to src/kami/rt.cljk
+diff --git a/src/kami/sample_manifest.cljk b/src/kami/sample_manifest.cljk
+new file mode 100644
+index 0000000..2af47ba
+--- /dev/null
++++ b/src/kami/sample_manifest.cljk
+@@ -0,0 +1,103 @@
++(ns kami.sample-manifest
++  "Pure data helpers for authoring and validating the public sample catalog."
++  (:require [kotoba.lang.coll :as set]
++            [kotoba.lang.text :as str]
++            [kami.benchmark :as benchmark]))
++
++(def schema-version 2)
++(def statuses #{:concept :prototype :playable :showcase :released :archived})
++(def url-keys [:sample/source-url :sample/fork-url :sample/play-url
++               :sample/benchmark-url])
++(def required-v2-keys
++  #{:sample/schema-version :sample/capabilities :sample/status :sample/license
++    :sample/source-url :sample/fork-url :sample/play-url :sample/benchmark-url})
++
++(defn- fail [message data]
++  (throw (ex-info (str "sample manifest: " message) data)))
++
++(defn public-url?
++  "True for an absolute HTTP(S) URL. Syntax only; no request is performed."
++  [value]
++  (boolean (and (string? value)
++                (re-matches #"https?://[^\s/$.?#].[^\s]*" value))))
++
++(defn scaffold
++  "Create a latest-version manifest from identity data, merging overrides last."
++  ([identity] (scaffold identity {}))
++  ([identity overrides]
++   (merge {:sample/schema-version schema-version
++           :sample/capabilities []
++           :sample/status :concept
++           :sample/license "Apache-2.0"
++           :sample/source-url "https://isekai.network/source"
++           :sample/fork-url "https://isekai.network/fork"
++           :sample/play-url "https://isekai.network/play"
++           :sample/benchmark-url "https://isekai.network/benchmarks"
++           :sample/metrics [:frame/fps :frame/cpu-ms :frame/gpu-ms]
++           :sample/tiers
++           {:playable {:target-fps 30 :budget {}}
++            :showcase {:target-fps 60 :budget {}}
++            :meltdown {:target-fps 60 :budget {}
++                       :load {:unit :entities :initial 1 :step 1 :maximum 1}}}}
++          identity overrides)))
++
++(defn migrate-manifest
++  "Upgrade a manifest to the current schema using explicit caller defaults.
++  An unversioned manifest is v1. Publication URLs are never invented here."
++  ([manifest] (migrate-manifest manifest {}))
++  ([manifest defaults]
++   (let [version (get manifest :sample/schema-version 1)]
++     (cond
++       (= version schema-version) manifest
++       (= version 1) (merge {:sample/schema-version schema-version
++                             :sample/capabilities []
++                             :sample/status :prototype
++                             :sample/license "UNLICENSED"}
++                            defaults manifest
++                            {:sample/schema-version schema-version})
++       :else (fail "unsupported schema version"
++                   {:version version :supported schema-version})))))
++
++(defn valid?
++  "Validate latest publication metadata and the benchmark contract."
++  [manifest]
++  (when-not (= schema-version (:sample/schema-version manifest))
++    (fail "manifest must use the latest schema version"
++          {:expected schema-version :actual (:sample/schema-version manifest)}))
++  (let [missing (set/difference required-v2-keys (set (keys manifest)))]
++    (when (seq missing)
++      (fail "manifest is missing publication metadata" {:missing missing})))
++  (when-not (and (vector? (:sample/capabilities manifest))
++                 (every? keyword? (:sample/capabilities manifest))
++                 (= (count (:sample/capabilities manifest))
++                    (count (distinct (:sample/capabilities manifest)))))
++    (fail ":sample/capabilities must be a vector of unique keywords"
++          {:value (:sample/capabilities manifest)}))
++  (when-not (statuses (:sample/status manifest))
++    (fail "unknown :sample/status"
++          {:value (:sample/status manifest) :known statuses}))
++  (when-not (and (string? (:sample/license manifest))
++                 (not (str/blank? (:sample/license manifest))))
++    (fail ":sample/license must be a non-empty license identifier"
++          {:value (:sample/license manifest)}))
++  (doseq [key url-keys]
++    (when-not (public-url? (get manifest key))
++      (fail "publication URL must be absolute HTTP(S)"
++            {:key key :value (get manifest key)})))
++  (benchmark/valid-manifest? manifest)
++  true)
++
++(defn valid-matrix?
++  "Validate unique fixtures and require both 2D and 3D genre coverage."
++  [manifests]
++  (when-not (sequential? manifests)
++    (fail "matrix must be sequential" {:value manifests}))
++  (doseq [manifest manifests] (valid? manifest))
++  (let [ids (map :sample/id manifests)
++        dimensions (group-by :sample/dimension manifests)]
++    (when-not (= (count ids) (count (distinct ids)))
++      (fail "matrix sample ids must be unique" {:ids ids}))
++    (doseq [dimension benchmark/dimensions]
++      (when-not (seq (get dimensions dimension))
++        (fail "matrix must cover every dimension" {:missing dimension})))
++    true))
+diff --git a/src/kami/scene.cljc b/src/kami/scene.cljk
+similarity index 100%
+rename from src/kami/scene.cljc
+rename to src/kami/scene.cljk
+diff --git a/src/kami/schedule.cljc b/src/kami/schedule.cljk
+similarity index 100%
+rename from src/kami/schedule.cljc
+rename to src/kami/schedule.cljk
+diff --git a/src/kami/sim.cljc b/src/kami/sim.cljk
+similarity index 100%
+rename from src/kami/sim.cljc
+rename to src/kami/sim.cljk
+diff --git a/src/kami/sim_lod.cljk b/src/kami/sim_lod.cljk
+new file mode 100644
+index 0000000..24dd964
+--- /dev/null
++++ b/src/kami/sim_lod.cljk
+@@ -0,0 +1,108 @@
++(ns kami.sim-lod
++  "Pure, deterministic simulation-LOD planning.
++
++  The logical population is never culled. Visibility only selects the render
++  population and update cadence controls how often offscreen actors enter a
++  coarse simulation workload. Hosts remain responsible for spatial indexes,
++  parallel execution, rendering and clocks; this namespace is a portable data
++  contract and intentionally claims no measured throughput.")
++
++(def contract-version 1)
++
++(defn- fail [message data]
++  (throw (ex-info (str "sim-lod: " message) data)))
++
++(defn- ordered [entities]
++  (sort-by (comp pr-str :entity/id) entities))
++
++(defn- distance-squared [a b]
++  (reduce + (map (fn [x y] (let [d (- x y)] (* d d))) a b)))
++
++(defn plan-frame
++  "Partition `entities` into logical, visible and due-update populations.
++
++  Every entity requires a unique :entity/id, non-negative integer
++  :entity/index and numeric :position vector. Visible entities update every
++  tick. Offscreen entities update once per :offscreen-cadence ticks, staggered
++  by :entity/index so a whole population is not released in one burst.
++
++  The returned vectors are ordered by printed entity id, making the result
++  independent of input iteration order and portable as EDN."
++  [{:keys [tick observer visible-distance offscreen-cadence]
++    :or {observer [0 0]}} entities]
++  (when-not (and (int? tick) (<= 0 tick))
++    (fail ":tick must be a non-negative integer" {:tick tick}))
++  (when-not (and (number? visible-distance) (<= 0 visible-distance))
++    (fail ":visible-distance must be non-negative" {:visible-distance visible-distance}))
++  (when-not (and (int? offscreen-cadence) (pos? offscreen-cadence))
++    (fail ":offscreen-cadence must be a positive integer" {:offscreen-cadence offscreen-cadence}))
++  (let [entities (vec (ordered entities))
++        ids (mapv :entity/id entities)]
++    (when (or (some nil? ids) (not= (count ids) (count (set ids))))
++      (fail ":entity/id values must be present and unique" {:ids ids}))
++    (doseq [{:entity/keys [id index] :keys [position]} entities]
++      (when-not (and (int? index) (<= 0 index))
++        (fail ":entity/index must be a non-negative integer" {:entity/id id :value index}))
++      (when-not (and (vector? position)
++                     (= (count observer) (count position))
++                     (every? number? position))
++        (fail ":position must match the numeric observer vector" {:entity/id id :value position})))
++    (let [visible? (fn [entity]
++                     (<= (distance-squared observer (:position entity))
++                         (* visible-distance visible-distance)))
++          visible (filterv visible? entities)
++          visible-ids (set (map :entity/id visible))
++          due? (fn [entity]
++                 (or (contains? visible-ids (:entity/id entity))
++                     (zero? (mod (+ tick (:entity/index entity)) offscreen-cadence))))]
++      {:sim-lod/contract contract-version
++       :sim-lod/tick tick
++       :sim-lod/logical entities
++       :sim-lod/visible visible
++       :sim-lod/due-updates (filterv due? entities)
++       :sim-lod/deferred (filterv (complement due?) entities)})))
++
++(defn formation-workload
++  "Build one deterministic coarse command per formation in `due-entities`.
++
++  `targets` maps formation ids to target vectors. Commands contain sorted
++  member ids and the arithmetic centroid; they describe work and do not mutate
++  a world."
++  [due-entities targets]
++  (->> due-entities
++       (filter :formation/id)
++       (group-by :formation/id)
++       (sort-by (comp pr-str key))
++       (mapv (fn [[formation members]]
++               (let [members (vec (ordered members))
++                     dimensions (count (:position (first members)))
++                     centroid (mapv (fn [axis]
++                                      (/ (reduce + (map #(nth (:position %) axis) members))
++                                         (count members)))
++                                    (range dimensions))]
++                 {:work/type :formation
++                  :formation/id formation
++                  :formation/members (mapv :entity/id members)
++                  :formation/centroid centroid
++                  :formation/target (get targets formation centroid)})))))
++
++(defn schedule-workload
++  "Resolve due actors' cyclic schedules at `tick`.
++
++  A schedule is a non-empty vector of opaque activity keywords. `period` is
++  the positive number of ticks per slot. Entity index staggers actors without
++  randomness, so replay and headless hosts produce the same commands."
++  [due-entities tick period schedules]
++  (when-not (and (int? period) (pos? period))
++    (fail "schedule period must be a positive integer" {:period period}))
++  (mapv (fn [{:entity/keys [id index] :as entity}]
++          (let [schedule (get schedules (:schedule/id entity))]
++            (when-not (seq schedule)
++              (fail "entity has no non-empty schedule" {:entity/id id
++                                                         :schedule/id (:schedule/id entity)}))
++            {:work/type :schedule
++             :entity/id id
++             :schedule/activity (nth schedule
++                                     (mod (quot (+ tick index) period)
++                                          (count schedule)))}))
++        (ordered due-entities)))
+diff --git a/src/kami/wgsl_emit.cljc b/src/kami/wgsl_emit.cljk
+similarity index 99%
+rename from src/kami/wgsl_emit.cljc
+rename to src/kami/wgsl_emit.cljk
+index 4a65f86..daace43 100644
+--- a/src/kami/wgsl_emit.cljc
++++ b/src/kami/wgsl_emit.cljk
+@@ -38,7 +38,7 @@
+   the s-expr subset, so `:wgsl/compute {:body ... :wgsl/body \"raw wgsl\"}` is
+   the documented escape hatch for the body (the surrounding `@compute
+   @workgroup_size(...)` entry-point scaffolding is still data-driven)."
+-  (:require [clojure.string :as str]
++  (:require [kotoba.lang.text :as str]
+             [kami.render.authority :as authority]))
+ 
+ (def builtin-pipelines
+diff --git a/src/kami/world_partition.cljk b/src/kami/world_partition.cljk
+new file mode 100644
+index 0000000..d4c41cd
+--- /dev/null
++++ b/src/kami/world_partition.cljk
+@@ -0,0 +1,106 @@
++(ns kami.world-partition
++  "Portable M3 world-partition contract.
++
++  Hosts provide camera positions, cell metadata, IO completion events, and a
++  byte budget. These pure functions choose LODs and lifecycle transitions; no
++  filesystem, network, clock, renderer, or measured throughput is implied.")
++
++(def lifecycle-states
++  #{:unloaded :requested :loading :resident :evicting :failed})
++
++(defn valid-cell?
++  "A cell has a stable id, world-space center, positive byte estimate, and
++  strictly increasing LOD distance thresholds."
++  [{:cell/keys [id center estimated-bytes lod-distances]}]
++  (and (some? id)
++       (vector? center) (= 3 (count center)) (every? number? center)
++       (pos-int? estimated-bytes)
++       (vector? lod-distances) (seq lod-distances)
++       (every? #(and (number? %) (not (neg? %))) lod-distances)
++       (apply < lod-distances)))
++
++(defn distance-squared [a b]
++  (when-not (and (vector? a) (vector? b) (= 3 (count a)) (= 3 (count b))
++                 (every? number? a) (every? number? b))
++    (throw (ex-info "world-partition: positions must be numeric vec3 values"
++                    {:a a :b b})))
++  (reduce + (map (fn [x y] (let [d (- x y)] (* d d))) a b)))
++
++(defn desired-lod
++  "Return zero-based LOD (0 = nearest/highest detail), or :culled beyond the
++  final threshold. Squared comparisons avoid host-specific square roots."
++  [cell observer]
++  (when-not (valid-cell? cell)
++    (throw (ex-info "world-partition: invalid cell" {:cell cell})))
++  (let [d2 (distance-squared (:cell/center cell) observer)]
++    (or (first (keep-indexed (fn [lod distance]
++                               (when (<= d2 (* distance distance)) lod))
++                             (:cell/lod-distances cell)))
++        :culled)))
++
++(defn initial-state [cells]
++  (when-let [invalid (seq (remove valid-cell? cells))]
++    (throw (ex-info "world-partition: invalid cells" {:cells (vec invalid)})))
++  {:partition/cells (into {} (map (juxt :cell/id identity) cells))
++   :partition/lifecycle (zipmap (map :cell/id cells) (repeat :unloaded))
++   :partition/resident-lod {}
++   :partition/failures {}})
++
++(def allowed-transitions
++  {:request #{[:unloaded :requested] [:failed :requested]}
++   :begin-load #{[:requested :loading]}
++   :load-ok #{[:loading :resident]}
++   :load-failed #{[:loading :failed]}
++   :begin-evict #{[:resident :evicting]}
++   :evict-ok #{[:evicting :unloaded]}})
++
++(defn transition
++  "Apply an explicit host event to one cell. Illegal transitions throw. A
++  successful load requires :lod; a failure may include :reason."
++  [state cell-id event]
++  (let [from (get-in state [:partition/lifecycle cell-id])
++        to ({:request :requested :begin-load :loading :load-ok :resident
++             :load-failed :failed :begin-evict :evicting :evict-ok :unloaded}
++            (:event/type event))]
++    (when-not (contains? (:partition/cells state) cell-id)
++      (throw (ex-info "world-partition: unknown cell" {:cell/id cell-id})))
++    (when-not (contains? (get allowed-transitions (:event/type event) #{}) [from to])
++      (throw (ex-info "world-partition: illegal lifecycle transition"
++                      {:cell/id cell-id :from from :event event})))
++    (when (and (= :load-ok (:event/type event)) (not (nat-int? (:lod event))))
++      (throw (ex-info "world-partition: load-ok requires a non-negative :lod" event)))
++    (cond-> (assoc-in state [:partition/lifecycle cell-id] to)
++      (= :load-ok (:event/type event))
++      (-> (assoc-in [:partition/resident-lod cell-id] (:lod event))
++          (update :partition/failures dissoc cell-id))
++      (= :load-failed (:event/type event))
++      (assoc-in [:partition/failures cell-id] (:reason event))
++      (= :evict-ok (:event/type event))
++      (update :partition/resident-lod dissoc cell-id))))
++
++(defn budget-plan
++  "Choose desired visible cells under `maximum-bytes`. Nearest cells win, then
++  stable printed id order. Returns selected requests and deferred ids."
++  [cells observer maximum-bytes]
++  (when-not (and (integer? maximum-bytes) (not (neg? maximum-bytes)))
++    (throw (ex-info "world-partition: budget must be a non-negative integer"
++                    {:maximum-bytes maximum-bytes})))
++  (let [candidates (->> cells
++                        (map (fn [cell] (assoc cell :plan/lod (desired-lod cell observer)
++                                                   :plan/distance-squared
++                                                   (distance-squared (:cell/center cell) observer))))
++                        (remove #(= :culled (:plan/lod %)))
++                        (sort-by (juxt :plan/distance-squared (comp pr-str :cell/id))))
++        result (reduce (fn [{:keys [used] :as plan} cell]
++                         (let [bytes (:cell/estimated-bytes cell)]
++                           (if (<= (+ used bytes) maximum-bytes)
++                             (-> plan (update :used + bytes)
++                                 (update :selected conj {:cell/id (:cell/id cell)
++                                                        :lod (:plan/lod cell)
++                                                        :estimated-bytes bytes}))
++                             (update plan :deferred conj (:cell/id cell)))))
++                       {:used 0 :selected [] :deferred []} candidates)]
++    {:plan/maximum-bytes maximum-bytes
++     :plan/estimated-bytes (:used result)
++     :plan/selected (:selected result)
++     :plan/deferred (:deferred result)}))
+diff --git a/test/kami/avatar_test.cljk b/test/kami/avatar_test.cljk
+new file mode 100644
+index 0000000..ffc8ee5
+--- /dev/null
++++ b/test/kami/avatar_test.cljk
+@@ -0,0 +1,29 @@
++(ns kami.avatar-test
++  (:require [kotoba.test :refer [deftest is]]
++            [kami.avatar :as avatar]))
++
++(deftest reduced-avatar-quality-sweep
++  (let [avatars (mapv (fn [n] {:avatar/id (keyword (str "avatar-" n))
++                               :avatar/position [(* n 5) 0 0]}) (range 8))
++        sweep (avatar/avatar-sweep avatars [0 0 0]
++                                   {:hero-distance 10 :animated-distance 25
++                                    :impostor-distance 40}
++                                   {:hero 1 :animated 2 :impostor 3})]
++    (is (= [:hero :animated :animated :impostor :impostor :impostor :hidden :hidden]
++           (mapv :avatar/quality sweep)))
++    (is (= (set (map :avatar/id avatars)) (set (map :avatar/id sweep))))))
++
++(deftest rtc-state-is-ordered-and-idempotent
++  (let [room (-> (avatar/rtc-room)
++                 (avatar/update-peer {:peer/id :a :peer/revision 0 :peer/state :present})
++                 (avatar/update-peer {:peer/id :a :peer/revision 1 :peer/state :negotiating})
++                 (avatar/update-peer {:peer/id :a :peer/revision 2 :peer/state :connected})
++                 (avatar/update-peer {:peer/id :b :peer/revision 0 :peer/state :present}))
++        duplicate (avatar/update-peer room {:peer/id :a :peer/revision 2
++                                            :peer/state :degraded})]
++    (is (= [:a] (avatar/connected-peers room)))
++    (is (= room duplicate))
++    (is (= 4 (:rtc/revision room))))
++  (is (thrown? js/Error
++               (avatar/update-peer (avatar/rtc-room)
++                                   {:peer/id :a :peer/revision 0 :peer/state :connected}))))
+diff --git a/test/kami/benchmark_test.cljc b/test/kami/benchmark_test.cljc
+deleted file mode 100644
+index 43c6d2f..0000000
+--- a/test/kami/benchmark_test.cljc
++++ /dev/null
+@@ -1,43 +0,0 @@
+-(ns kami.benchmark-test
+-  (:require [clojure.test :refer [deftest is testing]]
+-            [kami.benchmark :as benchmark]))
+-
+-(def manifest
+-  {:sample/id :isekai/swarm
+-   :sample/title "Isekai Swarm"
+-   :sample/dimension :2d
+-   :sample/genre :action-roguelite
+-   :sample/metrics [:frame/fps :frame/cpu-ms :frame/gpu-ms
+-                    :render/visible-entities :render/particles]
+-   :sample/tiers
+-   {:playable {:target-fps 30 :budget {:render/visible-entities 5000}}
+-    :showcase {:target-fps 60 :budget {:render/visible-entities 10000}}
+-    :meltdown {:target-fps 60
+-               :budget {:render/visible-entities 100000}
+-               :load {:unit :entities :initial 10000 :step 5000 :maximum 100000}}}})
+-
+-(deftest manifest-contract
+-  (is (true? (benchmark/valid-manifest? manifest)))
+-  (is (= 60 (:target-fps (benchmark/quality-config manifest :showcase))))
+-  (testing "every standard tier is mandatory"
+-    (is (thrown? #?(:clj Exception :cljs js/Error)
+-                 (benchmark/valid-manifest? (update manifest :sample/tiers dissoc :playable)))))
+-  (testing "metrics must use the common vocabulary"
+-    (is (thrown? #?(:clj Exception :cljs js/Error)
+-                 (benchmark/valid-manifest? (update manifest :sample/metrics conj :fps))))))
+-
+-(deftest telemetry-contract
+-  (let [frame (benchmark/telemetry-frame
+-               manifest :showcase 42 1234.5
+-               {:frame/fps 60.0 :frame/cpu-ms 3.1 :frame/gpu-ms 7.4
+-                :render/visible-entities 9999})]
+-    (is (= benchmark/contract-version (:telemetry/contract frame)))
+-    (is (= :isekai/swarm (:telemetry/sample frame)))
+-    (is (= :showcase (:telemetry/tier frame))))
+-  (is (thrown? #?(:clj Exception :cljs js/Error)
+-               (benchmark/telemetry-frame manifest :showcase 0 0 {:memory/rss 1}))))
+-
+-(deftest meltdown-ramp
+-  (is (= 10000 (benchmark/next-meltdown-load manifest nil)))
+-  (is (= 15000 (benchmark/next-meltdown-load manifest 10000)))
+-  (is (= 100000 (benchmark/next-meltdown-load manifest 99000))))
+diff --git a/test/kami/benchmark_test.cljk b/test/kami/benchmark_test.cljk
+new file mode 100644
+index 0000000..1f6b759
+--- /dev/null
++++ b/test/kami/benchmark_test.cljk
+@@ -0,0 +1,265 @@
++(ns kami.benchmark-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kami.benchmark :as benchmark]))
++
++(def manifest
++  {:sample/id :isekai/swarm
++   :sample/title "Isekai Swarm"
++   :sample/dimension :2d
++   :sample/genre :action-roguelite
++   :sample/metrics [:frame/fps :frame/cpu-ms :frame/gpu-ms :frame/p95-ms
++                    :render/visible-entities :render/particles]
++   :sample/tiers
++   {:playable {:target-fps 30 :budget {:render/visible-entities 5000}}
++    :showcase {:target-fps 60 :budget {:render/visible-entities 10000}}
++    :meltdown {:target-fps 60
++               :budget {:render/visible-entities 100000}
++               :load {:unit :entities :initial 10000 :step 5000 :maximum 100000}}}})
++
++(deftest manifest-contract
++  (is (true? (benchmark/valid-manifest? manifest)))
++  (is (= 60 (:target-fps (benchmark/quality-config manifest :showcase))))
++  (testing "every standard tier is mandatory"
++    (is (thrown? #?(:clj Exception :cljs js/Error)
++                 (benchmark/valid-manifest? (update manifest :sample/tiers dissoc :playable)))))
++  (testing "metrics must use the common vocabulary"
++    (is (thrown? #?(:clj Exception :cljs js/Error)
++                 (benchmark/valid-manifest? (update manifest :sample/metrics conj :fps))))))
++
++(deftest telemetry-contract
++  (let [frame (benchmark/telemetry-frame
++               manifest :showcase 42 1234.5
++               {:frame/fps 60.0 :frame/cpu-ms 3.1 :frame/gpu-ms 7.4
++                :render/visible-entities 9999})]
++    (is (= benchmark/contract-version (:telemetry/contract frame)))
++    (is (= :isekai/swarm (:telemetry/sample frame)))
++    (is (= :showcase (:telemetry/tier frame))))
++  (is (thrown? #?(:clj Exception :cljs js/Error)
++               (benchmark/telemetry-frame manifest :showcase 0 0 {:memory/rss 1}))))
++
++(deftest meltdown-ramp
++  (is (= 10000 (benchmark/next-meltdown-load manifest nil)))
++  (is (= 15000 (benchmark/next-meltdown-load manifest 10000)))
++  (is (= 100000 (benchmark/next-meltdown-load manifest 99000))))
++
++(def performance-plan
++  {:schema "kami.performance-plan/v1" :dimension "3d" :workload "mesh-density"
++   :samples [{:entities 100 :durationMs 5000 :warmupFrames 60}
++             {:entities 200 :durationMs 5000 :warmupFrames 60}
++             {:entities 300 :durationMs 5000 :warmupFrames 60}]
++   :budgets {:frameTimeP95Ms 16.7 :memoryMaxMiB 512}
++   :stopOnFirstViolation true})
++
++(deftest portable-performance-plan-contract
++  (is (true? (benchmark/valid-performance-plan? performance-plan)))
++  (is (= 15.0 (benchmark/percentile [1.0 15.0 8.0 4.0] 0.95)))
++  (is (thrown? #?(:clj Exception :cljs js/Error)
++               (benchmark/valid-performance-plan?
++                (assoc performance-plan :dimension "xr")))))
++
++(deftest saturation-runner-stops-at-first-violation
++  (let [attempts (atom [])
++        result (benchmark/run-saturation
++                performance-plan
++                (fn [{:keys [entities]}]
++                  (swap! attempts conj entities)
++                  {:frame-times-ms (if (= 200 entities) [10.0 18.0] [8.0 9.0])
++                   :memory-max-mib 256}))]
++    (is (= [100 200] @attempts))
++    (is (= :violated (:status result)))
++    (is (= 100 (:saturationEntities result)))
++    (is (= [:frame-time-p95] (-> result :results last :violations)))))
++
++(deftest saturation-rows-keep-the-readings-the-p95-came-from
++  ;; A p95 alone cannot say whether two runs differ by more than their own
++  ;; spread, so a row that drops its readings makes every downstream gate blind
++  ;; to the difference between a real change and noise.
++  (let [readings [8.0 9.0 8.5 9.5 8.2]
++        result (benchmark/run-saturation
++                (assoc performance-plan :dimension "2d")
++                (constantly {:frame-times-ms readings :memory-max-mib 64}))
++        row (-> result :results first)]
++    (is (= readings (:frameTimesMs row))
++        "the readings survive onto the row, in order")
++    (is (= (benchmark/percentile readings 0.95) (:frameTimeP95Ms row))
++        "and the p95 still is the p95 of exactly those readings")
++    (is (< 1 (count (distinct (:frameTimesMs row))))
++        "a spread the gate can actually measure")))
++
++(deftest rows-carry-the-run-parameters-they-were-produced-under
++  ;; A consumer needs these to know whether two rows are comparable, and they
++  ;; were being dropped: isekai.gap-evidence requires :warmupFrames and
++  ;; :durationMs to build a cohort, so a real capture could not be ingested at
++  ;; all — only a hand-written fixture that happened to include them.
++  (let [plan (assoc performance-plan :dimension "2d")
++        result (benchmark/run-saturation
++                plan (constantly {:frame-times-ms [5.0 6.0] :memory-max-mib 64}))
++        row (-> result :results first)
++        sample (-> plan :samples first)]
++    (is (= (:warmupFrames sample) (:warmupFrames row)))
++    (is (= (:durationMs sample) (:durationMs row)))
++    (is (every? some? [(:warmupFrames row) (:durationMs row)]))))
++
++(deftest rows-carry-how-warmup-ended-when-the-adapter-reports-it
++  ;; A warmup cut short by a wall-clock ceiling may not be at steady state.
++  ;; Hiding that makes the row look comparable with rows that were.
++  (let [plan (assoc performance-plan :dimension "2d")
++        with (benchmark/run-saturation
++              plan (constantly {:frame-times-ms [5.0 6.0] :memory-max-mib 64
++                                :warmup-ended-by "time" :warmup-frames-run 12
++                                :warmup-ms 5000.0}))
++        row (-> with :results first)]
++    (is (= "time" (:warmupEndedBy row)))
++    (is (= 12 (:warmupFramesRun row)))
++    (is (= 5000.0 (:warmupMs row)))))
++
++(deftest an-adapter-that-reports-no-warmup-outcome-still-works
++  ;; Optional: adapters predating this carry on unchanged.
++  (let [row (-> (benchmark/run-saturation
++                 (assoc performance-plan :dimension "2d")
++                 (constantly {:frame-times-ms [5.0 6.0] :memory-max-mib 64}))
++                :results first)]
++    (is (nil? (:warmupEndedBy row)))
++    (is (= 6.0 (:frameTimeP95Ms row)))))
++
++(def interval-plan
++  (assoc-in (assoc performance-plan :dimension "2d")
++            [:budgets :frameIntervalP95Ms] 16.7))
++
++(deftest a-slow-frame-interval-violates-even-when-cpu-submit-is-fast
++  ;; The case that broke the royale ramp: cpu-submit stayed ~5ms at every load
++  ;; while the interval reached 1667ms, so nothing ever violated and the ramp
++  ;; reported its own ceiling as the saturation point.
++  (let [result (benchmark/run-saturation
++                interval-plan
++                (constantly {:frame-times-ms [5.0 5.0 5.0]
++                             :frame-intervals-ms [900.0 1000.0 1100.0]
++                             :memory-max-mib 64}))
++        row (-> result :results first)]
++    (is (= :violated (:status result)))
++    (is (= [:frame-interval-p95] (:violations row)))
++    (is (= 5.0 (:frameTimeP95Ms row)) "cpu-submit was inside its budget")
++    (is (= 1100.0 (:frameIntervalP95Ms row)))))
++
++(deftest a-fast-interval-passes
++  (let [row (-> (benchmark/run-saturation
++                 interval-plan
++                 (constantly {:frame-times-ms [5.0 5.0]
++                              :frame-intervals-ms [12.0 13.0]
++                              :memory-max-mib 64}))
++                :results first)]
++    (is (true? (:pass? row)))
++    (is (= 13.0 (:frameIntervalP95Ms row)))))
++
++(deftest an-adapter-without-intervals-behaves-exactly-as-before
++  ;; Additive: the interval budget only applies when the adapter reports one.
++  (let [result (benchmark/run-saturation
++                interval-plan
++                (constantly {:frame-times-ms [5.0 6.0] :memory-max-mib 64}))
++        row (-> result :results first)]
++    (is (true? (:pass? row)))
++    (is (nil? (:frameIntervalP95Ms row)))
++    (is (nil? (:frameIntervalsMs row)))))
++
++(deftest a-plan-without-an-interval-budget-ignores-reported-intervals
++  ;; Reporting a metric is not the same as budgeting it.
++  (let [row (-> (benchmark/run-saturation
++                 (assoc performance-plan :dimension "2d")
++                 (constantly {:frame-times-ms [5.0]
++                              :frame-intervals-ms [5000.0]
++                              :memory-max-mib 64}))
++                :results first)]
++    (is (true? (:pass? row)))
++    (is (= 5000.0 (:frameIntervalP95Ms row)) "recorded")
++    (is (= [] (:violations row)) "but not budgeted")))
++
++(deftest kept-readings-do-not-change-what-a-row-already-said
++  ;; Additive on purpose: the schema stays v1 because every reader names the
++  ;; keys it needs, and this must not become a reason to re-verify them.
++  (let [result (benchmark/run-saturation
++                (assoc performance-plan :dimension "2d")
++                (constantly {:frame-times-ms [5.0 6.0] :memory-max-mib 64}))
++        row (-> result :results first)]
++    (is (= "kami.performance-result/v1" (:schema result)))
++    (is (= 6.0 (:frameTimeP95Ms row)))
++    (is (= 64 (:memoryMaxMiB row)))
++    (is (true? (:pass? row)))
++    (is (= [] (:violations row)))))
++
++(deftest saturation-runner-reports-the-tested-ceiling
++  (let [result (benchmark/run-saturation
++                (assoc performance-plan :dimension "2d")
++                (constantly {:frame-times-ms [5.0 6.0] :memory-max-mib 64}))]
++    (is (= :passed (:status result)))
++    (is (= 300 (:saturationEntities result)))
++    (is (= 3 (count (:results result))))))
++
++(def scenario
++  {:scenario/id :isekai-swarm/reduced-ci
++   :scenario/seed 7
++   :scenario/ticks 4
++   :scenario/fixed-step-ms 16.666667
++   :scenario/inputs [{:tick 1 :action :spawn :value 3}
++                     {:tick 2 :action :damage :value 1}]})
++
++(defn fixture-step [state {:keys [tick dt-ms inputs]}]
++  (reduce (fn [s {:keys [action value]}]
++            (case action
++              :spawn (update s :entities + value)
++              :damage (update s :health - value)))
++          (assoc state :last-tick tick :elapsed-ms (+ (:elapsed-ms state) dt-ms))
++          inputs))
++
++(deftest deterministic-headless-contract
++  (is (true? (benchmark/valid-scenario? scenario)))
++  (let [run #(benchmark/run-headless
++              scenario
++              (fn [seed] {:seed seed :entities 1 :health 10 :elapsed-ms 0.0})
++              fixture-step)
++        first-run (run)
++        second-run (run)]
++    (is (= (:headless/final-state first-run)
++           {:seed 7 :entities 4 :health 9 :elapsed-ms 66.666668 :last-tick 3}))
++    (is (= (:headless/simulation-digest first-run)
++           (:headless/simulation-digest second-run)))
++    (is (= (benchmark/deterministic-digest {:b #{3 2} :a 1})
++           (benchmark/deterministic-digest {:a 1 :b #{2 3}}))))
++  (is (thrown? #?(:clj Exception :cljs js/Error)
++               (benchmark/valid-scenario?
++                (assoc-in scenario [:scenario/inputs 0 :tick] 4)))))
++
++(def baseline
++  {:result/sample :isekai/swarm
++   :result/scenario :isekai-swarm/reduced-ci
++   :result/tier :showcase
++   :result/build "main@abc"
++   :result/profile :ci/headless-jvm
++   :result/measurements {:frame/fps 60.0 :frame/p95-ms 10.0}
++   :result/simulation-digest 123})
++
++(deftest baseline-comparison-contract
++  (let [candidate (-> baseline
++                      (assoc :result/build "pr@def")
++                      (assoc :result/measurements
++                             {:frame/fps 58.0 :frame/p95-ms 10.9}))
++        comparison (benchmark/compare-results
++                    manifest baseline candidate
++                    {:frame/fps 0.1 :frame/p95-ms 0.1}
++                    #{:frame/fps})]
++    (is (true? (benchmark/valid-result? manifest candidate)))
++    (is (:comparison/pass? comparison))
++    (is (< (abs (- 0.09 (get-in comparison
++                                [:comparison/metrics :frame/p95-ms
++                                 :regression-ratio])))
++           1.0e-9)))
++  (testing "a >10% p95 regression fails"
++    (let [candidate (assoc baseline :result/measurements
++                           {:frame/fps 60.0 :frame/p95-ms 11.1})]
++      (is (false? (:comparison/pass?
++                   (benchmark/compare-results
++                    manifest baseline candidate {:frame/p95-ms 0.1} #{}))))))
++  (testing "digest mismatch fails even when performance passes"
++    (let [candidate (assoc baseline :result/simulation-digest 124)]
++      (is (false? (:comparison/pass?
++                   (benchmark/compare-results
++                    manifest baseline candidate {:frame/p95-ms 0.1} #{})))))))
+diff --git a/test/kami/binaural_test.cljc b/test/kami/binaural_test.cljk
+similarity index 99%
+rename from test/kami/binaural_test.cljc
+rename to test/kami/binaural_test.cljk
+index 80992b4..c337291 100644
+--- a/test/kami/binaural_test.cljc
++++ b/test/kami/binaural_test.cljk
+@@ -2,7 +2,7 @@
+   "GPU-free, mixer-free contract tests for kami.binaural: the spatialization IR
+   (ITD / ILD / distance / gains) and per-backend lowering. Pins the data
+   contract long before any audio device is wired up."
+-  (:require [clojure.test :refer [deftest testing is]]
++  (:require [kotoba.test :refer [deftest testing is]]
+             [kami.binaural :as b]))
+ 
+ (defn- close? [a x] (< (Math/abs (- a x)) 1e-6))
+diff --git a/test/kami/contract_test.cljc b/test/kami/contract_test.cljk
+similarity index 92%
+rename from test/kami/contract_test.cljc
+rename to test/kami/contract_test.cljk
+index ea78cc6..699cf61 100644
+--- a/test/kami/contract_test.cljc
++++ b/test/kami/contract_test.cljk
+@@ -3,9 +3,9 @@
+   render-IR → KAMI columnar packing, plus WGSL emission and matrix math.
+   These pin the clj ↔ Rust contracts (ARCHITECTURE.md §7/§9) so they can be
+   validated long before a GPU is wired up."
+-  (:require [clojure.test :refer [deftest testing is]]
+-            #?(:clj [clojure.edn :as edn])
+-            #?(:clj [clojure.java.io :as io])
++  (:require [kotoba.test :refer [deftest testing is]]
++            #?(:clj [kotoba.lang.edn :as edn])
++            #?(:clj [kotoba.io :as io])
+             [kami.scene  :as scene]
+             [kami.ecs    :as ecs]
+             [kami.render :as render]
+@@ -15,7 +15,6 @@
+             [kami.postfx :as postfx]
+             [kami.physics-compute :as physics]
+             [kami.fsm    :as fsm]
+-            [kami.input  :as input]
+             [kami.math   :as m]))
+ 
+ ;; --- fixtures ---------------------------------------------------------------
+@@ -362,31 +361,7 @@
+ (deftest fsm-reachable-states-from-initial
+   (is (= #{:idle :running :paused} (fsm/reachable-states guard-fsm))))
+ 
+-;; --- input action maps (Phase 1.2) ------------------------------------------
+-
+-(def input-table
+-  {:axes    [{:axis :move-x :positive :d :negative :a :scale 1.0}
+-             {:axis :move-y :positive :w :negative :s :scale 1.0}]
+-   :actions [{:action :fire :keys #{:space :j}}]
+-   :triggers {:jump :space}})
+-
+-(deftest input-axes-from-held
+-  (testing "single direction"
+-    (is (= {:move-x 1.0 :move-y 0.0} (input/action-axes #{:d} input-table))))
+-  (testing "mutual cancellation (both held → 0)"
+-    (is (= {:move-x 0.0 :move-y 0.0} (input/action-axes #{:a :d} input-table))))
+-  (testing "diagonal"
+-    (is (= {:move-x -1.0 :move-y 1.0} (input/action-axes #{:a :w} input-table)))))
+-
+-(deftest input-active-actions
+-  (is (contains? (input/active-actions #{:space} input-table) :fire))
+-  (is (empty? (input/active-actions #{:k} input-table))))
+-
+-(deftest input-triggered-edge
+-  (testing "trigger fires only on the rising edge"
+-    (is (contains? (input/triggered-actions #{:space} #{} input-table) :space))
+-    (is (empty? (input/triggered-actions #{:space} #{:space} input-table)))))
+-
+-(deftest input-merge-held-press-release
+-  (is (= #{:a :d} (input/merge-held #{:a} {:press #{:d}})))
+-  (is (= #{:a}   (input/merge-held #{:a :d} {:release #{:d}}))))
++;; The `kami.input` action-map tests that used to close this file were removed with
++;; the namespace itself. `kami.input` is owned by kotoba-lang/host, which every app
++;; that actually wires input already depends on; this repo's copy had no consumer
++;; other than these tests. See the deletion commit for the full argument.
+diff --git a/test/kami/dispatch_budget_test.cljc b/test/kami/dispatch_budget_test.cljk
+similarity index 99%
+rename from test/kami/dispatch_budget_test.cljc
+rename to test/kami/dispatch_budget_test.cljk
+index d256b48..820f365 100644
+--- a/test/kami/dispatch_budget_test.cljc
++++ b/test/kami/dispatch_budget_test.cljk
+@@ -20,7 +20,7 @@
+   coarse-grain is already pinned by `kami.schedule-test`; this namespace pins
+   the multi-tick dispatch budget — the budget grows linearly with tick count,
+   never with tick-count × entity-count."
+-  (:require [clojure.test :refer [deftest testing is]]
++  (:require [kotoba.test :refer [deftest testing is]]
+             [kami.ecs      :as ecs]
+             [kami.schedule :as sched]))
+ 
+diff --git a/test/kami/network_test.cljk b/test/kami/network_test.cljk
+new file mode 100644
+index 0000000..3db8c79
+--- /dev/null
++++ b/test/kami/network_test.cljk
+@@ -0,0 +1,51 @@
++(ns kami.network-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kami.network :as net]))
++
++(defn bot-inputs []
++  (vec (for [tick (range 12)
++             bot (range 8)]
++         (net/input-envelope (keyword (str "bot-" bot)) tick tick
++                             [{:command :move-x :value (dec (mod (+ tick bot) 3))}]))))
++
++(deftest authority-sequence-contract
++  (let [i0 (net/input-envelope :bot-0 0 3 [{:command :fire}])
++        state (-> (net/authority) (net/receive-input i0) (net/receive-input i0))]
++    (is (= 1 (count (:authority/accepted state))))
++    (is (= :stale-or-duplicate (-> state :authority/rejected first :reason)))
++    (is (false? (net/valid-input? (dissoc i0 :input/tick)))))
++  (let [inputs [(net/input-envelope :bot-b 0 2 [])
++                (net/input-envelope :bot-a 0 1 [])
++                (net/input-envelope :bot-a 1 2 [])]
++        [state due] (net/drain-tick (reduce net/receive-input (net/authority) inputs) 2)]
++    (is (empty? (:authority/accepted state)))
++    (is (= [[:bot-a 0] [:bot-a 1] [:bot-b 0]]
++           (mapv (juxt :input/client :input/seq) due)))))
++
++(deftest snapshot-reconciliation-contract
++  (let [accepted (net/receive-input (net/authority)
++                                    (net/input-envelope :me 1 1 []))
++        snap (net/snapshot 10 {:x 10} accepted)
++        pending [(net/input-envelope :me 1 1 [{:dx 100}])
++                 (net/input-envelope :me 2 2 [{:dx 2}])]
++        apply-input (fn [world input]
++                      (update world :x + (get-in input [:input/commands 0 :dx])))
++        result (net/reconcile {:client/id :me :client/world {:x 999}
++                               :client/pending pending}
++                              snap apply-input)]
++    (is (= {:x 12} (:client/world result)))
++    (is (= [2] (mapv :input/seq (:client/pending result))))
++    (is (= 10 (:client/server-tick result)))))
++
++(deftest reduced-eight-bot-impairment-is-deterministic
++  (let [config {:seed 260714 :loss-permyriad 500
++                :base-delay-ticks 1 :jitter-ticks 1}
++        run-a (net/impair config (bot-inputs))
++        run-b (net/impair config (reverse (bot-inputs)))]
++    (testing "delivery decisions and their total order do not depend on arrival order"
++      (is (= (:deliver run-a) (:deliver run-b)))
++      (is (= (set (:drop run-a)) (set (:drop run-b)))))
++    (is (= 96 (+ (count (:deliver run-a)) (count (:drop run-a)))))
++    (is (every? #(<= (:input/tick %)
++                     (get-in % [:input/impairment :impairment/deliver-tick]))
++                (:deliver run-a)))))
+diff --git a/test/kami/rt_test.cljc b/test/kami/rt_test.cljk
+similarity index 98%
+rename from test/kami/rt_test.cljc
+rename to test/kami/rt_test.cljk
+index e31748c..c2e08c8 100644
+--- a/test/kami/rt_test.cljc
++++ b/test/kami/rt_test.cljk
+@@ -2,8 +2,8 @@
+   "GPU-free contract tests for kami.rt: recipe validation, IR normalization,
+   WGSL ray-query emission, per-backend lowering (emit vs delegate vs nda), and a
+   CPU reference intersector that pins the trace *semantics* without a GPU."
+-  (:require [clojure.test :refer [deftest testing is]]
+-            [clojure.string :as str]
++  (:require [kotoba.test :refer [deftest testing is]]
++            [kotoba.lang.text :as str]
+             [kami.rt :as rt]))
+ 
+ (deftest validation
+diff --git a/test/kami/runtime_test.cljc b/test/kami/runtime_test.cljk
+similarity index 98%
+rename from test/kami/runtime_test.cljc
+rename to test/kami/runtime_test.cljk
+index 3fcb2d7..958271b 100644
+--- a/test/kami/runtime_test.cljc
++++ b/test/kami/runtime_test.cljk
+@@ -3,7 +3,7 @@
+   using a mock IGpuBackend that records calls. Proves the loop wiring —
+   defsystem → step → render-IR → pack → submit, asset registration, and the
+   commit-on-save path — without a real GPU."
+-  (:require [clojure.test :refer [deftest testing is]]
++  (:require [kotoba.test :refer [deftest testing is]]
+             [kami.scene :as scene]
+             [kami.ecs   :as ecs]
+             [kami.gpu   :as gpu]
+diff --git a/test/kami/sample_manifest_test.cljk b/test/kami/sample_manifest_test.cljk
+new file mode 100644
+index 0000000..aa68659
+--- /dev/null
++++ b/test/kami/sample_manifest_test.cljk
+@@ -0,0 +1,54 @@
++(ns kami.sample-manifest-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kami.sample-manifest :as manifest]))
++
++(def urls
++  {:sample/source-url "https://github.com/kotoba-lang/kami-engine-sdk"
++   :sample/fork-url "https://isekai.network/fork/sample"
++   :sample/play-url "https://isekai.network/play/sample"
++   :sample/benchmark-url "https://isekai.network/benchmarks/sample"})
++
++(defn fixture [id dimension genre capabilities]
++  (manifest/scaffold
++   {:sample/id id :sample/title (name id)
++    :sample/dimension dimension :sample/genre genre}
++   (merge urls {:sample/status :prototype
++                :sample/capabilities capabilities})))
++
++(def matrix
++  [(fixture :sample/swarm :2d :action-roguelite [:ecs :gpu-sprites])
++   (fixture :sample/canvas :2d :sandbox [:streaming :persistence])
++   (fixture :sample/strike :3d :fps [:netcode :animation])
++   (fixture :sample/kingdom :3d :open-world [:terrain :lod])])
++
++(deftest scaffold-and-validation
++  (let [sample (first matrix)]
++    (is (= manifest/schema-version (:sample/schema-version sample)))
++    (is (true? (manifest/valid? sample))))
++  (testing "publication metadata is checked"
++    (is (thrown? #?(:clj Exception :cljs js/Error)
++                 (manifest/valid? (assoc (first matrix) :sample/play-url "/relative"))))
++    (is (thrown? #?(:clj Exception :cljs js/Error)
++                 (manifest/valid? (assoc (first matrix) :sample/status :aaa)))))
++  (testing "capabilities are stable, unique keyword data"
++    (is (thrown? #?(:clj Exception :cljs js/Error)
++                 (manifest/valid? (assoc (first matrix)
++                                         :sample/capabilities [:ecs :ecs]))))))
++
++(deftest explicit-v1-migration
++  (let [legacy (apply dissoc (first matrix)
++                      (conj manifest/url-keys :sample/schema-version
++                            :sample/capabilities :sample/status :sample/license))
++        migrated (manifest/migrate-manifest legacy urls)]
++    (is (= manifest/schema-version (:sample/schema-version migrated)))
++    (is (= :prototype (:sample/status migrated)))
++    (is (true? (manifest/valid? migrated))))
++  (is (thrown? #?(:clj Exception :cljs js/Error)
++               (manifest/migrate-manifest {:sample/schema-version 99}))))
++
++(deftest dimension-matrix-contract
++  (is (true? (manifest/valid-matrix? matrix)))
++  (is (thrown? #?(:clj Exception :cljs js/Error)
++               (manifest/valid-matrix? (filterv #(= :2d (:sample/dimension %)) matrix))))
++  (is (thrown? #?(:clj Exception :cljs js/Error)
++               (manifest/valid-matrix? (conj matrix (first matrix))))))
+diff --git a/test/kami/schedule_test.cljc b/test/kami/schedule_test.cljk
+similarity index 99%
+rename from test/kami/schedule_test.cljc
+rename to test/kami/schedule_test.cljk
+index 90f6898..fed3633 100644
+--- a/test/kami/schedule_test.cljc
++++ b/test/kami/schedule_test.cljk
+@@ -3,7 +3,7 @@
+   receives ONLY entities matching its `:query`, the runner threads `world` in
+   `:order`, and the runner itself does NOT loop per-entity (it hands the whole
+   queried seq to the system fn once). See ADR-2607010930."
+-  (:require [clojure.test :refer [deftest testing is]]
++  (:require [kotoba.test :refer [deftest testing is]]
+             [kami.ecs      :as ecs]
+             [kami.schedule :as sched]))
+ 
+diff --git a/test/kami/sim_lod_test.cljk b/test/kami/sim_lod_test.cljk
+new file mode 100644
+index 0000000..d485267
+--- /dev/null
++++ b/test/kami/sim_lod_test.cljk
+@@ -0,0 +1,56 @@
++(ns kami.sim-lod-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [kami.sim-lod :as sim-lod]))
++
++(def actors
++  [{:entity/id :unit/c :entity/index 2 :position [30 0] :formation/id :red}
++   {:entity/id :unit/a :entity/index 0 :position [3 4] :formation/id :red}
++   {:entity/id :unit/b :entity/index 1 :position [20 0] :formation/id :red}])
++
++(def config {:tick 2 :observer [0 0] :visible-distance 10 :offscreen-cadence 4})
++
++(deftest logical-and-visible-populations-are-independent
++  (let [plan (sim-lod/plan-frame config actors)]
++    (is (= [:unit/a :unit/b :unit/c]
++           (mapv :entity/id (:sim-lod/logical plan))))
++    (is (= [:unit/a] (mapv :entity/id (:sim-lod/visible plan))))
++    (is (= [:unit/a :unit/c] (mapv :entity/id (:sim-lod/due-updates plan))))
++    (is (= [:unit/b] (mapv :entity/id (:sim-lod/deferred plan))))))
++
++(deftest planning-is-input-order-independent
++  (is (= (sim-lod/plan-frame config actors)
++         (sim-lod/plan-frame config (reverse actors)))))
++
++(deftest offscreen-cadence-is-staggered
++  (testing "visible actors are always due; each offscreen index gets its slot"
++    (is (= [[:unit/a] [:unit/a] [:unit/a :unit/c] [:unit/a :unit/b]]
++           (mapv (fn [tick]
++                   (mapv :entity/id
++                         (:sim-lod/due-updates
++                          (sim-lod/plan-frame (assoc config :tick tick) actors))))
++                 (range 4))))))
++
++(deftest formation-contract
++  (is (= [{:work/type :formation
++           :formation/id :red
++           :formation/members [:unit/a :unit/c]
++           :formation/centroid [33/2 2]
++           :formation/target [100 0]}]
++         (sim-lod/formation-workload
++          (:sim-lod/due-updates (sim-lod/plan-frame config actors))
++          {:red [100 0]}))))
++
++(deftest schedule-contract
++  (let [workers [{:entity/id :worker/b :entity/index 2 :position [0 0] :schedule/id :factory}
++                 {:entity/id :worker/a :entity/index 0 :position [0 0] :schedule/id :citizen}]]
++    (is (= [{:work/type :schedule :entity/id :worker/a :schedule/activity :sleep}
++            {:work/type :schedule :entity/id :worker/b :schedule/activity :haul}]
++           (sim-lod/schedule-workload workers 4 4
++                                      {:citizen [:work :sleep]
++                                       :factory [:assemble :haul]})))))
++
++(deftest invalid-contract-data-is-rejected
++  (is (thrown? #?(:clj Exception :cljs js/Error)
++               (sim-lod/plan-frame (assoc config :offscreen-cadence 0) actors)))
++  (is (thrown? #?(:clj Exception :cljs js/Error)
++               (sim-lod/plan-frame config (conj actors (first actors))))))
+diff --git a/test/kami/world_partition_test.cljk b/test/kami/world_partition_test.cljk
+new file mode 100644
+index 0000000..b164086
+--- /dev/null
++++ b/test/kami/world_partition_test.cljk
+@@ -0,0 +1,34 @@
++(ns kami.world-partition-test
++  (:require [kotoba.test :refer [deftest is]]
++            [kami.world-partition :as world]))
++
++(def cells
++  [{:cell/id :origin :cell/center [0 0 0] :cell/estimated-bytes 60
++    :cell/lod-distances [10 30 100]}
++   {:cell/id :east :cell/center [20 0 0] :cell/estimated-bytes 50
++    :cell/lod-distances [10 30 100]}
++   {:cell/id :far :cell/center [200 0 0] :cell/estimated-bytes 10
++    :cell/lod-distances [10 30 100]}])
++
++(deftest lod-and-byte-budget-contract
++  (is (= [0 1 :culled] (mapv #(world/desired-lod % [0 0 0]) cells)))
++  (is (= {:plan/maximum-bytes 100 :plan/estimated-bytes 60
++          :plan/selected [{:cell/id :origin :lod 0 :estimated-bytes 60}]
++          :plan/deferred [:east]}
++         (world/budget-plan cells [0 0 0] 100))))
++
++(deftest explicit-cell-lifecycle
++  (let [loaded (-> (world/initial-state cells)
++                   (world/transition :origin {:event/type :request})
++                   (world/transition :origin {:event/type :begin-load})
++                   (world/transition :origin {:event/type :load-ok :lod 0}))
++        evicted (-> loaded
++                    (world/transition :origin {:event/type :begin-evict})
++                    (world/transition :origin {:event/type :evict-ok}))]
++    (is (= :resident (get-in loaded [:partition/lifecycle :origin])))
++    (is (= 0 (get-in loaded [:partition/resident-lod :origin])))
++    (is (= :unloaded (get-in evicted [:partition/lifecycle :origin])))
++    (is (nil? (get-in evicted [:partition/resident-lod :origin]))))
++  (is (thrown? js/Error
++               (world/transition (world/initial-state cells) :origin
++                                 {:event/type :load-ok :lod 0}))))

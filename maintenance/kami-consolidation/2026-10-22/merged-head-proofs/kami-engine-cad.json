@@ -1,0 +1,186 @@
+{
+  "repository": "kotoba-lang/kami-engine-cad",
+  "default": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7",
+  "heads": {
+    "e43f4fb475343f226a0aa421a7659f29d69ba101": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 3,
+        "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/3",
+        "head": "e43f4fb475343f226a0aa421a7659f29d69ba101",
+        "merge": "28cf9b5c08f90e89c24264b138d0cc2cc024220e",
+        "merge-base": "820a9c896d87c80ff492b4880d1bf8b91820a591",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/kami/cad.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a91d37cefef1398cde49a96dde34b2087deb0354"
+            }
+          },
+          {
+            "path": "test/kami/cad_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "26d3c09f905c4c2abe9b6506fe1826931c982461"
+            }
+          }
+        ]
+      }
+    },
+    "8354f6f1e329ad7afd5eaf2d0053bbb1bad9d219": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 4,
+        "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/4",
+        "head": "8354f6f1e329ad7afd5eaf2d0053bbb1bad9d219",
+        "merge": "462181e751284998d6d6c0139d1b85c139649a93",
+        "merge-base": "3ef65bcf83251739c0356b249cf31f31fe3afc17",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/kami/cad.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "0b6e456d780ade47cf59e32e1d62f6e469384d38"
+            }
+          },
+          {
+            "path": "test/kami/cad_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "875916300e2159755227b0cdeee754245bbeda45"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/1",
+      "head": "38f4f12362bf18912de9a41da57752dfe7db17c5",
+      "merge": "3ef65bcf83251739c0356b249cf31f31fe3afc17",
+      "merge-base": "28cf9b5c08f90e89c24264b138d0cc2cc024220e",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "836565464588519a484d23cd24a09e89c77551b5"
+          }
+        },
+        {
+          "path": "src/kami/cad.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "197e5ac83b2b50b3a8b9c826d8e0b1e57a7499f0"
+          }
+        },
+        {
+          "path": "test/kami/cad_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "441c3d2953219bfdef10a118100cbc9714ceae86"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/2",
+      "head": "667be3de75fd1044954bb82dbee7372c3f0b7581",
+      "merge": "820a9c896d87c80ff492b4880d1bf8b91820a591",
+      "merge-base": "db860f360b7a4e0dbe476a1356aa976365493ab3",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2bf6043eeec18a2027569ac2f9423b73db2f0683"
+          }
+        },
+        {
+          "path": "src/kami/cad.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a7f248608146d34cbf00b6a76a4ffa5aed9006d6"
+          }
+        },
+        {
+          "path": "test/kami/cad_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d347b1fcdf32a002a02b7470de9839dfaa1558f4"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/3",
+      "head": "e43f4fb475343f226a0aa421a7659f29d69ba101",
+      "merge": "28cf9b5c08f90e89c24264b138d0cc2cc024220e",
+      "merge-base": "820a9c896d87c80ff492b4880d1bf8b91820a591",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kami/cad.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a91d37cefef1398cde49a96dde34b2087deb0354"
+          }
+        },
+        {
+          "path": "test/kami/cad_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "26d3c09f905c4c2abe9b6506fe1826931c982461"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 4,
+      "url": "https://github.com/kotoba-lang/kami-engine-cad/pull/4",
+      "head": "8354f6f1e329ad7afd5eaf2d0053bbb1bad9d219",
+      "merge": "462181e751284998d6d6c0139d1b85c139649a93",
+      "merge-base": "3ef65bcf83251739c0356b249cf31f31fe3afc17",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kami/cad.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "0b6e456d780ade47cf59e32e1d62f6e469384d38"
+          }
+        },
+        {
+          "path": "test/kami/cad_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "875916300e2159755227b0cdeee754245bbeda45"
+          }
+        }
+      ]
+    }
+  ]
+}

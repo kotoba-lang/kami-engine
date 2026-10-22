@@ -1,30 +1,20 @@
-;; kami-gameplay — portable gameplay framework for the KAMI engine.
-;;
-;; No external dependencies on purpose. Every namespace here is pure `.cljc`
-;; over plain maps and vectors, which is what lets the same code run as the
-;; browser host's authority, as a native host's authority, and as the parity
-;; oracle the Rust `battle_royale.rs` used to be before it left this repository.
-;;
-;; Two ways to run the suite, both of which must pass:
-;;   kbb -M:test              JVM
-;;   npx --yes kbb --backend sci bin/run_tests.cljk   Node / ClojureScript
-;; The second is not a convenience: cross-platform bit-identical arithmetic is a
-;; load-bearing property here (see kami.gameplay.rng), and a suite that only ran
-;; on one platform could not observe it.
-{:paths ["src" "resources"]
- :deps {
- io.github.kotoba-lang/kami-engine-animation {:git/url "https://github.com/kotoba-lang/kami-engine-animation.git" :git/sha "2801b26952c7f5e703655fb4ee280b10cc68b089"}
-
-        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
-        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
-        ;; only from nbb.edn, so every project file this repo has names it.
-        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
-       ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
-        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
-        ;; this repo silently rides whatever a sibling happens to name.
-        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}}
+{:paths ["src" "resources"],
+ :deps
+ #:io.github.kotoba-lang{kami-engine-animation
+                         #:local{:root
+                                 "../packages/kotoba.kami.engine.animation"},
+                         edn
+                         #:git{:sha
+                               "79dba32c8892058842c57783f06a2dfe4601aeb0"},
+                         text
+                         #:git{:sha
+                               "73bdb13ae7a3d004b44bca08be03a3191157a38f"}},
  :aliases
- {:test {:extra-paths ["test"]
-         :extra-deps {io.github.cognitect-labs/test-runner
-                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
-         :main-opts ["-m" "cognitect.test-runner"]}}}
+ {:test
+  {:extra-paths ["test"],
+   :extra-deps
+   #:io.github.cognitect-labs{test-runner
+                              #:git{:tag "v0.5.1",
+                                    :sha
+                                    "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}},
+   :main-opts ["-m" "cognitect.test-runner"]}}}

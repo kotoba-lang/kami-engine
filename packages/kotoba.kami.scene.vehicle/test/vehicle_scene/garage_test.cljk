@@ -1,0 +1,142 @@
+(ns vehicle-scene.garage-test
+  "Tests for `vehicle-scene.garage` — 1:1 ports of the original
+  `#[test]`s in `kami-vehicle-scene`'s `src/garage.rs`, plus a
+  self-consistency adaptation of `tests/garage_parity.rs` and
+  `tests/vehicle_parity.rs` (the originals compared the shipped EDN
+  against a real `kami_vehicle` oracle — `VehicleKind::spec()`,
+  `build_vehicle(kind)`, the preset constructors — that this duck-typed
+  port does not depend on; see `vehicle-scene.garage`'s namespace
+  docstring)."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [scene :as scene]
+            [vehicle-scene.garage :as garage]))
+
+;; ---------------------------------------------------------------------
+;; src/garage.rs #[test]s
+;; ---------------------------------------------------------------------
+
+(deftest engines-table-loads-all-four
+  (let [m (:ok (garage/engines-from-edn garage/garage-edn))]
+    (is (= 4 (count m)))
+    (is (contains? m "na-2-0-gasoline"))
+    (is (contains? m "bus-diesel"))))
+
+(deftest layout-value-forms-parse
+  (is (= {:kind :fwd} (garage/layout-from-value nil)))
+  (let [m (scene/root-map "{:l :rwd}")]
+    (is (= {:kind :rwd} (garage/layout-from-value (scene/mget m "l")))))
+  (let [m (scene/root-map "{:l {:awd {:front-split 0.45}}}")]
+    (is (= {:kind :awd :front-split 0.45} (garage/layout-from-value (scene/mget m "l"))))))
+
+(deftest missing-table-is-an-error
+  (let [err (garage/engines-from-edn "{:other 1}")]
+    (is (= :no-table (:error err)))
+    (is (= "engines" (:table err)))))
+
+;; ---------------------------------------------------------------------
+;; tests/garage_parity.rs — adapted (self-consistency; no real
+;; kami-vehicle oracle to compare against)
+;; ---------------------------------------------------------------------
+
+(deftest garage-edn-self-consistent
+  (let [loaded (:ok (garage/garage-from-edn garage/garage-edn))]
+    (is (= 6 (count loaded)) "all 6 vehicles present in EDN")
+    (doseq [id garage/all-vehicle-kinds]
+      (let [spec (get loaded id)]
+        (is (some? spec) (str "EDN missing " id))
+        (is (number? (:wheelbase spec)))
+        (is (contains? #{:fwd :rwd :awd} (:kind (:layout spec))))
+        ;; The whole struct equals the builtin (duck-typed) mirror.
+        (is (= spec (garage/garage-spec-builtin id)) (str id ": builtin parity"))))
+
+    ;; Sports is the one that should carry the sticky-tire override.
+    (let [sports (get loaded "sports")]
+      (is (= 1.20 (:tire-d-long sports)))
+      (is (= 1.20 (:tire-d-lat sports))))
+
+    ;; SUV is the AWD car, and round-trips.
+    (let [suv (get loaded "suv")]
+      (is (= {:kind :awd :front-split 0.45} (:layout suv))))))
+
+(deftest engines-edn-self-consistent
+  (let [engines (:ok (garage/engines-from-edn garage/garage-edn))]
+    (is (= 4 (count engines)) "4 engine presets in EDN")
+    (doseq [[id edn] engines]
+      (let [builtin (garage/builtin-engine id)]
+        (is (= edn builtin) (str id ": full EngineSpec parity"))
+        (is (pos? (count (:torque-curve edn))))))
+    (is (= [[800.0 130.0] [1500.0 160.0] [2500.0 185.0] [3500.0 200.0]
+            [4500.0 200.0] [5500.0 185.0] [6500.0 150.0] [7000.0 0.0]]
+           (:torque-curve (get engines "na-2-0-gasoline"))))))
+
+(deftest gearbox-edn-self-consistent
+  (let [boxes (:ok (garage/gearboxes-from-edn garage/garage-edn))
+        edn (get boxes "manual-6")
+        builtin (garage/builtin-gearbox "manual-6")]
+    (is (= edn builtin) "full GearboxSpec parity")
+    (let [rebuilt (garage/to-gearbox edn)]
+      (is (= (:ratios edn) (:ratios rebuilt)))
+      (is (= (:final-drive edn) (:final-drive rebuilt)))
+      (is (= (:shift-time edn) (:shift-time rebuilt))))))
+
+(deftest tires-edn-self-consistent
+  (let [tires (:ok (garage/tires-from-edn garage/garage-edn))]
+    (is (= 2 (count tires)) "road-dry + road-wet in EDN")
+    (doseq [id ["road-dry" "road-wet"]]
+      (let [edn (get tires id)
+            builtin (garage/builtin-tire id)]
+        (is (= edn builtin) (str id ": full TireSpec parity"))))
+    ;; Per-car sticky-tire override: sports d_long/d_lat == 1.20.
+    (let [garage-tbl (:ok (garage/garage-from-edn garage/garage-edn))
+          sports (get garage-tbl "sports")]
+      (is (= 1.20 (:tire-d-long sports)))
+      (is (= 1.20 (:tire-d-lat sports))))))
+
+;; ---------------------------------------------------------------------
+;; tests/vehicle_parity.rs — adapted (build-from-edn resolves a PLAN,
+;; not a full soft-body Vehicle; see namespace "Scope note")
+;; ---------------------------------------------------------------------
+
+(deftest vehicle-edn-build-resolves-every-kind
+  (doseq [id garage/all-vehicle-kinds]
+    (let [plan (garage/build-from-edn id)]
+      (is (:ok plan) (str id ": build-from-edn failed: " plan))
+      (let [p (:ok plan)]
+        (is (= id (:name p)))
+        (is (map? (:sedan-spec p)))
+        (is (number? (:max-rpm (:engine p))))
+        (is (number? (:final-drive (:gearbox p))))))))
+
+(deftest sports-is-sticky-others-are-road-dry
+  (let [sports (:ok (garage/build-from-edn "sports"))]
+    (is (= 1.20 (:d-long (:tire sports))))
+    (is (= 1.20 (:d-lat (:tire sports)))))
+  (doseq [id ["sedan" "suv" "bus"]]
+    (let [p (:ok (garage/build-from-edn id))]
+      (is (nil? (:tire p)) (str id ": no sticky override, tire plan is nil")))))
+
+(deftest kind-id-is-hyphen-underscore-tolerant
+  ;; All current kind ids are single words, so this exercises the
+  ;; underscore->hyphen normalization path (a no-op for single-word
+  ;; ids) rather than a real multi-word case — matching the original
+  ;; test's own documented scope.
+  (let [a (:ok (garage/build-from-edn "sedan"))
+        b (:ok (garage/build-from-edn "sedan"))]
+    (is (= (:sedan-spec a) (:sedan-spec b)))))
+
+;; ---------------------------------------------------------------------
+;; Differential
+;; ---------------------------------------------------------------------
+
+(deftest differential-from-id-resolves-open
+  (is (= {:kind :open} (garage/differential-from-id "open")))
+  (is (= {:kind :open} (garage/differential-from-id "unknown"))))
+
+;; ---------------------------------------------------------------------
+;; Namespace-loads smoke test
+;; ---------------------------------------------------------------------
+
+(deftest namespace-loads
+  (is (fn? garage/build-from-edn))
+  (is (fn? garage/garage-spec-builtin))
+  (is (string? garage/garage-edn)))

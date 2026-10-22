@@ -1,0 +1,2217 @@
+{
+  "repository": "kotoba-lang/kami-engine-vehicle-designer",
+  "default": "84da8aed92b359d70725fce3850cdddc313be8f8",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "commit": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "commit": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/docs/about-refresh",
+      "object": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "commit": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 20,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/20",
+        "head": "a64357a72af619d50d4d812068b004e3b20e733e",
+        "merge": "ef5f401f99f7a5bbe5a3d83259dc79acd7801d88",
+        "merge-base": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c7845e17bdd7e916fc4e49f478150d6038c88bcf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/heads/docs/stale-followup",
+      "object": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "commit": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "a0dccc36a036aa29bf10e48ee432b8ae5ee68893",
+      "commit": "a0dccc36a036aa29bf10e48ee432b8ae5ee68893",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "commit": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/dc-bus-power-split",
+      "object": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "commit": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/dc-bus-regen-power-split",
+      "object": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "commit": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/dutycycle-demand-profile",
+      "object": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "commit": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/vibration-fatigue-miner",
+      "object": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "commit": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 16,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/16",
+        "head": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+        "merge": "9626721c843fe0e9030ba3daa085ed98f9af104b",
+        "merge-base": "8500c3b4f69d63202cd30c3a4579982486656b8e",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/fatigue.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a8cc3abf783ba342959a55dd2d9814a50a842862"
+            }
+          },
+          {
+            "path": "test/vdesign/fatigue_test.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a50e80a45b6f6606e3316cdb0e704e3e2c8d626c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/bot/bev-store-soc-profile",
+      "object": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "commit": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 8,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/8",
+        "head": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+        "merge": "1cce3c6831881ea2d2127857c27f9f9746ef2f2a",
+        "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/bev_store.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a7b1770735d189d98e280be30be7cb0f674b3752"
+            }
+          },
+          {
+            "path": "test/vdesign/bev_store_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "55cc573c8c5110ef01909d43714d8b26ffcaccde"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/bot/cartridge-fcev-closure-20260903",
+      "object": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "commit": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 9,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/9",
+        "head": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+        "merge": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+        "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/cartridge_fcev.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3867446848791cb2f44e6d44d3b2e50d40001771"
+            }
+          },
+          {
+            "path": "src/vdesign/physics.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "0df6bce7c9b7b210801db4574190644806e92bff"
+            }
+          },
+          {
+            "path": "test/vdesign/cartridge_fcev_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "92737f6f31333d3c75b7c6af9b6809cdade8a98e"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/bot/cartridge-geometry-20260902",
+      "object": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "commit": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/bot/cartridge-swap-schedule-20260905",
+      "object": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "commit": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 11,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/11",
+        "head": "23735b1a4908aa5d9333198c91c8b87a00162030",
+        "merge": "90f70ac17886f479270753ac4eca3530e294fa27",
+        "merge-base": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_schedule.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3bbaba231e4dd43dd0b75b4e0055bfba23a2faa5"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_schedule_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "47159bbb00cabbc594601dafafe14e1cd48c3046"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/bot/cartridge-volume-link-20260906",
+      "object": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "commit": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 13,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/13",
+        "head": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+        "merge": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+        "merge-base": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/cartridge_volume.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c50fb3ae94f12cd63bee79117364a98bd1f73cde"
+            }
+          },
+          {
+            "path": "test/vdesign/cartridge_volume_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "85f6669fc9a41606e53ceb4ce22c2b628cd6c2cb"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/bot/swap-schedule-range-20260905",
+      "object": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "commit": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 12,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/12",
+        "head": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+        "merge": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+        "merge-base": "90f70ac17886f479270753ac4eca3530e294fa27",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_schedule.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "1a4d73933ddd945b3e85b81bfc415f6fffd0fa8c"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_schedule_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "b4b2873cae594a1ae12f4eb3e962f34885bb26d2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/bot/swap-station-clearance-20260906",
+      "object": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "commit": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 14,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/14",
+        "head": "e29c582fe862c60537b4347462176ab38dfc5304",
+        "merge": "8635b13ee648dfd754ccef4e328dff6b2b7b103e",
+        "merge-base": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_station.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fa3f781ef95e5053bdbb49264fe46b22c3e7e489"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_station_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "076ed285537971fef8394b2d8aed8ab80ff6f1f1"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/cartridge/mgmh2-stoich-sizing",
+      "object": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "commit": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/docs/about-refresh",
+      "object": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "commit": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 20,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/20",
+        "head": "a64357a72af619d50d4d812068b004e3b20e733e",
+        "merge": "ef5f401f99f7a5bbe5a3d83259dc79acd7801d88",
+        "merge-base": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c7845e17bdd7e916fc4e49f478150d6038c88bcf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/docs/stale-followup",
+      "object": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "commit": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/energyflow/h2-consumption-profile",
+      "object": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "commit": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/6",
+        "head": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+        "merge": "7b81943fa3292586217deeec133bcd0cc9201d8e",
+        "merge-base": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/hydrogen.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5d3ffbc2d1548f01189b7c1e569bdd4156ad2fb4"
+            }
+          },
+          {
+            "path": "test/vdesign/hydrogen_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "688985a7d2cd8780d4e52f8ab3a1224cea0be19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "commit": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/powertrain/b2w-motor-eff-provenance",
+      "object": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "commit": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "e2f302f2fbea43b13cc8e7b9a6ee6704039c2276",
+      "commit": "e2f302f2fbea43b13cc8e7b9a6ee6704039c2276",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-10",
+      "object": "174ed81d441b0d8e179b42d408e7fa220bbb7806",
+      "commit": "174ed81d441b0d8e179b42d408e7fa220bbb7806",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 10,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/10",
+        "head": "174ed81d441b0d8e179b42d408e7fa220bbb7806",
+        "merge": "cfcf559e25de5f9b53ee4f687e10486a124aa209",
+        "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/endurance.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5bdac130d386f30465f1227dd6d423473caabb41"
+            }
+          },
+          {
+            "path": "test/vdesign/endurance_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3c45f9aef970a3e4e7ad1d6a02f02b1554618ddb"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-11",
+      "object": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "commit": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 11,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/11",
+        "head": "23735b1a4908aa5d9333198c91c8b87a00162030",
+        "merge": "90f70ac17886f479270753ac4eca3530e294fa27",
+        "merge-base": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_schedule.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3bbaba231e4dd43dd0b75b4e0055bfba23a2faa5"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_schedule_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "47159bbb00cabbc594601dafafe14e1cd48c3046"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-12",
+      "object": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "commit": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 12,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/12",
+        "head": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+        "merge": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+        "merge-base": "90f70ac17886f479270753ac4eca3530e294fa27",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_schedule.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "1a4d73933ddd945b3e85b81bfc415f6fffd0fa8c"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_schedule_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "b4b2873cae594a1ae12f4eb3e962f34885bb26d2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-13",
+      "object": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "commit": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 13,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/13",
+        "head": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+        "merge": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+        "merge-base": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/cartridge_volume.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c50fb3ae94f12cd63bee79117364a98bd1f73cde"
+            }
+          },
+          {
+            "path": "test/vdesign/cartridge_volume_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "85f6669fc9a41606e53ceb4ce22c2b628cd6c2cb"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-14",
+      "object": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "commit": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 14,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/14",
+        "head": "e29c582fe862c60537b4347462176ab38dfc5304",
+        "merge": "8635b13ee648dfd754ccef4e328dff6b2b7b103e",
+        "merge-base": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_station.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fa3f781ef95e5053bdbb49264fe46b22c3e7e489"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_station_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "076ed285537971fef8394b2d8aed8ab80ff6f1f1"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-15",
+      "object": "f565aa2ce8a60fc363a25e743049356d755c39c9",
+      "commit": "f565aa2ce8a60fc363a25e743049356d755c39c9",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 15,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/15",
+        "head": "f565aa2ce8a60fc363a25e743049356d755c39c9",
+        "merge": "fb9802b594f76896a603a419066a0f799b130e36",
+        "merge-base": "8635b13ee648dfd754ccef4e328dff6b2b7b103e",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/hydrogen.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "21c311ff9e431c86d0b73e9004df7a175216eadd"
+            }
+          },
+          {
+            "path": "src/vdesign/reactor_heat.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "ae4c2781f0c50745f26da5eaa3666bd4ea94b836"
+            }
+          },
+          {
+            "path": "test/vdesign/reactor_heat_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "076be95e59a204d823c975a1faf467821ea87d74"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-16",
+      "object": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "commit": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 16,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/16",
+        "head": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+        "merge": "9626721c843fe0e9030ba3daa085ed98f9af104b",
+        "merge-base": "8500c3b4f69d63202cd30c3a4579982486656b8e",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/fatigue.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a8cc3abf783ba342959a55dd2d9814a50a842862"
+            }
+          },
+          {
+            "path": "test/vdesign/fatigue_test.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a50e80a45b6f6606e3316cdb0e704e3e2c8d626c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-17",
+      "object": "f71975d469da38494992c8b87e3cb2f8c4101cc6",
+      "commit": "f71975d469da38494992c8b87e3cb2f8c4101cc6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 17,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/17",
+        "head": "f71975d469da38494992c8b87e3cb2f8c4101cc6",
+        "merge": "afebbeff74070051c49c63681733b92ab6579054",
+        "merge-base": "240b2729bf1a2487f9ed56cb0a005bcd4c9f9279",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "docs/adr/0002-sim-verify-and-datafied-process.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "00853d10956776d64ed7863c2569b07ab4b710df"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-18",
+      "object": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+      "commit": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 18,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/18",
+        "head": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+        "merge": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+        "merge-base": "afebbeff74070051c49c63681733b92ab6579054",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f15febe18a58fbaeedb83a9b402d0d1361a7f9ee"
+            }
+          },
+          {
+            "path": "src/vdesign/hydrogen.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "d9240099a4d27dc1d985a8484cd37e8742e524d5"
+            }
+          },
+          {
+            "path": "src/vdesign/reactor_heat.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "d7d557be00dd306ee886a2ac97c43327a2554e02"
+            }
+          },
+          {
+            "path": "test/vdesign/hydrogen_test.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a9b7a84d6a23cfd575710f18cbaa853b48208840"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-19",
+      "object": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "commit": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "commit": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-20",
+      "object": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "commit": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 20,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/20",
+        "head": "a64357a72af619d50d4d812068b004e3b20e733e",
+        "merge": "ef5f401f99f7a5bbe5a3d83259dc79acd7801d88",
+        "merge-base": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c7845e17bdd7e916fc4e49f478150d6038c88bcf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-21",
+      "object": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "commit": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
+      "object": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "commit": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-4",
+      "object": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "commit": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-5",
+      "object": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "commit": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-6",
+      "object": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "commit": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/6",
+        "head": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+        "merge": "7b81943fa3292586217deeec133bcd0cc9201d8e",
+        "merge-base": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/hydrogen.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5d3ffbc2d1548f01189b7c1e569bdd4156ad2fb4"
+            }
+          },
+          {
+            "path": "test/vdesign/hydrogen_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "688985a7d2cd8780d4e52f8ab3a1224cea0be19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-7",
+      "object": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "commit": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-8",
+      "object": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "commit": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 8,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/8",
+        "head": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+        "merge": "1cce3c6831881ea2d2127857c27f9f9746ef2f2a",
+        "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/bev_store.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a7b1770735d189d98e280be30be7cb0f674b3752"
+            }
+          },
+          {
+            "path": "test/vdesign/bev_store_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "55cc573c8c5110ef01909d43714d8b26ffcaccde"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-9",
+      "object": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "commit": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 9,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/9",
+        "head": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+        "merge": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+        "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/cartridge_fcev.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3867446848791cb2f44e6d44d3b2e50d40001771"
+            }
+          },
+          {
+            "path": "src/vdesign/physics.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "0df6bce7c9b7b210801db4574190644806e92bff"
+            }
+          },
+          {
+            "path": "test/vdesign/cartridge_fcev_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "92737f6f31333d3c75b7c6af9b6809cdade8a98e"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/HEAD",
+      "object": "240b2729bf1a2487f9ed56cb0a005bcd4c9f9279",
+      "commit": "240b2729bf1a2487f9ed56cb0a005bcd4c9f9279",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/agent/dc-bus-power-split",
+      "object": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "commit": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/agent/dutycycle-demand-profile",
+      "object": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "commit": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/agent/vibration-fatigue-miner",
+      "object": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "commit": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 16,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/16",
+        "head": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+        "merge": "9626721c843fe0e9030ba3daa085ed98f9af104b",
+        "merge-base": "8500c3b4f69d63202cd30c3a4579982486656b8e",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/fatigue.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a8cc3abf783ba342959a55dd2d9814a50a842862"
+            }
+          },
+          {
+            "path": "test/vdesign/fatigue_test.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a50e80a45b6f6606e3316cdb0e704e3e2c8d626c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/bot/bev-store-soc-profile",
+      "object": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "commit": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 8,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/8",
+        "head": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+        "merge": "1cce3c6831881ea2d2127857c27f9f9746ef2f2a",
+        "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/bev_store.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a7b1770735d189d98e280be30be7cb0f674b3752"
+            }
+          },
+          {
+            "path": "test/vdesign/bev_store_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "55cc573c8c5110ef01909d43714d8b26ffcaccde"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/bot/cartridge-fcev-closure-20260903",
+      "object": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "commit": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 9,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/9",
+        "head": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+        "merge": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+        "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/cartridge_fcev.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3867446848791cb2f44e6d44d3b2e50d40001771"
+            }
+          },
+          {
+            "path": "src/vdesign/physics.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "0df6bce7c9b7b210801db4574190644806e92bff"
+            }
+          },
+          {
+            "path": "test/vdesign/cartridge_fcev_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "92737f6f31333d3c75b7c6af9b6809cdade8a98e"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/bot/cartridge-geometry-20260902",
+      "object": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "commit": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/bot/cartridge-swap-schedule-20260905",
+      "object": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "commit": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 11,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/11",
+        "head": "23735b1a4908aa5d9333198c91c8b87a00162030",
+        "merge": "90f70ac17886f479270753ac4eca3530e294fa27",
+        "merge-base": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_schedule.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3bbaba231e4dd43dd0b75b4e0055bfba23a2faa5"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_schedule_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "47159bbb00cabbc594601dafafe14e1cd48c3046"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/bot/cartridge-volume-link-20260906",
+      "object": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "commit": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 13,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/13",
+        "head": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+        "merge": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+        "merge-base": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/cartridge_volume.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c50fb3ae94f12cd63bee79117364a98bd1f73cde"
+            }
+          },
+          {
+            "path": "test/vdesign/cartridge_volume_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "85f6669fc9a41606e53ceb4ce22c2b628cd6c2cb"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/bot/swap-schedule-range-20260905",
+      "object": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "commit": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 12,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/12",
+        "head": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+        "merge": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+        "merge-base": "90f70ac17886f479270753ac4eca3530e294fa27",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_schedule.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "1a4d73933ddd945b3e85b81bfc415f6fffd0fa8c"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_schedule_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "b4b2873cae594a1ae12f4eb3e962f34885bb26d2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/bot/swap-station-clearance-20260906",
+      "object": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "commit": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 14,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/14",
+        "head": "e29c582fe862c60537b4347462176ab38dfc5304",
+        "merge": "8635b13ee648dfd754ccef4e328dff6b2b7b103e",
+        "merge-base": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_station.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fa3f781ef95e5053bdbb49264fe46b22c3e7e489"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_station_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "076ed285537971fef8394b2d8aed8ab80ff6f1f1"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/cartridge/mgmh2-stoich-sizing",
+      "object": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "commit": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/energyflow/h2-consumption-profile",
+      "object": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "commit": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/6",
+        "head": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+        "merge": "7b81943fa3292586217deeec133bcd0cc9201d8e",
+        "merge-base": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/hydrogen.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5d3ffbc2d1548f01189b7c1e569bdd4156ad2fb4"
+            }
+          },
+          {
+            "path": "test/vdesign/hydrogen_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "688985a7d2cd8780d4e52f8ab3a1224cea0be19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/jv/kotoba-text",
+      "object": "908f758f64ae9b2107d93faeaadd938927a64309",
+      "commit": "908f758f64ae9b2107d93faeaadd938927a64309",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/main",
+      "object": "240b2729bf1a2487f9ed56cb0a005bcd4c9f9279",
+      "commit": "240b2729bf1a2487f9ed56cb0a005bcd4c9f9279",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/maturity-loop-bom-fcev-double-count",
+      "object": "9524480a5728e889de22d1caee3e3671f17cd12a",
+      "commit": "9524480a5728e889de22d1caee3e3671f17cd12a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/maturity-loop-fcev-h2-double-count",
+      "object": "07c394be1bd5908dee57b68f6e72ed54e934d99a",
+      "commit": "07c394be1bd5908dee57b68f6e72ed54e934d99a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/com-junkawasaki/powertrain/b2w-motor-eff-provenance",
+      "object": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "commit": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "commit": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/dc-bus-power-split",
+      "object": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "commit": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/dc-bus-regen-power-split",
+      "object": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "commit": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/dutycycle-demand-profile",
+      "object": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "commit": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/shared-vehicle-design",
+      "object": "e2f302f2fbea43b13cc8e7b9a6ee6704039c2276",
+      "commit": "e2f302f2fbea43b13cc8e7b9a6ee6704039c2276",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/vibration-fatigue-miner",
+      "object": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "commit": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 16,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/16",
+        "head": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+        "merge": "9626721c843fe0e9030ba3daa085ed98f9af104b",
+        "merge-base": "8500c3b4f69d63202cd30c3a4579982486656b8e",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/fatigue.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a8cc3abf783ba342959a55dd2d9814a50a842862"
+            }
+          },
+          {
+            "path": "test/vdesign/fatigue_test.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a50e80a45b6f6606e3316cdb0e704e3e2c8d626c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/bot/bev-store-soc-profile",
+      "object": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "commit": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 8,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/8",
+        "head": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+        "merge": "1cce3c6831881ea2d2127857c27f9f9746ef2f2a",
+        "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/bev_store.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a7b1770735d189d98e280be30be7cb0f674b3752"
+            }
+          },
+          {
+            "path": "test/vdesign/bev_store_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "55cc573c8c5110ef01909d43714d8b26ffcaccde"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/bot/cartridge-fcev-closure-20260903",
+      "object": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "commit": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 9,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/9",
+        "head": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+        "merge": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+        "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/cartridge_fcev.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3867446848791cb2f44e6d44d3b2e50d40001771"
+            }
+          },
+          {
+            "path": "src/vdesign/physics.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "0df6bce7c9b7b210801db4574190644806e92bff"
+            }
+          },
+          {
+            "path": "test/vdesign/cartridge_fcev_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "92737f6f31333d3c75b7c6af9b6809cdade8a98e"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/bot/cartridge-geometry-20260902",
+      "object": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "commit": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/bot/cartridge-swap-schedule-20260905",
+      "object": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "commit": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 11,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/11",
+        "head": "23735b1a4908aa5d9333198c91c8b87a00162030",
+        "merge": "90f70ac17886f479270753ac4eca3530e294fa27",
+        "merge-base": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_schedule.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3bbaba231e4dd43dd0b75b4e0055bfba23a2faa5"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_schedule_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "47159bbb00cabbc594601dafafe14e1cd48c3046"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/bot/cartridge-volume-link-20260906",
+      "object": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "commit": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 13,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/13",
+        "head": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+        "merge": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+        "merge-base": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/cartridge_volume.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c50fb3ae94f12cd63bee79117364a98bd1f73cde"
+            }
+          },
+          {
+            "path": "test/vdesign/cartridge_volume_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "85f6669fc9a41606e53ceb4ce22c2b628cd6c2cb"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/bot/swap-schedule-range-20260905",
+      "object": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "commit": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 12,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/12",
+        "head": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+        "merge": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+        "merge-base": "90f70ac17886f479270753ac4eca3530e294fa27",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_schedule.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "1a4d73933ddd945b3e85b81bfc415f6fffd0fa8c"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_schedule_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "b4b2873cae594a1ae12f4eb3e962f34885bb26d2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/bot/swap-station-clearance-20260906",
+      "object": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "commit": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 14,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/14",
+        "head": "e29c582fe862c60537b4347462176ab38dfc5304",
+        "merge": "8635b13ee648dfd754ccef4e328dff6b2b7b103e",
+        "merge-base": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/swap_station.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fa3f781ef95e5053bdbb49264fe46b22c3e7e489"
+            }
+          },
+          {
+            "path": "test/vdesign/swap_station_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "076ed285537971fef8394b2d8aed8ab80ff6f1f1"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/cartridge/mgmh2-stoich-sizing",
+      "object": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "commit": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "2b02b3ac34071a07d96b7fac2f1c0a94e2735cb1",
+      "commit": "2b02b3ac34071a07d96b7fac2f1c0a94e2735cb1",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/docs/about-refresh",
+      "object": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "commit": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 20,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/20",
+        "head": "a64357a72af619d50d4d812068b004e3b20e733e",
+        "merge": "ef5f401f99f7a5bbe5a3d83259dc79acd7801d88",
+        "merge-base": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c7845e17bdd7e916fc4e49f478150d6038c88bcf"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/docs/stale-followup",
+      "object": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "commit": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/origin/energyflow/h2-consumption-profile",
+      "object": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "commit": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/6",
+        "head": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+        "merge": "7b81943fa3292586217deeec133bcd0cc9201d8e",
+        "merge-base": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/hydrogen.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5d3ffbc2d1548f01189b7c1e569bdd4156ad2fb4"
+            }
+          },
+          {
+            "path": "test/vdesign/hydrogen_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "688985a7d2cd8780d4e52f8ab3a1224cea0be19c"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/jv/full-sha",
+      "object": "76e533dda2ccde73dd9c604a80b2a512eaac3879",
+      "commit": "76e533dda2ccde73dd9c604a80b2a512eaac3879",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "fa07ec3387ea6c33cb50600d9116d248599bc05f",
+      "commit": "fa07ec3387ea6c33cb50600d9116d248599bc05f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "commit": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/mg-hydrogen-duty-consumption",
+      "object": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+      "commit": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 18,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/18",
+        "head": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+        "merge": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+        "merge-base": "afebbeff74070051c49c63681733b92ab6579054",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f15febe18a58fbaeedb83a9b402d0d1361a7f9ee"
+            }
+          },
+          {
+            "path": "src/vdesign/hydrogen.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "d9240099a4d27dc1d985a8484cd37e8742e524d5"
+            }
+          },
+          {
+            "path": "src/vdesign/reactor_heat.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "d7d557be00dd306ee886a2ac97c43327a2554e02"
+            }
+          },
+          {
+            "path": "test/vdesign/hydrogen_test.cljk",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a9b7a84d6a23cfd575710f18cbaa853b48208840"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/powertrain/b2w-motor-eff-provenance",
+      "object": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "commit": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/pr6",
+      "object": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "commit": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/6",
+        "head": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+        "merge": "7b81943fa3292586217deeec133bcd0cc9201d8e",
+        "merge-base": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "src/vdesign/hydrogen.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5d3ffbc2d1548f01189b7c1e569bdd4156ad2fb4"
+            }
+          },
+          {
+            "path": "test/vdesign/hydrogen_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "688985a7d2cd8780d4e52f8ab3a1224cea0be19c"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "pending-semantic-review": [
+    {
+      "commit": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "to-default-diff": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-vehicle-designer/df7a62e27afa6fd92847d9ebf2afbd82f29485a0.diff",
+      "diff-sha256": "bbf49bd8c553d017c25eaaeba304f1574fa5be16cef71e88e4024f1da27c9185",
+      "changed-paths": [
+        "README.md"
+      ],
+      "unique-nonmerge-commits": [
+        "df7a62e27afa6fd92847d9ebf2afbd82f29485a0"
+      ],
+      "log": [
+        "df7a62e docs(readme): current names for sim/CAE/langgraph, drop dead robotaxi link"
+      ],
+      "refs": [
+        "refs/heads/docs/stale-followup",
+        "refs/preservation/kami-monorepo-20261022/heads/docs/stale-followup",
+        "refs/preservation/kami-monorepo-20261022/pull-21",
+        "refs/remotes/origin/docs/stale-followup"
+      ]
+    },
+    {
+      "commit": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "to-default-diff": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-vehicle-designer/2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d.diff",
+      "diff-sha256": "a5698b22d8763bd83f0d7f09afad1617bdca4c183eb45c390fb471e7114048a2",
+      "changed-paths": [
+        "README.md",
+        "src/vdesign/dc_bus.cljk",
+        "test/vdesign/dc_bus_test.cljk"
+      ],
+      "unique-nonmerge-commits": [
+        "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d"
+      ],
+      "log": [
+        "2e07028 dc-bus: accept signed (regen) demand in power-split"
+      ],
+      "refs": [
+        "refs/preservation/kami-monorepo-20261022/heads/agent/dc-bus-regen-power-split",
+        "refs/preservation/kami-monorepo-20261022/pull-19",
+        "refs/remotes/origin/agent/dc-bus-regen-power-split"
+      ]
+    }
+  ],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/1",
+      "head": "e2f302f2fbea43b13cc8e7b9a6ee6704039c2276",
+      "merge": "9fe228b74e89a38c70582256e080cf0c528850c9",
+      "merge-base": "b6d7294a8760db997f21bcb3f2464c231aa1ced6",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1139c47a9888437471781f873d4f5b055bac5e21"
+          }
+        },
+        {
+          "path": "src/vdesign/design.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "97e4d96a9e5dad3d586e6bae26bb51ca809fad7d"
+          }
+        },
+        {
+          "path": "src/vdesign/vehicle.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "e6f23ed918ad0e08fdac11e4cefb9983247cc052"
+          }
+        },
+        {
+          "path": "test/vdesign/vehicle_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b4cd2922713b44e8c84d2cb111974f054a66df92"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/2",
+      "head": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "merge": "d893b6a747528eee576133e307a18224a9a243f3",
+      "merge-base": "85fa550ae2b1589689e8ef70d8f81de946c422af",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/cartridge.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "af09f044155bfdde3de7a10ce22591ab81c2f085"
+          }
+        },
+        {
+          "path": "test/vdesign/cartridge_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "5219abf84523ab18c04485eef6f84ac138686bea"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/3",
+      "head": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "merge": "4879b697a736b54359f69ea8ec475df960e35d13",
+      "merge-base": "85fa550ae2b1589689e8ef70d8f81de946c422af",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/dc_bus.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "7b73c6757dda0d726e16c95d476d61ce5db47413"
+          }
+        },
+        {
+          "path": "test/vdesign/dc_bus_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "28a85c64f08abe1d2e0482b1931fea814f0b51eb"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 4,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/4",
+      "head": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "merge": "406f2dccafaa39fecb4d24bc48bedeed958e2ce4",
+      "merge-base": "85fa550ae2b1589689e8ef70d8f81de946c422af",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/powertrain.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "052e6de532c53b425985147fef913be3181975d5"
+          }
+        },
+        {
+          "path": "test/vdesign/powertrain_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "331746210e28a5c21e2fcc440879f5f10a4e1d13"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 5,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/5",
+      "head": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "merge": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+      "merge-base": "85fa550ae2b1589689e8ef70d8f81de946c422af",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/dutycycle.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "0c3ab82df4757ec112a2f0aadfb8f7dd2819e8c9"
+          }
+        },
+        {
+          "path": "test/vdesign/dutycycle_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "7fcde198c82c2f80ae0b8c4116070b400808600d"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 6,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/6",
+      "head": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "merge": "7b81943fa3292586217deeec133bcd0cc9201d8e",
+      "merge-base": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/hydrogen.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "5d3ffbc2d1548f01189b7c1e569bdd4156ad2fb4"
+          }
+        },
+        {
+          "path": "test/vdesign/hydrogen_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "688985a7d2cd8780d4e52f8ab3a1224cea0be19c"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 7,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/7",
+      "head": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "merge": "11aded7538b7c87dac2a857c65155087cce936d5",
+      "merge-base": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/cartridge_geometry.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a09b38b25b4ec72965e0844be84a65e52396506d"
+          }
+        },
+        {
+          "path": "test/vdesign/cartridge_geometry_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "44778e1c7142f013f965a1d6f2120b9aa5c5a887"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 8,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/8",
+      "head": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "merge": "1cce3c6831881ea2d2127857c27f9f9746ef2f2a",
+      "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/bev_store.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a7b1770735d189d98e280be30be7cb0f674b3752"
+          }
+        },
+        {
+          "path": "test/vdesign/bev_store_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "55cc573c8c5110ef01909d43714d8b26ffcaccde"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 9,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/9",
+      "head": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "merge": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+      "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/cartridge_fcev.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3867446848791cb2f44e6d44d3b2e50d40001771"
+          }
+        },
+        {
+          "path": "src/vdesign/physics.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "0df6bce7c9b7b210801db4574190644806e92bff"
+          }
+        },
+        {
+          "path": "test/vdesign/cartridge_fcev_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "92737f6f31333d3c75b7c6af9b6809cdade8a98e"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 10,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/10",
+      "head": "174ed81d441b0d8e179b42d408e7fa220bbb7806",
+      "merge": "cfcf559e25de5f9b53ee4f687e10486a124aa209",
+      "merge-base": "11aded7538b7c87dac2a857c65155087cce936d5",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/endurance.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "5bdac130d386f30465f1227dd6d423473caabb41"
+          }
+        },
+        {
+          "path": "test/vdesign/endurance_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3c45f9aef970a3e4e7ad1d6a02f02b1554618ddb"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 11,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/11",
+      "head": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "merge": "90f70ac17886f479270753ac4eca3530e294fa27",
+      "merge-base": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/swap_schedule.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3bbaba231e4dd43dd0b75b4e0055bfba23a2faa5"
+          }
+        },
+        {
+          "path": "test/vdesign/swap_schedule_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "47159bbb00cabbc594601dafafe14e1cd48c3046"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 12,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/12",
+      "head": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "merge": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+      "merge-base": "90f70ac17886f479270753ac4eca3530e294fa27",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/swap_schedule.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1a4d73933ddd945b3e85b81bfc415f6fffd0fa8c"
+          }
+        },
+        {
+          "path": "test/vdesign/swap_schedule_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b4b2873cae594a1ae12f4eb3e962f34885bb26d2"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 13,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/13",
+      "head": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "merge": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+      "merge-base": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/cartridge_volume.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c50fb3ae94f12cd63bee79117364a98bd1f73cde"
+          }
+        },
+        {
+          "path": "test/vdesign/cartridge_volume_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "85f6669fc9a41606e53ceb4ce22c2b628cd6c2cb"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 14,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/14",
+      "head": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "merge": "8635b13ee648dfd754ccef4e328dff6b2b7b103e",
+      "merge-base": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/swap_station.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "fa3f781ef95e5053bdbb49264fe46b22c3e7e489"
+          }
+        },
+        {
+          "path": "test/vdesign/swap_station_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "076ed285537971fef8394b2d8aed8ab80ff6f1f1"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 15,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/15",
+      "head": "f565aa2ce8a60fc363a25e743049356d755c39c9",
+      "merge": "fb9802b594f76896a603a419066a0f799b130e36",
+      "merge-base": "8635b13ee648dfd754ccef4e328dff6b2b7b103e",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/hydrogen.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "21c311ff9e431c86d0b73e9004df7a175216eadd"
+          }
+        },
+        {
+          "path": "src/vdesign/reactor_heat.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "ae4c2781f0c50745f26da5eaa3666bd4ea94b836"
+          }
+        },
+        {
+          "path": "test/vdesign/reactor_heat_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "076be95e59a204d823c975a1faf467821ea87d74"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 16,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/16",
+      "head": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "merge": "9626721c843fe0e9030ba3daa085ed98f9af104b",
+      "merge-base": "8500c3b4f69d63202cd30c3a4579982486656b8e",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/vdesign/fatigue.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a8cc3abf783ba342959a55dd2d9814a50a842862"
+          }
+        },
+        {
+          "path": "test/vdesign/fatigue_test.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a50e80a45b6f6606e3316cdb0e704e3e2c8d626c"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 17,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/17",
+      "head": "f71975d469da38494992c8b87e3cb2f8c4101cc6",
+      "merge": "afebbeff74070051c49c63681733b92ab6579054",
+      "merge-base": "240b2729bf1a2487f9ed56cb0a005bcd4c9f9279",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "docs/adr/0002-sim-verify-and-datafied-process.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "00853d10956776d64ed7863c2569b07ab4b710df"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 18,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/18",
+      "head": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+      "merge": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "merge-base": "afebbeff74070051c49c63681733b92ab6579054",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "f15febe18a58fbaeedb83a9b402d0d1361a7f9ee"
+          }
+        },
+        {
+          "path": "src/vdesign/hydrogen.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d9240099a4d27dc1d985a8484cd37e8742e524d5"
+          }
+        },
+        {
+          "path": "src/vdesign/reactor_heat.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d7d557be00dd306ee886a2ac97c43327a2554e02"
+          }
+        },
+        {
+          "path": "test/vdesign/hydrogen_test.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a9b7a84d6a23cfd575710f18cbaa853b48208840"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 20,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/20",
+      "head": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "merge": "ef5f401f99f7a5bbe5a3d83259dc79acd7801d88",
+      "merge-base": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c7845e17bdd7e916fc4e49f478150d6038c88bcf"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,558 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTGvhAw",
+    "databaseId": 1282138371,
+    "nameWithOwner": "kotoba-lang/kami-engine-vehicle-designer",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-10-13T13:01:45Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "84da8aed92b359d70725fce3850cdddc313be8f8"
+      }
+    },
+    "heads": {
+      "totalCount": 17,
+      "nodes": [
+        {
+          "name": "agent/dc-bus-power-split",
+          "target": {
+            "oid": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8"
+          }
+        },
+        {
+          "name": "agent/dc-bus-regen-power-split",
+          "target": {
+            "oid": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d"
+          }
+        },
+        {
+          "name": "agent/dutycycle-demand-profile",
+          "target": {
+            "oid": "b3b74a9ccb61518b1afc5c313e765ca381303f54"
+          }
+        },
+        {
+          "name": "agent/vibration-fatigue-miner",
+          "target": {
+            "oid": "21e04c6bf5db6cee5c08ae96751fa4ce92152992"
+          }
+        },
+        {
+          "name": "bot/bev-store-soc-profile",
+          "target": {
+            "oid": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9"
+          }
+        },
+        {
+          "name": "bot/cartridge-fcev-closure-20260903",
+          "target": {
+            "oid": "40d21bb27242206ef8d92c0506c18703d15f17ce"
+          }
+        },
+        {
+          "name": "bot/cartridge-geometry-20260902",
+          "target": {
+            "oid": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b"
+          }
+        },
+        {
+          "name": "bot/cartridge-swap-schedule-20260905",
+          "target": {
+            "oid": "23735b1a4908aa5d9333198c91c8b87a00162030"
+          }
+        },
+        {
+          "name": "bot/cartridge-volume-link-20260906",
+          "target": {
+            "oid": "5086d04c1432094ee3da1f59d48abe0415c7c030"
+          }
+        },
+        {
+          "name": "bot/swap-schedule-range-20260905",
+          "target": {
+            "oid": "5a69fbadded3245df81fef3a88659b47e620f8e6"
+          }
+        },
+        {
+          "name": "bot/swap-station-clearance-20260906",
+          "target": {
+            "oid": "e29c582fe862c60537b4347462176ab38dfc5304"
+          }
+        },
+        {
+          "name": "cartridge/mgmh2-stoich-sizing",
+          "target": {
+            "oid": "15c7a281f22d89f43822d539be8cdb2a82d4c435"
+          }
+        },
+        {
+          "name": "docs/about-refresh",
+          "target": {
+            "oid": "a64357a72af619d50d4d812068b004e3b20e733e"
+          }
+        },
+        {
+          "name": "docs/stale-followup",
+          "target": {
+            "oid": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0"
+          }
+        },
+        {
+          "name": "energyflow/h2-consumption-profile",
+          "target": {
+            "oid": "8b2314615ca7c87ff4ba4082962b45f55fd198e6"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "84da8aed92b359d70725fce3850cdddc313be8f8"
+          }
+        },
+        {
+          "name": "powertrain/b2w-motor-eff-provenance",
+          "target": {
+            "oid": "94d0f063edeb820382a0fb1b609bdc7175589b00"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 21
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-vehicle-designer\nHEAD c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 84da8aed92b359d70725fce3850cdddc313be8f8\nrefs/heads/docs/about-refresh a64357a72af619d50d4d812068b004e3b20e733e\nrefs/heads/docs/stale-followup df7a62e27afa6fd92847d9ebf2afbd82f29485a0\nrefs/heads/main a0dccc36a036aa29bf10e48ee432b8ae5ee68893\nrefs/heads/manifest-rev c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b\nrefs/remotes/com-junkawasaki/HEAD 240b2729bf1a2487f9ed56cb0a005bcd4c9f9279\nrefs/remotes/com-junkawasaki/agent/dc-bus-power-split 578ef27b5e0881c7b4bc79f990b82b7f57bee0c8\nrefs/remotes/com-junkawasaki/agent/dutycycle-demand-profile b3b74a9ccb61518b1afc5c313e765ca381303f54\nrefs/remotes/com-junkawasaki/agent/vibration-fatigue-miner 21e04c6bf5db6cee5c08ae96751fa4ce92152992\nrefs/remotes/com-junkawasaki/bot/bev-store-soc-profile b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9\nrefs/remotes/com-junkawasaki/bot/cartridge-fcev-closure-20260903 40d21bb27242206ef8d92c0506c18703d15f17ce\nrefs/remotes/com-junkawasaki/bot/cartridge-geometry-20260902 d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b\nrefs/remotes/com-junkawasaki/bot/cartridge-swap-schedule-20260905 23735b1a4908aa5d9333198c91c8b87a00162030\nrefs/remotes/com-junkawasaki/bot/cartridge-volume-link-20260906 5086d04c1432094ee3da1f59d48abe0415c7c030\nrefs/remotes/com-junkawasaki/bot/swap-schedule-range-20260905 5a69fbadded3245df81fef3a88659b47e620f8e6\nrefs/remotes/com-junkawasaki/bot/swap-station-clearance-20260906 e29c582fe862c60537b4347462176ab38dfc5304\nrefs/remotes/com-junkawasaki/cartridge/mgmh2-stoich-sizing 15c7a281f22d89f43822d539be8cdb2a82d4c435\nrefs/remotes/com-junkawasaki/energyflow/h2-consumption-profile 8b2314615ca7c87ff4ba4082962b45f55fd198e6\nrefs/remotes/com-junkawasaki/jv/kotoba-text 908f758f64ae9b2107d93faeaadd938927a64309\nrefs/remotes/com-junkawasaki/main 240b2729bf1a2487f9ed56cb0a005bcd4c9f9279\nrefs/remotes/com-junkawasaki/maturity-loop-bom-fcev-double-count 9524480a5728e889de22d1caee3e3671f17cd12a\nrefs/remotes/com-junkawasaki/maturity-loop-fcev-h2-double-count 07c394be1bd5908dee57b68f6e72ed54e934d99a\nrefs/remotes/com-junkawasaki/powertrain/b2w-motor-eff-provenance 94d0f063edeb820382a0fb1b609bdc7175589b00\nrefs/remotes/origin/HEAD 84da8aed92b359d70725fce3850cdddc313be8f8\nrefs/remotes/origin/agent/dc-bus-power-split 578ef27b5e0881c7b4bc79f990b82b7f57bee0c8\nrefs/remotes/origin/agent/dc-bus-regen-power-split 2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d\nrefs/remotes/origin/agent/dutycycle-demand-profile b3b74a9ccb61518b1afc5c313e765ca381303f54\nrefs/remotes/origin/agent/shared-vehicle-design e2f302f2fbea43b13cc8e7b9a6ee6704039c2276\nrefs/remotes/origin/agent/vibration-fatigue-miner 21e04c6bf5db6cee5c08ae96751fa4ce92152992\nrefs/remotes/origin/bot/bev-store-soc-profile b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9\nrefs/remotes/origin/bot/cartridge-fcev-closure-20260903 40d21bb27242206ef8d92c0506c18703d15f17ce\nrefs/remotes/origin/bot/cartridge-geometry-20260902 d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b\nrefs/remotes/origin/bot/cartridge-swap-schedule-20260905 23735b1a4908aa5d9333198c91c8b87a00162030\nrefs/remotes/origin/bot/cartridge-volume-link-20260906 5086d04c1432094ee3da1f59d48abe0415c7c030\nrefs/remotes/origin/bot/swap-schedule-range-20260905 5a69fbadded3245df81fef3a88659b47e620f8e6\nrefs/remotes/origin/bot/swap-station-clearance-20260906 e29c582fe862c60537b4347462176ab38dfc5304\nrefs/remotes/origin/cartridge/mgmh2-stoich-sizing 15c7a281f22d89f43822d539be8cdb2a82d4c435\nrefs/remotes/origin/cljk-rename-20260911 2b02b3ac34071a07d96b7fac2f1c0a94e2735cb1\nrefs/remotes/origin/docs/about-refresh a64357a72af619d50d4d812068b004e3b20e733e\nrefs/remotes/origin/docs/stale-followup df7a62e27afa6fd92847d9ebf2afbd82f29485a0\nrefs/remotes/origin/energyflow/h2-consumption-profile 8b2314615ca7c87ff4ba4082962b45f55fd198e6\nrefs/remotes/origin/jv/full-sha 76e533dda2ccde73dd9c604a80b2a512eaac3879\nrefs/remotes/origin/kbb-cutover-20260911 fa07ec3387ea6c33cb50600d9116d248599bc05f\nrefs/remotes/origin/main 84da8aed92b359d70725fce3850cdddc313be8f8\nrefs/remotes/origin/mg-hydrogen-duty-consumption 8538cd06a9892b60307c3fd17f58f2ec528ad377\nrefs/remotes/origin/powertrain/b2w-motor-eff-provenance 94d0f063edeb820382a0fb1b609bdc7175589b00\nrefs/remotes/pr6 8b2314615ca7c87ff4ba4082962b45f55fd198e6"
+  },
+  "local-after-preservation": {
+    "HEAD": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-vehicle-designer\nHEAD c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "refs/heads/docs/about-refresh": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "refs/heads/docs/stale-followup": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "refs/heads/main": "a0dccc36a036aa29bf10e48ee432b8ae5ee68893",
+      "refs/heads/manifest-rev": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/dc-bus-power-split": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/dc-bus-regen-power-split": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/dutycycle-demand-profile": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/vibration-fatigue-miner": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "refs/preservation/kami-monorepo-20261022/heads/bot/bev-store-soc-profile": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "refs/preservation/kami-monorepo-20261022/heads/bot/cartridge-fcev-closure-20260903": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "refs/preservation/kami-monorepo-20261022/heads/bot/cartridge-geometry-20260902": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "refs/preservation/kami-monorepo-20261022/heads/bot/cartridge-swap-schedule-20260905": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "refs/preservation/kami-monorepo-20261022/heads/bot/cartridge-volume-link-20260906": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "refs/preservation/kami-monorepo-20261022/heads/bot/swap-schedule-range-20260905": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "refs/preservation/kami-monorepo-20261022/heads/bot/swap-station-clearance-20260906": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "refs/preservation/kami-monorepo-20261022/heads/cartridge/mgmh2-stoich-sizing": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "refs/preservation/kami-monorepo-20261022/heads/docs/about-refresh": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "refs/preservation/kami-monorepo-20261022/heads/docs/stale-followup": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "refs/preservation/kami-monorepo-20261022/heads/energyflow/h2-consumption-profile": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "refs/preservation/kami-monorepo-20261022/heads/powertrain/b2w-motor-eff-provenance": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "e2f302f2fbea43b13cc8e7b9a6ee6704039c2276",
+      "refs/preservation/kami-monorepo-20261022/pull-10": "174ed81d441b0d8e179b42d408e7fa220bbb7806",
+      "refs/preservation/kami-monorepo-20261022/pull-11": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "refs/preservation/kami-monorepo-20261022/pull-12": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "refs/preservation/kami-monorepo-20261022/pull-13": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "refs/preservation/kami-monorepo-20261022/pull-14": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "refs/preservation/kami-monorepo-20261022/pull-15": "f565aa2ce8a60fc363a25e743049356d755c39c9",
+      "refs/preservation/kami-monorepo-20261022/pull-16": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "refs/preservation/kami-monorepo-20261022/pull-17": "f71975d469da38494992c8b87e3cb2f8c4101cc6",
+      "refs/preservation/kami-monorepo-20261022/pull-18": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+      "refs/preservation/kami-monorepo-20261022/pull-19": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "refs/preservation/kami-monorepo-20261022/pull-2": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "refs/preservation/kami-monorepo-20261022/pull-20": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "refs/preservation/kami-monorepo-20261022/pull-21": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "refs/preservation/kami-monorepo-20261022/pull-3": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "refs/preservation/kami-monorepo-20261022/pull-4": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "refs/preservation/kami-monorepo-20261022/pull-5": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "refs/preservation/kami-monorepo-20261022/pull-6": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "refs/preservation/kami-monorepo-20261022/pull-7": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "refs/preservation/kami-monorepo-20261022/pull-8": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "refs/preservation/kami-monorepo-20261022/pull-9": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "refs/remotes/com-junkawasaki/HEAD": "240b2729bf1a2487f9ed56cb0a005bcd4c9f9279",
+      "refs/remotes/com-junkawasaki/agent/dc-bus-power-split": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "refs/remotes/com-junkawasaki/agent/dutycycle-demand-profile": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "refs/remotes/com-junkawasaki/agent/vibration-fatigue-miner": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "refs/remotes/com-junkawasaki/bot/bev-store-soc-profile": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "refs/remotes/com-junkawasaki/bot/cartridge-fcev-closure-20260903": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "refs/remotes/com-junkawasaki/bot/cartridge-geometry-20260902": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "refs/remotes/com-junkawasaki/bot/cartridge-swap-schedule-20260905": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "refs/remotes/com-junkawasaki/bot/cartridge-volume-link-20260906": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "refs/remotes/com-junkawasaki/bot/swap-schedule-range-20260905": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "refs/remotes/com-junkawasaki/bot/swap-station-clearance-20260906": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "refs/remotes/com-junkawasaki/cartridge/mgmh2-stoich-sizing": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "refs/remotes/com-junkawasaki/energyflow/h2-consumption-profile": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "refs/remotes/com-junkawasaki/jv/kotoba-text": "908f758f64ae9b2107d93faeaadd938927a64309",
+      "refs/remotes/com-junkawasaki/main": "240b2729bf1a2487f9ed56cb0a005bcd4c9f9279",
+      "refs/remotes/com-junkawasaki/maturity-loop-bom-fcev-double-count": "9524480a5728e889de22d1caee3e3671f17cd12a",
+      "refs/remotes/com-junkawasaki/maturity-loop-fcev-h2-double-count": "07c394be1bd5908dee57b68f6e72ed54e934d99a",
+      "refs/remotes/com-junkawasaki/powertrain/b2w-motor-eff-provenance": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "refs/remotes/origin/HEAD": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "refs/remotes/origin/agent/dc-bus-power-split": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "refs/remotes/origin/agent/dc-bus-regen-power-split": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "refs/remotes/origin/agent/dutycycle-demand-profile": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "refs/remotes/origin/agent/shared-vehicle-design": "e2f302f2fbea43b13cc8e7b9a6ee6704039c2276",
+      "refs/remotes/origin/agent/vibration-fatigue-miner": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "refs/remotes/origin/bot/bev-store-soc-profile": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "refs/remotes/origin/bot/cartridge-fcev-closure-20260903": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "refs/remotes/origin/bot/cartridge-geometry-20260902": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "refs/remotes/origin/bot/cartridge-swap-schedule-20260905": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "refs/remotes/origin/bot/cartridge-volume-link-20260906": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "refs/remotes/origin/bot/swap-schedule-range-20260905": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "refs/remotes/origin/bot/swap-station-clearance-20260906": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "refs/remotes/origin/cartridge/mgmh2-stoich-sizing": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "refs/remotes/origin/cljk-rename-20260911": "2b02b3ac34071a07d96b7fac2f1c0a94e2735cb1",
+      "refs/remotes/origin/docs/about-refresh": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "refs/remotes/origin/docs/stale-followup": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "refs/remotes/origin/energyflow/h2-consumption-profile": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "refs/remotes/origin/jv/full-sha": "76e533dda2ccde73dd9c604a80b2a512eaac3879",
+      "refs/remotes/origin/kbb-cutover-20260911": "fa07ec3387ea6c33cb50600d9116d248599bc05f",
+      "refs/remotes/origin/main": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "refs/remotes/origin/mg-hydrogen-duty-consumption": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+      "refs/remotes/origin/powertrain/b2w-motor-eff-provenance": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "refs/remotes/pr6": "8b2314615ca7c87ff4ba4082962b45f55fd198e6"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "emit shared vehicle documents",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/shared-vehicle-design",
+      "headRefOid": "e2f302f2fbea43b13cc8e7b9a6ee6704039c2276",
+      "baseRefName": "main",
+      "baseRefOid": "b6d7294a8760db997f21bcb3f2464c231aa1ced6",
+      "mergeCommit": {
+        "oid": "9fe228b74e89a38c70582256e080cf0c528850c9"
+      },
+      "mergedAt": "2026-07-14T07:41:04Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/1"
+    },
+    {
+      "number": 2,
+      "title": "cartridge: stoichiometric Mg/MgH2 hydride cartridge sizing on the vehicle energy-flow plane",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "cartridge/mgmh2-stoich-sizing",
+      "headRefOid": "15c7a281f22d89f43822d539be8cdb2a82d4c435",
+      "baseRefName": "main",
+      "baseRefOid": "85fa550ae2b1589689e8ef70d8f81de946c422af",
+      "mergeCommit": {
+        "oid": "d893b6a747528eee576133e307a18224a9a243f3"
+      },
+      "mergedAt": "2026-09-01T14:38:01Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/2"
+    },
+    {
+      "number": 3,
+      "title": "dc-bus: time-domain fuel-cell/buffer power-split contract",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/dc-bus-power-split",
+      "headRefOid": "578ef27b5e0881c7b4bc79f990b82b7f57bee0c8",
+      "baseRefName": "main",
+      "baseRefOid": "85fa550ae2b1589689e8ef70d8f81de946c422af",
+      "mergeCommit": {
+        "oid": "4879b697a736b54359f69ea8ec475df960e35d13"
+      },
+      "mergedAt": "2026-09-01T14:38:07Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/3"
+    },
+    {
+      "number": 4,
+      "title": "powertrain: b2w path efficiency with solved-motor provenance (:compose-b2w-eff)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "powertrain/b2w-motor-eff-provenance",
+      "headRefOid": "94d0f063edeb820382a0fb1b609bdc7175589b00",
+      "baseRefName": "main",
+      "baseRefOid": "85fa550ae2b1589689e8ef70d8f81de946c422af",
+      "mergeCommit": {
+        "oid": "406f2dccafaa39fecb4d24bc48bedeed958e2ce4"
+      },
+      "mergedAt": "2026-09-01T14:38:14Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/4"
+    },
+    {
+      "number": 5,
+      "title": "dutycycle: drive-cycle \u2192 per-interval DC-bus demand profile (:demand-profile)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/dutycycle-demand-profile",
+      "headRefOid": "b3b74a9ccb61518b1afc5c313e765ca381303f54",
+      "baseRefName": "main",
+      "baseRefOid": "85fa550ae2b1589689e8ef70d8f81de946c422af",
+      "mergeCommit": {
+        "oid": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6"
+      },
+      "mergedAt": "2026-09-01T14:38:21Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/5"
+    },
+    {
+      "number": 6,
+      "title": "hydrogen: per-interval H2/MgH2 consumption + cartridge depletion contract (:consumption-profile)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "energyflow/h2-consumption-profile",
+      "headRefOid": "8b2314615ca7c87ff4ba4082962b45f55fd198e6",
+      "baseRefName": "main",
+      "baseRefOid": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+      "mergeCommit": {
+        "oid": "7b81943fa3292586217deeec133bcd0cc9201d8e"
+      },
+      "mergedAt": "2026-09-05T01:14:11Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/6"
+    },
+    {
+      "number": 7,
+      "title": "cad: parametric neutral-data Mg/MgH2 cartridge geometry (:mgmh2-cartridge-geometry)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/cartridge-geometry-20260902",
+      "headRefOid": "d724a8fd30b63e0b8df7f55bfd62aeed81e3e62b",
+      "baseRefName": "main",
+      "baseRefOid": "1adb40f216aac38405f9aeae0c9ea80ee47d8ce6",
+      "mergeCommit": {
+        "oid": "11aded7538b7c87dac2a857c65155087cce936d5"
+      },
+      "mergedAt": "2026-09-02T09:43:09Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/7"
+    },
+    {
+      "number": 8,
+      "title": "bev: traction-battery SoC/feasibility over a signed demand profile (:bev-store/soc-profile)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/bev-store-soc-profile",
+      "headRefOid": "b7025b2ee2a4ee0bc462aac83ba5d2d7e74195d9",
+      "baseRefName": "main",
+      "baseRefOid": "11aded7538b7c87dac2a857c65155087cce936d5",
+      "mergeCommit": {
+        "oid": "1cce3c6831881ea2d2127857c27f9f9746ef2f2a"
+      },
+      "mergedAt": "2026-09-05T01:14:14Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/8"
+    },
+    {
+      "number": 9,
+      "title": "cartridge: MgH2 cartridge-fed FCEV mass closure (:fcev-cartridge)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/cartridge-fcev-closure-20260903",
+      "headRefOid": "40d21bb27242206ef8d92c0506c18703d15f17ce",
+      "baseRefName": "main",
+      "baseRefOid": "11aded7538b7c87dac2a857c65155087cce936d5",
+      "mergeCommit": {
+        "oid": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320"
+      },
+      "mergedAt": "2026-09-05T01:14:17Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/9"
+    },
+    {
+      "number": 10,
+      "title": "endurance: H2 inventory endurance + range from a measured inventory and a per-interval demand schedule (:h2-endurance)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/h2-endurance-20260904",
+      "headRefOid": "174ed81d441b0d8e179b42d408e7fa220bbb7806",
+      "baseRefName": "main",
+      "baseRefOid": "11aded7538b7c87dac2a857c65155087cce936d5",
+      "mergeCommit": {
+        "oid": "cfcf559e25de5f9b53ee4f687e10486a124aa209"
+      },
+      "mergedAt": "2026-09-04T14:17:26Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/10"
+    },
+    {
+      "number": 11,
+      "title": "swap-schedule: replaceable Mg/MgH2 cartridge swap scheduling (:cartridge-swap-schedule)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/cartridge-swap-schedule-20260905",
+      "headRefOid": "23735b1a4908aa5d9333198c91c8b87a00162030",
+      "baseRefName": "main",
+      "baseRefOid": "7b25f299eb7a1fb2206daa0dbbc80e58c3cc1320",
+      "mergeCommit": {
+        "oid": "90f70ac17886f479270753ac4eca3530e294fa27"
+      },
+      "mergedAt": "2026-09-05T02:36:05Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/11"
+    },
+    {
+      "number": 12,
+      "title": "swap-schedule: optional speed grid \u2192 mission range (:range-km)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/swap-schedule-range-20260905",
+      "headRefOid": "5a69fbadded3245df81fef3a88659b47e620f8e6",
+      "baseRefName": "main",
+      "baseRefOid": "90f70ac17886f479270753ac4eca3530e294fa27",
+      "mergeCommit": {
+        "oid": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572"
+      },
+      "mergedAt": "2026-09-05T07:29:54Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/12"
+    },
+    {
+      "number": 13,
+      "title": "cartridge-volume: declared-density mass-volume link makes the packaging gate verifiable on the cartridge-fed path (:mgmh2-cartridge-volume)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/cartridge-volume-link-20260906",
+      "headRefOid": "5086d04c1432094ee3da1f59d48abe0415c7c030",
+      "baseRefName": "main",
+      "baseRefOid": "bf7f84d8bed02b1bae768e9f0cdbc5f3b0c55572",
+      "mergeCommit": {
+        "oid": "a16eb599c01f00c1d3b0494757f7ae64560ce83e"
+      },
+      "mergedAt": "2026-09-06T02:55:09Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/13"
+    },
+    {
+      "number": 14,
+      "title": "swap-station: cartridge swap clearance decision plane (:swap-station-clearance)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/swap-station-clearance-20260906",
+      "headRefOid": "e29c582fe862c60537b4347462176ab38dfc5304",
+      "baseRefName": "main",
+      "baseRefOid": "a16eb599c01f00c1d3b0494757f7ae64560ce83e",
+      "mergeCommit": {
+        "oid": "8635b13ee648dfd754ccef4e328dff6b2b7b103e"
+      },
+      "mergedAt": "2026-09-06T04:20:19Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/14"
+    },
+    {
+      "number": 15,
+      "title": "reactor-heat: declared-enthalpy desorption heat demand for the MgH2 reactor",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/reactor-heat-demand-20260906",
+      "headRefOid": "f565aa2ce8a60fc363a25e743049356d755c39c9",
+      "baseRefName": "main",
+      "baseRefOid": "8635b13ee648dfd754ccef4e328dff6b2b7b103e",
+      "mergeCommit": {
+        "oid": "fb9802b594f76896a603a419066a0f799b130e36"
+      },
+      "mergedAt": "2026-09-06T06:06:07Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/15"
+    },
+    {
+      "number": 16,
+      "title": "vdesign.fatigue: Miner-rule vibration-fatigue screening contract",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/vibration-fatigue-miner",
+      "headRefOid": "21e04c6bf5db6cee5c08ae96751fa4ce92152992",
+      "baseRefName": "main",
+      "baseRefOid": "8500c3b4f69d63202cd30c3a4579982486656b8e",
+      "mergeCommit": {
+        "oid": "9626721c843fe0e9030ba3daa085ed98f9af104b"
+      },
+      "mergedAt": "2026-09-16T14:32:43Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/16"
+    },
+    {
+      "number": 17,
+      "title": "docs: consolidate CLAUDE.md into AGENTS.md",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "chore/consolidate-claude-md-into-agents-md",
+      "headRefOid": "f71975d469da38494992c8b87e3cb2f8c4101cc6",
+      "baseRefName": "main",
+      "baseRefOid": "240b2729bf1a2487f9ed56cb0a005bcd4c9f9279",
+      "mergeCommit": {
+        "oid": "afebbeff74070051c49c63681733b92ab6579054"
+      },
+      "mergedAt": "2026-09-29T19:52:31Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/17"
+    },
+    {
+      "number": 18,
+      "title": "hydrogen: duty-cycle H2/cartridge consumption from echem.profile per-sample ROM points",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "mg-hydrogen-duty-consumption",
+      "headRefOid": "8538cd06a9892b60307c3fd17f58f2ec528ad377",
+      "baseRefName": "main",
+      "baseRefOid": "afebbeff74070051c49c63681733b92ab6579054",
+      "mergeCommit": {
+        "oid": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b"
+      },
+      "mergedAt": "2026-10-08T07:27:20Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/18"
+    },
+    {
+      "number": 19,
+      "title": "dc-bus: accept signed (regen) demand in power-split",
+      "state": "CLOSED",
+      "isDraft": false,
+      "headRefName": "agent/dc-bus-regen-power-split",
+      "headRefOid": "2e07028a857e4b6a2b1eaa835e1f3debbeb15a3d",
+      "baseRefName": "main",
+      "baseRefOid": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "mergeCommit": null,
+      "mergedAt": null,
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/19"
+    },
+    {
+      "number": 20,
+      "title": "docs: point langgraph-clj link at kotoba-lang/langgraph",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "docs/about-refresh",
+      "headRefOid": "a64357a72af619d50d4d812068b004e3b20e733e",
+      "baseRefName": "main",
+      "baseRefOid": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "mergeCommit": {
+        "oid": "ef5f401f99f7a5bbe5a3d83259dc79acd7801d88"
+      },
+      "mergedAt": "2026-10-13T12:58:26Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/20"
+    },
+    {
+      "number": 21,
+      "title": "docs(readme): current names for sim/CAE/langgraph, drop dead robotaxi link",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "docs/stale-followup",
+      "headRefOid": "df7a62e27afa6fd92847d9ebf2afbd82f29485a0",
+      "baseRefName": "main",
+      "baseRefOid": "c0aedff3a6f5c0d46ab74aeb9e1cc2188e8d854b",
+      "mergeCommit": {
+        "oid": "84da8aed92b359d70725fce3850cdddc313be8f8"
+      },
+      "mergedAt": "2026-10-13T13:01:45Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-vehicle-designer/pull/21"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "repository": "kotoba-lang/kami-game-scene",
+  "default": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "commit": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "commit": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "abb115d044e98c7111ddafe1de7ceeb93afd181d",
+      "commit": "abb115d044e98c7111ddafe1de7ceeb93afd181d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "df21039144a48b2d154acac10e5dd79f511000d9",
+      "commit": "df21039144a48b2d154acac10e5dd79f511000d9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "commit": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "commit": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/cljk-rename-20260911",
+      "object": "2f4c88c52e12a0098be4912bf4a5919c784e70be",
+      "commit": "2f4c88c52e12a0098be4912bf4a5919c784e70be",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "56a712fe7da58a294c8bc651ec7341fa5c5ea08d",
+      "commit": "56a712fe7da58a294c8bc651ec7341fa5c5ea08d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text",
+      "object": "8eb82237f3e59c2892e80c4195e2004f8699fc5f",
+      "commit": "8eb82237f3e59c2892e80c4195e2004f8699fc5f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/kbb-cutover-20260911",
+      "object": "bfd52eb35c3e6321bdcc5399b7321783ec1b6983",
+      "commit": "bfd52eb35c3e6321bdcc5399b7321783ec1b6983",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "commit": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

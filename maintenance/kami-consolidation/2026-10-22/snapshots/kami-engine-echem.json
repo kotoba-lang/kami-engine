@@ -1,0 +1,185 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTGwuNg",
+    "databaseId": 1282158134,
+    "nameWithOwner": "kotoba-lang/kami-engine-echem",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-10-07T01:35:36Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f"
+      }
+    },
+    "heads": {
+      "totalCount": 6,
+      "nodes": [
+        {
+          "name": "bot/stack-thermal-20260903",
+          "target": {
+            "oid": "b212f68c59cda0bf8cc65974dc5d4f53e2532c00"
+          }
+        },
+        {
+          "name": "echem/rom-fc-operating-point",
+          "target": {
+            "oid": "4a66ca9837168e0a41c6ba0e76b42c068e980072"
+          }
+        },
+        {
+          "name": "echem/rom-fc-system-bop",
+          "target": {
+            "oid": "d33962b52b154628fe52de3e5aef619fa21cbeae"
+          }
+        },
+        {
+          "name": "echem/run-at-power-datafied",
+          "target": {
+            "oid": "f9b8c1a4e9a7d0b21f76d83b05b8c6f8abd06e3b"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f"
+          }
+        },
+        {
+          "name": "mg-echem-duty-profile",
+          "target": {
+            "oid": "d1dd7fae64360fb6786bd4facff407cf0b106f55"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 5
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-echem\nHEAD 8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f\nrefs/heads/main d1849ce7b4ada93abd56ad6afb55c7a03b5638eb\nrefs/heads/manifest-rev 7f06e824c6a04c0c9f402bf6da23092cfd468fc1\nrefs/remotes/origin/HEAD 8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f\nrefs/remotes/origin/main 8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f"
+  },
+  "local-after-preservation": {
+    "HEAD": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-echem\nHEAD 8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f",
+      "refs/heads/main": "d1849ce7b4ada93abd56ad6afb55c7a03b5638eb",
+      "refs/heads/manifest-rev": "7f06e824c6a04c0c9f402bf6da23092cfd468fc1",
+      "refs/preservation/kami-monorepo-20261022/heads/bot/stack-thermal-20260903": "b212f68c59cda0bf8cc65974dc5d4f53e2532c00",
+      "refs/preservation/kami-monorepo-20261022/heads/echem/rom-fc-operating-point": "4a66ca9837168e0a41c6ba0e76b42c068e980072",
+      "refs/preservation/kami-monorepo-20261022/heads/echem/rom-fc-system-bop": "d33962b52b154628fe52de3e5aef619fa21cbeae",
+      "refs/preservation/kami-monorepo-20261022/heads/echem/run-at-power-datafied": "f9b8c1a4e9a7d0b21f76d83b05b8c6f8abd06e3b",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f",
+      "refs/preservation/kami-monorepo-20261022/heads/mg-echem-duty-profile": "d1dd7fae64360fb6786bd4facff407cf0b106f55",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "ebbc078404461bffc5fb2fc533843a2a8fc2e79c",
+      "refs/preservation/kami-monorepo-20261022/pull-2": "4a66ca9837168e0a41c6ba0e76b42c068e980072",
+      "refs/preservation/kami-monorepo-20261022/pull-3": "b212f68c59cda0bf8cc65974dc5d4f53e2532c00",
+      "refs/preservation/kami-monorepo-20261022/pull-4": "d33962b52b154628fe52de3e5aef619fa21cbeae",
+      "refs/preservation/kami-monorepo-20261022/pull-5": "d1dd7fae64360fb6786bd4facff407cf0b106f55",
+      "refs/remotes/origin/HEAD": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f",
+      "refs/remotes/origin/main": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "chore(deps): rename com-junkawasaki/*-clj \u2192 kotoba-lang/* (org reconcile)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "chore/org-rename-reconcile",
+      "headRefOid": "ebbc078404461bffc5fb2fc533843a2a8fc2e79c",
+      "baseRefName": "main",
+      "baseRefOid": "9787ef66cccc70aab4ec15e255ae472cb9f0f456",
+      "mergeCommit": {
+        "oid": "2a6b330a876515c8625bac70edd44a6dc8960c6e"
+      },
+      "mergedAt": "2026-06-30T05:16:18Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-echem/pull/1"
+    },
+    {
+      "number": 2,
+      "title": "rom-fc: operating-point contract \u2014 power-targeted solve, polarization sweep, Faraday H2 consumption",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "echem/rom-fc-operating-point",
+      "headRefOid": "4a66ca9837168e0a41c6ba0e76b42c068e980072",
+      "baseRefName": "main",
+      "baseRefOid": "eb9649fd3aa0e5f46b97bbcceb136d287dc58b20",
+      "mergeCommit": {
+        "oid": "56e983575d4db65649e00f7cd3bde8b40e285589"
+      },
+      "mergedAt": "2026-09-05T01:13:19Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-echem/pull/2"
+    },
+    {
+      "number": 3,
+      "title": "echem: steady stack heat balance (:rom-fc-stack-heat) \u2014 waste heat from the ROM's own eta",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/stack-thermal-20260903",
+      "headRefOid": "b212f68c59cda0bf8cc65974dc5d4f53e2532c00",
+      "baseRefName": "main",
+      "baseRefOid": "eb9649fd3aa0e5f46b97bbcceb136d287dc58b20",
+      "mergeCommit": {
+        "oid": "8dc5685b401800e3b4a92a59357cf5dc6ae8336f"
+      },
+      "mergedAt": "2026-09-05T01:13:22Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-echem/pull/3"
+    },
+    {
+      "number": 4,
+      "title": "system: net system-level operating point (:rom-fc-system) \u2014 stack ROM eta + caller-supplied BoP + optional DC/DC",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "echem/rom-fc-system-bop",
+      "headRefOid": "d33962b52b154628fe52de3e5aef619fa21cbeae",
+      "baseRefName": "main",
+      "baseRefOid": "8dc5685b401800e3b4a92a59357cf5dc6ae8336f",
+      "mergeCommit": {
+        "oid": "b1f018a95cbbf5c0d7576ed97e6423e4b2bbac11"
+      },
+      "mergedAt": "2026-09-05T22:13:15Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-echem/pull/4"
+    },
+    {
+      "number": 5,
+      "title": "echem: :rom-fc-profile demand-following duty-cycle H2/energy integration",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "mg-echem-duty-profile",
+      "headRefOid": "d1dd7fae64360fb6786bd4facff407cf0b106f55",
+      "baseRefName": "main",
+      "baseRefOid": "7f06e824c6a04c0c9f402bf6da23092cfd468fc1",
+      "mergeCommit": {
+        "oid": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f"
+      },
+      "mergedAt": "2026-10-07T01:35:37Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-echem/pull/5"
+    }
+  ]
+}

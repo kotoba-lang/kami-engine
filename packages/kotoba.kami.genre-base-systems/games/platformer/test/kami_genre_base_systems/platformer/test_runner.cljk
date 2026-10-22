@@ -1,0 +1,19 @@
+;; test_runner.clj -- entrypoint for `kbb -M:test` (see deps.edn).
+;; JVM-only by nature of being a CLI entrypoint (same spirit as this
+;; repo's existing author.clj scripts) -- the systems under test
+;; themselves (camera/weapon/style/boss/stairs .cljc) are plain portable
+;; Clojure with no JVM-only calls.
+(ns kami-genre-base-systems.platformer.test-runner
+  (:require [clojure.test :as t]
+            [kami-genre-base-systems.platformer.camera-test]
+            [kami-genre-base-systems.platformer.weapon-test]
+            [kami-genre-base-systems.platformer.style-test]
+            [kami-genre-base-systems.platformer.boss-test]))
+
+(defn -main [& _args]
+  (let [{:keys [fail error]}
+        (t/run-tests 'kami-genre-base-systems.platformer.camera-test
+                      'kami-genre-base-systems.platformer.weapon-test
+                      'kami-genre-base-systems.platformer.style-test
+                      'kami-genre-base-systems.platformer.boss-test)]
+    (System/exit (if (zero? (+ fail error)) 0 1))))

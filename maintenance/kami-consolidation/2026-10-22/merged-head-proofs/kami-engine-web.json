@@ -1,0 +1,53 @@
+{
+  "repository": "kotoba-lang/kami-engine-web",
+  "default": "1bc9526d3c1aad1222744c32e39e499b2850c49a",
+  "heads": {},
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-web/pull/1",
+      "head": "53b6c133e25a1ec4191f1bf13bbb0e25cc7b02ed",
+      "merge": "6c019a9b256b510979a8a3340b9069192c622f6b",
+      "merge-base": "1c9d4797c1f8f2a422c85799e6a132f482b6cba9",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "fc86937b143c7331f89030e209d90620cbd3aa43"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "8293ed6d867a0359c132b5f2354499abf8590860"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": null
+        },
+        {
+          "path": "docs/adr/0001-retire-empty-cljc-scaffold.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "5149eab63b3381c8e4dc4b84767160f6ea13c9f5"
+          }
+        },
+        {
+          "path": "src/kami_engine_web.cljc",
+          "entry": null
+        },
+        {
+          "path": "test/kami_engine_web_test.cljc",
+          "entry": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,367 @@
+diff --git a/README.md b/README.md
+index a1a802e..5d33aa1 100644
+--- a/README.md
++++ b/README.md
+@@ -4,10 +4,10 @@ A **clean-sheet vehicle design** actor — given requirements (class, range,
+ payload, top speed) it designs a car *from zero* and sizes its energy
+ system for **either a battery-electric (BEV) or a hydrogen fuel-cell
+ (FCEV)** powertrain. Built on this workspace's
+-[`langgraph-clj`](https://github.com/com-junkawasaki/langgraph-clj)
++[`langgraph-clj`](https://github.com/kotoba-lang/langgraph)
+ StateGraph runtime (portable `.cljc`, supervised superstep loop,
+ interrupts, Datomic/in-mem checkpoints) — the same runtime the
+-[`robotaxi-actor`](../robotaxi-actor) rides on.
++`robotaxi-actor` rides on.
+ 
+ > **Why an actor layer at all?** A generative design proposer (LLM /
+ > CAD agent) is a brilliant *concept generator* but it does **not respect
+@@ -91,7 +91,7 @@ out of identical requirements as physically distinct vehicles.
+ | `src/vdesign/simverify.cljk` | **(a) SimGovernor** — structural · clash · axle on the Isaac/genesis-compat surface + per-env DR |
+ | `src/vdesign/process.cljk` | **(b) ProcessPlanner** — BOM → CAM (G-code) → 4D assembly order |
+ | `src/vdesign/datom.cljk` | kotoba Datom-log (EAVT) representation — verification + mfg as facts |
+-| `src/vdesign/design.cljk` | **VehicleDesignActor** — the langgraph-clj StateGraph (1 run = 1 design pass) |
++| `src/vdesign/design.cljk` | **VehicleDesignActor** — the `langgraph` StateGraph (1 run = 1 design pass) |
+ | `src/vdesign/sim.cljk` | demo driver |
+ | `src/vdesign/simphysics.cljk` | **real time-stepped physics** — `physics-2d`-backed frontal-crash rigid-body simulation |
+ | `src/vdesign/scene.cljk` | bridges tessellated geometry + the physics trajectory into `kami.webgpu.mesh`'s real input shape |
+@@ -105,8 +105,11 @@ the workspace's simulation and manufacturing fabric:
+ 
+ - **(a) `simverify` → Isaac / Cosmos sim.** The released spec is verified
+   for crash-load paths, package clash and axle loading against the
+-  **kami-genesis** (`isaacsim.core.api`) / **kami-cae** surface, then
+-  hardened with **kami-shugyo-style per-env domain randomization** (mass
++  [**com-nvidia-isaac-sim**](https://github.com/kotoba-lang/com-nvidia-isaac-sim)
++  (`isaacsim.core.api`, formerly kami-genesis) /
++  [**fea**](https://github.com/kotoba-lang/fea) (formerly kami-cae) surface, then
++  hardened with **[com-nvidia-isaac-lab](https://github.com/kotoba-lang/com-nvidia-isaac-lab)-style
++  (formerly kami-shugyo) per-env domain randomization** (mass
+   ±8 %, structure ±6 %, crash pulse ±10 %) for a sim-to-real margin — the
+   same clean-room Isaac-compat stack kami-engine matured in ADR-0034. A
+   structural failure downgrades even a physics-closed design to *rejected*
+diff --git a/deps.edn b/deps.edn
+index 7a7df80..f15febe 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -30,7 +30,7 @@
+         io.github.kotoba-lang/kami-engine-crash       {:git/url "https://github.com/kotoba-lang/kami-engine-crash.git"
+                                            :git/sha "fa29f4e0282c5ab00741084dc9492b5fe76e5b1a"}
+         io.github.kotoba-lang/kami-engine-echem       {:git/url "https://github.com/kotoba-lang/kami-engine-echem.git"
+-                                           :git/sha "2a6b330a876515c8625bac70edd44a6dc8960c6e"}
++                                           :git/sha "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f"}
+         io.github.kotoba-lang/kami-engine-motor       {:git/url "https://github.com/kotoba-lang/kami-engine-motor.git"
+                                            :git/sha "d49a16e7563ef230531b3b0c7f3152f5f9d2ce8c"}
+         ;; CAD/CAM bridge (vdesign.cad / vdesign.process): org-iso-10303
+diff --git a/src/vdesign/hydrogen.cljk b/src/vdesign/hydrogen.cljk
+index 21c311f..d924009 100644
+--- a/src/vdesign/hydrogen.cljk
++++ b/src/vdesign/hydrogen.cljk
+@@ -43,7 +43,12 @@
+   `vdesign.dc-bus`'s deficit handling."
+ 
+   (:require [vdesign.powertrain :as pt]
+-            [vdesign.cartridge :as cartridge]))
++            [vdesign.cartridge :as cartridge]
++            [kotoba.lang.text :as str]
++            ;; upstream :rom-fc-profile duty-cycle contract (echem PR#5):
++            ;; the per-sample operating points consumed below. Required so the
++            ;; dependency is explicit on the vehicle plane, not incidental.
++            [echem.profile :as eprof]))
+ 
+ (def LHV-H2-J pt/LHV-H2-J)   ; J/kg, LHV — re-export for callers composing units
+ 
+@@ -177,3 +182,155 @@
+                           :dt-s dt
+                           :fc-elec-eff fc-elec-eff
+                           :store-h2-kg store-h2-kg})))
++
++(defn- require-profile-result [p]
++  (when-not (and (map? p)
++                 (= :rom-fc-profile (:solver p))
++                 (sequential? (:points p))
++                 (seq (:points p))
++                 (map? (:provenance p))
++                 (number? (:dt-s p)) (pos? (:dt-s p)))
++    (throw (ex-info "expected an echem.profile/demand-profile result"
++                    {:received (select-keys p [:solver :samples :dt-s])}))))
++
++(defn- require-source-string [x]
++  (when-not (and (string? x) (not (str/blank? x)))
++    (throw (ex-info "non-blank provenance string required"
++                    {:profile-source x}))))
++
++(defn consumption-from-duty-profile
++  "Compose with the echem plane's duty-profile integration: take an
++  `echem.profile/demand-profile` result (per-sample ROM operating points
++  from the polarization curve + caller-supplied BoP group) and convert its
++  trapezoid-integrated H2 demand into the cartridge-depletion bookkeeping
++  this namespace owns (exact MgH2 stoichiometry, store tracking, shortfall).
++
++  This removes the remaining downstream block on the vehicle plane: before
++  this contract, a duty-cycle consumption claim could only be made through
++  `consumption-profile`'s scalar :fc-elec-eff — a single operating point
++  silently applied across a profile the ROM resolves per sample. Here the
++  per-sample H2 rates come from the ROM chain itself; this namespace adds
++  NO efficiency, NO H2 constant, and NO reactor behavior of its own.
++
++  Inputs:
++    profile — an echem.profile/demand-profile result (validated:
++              :solver :rom-fc-profile, feasible :points, :dt-s)
++    opts:
++      :store-h2-kg  — optional cartridge H2 capacity (kg), as in
++                      consumption-profile
++      :profile-source — required provenance echo for the duty cycle the
++                      profile was computed over (cross-checked against the
++                      profile result's own :provenance when present)
++      :allow-gaps   — default false: refuse when the profile result reports
++                      skipped/infeasible intervals (a duty cycle with gaps
++                      is not a consumption claim); with true, only covered
++                      intervals are consumed and the gap is reported.
++
++  Interval H2 demand follows the upstream trapezoid exactly:
++    m-h2(i) = dt-s · (ṁ(i) + ṁ(i+1)) / 2     over adjacent feasible samples
++  MgH2 conversion uses the same exact stoichiometric mass fraction
++  (w-h2-in-mgh2) as consumption-profile — identical arithmetic, not a copy.
++
++  Refusals: non-profile input, blank :profile-source, infeasible gaps
++  without :allow-gaps, non-positive :store-h2-kg. A depleted cartridge is a
++  reported shortfall, never an exception.
++
++  Unmeasured: everything upstream declares (transients, thermal lag,
++  purge, DC/DC part-load, trapezoid error) PLUS desorption kinetics, heat
++  of desorption, plateau pressure, min recirculation — the reactor is not
++  simulated here."
++  [profile {:keys [store-h2-kg profile-source allow-gaps]}]
++  (require-profile-result profile)
++  (require-source-string profile-source)
++  (let [upstream-source (get-in profile [:provenance :profile-source])]
++    (when (and (some? upstream-source) (not= upstream-source profile-source))
++      (throw (ex-info ":profile-source does not match the duty profile's own provenance — refusing (a consumption result must not be attributed to a different duty cycle)"
++                      {:profile-source profile-source
++                       :upstream-profile-source upstream-source}))))
++  (when (and (some? store-h2-kg)
++             (not (and (number? store-h2-kg) (pos? store-h2-kg))))
++    (throw (ex-info "store-h2-kg must be a positive number (kg)"
++                    {:store-h2-kg store-h2-kg})))
++  (let [skipped (:skipped-interval-indices profile)]
++    (when (and (not allow-gaps) (seq skipped))
++      (throw (ex-info "duty profile has skipped/infeasible intervals — refusing (pass :allow-gaps true to consume covered intervals only)"
++                      {:skipped-interval-indices skipped
++                       :infeasible-count (:infeasible-count profile)}))))
++  (let [dt      (:dt-s profile)
++        skipped (:skipped-interval-indices profile)
++        wh2     (w-h2-in-mgh2)
++        pts     (:points profile)
++        step    (fn [{:keys [remaining] :as acc} [a b]]
++                  (let [h2-demand (* dt (/ (+ (:h2-kg-per-s a) (:h2-kg-per-s b)) 2.0))
++                        h2-used   (if remaining (min h2-demand remaining) h2-demand)
++                        shortfall (- h2-demand h2-used)
++                        remaining' (when remaining (- remaining h2-used))
++                        row {:i (:sample a)
++                             :i-next (:sample b)
++                             :p-net-kw-start (:p-net-kw-target a)
++                             :p-net-kw-end (:p-net-kw-target b)
++                             :eta-sys-start (:eta-sys a)
++                             :eta-sys-end (:eta-sys b)
++                             :h2-kg h2-demand
++                             :mgh2-kg (/ h2-demand wh2)
++                             :store-remaining-kg remaining'
++                             :h2-shortfall-kg shortfall}]
++                    (-> acc
++                        (update :intervals conj row)
++                        (update :h2-total + h2-demand)
++                        (update :mgh2-total + (/ h2-demand wh2))
++                        (update :shortfall + shortfall)
++                        (assoc :remaining remaining'))))
++        init   {:intervals [] :h2-total 0.0 :mgh2-total 0.0 :shortfall 0.0
++                :remaining (some-> store-h2-kg double)}
++        ;; Only ORIGINAL adjacent intervals with two feasible endpoints are
++        ;; consumed — a skipped sample never bridges a gap (same discipline
++        ;; as the upstream trapezoid over :points' :sample indices).
++        covered (filterv (fn [[a b]] (= (:sample b) (inc (:sample a))))
++                         (map vector pts (rest pts)))
++        out    (reduce step init covered)
++        rows   (:intervals out)
++        total  (:h2-total out)
++        ;; cross-check against the upstream integration's own :h2-kg
++        upstream-h2 (:h2-kg profile)
++        consistent (if (zero? upstream-h2)
++                     (zero? total)
++                     (< (Math/abs (- total upstream-h2))
++                        (* 1.0e-9 upstream-h2)))
++        depleted-at (some (fn [row]
++                            (when (pos? (:h2-shortfall-kg row))
++                              (:i row)))
++                          rows)
++        upstream-up (:unmeasured profile)]
++    (when-not consistent
++      (throw (ex-info "interval consumption does not reproduce the upstream trapezoid integral — refusing"
++                      {:h2-total-kg total :upstream-h2-kg upstream-h2})))
++    {:kind :hydrogen-duty-consumption
++     :intervals rows
++     :h2 {:total-kg total
++          :total-mgh2-kg (:mgh2-total out)
++          :total-shortfall-kg (:shortfall out)
++          :upstream-h2-kg upstream-h2
++          :integration-consistent consistent}
++     :store (when store-h2-kg
++              {:start-kg store-h2-kg
++               :end-kg (:remaining out)
++               :depleted-at-i depleted-at})
++     :gaps (when allow-gaps
++             {:skipped-interval-indices skipped
++              :infeasible-count (:infeasible-count profile)})
++     :provenance {:profile-source profile-source
++                  :upstream-profile-source (get-in profile [:provenance :profile-source])
++                  ;; full upstream ROM / polarization / BoP basis, so the
++                  ;; per-interval H2 rates stay reproducible from this result
++                  :upstream-provenance (:provenance profile)
++                  :dt-s dt
++                  :w-h2-mgh2 wh2
++                  :eta-sys-min (:eta-sys-min profile)
++                  :eta-sys-max (:eta-sys-max profile)
++                  :store-h2-kg store-h2-kg}
++     :unmeasured (merge upstream-up
++                        {:desorption-kinetics true
++                         :heat-of-desorption true
++                         :plateau-pressure true
++                         :min-h2-recirculation true})}))
+diff --git a/src/vdesign/reactor_heat.cljk b/src/vdesign/reactor_heat.cljk
+index ae4c278..d7d557b 100644
+--- a/src/vdesign/reactor_heat.cljk
++++ b/src/vdesign/reactor_heat.cljk
+@@ -126,10 +126,11 @@
+   [consumption {:keys [dh-j-per-kg-mgh2 dh-source heater-kw heater-source
+                        label case/id]}]
+   (when-not (and (map? consumption)
+-                 (#{:cartridge-swap-schedule :hydrogen-consumption}
++                 (#{:cartridge-swap-schedule :hydrogen-consumption
++                    :hydrogen-duty-consumption}
+                   (:kind consumption)))
+     (throw (ex-info
+-            "reactor-heat: expects a vdesign.swap-schedule (:cartridge-swap-schedule) or vdesign.hydrogen (:hydrogen-consumption) result"
++            "reactor-heat: expects a vdesign.swap-schedule (:cartridge-swap-schedule) or vdesign.hydrogen (:hydrogen-consumption / :hydrogen-duty-consumption) result"
+             {:kind (:kind consumption)})))
+   (when-not (and (finite? dh-j-per-kg-mgh2)
+                  (pos? (double dh-j-per-kg-mgh2)))
+diff --git a/test/vdesign/hydrogen_test.cljk b/test/vdesign/hydrogen_test.cljk
+index ef9285b..a9b7a84 100644
+--- a/test/vdesign/hydrogen_test.cljk
++++ b/test/vdesign/hydrogen_test.cljk
+@@ -3,7 +3,10 @@
+             [vdesign.hydrogen :as h]
+             [vdesign.dc-bus :as dc]
+             [vdesign.cartridge :as cartridge]
+-            [vdesign.powertrain :as pt]))
++            [vdesign.powertrain :as pt]
++            [echem.profile :as prof]
++            [echem.system :as es]
++            [vdesign.reactor-heat :as rh]))
+ 
+ (defn- close? [a b] (< (Math/abs (- a b)) 1e-9))
+ 
+@@ -115,3 +118,105 @@
+     (is (throws? #(h/consumption-profile {:fc-profile-kw [1.0] :dt-s 1.0
+                                           :fc-elec-eff 0.5
+                                           :store-h2-kg -2.0})))))
++;; ---------------------------------------------------------------------
++;; consumption-from-duty-profile — composition with echem.profile
++;; (requires the echem git dep pinned past :rom-fc-profile, PR#5)
++
++(def echem-case {:bop-frac 0.15 :bop-source "fixture: synthetic screening value"})
++
++(defn- duty-profile [p-net-kw]
++  (prof/demand-profile
++   echem-case
++   {:p-net-kw p-net-kw :dt-s 10.0
++    :profile-source "fixture: synthetic constant duty cycle"}))
++
++(deftest duty-consumption-constant-profile-closed-form
++  (testing "constant net demand → per-interval H2 = ṁ·dt, upstream total reproduced"
++    (let [prof (duty-profile [80.0 80.0 80.0 80.0])
++          rate (:h2-kg-per-s (es/demand-point echem-case 80.0))
++          r    (h/consumption-from-duty-profile
++                prof {:profile-source "fixture: synthetic constant duty cycle"})]
++      (is (= 3 (count (:intervals r))))
++      (doseq [row (:intervals r)]
++        (is (close? (* rate 10.0) (:h2-kg row)))
++        (is (pos? (:eta-sys-start row)))
++        (is (pos? (:eta-sys-end row))))
++      (is (close? (:h2-kg prof) (get-in r [:h2 :total-kg])))
++      (is (get-in r [:h2 :integration-consistent]))
++      (is (pos? (get-in r [:provenance :eta-sys-min])))
++      (is (pos? (get-in r [:provenance :eta-sys-max])))
++      (is (= "fixture: synthetic constant duty cycle"
++             (get-in r [:provenance :profile-source]))))))
++
++(deftest duty-consumption-mgh2-stoichiometry-identity
++  (testing "per-interval MgH2 = H2 / w-h2(MgH2), same arithmetic as consumption-profile"
++    (let [prof (duty-profile [80.0 80.0])
++          r    (h/consumption-from-duty-profile prof {:profile-source "fixture: synthetic constant duty cycle"})
++          wh2  (:w-h2-mgh2 (:provenance (h/consumption-profile
++                                          {:fc-profile-kw [1.0] :dt-s 1.0
++                                           :fc-elec-eff 0.5})))]
++      (doseq [row (:intervals r)]
++        (is (close? (/ (:h2-kg row) wh2) (:mgh2-kg row)))))))
++
++(deftest duty-consumption-depleted-store-is-a-reported-shortfall
++  (testing "a store that runs out mid-profile is reported, never thrown"
++    (let [prof (duty-profile [80.0 80.0 80.0 80.0])
++          full (h/consumption-from-duty-profile
++                prof {:profile-source "fixture: synthetic constant duty cycle" :store-h2-kg 1.0e9})
++          tiny (h/consumption-from-duty-profile
++                prof {:profile-source "fixture: synthetic constant duty cycle"
++                      :store-h2-kg (get-in full [:intervals 0 :h2-kg])})]
++      (is (close? 0.0 (get-in full [:h2 :total-shortfall-kg])))
++      (is (pos? (get-in tiny [:h2 :total-shortfall-kg])))
++      (is (= 1 (get-in tiny [:store :depleted-at-i])))
++      (is (close? 0.0 (get-in tiny [:store :end-kg])))
++      (is (close? (get-in tiny [:store :start-kg])
++                  (+ (get-in tiny [:store :end-kg])
++                     (- (get-in tiny [:h2 :total-kg])
++                        (get-in tiny [:h2 :total-shortfall-kg]))))))))
++
++(deftest duty-consumption-refusals
++  (testing "fail closed: non-profile input, blank provenance, missing store form"
++    (is (throws? #(h/consumption-from-duty-profile
++                   {:solver :nope :points [] :dt-s 1.0 :provenance {}}
++                   {:profile-source "x"})))
++    (is (throws? #(h/consumption-from-duty-profile
++                   (duty-profile [80.0 80.0]) {:profile-source " "})))
++    (is (throws? #(h/consumption-from-duty-profile
++                   (duty-profile [80.0 80.0]) {})))
++    (is (throws? #(h/consumption-from-duty-profile
++                   (duty-profile [80.0 80.0]) {:profile-source "fixture: synthetic constant duty cycle" :store-h2-kg 0.0})))))
++
++(deftest duty-consumption-gaps-skip-and-refuse
++  (testing "infeasible sample: refuse by default; :allow-gaps consumes only covered intervals"
++    (let [gappy (prof/demand-profile
++                 echem-case
++                 {:p-net-kw [80.0 1.0e6 80.0 80.0] :dt-s 10.0
++                  :profile-source "fixture: synthetic gappy duty cycle"
++                  :on-infeasible :skip})]
++      (is (throws? #(h/consumption-from-duty-profile gappy {:profile-source "fixture: synthetic gappy duty cycle"})))
++      (let [r (h/consumption-from-duty-profile
++               gappy {:profile-source "fixture: synthetic gappy duty cycle" :allow-gaps true})]
++        (is (pos? (count (get-in r [:gaps :skipped-interval-indices]))))
++        ;; only the single covered 80→80 pair is consumed; the gap never bridges
++        (is (= 1 (count (:intervals r))))
++        (is (pos? (:infeasible-count gappy)))))))
++
++(deftest duty-consumption-refuses-mismatched-provenance
++  (testing ":profile-source must match the duty profile's own provenance"
++    (is (throws? #(h/consumption-from-duty-profile
++                   (duty-profile [80.0 80.0]) {:profile-source "some other duty cycle"})))
++    (let [prof (duty-profile [80.0 80.0])
++          r    (h/consumption-from-duty-profile prof {:profile-source "fixture: synthetic constant duty cycle"})]
++      (is (= (:provenance prof) (get-in r [:provenance :upstream-provenance]))))))
++
++(deftest duty-consumption-feeds-reactor-heat
++  (testing "the duty-consumption result composes with vdesign.reactor-heat"
++    (let [r  (h/consumption-from-duty-profile
++              (duty-profile [80.0 80.0 80.0])
++              {:profile-source "fixture: synthetic constant duty cycle"})
++          rh (rh/reactor-heat r {:dh-j-per-kg-mgh2 1.0e6
++                                 :dh-source "fixture: synthetic declared enthalpy"})]
++      (is (= :reactor-heat-demand (:kind rh)))
++      (is (= (count (:intervals r)) (count (:intervals rh))))
++      (is (= :hydrogen-duty-consumption (get-in rh [:provenance :source-kind]))))))

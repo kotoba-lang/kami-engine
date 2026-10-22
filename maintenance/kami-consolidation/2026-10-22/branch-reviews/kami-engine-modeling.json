@@ -1,0 +1,97 @@
+{
+  "repository": "kotoba-lang/kami-engine-modeling",
+  "default": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "commit": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "commit": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "d68cd4f6461dadd6ab6194a83606af32ae3d9966",
+      "commit": "d68cd4f6461dadd6ab6194a83606af32ae3d9966",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "8e9efc02602f2be5ff383d43d366f5b3faeba3a5",
+      "commit": "8e9efc02602f2be5ff383d43d366f5b3faeba3a5",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/jv/kotoba-text-cljs",
+      "object": "e7ed46953222f3fac49c5ebcf00a4e8ebefc9aac",
+      "commit": "e7ed46953222f3fac49c5ebcf00a4e8ebefc9aac",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "commit": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "commit": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/two-more-exclusions-that-check-themselves",
+      "object": "87f580c7b97c3829ffea72285736881c10e1fa68",
+      "commit": "87f580c7b97c3829ffea72285736881c10e1fa68",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "93d90b753320b47e9f0efd4713a43de395ff974b",
+      "commit": "93d90b753320b47e9f0efd4713a43de395ff974b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/drop-nbb-cache",
+      "object": "1fe5914da5eeee01c309e62fcc1610560bc21028",
+      "commit": "1fe5914da5eeee01c309e62fcc1610560bc21028",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/full-sha",
+      "object": "a2174517ae4ddd7d021bc911d2d2da5544cd4ae9",
+      "commit": "a2174517ae4ddd7d021bc911d2d2da5544cd4ae9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/kotoba-text",
+      "object": "fab47c6e97c83fe194d767947e1b4303a45840ea",
+      "commit": "fab47c6e97c83fe194d767947e1b4303a45840ea",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/kotoba-text-cljs",
+      "object": "e7ed46953222f3fac49c5ebcf00a4e8ebefc9aac",
+      "commit": "e7ed46953222f3fac49c5ebcf00a4e8ebefc9aac",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "188193b4ef071b63aeb5e0a08ffa3e9057163e1a",
+      "commit": "188193b4ef071b63aeb5e0a08ffa3e9057163e1a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "commit": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

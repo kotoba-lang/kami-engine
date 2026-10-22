@@ -1,0 +1,282 @@
+(ns solar-helix-scene
+  "kami-solar-helix-scene — EDN authoring surface for the solar system's
+  so-called \"helical model\": since the Sun itself moves through the
+  Galaxy, a planet's path in a frame where the Sun is NOT held fixed (e.g.
+  relative to nearby stars or the Galactic Center) is a helix/corkscrew,
+  not the flat ellipse seen in the ordinary Sun-fixed heliocentric frame.
+  Both descriptions are correct simultaneously — this is a change of
+  reference frame (Galilean addition of the Sun's translational velocity
+  to each planet's orbital velocity), not a competing physical claim.
+
+  This namespace exists because the popular 2012-era \"vortex\" animations
+  of this idea (e.g. DjSadhu's \"The Helical Model\") got the *geometry*
+  wrong: they drew a tight corkscrew, when the real ratio of the Sun's
+  galactic advance per orbit to the orbit's own circumference is large
+  (~7.4x for Earth, see [[pitch-to-circumference-ratio]]) — i.e. the true
+  curve is a very gently stretched-out spring, nearly a straight line with
+  a small sinusoidal wobble, not a tight vortex tube. Concrete numbers,
+  not just the corrected picture, are the point of this repo.
+
+  ## Simplifications (read before consuming positions downstream)
+
+  - **Circular, coplanar orbits.** [[resources/solar-helix.edn]] uses each
+    planet's real semi-major axis as a fixed orbital radius and its real
+    sidereal period, but ignores eccentricity and each planet's own small
+    inclination to the ecliptic. Good enough to illustrate the helix/pitch
+    geometry; this is NOT an ephemeris (use VSOP/DE440 for true positions).
+  - **Single-axis tilt for the galactic frame.** A real ecliptic->Galactic
+    transform needs the solar apex's full spherical coordinates (RA/Dec of
+    the Galactic pole and of the direction of solar motion). This
+    namespace instead uses one scalar `:ecliptic-tilt-deg` (~60°, the
+    commonly cited popular-science rounding for that inclination) and
+    rotates the heliocentric orbital plane by that single angle around the
+    x-axis before adding the Sun's forward translation — see
+    [[galactic-frame-position-au]]. Treat the resulting 3D path as
+    illustrative of the *helix shape and pitch*, not as true galactic
+    coordinates.
+  - **`:sun-speed-km-s` is a rounded CONFIG default (220.0)**, the
+    traditional IAU-era Local Standard of Rest circular speed; modern
+    Gaia-based fits commonly land ~225-240 km/s depending on the adopted
+    R0/rotation curve. Swap the EDN value if a different estimate is
+    wanted — nothing here is hardcoded to 220 beyond this one field.
+
+  Zero-dep portable CLJC. Depends only on `kotoba-lang/scene` (tolerant
+  EDN accessors: `scene/mget` / `scene/num` / `scene/vec3` / `scene/root-map`
+  / `scene/kw-key`), the same way `kami-atmosphere-scene` / `kami-cam-scene`
+  parse their EDN authoring surfaces."
+  (:require [scene :as scene]))
+
+;; ════════════════════════════════════════════════════════════════════════
+;; portable math helpers (no java.lang.Math / js/Math leaking into the API)
+;; ════════════════════════════════════════════════════════════════════════
+
+(def ^:private PI #?(:clj Math/PI :cljs js/Math.PI))
+
+(defn- cos [x] #?(:clj (Math/cos x) :cljs (js/Math.cos x)))
+(defn- sin [x] #?(:clj (Math/sin x) :cljs (js/Math.sin x)))
+
+(defn- deg->rad [d] (* d (/ PI 180.0)))
+
+;; ════════════════════════════════════════════════════════════════════════
+;; physical constants
+;; ════════════════════════════════════════════════════════════════════════
+
+(def au-km
+  "1 AU in km (IAU 2012 exact definition: 149597870700 m)."
+  1.495978707e8)
+
+(def day-s
+  "1 day in seconds."
+  86400.0)
+
+(defn au->km [au] (* au au-km))
+(defn km->au [km] (/ km au-km))
+
+;; ════════════════════════════════════════════════════════════════════════
+;; shipped EDN — byte-identical to resources/solar-helix.edn, embedded as a
+;; literal so this namespace loads identically on the JVM and in ClojureScript
+;; ════════════════════════════════════════════════════════════════════════
+
+(def solar-helix-edn
+  ";; solar-helix.edn — canonical CONFIG/DATA for the solar-system \"helical
+;; model\": circular/coplanar orbital elements for the Sun + 8 planets, plus
+;; the Sun's own translation through the galaxy.
+;;
+;; Orbit data is a first-order schematic (circular, coplanar orbits using
+;; the real semi-major axis as radius and the real sidereal period) — real
+;; eccentricity/inclination-to-ecliptic are NOT modeled. This is enough to
+;; illustrate the helix/pitch geometry; it is NOT an ephemeris (use a
+;; VSOP/DE440 source for true positions).
+;;
+;; :sun-speed-km-s: the Sun's circular speed around the Galactic Center.
+;; ~220 km/s is the traditional IAU-era Local Standard of Rest value;
+;; modern Gaia-based fits commonly land ~225-240 km/s depending on R0 and
+;; the rotation curve used. 220.0 is kept here as a rounded, documented
+;; CONFIG default, not a precision astrometric claim.
+;;
+;; :ecliptic-tilt-deg: the angle this model uses between the ecliptic
+;; plane and the Sun's direction of galactic travel. ~60 degrees is the
+;; commonly cited popular-science rounding for the ecliptic-to-Galactic-
+;; plane inclination; kept at that precision deliberately (not pinned to
+;; sub-degree accuracy, which would require a full spherical-astronomy
+;; frame transform this schematic model does not attempt — see
+;; `galactic-frame-position-au` docstring in `src/solar_helix_scene.cljk`).
+{:helix/bodies
+ {:sun     {:orbit-radius-au 0.0     :period-days 0.0      :color [1.0  0.86 0.2]}
+  :mercury {:orbit-radius-au 0.38710 :period-days 87.9691  :color [0.6  0.6  0.6]}
+  :venus   {:orbit-radius-au 0.72333 :period-days 224.701  :color [0.9  0.85 0.6]}
+  :earth   {:orbit-radius-au 1.0     :period-days 365.256  :color [0.25 0.5  0.9]}
+  :mars    {:orbit-radius-au 1.52366 :period-days 686.980  :color [0.8  0.35 0.2]}
+  :jupiter {:orbit-radius-au 5.20336 :period-days 4332.59  :color [0.85 0.65 0.4]}
+  :saturn  {:orbit-radius-au 9.53707 :period-days 10759.22 :color [0.9  0.8  0.55]}
+  :uranus  {:orbit-radius-au 19.1913 :period-days 30688.5  :color [0.55 0.85 0.9]}
+  :neptune {:orbit-radius-au 30.069  :period-days 60182.0  :color [0.2  0.35 0.85]}}
+ :helix/galactic-frame
+ {:sun-speed-km-s    220.0
+  :ecliptic-tilt-deg 60.0}}
+")
+
+(def all-body-names
+  "Iteration order for the shipped bodies table (Sun first, then the 8
+  planets outward)."
+  ["sun" "mercury" "venus" "earth" "mars" "jupiter" "saturn" "uranus" "neptune"])
+
+;; ════════════════════════════════════════════════════════════════════════
+;; EDN parsing
+;; ════════════════════════════════════════════════════════════════════════
+
+(defn- body-spec-from-map
+  [m]
+  {:orbit-radius-au (scene/num (scene/mget m "orbit-radius-au"))
+   :period-days     (scene/num (scene/mget m "period-days"))
+   :color           (scene/vec3 (scene/mget m "color"))})
+
+(defn bodies-from-edn
+  "Parse `:helix/bodies` from EDN `src` into a map keyed by (hyphenated)
+  body id, each value a body spec `{:orbit-radius-au :period-days :color}`.
+
+  Throws `ex-info` with `:solar-helix-scene/error` of `:not-a-map` (EDN
+  root didn't parse to a map) or `:no-bodies` (`:helix/bodies` missing or
+  not a map) on failure."
+  [src]
+  (let [root (scene/root-map src)]
+    (when (nil? root)
+      (throw (ex-info "solar-helix EDN root is not a map"
+                       {:solar-helix-scene/error :not-a-map})))
+    (let [bodies (scene/mget root "helix/bodies")]
+      (when-not (map? bodies)
+        (throw (ex-info "`:helix/bodies` missing or not a map"
+                         {:solar-helix-scene/error :no-bodies})))
+      (reduce (fn [acc [k v]]
+                (if-let [id (scene/kw-key k)]
+                  (if (map? v)
+                    (assoc acc id (body-spec-from-map v))
+                    acc)
+                  acc))
+              {}
+              bodies))))
+
+(defn galactic-frame-from-edn
+  "Parse `:helix/galactic-frame` from EDN `src` into
+  `{:sun-speed-km-s :ecliptic-tilt-deg}`.
+
+  Throws `ex-info` with `:solar-helix-scene/error` of `:not-a-map` or
+  `:no-galactic-frame` on failure."
+  [src]
+  (let [root (scene/root-map src)]
+    (when (nil? root)
+      (throw (ex-info "solar-helix EDN root is not a map"
+                       {:solar-helix-scene/error :not-a-map})))
+    (let [g (scene/mget root "helix/galactic-frame")]
+      (when-not (map? g)
+        (throw (ex-info "`:helix/galactic-frame` missing or not a map"
+                         {:solar-helix-scene/error :no-galactic-frame})))
+      {:sun-speed-km-s     (scene/num (scene/mget g "sun-speed-km-s"))
+       :ecliptic-tilt-deg  (scene/num (scene/mget g "ecliptic-tilt-deg"))})))
+
+(defn shipped-bodies
+  "Convenience: parse all bodies from the crate-shipped [[solar-helix-edn]]."
+  []
+  (bodies-from-edn solar-helix-edn))
+
+(defn shipped-galactic-frame
+  "Convenience: parse the galactic-frame CONFIG from the crate-shipped
+  [[solar-helix-edn]]."
+  []
+  (galactic-frame-from-edn solar-helix-edn))
+
+;; ════════════════════════════════════════════════════════════════════════
+;; derived physics
+;; ════════════════════════════════════════════════════════════════════════
+
+(defn orbital-speed-km-s
+  "Circular-orbit speed of `body` in km/s, derived from its orbit radius
+  and period (`2*pi*r / T`) — not a transcribed constant, so it can be
+  checked against published values (see the test suite's parity check).
+  0.0 for a body with `:period-days` 0 (the Sun itself)."
+  [body]
+  (let [t-s (* (:period-days body) day-s)]
+    (if (zero? t-s)
+      0.0
+      (/ (* 2 PI (au->km (:orbit-radius-au body))) t-s))))
+
+(defn circumference-au
+  "Orbital circumference of `body` in AU (`2*pi*r`)."
+  [body]
+  (* 2 PI (:orbit-radius-au body)))
+
+(defn angular-position-rad
+  "`body`'s angular position in its (circular) orbit at time `t-days`
+  (days since epoch t=0). 0.0 for a body with `:period-days` 0."
+  [body t-days]
+  (let [p (:period-days body)]
+    (if (zero? p)
+      0.0
+      (* 2 PI (/ t-days p)))))
+
+(defn heliocentric-position-au
+  "`body`'s position in AU in the ordinary Sun-fixed heliocentric frame at
+  time `t-days`: a flat circle in the z=0 plane. This is the \"it's just a
+  flat ellipse\" view."
+  [body t-days]
+  (let [r     (:orbit-radius-au body)
+        theta (angular-position-rad body t-days)]
+    [(* r (cos theta)) (* r (sin theta)) 0.0]))
+
+(defn sun-forward-au-per-day
+  "The Sun's own galactic translation speed, converted to AU/day, from
+  `galactic`'s `:sun-speed-km-s`."
+  [galactic]
+  (km->au (* (:sun-speed-km-s galactic) day-s)))
+
+(defn pitch-au
+  "Distance the Sun advances along its galactic path during one full orbit
+  of `body` (`sun-forward-au-per-day * body's period`) — the helix's
+  \"pitch\" for this body, in AU."
+  [body galactic]
+  (* (sun-forward-au-per-day galactic) (:period-days body)))
+
+(defn pitch-to-circumference-ratio
+  "How many orbit-circumferences the Sun advances during one full orbit of
+  `body` — the number that shows the helix is a gentle stretched-out
+  spring, not a tight corkscrew (~7.4 for Earth, ~16.8 for Jupiter with
+  the shipped CONFIG: the more distant/slower the planet, the longer its
+  period, the further the Sun travels meanwhile, the MORE stretched out
+  its helix is — a tighter physical intuition than the popular 'vortex'
+  pictures usually convey). nil for a body with zero circumference (the
+  Sun itself)."
+  [body galactic]
+  (let [c (circumference-au body)]
+    (when (pos? c)
+      (/ (pitch-au body galactic) c))))
+
+(defn galactic-frame-position-au
+  "`body`'s position in AU in a frame where the Sun is NOT held fixed —
+  the \"it's a helix\" view. Simplified single-axis transform (see the
+  namespace docstring's Simplifications section): rotate the heliocentric
+  orbital plane by `galactic`'s `:ecliptic-tilt-deg` around the x-axis,
+  then add the Sun's own forward translation (accumulated at
+  [[sun-forward-au-per-day]]) along the z-axis — the helix's long axis.
+
+  At `:ecliptic-tilt-deg` 0 this degenerates to the flat heliocentric
+  circle translated bodily along z (no wobble); at 90 it produces a
+  circular helix of radius `(:orbit-radius-au body)` around the z-axis."
+  [body galactic t-days]
+  (let [[x y _] (heliocentric-position-au body t-days)
+        tilt    (deg->rad (:ecliptic-tilt-deg galactic))
+        forward (* (sun-forward-au-per-day galactic) t-days)]
+    [x (* y (cos tilt)) (+ (* y (sin tilt)) forward)]))
+
+(defn helix-tick
+  "Per-frame convenience for a renderer: given a `bodies` map (as returned
+  by [[shipped-bodies]]/[[bodies-from-edn]]), `galactic` CONFIG, and time
+  `t-days`, return `{id {:heliocentric [x y z] :galactic [x y z]}}` for
+  every body — both frames side by side, so a scene can show the flat
+  vs. helical view together or toggle between them."
+  [bodies galactic t-days]
+  (reduce (fn [acc [id body]]
+            (assoc acc id
+                   {:heliocentric (heliocentric-position-au body t-days)
+                    :galactic     (galactic-frame-position-au body galactic t-days)}))
+          {}
+          bodies))

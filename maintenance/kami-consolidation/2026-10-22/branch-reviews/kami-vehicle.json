@@ -1,0 +1,97 @@
+{
+  "repository": "kotoba-lang/kami-vehicle",
+  "default": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "commit": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "commit": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "5525f2c91d2745cb882eb773be5155b16623c8e5",
+      "commit": "5525f2c91d2745cb882eb773be5155b16623c8e5",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "51fc9a3a1dc9f1c5591d58a9066f501371f61fa7",
+      "commit": "51fc9a3a1dc9f1c5591d58a9066f501371f61fa7",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "commit": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "9a3c3cbfee195692d6dbd23a2b6891f991483d00",
+      "commit": "9a3c3cbfee195692d6dbd23a2b6891f991483d00",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "commit": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "f37b730bd04b51ccffa0425d9e86944bcb276454",
+      "commit": "f37b730bd04b51ccffa0425d9e86944bcb276454",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "commit": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/maturity-loop-bounded-beam-discontinuity",
+      "object": "0722b1e80fd08c205fc80cac5d84c5d21a119d76",
+      "commit": "0722b1e80fd08c205fc80cac5d84c5d21a119d76",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/maturity-loop-pressured-beam-formula",
+      "object": "53c99219c29f5c7f332fa440d1bec10df1c1ca88",
+      "commit": "53c99219c29f5c7f332fa440d1bec10df1c1ca88",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "commit": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "a35beb3c771c18eacb145d7f0f42bff76658b3ea",
+      "commit": "a35beb3c771c18eacb145d7f0f42bff76658b3ea",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "e1d33743e0ed45c686ef9b4440c2c762f61ba400",
+      "commit": "e1d33743e0ed45c686ef9b4440c2c762f61ba400",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "commit": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

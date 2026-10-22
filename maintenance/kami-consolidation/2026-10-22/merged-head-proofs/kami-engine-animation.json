@@ -1,0 +1,167 @@
+{
+  "repository": "kotoba-lang/kami-engine-animation",
+  "default": "33ac2ab4864e64ba5d359fda6bce5187074144b3",
+  "heads": {
+    "9aa428851f5abfe115e1836611d3f05c99d0638a": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/1",
+        "head": "9aa428851f5abfe115e1836611d3f05c99d0638a",
+        "merge": "2801b26952c7f5e703655fb4ee280b10cc68b089",
+        "merge-base": "001bc5a4bc567b7941ce603a5b637e9141da7bf5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "hermes/profiles/anim-app-maint/config.yaml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "bc3e3e1a87c06562f0ee8f5e0fea22593e0fd328"
+            }
+          }
+        ]
+      }
+    },
+    "1cca648c9e896f90733f5a73f37fa9900a0fb578": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 2,
+        "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/2",
+        "head": "1cca648c9e896f90733f5a73f37fa9900a0fb578",
+        "merge": "f4ad50f19dd36536478efc18524ca13263495891",
+        "merge-base": "2801b26952c7f5e703655fb4ee280b10cc68b089",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "hermes/profiles/anim-app-maint/SOUL.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "2e669d52f60564dc7805a2121d6fa95c35f32fd1"
+            }
+          }
+        ]
+      }
+    },
+    "e4dfcec99c728b753e795be73ec19615736555fc": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 3,
+        "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/3",
+        "head": "e4dfcec99c728b753e795be73ec19615736555fc",
+        "merge": "6ef34819cc92f8eb763e851fd6711ac58bbaa6d3",
+        "merge-base": "f4ad50f19dd36536478efc18524ca13263495891",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "hermes/profiles/anim-app-maint/SOUL.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "eae181c54f8a0bc7c4781323aaadb3409718fb89"
+            }
+          },
+          {
+            "path": "hermes/profiles/anim-app-maint/config.yaml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "8a199b8c63ecb8937a8a90b27fc666e3cc5b13fa"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/1",
+      "head": "9aa428851f5abfe115e1836611d3f05c99d0638a",
+      "merge": "2801b26952c7f5e703655fb4ee280b10cc68b089",
+      "merge-base": "001bc5a4bc567b7941ce603a5b637e9141da7bf5",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "hermes/profiles/anim-app-maint/config.yaml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "bc3e3e1a87c06562f0ee8f5e0fea22593e0fd328"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/2",
+      "head": "1cca648c9e896f90733f5a73f37fa9900a0fb578",
+      "merge": "f4ad50f19dd36536478efc18524ca13263495891",
+      "merge-base": "2801b26952c7f5e703655fb4ee280b10cc68b089",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "hermes/profiles/anim-app-maint/SOUL.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2e669d52f60564dc7805a2121d6fa95c35f32fd1"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/3",
+      "head": "e4dfcec99c728b753e795be73ec19615736555fc",
+      "merge": "6ef34819cc92f8eb763e851fd6711ac58bbaa6d3",
+      "merge-base": "f4ad50f19dd36536478efc18524ca13263495891",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "hermes/profiles/anim-app-maint/SOUL.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "eae181c54f8a0bc7c4781323aaadb3409718fb89"
+          }
+        },
+        {
+          "path": "hermes/profiles/anim-app-maint/config.yaml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "8a199b8c63ecb8937a8a90b27fc666e3cc5b13fa"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 4,
+      "url": "https://github.com/kotoba-lang/kami-engine-animation/pull/4",
+      "head": "403c9f0965e34d0cd29d90d60d3d371a7bf09a91",
+      "merge": "33ac2ab4864e64ba5d359fda6bce5187074144b3",
+      "merge-base": "6ef34819cc92f8eb763e851fd6711ac58bbaa6d3",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "hermes/profiles/anim-app-maint/SOUL.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "64f4b267dd2a4caf9c699f1101fd4b3fc521ab59"
+          }
+        },
+        {
+          "path": "hermes/profiles/anim-app-maint/config.yaml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "25a1759ec478202f3a88e8ce428342d53aacd40d"
+          }
+        }
+      ]
+    }
+  ]
+}

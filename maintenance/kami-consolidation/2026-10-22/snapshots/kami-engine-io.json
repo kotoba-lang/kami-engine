@@ -1,0 +1,96 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTKW9QA",
+    "databaseId": 1285930304,
+    "nameWithOwner": "kotoba-lang/kami-engine-io",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-08-04T02:49:13Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "87868b4dd440b78df06d48a6f804c57bff0ab894"
+      }
+    },
+    "heads": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "agent/retirement-readme",
+          "target": {
+            "oid": "1ad175484630bf98e23305f7e9741c23068a0b92"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "87868b4dd440b78df06d48a6f804c57bff0ab894"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 1
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "87868b4dd440b78df06d48a6f804c57bff0ab894",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-io\nHEAD 87868b4dd440b78df06d48a6f804c57bff0ab894\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 87868b4dd440b78df06d48a6f804c57bff0ab894\nrefs/heads/main ea22679aa8ec1bad476d5f65191fb79262286b05\nrefs/heads/manifest-rev 87868b4dd440b78df06d48a6f804c57bff0ab894\nrefs/remotes/kotoba-lang/HEAD 87868b4dd440b78df06d48a6f804c57bff0ab894\nrefs/remotes/kotoba-lang/add/ci-lint-gate 77ed2fcd057042c645dc22479e39ad868d29d7b1\nrefs/remotes/kotoba-lang/agent/retirement-readme 1ad175484630bf98e23305f7e9741c23068a0b92\nrefs/remotes/kotoba-lang/fix/test-alias-and-ci df5c49385878d9d6f80de9b9b9e8b48ce5513d09\nrefs/remotes/kotoba-lang/main 87868b4dd440b78df06d48a6f804c57bff0ab894"
+  },
+  "local-after-preservation": {
+    "HEAD": "87868b4dd440b78df06d48a6f804c57bff0ab894",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-io\nHEAD 87868b4dd440b78df06d48a6f804c57bff0ab894\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "87868b4dd440b78df06d48a6f804c57bff0ab894",
+      "refs/heads/main": "ea22679aa8ec1bad476d5f65191fb79262286b05",
+      "refs/heads/manifest-rev": "87868b4dd440b78df06d48a6f804c57bff0ab894",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/retirement-readme": "1ad175484630bf98e23305f7e9741c23068a0b92",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "87868b4dd440b78df06d48a6f804c57bff0ab894",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "468e6908d0b4d52e75fd7aff0e5a3302f5ec6c0b",
+      "refs/remotes/kotoba-lang/HEAD": "87868b4dd440b78df06d48a6f804c57bff0ab894",
+      "refs/remotes/kotoba-lang/add/ci-lint-gate": "77ed2fcd057042c645dc22479e39ad868d29d7b1",
+      "refs/remotes/kotoba-lang/agent/retirement-readme": "1ad175484630bf98e23305f7e9741c23068a0b92",
+      "refs/remotes/kotoba-lang/fix/test-alias-and-ci": "df5c49385878d9d6f80de9b9b9e8b48ce5513d09",
+      "refs/remotes/kotoba-lang/main": "87868b4dd440b78df06d48a6f804c57bff0ab894"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "Retire empty CLJC scaffold",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "retire-empty-cljc-scaffold",
+      "headRefOid": "468e6908d0b4d52e75fd7aff0e5a3302f5ec6c0b",
+      "baseRefName": "main",
+      "baseRefOid": "e8f1d58d1425e97b6d62743ae50cc8574d3ed2cb",
+      "mergeCommit": {
+        "oid": "046bc379926a4b2e54704e5eaf24a61c04bbe8ac"
+      },
+      "mergedAt": "2026-07-22T14:13:05Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-io/pull/1"
+    }
+  ]
+}

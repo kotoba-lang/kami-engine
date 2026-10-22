@@ -1,0 +1,55 @@
+{
+  "repository": "kotoba-lang/kami-ongaku-sequencer",
+  "default": "c575b9946e139ae1fd51cefd7740ec374e640975",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "commit": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "commit": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "17c0ec4607b121e71cc7f16fc66abb40e442f8b8",
+      "commit": "17c0ec4607b121e71cc7f16fc66abb40e442f8b8",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "commit": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "commit": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "4c25895226c50e9c7947207cd54b7c1371812a5d",
+      "commit": "4c25895226c50e9c7947207cd54b7c1371812a5d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "commit": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "commit": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

@@ -1,0 +1,54 @@
+(ns terrain-scene.waves-test
+  "Tests for `terrain-scene.waves`, ported 1:1 from the original
+  `kami-terrain-scene` Rust crate's `src/waves.rs` `#[cfg(test)]` module and
+  `tests/waves_parity.rs` (deleted in kotoba-lang/kami-engine PR #82)."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [terrain-scene.waves :as waves]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'terrain-scene.waves)))))
+
+;; Rust (src/waves.rs): shipped_has_four_waves
+(deftest shipped-has-four-waves
+  (let [w (waves/waves-from-edn waves/waves-edn)]
+    (is (= 4 (count w)))
+    (is (= (count w) (count (waves/builtin-waves))))))
+
+;; Rust (src/waves.rs): non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try
+              (waves/waves-from-edn "42")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :not-a-map (:terrain-scene.waves/error (ex-data err))))))
+
+;; Rust (src/waves.rs): missing_table_is_an_error
+(deftest missing-table-is-an-error
+  (let [err (try
+              (waves/waves-from-edn "{:x 1}")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :no-table (:terrain-scene.waves/error (ex-data err))))))
+
+;; Rust (tests/waves_parity.rs): waves_edn_matches_builtin
+(deftest waves-edn-matches-builtin
+  (let [loaded (waves/waves-from-edn waves/waves-edn)
+        builtin (waves/builtin-waves)]
+    (is (= (count loaded) (count builtin)) "wave count")
+    (is (= 4 (count loaded)) "all 4 waves present")
+    (doseq [[i g w] (map vector (range) loaded builtin)]
+      (is (= g w) (str "wave[" i "] (direction/amplitude/wavelength/speed/steepness)")))
+    (is (= loaded builtin) "full waves parity (ordered)")))
+
+;; Rust (tests/waves_parity.rs): spec_round_trips_through_wave (adapted: no
+;; separate spec/_pad type in this port — the EDN-loaded wave map IS the
+;; real `terrain` wave map already, so equality with the oracle *is* the
+;; round-trip proof).
+(deftest waves-round-trip-through-real-shape
+  (let [loaded (waves/waves-from-edn waves/waves-edn)
+        builtin (waves/builtin-waves)]
+    (doseq [[w want] (map vector loaded builtin)]
+      (is (= w want) "wave round-trips through the real terrain wave map"))))

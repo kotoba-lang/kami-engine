@@ -1,0 +1,39 @@
+{:paths ["src"],
+ :deps
+ {io.github.kotoba-lang/test
+  #:git{:url "https://github.com/kotoba-lang/test.git",
+        :sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"},
+  io.github.kotoba-lang/text
+  #:git{:sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"},
+  org.clojure/clojure #:mvn{:version "1.12.0"},
+  org.clojure/clojurescript #:mvn{:version "1.11.132"}},
+ :aliases
+ {:test
+  {:extra-paths ["test"],
+   :extra-deps
+   #:io.github.cognitect-labs{test-runner
+                              #:git{:tag "v0.5.1",
+                                    :sha
+                                    "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}},
+   :main-opts ["-m" "cognitect.test-runner"],
+   :exec-fn cognitect.test-runner.api/test},
+  :lint
+  {:replace-deps #:clj-kondo{clj-kondo #:mvn{:version "2024.11.14"}},
+   :main-opts
+   ["-m"
+    "clj-kondo.main"
+    "--lint"
+    "src"
+    "test"
+    "--fail-level"
+    "error"]},
+  :demos
+  {:extra-deps
+   #:io.github.kotoba-lang{webgpu #:local{:root "../../../webgpu"},
+                           host #:local{:root "../../../host"},
+                           kami-engine-app-sdk
+                           #:local{:root
+                                   "../kotoba.kami.engine.app-sdk"},
+                           kami-engine-sdk
+                           #:local{:root
+                                   "../kotoba.kami.engine.sdk"}}}}}

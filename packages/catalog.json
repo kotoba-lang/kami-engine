@@ -1,0 +1,1136 @@
+{
+  "schema": "kotoba.kami.source-catalog.v1",
+  "owner": "kotoba-lang/kami-engine",
+  "libraries": [
+    {
+      "id": "kotoba.kami.app.fixtures",
+      "aliases": [
+        "kami-app-fixtures",
+        "io.github.kotoba-lang/kami-app-fixtures"
+      ],
+      "path": "packages/kotoba.kami.app.fixtures",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "app-provider-fixture-contracts",
+      "source-repository": "kotoba-lang/kami-app-fixtures",
+      "source-commit": "105f1a58fe1fce2417c38272f2043f6ab98dc9a0",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.articulated",
+      "aliases": [
+        "kami-articulated",
+        "io.github.kotoba-lang/kami-articulated"
+      ],
+      "path": "packages/kotoba.kami.articulated",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-articulated",
+      "source-commit": "cacef9cde52f2e0a60134ddcf91a3c636e038499",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.atmosphere",
+      "aliases": [
+        "kami-atmosphere-scene",
+        "io.github.kotoba-lang/kami-atmosphere-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.atmosphere",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-atmosphere-scene",
+      "source-commit": "a06aaf93dbb85be4f94745b50b97c2348e0f83f7",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.autodrive",
+      "aliases": [
+        "kami-autodrive",
+        "io.github.kotoba-lang/kami-autodrive"
+      ],
+      "path": "packages/kotoba.kami.autodrive",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-autodrive",
+      "source-commit": "82fb5bef55b4555b8e6a4c5c3004cd89d62efc8b",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.autodrive",
+      "aliases": [
+        "kami-autodrive-scene",
+        "io.github.kotoba-lang/kami-autodrive-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.autodrive",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-autodrive-scene",
+      "source-commit": "8922de8ea2c9422c8cc9c3bff16f751772512518",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.cad-import",
+      "aliases": [
+        "kami-cad-import",
+        "io.github.kotoba-lang/kami-cad-import"
+      ],
+      "path": "packages/kotoba.kami.cad-import",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-cad-import",
+      "source-commit": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.cam",
+      "aliases": [
+        "kami-cam-scene",
+        "io.github.kotoba-lang/kami-cam-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.cam",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-cam-scene",
+      "source-commit": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.character",
+      "aliases": [
+        "kami-character-scene",
+        "io.github.kotoba-lang/kami-character-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.character",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-character-scene",
+      "source-commit": "9dcf24641bcb7675e54282b464d0665737a8f286",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.contracts",
+      "aliases": [
+        "kami-contracts",
+        "io.github.kotoba-lang/kami-contracts"
+      ],
+      "path": "packages/kotoba.kami.contracts",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "portable-contract-and-resource-authority",
+      "source-repository": "kotoba-lang/kami-contracts",
+      "source-commit": "43811a845c8a31708f38e2375769e36fb74287f9",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.eizo.compositor",
+      "aliases": [
+        "kami-eizo-compositor",
+        "io.github.kotoba-lang/kami-eizo-compositor"
+      ],
+      "path": "packages/kotoba.kami.eizo.compositor",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-eizo-compositor",
+      "source-commit": "2e4382dca9d6f8a22ae228189f4f9039e63b1664",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.eizo.grade",
+      "aliases": [
+        "kami-eizo-grade",
+        "io.github.kotoba-lang/kami-eizo-grade"
+      ],
+      "path": "packages/kotoba.kami.eizo.grade",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-eizo-grade",
+      "source-commit": "f960c23a14f52041e2c7ae600675295126b96072",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.eizo.timeline",
+      "aliases": [
+        "kami-eizo-timeline",
+        "io.github.kotoba-lang/kami-eizo-timeline"
+      ],
+      "path": "packages/kotoba.kami.eizo.timeline",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-eizo-timeline",
+      "source-commit": "226e1c1b807d11eb6a6c67e6a71cdae75e2de26d",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.eng-web",
+      "aliases": [
+        "kami-eng-web",
+        "io.github.kotoba-lang/kami-eng-web"
+      ],
+      "path": "packages/kotoba.kami.eng-web",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-client-contract-and-optional-host-adapter",
+      "source-repository": "kotoba-lang/kami-eng-web",
+      "source-commit": "17a53ad6fb9d9d67c59aa2ffa2d85d552d221628",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.aero",
+      "aliases": [
+        "kami-engine-aero",
+        "io.github.kotoba-lang/kami-engine-aero"
+      ],
+      "path": "packages/kotoba.kami.engine.aero",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-aero",
+      "source-commit": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.animation",
+      "aliases": [
+        "kami-engine-animation",
+        "io.github.kotoba-lang/kami-engine-animation"
+      ],
+      "path": "packages/kotoba.kami.engine.animation",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-animation",
+      "source-commit": "33ac2ab4864e64ba5d359fda6bce5187074144b3",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.app-sdk",
+      "aliases": [
+        "kami-engine-app-sdk",
+        "io.github.kotoba-lang/kami-engine-app-sdk"
+      ],
+      "path": "packages/kotoba.kami.engine.app-sdk",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "client-ui-sdk-with-injected-host",
+      "source-repository": "kotoba-lang/kami-engine-app-sdk",
+      "source-commit": "efe8f6ce35c7db866819c2ddded6a886ef4f9823",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.cad",
+      "aliases": [
+        "kami-engine-cad",
+        "io.github.kotoba-lang/kami-engine-cad"
+      ],
+      "path": "packages/kotoba.kami.engine.cad",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-cad",
+      "source-commit": "7068b4cc2d5044aee479ddbdf75ef4efb8133da7",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.cae-solver",
+      "aliases": [
+        "kami-engine-cae-solver",
+        "io.github.kotoba-lang/kami-engine-cae-solver"
+      ],
+      "path": "packages/kotoba.kami.engine.cae-solver",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-cae-solver",
+      "source-commit": "92dcd10b8d56d721073131d005d944077605bc5e",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.cfd",
+      "aliases": [
+        "kami-engine-cfd",
+        "io.github.kotoba-lang/kami-engine-cfd"
+      ],
+      "path": "packages/kotoba.kami.engine.cfd",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-cfd",
+      "source-commit": "45bdf336d5cf5c92a075cc27a4da0b1e035d2a2f",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.crash",
+      "aliases": [
+        "kami-engine-crash",
+        "io.github.kotoba-lang/kami-engine-crash"
+      ],
+      "path": "packages/kotoba.kami.engine.crash",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-crash",
+      "source-commit": "849a2be18a1c1442fc28983629b655e9d355835f",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.echem",
+      "aliases": [
+        "kami-engine-echem",
+        "io.github.kotoba-lang/kami-engine-echem"
+      ],
+      "path": "packages/kotoba.kami.engine.echem",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-echem",
+      "source-commit": "8b7b449ffc9f0ec19c5248e8f1026d97e7daf22f",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.hud-gpu",
+      "aliases": [
+        "kami-engine-hud-gpu",
+        "io.github.kotoba-lang/kami-engine-hud-gpu"
+      ],
+      "path": "packages/kotoba.kami.engine.hud-gpu",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-hud-gpu",
+      "source-commit": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.input-map",
+      "aliases": [
+        "kami-engine-input-map",
+        "io.github.kotoba-lang/kami-engine-input-map"
+      ],
+      "path": "packages/kotoba.kami.engine.input-map",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-input-map",
+      "source-commit": "9841302680163b7aafb760cd1d21de809d172084",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.modeling",
+      "aliases": [
+        "kami-engine-modeling",
+        "io.github.kotoba-lang/kami-engine-modeling"
+      ],
+      "path": "packages/kotoba.kami.engine.modeling",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-modeling",
+      "source-commit": "c514bc8c9e294425a5cdfa8e0db9ec074a625823",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.motor",
+      "aliases": [
+        "kami-engine-motor",
+        "io.github.kotoba-lang/kami-engine-motor"
+      ],
+      "path": "packages/kotoba.kami.engine.motor",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-motor",
+      "source-commit": "c465afd0124fbebf1c5bfa645b1b643dba98701d",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.multirotor",
+      "aliases": [
+        "kami-engine-multirotor",
+        "io.github.kotoba-lang/kami-engine-multirotor"
+      ],
+      "path": "packages/kotoba.kami.engine.multirotor",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-multirotor",
+      "source-commit": "97377fa5ba0c1942fccea6594f358d2ec2e2663b",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.pack",
+      "aliases": [
+        "kami-engine-pack",
+        "io.github.kotoba-lang/kami-engine-pack"
+      ],
+      "path": "packages/kotoba.kami.engine.pack",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-pack",
+      "source-commit": "770965c73aa5c70b9bab47830a35ac9323e5781c",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.rotor",
+      "aliases": [
+        "kami-engine-rotor",
+        "io.github.kotoba-lang/kami-engine-rotor"
+      ],
+      "path": "packages/kotoba.kami.engine.rotor",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-rotor",
+      "source-commit": "41ba842ba08f3c45bdd4227ef177b1b37048eefc",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.sculpt",
+      "aliases": [
+        "kami-engine-sculpt",
+        "io.github.kotoba-lang/kami-engine-sculpt"
+      ],
+      "path": "packages/kotoba.kami.engine.sculpt",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-sculpt",
+      "source-commit": "9312048f78a2111ee12493acb39c6782dddd7ae9",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.sdk",
+      "aliases": [
+        "kami-engine-sdk",
+        "io.github.kotoba-lang/kami-engine-sdk"
+      ],
+      "path": "packages/kotoba.kami.engine.sdk",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "scene-ECS-and-render-IR-authoring-sdk",
+      "source-repository": "kotoba-lang/kami-engine-sdk",
+      "source-commit": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.vehicle-designer",
+      "aliases": [
+        "kami-engine-vehicle-designer",
+        "io.github.kotoba-lang/kami-engine-vehicle-designer"
+      ],
+      "path": "packages/kotoba.kami.engine.vehicle-designer",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-vehicle-designer",
+      "source-commit": "84da8aed92b359d70725fce3850cdddc313be8f8",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.engine.vphysics",
+      "aliases": [
+        "kami-engine-vphysics",
+        "io.github.kotoba-lang/kami-engine-vphysics"
+      ],
+      "path": "packages/kotoba.kami.engine.vphysics",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-engine-vphysics",
+      "source-commit": "7ff753e7287ec5746e13616dfe7cde49ee7e6b3d",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.flow",
+      "aliases": [
+        "kami-flow",
+        "io.github.kotoba-lang/kami-flow"
+      ],
+      "path": "packages/kotoba.kami.flow",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-flow",
+      "source-commit": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.game",
+      "aliases": [
+        "kami-game-scene",
+        "io.github.kotoba-lang/kami-game-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.game",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-game-scene",
+      "source-commit": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.gen.hybrid",
+      "aliases": [
+        "kami-gen-hybrid",
+        "io.github.kotoba-lang/kami-gen-hybrid"
+      ],
+      "path": "packages/kotoba.kami.gen.hybrid",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "optional-asset-generation-adapter",
+      "source-repository": "kotoba-lang/kami-gen-hybrid",
+      "source-commit": "4082aa24c797207a01f711223cbae8d5dc749ea3",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.gen.ml3d",
+      "aliases": [
+        "kami-gen-ml3d",
+        "io.github.kotoba-lang/kami-gen-ml3d"
+      ],
+      "path": "packages/kotoba.kami.gen.ml3d",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "optional-asset-generation-adapter",
+      "source-repository": "kotoba-lang/kami-gen-ml3d",
+      "source-commit": "e7388b625837f6d014fa0050fadbd6d387176a07",
+      "admission": "not-granted",
+      "declaredSourcePaths": [
+        "src",
+        "resources"
+      ],
+      "unavailableSourcePaths": [
+        "resources"
+      ]
+    },
+    {
+      "id": "kotoba.kami.gen.procedural",
+      "aliases": [
+        "kami-gen-procedural",
+        "io.github.kotoba-lang/kami-gen-procedural"
+      ],
+      "path": "packages/kotoba.kami.gen.procedural",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "optional-asset-generation-adapter",
+      "source-repository": "kotoba-lang/kami-gen-procedural",
+      "source-commit": "ec78fbae72e563c017df36846beb183e097514a6",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.gen.sdf-agent",
+      "aliases": [
+        "kami-gen-sdf-agent",
+        "io.github.kotoba-lang/kami-gen-sdf-agent"
+      ],
+      "path": "packages/kotoba.kami.gen.sdf-agent",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "optional-asset-generation-adapter",
+      "source-repository": "kotoba-lang/kami-gen-sdf-agent",
+      "source-commit": "b9074f7f47df244e1f23aed7424d4772a5fe0deb",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.genre-base-systems",
+      "aliases": [
+        "kami-genre-base-systems",
+        "io.github.kotoba-lang/kami-genre-base-systems"
+      ],
+      "path": "packages/kotoba.kami.genre-base-systems",
+      "sourcePaths": [
+        "games/platformer/src"
+      ],
+      "kind": "reference-programs-and-action-systems",
+      "source-repository": "kotoba-lang/kami-genre-base-systems",
+      "source-commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "admission": "not-granted",
+      "dataPaths": [
+        "design",
+        "games"
+      ]
+    },
+    {
+      "id": "kotoba.kami.scene.input",
+      "aliases": [
+        "kami-input-scene",
+        "io.github.kotoba-lang/kami-input-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.input",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-input-scene",
+      "source-commit": "3e840f5042f5039008467e0c40e6ca3d295bbf3c",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.isekai.assets",
+      "aliases": [
+        "kami-isekai-assets",
+        "io.github.kotoba-lang/kami-isekai-assets"
+      ],
+      "path": "packages/kotoba.kami.isekai.assets",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "pure-character-and-effect-assets",
+      "source-repository": "kotoba-lang/kami-isekai-assets",
+      "source-commit": "d50bfe0f4ed4d02b63ddda8623bd39eff0378962",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.mangaka.expression",
+      "aliases": [
+        "kami-mangaka-expression",
+        "io.github.kotoba-lang/kami-mangaka-expression"
+      ],
+      "path": "packages/kotoba.kami.mangaka.expression",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-mangaka-expression",
+      "source-commit": "96fc3cef86a46f177470b6a4f253f28cc0a5a7de",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.mangaka.page",
+      "aliases": [
+        "kami-mangaka-page",
+        "io.github.kotoba-lang/kami-mangaka-page"
+      ],
+      "path": "packages/kotoba.kami.mangaka.page",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-mangaka-page",
+      "source-commit": "555e18af8731e49e0fbdfc9af5fc0830af44b5ed",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.mangaka.qa",
+      "aliases": [
+        "kami-mangaka-qa",
+        "io.github.kotoba-lang/kami-mangaka-qa"
+      ],
+      "path": "packages/kotoba.kami.mangaka.qa",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-mangaka-qa",
+      "source-commit": "c33c68cd4f2cd2dbd872d4cb5426f5ba3a9560db",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.mangaka.reader",
+      "aliases": [
+        "kami-mangaka-reader",
+        "io.github.kotoba-lang/kami-mangaka-reader"
+      ],
+      "path": "packages/kotoba.kami.mangaka.reader",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-mangaka-reader",
+      "source-commit": "01823ab3c0dc1e15a59f38c2805609bbfd5318ed",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.mangaka.render",
+      "aliases": [
+        "kami-mangaka-render",
+        "io.github.kotoba-lang/kami-mangaka-render"
+      ],
+      "path": "packages/kotoba.kami.mangaka.render",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-mangaka-render",
+      "source-commit": "f72d590bba66586391611cdcdb0b09ddc5b26586",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.mangaka.scene",
+      "aliases": [
+        "kami-mangaka-scene",
+        "io.github.kotoba-lang/kami-mangaka-scene"
+      ],
+      "path": "packages/kotoba.kami.mangaka.scene",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-mangaka-scene",
+      "source-commit": "ab1bb6426f48e74a565f0cc99e38ab374096d3ba",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.mangaka.scene-author",
+      "aliases": [
+        "kami-mangaka-scene-author",
+        "io.github.kotoba-lang/kami-mangaka-scene-author"
+      ],
+      "path": "packages/kotoba.kami.mangaka.scene-author",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-mangaka-scene-author",
+      "source-commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.mangaka.text",
+      "aliases": [
+        "kami-mangaka-text",
+        "io.github.kotoba-lang/kami-mangaka-text"
+      ],
+      "path": "packages/kotoba.kami.mangaka.text",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-mangaka-text",
+      "source-commit": "b4ab9df7a936e06cd9d80aac32aa972099c28006",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.nv-compat",
+      "aliases": [
+        "kami-nv-compat",
+        "io.github.kotoba-lang/kami-nv-compat"
+      ],
+      "path": "packages/kotoba.kami.nv-compat",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-provider-facade-and-status-contracts",
+      "source-repository": "kotoba-lang/kami-nv-compat",
+      "source-commit": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.ongaku.notation",
+      "aliases": [
+        "kami-ongaku-notation",
+        "io.github.kotoba-lang/kami-ongaku-notation"
+      ],
+      "path": "packages/kotoba.kami.ongaku.notation",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-ongaku-notation",
+      "source-commit": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.ongaku.plugin-host",
+      "aliases": [
+        "kami-ongaku-plugin-host",
+        "io.github.kotoba-lang/kami-ongaku-plugin-host"
+      ],
+      "path": "packages/kotoba.kami.ongaku.plugin-host",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-ongaku-plugin-host",
+      "source-commit": "7d86077d019a66cff33e7d1ee37155f93696ec49",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.ongaku.project",
+      "aliases": [
+        "kami-ongaku-project",
+        "io.github.kotoba-lang/kami-ongaku-project"
+      ],
+      "path": "packages/kotoba.kami.ongaku.project",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-ongaku-project",
+      "source-commit": "6dccb9eaafd3c015e19b9a6ac69c975cd4aea226",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.ongaku.sampler",
+      "aliases": [
+        "kami-ongaku-sampler",
+        "io.github.kotoba-lang/kami-ongaku-sampler"
+      ],
+      "path": "packages/kotoba.kami.ongaku.sampler",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-ongaku-sampler",
+      "source-commit": "8248fc145061373698d42d2ebd4518a94e3d397d",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.ongaku.sequencer",
+      "aliases": [
+        "kami-ongaku-sequencer",
+        "io.github.kotoba-lang/kami-ongaku-sequencer"
+      ],
+      "path": "packages/kotoba.kami.ongaku.sequencer",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "media-authoring-library",
+      "source-repository": "kotoba-lang/kami-ongaku-sequencer",
+      "source-commit": "c575b9946e139ae1fd51cefd7740ec374e640975",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.postfx",
+      "aliases": [
+        "kami-postfx-scene",
+        "io.github.kotoba-lang/kami-postfx-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.postfx",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-postfx-scene",
+      "source-commit": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.contracts",
+      "aliases": [
+        "kami-scene-contracts",
+        "io.github.kotoba-lang/kami-scene-contracts"
+      ],
+      "path": "packages/kotoba.kami.scene.contracts",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "portable-contract-and-resource-authority",
+      "source-repository": "kotoba-lang/kami-scene-contracts",
+      "source-commit": "87918d611775141ee32bac16a7c62b838ba5dc03",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.sensor-sim",
+      "aliases": [
+        "kami-sensor-sim",
+        "io.github.kotoba-lang/kami-sensor-sim"
+      ],
+      "path": "packages/kotoba.kami.sensor-sim",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-sensor-sim",
+      "source-commit": "caae6787e8a07fa8e6613e52412bc94878cca094",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.skeleton",
+      "aliases": [
+        "kami-skeleton-scene",
+        "io.github.kotoba-lang/kami-skeleton-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.skeleton",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-skeleton-scene",
+      "source-commit": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.solar-helix",
+      "aliases": [
+        "kami-solar-helix-scene",
+        "io.github.kotoba-lang/kami-solar-helix-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.solar-helix",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-solar-helix-scene",
+      "source-commit": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.terrain",
+      "aliases": [
+        "kami-terrain-scene",
+        "io.github.kotoba-lang/kami-terrain-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.terrain",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-terrain-scene",
+      "source-commit": "1087f9354664d7146fab05886801407a7cef3742",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.usd-native",
+      "aliases": [
+        "kami-usd-native",
+        "io.github.kotoba-lang/kami-usd-native"
+      ],
+      "path": "packages/kotoba.kami.usd-native",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-provider-facade-and-status-contracts",
+      "source-repository": "kotoba-lang/kami-usd-native",
+      "source-commit": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.vegetation",
+      "aliases": [
+        "kami-vegetation-scene",
+        "io.github.kotoba-lang/kami-vegetation-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.vegetation",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-vegetation-scene",
+      "source-commit": "d7ba32cca64ea5376c7367286b957f9311d73ce4",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.vehicle",
+      "aliases": [
+        "kami-vehicle",
+        "io.github.kotoba-lang/kami-vehicle"
+      ],
+      "path": "packages/kotoba.kami.vehicle",
+      "sourcePaths": [
+        "src",
+        "test"
+      ],
+      "kind": "portable-domain-library",
+      "source-repository": "kotoba-lang/kami-vehicle",
+      "source-commit": "50d5e299486f1c4fb5f9687ba258b5d32f694f06",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.scene.vehicle",
+      "aliases": [
+        "kami-vehicle-scene",
+        "io.github.kotoba-lang/kami-vehicle-scene"
+      ],
+      "path": "packages/kotoba.kami.scene.vehicle",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "scene-data-loader-and-authoring",
+      "source-repository": "kotoba-lang/kami-vehicle-scene",
+      "source-commit": "da9a156e021df92b86fc7f6b522f22349e74d66f",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.web",
+      "aliases": [
+        "kami-web",
+        "io.github.kotoba-lang/kami-web"
+      ],
+      "path": "packages/kotoba.kami.web",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-client-contract-and-optional-host-adapter",
+      "source-repository": "kotoba-lang/kami-web",
+      "source-commit": "2c4064bb9dd3eefbceab3ceb8a83178609416f7d",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.webvr",
+      "aliases": [
+        "kami-webvr",
+        "io.github.kotoba-lang/kami-webvr"
+      ],
+      "path": "packages/kotoba.kami.webvr",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "portable-client-contract-and-optional-host-adapter",
+      "source-repository": "kotoba-lang/kami-webvr",
+      "source-commit": "24087fee54a92b982aa1c04af84f886d9e2fa88f",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.gameplay",
+      "aliases": [
+        "kami-gameplay"
+      ],
+      "path": "kami-gameplay",
+      "sourcePaths": [
+        "src",
+        "resources"
+      ],
+      "kind": "existing-owner-project",
+      "source-repository": "kotoba-lang/kami-engine",
+      "source-commit": "c7f86b7de720976f9b0083018d16e721b1fd94ba",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.render",
+      "aliases": [
+        "kami-render"
+      ],
+      "path": "kami-render",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "existing-owner-project",
+      "source-repository": "kotoba-lang/kami-engine",
+      "source-commit": "c7f86b7de720976f9b0083018d16e721b1fd94ba",
+      "admission": "not-granted"
+    },
+    {
+      "id": "kotoba.kami.physics",
+      "aliases": [
+        "kami-physics"
+      ],
+      "path": "kami-physics",
+      "sourcePaths": [
+        "src"
+      ],
+      "kind": "existing-owner-project",
+      "source-repository": "kotoba-lang/kami-engine",
+      "source-commit": "c7f86b7de720976f9b0083018d16e721b1fd94ba",
+      "admission": "not-granted"
+    }
+  ],
+  "retired-reservations": [
+    {
+      "legacy-name": "kami-app",
+      "path": "retired-reservations/kami-app",
+      "reason": "retired empty scaffold; no source paths or runtime admission"
+    },
+    {
+      "legacy-name": "kami-engine-core",
+      "path": "retired-reservations/kami-engine-core",
+      "reason": "retired empty scaffold; no source paths or runtime admission"
+    },
+    {
+      "legacy-name": "kami-engine-engine",
+      "path": "retired-reservations/kami-engine-engine",
+      "reason": "retired empty scaffold; no source paths or runtime admission"
+    },
+    {
+      "legacy-name": "kami-engine-io",
+      "path": "retired-reservations/kami-engine-io",
+      "reason": "retired empty scaffold; no source paths or runtime admission"
+    },
+    {
+      "legacy-name": "kami-engine-render",
+      "path": "retired-reservations/kami-engine-render",
+      "reason": "retired empty scaffold; no source paths or runtime admission"
+    },
+    {
+      "legacy-name": "kami-engine-script-runtime",
+      "path": "retired-reservations/kami-engine-script-runtime",
+      "reason": "retired empty scaffold; no source paths or runtime admission"
+    },
+    {
+      "legacy-name": "kami-engine-web",
+      "path": "retired-reservations/kami-engine-web",
+      "reason": "retired empty scaffold; no source paths or runtime admission"
+    }
+  ]
+}

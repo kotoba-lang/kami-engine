@@ -1,0 +1,165 @@
+{
+  "repository": "kotoba-lang/kami-engine-aero",
+  "default": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "commit": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "commit": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "5ef0bfbfebbf39e03b548efdf95706cdc9e49d0c",
+      "commit": "5ef0bfbfebbf39e03b548efdf95706cdc9e49d0c",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "c6e107ec887af6420a3bf3c335380f857bff0a65",
+      "commit": "c6e107ec887af6420a3bf3c335380f857bff0a65",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "commit": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "1dddfaa84fe3342a292469eee4b8dc8dd254f597",
+      "commit": "1dddfaa84fe3342a292469eee4b8dc8dd254f597",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-engine-aero/pull/1",
+        "head": "1dddfaa84fe3342a292469eee4b8dc8dd254f597",
+        "merge": "512e6cceec1c7f9ec6218fefbaf9b3a8720a190e",
+        "merge-base": "d3b715b5437cab98bb3fcab2a7690c4ecea00711",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a4076931c687d51e307090925403b2daa14b9847"
+            }
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3610e957b49331677430a89b1540748349afe99a"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f9aebc4dc6b847c7dca862dfeae8bba6e98acd21"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "88ad782609ff56671bd5ae727aca99ee29097f21",
+      "commit": "88ad782609ff56671bd5ae727aca99ee29097f21",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "commit": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "commit": "fabfd90423a60ab1a434673c0a4cbff079d9338e",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-aero/pull/1",
+      "head": "1dddfaa84fe3342a292469eee4b8dc8dd254f597",
+      "merge": "512e6cceec1c7f9ec6218fefbaf9b3a8720a190e",
+      "merge-base": "d3b715b5437cab98bb3fcab2a7690c4ecea00711",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a4076931c687d51e307090925403b2daa14b9847"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3610e957b49331677430a89b1540748349afe99a"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "f9aebc4dc6b847c7dca862dfeae8bba6e98acd21"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-engine-aero/pull/2",
+      "head": "88ad782609ff56671bd5ae727aca99ee29097f21",
+      "merge": "7151ae056b8dcd8338c9717d932e347c1817ba66",
+      "merge-base": "512e6cceec1c7f9ec6218fefbaf9b3a8720a190e",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "e1bd2f391abda02690d8a51969496fcb03ea7223"
+          }
+        },
+        {
+          "path": "src/aero/native.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1bc5596d076a4754196efb76187d1e7b2d6f7b29"
+          }
+        },
+        {
+          "path": "test/aero/native_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "9d31af25764cbb83aece7ea0379a5c2dad54c178"
+          }
+        }
+      ]
+    }
+  ]
+}

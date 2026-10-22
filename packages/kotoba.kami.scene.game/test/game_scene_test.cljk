@@ -1,0 +1,119 @@
+(ns game-scene-test
+  "Tests for `game-scene`, ported 1:1 from the original `kami-game-scene`
+  Rust crate's `src/lib.rs` `#[cfg(test)] mod tests` AND
+  `tests/animation_parity.rs` (both deleted in kotoba-lang/kami-engine PR
+  #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [game-scene :as game-scene]
+            [game.animation :as animation]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'game-scene)))))
+
+;; ── lib.rs #[cfg(test)] ─────────────────────────────────────────────────
+
+;; Rust: shipped_has_all_animations
+(deftest shipped-has-all-animations
+  (let [a (game-scene/shipped-animations)]
+    (is (= (count game-scene/all-animation-names) (count a)))
+    (doseq [name game-scene/all-animation-names]
+      (is (contains? a name) (str name " present in EDN")))))
+
+;; Rust: animation_lengths_match_builtin
+(deftest animation-lengths-match-builtin
+  (is (= 2 (count (:animations (game-scene/shipped-animation "skibidi-idle")))))
+  (is (= 2 (count (:animations (game-scene/shipped-animation "grimace-wobble")))))
+  (is (= 3 (count (:animations (game-scene/shipped-animation "item-pickup")))))
+  (is (= 0 (count (:animations (game-scene/shipped-animation "sigma-idle")))))
+  (is (= 1 (count (:animations (game-scene/shipped-animation "ohio-glitch"))))))
+
+;; Rust: unknown_builtin_animation_is_none
+(deftest unknown-builtin-animation-is-none
+  (is (nil? (game-scene/builtin-animation "does-not-exist"))))
+
+;; Rust: unknown_animation_from_edn_is_an_error
+(deftest unknown-animation-from-edn-is-an-error
+  (let [err (try (game-scene/animation-from-edn game-scene/animations-edn "rizz-idle")
+                 nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :animation-not-found (:game-scene/error err)))))
+
+;; Rust: non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try (game-scene/animations-from-edn "42")
+                 nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :not-a-map (:game-scene/error err)))))
+
+;; Rust: missing_table_is_an_error
+(deftest missing-table-is-an-error
+  (let [err (try (game-scene/animations-from-edn "{:other 1}")
+                 nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :no-table (:game-scene/error err)))))
+
+;; Rust: unknown_clip_is_an_error
+(deftest unknown-clip-is-an-error
+  (let [err (try (game-scene/animations-from-edn "{:game/animations {:p [{:clip :no-such-clip}]}}")
+                 nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :unknown-clip (:game-scene/error err)))))
+
+;; Rust: clip_id_round_trips
+(deftest clip-id-round-trips
+  (doseq [anim-name game-scene/all-animation-names]
+    (doseq [c (:animations (game-scene/builtin-animation anim-name))]
+      (is (= (game-scene/clip-id c) (clojure.core/name (:type c)))))))
+
+;; ── tests/animation_parity.rs ────────────────────────────────────────────
+
+;; Rust: animations_edn_matches_builtin
+(deftest animations-edn-matches-builtin
+  (let [loaded (game-scene/animations-from-edn game-scene/animations-edn)]
+    (is (= 13 (count loaded)) "all presets present in EDN")
+    (doseq [name game-scene/all-animation-names]
+      (let [got (game-scene/animation-specs (get loaded name))
+            want (game-scene/animation-specs (game-scene/builtin-animation name))]
+        (is (= (count got) (count want)) (str name ": clip count"))
+        (doseq [[i g w] (map vector (range) got want)]
+          (is (= g w) (str name ": clip[" i "] (variant + fields, in order)")))
+        (is (= got want) (str name ": full animation parity (ordered)")))
+      (let [built (game-scene/builtin-animation name)]
+        (is (= (game-scene/animation-specs (get loaded name)) (game-scene/animation-specs built))
+            (str name ": EDN == builtin-animation"))))
+    (let [shipped (game-scene/shipped-animations)]
+      (doseq [name game-scene/all-animation-names]
+        (is (= (game-scene/animation-specs (get shipped name)) (game-scene/animation-specs (get loaded name)))
+            (str name ": shipped == loaded"))))))
+
+;; Rust: single_animation_from_edn_matches
+(deftest single-animation-from-edn-matches
+  (doseq [name game-scene/all-animation-names]
+    (let [got (game-scene/animation-from-edn game-scene/animations-edn name)
+          want (game-scene/builtin-animation name)]
+      (is (= (game-scene/animation-specs got) (game-scene/animation-specs want)) name))))
+
+;; Rust: clipspec_round_trips_through_clip (trivial here — see namespace
+;; docstring: Clojure clip maps ARE the comparable representation, so a
+;; round trip through `clip-id` + reconstruction is just identity).
+(deftest clipspec-round-trips-through-clip
+  (doseq [name game-scene/all-animation-names]
+    (doseq [c (:animations (game-scene/builtin-animation name))]
+      (is (= c c) (str name ": clip is its own ClipSpec"))
+      (is (= (game-scene/clip-id c) (game-scene/clip-id c))))))
+
+;; Rust: tolerant_parse_errors
+(deftest tolerant-parse-errors
+  (is (= :animation-not-found
+         (:game-scene/error (ex-data (try (game-scene/animation-from-edn game-scene/animations-edn "rizz-idle")
+                                           (catch #?(:clj Exception :cljs js/Error) e e))))))
+  (is (= :unknown-clip
+         (:game-scene/error (ex-data (try (game-scene/animations-from-edn "{:game/animations {:p [{:clip :bogus-clip}]}}")
+                                           (catch #?(:clj Exception :cljs js/Error) e e))))))
+  (is (= :not-a-map
+         (:game-scene/error (ex-data (try (game-scene/animations-from-edn "123")
+                                           (catch #?(:clj Exception :cljs js/Error) e e))))))
+  (is (= :no-table
+         (:game-scene/error (ex-data (try (game-scene/animations-from-edn "{:x 1}")
+                                           (catch #?(:clj Exception :cljs js/Error) e e)))))))

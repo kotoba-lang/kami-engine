@@ -1,0 +1,133 @@
+{
+  "repository": "kotoba-lang/kami-mangaka-scene-author",
+  "default": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "a242067f5a33f2c072b82b47b9246ea400cec48d",
+      "commit": "a242067f5a33f2c072b82b47b9246ea400cec48d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "12467745af8ea5d023ebd1fcfe2fabb5e230b4fa",
+      "commit": "12467745af8ea5d023ebd1fcfe2fabb5e230b4fa",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/data-json-tranche-1",
+      "object": "fd500f460beb7dacbabfc61cdede5c481f64b0d0",
+      "commit": "fd500f460beb7dacbabfc61cdede5c481f64b0d0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/drop-clj-suffix",
+      "object": "fc574a35c2113e1c4f3cbab3c9e48d55b34580c3",
+      "commit": "fc574a35c2113e1c4f3cbab3c9e48d55b34580c3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "3a4454fe06b06a5c3e036adfa6bb0bfb6bae206e",
+      "commit": "3a4454fe06b06a5c3e036adfa6bb0bfb6bae206e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/data-json-tranche-1",
+      "object": "fd500f460beb7dacbabfc61cdede5c481f64b0d0",
+      "commit": "fd500f460beb7dacbabfc61cdede5c481f64b0d0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/drop-clj-suffix",
+      "object": "fc574a35c2113e1c4f3cbab3c9e48d55b34580c3",
+      "commit": "fc574a35c2113e1c4f3cbab3c9e48d55b34580c3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "ecbc11d63cdb5b11e5b02a5372d6c0d4c3defe17",
+      "commit": "ecbc11d63cdb5b11e5b02a5372d6c0d4c3defe17",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text",
+      "object": "3f070fd938cbc44250fdeb0c39ba537eeea8550d",
+      "commit": "3f070fd938cbc44250fdeb0c39ba537eeea8550d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text-cljs",
+      "object": "0cb7bd2e081b45e400bad2cb045cddd6659b9f16",
+      "commit": "0cb7bd2e081b45e400bad2cb045cddd6659b9f16",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/data-json-tranche-1",
+      "object": "fd500f460beb7dacbabfc61cdede5c481f64b0d0",
+      "commit": "fd500f460beb7dacbabfc61cdede5c481f64b0d0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/drop-clj-suffix",
+      "object": "fc574a35c2113e1c4f3cbab3c9e48d55b34580c3",
+      "commit": "fc574a35c2113e1c4f3cbab3c9e48d55b34580c3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "6e5e8b3563598a5ca98f26a9b1a55683856370a2",
+      "commit": "6e5e8b3563598a5ca98f26a9b1a55683856370a2",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "d5b8984f51c7ac19962f2f6027616d92122607cc",
+      "commit": "d5b8984f51c7ac19962f2f6027616d92122607cc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "commit": "44975112ed2f40e58da14602cdb14d8c4a48f05a",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

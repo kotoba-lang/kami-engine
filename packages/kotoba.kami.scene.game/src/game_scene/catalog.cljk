@@ -1,0 +1,143 @@
+(ns game-scene.catalog
+  "Game-catalog data tier — `game`'s Godot game catalog
+  (`game.island-gen/godot-game-catalog`) as parity-tested EDN. Restored from
+  the legacy kami-engine/kami-game-scene Rust crate's `catalog.rs` (deleted
+  in kotoba-lang/kami-engine PR #82) as part of the clj-wgsl migration
+  (ADR-2607010930, com-junkawasaki/root).
+
+  Scene generation (`game_to_island` in the original) stays native Rust /
+  `game.island-gen`; only the init-time **description** — the per-game
+  metadata table (slug / title / genre / max-players / description) —
+  moves to EDN (ADR-0046 / ADR-0038). [[catalog-from-edn]] rebuilds the
+  real `game.island-gen/game-def` list, asserted entry-for-entry `=` the
+  compiled-in `godot-game-catalog` in `test/game_scene/catalog_test.cljk`.
+
+  Simplification vs the original Rust: `GameDef`/`Genre` derived no
+  `PartialEq` there, so the crate carried a local `GameDefSpec` mirror.
+  Clojure maps/keywords compare structurally for free, so the loaded
+  entries here are already `game.island-gen/game-def`-shaped maps — no
+  mirror type is needed; [[spec-to-game-def]] is kept (as `identity`) only
+  for API parity with the original.
+
+  Zero-dep portable CLJC."
+  (:require [scene :as scene]
+            [game.island-gen :as island-gen]))
+
+(def game-catalog-edn
+  "The canonical game-catalog CONFIG shipped with this crate. Embedded as a
+  literal string; kept byte-identical to
+  `resources/game_scene/game_catalog.edn`."
+";; game_catalog.edn — canonical CONFIG/DATA for kami-game's Godot game catalog
+;; (`island_gen::godot_game_catalog()`): the games at games.etzhayyim.com that each
+;; become a KAMI Island.
+;;
+;; ADR-0046 / ADR-0038: scene generation (`game_to_island`) stays native Rust; only the
+;; init-time DESCRIPTION — the per-game metadata table — moves to EDN here. kami-game is
+;; untouched; `godot_game_catalog()` stays the builtin fallback AND the parity oracle
+;; (the loaded list is asserted entry-for-entry `==` it, in order, in
+;; tests/catalog_parity.rs). `:genre` is a hyphenated keyword id for the `Genre` enum.
+{:game/catalog
+ [{:slug \"agar\"            :title \"Agar Arena\"      :genre :io-multiplayer :max-players 100 :description \"Grow by absorbing smaller cells\"}
+  {:slug \"slither\"         :title \"Slither World\"   :genre :io-multiplayer :max-players 100 :description \"Snake multiplayer arena\"}
+  {:slug \"diep\"            :title \"Diep Tanks\"      :genre :io-multiplayer :max-players 50  :description \"Tank shooter arena\"}
+  {:slug \"mope\"            :title \"Mope Wilderness\" :genre :io-multiplayer :max-players 80  :description \"Animal evolution multiplayer\"}
+  {:slug \"splix\"           :title \"Splix Territory\" :genre :io-multiplayer :max-players 50  :description \"Territory capture game\"}
+  {:slug \"hole\"            :title \"Hole Devourer\"   :genre :io-multiplayer :max-players 30  :description \"Devour everything in the city\"}
+  {:slug \"paper\"           :title \"Paper Conquest\"  :genre :io-multiplayer :max-players 50  :description \"Claim territory on paper\"}
+  {:slug \"wings\"           :title \"Wings Dogfight\"  :genre :io-multiplayer :max-players 30  :description \"Aerial combat multiplayer\"}
+  {:slug \"zombs\"           :title \"Zombs Defense\"   :genre :io-multiplayer :max-players 4   :description \"Base defense against zombies\"}
+  {:slug \"snake\"           :title \"Snake Classic\"   :genre :arcade         :max-players 1   :description \"Classic snake game\"}
+  {:slug \"colorbynumber\"   :title \"Color Zen\"       :genre :puzzle         :max-players 1   :description \"Relaxing color puzzle\"}
+  {:slug \"match3desires\"   :title \"Match 3\"         :genre :puzzle         :max-players 1   :description \"Match-3 puzzle game\"}
+  {:slug \"infinitedive\"    :title \"Infinite Dive\"   :genre :arcade         :max-players 1   :description \"Endless falling arcade\"}
+  {:slug \"dungeonslave\"    :title \"Dungeon Quest\"   :genre :rpg            :max-players 4   :description \"Dungeon crawler RPG\"}
+  {:slug \"kyberfrontier\"   :title \"Kyber Frontier\"  :genre :rpg            :max-players 8   :description \"Cyberpunk RPG adventure\"}
+  {:slug \"idolproduction\"  :title \"Idol Manager\"    :genre :simulation     :max-players 1   :description \"Idol production simulation\"}
+  {:slug \"nightclubtycoon\" :title \"Club Tycoon\"     :genre :simulation     :max-players 1   :description \"Nightclub management sim\"}
+  {:slug \"loveandglitch\"   :title \"Love & Glitch\"   :genre :visual-novel   :max-players 1   :description \"Visual novel romance\"}
+  {:slug \"strippoker\"      :title \"Card Showdown\"   :genre :card           :max-players 4   :description \"Multiplayer card game\"}
+  {:slug \"alchemistlust\"   :title \"Alchemist Lab\"   :genre :adult          :max-players 1   :description \"Alchemy simulation\"}
+  {:slug \"haremconquest\"   :title \"Conquest\"        :genre :adult          :max-players 1   :description \"Strategy conquest game\"}
+  {:slug \"succubusagency\"  :title \"Agency\"          :genre :adult          :max-players 1   :description \"Management simulation\"}
+  {:slug \"skibidi\"         :title \"Skibidi Arena\"   :genre :brainrot       :max-players 50  :description \"Giant toilet boss battle — dop dop yes yes\"}
+  {:slug \"sigma\"           :title \"Sigma Grindset\"  :genre :brainrot       :max-players 30  :description \"Lone wolf gym simulator — no distractions\"}
+  {:slug \"ohio\"            :title \"Ohio Final Boss\" :genre :brainrot       :max-players 20  :description \"Only in Ohio — survive the anomalies\"}
+  {:slug \"grimace\"         :title \"Grimace Shake\"   :genre :brainrot       :max-players 40  :description \"Purple blob chaos — don't drink the shake\"}
+  {:slug \"rizz\"            :title \"Rizz Academy\"    :genre :brainrot       :max-players 25  :description \"Master the art of W rizz\"}
+  {:slug \"fanum\"           :title \"Fanum Tax\"       :genre :brainrot       :max-players 30  :description \"Protect your food — tax collectors everywhere\"}
+  {:slug \"ketsu-gorilla\"   :title \"Goriketsu Dash!!\" :genre :chase         :max-players 10  :description \"Slap a sleeping gorilla's butt and RUN — goriririri gorigori ketsu dasshu!\"}]}
+")
+
+(defn genre-id
+  "The hyphenated `:genre` keyword id for a genre keyword. Genre keywords
+  are already hyphenated ids (e.g. `:io-multiplayer`), so this is just
+  `name`."
+  [g]
+  (name g))
+
+(defn genre-from-id
+  "Inverse of [[genre-id]]; unknown ids fall back to `:io-multiplayer`
+  (tolerant)."
+  [id]
+  (let [k (keyword id)]
+    (if (contains? island-gen/genres k) k :io-multiplayer)))
+
+(defn- str-at [m key] (or (scene/mget m key) ""))
+
+(defn- max-players-at [m]
+  (let [v (scene/mget m "max-players")]
+    (if (integer? v) (max 0 v) 0)))
+
+(defn game-def-from-map
+  "Build one `game.island-gen/game-def` from one catalog entry's EDN map
+  (tolerant: missing -> default, int coerces to non-negative)."
+  [m]
+  (island-gen/game-def
+   (str-at m "slug")
+   (str-at m "title")
+   (genre-from-id (or (scene/kw-key (scene/mget m "genre")) ""))
+   (max-players-at m)
+   (str-at m "description")))
+
+(defn spec-to-game-def
+  "Reconstruct the real `game-def` from a spec. Since a spec IS already a
+  `game-def`-shaped map (see namespace docstring), this is `identity`,
+  kept for API parity with the original `spec_to_game_def`."
+  [spec]
+  spec)
+
+(defn catalog-specs-from-edn
+  "Parse the `:game/catalog` table from EDN `src` into ordered game-def
+  maps.
+
+  Throws `ex-info` with `:game-scene.catalog/error` of `:not-a-map` (EDN
+  root didn't parse to a map) or `:no-catalog` (`:game/catalog` missing or
+  not a vector) — mirroring the original `CatalogError::NotAMap` /
+  `CatalogError::NoCatalog`."
+  [src]
+  (let [root (scene/root-map src)]
+    (when (nil? root)
+      (throw (ex-info "game-catalog EDN root is not a map" {:game-scene.catalog/error :not-a-map})))
+    (let [entries (scene/mget root "game/catalog")]
+      (when-not (vector? entries)
+        (throw (ex-info "`:game/catalog` missing or not a vector" {:game-scene.catalog/error :no-catalog})))
+      (mapv game-def-from-map (filter map? entries)))))
+
+(defn catalog-from-edn
+  "Parse the `:game/catalog` table from EDN `src` into the real `game-def`
+  list. Since specs and `game-def`s are the same shape here, this is the
+  same as [[catalog-specs-from-edn]] (kept as a distinct fn for API parity
+  with the original `catalog_from_edn`)."
+  [src]
+  (catalog-specs-from-edn src))
+
+(defn builtin-catalog-specs
+  "The compiled-in oracle: `godot-game-catalog` (already `game-def`-shaped,
+  so no projection is needed)."
+  []
+  (island-gen/godot-game-catalog))
+
+(defn shipped-catalog
+  "Convenience: the catalog from the crate-shipped [[game-catalog-edn]]."
+  []
+  (catalog-from-edn game-catalog-edn))

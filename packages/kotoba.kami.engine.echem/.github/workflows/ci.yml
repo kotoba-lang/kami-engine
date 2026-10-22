@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: CLJK tests and lint (JDK ${{ matrix.java }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['17', '21']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Checkout pinned CLJK launcher
+        uses: actions/checkout@v4
+        with:
+          repository: kotoba-lang/kotoba
+          ref: 3d6723a0bed42e88435ee85e8307458fae97db9d
+          path: .ci-runtime/kotoba
+          persist-credentials: false
+      - name: Checkout pinned CLJK engine
+        uses: actions/checkout@v4
+        with:
+          repository: kotoba-lang/org-babashka-nbb
+          ref: 829f0ba11016e925001d80e51f12848c4ad58112
+          path: .ci-runtime/org-babashka-nbb
+          persist-credentials: false
+      - name: Install engine dependency
+        run: npm install --prefix .ci-runtime/org-babashka-nbb --omit=dev --ignore-scripts --no-audit --no-fund --package-lock=false
+
+      - name: Setup JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Setup Clojure CLI
+        uses: DeLaGuardo/setup-clojure@13.1
+        with:
+          cli: latest
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache m2 / gitlibs
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2
+            ~/.gitlibs
+          key: ${{ runner.os }}-jdk${{ matrix.java }}-clj-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-jdk${{ matrix.java }}-clj-
+
+      - name: Run tests
+        env:
+          KBB_NO_STDLIB: '1'
+        run: .ci-runtime/kotoba/bin/kbb -M:test
+      - name: Lint
+        run: |
+          node scripts/lint-mirror.mjs
+          clojure -M:lint --lint .ci-lint --config '{:lint-as {kotoba.test/deftest clojure.test/deftest kotoba.test/is clojure.test/is kotoba.test/testing clojure.test/testing} :linters {:unresolved-symbol {:exclude [(kotoba.test/is [thrown? thrown-with-msg?])]}}}'

@@ -1,0 +1,77 @@
+{
+  "repository": "kotoba-lang/kami-mangaka-qa",
+  "default": "c33c68cd4f2cd2dbd872d4cb5426f5ba3a9560db",
+  "heads": {
+    "834ecadc4d0485f34b0ffc3623ab4331fb826fd7": {
+      "decision": "cherry-picked-exact-patch-and-postimages",
+      "proof": {
+        "original": "834ecadc4d0485f34b0ffc3623ab4331fb826fd7",
+        "landed": "c294f46b96523f5524870400ea0d1e2a51ebccba",
+        "patch-id": "967420c8b8527324569e1fe761a8e4bf00f9ca2e",
+        "changed-postimages": [
+          {
+            "path": "src/kami/mangaka/qa/axes.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "eeafa0b32fa5034816958d8960fcf3787cb3306a"
+            }
+          },
+          {
+            "path": "src/kami/mangaka/qa/score.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "481a76249b82f6a9eed36adc2b39f2b355bac20b"
+            }
+          },
+          {
+            "path": "test/kami/mangaka/qa_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "cf64eac19765e0adcef20f6a6604971bbdffe792"
+            }
+          }
+        ],
+        "landed-is-ancestor-of-current-default": true
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-mangaka-qa/pull/2",
+      "head": "c294f46b96523f5524870400ea0d1e2a51ebccba",
+      "merge": "13e065d5ce6863848c6a071bbc7cc60e50fb1d5a",
+      "merge-base": "61c885857391fa9595586580b0fdc6d5af03282b",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kami/mangaka/qa/axes.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "eeafa0b32fa5034816958d8960fcf3787cb3306a"
+          }
+        },
+        {
+          "path": "src/kami/mangaka/qa/score.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "481a76249b82f6a9eed36adc2b39f2b355bac20b"
+          }
+        },
+        {
+          "path": "test/kami/mangaka/qa_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "cf64eac19765e0adcef20f6a6604971bbdffe792"
+          }
+        }
+      ]
+    }
+  ]
+}

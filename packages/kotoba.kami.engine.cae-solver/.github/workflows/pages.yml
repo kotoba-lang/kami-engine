@@ -1,0 +1,55 @@
+name: Deploy verification report to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: DeLaGuardo/setup-clojure@13.1
+        with:
+          cli: latest
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run portable CLJS smoke test
+        run: npx --yes nbb -cp src:test -e "(require '[cae.cljs-smoke-test])"
+      - name: Generate Hiccup report and Shadow CSS
+        run: clojure -M:pages -m build-pages-report
+      - name: Compile direct ClojureScript WebGPU renderer
+        run: |
+          clojure -M:pages -m cljs.main -O simple -t browser \
+            -d dist/cljs-out -o dist/kami-cae-webgpu.js -c cae.webgpu
+      - name: Verify advanced 3D scene contract
+        run: node scripts/verify_advanced_scenes.mjs dist/index.html src/cae/webgpu.cljk
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

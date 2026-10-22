@@ -1,0 +1,95 @@
+{
+  "repository": "kotoba-lang/kami-cad-import",
+  "default": "ff9fef1a7b7921dc1093d47ce5f68254df098905",
+  "heads": {
+    "b769490cc89ae796c51e29a693030aa2bee909ca": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-cad-import/pull/1",
+        "head": "b769490cc89ae796c51e29a693030aa2bee909ca",
+        "merge": "592e937601e6a219db2991dce7630a9dae23edd9",
+        "merge-base": "f253cbb9f8ca242b435690788fb392522ea95cc5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "429cfea67fab7ddec65afabc13d29d9a4f91ad0b"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "5b375ecd62603aa7d00746f5b14bfaf4e7bb1747"
+            }
+          },
+          {
+            "path": "src/cad_transform_golden.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f5e2c0fbe98ffb1afcef8c6e28ae0a2626fb1695"
+            }
+          },
+          {
+            "path": "test/cad_import/cad_transform_kotoba_golden_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "3561c973a1a513a55f1ad9ea799da60407c78569"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-cad-import/pull/1",
+      "head": "b769490cc89ae796c51e29a693030aa2bee909ca",
+      "merge": "592e937601e6a219db2991dce7630a9dae23edd9",
+      "merge-base": "f253cbb9f8ca242b435690788fb392522ea95cc5",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "429cfea67fab7ddec65afabc13d29d9a4f91ad0b"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "5b375ecd62603aa7d00746f5b14bfaf4e7bb1747"
+          }
+        },
+        {
+          "path": "src/cad_transform_golden.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "f5e2c0fbe98ffb1afcef8c6e28ae0a2626fb1695"
+          }
+        },
+        {
+          "path": "test/cad_import/cad_transform_kotoba_golden_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3561c973a1a513a55f1ad9ea799da60407c78569"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,432 @@
+{
+  "repository": "kotoba-lang/kami-articulated",
+  "default": "cacef9cde52f2e0a60134ddcf91a3c636e038499",
+  "heads": {
+    "4dcd26eb510a090a54d1ed05ea2e324612ffdd93": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-articulated/pull/1",
+        "head": "4dcd26eb510a090a54d1ed05ea2e324612ffdd93",
+        "merge": "af937c2124d668caa0d95ce6dc7df68f6ea9ea2d",
+        "merge-base": "a467bd3cde59ac1c84b44844672308059e5f9eae",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "243e3854f029300754bd3b95c9c8f5d428ac15fd"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "ad1e82f844b55a4be8f0797d3da1b0a7df982a5d"
+            }
+          },
+          {
+            "path": "src/articulated_transform_golden.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "9ce1dcd01295ff28f09daa94c39a143874c9e4fb"
+            }
+          },
+          {
+            "path": "test/articulated_transform_kotoba_golden_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "2aad084e25c4a0e059ab3f98c8a906b9064b3ccb"
+            }
+          }
+        ]
+      }
+    },
+    "678f1248a367eaf1e63e54e672f114e03b6e44c4": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 7,
+        "url": "https://github.com/kotoba-lang/kami-articulated/pull/7",
+        "head": "678f1248a367eaf1e63e54e672f114e03b6e44c4",
+        "merge": "4cca28739aea0b44ccacf2efa1c2eb944e3bec5c",
+        "merge-base": "ef846b5016693417e138473979988466558a4ba5",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "222cd0d990279859f6498a04d97cb016bc2e8e3f"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c289c8a9e255b383f92c48a7f09383894b950f4e"
+            }
+          },
+          {
+            "path": "docs/adr/0003-bounded-indexed-joint-graph.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "863806fa3fb684d1d463083395408d1703e3d577"
+            }
+          },
+          {
+            "path": "src/urdf_query.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "4c8dc50f47acee1531361b216990ee3e2165a931"
+            }
+          },
+          {
+            "path": "test/urdf_query_kotoba_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "ea40af79fe2f815d9fe17df5c0bf9a3e602f9581"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-articulated/pull/1",
+      "head": "4dcd26eb510a090a54d1ed05ea2e324612ffdd93",
+      "merge": "af937c2124d668caa0d95ce6dc7df68f6ea9ea2d",
+      "merge-base": "a467bd3cde59ac1c84b44844672308059e5f9eae",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "243e3854f029300754bd3b95c9c8f5d428ac15fd"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "ad1e82f844b55a4be8f0797d3da1b0a7df982a5d"
+          }
+        },
+        {
+          "path": "src/articulated_transform_golden.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "9ce1dcd01295ff28f09daa94c39a143874c9e4fb"
+          }
+        },
+        {
+          "path": "test/articulated_transform_kotoba_golden_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2aad084e25c4a0e059ab3f98c8a906b9064b3ccb"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-articulated/pull/2",
+      "head": "76cd699a700da43f6e4e8ee73d9e4cde994d200a",
+      "merge": "e6324c84ef38698b82897a9050e2f962e0a72093",
+      "merge-base": "af937c2124d668caa0d95ce6dc7df68f6ea9ea2d",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d563d7569fda322372fae72b151ad72b8c511daa"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "adfc463a339ccb3a2fd2cb86b0f2f4e0877d77b3"
+          }
+        },
+        {
+          "path": "docs/adr/0001-kotoba-bounded-urdf-ingestion.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b14811b6a6a835a7176b6f57f230e4cba7dbc9e8"
+          }
+        },
+        {
+          "path": "src/urdf_query.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3662ec39434b5a85a32eca5e02d088f19c47aa4e"
+          }
+        },
+        {
+          "path": "test/urdf_query_kotoba_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "eb5f53323f0136edf5599d46377ddd78cdc8cd7f"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-articulated/pull/3",
+      "head": "af6a41a08626d8e7c3bb35fd3921d73aca9bcd77",
+      "merge": "c7413bce0bc73b6c506e86f883dcc9e3990b9ccd",
+      "merge-base": "e6324c84ef38698b82897a9050e2f962e0a72093",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "caab411783dad49ff16a0e5f05a10e1456527de2"
+          }
+        },
+        {
+          "path": "docs/adr/0001-kotoba-bounded-urdf-ingestion.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "638c7d75b91ac3372ba0fa07e0fc9452f91a0679"
+          }
+        },
+        {
+          "path": "src/urdf_query.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "044a49e3ee5fbca92588a475089b785e257576af"
+          }
+        },
+        {
+          "path": "test/urdf_query_kotoba_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "9a7ddce445e6b3c3d3fe16a1cafd2c3a2add1de5"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 4,
+      "url": "https://github.com/kotoba-lang/kami-articulated/pull/4",
+      "head": "f4cf454ffe310d4ad9dfb71bead276911a29d1cf",
+      "merge": "b67c1ec2fceaa00d522e9e8384b600cadb6c6bf8",
+      "merge-base": "c7413bce0bc73b6c506e86f883dcc9e3990b9ccd",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3b347ddc1a8238dd36e2d62b63b66100835c5c5c"
+          }
+        },
+        {
+          "path": "docs/adr/0001-kotoba-bounded-urdf-ingestion.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "457c4473691a9d8cd65f7b30b5abdfe02bde6d7b"
+          }
+        },
+        {
+          "path": "src/urdf_query.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "30df6117f476e17ca9e95c92d807af242dd984fe"
+          }
+        },
+        {
+          "path": "test/urdf_query_kotoba_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "0dde513ac56cd0e811d7e4577481c08b6b44e4c1"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 5,
+      "url": "https://github.com/kotoba-lang/kami-articulated/pull/5",
+      "head": "28939bc9a5e80b84bacece55df174beddf8f57b6",
+      "merge": "ae40b415c171ffd27956c74c012330b5dc14262a",
+      "merge-base": "b67c1ec2fceaa00d522e9e8384b600cadb6c6bf8",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "658c5a67f57b2156421b7e1deccefbba8b45dd73"
+          }
+        },
+        {
+          "path": "docs/adr/0001-kotoba-bounded-urdf-ingestion.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a66161a97344095117221661fe339af7ff6b6b14"
+          }
+        },
+        {
+          "path": "docs/adr/0002-bounded-structured-urdf-records.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c032ee026e329b7219bac51a4e2b08eb24261b2d"
+          }
+        },
+        {
+          "path": "src/urdf_query.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "ea3ccbfd7b4cf4cc0fba34cbc21da509da5afcf5"
+          }
+        },
+        {
+          "path": "test/urdf_query_kotoba_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "693a57949af500265667c97462109ae02186a3de"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 6,
+      "url": "https://github.com/kotoba-lang/kami-articulated/pull/6",
+      "head": "9a99cbc4f931d3e7c147eef309851b9ba06dc15e",
+      "merge": "ef846b5016693417e138473979988466558a4ba5",
+      "merge-base": "ae40b415c171ffd27956c74c012330b5dc14262a",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "35016e7c9402ce48b64238ab4361db33d3fddf33"
+          }
+        },
+        {
+          "path": "docs/adr/0002-bounded-structured-urdf-records.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c6ed747f2e88bc4f91b468ccb7e10cf9781d08ff"
+          }
+        },
+        {
+          "path": "docs/adr/0003-bounded-indexed-joint-graph.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3416fb1dc6ce343d876c87ad8c83b061b2db1cd3"
+          }
+        },
+        {
+          "path": "src/urdf_query.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "31c6ae7afba3965ddb59e162cf963c7bb0f4a626"
+          }
+        },
+        {
+          "path": "test/urdf_query_kotoba_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b97819c34be814099a6dd148455c4b78239a3263"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 7,
+      "url": "https://github.com/kotoba-lang/kami-articulated/pull/7",
+      "head": "678f1248a367eaf1e63e54e672f114e03b6e44c4",
+      "merge": "4cca28739aea0b44ccacf2efa1c2eb944e3bec5c",
+      "merge-base": "ef846b5016693417e138473979988466558a4ba5",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "222cd0d990279859f6498a04d97cb016bc2e8e3f"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c289c8a9e255b383f92c48a7f09383894b950f4e"
+          }
+        },
+        {
+          "path": "docs/adr/0003-bounded-indexed-joint-graph.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "863806fa3fb684d1d463083395408d1703e3d577"
+          }
+        },
+        {
+          "path": "src/urdf_query.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "4c8dc50f47acee1531361b216990ee3e2165a931"
+          }
+        },
+        {
+          "path": "test/urdf_query_kotoba_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "ea40af79fe2f815d9fe17df5c0bf9a3e602f9581"
+          }
+        }
+      ]
+    }
+  ]
+}

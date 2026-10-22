@@ -1,0 +1,157 @@
+(ns cam-scene
+  "KAMI Cam Scene — EDN authoring surface for `kami-cam` (kotoba-lang/cnc,
+  namespace `kotoba.cam.stock`) STOCK MATERIAL presets. Turns canonical
+  `:cam/materials` EDN into CamMaterial maps (`{:name :density :hardness}`),
+  re-using the tolerant `scene` accessors (`kotoba-lang/scene`) the same way
+  games parse `scene.edn`: missing keys fall back to defaults, hyphenated
+  keyword ids, integers coerce to doubles. Restored from the legacy
+  kami-engine/kami-cam-scene Rust crate (deleted in kotoba-lang/kami-engine
+  PR #82 'Remove Rust workspace from kami-engine', recoverable at commit
+  a8368f9c0d784dbc9d11e8fa8f407aa95c7ce4fa) as part of the clj-wgsl
+  migration (ADR-2607010930, com-junkawasaki/root).
+
+  Dependency relationships (both zero-dep .cljc, no runtime IO):
+  - `scene` (kotoba-lang/scene) supplies `kw-key`/`mget`/`root-map` — the
+    tolerant EDN-map accessors.
+  - `kotoba.cam.stock` (kotoba-lang/cnc) supplies the CANONICAL/compiled-in
+    material builders (`aluminum-6061`, `steel-1045`, `titanium-ti6al4v`,
+    `abs-plastic`, `wood-oak`) that this namespace's EDN is parity-tested
+    against in `test/cam_scene_test.cljk` — the oracle is the real
+    `kotoba.cam.stock` functions, never hand-transcribed numbers. `cnc`
+    itself stays EDN-free; the EDN dependency lives only here, matching
+    the original crate's split (kami-cam stays edn-free, kami-cam-scene
+    carries the kami-scene dependency).
+
+  Unlike the original (which hand-parsed EDN via a bespoke `EdnValue` type
+  since Rust has no native EDN reader), this namespace parses via
+  Clojure's own `clojure.edn/read-string` (through `scene/root-map`) — map
+  keys are already real keywords, so `kw-key`/`mget` operate directly on
+  them.
+
+  Portable CLJC — `materials-edn` is embedded as a string constant (the
+  CLJC analogue of the original's `include_str!(\"../data/materials.edn\")`)
+  rather than read via file IO, so this namespace stays portable to
+  cljs/wasm with no runtime IO. The canonical source text also lives at
+  `resources/kami_cam_scene/materials.edn` for reference/tooling."
+  (:require [scene :as scene]
+            [kotoba.cam.stock :as stock]))
+
+;; ---------------------------------------------------------------------
+;; Shipped EDN (compile-time embedded, matches
+;; resources/kami_cam_scene/materials.edn byte-for-byte)
+;; ---------------------------------------------------------------------
+
+(def materials-edn
+  "The canonical stock-material CONFIG shipped with this namespace (the
+  preset table). This is the source of truth; the compiled-in
+  `kotoba.cam.stock` presets are the parity-tested mirror."
+  "{:cam/materials
+ {:aluminum-6061    {:name \"Aluminum 6061-T6\"   :density 2.70 :hardness 95.0}
+  :steel-1045       {:name \"Steel 1045\"         :density 7.87 :hardness 163.0}
+  :titanium-ti6al4v {:name \"Titanium Ti-6Al-4V\" :density 4.43 :hardness 334.0}
+  :abs-plastic      {:name \"ABS Plastic\"        :density 1.04 :hardness 10.0}
+  :wood-oak         {:name \"Oak (Red)\"          :density 0.66 :hardness 6.0}}}")
+
+;; ---------------------------------------------------------------------
+;; Error values (data, not exceptions — CLJC-idiomatic 1:1 port of the
+;; original `thiserror`-derived `Error` enum)
+;; ---------------------------------------------------------------------
+
+(def all-material-ids
+  "Ids of the materials shipped as the compiled-in oracle (iteration
+  source for `builtin-material`/parity). Kept here, not in `kotoba.cam.stock`,
+  so the engine namespace stays untouched."
+  ["aluminum-6061" "steel-1045" "titanium-ti6al4v" "abs-plastic" "wood-oak"])
+
+;; ---------------------------------------------------------------------
+;; CamMaterialSpec — plain map mirror of a loaded material
+;; ---------------------------------------------------------------------
+
+(defn material-spec
+  "Build a CamMaterialSpec map `{:name :density :hardness}` from one
+  material's parsed EDN map `m`. Tolerant: an absent `:name` -> \"\", an
+  absent / non-numeric `:density` / `:hardness` -> 0.0 (the shipped EDN
+  sets all three, so the parity test pins the real values). Integers
+  coerce to doubles via `scene/num`."
+  [m]
+  {:name (or (scene/mget m "name") "")
+   :density (scene/num (scene/mget m "density"))
+   :hardness (scene/num (scene/mget m "hardness"))})
+
+;; ---------------------------------------------------------------------
+;; Parsing
+;; ---------------------------------------------------------------------
+
+(defn materials-from-edn
+  "Parse the whole `:cam/materials` table from EDN string `src` into a map
+  keyed by the (hyphenated) material id string, each value a CamMaterialSpec
+  map. Returns `{:error :not-a-map}` if `src` doesn't parse to a top-level
+  map, or `{:error :no-materials}` if `:cam/materials` is missing / not a
+  map. Otherwise returns `{:ok {id spec ...}}`."
+  [src]
+  (if-let [root (scene/root-map src)]
+    (let [materials (scene/mget root "cam/materials")]
+      (if (map? materials)
+        {:ok (into {}
+                   (keep (fn [[k v]]
+                           (when-let [id (scene/kw-key k)]
+                             (when (map? v)
+                               [id (material-spec v)]))))
+                   materials)}
+        {:error :no-materials}))
+    {:error :not-a-map}))
+
+(defn material-from-edn
+  "Look up a single material by (hyphenated) id string from EDN `src`.
+  Returns `{:ok spec}`, propagates a `materials-from-edn` error, or
+  `{:error :material-not-found :id id}` if the table parses but `id` is
+  absent."
+  [src id]
+  (let [result (materials-from-edn src)]
+    (if (:error result)
+      result
+      (if-let [spec (get (:ok result) id)]
+        {:ok spec}
+        {:error :material-not-found :id id}))))
+
+(defn spec-to-cam-material
+  "Reconstruct a real `kotoba.cam.stock` material map from a CamMaterialSpec
+  `spec` — behaviourally identical to the hardcoded
+  `kotoba.cam.stock/aluminum-6061` … builders (proven by the parity tests)."
+  [spec]
+  (stock/material (:name spec) (:density spec) (:hardness spec)))
+
+;; ---------------------------------------------------------------------
+;; Compiled-in fallback / parity oracle
+;; ---------------------------------------------------------------------
+
+(def ^:private builtin-material-fns
+  "id -> `kotoba.cam.stock` builder. This is the compiled-in oracle: the
+  real preset-returning functions, never hand-transcribed numbers."
+  {"aluminum-6061" stock/aluminum-6061
+   "steel-1045" stock/steel-1045
+   "titanium-ti6al4v" stock/titanium-ti6al4v
+   "abs-plastic" stock/abs-plastic
+   "wood-oak" stock/wood-oak})
+
+(defn builtin-material
+  "The compiled-in fallback / parity oracle: the material preset straight
+  from `kotoba.cam.stock`'s builders (a CamMaterialSpec-shaped map
+  `{:name :density :hardness}`). Returns nil for an unknown id."
+  [id]
+  (when-let [f (get builtin-material-fns id)]
+    (f)))
+
+;; ---------------------------------------------------------------------
+;; Convenience: shipped EDN
+;; ---------------------------------------------------------------------
+
+(defn shipped-materials
+  "Convenience: load all materials from the namespace-shipped `materials-edn`."
+  []
+  (materials-from-edn materials-edn))
+
+(defn shipped-material
+  "Convenience: load one material from the shipped EDN."
+  [id]
+  (material-from-edn materials-edn id))

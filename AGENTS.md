@@ -27,6 +27,12 @@ moved out (ADR-2607102200). The Rust-era guide is in git history
 describe that removed workspace and are historical. All Clojure-family sources
 were renamed to `.cljk` on 2026-09-11 (`cljk-origin.edn`).
 
+The portable-family consolidation in
+`90-docs/adr/2610220800-portable-kami-source-monorepo.md` rehomes selected
+standalone source projects under `packages/`. Its qualification is still in
+progress. It changes physical source location, not native/provider authority
+or application deployment ownership. Source discovery grants no admission.
+
 ## Layout
 
 | path | contents |
@@ -50,6 +56,9 @@ were renamed to `.cljk` on 2026-09-11 (`cljk-origin.edn`).
 | `kami-engine-sdk` | gitlink (no `.gitmodules`); the SDK is a separate repo |
 | `hermes/` | resident-bot profiles for this repo |
 | `scripts/` | gates (`wit_test.cljk`, `check_adapter_registry.cljk`, `guest_lint.cljk`), task runner (`run-task.cljk` + `scripts/tasks.edn`) |
+| `packages/<dotted-id>/`, `packages/catalog.json` | selected portable projects and exact old-name aliases; use isolated classpaths |
+| `retired-reservations/` | retired empty scaffold documentation; never executable packages |
+| `maintenance/kami-*` | original file/configuration provenance, branch/history recovery and consolidation gates |
 | `edn-datomize.cljk`, `schema.edn` | EDN → datom conversion; `schema.edn` is generated |
 | `90-docs/adr/` | repo-local ADRs (0032–0048) |
 
@@ -89,6 +98,15 @@ CI does not run the gameplay/render/physics suites.
   (`kami-mangaka-reader-clj` keeps only its built `dist/`). `kami-ui-sdk` JS is
   retired: CLJC lives in `kotoba-lang/kami-engine-app-sdk`, the game host
   surface in `kotoba-lang/host`.
+- For the explicitly cataloged portable projects, `packages/<dotted-id>` is
+  the new consolidation location. Keep the legacy pointer/artifact paths
+  intact rather than restoring code there. The old SDK gitlink remains a
+  compatibility marker, not a second maintained source tree. The guest
+  compiler and native runtime foundations remain separate repositories.
+- Preserve original source/license/notice bytes and record every migration
+  change in `maintenance/kami-source-imports.json`. Keep pending branch,
+  dependency and host qualification explicit; do not archive to hide a
+  failing gate. Do not enable disabled Actions/workflows.
 - Root `deps.edn` keeps `:paths []`: consumers point `:local/root` here, and a
   default `["src"]` would add a missing directory to their classpath.
 - The live browser host for compiled kami games is `kotoba-lang/host`

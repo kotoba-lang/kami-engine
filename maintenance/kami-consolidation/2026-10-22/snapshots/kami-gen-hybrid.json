@@ -1,0 +1,90 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTNRlpw",
+    "databaseId": 1288988071,
+    "nameWithOwner": "kotoba-lang/kami-gen-hybrid",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-29T19:53:04Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "4082aa24c797207a01f711223cbae8d5dc749ea3"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "4082aa24c797207a01f711223cbae8d5dc749ea3"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 1
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "4082aa24c797207a01f711223cbae8d5dc749ea3",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-gen-hybrid\nHEAD 4082aa24c797207a01f711223cbae8d5dc749ea3\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 4082aa24c797207a01f711223cbae8d5dc749ea3\nrefs/heads/main 8743c32fb8fd44d5184d4ec3431fce3024284053\nrefs/heads/manifest-rev 4082aa24c797207a01f711223cbae8d5dc749ea3\nrefs/remotes/origin/HEAD 4082aa24c797207a01f711223cbae8d5dc749ea3\nrefs/remotes/origin/adr0048-space-retrofit 9f9eeabae0e533e707f2fda069edd8adf4b6a96f\nrefs/remotes/origin/cljk-rename-20260911 ff5e4206d4f94339cd84a451ff574f03c44a3787\nrefs/remotes/origin/jv/full-sha ca6d9298bd8238c842c82de83716071cb28bae76\nrefs/remotes/origin/kbb-cutover-20260911 4a924a5fb6c0c769c91e3dd171a7f139dc647d0c\nrefs/remotes/origin/main 4082aa24c797207a01f711223cbae8d5dc749ea3"
+  },
+  "local-after-preservation": {
+    "HEAD": "4082aa24c797207a01f711223cbae8d5dc749ea3",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-gen-hybrid\nHEAD 4082aa24c797207a01f711223cbae8d5dc749ea3\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "4082aa24c797207a01f711223cbae8d5dc749ea3",
+      "refs/heads/main": "8743c32fb8fd44d5184d4ec3431fce3024284053",
+      "refs/heads/manifest-rev": "4082aa24c797207a01f711223cbae8d5dc749ea3",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "4082aa24c797207a01f711223cbae8d5dc749ea3",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "203b42d0e0aeab5e1f25c6ddd7e64de9734a1342",
+      "refs/remotes/origin/HEAD": "4082aa24c797207a01f711223cbae8d5dc749ea3",
+      "refs/remotes/origin/adr0048-space-retrofit": "9f9eeabae0e533e707f2fda069edd8adf4b6a96f",
+      "refs/remotes/origin/cljk-rename-20260911": "ff5e4206d4f94339cd84a451ff574f03c44a3787",
+      "refs/remotes/origin/jv/full-sha": "ca6d9298bd8238c842c82de83716071cb28bae76",
+      "refs/remotes/origin/kbb-cutover-20260911": "4a924a5fb6c0c769c91e3dd171a7f139dc647d0c",
+      "refs/remotes/origin/main": "4082aa24c797207a01f711223cbae8d5dc749ea3"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "docs: consolidate CLAUDE.md into AGENTS.md",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "chore/consolidate-claude-md-into-agents-md",
+      "headRefOid": "203b42d0e0aeab5e1f25c6ddd7e64de9734a1342",
+      "baseRefName": "main",
+      "baseRefOid": "c2bd1757c70c69a3dccddd0624927a811cfe5d85",
+      "mergeCommit": {
+        "oid": "4082aa24c797207a01f711223cbae8d5dc749ea3"
+      },
+      "mergedAt": "2026-09-29T19:53:03Z",
+      "url": "https://github.com/kotoba-lang/kami-gen-hybrid/pull/1"
+    }
+  ]
+}

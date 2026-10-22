@@ -1,0 +1,15 @@
+name: docs-only
+on: [push, pull_request]
+jobs:
+  authority:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce retired source authority
+        shell: bash
+        run: |
+          if find . -type f \( -name '*.clj' -o -name '*.cljc' -o -name '*.cljs' -o -name '*.cljk' -o -name '*.kotoba' -o -name '*.kotobas' \) -print -quit | grep -q .; then
+            echo 'This repository is docs-only under ADR 0001.' >&2
+            exit 1
+          fi
+          test ! -e deps.edn

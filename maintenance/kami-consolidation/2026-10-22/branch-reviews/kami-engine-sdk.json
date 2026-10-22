@@ -1,0 +1,1315 @@
+{
+  "repository": "kotoba-lang/kami-engine-sdk",
+  "default": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "commit": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "commit": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "1456591d729161054a9aac630a6828ae357d79f3",
+      "commit": "1456591d729161054a9aac630a6828ae357d79f3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "commit": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/genre-benchmark-contract",
+      "object": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "commit": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/jv/dot-on-paths",
+      "object": "a784f5123df3a2f8ee4ce56fc0cce8ad8a986da0",
+      "commit": "a784f5123df3a2f8ee4ce56fc0cce8ad8a986da0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "commit": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/rescue/wip-20260718",
+      "object": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "commit": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "9f32890a0d2a75728aa337a46ca7e93b1da280d1",
+      "commit": "9f32890a0d2a75728aa337a46ca7e93b1da280d1",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-10",
+      "object": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "commit": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-11",
+      "object": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+      "commit": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 3,
+        "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/3",
+        "head": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+        "merge": "f17150a17dabb1ef76197b313fc9fe79d72d95ab",
+        "merge-base": "67f87b90ff062767b08f4eed967850186e0cd669",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fd775e4f778ed200b31b771ee0d9d4e0f670af7b"
+            }
+          },
+          {
+            "path": "resources/kami/samples/isekai-swarm.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "79f920cc3294ad2d13227bb790841ad01f7febbe"
+            }
+          },
+          {
+            "path": "src/kami/benchmark.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "8b7a663d64e1c088ed05067607095a27f2a6b9dc"
+            }
+          },
+          {
+            "path": "test/kami/benchmark_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "54cde3fe34209b85392d8e88409131398688cf6b"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-12",
+      "object": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+      "commit": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 4,
+        "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/4",
+        "head": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+        "merge": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+        "merge-base": "f17150a17dabb1ef76197b313fc9fe79d72d95ab",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "bbccf26c153d847ec05060ff75baa00f116f10ac"
+            }
+          },
+          {
+            "path": "resources/kami/samples/nightglass-strike-m2.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f25341e718dba30a387363123adf72cb3c556a36"
+            }
+          },
+          {
+            "path": "src/kami/network.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "1f2b6a9e6936a56b3870bf976124b1820122e318"
+            }
+          },
+          {
+            "path": "test/kami/network_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "6bf8c842958e9be84dccef1aee0c3a3ff54f4b71"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-13",
+      "object": "21f746cbf8ea9c0d6252dad331a683662ce4f51e",
+      "commit": "21f746cbf8ea9c0d6252dad331a683662ce4f51e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-14",
+      "object": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+      "commit": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/6",
+        "head": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+        "merge": "0ea58a1ae39b33a5edb179d71e918a9e969fd430",
+        "merge-base": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "resources/kami/samples/chronicle-city-sim-lod.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "7ecd6e4d4aa6ed4040c81c389412f2b0fa5b3035"
+            }
+          },
+          {
+            "path": "resources/kami/samples/iron-front-sim-lod.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "476893a15e5f003e8bd111fecab1a97edba02f54"
+            }
+          },
+          {
+            "path": "resources/kami/samples/isekai-dominion-sim-lod.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "48d42468afb799552dff3de7e44d15c6ac928c44"
+            }
+          },
+          {
+            "path": "src/kami/sim_lod.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "24dd9645709c102b7504e4780bd3880b78912c4b"
+            }
+          },
+          {
+            "path": "test/kami/sim_lod_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "009ff7a3da8868ed245cbf072eaa0d4a302b51e6"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-15",
+      "object": "3ac8bdb33deb62943409fef413e4192299ee6267",
+      "commit": "3ac8bdb33deb62943409fef413e4192299ee6267",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-16",
+      "object": "aa85384578271039d802f2ced705641e742bb539",
+      "commit": "aa85384578271039d802f2ced705641e742bb539",
+      "decision": "default-tree-identical"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "commit": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
+      "object": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+      "commit": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 3,
+        "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/3",
+        "head": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+        "merge": "f17150a17dabb1ef76197b313fc9fe79d72d95ab",
+        "merge-base": "67f87b90ff062767b08f4eed967850186e0cd669",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fd775e4f778ed200b31b771ee0d9d4e0f670af7b"
+            }
+          },
+          {
+            "path": "resources/kami/samples/isekai-swarm.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "79f920cc3294ad2d13227bb790841ad01f7febbe"
+            }
+          },
+          {
+            "path": "src/kami/benchmark.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "8b7a663d64e1c088ed05067607095a27f2a6b9dc"
+            }
+          },
+          {
+            "path": "test/kami/benchmark_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "54cde3fe34209b85392d8e88409131398688cf6b"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-4",
+      "object": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+      "commit": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 4,
+        "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/4",
+        "head": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+        "merge": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+        "merge-base": "f17150a17dabb1ef76197b313fc9fe79d72d95ab",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "bbccf26c153d847ec05060ff75baa00f116f10ac"
+            }
+          },
+          {
+            "path": "resources/kami/samples/nightglass-strike-m2.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f25341e718dba30a387363123adf72cb3c556a36"
+            }
+          },
+          {
+            "path": "src/kami/network.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "1f2b6a9e6936a56b3870bf976124b1820122e318"
+            }
+          },
+          {
+            "path": "test/kami/network_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "6bf8c842958e9be84dccef1aee0c3a3ff54f4b71"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-5",
+      "object": "3ac8bdb33deb62943409fef413e4192299ee6267",
+      "commit": "3ac8bdb33deb62943409fef413e4192299ee6267",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-6",
+      "object": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+      "commit": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/6",
+        "head": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+        "merge": "0ea58a1ae39b33a5edb179d71e918a9e969fd430",
+        "merge-base": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "resources/kami/samples/chronicle-city-sim-lod.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "7ecd6e4d4aa6ed4040c81c389412f2b0fa5b3035"
+            }
+          },
+          {
+            "path": "resources/kami/samples/iron-front-sim-lod.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "476893a15e5f003e8bd111fecab1a97edba02f54"
+            }
+          },
+          {
+            "path": "resources/kami/samples/isekai-dominion-sim-lod.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "48d42468afb799552dff3de7e44d15c6ac928c44"
+            }
+          },
+          {
+            "path": "src/kami/sim_lod.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "24dd9645709c102b7504e4780bd3880b78912c4b"
+            }
+          },
+          {
+            "path": "test/kami/sim_lod_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "009ff7a3da8868ed245cbf072eaa0d4a302b51e6"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-7",
+      "object": "21f746cbf8ea9c0d6252dad331a683662ce4f51e",
+      "commit": "21f746cbf8ea9c0d6252dad331a683662ce4f51e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-8",
+      "object": "360bc03d1cd9cece318a1860c4c8800c8e2e359a",
+      "commit": "360bc03d1cd9cece318a1860c4c8800c8e2e359a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-9",
+      "object": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "commit": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "f1ad71686f233c2ade272e17aea0acc8645f2971",
+      "commit": "f1ad71686f233c2ade272e17aea0acc8645f2971",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/genre-benchmark-contract",
+      "object": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "commit": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/rename-banner",
+      "object": "9c52ee77364fb043c503b12c5b34fb022b4494c2",
+      "commit": "9c52ee77364fb043c503b12c5b34fb022b4494c2",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/wgsl-emit-ns",
+      "object": "11ffec0f575942e9328c2cb72ac3214c5b5cf621",
+      "commit": "11ffec0f575942e9328c2cb72ac3214c5b5cf621",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/chore/edn-nbb-1784252848-3276",
+      "object": "8b2731f9a9b3dfcbc5fea3cb8a53936d13dfeda2",
+      "commit": "8b2731f9a9b3dfcbc5fea3cb8a53936d13dfeda2",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/edn-datomize-fanout",
+      "object": "7e1a45f8122950dc27cdaa0446670aaac175c260",
+      "commit": "7e1a45f8122950dc27cdaa0446670aaac175c260",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/dot-on-paths",
+      "object": "a784f5123df3a2f8ee4ce56fc0cce8ad8a986da0",
+      "commit": "a784f5123df3a2f8ee4ce56fc0cce8ad8a986da0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/drop-nbb-cache",
+      "object": "1f1dffb289bdd1588ec4c657311e18fe508de384",
+      "commit": "1f1dffb289bdd1588ec4c657311e18fe508de384",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text",
+      "object": "59f375bbbaad183582577ddc1c7b7cd6a9e79a74",
+      "commit": "59f375bbbaad183582577ddc1c7b7cd6a9e79a74",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/nbb-declaration",
+      "object": "1233764a028d0ac263b9cd45f47a32af25d22b7a",
+      "commit": "1233764a028d0ac263b9cd45f47a32af25d22b7a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "f1ad71686f233c2ade272e17aea0acc8645f2971",
+      "commit": "f1ad71686f233c2ade272e17aea0acc8645f2971",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/rescue/wip-20260718",
+      "object": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "commit": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "commit": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/genre-benchmark-contract",
+      "object": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "commit": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/m0-m1-benchmark-runner",
+      "object": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+      "commit": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 3,
+        "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/3",
+        "head": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+        "merge": "f17150a17dabb1ef76197b313fc9fe79d72d95ab",
+        "merge-base": "67f87b90ff062767b08f4eed967850186e0cd669",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "fd775e4f778ed200b31b771ee0d9d4e0f670af7b"
+            }
+          },
+          {
+            "path": "resources/kami/samples/isekai-swarm.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "79f920cc3294ad2d13227bb790841ad01f7febbe"
+            }
+          },
+          {
+            "path": "src/kami/benchmark.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "8b7a663d64e1c088ed05067607095a27f2a6b9dc"
+            }
+          },
+          {
+            "path": "test/kami/benchmark_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "54cde3fe34209b85392d8e88409131398688cf6b"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/agent/m2-network-contract",
+      "object": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+      "commit": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 4,
+        "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/4",
+        "head": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+        "merge": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+        "merge-base": "f17150a17dabb1ef76197b313fc9fe79d72d95ab",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "bbccf26c153d847ec05060ff75baa00f116f10ac"
+            }
+          },
+          {
+            "path": "resources/kami/samples/nightglass-strike-m2.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "f25341e718dba30a387363123adf72cb3c556a36"
+            }
+          },
+          {
+            "path": "src/kami/network.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "1f2b6a9e6936a56b3870bf976124b1820122e318"
+            }
+          },
+          {
+            "path": "test/kami/network_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "6bf8c842958e9be84dccef1aee0c3a3ff54f4b71"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/agent/m3-streaming-avatar-contract",
+      "object": "21f746cbf8ea9c0d6252dad331a683662ce4f51e",
+      "commit": "21f746cbf8ea9c0d6252dad331a683662ce4f51e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/m4-simulation-lod",
+      "object": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+      "commit": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 6,
+        "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/6",
+        "head": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+        "merge": "0ea58a1ae39b33a5edb179d71e918a9e969fd430",
+        "merge-base": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "resources/kami/samples/chronicle-city-sim-lod.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "7ecd6e4d4aa6ed4040c81c389412f2b0fa5b3035"
+            }
+          },
+          {
+            "path": "resources/kami/samples/iron-front-sim-lod.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "476893a15e5f003e8bd111fecab1a97edba02f54"
+            }
+          },
+          {
+            "path": "resources/kami/samples/isekai-dominion-sim-lod.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "48d42468afb799552dff3de7e44d15c6ac928c44"
+            }
+          },
+          {
+            "path": "src/kami/sim_lod.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "24dd9645709c102b7504e4780bd3880b78912c4b"
+            }
+          },
+          {
+            "path": "test/kami/sim_lod_test.cljc",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "009ff7a3da8868ed245cbf072eaa0d4a302b51e6"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/origin/agent/m5-sample-scaffold",
+      "object": "3ac8bdb33deb62943409fef413e4192299ee6267",
+      "commit": "3ac8bdb33deb62943409fef413e4192299ee6267",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/rename-banner",
+      "object": "9c52ee77364fb043c503b12c5b34fb022b4494c2",
+      "commit": "9c52ee77364fb043c503b12c5b34fb022b4494c2",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/wgsl-emit-ns",
+      "object": "11ffec0f575942e9328c2cb72ac3214c5b5cf621",
+      "commit": "11ffec0f575942e9328c2cb72ac3214c5b5cf621",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/chore/edn-nbb-1784252848-3276",
+      "object": "8b2731f9a9b3dfcbc5fea3cb8a53936d13dfeda2",
+      "commit": "8b2731f9a9b3dfcbc5fea3cb8a53936d13dfeda2",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "daacbaac331b8adae0010e3795c760b696416f2f",
+      "commit": "daacbaac331b8adae0010e3795c760b696416f2f",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/dot-on-paths",
+      "object": "a784f5123df3a2f8ee4ce56fc0cce8ad8a986da0",
+      "commit": "a784f5123df3a2f8ee4ce56fc0cce8ad8a986da0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/full-sha",
+      "object": "e6ae40cc0bb1855af844b02682a7b0528629294b",
+      "commit": "e6ae40cc0bb1855af844b02682a7b0528629294b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/kotoba-text-cljs",
+      "object": "5a660dcda56eb75fe5e38ca9dfa85856519d7ba5",
+      "commit": "5a660dcda56eb75fe5e38ca9dfa85856519d7ba5",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "9a633b17ab8b49a156bc193f60133b1e8b9d20d0",
+      "commit": "9a633b17ab8b49a156bc193f60133b1e8b9d20d0",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "commit": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/rescue/wip-20260718",
+      "object": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "commit": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "decision": "pending-semantic-review"
+    }
+  ],
+  "pending-semantic-review": [
+    {
+      "commit": "e735775ddd2361e3c5957bf885d36a6fd59154c1",
+      "to-default-diff": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-sdk/e735775ddd2361e3c5957bf885d36a6fd59154c1.diff",
+      "diff-sha256": "90aca36ce0fe18e9d9f49c2eff0075019097158820fab59024e0a9041ae8a86d",
+      "changed-paths": [
+        ".gitignore",
+        "ARCHITECTURE.md",
+        "LICENSE",
+        "README.md",
+        "cljk-origin.edn",
+        "deps.edn",
+        "dev/gen_demo.cljk",
+        "dev/gen_fixture.cljk",
+        "dev/roundtrip.cljk",
+        "edn-datomize.bb",
+        "edn-datomize.cljk",
+        "examples/hello_scene.cljk",
+        "nbb.edn",
+        "resources/kami/samples/ashen-kingdom-m3.edn",
+        "resources/kami/samples/chronicle-city-sim-lod.edn",
+        "resources/kami/samples/dream-stage-m3.edn",
+        "resources/kami/samples/iron-front-sim-lod.edn",
+        "resources/kami/samples/isekai-dominion-sim-lod.edn",
+        "resources/kami/samples/isekai-swarm.edn",
+        "resources/kami/samples/nightglass-strike-m2.edn",
+        "schema.edn",
+        "src/kami/avatar.cljk",
+        "src/kami/backend/browser.cljk",
+        "src/kami/backend/host.cljk",
+        "src/kami/benchmark.cljc",
+        "src/kami/benchmark.cljk",
+        "src/kami/binaural.cljk",
+        "src/kami/db.cljk",
+        "src/kami/ecs.cljk",
+        "src/kami/fsm.cljk",
+        "src/kami/gpu.cljk",
+        "src/kami/input.cljc",
+        "src/kami/ipc.cljk",
+        "src/kami/math.cljk",
+        "src/kami/network.cljk",
+        "src/kami/physics_compute.cljk",
+        "src/kami/postfx.cljk",
+        "src/kami/render.cljk",
+        "src/kami/render/authority.cljk",
+        "src/kami/rt.cljk",
+        "src/kami/sample_manifest.cljk",
+        "src/kami/scene.cljk",
+        "src/kami/schedule.cljk",
+        "src/kami/sim.cljk",
+        "src/kami/sim_lod.cljk",
+        "src/kami/wgsl_emit.cljk",
+        "src/kami/world_partition.cljk",
+        "test/kami/avatar_test.cljk",
+        "test/kami/benchmark_test.cljc",
+        "test/kami/benchmark_test.cljk",
+        "test/kami/binaural_test.cljk",
+        "test/kami/contract_test.cljk",
+        "test/kami/dispatch_budget_test.cljk",
+        "test/kami/network_test.cljk",
+        "test/kami/rt_test.cljk",
+        "test/kami/runtime_test.cljk",
+        "test/kami/sample_manifest_test.cljk",
+        "test/kami/schedule_test.cljk",
+        "test/kami/sim_lod_test.cljk",
+        "test/kami/world_partition_test.cljk"
+      ],
+      "unique-nonmerge-commits": [],
+      "log": [
+        "e735775 add genre benchmark contract"
+      ],
+      "refs": [
+        "refs/preservation/kami-monorepo-20261022/heads/agent/genre-benchmark-contract",
+        "refs/preservation/kami-monorepo-20261022/pull-10",
+        "refs/preservation/kami-monorepo-20261022/pull-2",
+        "refs/remotes/kotoba-lang/agent/genre-benchmark-contract",
+        "refs/remotes/origin/agent/genre-benchmark-contract"
+      ]
+    },
+    {
+      "commit": "f94a8fce4008dc3466370841e8a409ac738d308d",
+      "to-default-diff": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-sdk/f94a8fce4008dc3466370841e8a409ac738d308d.diff",
+      "diff-sha256": "ad90c1cbcb1049f858d2d40123f7dca366507cc0d5712bde886ccae2b218b8ab",
+      "changed-paths": [
+        ".gitignore",
+        "ARCHITECTURE.md",
+        "LICENSE",
+        "README.md",
+        "cljk-origin.edn",
+        "deps.edn",
+        "dev/gen_demo.cljk",
+        "dev/gen_fixture.cljk",
+        "dev/roundtrip.cljk",
+        "edn-datomize.bb",
+        "edn-datomize.cljk",
+        "examples/hello_scene.cljk",
+        "nbb.edn",
+        "resources/kami/samples/ashen-kingdom-m3.edn",
+        "resources/kami/samples/dream-stage-m3.edn",
+        "resources/kami/samples/isekai-swarm.edn",
+        "resources/kami/samples/nightglass-strike-m2.edn",
+        "schema.edn",
+        "src/kami/avatar.cljk",
+        "src/kami/backend/browser.cljk",
+        "src/kami/backend/host.cljk",
+        "src/kami/benchmark.cljc",
+        "src/kami/benchmark.cljk",
+        "src/kami/binaural.cljk",
+        "src/kami/db.cljk",
+        "src/kami/ecs.cljk",
+        "src/kami/fsm.cljk",
+        "src/kami/gpu.cljk",
+        "src/kami/input.cljc",
+        "src/kami/ipc.cljk",
+        "src/kami/math.cljk",
+        "src/kami/network.cljk",
+        "src/kami/physics_compute.cljk",
+        "src/kami/postfx.cljk",
+        "src/kami/render.cljk",
+        "src/kami/render/authority.cljk",
+        "src/kami/rt.cljk",
+        "src/kami/sample_manifest.cljk",
+        "src/kami/scene.cljk",
+        "src/kami/schedule.cljk",
+        "src/kami/sim.cljk",
+        "src/kami/sim_lod.cljk",
+        "src/kami/wgsl_emit.cljk",
+        "src/kami/world_partition.cljk",
+        "test/kami/avatar_test.cljk",
+        "test/kami/benchmark_test.cljc",
+        "test/kami/benchmark_test.cljk",
+        "test/kami/binaural_test.cljk",
+        "test/kami/contract_test.cljk",
+        "test/kami/dispatch_budget_test.cljk",
+        "test/kami/network_test.cljk",
+        "test/kami/rt_test.cljk",
+        "test/kami/runtime_test.cljk",
+        "test/kami/sample_manifest_test.cljk",
+        "test/kami/schedule_test.cljk",
+        "test/kami/sim_lod_test.cljk",
+        "test/kami/world_partition_test.cljk"
+      ],
+      "unique-nonmerge-commits": [
+        "f94a8fce4008dc3466370841e8a409ac738d308d"
+      ],
+      "log": [
+        "f94a8fc rescue: preserve outstanding WIP"
+      ],
+      "refs": [
+        "refs/preservation/kami-monorepo-20261022/heads/rescue/wip-20260718",
+        "refs/preservation/kami-monorepo-20261022/pull-9",
+        "refs/remotes/kotoba-lang/rescue/wip-20260718",
+        "refs/remotes/origin/rescue/wip-20260718"
+      ]
+    },
+    {
+      "commit": "3ac8bdb33deb62943409fef413e4192299ee6267",
+      "to-default-diff": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-sdk/3ac8bdb33deb62943409fef413e4192299ee6267.diff",
+      "diff-sha256": "027da9eeb548b91e5b9708d52b50ce5c36de2a84227e5b61e908a6aa88de4db7",
+      "changed-paths": [
+        ".gitignore",
+        "ARCHITECTURE.md",
+        "LICENSE",
+        "README.md",
+        "cljk-origin.edn",
+        "deps.edn",
+        "dev/gen_demo.cljk",
+        "dev/gen_fixture.cljk",
+        "dev/roundtrip.cljk",
+        "edn-datomize.bb",
+        "edn-datomize.cljk",
+        "examples/hello_scene.cljk",
+        "nbb.edn",
+        "resources/kami/samples/ashen-kingdom-m3.edn",
+        "resources/kami/samples/chronicle-city-sim-lod.edn",
+        "resources/kami/samples/dream-stage-m3.edn",
+        "resources/kami/samples/iron-front-sim-lod.edn",
+        "resources/kami/samples/isekai-dominion-sim-lod.edn",
+        "schema.edn",
+        "src/kami/avatar.cljk",
+        "src/kami/backend/browser.cljk",
+        "src/kami/backend/host.cljk",
+        "src/kami/benchmark.cljk",
+        "src/kami/binaural.cljk",
+        "src/kami/db.cljk",
+        "src/kami/ecs.cljk",
+        "src/kami/fsm.cljk",
+        "src/kami/gpu.cljk",
+        "src/kami/input.cljc",
+        "src/kami/ipc.cljk",
+        "src/kami/math.cljk",
+        "src/kami/network.cljk",
+        "src/kami/physics_compute.cljk",
+        "src/kami/postfx.cljk",
+        "src/kami/render.cljk",
+        "src/kami/render/authority.cljk",
+        "src/kami/rt.cljk",
+        "src/kami/sample_manifest.cljk",
+        "src/kami/scene.cljk",
+        "src/kami/schedule.cljk",
+        "src/kami/sim.cljk",
+        "src/kami/sim_lod.cljk",
+        "src/kami/wgsl_emit.cljk",
+        "src/kami/world_partition.cljk",
+        "test/kami/avatar_test.cljk",
+        "test/kami/benchmark_test.cljc",
+        "test/kami/benchmark_test.cljk",
+        "test/kami/binaural_test.cljk",
+        "test/kami/contract_test.cljk",
+        "test/kami/dispatch_budget_test.cljk",
+        "test/kami/network_test.cljk",
+        "test/kami/rt_test.cljk",
+        "test/kami/runtime_test.cljk",
+        "test/kami/sample_manifest_test.cljk",
+        "test/kami/schedule_test.cljk",
+        "test/kami/sim_lod_test.cljk",
+        "test/kami/world_partition_test.cljk"
+      ],
+      "unique-nonmerge-commits": [],
+      "log": [
+        "3ac8bdb add M5 sample manifest scaffold"
+      ],
+      "refs": [
+        "refs/preservation/kami-monorepo-20261022/pull-15",
+        "refs/preservation/kami-monorepo-20261022/pull-5",
+        "refs/remotes/origin/agent/m5-sample-scaffold"
+      ]
+    }
+  ],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/1",
+      "head": "9f32890a0d2a75728aa337a46ca7e93b1da280d1",
+      "merge": "f04a9a41052acbc8d2dfa47461aae5a873905fea",
+      "merge-base": "47d8d86e8062054ec54d74eaddc5b0de034f1213",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".clj-kondo/config.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "6eaefe99254454e1e2ae17c1f1560b582581495f"
+          }
+        },
+        {
+          "path": ".gitignore",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b614cd3cb91b68de00f088a8c1cdc3276d1c06cb"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "8e29e07ab668fce0955d7926ab46b1344ff5023d"
+          }
+        },
+        {
+          "path": "src/kami/backend/browser.cljs",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3f4bc5e4e867787f5c07aa5079d3638bfda18c74"
+          }
+        },
+        {
+          "path": "src/kami/backend/host.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "494cacc12cd43da2a45874f6b3bdab52b44a5b54"
+          }
+        },
+        {
+          "path": "src/kami/fsm.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2b5f293a5de01710c842e18b99615349966b4dac"
+          }
+        },
+        {
+          "path": "src/kami/input.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "283d2ee3e1cf46cb03e9ca82643c6612ecdc33dc"
+          }
+        },
+        {
+          "path": "src/kami/schedule.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "8b4bc7186c501508702f5daa1461e0e9084e7f5d"
+          }
+        },
+        {
+          "path": "test/kami/binaural_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d0c84677ca754de2867d067bcd8102ff4107fbc0"
+          }
+        },
+        {
+          "path": "test/kami/runtime_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "3fcb2d7c97bbddb4f373158ec5f7c2458374b9c0"
+          }
+        },
+        {
+          "path": "test/kami/schedule_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "fdde6116dea43b558f95521e247b84b6d60c73fe"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/3",
+      "head": "b2da2ee8759991ba48981714ee6a784cb92a6ecb",
+      "merge": "f17150a17dabb1ef76197b313fc9fe79d72d95ab",
+      "merge-base": "67f87b90ff062767b08f4eed967850186e0cd669",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "fd775e4f778ed200b31b771ee0d9d4e0f670af7b"
+          }
+        },
+        {
+          "path": "resources/kami/samples/isekai-swarm.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "79f920cc3294ad2d13227bb790841ad01f7febbe"
+          }
+        },
+        {
+          "path": "src/kami/benchmark.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "8b7a663d64e1c088ed05067607095a27f2a6b9dc"
+          }
+        },
+        {
+          "path": "test/kami/benchmark_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "54cde3fe34209b85392d8e88409131398688cf6b"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 4,
+      "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/4",
+      "head": "85025ab0549aaa7f8f141a4988da765295f41b4d",
+      "merge": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+      "merge-base": "f17150a17dabb1ef76197b313fc9fe79d72d95ab",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "bbccf26c153d847ec05060ff75baa00f116f10ac"
+          }
+        },
+        {
+          "path": "resources/kami/samples/nightglass-strike-m2.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "f25341e718dba30a387363123adf72cb3c556a36"
+          }
+        },
+        {
+          "path": "src/kami/network.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1f2b6a9e6936a56b3870bf976124b1820122e318"
+          }
+        },
+        {
+          "path": "test/kami/network_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "6bf8c842958e9be84dccef1aee0c3a3ff54f4b71"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 6,
+      "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/6",
+      "head": "b385444cd28883a3711b1c6c17f87a47cdf077f1",
+      "merge": "0ea58a1ae39b33a5edb179d71e918a9e969fd430",
+      "merge-base": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "resources/kami/samples/chronicle-city-sim-lod.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "7ecd6e4d4aa6ed4040c81c389412f2b0fa5b3035"
+          }
+        },
+        {
+          "path": "resources/kami/samples/iron-front-sim-lod.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "476893a15e5f003e8bd111fecab1a97edba02f54"
+          }
+        },
+        {
+          "path": "resources/kami/samples/isekai-dominion-sim-lod.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "48d42468afb799552dff3de7e44d15c6ac928c44"
+          }
+        },
+        {
+          "path": "src/kami/sim_lod.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "24dd9645709c102b7504e4780bd3880b78912c4b"
+          }
+        },
+        {
+          "path": "test/kami/sim_lod_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "009ff7a3da8868ed245cbf072eaa0d4a302b51e6"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 7,
+      "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/7",
+      "head": "21f746cbf8ea9c0d6252dad331a683662ce4f51e",
+      "merge": "ad0f0f26e4c6b47c02e24a7cd3354631945cd967",
+      "merge-base": "650cc7c94b8946f7d773887b2b8a63765a7783d6",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "18985f1ab43986701d1d082a0a52f11b73d54b66"
+          }
+        },
+        {
+          "path": "resources/kami/samples/ashen-kingdom-m3.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c6287c4fcf62dc8e5c9698d30539ad31779a848f"
+          }
+        },
+        {
+          "path": "resources/kami/samples/dream-stage-m3.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "f7b8c544793d7f71bb4ae72fa8b16043d85d0c18"
+          }
+        },
+        {
+          "path": "src/kami/avatar.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "794dd8c65d37fb2e8707afda6d38a9e27b42a213"
+          }
+        },
+        {
+          "path": "src/kami/world_partition.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "d4c41cd4feb3a407cdfcb3322533cf98523fea2d"
+          }
+        },
+        {
+          "path": "test/kami/avatar_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "157310c42fd20db291df351bb808c81cfacf8c93"
+          }
+        },
+        {
+          "path": "test/kami/world_partition_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "78069c69ab37a2fde6dc045dd0d5b7bf8f564cf8"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 8,
+      "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/8",
+      "head": "360bc03d1cd9cece318a1860c4c8800c8e2e359a",
+      "merge": "baa542978b0151eccb5b2078da472f303f34b0c2",
+      "merge-base": "96d9a2bbc0d355dd9b85105c2d83e0ea2b451dd9",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b09d6ed851395040bc8e93058a5d715f9b3258e0"
+          }
+        },
+        {
+          "path": "src/kami/benchmark.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "4fda8abb17b7d93f6484da7e6969f6281cab6a5d"
+          }
+        },
+        {
+          "path": "test/kami/benchmark_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2f38b1ab6560341da9228aecb9665b4cfb57a33f"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 16,
+      "url": "https://github.com/kotoba-lang/kami-engine-sdk/pull/16",
+      "head": "aa85384578271039d802f2ced705641e742bb539",
+      "merge": "3f5f61b77f7bac9331641f98c403a2d3b80185df",
+      "merge-base": "f1ad71686f233c2ade272e17aea0acc8645f2971",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "ARCHITECTURE.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2a0cd8bee5ec58529f15e2a562766dac67c5fd1f"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "723415ac98349bdd006933dbdcf23b1599335b41"
+          }
+        }
+      ]
+    }
+  ]
+}

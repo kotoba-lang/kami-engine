@@ -1,0 +1,695 @@
+diff --git a/.gitignore b/.gitignore
+index bd04223..05e79af 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,2 @@
+ .cpcache/
++.nbb/
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..57bc88a
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,202 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
+diff --git a/README.md b/README.md
+index 429cfea..8285afa 100644
+--- a/README.md
++++ b/README.md
+@@ -105,7 +105,7 @@ files) plus a namespace-loads smoke test for the root namespace:
+ Run with:
+ 
+ ```bash
+-clojure -M:test
++kbb -M:test
+ ```
+ 
+ (pulls `kotoba-lang/kami-vehicle` as a test-only dependency for the two
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..2341a38
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,30 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/cad_import.cljk" ".cljc"
++  "src/cad_import/demos.cljk" ".cljc"
++  "src/cad_import/demos/roadster.cljk" ".cljc"
++  "src/cad_import/demos/synth_sedan.cljk" ".cljc"
++  "src/cad_import/ingest.cljk" ".cljc"
++  "src/cad_import/ingest/gltf.cljk" ".cljc"
++  "src/cad_import/ingest/scad.cljk" ".cljc"
++  "src/cad_import/ingest/step.cljk" ".cljc"
++  "src/cad_import/jbeam_emit.cljk" ".cljc"
++  "src/cad_import/part.cljk" ".cljc"
++  "src/cad_import/register.cljk" ".cljc"
++  "src/cad_import/sbom.cljk" ".cljc"
++  "src/cad_import/xform.cljk" ".cljc"
++  "test/cad_import/cad_transform_kotoba_golden_test.cljk" ".clj"
++  "test/cad_import/demos/roadster_test.cljk" ".cljc"
++  "test/cad_import/ingest/gltf_test.cljk" ".cljc"
++  "test/cad_import/ingest/scad_test.cljk" ".cljc"
++  "test/cad_import/ingest/step_test.cljk" ".cljc"
++  "test/cad_import/jbeam_emit_test.cljk" ".cljc"
++  "test/cad_import/jbeam_loadback_test.cljk" ".cljc"
++  "test/cad_import/jbeam_physics_smoke_test.cljk" ".cljc"
++  "test/cad_import/part_test.cljk" ".cljc"
++  "test/cad_import/register_test.cljk" ".cljc"
++  "test/cad_import/sbom_test.cljk" ".cljc"
++  "test/cad_import_test.cljk" ".cljc"}}
+diff --git a/deps.edn b/deps.edn
+index 5b375ec..3c23a41 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -1,10 +1,26 @@
+ {:paths ["src" "test"]
+- :deps {io.github.kotoba-lang/compiler
+-        {:git/url "https://github.com/kotoba-lang/compiler.git"
++ :deps {
++        ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
++        ;; floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
++        ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
++        ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
++        ;; and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       io.github.kotoba-lang/amu
++        {:git/url "https://github.com/kotoba-lang/amu.git"
+          :git/sha "243dfccd561c575b66f82b58c469e66f902951f5"}}
+  :aliases {:test {:extra-paths ["test"]
+                    :extra-deps {io.github.cognitect-labs/test-runner
+-                                {:git/tag "v0.5.1" :git/sha "dfb30dd"}
++                                {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}
+                                 io.github.kotoba-lang/kami-vehicle
+                                 {:git/sha "49efb48d04542bdeb905529f94420ff149cc61bd"}}
+                    :main-opts ["-m" "cognitect.test-runner"]}
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..25ce62e
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,16 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src" "test"]
++ :deps {
++        ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
++        ;; floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
++        ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
++        ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
++        ;; and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/cad_import.cljc b/src/cad_import.cljk
+similarity index 100%
+rename from src/cad_import.cljc
+rename to src/cad_import.cljk
+diff --git a/src/cad_import/demos.cljc b/src/cad_import/demos.cljk
+similarity index 100%
+rename from src/cad_import/demos.cljc
+rename to src/cad_import/demos.cljk
+diff --git a/src/cad_import/demos/roadster.cljc b/src/cad_import/demos/roadster.cljk
+similarity index 99%
+rename from src/cad_import/demos/roadster.cljc
+rename to src/cad_import/demos/roadster.cljk
+index 7778c05..353ba59 100644
+--- a/src/cad_import/demos/roadster.cljc
++++ b/src/cad_import/demos/roadster.cljk
+@@ -9,7 +9,7 @@
+    Restored from kami-cad-import (kotoba-lang/kami-engine, deleted PR #82,
+    \"Remove Rust workspace\"), per ADR-2607010930. Ported 1:1 from the
+    original `src/demos/roadster.rs`."
+-  (:require [clojure.string :as str]
++  (:require [kotoba.lang.text :as str]
+             [cad-import.ingest.scad :as scad]))
+ 
+ (defn roadster-na []
+@@ -147,7 +147,7 @@
+                    (-> default-t
+                        (scad/translate x 0.30 z)
+                        (scad/rotate-xyzw 0.0 0.0 frac-1-sqrt-2 frac-1-sqrt-2))
+-                   {:part-id id :display-name (str "Brake disc " (last (clojure.string/split id #"_")))
++                   {:part-id id :display-name (str "Brake disc " (last (str/split id #"_")))
+                     :kind :brake :material :steel-mild :mass-kg 8.0 :parent "chassis"
+                     :break-group nil :supplier {:name "Akebono" :cpe "" :mpn "ABK-NA-235"}
+                     :revision "0.1.0" :source (prov-part "brake_disc")}))
+diff --git a/src/cad_import/demos/synth_sedan.cljc b/src/cad_import/demos/synth_sedan.cljk
+similarity index 100%
+rename from src/cad_import/demos/synth_sedan.cljc
+rename to src/cad_import/demos/synth_sedan.cljk
+diff --git a/src/cad_import/ingest.cljc b/src/cad_import/ingest.cljk
+similarity index 100%
+rename from src/cad_import/ingest.cljc
+rename to src/cad_import/ingest.cljk
+diff --git a/src/cad_import/ingest/gltf.cljc b/src/cad_import/ingest/gltf.cljk
+similarity index 100%
+rename from src/cad_import/ingest/gltf.cljc
+rename to src/cad_import/ingest/gltf.cljk
+diff --git a/src/cad_import/ingest/scad.cljc b/src/cad_import/ingest/scad.cljk
+similarity index 100%
+rename from src/cad_import/ingest/scad.cljc
+rename to src/cad_import/ingest/scad.cljk
+diff --git a/src/cad_import/ingest/step.cljc b/src/cad_import/ingest/step.cljk
+similarity index 100%
+rename from src/cad_import/ingest/step.cljc
+rename to src/cad_import/ingest/step.cljk
+diff --git a/src/cad_import/jbeam_emit.cljc b/src/cad_import/jbeam_emit.cljk
+similarity index 100%
+rename from src/cad_import/jbeam_emit.cljc
+rename to src/cad_import/jbeam_emit.cljk
+diff --git a/src/cad_import/part.cljc b/src/cad_import/part.cljk
+similarity index 100%
+rename from src/cad_import/part.cljc
+rename to src/cad_import/part.cljk
+diff --git a/src/cad_import/register.cljc b/src/cad_import/register.cljk
+similarity index 82%
+rename from src/cad_import/register.cljc
+rename to src/cad_import/register.cljk
+index 73c0874..d303fff 100644
+--- a/src/cad_import/register.cljc
++++ b/src/cad_import/register.cljk
+@@ -30,7 +30,7 @@
+      \"license\": \"<spdx>\", \"cdxJson\": \"<full CycloneDX 1.5 document, JSON string>\"
+    }
+    ```"
+-  (:require [clojure.string :as str]
++  (:require [kotoba.lang.text :as str]
+             [cad-import.part :as part]
+             [cad-import.sbom :as sbom]))
+ 
+@@ -80,8 +80,31 @@
+   [s]
+   (str "'" (str/replace s "'" "'\\''") "'"))
+ 
++(def ^:private hex-digits "0123456789abcdef")
++
++(defn- hex4
++  "4-digit hex for a JSON `\\uXXXX` escape (portable: bit ops + a lookup
++  table, no Long/Integer interop that would only work on :clj)."
++  [n]
++  (apply str (for [shift [12 8 4 0]] (nth hex-digits (bit-and (bit-shift-right n shift) 0xf)))))
++
++(def ^:private json-string-escapes
++  "RFC 8259 §7: EVERY control character U+0000-U+001F must be escaped in a
++  JSON string, not just the handful with a named shorthand (\\b \\t \\n \\f
++  \\r) -- the previous map covered only \\n and \\t, so any other C0
++  control byte (verified reachable: ingested CAD-file metadata such as a
++  glTF `asset.copyright` string or a STEP header can carry a raw \\r or
++  other control byte) was copied through raw, producing a JSON string
++  literal with a literal control byte embedded in it -- invalid per
++  RFC 8259, confirmed with Python's strict json module rejecting it."
++  (into {\" "\\\"" \\ "\\\\"}
++        (for [i (range 0x20)]
++          [(char i) (case i
++                      8 "\\b" 9 "\\t" 10 "\\n" 12 "\\f" 13 "\\r"
++                      (str "\\u" (hex4 i)))])))
++
+ (defn- json-escape-string [s]
+-  (str "\"" (str/escape s {\" "\\\"" \\ "\\\\" \newline "\\n" \tab "\\t"}) "\""))
++  (str "\"" (str/escape s json-string-escapes) "\""))
+ 
+ (defn edn->json
+   "Minimal recursive EDN->JSON string encoder — covers the small subset
+diff --git a/src/cad_import/sbom.cljc b/src/cad_import/sbom.cljk
+similarity index 98%
+rename from src/cad_import/sbom.cljc
+rename to src/cad_import/sbom.cljk
+index e7e732d..a52dad1 100644
+--- a/src/cad_import/sbom.cljc
++++ b/src/cad_import/sbom.cljk
+@@ -15,7 +15,7 @@
+    `VehiclePart` becomes a CycloneDX component with `\"type\": \"device\"`
+    — the closest first-class fit for a physical car part in CDX 1.5. The
+    full spec is at <https://cyclonedx.org/docs/1.5/json/>."
+-  (:require [clojure.string :as str]
++  (:require [kotoba.bytes :as kbytes] [kotoba.lang.text :as str]
+             [cad-import.part :as part]))
+ 
+ (def cdx-spec-version "1.5")
+@@ -74,7 +74,7 @@
+   "Percent-encode `c`'s UTF-8 bytes (`.getBytes` has no cljs equivalent;
+    `TextEncoder` is the portable substitute)."
+   [c]
+-  #?(:clj (apply str (map byte->pct (.getBytes (str c) "UTF-8")))
++  #?(:clj (apply str (map byte->pct (kbytes/utf8-bytes (str c))))
+      :cljs (apply str (map byte->pct (js/Array.from (.encode (js/TextEncoder.) c))))))
+ 
+ (defn urlencode
+diff --git a/src/cad_import/xform.cljc b/src/cad_import/xform.cljk
+similarity index 100%
+rename from src/cad_import/xform.cljc
+rename to src/cad_import/xform.cljk
+diff --git a/test/cad_import/cad_transform_kotoba_golden_test.clj b/test/cad_import/cad_transform_kotoba_golden_test.cljk
+similarity index 85%
+rename from test/cad_import/cad_transform_kotoba_golden_test.clj
+rename to test/cad_import/cad_transform_kotoba_golden_test.cljk
+index 3561c97..6616f90 100644
+--- a/test/cad_import/cad_transform_kotoba_golden_test.clj
++++ b/test/cad_import/cad_transform_kotoba_golden_test.cljk
+@@ -1,8 +1,8 @@
+ (ns cad-import.cad-transform-kotoba-golden-test
+-  (:require [cad-import.xform :as xform]
+-            [clojure.java.shell :as shell]
+-            [clojure.string :as str]
+-            [clojure.test :refer [deftest is]]
++  (:require [kotoba.bytes :as kbytes] [cad-import.xform :as xform]
++            [kotoba.process :as shell]
++            [kotoba.lang.text :as str]
++            [kotoba.test :refer [deftest is]]
+             [kotoba.compiler.core :as compiler]
+             [kotoba.compiler.ir :as ir]))
+ 
+@@ -23,9 +23,9 @@
+         js-artifact (compiler/compile-source source :js-kotoba-v1)
+         wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
+         reference (mapv #(ir/execute (:kir js-artifact) % []) names)
+-        js64 (.encodeToString (java.util.Base64/getEncoder)
+-                              (.getBytes ^String (:source js-artifact) "UTF-8"))
+-        wasm64 (.encodeToString (java.util.Base64/getEncoder) (:bytes wasm-artifact))
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))
+         expected-js (str "[" (str/join "," (map #(Double/toString (double %)) expected)) "]")
+         names-js (str "[" (str/join "," (map #(str "\"" % "\"") names)) "]")
+         node-source
+diff --git a/test/cad_import/demos/roadster_test.cljc b/test/cad_import/demos/roadster_test.cljk
+similarity index 92%
+rename from test/cad_import/demos/roadster_test.cljc
+rename to test/cad_import/demos/roadster_test.cljk
+index 3e92f27..1c7318a 100644
+--- a/test/cad_import/demos/roadster_test.cljc
++++ b/test/cad_import/demos/roadster_test.cljk
+@@ -2,7 +2,7 @@
+   "Ported 1:1 from `src/demos/roadster.rs`'s `#[cfg(test)] mod tests` in
+    the original kami-cad-import crate (kotoba-lang/kami-engine, deleted
+    PR #82). ADR-2607010930."
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.test :refer [deftest is]]
+             [cad-import.part :as part]
+             [cad-import.demos.roadster :as roadster]))
+ 
+diff --git a/test/cad_import/ingest/gltf_test.cljc b/test/cad_import/ingest/gltf_test.cljk
+similarity index 98%
+rename from test/cad_import/ingest/gltf_test.cljc
+rename to test/cad_import/ingest/gltf_test.cljk
+index 3f91a4f..b40d115 100644
+--- a/test/cad_import/ingest/gltf_test.cljc
++++ b/test/cad_import/ingest/gltf_test.cljk
+@@ -9,8 +9,8 @@
+    Clojure map with string keys (see `cad-import.ingest.gltf`'s
+    namespace docstring) — the equivalent of what
+    `(clojure.data.json/read-str json-text)` would have produced."
+-  (:require [clojure.test :refer [deftest is]]
+-            [clojure.string :as str]
++  (:require [kotoba.test :refer [deftest is]]
++            [kotoba.lang.text :as str]
+             [cad-import.part :as part]
+             [cad-import.ingest.gltf :as gltf]))
+ 
+diff --git a/test/cad_import/ingest/scad_test.cljc b/test/cad_import/ingest/scad_test.cljk
+similarity index 98%
+rename from test/cad_import/ingest/scad_test.cljc
+rename to test/cad_import/ingest/scad_test.cljk
+index a17cbfb..4e1de76 100644
+--- a/test/cad_import/ingest/scad_test.cljc
++++ b/test/cad_import/ingest/scad_test.cljk
+@@ -2,7 +2,7 @@
+   "Ported 1:1 from `src/ingest/scad.rs`'s `#[cfg(test)] mod tests` in the
+    original kami-cad-import crate (kotoba-lang/kami-engine, deleted PR
+    #82). ADR-2607010930."
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.test :refer [deftest is]]
+             [cad-import.part :as part]
+             [cad-import.ingest.scad :as scad]))
+ 
+diff --git a/test/cad_import/ingest/step_test.cljc b/test/cad_import/ingest/step_test.cljk
+similarity index 93%
+rename from test/cad_import/ingest/step_test.cljc
+rename to test/cad_import/ingest/step_test.cljk
+index 586c607..bbe0456 100644
+--- a/test/cad_import/ingest/step_test.cljc
++++ b/test/cad_import/ingest/step_test.cljk
+@@ -9,8 +9,8 @@
+    docstring — the FreeCAD shell-out itself is intentionally not
+    portable). This test instead covers the one piece that *is*
+    ported: the pure `freecad-script` string builder."
+-  (:require [clojure.test :refer [deftest is]]
+-            [clojure.string :as str]
++  (:require [kotoba.test :refer [deftest is]]
++            [kotoba.lang.text :as str]
+             [cad-import.ingest.step :as step]))
+ 
+ (deftest freecad-script-embeds-input-and-output-paths
+diff --git a/test/cad_import/jbeam_emit_test.cljc b/test/cad_import/jbeam_emit_test.cljk
+similarity index 97%
+rename from test/cad_import/jbeam_emit_test.cljc
+rename to test/cad_import/jbeam_emit_test.cljk
+index 8a33e47..86adbb9 100644
+--- a/test/cad_import/jbeam_emit_test.cljc
++++ b/test/cad_import/jbeam_emit_test.cljk
+@@ -2,8 +2,8 @@
+   "Ported 1:1 from `src/jbeam_emit.rs`'s `#[cfg(test)] mod tests` in the
+    original kami-cad-import crate (kotoba-lang/kami-engine, deleted PR
+    #82). ADR-2607010930."
+-  (:require [clojure.test :refer [deftest is]]
+-            [clojure.string :as str]
++  (:require [kotoba.test :refer [deftest is]]
++            [kotoba.lang.text :as str]
+             [cad-import.part :as part]
+             [cad-import.jbeam-emit :as je]))
+ 
+diff --git a/test/cad_import/jbeam_loadback_test.cljc b/test/cad_import/jbeam_loadback_test.cljk
+similarity index 99%
+rename from test/cad_import/jbeam_loadback_test.cljc
+rename to test/cad_import/jbeam_loadback_test.cljk
+index e5daf1b..2fb8fff 100644
+--- a/test/cad_import/jbeam_loadback_test.cljc
++++ b/test/cad_import/jbeam_loadback_test.cljk
+@@ -21,7 +21,7 @@
+    aren't tuned for kami-vehicle's default damping (see
+    `cad-import.jbeam-physics-smoke-test` for the settle/step smoke
+    coverage that *is* ported, with generous tolerances)."
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.test :refer [deftest is]]
+             [cad-import.demos :as demos]
+             [cad-import.jbeam-emit :as je]
+             [vehicle.jbeam :as vjbeam]
+diff --git a/test/cad_import/jbeam_physics_smoke_test.cljc b/test/cad_import/jbeam_physics_smoke_test.cljk
+similarity index 99%
+rename from test/cad_import/jbeam_physics_smoke_test.cljc
+rename to test/cad_import/jbeam_physics_smoke_test.cljk
+index c759343..08797c1 100644
+--- a/test/cad_import/jbeam_physics_smoke_test.cljc
++++ b/test/cad_import/jbeam_physics_smoke_test.cljk
+@@ -15,7 +15,7 @@
+    (kami-cad-import, kotoba-lang/kami-engine, deleted PR #82),
+    ADR-2607010930. Uses `vehicle.*` (kotoba-lang/kami-vehicle, also
+    restored to CLJC under the same ADR) for the actual physics step."
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.test :refer [deftest is]]
+             [cad-import.demos :as demos]
+             [cad-import.jbeam-emit :as je]
+             [vehicle.jbeam :as vjbeam]
+diff --git a/test/cad_import/part_test.cljc b/test/cad_import/part_test.cljk
+similarity index 98%
+rename from test/cad_import/part_test.cljc
+rename to test/cad_import/part_test.cljk
+index 7b92456..a1bd5c9 100644
+--- a/test/cad_import/part_test.cljc
++++ b/test/cad_import/part_test.cljk
+@@ -2,7 +2,7 @@
+   "Ported 1:1 from `src/part.rs`'s `#[cfg(test)] mod tests` in the
+    original kami-cad-import crate (kotoba-lang/kami-engine, deleted PR
+    #82). ADR-2607010930."
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.test :refer [deftest is]]
+             [cad-import.part :as part]))
+ 
+ (defn- provenance [sha]
+diff --git a/test/cad_import/register_test.cljc b/test/cad_import/register_test.cljk
+similarity index 81%
+rename from test/cad_import/register_test.cljc
+rename to test/cad_import/register_test.cljk
+index 1ccc153..7bee0aa 100644
+--- a/test/cad_import/register_test.cljc
++++ b/test/cad_import/register_test.cljk
+@@ -2,8 +2,8 @@
+   "Ported 1:1 from `src/register.rs`'s `#[cfg(test)] mod tests` in the
+    original kami-cad-import crate (kotoba-lang/kami-engine, deleted PR
+    #82). ADR-2607010930."
+-  (:require [clojure.test :refer [deftest is]]
+-            [clojure.string :as str]
++  (:require [kotoba.test :refer [deftest is]]
++            [kotoba.lang.text :as str]
+             [cad-import.part :as part]
+             [cad-import.register :as reg]))
+ 
+@@ -48,6 +48,16 @@
+     (is (= status :ok))
+     (is (= v "Bearer eyJ.testtoken"))))
+ 
++(deftest edn->json-escapes-every-c0-control-character
++  ;; RFC 8259 requires EVERY control character U+0000-U+001F to be
++  ;; escaped, not just \n and \t -- ingested CAD-file metadata (a glTF
++  ;; asset.copyright string, a STEP header) can genuinely carry a raw \r
++  ;; or other control byte. Verified against Python's strict json module:
++  ;; the unescaped version was rejected as invalid JSON.
++  (let [payload (str "MIT" (char 13) "OR" (char 13) "Apache-2.0" (char 1))
++        out (reg/edn->json {:license payload})]
++    (is (= "{\"license\":\"MIT\\rOR\\rApache-2.0\\u0001\"}" out))))
++
+ (deftest curl-command-is-runnable
+   (let [a (-> (part/new-assembly "v1" (provenance)) (part/add-part (mk-part "rail" :chassis :steel-hss)))
+         [status cmd] (reg/curl-command a)]
+diff --git a/test/cad_import/sbom_test.cljc b/test/cad_import/sbom_test.cljk
+similarity index 98%
+rename from test/cad_import/sbom_test.cljc
+rename to test/cad_import/sbom_test.cljk
+index 6e12fa7..038426c 100644
+--- a/test/cad_import/sbom_test.cljc
++++ b/test/cad_import/sbom_test.cljk
+@@ -2,8 +2,8 @@
+   "Ported 1:1 from `src/sbom.rs`'s `#[cfg(test)] mod tests` in the
+    original kami-cad-import crate (kotoba-lang/kami-engine, deleted PR
+    #82). ADR-2607010930."
+-  (:require [clojure.test :refer [deftest is]]
+-            [clojure.string :as str]
++  (:require [kotoba.test :refer [deftest is]]
++            [kotoba.lang.text :as str]
+             [cad-import.part :as part]
+             [cad-import.sbom :as sbom]))
+ 
+diff --git a/test/cad_import_test.cljc b/test/cad_import_test.cljk
+similarity index 91%
+rename from test/cad_import_test.cljc
+rename to test/cad_import_test.cljk
+index c033fdb..77ac0d2 100644
+--- a/test/cad_import_test.cljc
++++ b/test/cad_import_test.cljk
+@@ -1,7 +1,7 @@
+ (ns cad-import-test
+   "Namespace-loads smoke test for the `cad-import` root namespace.
+    Restored from kami-cad-import (deleted PR #82), ADR-2607010930."
+-  (:require [clojure.test :refer [deftest is]]
++  (:require [kotoba.test :refer [deftest is]]
+             [cad-import]
+             [cad-import.part :as part]
+             [cad-import.jbeam-emit]

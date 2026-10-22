@@ -1,0 +1,495 @@
+{
+  "repository": "kotoba-lang/kami-nv-compat",
+  "default": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "commit": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "commit": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "f121edeab0e12682498f608c2038e3a6466bfd51",
+      "commit": "f121edeab0e12682498f608c2038e3a6466bfd51",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "e721c4ae86715c12501bd593d385e08a4730ec20",
+      "commit": "e721c4ae86715c12501bd593d385e08a4730ec20",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "commit": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "6fe5aa1aeeab46a1fb9e246bfb2cc4695c71e01c",
+      "commit": "6fe5aa1aeeab46a1fb9e246bfb2cc4695c71e01c",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "9088b616f83a4d4410b5bf77f11b10b7b262b3ed",
+      "commit": "9088b616f83a4d4410b5bf77f11b10b7b262b3ed",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
+      "object": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "commit": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-4",
+      "object": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "commit": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "9bc26b870a3181f70b0a0defe90e5ad63da6135e",
+      "commit": "9bc26b870a3181f70b0a0defe90e5ad63da6135e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/data-json-tranche-1",
+      "object": "94b187efad27f19382fa209c7ea8b56edd1c99d3",
+      "commit": "94b187efad27f19382fa209c7ea8b56edd1c99d3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "c3490ceac1453fa47ddc04adc06d9693b516f340",
+      "commit": "c3490ceac1453fa47ddc04adc06d9693b516f340",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/json-pin",
+      "object": "f1e0b45a3f2b070fe2a153b7645b39c3950583d6",
+      "commit": "f1e0b45a3f2b070fe2a153b7645b39c3950583d6",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text",
+      "object": "fe53b4638a083a6c64dadd94b3b2e5de310c0c33",
+      "commit": "fe53b4638a083a6c64dadd94b3b2e5de310c0c33",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/kami-warp-fix",
+      "object": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "commit": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "9bc26b870a3181f70b0a0defe90e5ad63da6135e",
+      "commit": "9bc26b870a3181f70b0a0defe90e5ad63da6135e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "commit": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/data-json-tranche-1",
+      "object": "94b187efad27f19382fa209c7ea8b56edd1c99d3",
+      "commit": "94b187efad27f19382fa209c7ea8b56edd1c99d3",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "be6983c8f3f2d94965313245795214fda6d4175a",
+      "commit": "be6983c8f3f2d94965313245795214fda6d4175a",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/jv/kotoba-stdlib-instead-of-clojure",
+      "object": "e45bf95a05a68bd0a3405988e696c8beeb10cf14",
+      "commit": "e45bf95a05a68bd0a3405988e696c8beeb10cf14",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/kami-warp-fix",
+      "object": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "commit": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "f5a1acc4729a2068653e9187fb6404cd363fa7e7",
+      "commit": "f5a1acc4729a2068653e9187fb6404cd363fa7e7",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "commit": "8e43a10f3b1d12e9f82f547f6d8eeeda2687393b",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [
+    {
+      "commit": "a662f037d95c2674b8f2e6d831c6f6b45faf090a",
+      "to-default-diff": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-nv-compat/a662f037d95c2674b8f2e6d831c6f6b45faf090a.diff",
+      "diff-sha256": "9a297499babe223ff95df537aa547b8f21ab007a90352012001b7074a5e24b56",
+      "changed-paths": [
+        ".cpcache/1871584659.basis",
+        ".cpcache/1871584659.cp",
+        ".cpcache/1871584659.main",
+        ".cpcache/4246712940.basis",
+        ".cpcache/4246712940.cp",
+        ".cpcache/4246712940.main",
+        ".cpcache/4246712940.manifest",
+        ".gitignore",
+        "README.md",
+        "cljk-origin.edn",
+        "deps.edn",
+        "nbb.edn",
+        "package-lock.json",
+        "package.json",
+        "src/actions/action-term.ts",
+        "src/actions/articulated-env.ts",
+        "src/actions/index.ts",
+        "src/actions/task-space-actions.ts",
+        "src/alpamayo.ts",
+        "src/alpasim.ts",
+        "src/amenominaka/application.ts",
+        "src/amenominaka/commands.ts",
+        "src/amenominaka/extension.ts",
+        "src/amenominaka/index.ts",
+        "src/assets/anymal-c.ts",
+        "src/assets/franka-panda.ts",
+        "src/assets/index.ts",
+        "src/assets/ur10.ts",
+        "src/assets/urdf-builder.ts",
+        "src/controllers/differential-ik.ts",
+        "src/controllers/index.ts",
+        "src/controllers/operational-space.ts",
+        "src/drive-sim.ts",
+        "src/dynamics/articulated-dynamics.ts",
+        "src/dynamics/index.ts",
+        "src/dynamics/urdf-parser.ts",
+        "src/e7m-shugyo/cartpole.ts",
+        "src/e7m-shugyo/env.ts",
+        "src/e7m-shugyo/index.ts",
+        "src/e7m-shugyo/managers.ts",
+        "src/e7m-sim/index.ts",
+        "src/index.ts",
+        "src/isaac-sim.ts",
+        "src/isaaclab-envs.ts",
+        "src/kami-drive/coc.ts",
+        "src/kami-drive/index.ts",
+        "src/kami-drive/planner.ts",
+        "src/kami-drive/unicycle.ts",
+        "src/kami-rt/bvh.ts",
+        "src/kami-rt/index.ts",
+        "src/kami-rt/pathtrace.ts",
+        "src/kami-rt/raytrace-wgsl.ts",
+        "src/kami-rt/wgpu-pathtrace.ts",
+        "src/kami-rt/wgpu-raytrace.ts",
+        "src/kami-usd/geom.ts",
+        "src/kami-usd/index.ts",
+        "src/kami-usd/usda.ts",
+        "src/kotoba-datomic-nucleus/client.ts",
+        "src/kotoba-datomic-nucleus/index.ts",
+        "src/kotoba-datomic-nucleus/store.ts",
+        "src/kotoba/lang/kami_nv_compat/actions/action_term.cljk",
+        "src/kotoba/lang/kami_nv_compat/actions/articulated_env.cljk",
+        "src/kotoba/lang/kami_nv_compat/actions/task_space_actions.cljk",
+        "src/kotoba/lang/kami_nv_compat/alpamayo.cljk",
+        "src/kotoba/lang/kami_nv_compat/alpasim.cljk",
+        "src/kotoba/lang/kami_nv_compat/amenominaka/application.cljk",
+        "src/kotoba/lang/kami_nv_compat/amenominaka/commands.cljk",
+        "src/kotoba/lang/kami_nv_compat/amenominaka/extension.cljk",
+        "src/kotoba/lang/kami_nv_compat/assets/anymal_c.cljk",
+        "src/kotoba/lang/kami_nv_compat/assets/franka_panda.cljk",
+        "src/kotoba/lang/kami_nv_compat/assets/ur10.cljk",
+        "src/kotoba/lang/kami_nv_compat/assets/urdf_builder.cljk",
+        "src/kotoba/lang/kami_nv_compat/controllers/differential_ik.cljk",
+        "src/kotoba/lang/kami_nv_compat/controllers/operational_space.cljk",
+        "src/kotoba/lang/kami_nv_compat/drive_sim.cljk",
+        "src/kotoba/lang/kami_nv_compat/dynamics/articulated_dynamics.cljk",
+        "src/kotoba/lang/kami_nv_compat/dynamics/urdf_parser.cljk",
+        "src/kotoba/lang/kami_nv_compat/e7m_shugyo/cartpole.cljk",
+        "src/kotoba/lang/kami_nv_compat/e7m_shugyo/env.cljk",
+        "src/kotoba/lang/kami_nv_compat/e7m_shugyo/managers.cljk",
+        "src/kotoba/lang/kami_nv_compat/e7m_sim.cljk",
+        "src/kotoba/lang/kami_nv_compat/index.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_drive/coc.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_drive/planner.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_drive/unicycle.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_rt/bvh.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_rt/index.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_rt/pathtrace.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_rt/wgpu_pathtrace.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_rt/wgpu_raytrace.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_rt/wgsl_shaders.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_usd/geom.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_usd/index.cljk",
+        "src/kotoba/lang/kami_nv_compat/kami_usd/usda.cljk",
+        "src/kotoba/lang/kami_nv_compat/kotoba_datomic_nucleus/client.cljk",
+        "src/kotoba/lang/kami_nv_compat/kotoba_datomic_nucleus/index.cljk",
+        "src/kotoba/lang/kami_nv_compat/kotoba_datomic_nucleus/store.cljk",
+        "src/kotoba/lang/kami_nv_compat/murakumo_render/farm.cljk",
+        "src/kotoba/lang/kami_nv_compat/omni_kit_app.cljk",
+        "src/kotoba/lang/kami_nv_compat/omni_replicator_core.cljk",
+        "src/kotoba/lang/kami_nv_compat/omni_usd.cljk",
+        "src/kotoba/lang/kami_nv_compat/optix.cljk",
+        "src/kotoba/lang/kami_nv_compat/policies.cljk",
+        "src/kotoba/lang/kami_nv_compat/rtx_renderer.cljk",
+        "src/kotoba/lang/kami_nv_compat/utsushimi/distribution.cljk",
+        "src/kotoba/lang/kami_nv_compat/utsushimi/index.cljk",
+        "src/kotoba/lang/kami_nv_compat/utsushimi/randomize.cljk",
+        "src/kotoba/lang/kami_nv_compat/utsushimi/render_bridge.cljk",
+        "src/kotoba/lang/kami_nv_compat/utsushimi/sampler.cljk",
+        "src/kotoba/lang/kami_nv_compat/utsushimi/writers.cljk",
+        "src/kotoba/lang/kami_nv_compat/wadachi_sim/index.cljk",
+        "src/kotoba/lang/kami_nv_compat/wadachi_sim/sensors.cljk",
+        "src/kotoba/lang/kami_nv_compat/wadachi_sim/world.cljk",
+        "src/kotoba/lang/kami_nv_compat/warp/examples.cljk",
+        "src/kotoba/lang/kami_nv_compat/warp/warp.cljk",
+        "src/kotoba/lang/kami_nv_compat/warp/wgpu_backend.cljk",
+        "src/murakumo-render/farm.ts",
+        "src/murakumo-render/index.ts",
+        "src/omni-cloud.ts",
+        "src/omni-kit-app.ts",
+        "src/omni-nucleus.ts",
+        "src/omni-replicator-core.ts",
+        "src/omni-usd.ts",
+        "src/optix.ts",
+        "src/policies/index.ts",
+        "src/policies/mlp.ts",
+        "src/rtx-renderer.ts",
+        "src/utsushimi/distribution.ts",
+        "src/utsushimi/index.ts",
+        "src/utsushimi/randomize.ts",
+        "src/utsushimi/render-bridge.ts",
+        "src/utsushimi/sampler.ts",
+        "src/utsushimi/writers.ts",
+        "src/wadachi-sim/index.ts",
+        "src/wadachi-sim/sensors.ts",
+        "src/wadachi-sim/world.ts",
+        "src/warp/examples.ts",
+        "src/warp/index.ts",
+        "src/warp/warp.ts",
+        "src/warp/wgpu-backend.ts",
+        "test/isaac-sim-wasm-bridge.smoke.test.ts",
+        "test/kotoba/lang/kami_nv_compat/actions/action_term_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/actions/articulated_env_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/actions/task_space_actions_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/alpamayo_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/alpasim_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/amenominaka/application_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/amenominaka/commands_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/amenominaka/extension_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/assets/anymal_c_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/assets/franka_panda_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/assets/ur10_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/assets/urdf_builder_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/controllers/differential_ik_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/controllers/operational_space_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/drive_sim_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/dynamics/articulated_dynamics_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/dynamics/urdf_parser_test.clj",
+        "test/kotoba/lang/kami_nv_compat/dynamics/urdf_parser_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/e7m_shugyo/cartpole_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/e7m_shugyo/env_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/e7m_shugyo/managers_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/e7m_sim_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/index_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_drive/coc_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_drive/planner_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_drive/unicycle_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_rt/bvh_axis_aligned_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_rt/bvh_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_rt/index_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_rt/pathtrace_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_rt/wgpu_pathtrace_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_rt/wgpu_raytrace_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_rt/wgsl_shaders_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_usd/geom_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_usd/index_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kami_usd/usda_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kotoba_datomic_nucleus/client_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kotoba_datomic_nucleus/index_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/kotoba_datomic_nucleus/store_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/murakumo_render/farm_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/omni_kit_app_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/omni_replicator_core_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/omni_usd_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/optix_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/policies_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/rtx_renderer_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/utsushimi/distribution_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/utsushimi/index_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/utsushimi/randomize_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/utsushimi/render_bridge_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/utsushimi/sampler_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/utsushimi/writers_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/wadachi_sim/index_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/wadachi_sim/sensors_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/wadachi_sim/world_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/warp/examples_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/warp/warp_test.cljk",
+        "test/kotoba/lang/kami_nv_compat/warp/wgpu_backend_test.cljk",
+        "test/nv-compat-alpamayo-input.test.ts",
+        "test/nv-compat-alpamayo.test.ts",
+        "test/nv-compat-alpasim-reward.test.ts",
+        "test/nv-compat-amenominaka-edge.test.ts",
+        "test/nv-compat-coverage.test.ts",
+        "test/nv-compat-cross-validation.test.ts",
+        "test/nv-compat-distribution-stats.test.ts",
+        "test/nv-compat-drive-sim-integration.test.ts",
+        "test/nv-compat-drive-sim.test.ts",
+        "test/nv-compat-dynamics-invariants.test.ts",
+        "test/nv-compat-e7m-shugyo-edge.test.ts",
+        "test/nv-compat-e7m-sim-edge.test.ts",
+        "test/nv-compat-isaac-sim.test.ts",
+        "test/nv-compat-isaaclab-envs.test.ts",
+        "test/nv-compat-kami-drive-edge.test.ts",
+        "test/nv-compat-kami-rt-edge.test.ts",
+        "test/nv-compat-kami-rtx-primitives.test.ts",
+        "test/nv-compat-kami-usd-matrix.test.ts",
+        "test/nv-compat-kami-usd-xform.test.ts",
+        "test/nv-compat-murakumo-render-edge.test.ts",
+        "test/nv-compat-nucleus-cloud.test.ts",
+        "test/nv-compat-nucleus-edge.test.ts",
+        "test/nv-compat-omni-kit-app.test.ts",
+        "test/nv-compat-omni-usd-facade.test.ts",
+        "test/nv-compat-omni-usd.test.ts",
+        "test/nv-compat-optix-internals.test.ts",
+        "test/nv-compat-optix-raytrace.test.ts",
+        "test/nv-compat-optix-rtx-facade.test.ts",
+        "test/nv-compat-policies-assets.test.ts",
+        "test/nv-compat-render-bridge.test.ts",
+        "test/nv-compat-replicator.test.ts",
+        "test/nv-compat-rtx-pathtrace.test.ts",
+        "test/nv-compat-unicycle-circle.test.ts",
+        "test/nv-compat-usda-edge.test.ts",
+        "test/nv-compat-utsushimi-edge.test.ts",
+        "test/nv-compat-wadachi-sensors-edge.test.ts",
+        "test/nv-compat-warp-types.test.ts",
+        "test/nv-compat-warp-wgpu-fallback.test.ts",
+        "test/nv-compat-warp.test.ts",
+        "tsconfig.json",
+        "vendor/kami-isaac-sim-wasm/README.md",
+        "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm.cjs",
+        "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm.d.cts",
+        "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm_bg.wasm",
+        "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm_bg.wasm.d.ts"
+      ],
+      "unique-nonmerge-commits": [
+        "a662f037d95c2674b8f2e6d831c6f6b45faf090a"
+      ],
+      "log": [
+        "a662f03 fix(warp): abs shadowing, vec3-mul double-arity, wp-set swap syntax, quat double-parens"
+      ],
+      "refs": [
+        "refs/preservation/kami-monorepo-20261022/pull-3",
+        "refs/preservation/kami-monorepo-20261022/pull-4",
+        "refs/remotes/kotoba-lang/kami-warp-fix",
+        "refs/remotes/origin/kami-warp-fix"
+      ]
+    }
+  ],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-nv-compat/pull/1",
+      "head": "6fe5aa1aeeab46a1fb9e246bfb2cc4695c71e01c",
+      "merge": "e4ed98d251b87f497f363cd07fe30a38534b91fb",
+      "merge-base": "f121edeab0e12682498f608c2038e3a6466bfd51",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/kotoba/lang/kami_nv_compat/dynamics/urdf_parser.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "27cda8015a7dc6e2cec1bee6d1e95228337c4c35"
+          }
+        },
+        {
+          "path": "test/kotoba/lang/kami_nv_compat/dynamics/urdf_parser_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "6f94836d4447f0d6eff36078f9fd3bd5717329ed"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-nv-compat/pull/2",
+      "head": "9088b616f83a4d4410b5bf77f11b10b7b262b3ed",
+      "merge": "2f8a2e2fe4ff8621b6855ecabf4f6295324e4c43",
+      "merge-base": "e4ed98d251b87f497f363cd07fe30a38534b91fb",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "test/isaac-sim-wasm-bridge.smoke.test.ts",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "9d2ece7bc8ee29523dd41678d54e49655ca72e4b"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1bfdb1a2196975279d13565dfd4e49785b3b68af"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm.cjs",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "03285e0da5dc875857192296365023dc2bc58aac"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm.d.cts",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c29d9ba6836a4502f4dd8a88ba3fe14356965a88"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm_bg.wasm",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "65ccfd61e57d4f81301b4a1d7fa01d2b27fa71be"
+          }
+        },
+        {
+          "path": "vendor/kami-isaac-sim-wasm/kami_isaac_sim_wasm_bg.wasm.d.ts",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "b4dd31a0a949be14e8aa5a0cab2529435d3c507b"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "repository": "kotoba-lang/kami-engine-hud-gpu",
+  "default": "16076705114bdef321ef50a285020f2aa142f7dc",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "commit": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "commit": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "a26001418f0b07e42a1b756af3fe28b72d1d0a80",
+      "commit": "a26001418f0b07e42a1b756af3fe28b72d1d0a80",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "commit": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/agent/hud-merge-note",
+      "object": "9ab7a750b6b0e49c12b8726a93ecd1277a872928",
+      "commit": "9ab7a750b6b0e49c12b8726a93ecd1277a872928",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/fix/test-alias-and-ci",
+      "object": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "commit": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "commit": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "2c6e9cf1519bd510aa6c89fab861031bcbc9b19d",
+      "commit": "2c6e9cf1519bd510aa6c89fab861031bcbc9b19d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/agent/hud-merge-note",
+      "object": "9ab7a750b6b0e49c12b8726a93ecd1277a872928",
+      "commit": "9ab7a750b6b0e49c12b8726a93ecd1277a872928",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/fix/test-alias-and-ci",
+      "object": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "commit": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "c95c54eae6dcc7f440cba4589170c9c1f2075036",
+      "commit": "c95c54eae6dcc7f440cba4589170c9c1f2075036",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "2c6e9cf1519bd510aa6c89fab861031bcbc9b19d",
+      "commit": "2c6e9cf1519bd510aa6c89fab861031bcbc9b19d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/maturity-loop-persistent-toast-bug",
+      "object": "0a78aab669d89b38db1f13967fe1354365f06c1d",
+      "commit": "0a78aab669d89b38db1f13967fe1354365f06c1d",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "commit": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/agent/hud-merge-note",
+      "object": "9ab7a750b6b0e49c12b8726a93ecd1277a872928",
+      "commit": "9ab7a750b6b0e49c12b8726a93ecd1277a872928",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/cljk-rename-20260911",
+      "object": "b5d6079afe0afd18ab1f73d8ec1e03e796c64f77",
+      "commit": "b5d6079afe0afd18ab1f73d8ec1e03e796c64f77",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/fix/test-alias-and-ci",
+      "object": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "commit": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "decision": "pending-semantic-review"
+    },
+    {
+      "ref": "refs/remotes/origin/kbb-cutover-20260911",
+      "object": "3e1ec193a9382a2278e553081b384a0be25250a9",
+      "commit": "3e1ec193a9382a2278e553081b384a0be25250a9",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "commit": "16076705114bdef321ef50a285020f2aa142f7dc",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [
+    {
+      "commit": "d770f1046f4543444bb385c4055970bcf5e8f413",
+      "to-default-diff": "maintenance/kami-consolidation/2026-10-22/branch-reviews/kami-engine-hud-gpu/d770f1046f4543444bb385c4055970bcf5e8f413.diff",
+      "diff-sha256": "1f89165df55e29eb49695350bf9b606e65724f473fa12ba516397db9dd3f04dc",
+      "changed-paths": [
+        ".gitignore",
+        "LICENSE",
+        "README.md",
+        "cljk-origin.edn",
+        "deps.edn",
+        "nbb.edn",
+        "src/ui_gpu.cljc",
+        "src/ui_gpu.cljk",
+        "test/run_portable.cljk",
+        "test/ui_gpu_test.cljc",
+        "test/ui_gpu_test.cljk"
+      ],
+      "unique-nonmerge-commits": [
+        "d770f1046f4543444bb385c4055970bcf5e8f413"
+      ],
+      "log": [
+        "d770f10 fix(deps): broken :test alias + smoke-test bug; add CI+lint"
+      ],
+      "refs": [
+        "refs/preservation/kami-monorepo-20261022/heads/fix/test-alias-and-ci",
+        "refs/remotes/kotoba-lang/fix/test-alias-and-ci",
+        "refs/remotes/origin/fix/test-alias-and-ci"
+      ]
+    }
+  ],
+  "strong-merged-head-proofs": []
+}

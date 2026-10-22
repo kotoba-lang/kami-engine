@@ -1,0 +1,53 @@
+{
+  "repository": "kotoba-lang/kami-engine-input-map",
+  "default": "9841302680163b7aafb760cd1d21de809d172084",
+  "heads": {
+    "538c11eaaa04cb318fe73582d67b5f26b857a58f": {
+      "decision": "cherry-picked-exact-patch-and-postimages",
+      "proof": {
+        "original": "538c11eaaa04cb318fe73582d67b5f26b857a58f",
+        "landed": "e9a14c98965e584f82286ce8f48229ba6caf8560",
+        "patch-id": "c15e7bfb5d4b91f432c0be74046ed52974775ee9",
+        "changed-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "a521580d398bf7ecbee30e03781c26862de30add"
+            }
+          }
+        ],
+        "landed-is-ancestor-of-current-default": true
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-engine-input-map/pull/2",
+      "head": "dd500b5b04a291459dc7b467ef3bb4aee59920f6",
+      "merge": "9841302680163b7aafb760cd1d21de809d172084",
+      "merge-base": "c41a79dd856b350dba4b1c9078a2fd85ffa14639",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "363c8b31e228c749eab36a2f301a822c66b06db7"
+          }
+        },
+        {
+          "path": "src/input_map.cljk",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "a6e073f745c263cbd6154624669c11cf3f792acd"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export const __wbg_kamimap_free: (a: number, b: number) => void;
+export const kamimap_clear_layers: (a: number) => void;
+export const kamimap_create: (a: number, b: number, c: number, d: number) => any;
+export const kamimap_fly_to: (a: number, b: number, c: number, d: number, e: number) => void;
+export const kamimap_frame: (a: number, b: number) => void;
+export const kamimap_get_viewport: (a: number) => [number, number];
+export const kamimap_get_zoom: (a: number) => number;
+export const kamimap_on_pointer_down: (a: number, b: number, c: number, d: number) => void;
+export const kamimap_on_pointer_move: (a: number, b: number, c: number, d: number, e: number) => void;
+export const kamimap_on_pointer_up: (a: number, b: number, c: number) => void;
+export const kamimap_on_wheel: (a: number, b: number) => void;
+export const kamimap_resize: (a: number, b: number, c: number) => void;
+export const kamimap_set_bearing: (a: number, b: number) => void;
+export const kamimap_set_center: (a: number, b: number, c: number) => void;
+export const kamimap_set_pitch: (a: number, b: number) => void;
+export const kamimap_set_route: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
+export const kamimap_set_zoom: (a: number, b: number) => void;
+export const kamimap_tiles_to_fetch: (a: number) => [number, number];
+export const kamimap_unproject: (a: number, b: number, c: number) => [number, number];
+export const kamimap_upload_tile: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => void;
+export const wasm_bindgen__closure__destroy__h1fc64ebb5598a658: (a: number, b: number) => void;
+export const wasm_bindgen__convert__closures_____invoke__he5b12a5e6eb39525: (a: number, b: number, c: any) => [number, number];
+export const wasm_bindgen__convert__closures_____invoke__h383bd871f37058d8: (a: number, b: number, c: any, d: any) => void;
+export const __wbindgen_malloc: (a: number, b: number) => number;
+export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+export const __wbindgen_exn_store: (a: number) => void;
+export const __externref_table_alloc: () => number;
+export const __wbindgen_externrefs: WebAssembly.Table;
+export const __wbindgen_free: (a: number, b: number, c: number) => void;
+export const __externref_table_dealloc: (a: number) => void;
+export const __wbindgen_start: () => void;

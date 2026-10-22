@@ -1,0 +1,531 @@
+diff --git a/.gitignore b/.gitignore
+index bd04223..05e79af 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,2 @@
+ .cpcache/
++.nbb/
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..57bc88a
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,202 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
+diff --git a/NOTICE b/NOTICE
+new file mode 100644
+index 0000000..6b2cfe4
+--- /dev/null
++++ b/NOTICE
+@@ -0,0 +1,17 @@
++Copyright 2026 Jun Kawasaki
++
++This product is licensed under the Apache License, Version 2.0
++(see LICENSE). No additional terms or conditions apply.
++
++Defensive publication
++---------------------
++Subject matter in this repository is disclosed as prior art in DP-2026-001:
++
++    https://github.com/com-junkawasaki/prior-art
++
++Published 2026-08-19 (UTC). That bundle fixes this repository by commit and
++tree SHA-1 and carries RFC 3161 time-stamp tokens and OpenTimestamps
++attestations over the fixing manifest.
++
++No patent protection is sought by the copyright holder for any subject matter
++disclosed there.
+diff --git a/README.md b/README.md
+index 222cd0d..e960395 100644
+--- a/README.md
++++ b/README.md
+@@ -77,9 +77,9 @@ description into structured links + joints):
+ 
+ ## Stats
+ 
+-- `src/kami_articulated.cljc` — 57 lines (root namespace, re-exports).
+-- `src/kami_articulated/urdf.cljc` — 344 lines (XML reader + URDF parser).
+-- `test/kami_articulated_test.cljc` — 103 lines.
++- `src/kami_articulated.cljk` — 57 lines (root namespace, re-exports).
++- `src/kami_articulated/urdf.cljk` — 344 lines (XML reader + URDF parser).
++- `test/kami_articulated_test.cljk` — 103 lines.
+ - 6 tests / 28 assertions, 0 failures, 0 errors.
+ - All 4 original Rust `#[test]`s ported 1:1 (`parses_cartpole_urdf`,
+   `cartpole_topology_correct`, `cartpole_masses_match_isaaclab_baseline`,
+@@ -101,5 +101,5 @@ description into structured links + joints):
+ ## Verify
+ 
+ ```sh
+-clojure -M:test
++kbb -M:test
+ ```
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..35039e6
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,10 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/kami_articulated.cljk" ".cljc"
++  "src/kami_articulated/urdf.cljk" ".cljc"
++  "test/articulated_transform_kotoba_golden_test.cljk" ".clj"
++  "test/kami_articulated_test.cljk" ".cljc"
++  "test/urdf_query_kotoba_test.cljk" ".clj"}}
+diff --git a/deps.edn b/deps.edn
+index c289c8a..360c0bc 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -1,8 +1,28 @@
+ {:paths ["src" "test"]
+- :deps {io.github.kotoba-lang/compiler
+-        {:git/url "https://github.com/kotoba-lang/compiler.git"
++ :deps {
++        ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
++        ;; floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
++        ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
++        ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
++        ;; and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
++        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
++        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
++        ;; this repo silently rides whatever a sibling happens to name.
++        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
++       io.github.kotoba-lang/amu
++        {:git/url "https://github.com/kotoba-lang/amu.git"
+          :git/sha "899ae1da92d6d74e1ae68640b5adea3edbec46a3"}}
+  :aliases {:test {:extra-paths ["test"]
+                   :extra-deps {io.github.cognitect-labs/test-runner
+-                               {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+-                  :main-opts ["-m" "cognitect.test-runner"]}}}
++                               {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
++                  :main-opts ["-m" "cognitect.test-runner"]}
++                ;; clj-kondo as a Clojars lib (no Homebrew/system install needed).
++                :lint {:replace-deps {clj-kondo/clj-kondo {:mvn/version "2024.11.14"}}
++                  :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test"
++                              "--fail-level" "error"]}}}
+diff --git a/docs/adr/0001-kotoba-bounded-urdf-ingestion.md b/docs/adr/0001-kotoba-bounded-urdf-ingestion.md
+index a66161a..0714828 100644
+--- a/docs/adr/0001-kotoba-bounded-urdf-ingestion.md
++++ b/docs/adr/0001-kotoba-bounded-urdf-ingestion.md
+@@ -32,6 +32,6 @@ solver remains a separate Kami engine provider boundary.
+ 
+ Evidence: kotoba-lang/compiler PR #138 merged as
+ `d950713d7a27094371f1b3085a63df6a5b51c7de`; this repository pins that exact
+-commit. `clojure -M:test` passes 9 tests and 45 assertions, including both real
++commit. `kbb -M:test` passes 9 tests and 45 assertions, including both real
+ fixtures across the CLJC oracle, Kotoba reference evaluator, restricted
+ JavaScript, and actual typed Wasm browser host.
+diff --git a/docs/adr/0002-bounded-structured-urdf-records.md b/docs/adr/0002-bounded-structured-urdf-records.md
+index c6ed747..e476930 100644
+--- a/docs/adr/0002-bounded-structured-urdf-records.md
++++ b/docs/adr/0002-bounded-structured-urdf-records.md
+@@ -40,5 +40,5 @@ and over-limit inertia. Compiler ADRs 0021 and 0022 seal nested descriptor
+ trust and the `string=? -> :i64` contract required by these values.
+ 
+ Evidence: kotoba-lang/compiler PR #141 merged as
+-`0dc6fc7df3b8d79b7eb39649f50fb2d87e03de82`; `clojure -M:test` passes 11 tests / 60
++`0dc6fc7df3b8d79b7eb39649f50fb2d87e03de82`; `kbb -M:test` passes 11 tests / 60
+ assertions with zero failures or errors.
+diff --git a/docs/adr/0003-bounded-indexed-joint-graph.md b/docs/adr/0003-bounded-indexed-joint-graph.md
+index 863806f..354989e 100644
+--- a/docs/adr/0003-bounded-indexed-joint-graph.md
++++ b/docs/adr/0003-bounded-indexed-joint-graph.md
+@@ -33,5 +33,5 @@ evaluator, restricted JavaScript, and actual browser-hosted typed Wasm without
+ increasing any general compiler/runtime limit. A 129-link chain is explicitly
+ rejected in all three execution paths.
+ 
+-Evidence is the repository `clojure -M:test` gate covering the reference
++Evidence is the repository `kbb -M:test` gate covering the reference
+ evaluator, restricted JavaScript, and actual browser-hosted typed Wasm.
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..25ce62e
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,16 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src" "test"]
++ :deps {
++        ;; kotoba.bytes replaced java.util.Base64 here (2026-09-24). An explicit
++        ;; floor: tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
++        ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
++        ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
++        ;; and tools.deps takes the NEWEST sha it is shown.
++        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/kami_articulated.cljc b/src/kami_articulated.cljk
+similarity index 100%
+rename from src/kami_articulated.cljc
+rename to src/kami_articulated.cljk
+diff --git a/src/kami_articulated/urdf.cljc b/src/kami_articulated/urdf.cljk
+similarity index 99%
+rename from src/kami_articulated/urdf.cljc
+rename to src/kami_articulated/urdf.cljk
+index 58ecfb3..e8c9f03 100644
+--- a/src/kami_articulated/urdf.cljc
++++ b/src/kami_articulated/urdf.cljk
+@@ -29,8 +29,8 @@
+   that consumes the `ArticulatedSystem` this namespace produces. Only the
+   URDF -> data parsing step is ported here.")
+ 
+-#?(:clj (require '[clojure.string :as str])
+-   :cljs (require '[clojure.string :as str]))
++#?(:clj (require '[kotoba.lang.text :as str])
++   :cljs (require '[kotoba.lang.text :as str]))
+ 
+ ;; ---------------------------------------------------------------------------
+ ;; Minimal recursive-descent XML reader — element/attribute subset only.
+diff --git a/test/articulated_transform_kotoba_golden_test.clj b/test/articulated_transform_kotoba_golden_test.cljk
+similarity index 87%
+rename from test/articulated_transform_kotoba_golden_test.clj
+rename to test/articulated_transform_kotoba_golden_test.cljk
+index 2aad084..6ddfda1 100644
+--- a/test/articulated_transform_kotoba_golden_test.clj
++++ b/test/articulated_transform_kotoba_golden_test.cljk
+@@ -1,7 +1,7 @@
+ (ns articulated-transform-kotoba-golden-test
+-  (:require [clojure.java.shell :as shell]
+-            [clojure.string :as str]
+-            [clojure.test :refer [deftest is]]
++  (:require [kotoba.bytes :as kbytes] [kotoba.process :as shell]
++            [kotoba.lang.text :as str]
++            [kotoba.test :refer [deftest is]]
+             [kami_articulated :as articulated]
+             [kotoba.compiler.core :as compiler]
+             [kotoba.compiler.ir :as ir]))
+@@ -23,9 +23,9 @@
+         js-artifact (compiler/compile-source source :js-kotoba-v1)
+         wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
+         reference (mapv #(ir/execute (:kir js-artifact) % []) names)
+-        js64 (.encodeToString (java.util.Base64/getEncoder)
+-                              (.getBytes ^String (:source js-artifact) "UTF-8"))
+-        wasm64 (.encodeToString (java.util.Base64/getEncoder) (:bytes wasm-artifact))
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))
+         expected-js (str "[" (str/join "," (map #(Double/toString (double %)) expected)) "]")
+         names-js (str "[" (str/join "," (map #(str "\"" % "\"") names)) "]")
+         node-source
+diff --git a/test/kami_articulated_test.cljc b/test/kami_articulated_test.cljk
+similarity index 97%
+rename from test/kami_articulated_test.cljc
+rename to test/kami_articulated_test.cljk
+index e295873..32fde61 100644
+--- a/test/kami_articulated_test.cljc
++++ b/test/kami_articulated_test.cljk
+@@ -1,6 +1,6 @@
+ (ns kami_articulated-test
+   "Ports every #[test] from the original kami-articulated::urdf::tests
+-  module 1:1 (see src/kami_articulated/urdf.cljc for restoration
++  module 1:1 (see src/kami_articulated/urdf.cljk for restoration
+   provenance: kami-engine PR #82 deletion, ADR-2607010930), plus a
+   namespace-loads smoke test.
+ 
+@@ -11,7 +11,7 @@
+   hizukue.urdf` is the crate's own `urdf/hizukue.urdf` fixture (a 6-DoF
+   panel-servicer robot), read here as an additional real-world parse
+   smoke test beyond what the original crate's #[test]s exercised."
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [kami_articulated :as ka]
+             [kami_articulated.urdf :as urdf]))
+ 
+diff --git a/test/urdf_query_kotoba_test.clj b/test/urdf_query_kotoba_test.cljk
+similarity index 94%
+rename from test/urdf_query_kotoba_test.clj
+rename to test/urdf_query_kotoba_test.cljk
+index ea40af7..1dbff6e 100644
+--- a/test/urdf_query_kotoba_test.clj
++++ b/test/urdf_query_kotoba_test.cljk
+@@ -1,8 +1,8 @@
+ (ns urdf-query-kotoba-test
+-  (:require [clojure.java.io :as io]
+-            [clojure.java.shell :as shell]
+-            [clojure.string :as str]
+-            [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.bytes :as kbytes] [clojure.java.io :as io]
++            [kotoba.process :as shell]
++            [kotoba.lang.text :as str]
++            [kotoba.test :refer [deftest is testing]]
+             [kami_articulated :as articulated]
+             [kotoba.compiler.core :as compiler]
+             [kotoba.compiler.ir :as ir]))
+@@ -125,9 +125,9 @@
+   (let [source (slurp "src/urdf_query.kotoba")
+         js-artifact (compiler/compile-source source :js-kotoba-v1)
+         wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
+-        js64 (.encodeToString (java.util.Base64/getEncoder)
+-                              (.getBytes ^String (:source js-artifact) "UTF-8"))
+-        wasm64 (.encodeToString (java.util.Base64/getEncoder) (:bytes wasm-artifact))
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))
+         cases ["<robot><link><inertial><inertia ixx=\"1\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\"/></inertial></link></robot>"
+                "<robot><link><inertial><inertia ixx=\"1\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\" iyz=\"Infinity\"/></inertial></link></robot>"
+                "<robot><link><inertial><inertia ixx=\"-1\" iyy=\"1\" izz=\"1\" ixy=\"0\" ixz=\"0\" iyz=\"0\"/></inertial></link></robot>"
+@@ -147,9 +147,9 @@
+   (let [source (slurp "src/urdf_query.kotoba")
+         js-artifact (compiler/compile-source source :js-kotoba-v1)
+         wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
+-        js64 (.encodeToString (java.util.Base64/getEncoder)
+-                              (.getBytes ^String (:source js-artifact) "UTF-8"))
+-        wasm64 (.encodeToString (java.util.Base64/getEncoder) (:bytes wasm-artifact))
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))
+         cases
+         ["<robot><link name=\"same\"/><link name=\"same\"/><joint name=\"j\" type=\"fixed\"><parent link=\"same\"/><child link=\"same\"/></joint></robot>"
+          "<robot><link name=\"a\"/><link name=\"b\"/><joint name=\"j\" type=\"fixed\"><parent link=\"missing\"/><child link=\"b\"/></joint></robot>"
+@@ -180,9 +180,9 @@
+   (let [source (slurp "src/urdf_query.kotoba")
+         js-artifact (compiler/compile-source source :js-kotoba-v1)
+         wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
+-        js64 (.encodeToString (java.util.Base64/getEncoder)
+-                              (.getBytes ^String (:source js-artifact) "UTF-8"))
+-        wasm64 (.encodeToString (java.util.Base64/getEncoder) (:bytes wasm-artifact))
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))
+         arbitrary
+         (str "<robot>"
+              "<link name=\"c\"/><link name=\"a\"/><link name=\"d\"/><link name=\"b\"/>"
+@@ -217,9 +217,9 @@
+   (let [source (slurp "src/urdf_query.kotoba")
+         js-artifact (compiler/compile-source source :js-kotoba-v1)
+         wasm-artifact (compiler/compile-source source :wasm32-browser-kotoba-v1)
+-        js64 (.encodeToString (java.util.Base64/getEncoder)
+-                              (.getBytes ^String (:source js-artifact) "UTF-8"))
+-        wasm64 (.encodeToString (java.util.Base64/getEncoder) (:bytes wasm-artifact))]
++        js64 (kbytes/base64-encode
++                              (kbytes/utf8-bytes ^String (:source js-artifact)))
++        wasm64 (kbytes/base64-encode (:bytes wasm-artifact))]
+     (doseq [fixture ["cartpole.urdf" "hizukue.urdf"]]
+       (testing fixture
+         (let [xml (slurp (str "test/fixtures/" fixture))
+@@ -268,8 +268,8 @@
+                                        (range (count (:joint-origin-rpy expected))))
+                :joint-axis-xyz (mapv #(option-vec3 (execute 'joint-axis-xyz [xml %]))
+                                      (range (count (:joint-axis-xyz expected))))}
+-              xml64 (.encodeToString (java.util.Base64/getEncoder)
+-                                     (.getBytes ^String xml "UTF-8"))
++              xml64 (kbytes/base64-encode
++                                     (kbytes/utf8-bytes ^String xml))
+               node-source
+               (str "const xml=Buffer.from(process.argv[1],'base64').toString(),expected={"
+                    "robot:" (pr-str (:robot-name expected)) ",links:" (js-array (:link-names expected))

@@ -1,0 +1,23 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # provider-catalog-test's provider-split-repo-local-contracts checks
+      # ../<repo>/resources/kami/provider/split_contract.edn for every
+      # materialized-split-kinds provider (edn-fixture-provider,
+      # wasm-component-provider) -- needs these as siblings.
+      - uses: actions/checkout@v4
+        with: { path: kami-contracts }
+      - uses: actions/checkout@v4
+        with: { repository: kotoba-lang/kami-app-fixtures, path: kami-app-fixtures }
+      - uses: actions/checkout@v4
+        with: { repository: kotoba-lang/giemon, path: giemon }
+      - uses: DeLaGuardo/setup-clojure@13.4
+        with:
+          cli: latest
+      - working-directory: kami-contracts
+        run: clojure -M:test
+      - working-directory: kami-contracts
+        run: clojure -M:lint

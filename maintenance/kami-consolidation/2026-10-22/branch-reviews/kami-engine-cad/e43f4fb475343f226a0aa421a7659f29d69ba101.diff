@@ -1,0 +1,455 @@
+diff --git a/.gitignore b/.gitignore
+index bd04223..05e79af 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,2 @@
+ .cpcache/
++.nbb/
+diff --git a/README.md b/README.md
+index 2bf6043..8365654 100644
+--- a/README.md
++++ b/README.md
+@@ -2,4 +2,4 @@
+ 
+ Portable CAD geometry engine. The initial stable primitive is a rational Bezier span, the fundamental NURBS-compatible curve evaluator; knots, surfaces, trim, loft, sweep and tessellation extend this EDN contract.
+ 
+-Solids come from two generators: `extrude-polygon` (prismatic, planar cross-section × extrusion vector) and `revolve` (open XZ-plane profile revolved about the Z axis — the axisymmetric sibling, for cylinders, cones, and closed-of-revolution shells). Both return watertight `:cad/kind :solid` values that `solid-mesh` / `solid-volume` consume. The boolean ops below accept only `extrude-polygon` prisms and refuse other solids loudly.
++Solids come from two generators: `extrude-polygon` (prismatic, planar cross-section × extrusion vector) and `revolve` (open XZ-plane profile revolved about the Z axis — the axisymmetric sibling, for cylinders, cones, and closed-of-revolution shells). Both return watertight `:cad/kind :solid` values that `solid-mesh` / `solid-volume` consume. The boolean ops below accept only `extrude-polygon` prisms and refuse other solids loudly. Polygon extrusion supports a single convex hole (`extrude-polygon-with-holes`) for tube/annular solids such as a cartridge body pierced by a flow channel.
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..e5346cd
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,7 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/kami/cad.cljk" ".cljc"
++  "test/kami/cad_test.cljk" ".cljc"}}
+diff --git a/deps.edn b/deps.edn
+index ce11eda..fc3f32c 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -1,5 +1,10 @@
+-{:paths ["src"]
++{:deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}
++ :paths ["src"]
+  :aliases {:test {:extra-paths ["test"]
+                   :extra-deps {io.github.cognitect-labs/test-runner
+-                               {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                               {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+                   :main-opts ["-m" "cognitect.test-runner"]}}}
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..af416ec
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,9 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src"]
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/kami/cad.cljc b/src/kami/cad.cljk
+similarity index 82%
+rename from src/kami/cad.cljc
+rename to src/kami/cad.cljk
+index a91d37c..0b6e456 100644
+--- a/src/kami/cad.cljc
++++ b/src/kami/cad.cljk
+@@ -355,7 +355,7 @@
+ (defn suppress-feature [model id suppressed?]
+   (update-feature model id assoc :feature/suppressed? (boolean suppressed?)))
+ 
+-(declare extrude-polygon boolean-union boolean-difference boolean-intersect
++(declare extrude-polygon extrude-polygon-with-holes boolean-union boolean-difference boolean-intersect
+          translate-solid rotate-solid mirror-solid transform-solid)
+ (defn- evaluate-feature [feature inputs]
+   (let [p (:feature/params feature)]
+@@ -371,6 +371,7 @@
+       :chamfer-sketch (chamfer-sketch (first inputs) (:corner p) (:distance p) (:start-id p) (:end-id p) (:chamfer-id p))
+       :sketch->polygon (sketch-loop->polygon (first inputs) (:segments p 16))
+       :extrude (extrude-polygon (first inputs) (:direction p))
++      :extrude-with-holes (extrude-polygon-with-holes (first inputs) (:holes p) (:direction p))
+       ;; Boolean feature kinds always evaluate to a *vector* of 0..2 result
+       ;; solids (see `boolean-union`/`boolean-difference`/`boolean-intersect`
+       ;; docstrings) -- consumers that need a single mesh must pick an
+@@ -954,3 +955,204 @@
+         (cond-> []
+           (> cut-lo lo) (conj (extrude-coaxial-solid pa (:polygon pa) lo cut-lo))
+           (< cut-hi hi) (conj (extrude-coaxial-solid pa (:polygon pa) cut-hi hi)))))))
++
++;; Polygon-with-hole extrusion. The boolean-ops scope note above states the
++;; constraint this lifts: a single-loop `extrude-polygon` prism cannot
++;; represent a solid with a hole (e.g. a cartridge body pierced by a hydrogen
++;; flow channel), because the annular cap is not a simple polygon. Here the
++;; caps are triangulated annulus strips instead of claimed as one loop, which
++;; keeps every face a plain polygon and keeps `watertight-solid?` meaningful.
++;;
++;; Scope (deliberate narrow first cut, same discipline as the boolean ops):
++;;   - exactly ONE hole loop (multi-hole caps are not yet supported);
++;;   - both loops convex and planar perpendicular to the extrusion axis, and
++;;     the direction must be axis-aligned (exactly one of x/y/z nonzero);
++;;   - the hole loop must have the SAME vertex count as the outer loop, with
++;;     vertices paired by index (hole corner i against outer corner i). A
++;;     pairing whose cap strips would cross is refused loudly rather than
++;;     producing an inside-out or self-overlapping cap -- rotate the hole
++;;     loop's start index to align with the outer loop;
++;;   - every hole vertex must lie strictly inside the outer loop (outer is
++;;     convex, so this contains the whole hole);
++;;   - the result is watertight but is NOT yet a boolean-ops input
++;;     (`coaxial-prism` accepts only 2n-vertex single-loop prisms).
++(defn- planar-loop-coord [ai points]
++  (let [vals (mapv #(nth % ai) points)]
++    (when-not (apply = vals)
++      (throw (ex-info "loops must be planar perpendicular to the extrusion axis"
++                      {:axis-coords (vec (distinct vals))})))
++    (first vals)))
++
++(defn extrude-polygon-with-holes
++  "Extrude a planar convex polygon with one convex hole along an axis-aligned
++  direction into a closed watertight solid. See the scope note above this
++  definition for exactly which inputs are supported; anything else throws."
++  [points holes direction]
++  (when (every? zero? direction) (throw (ex-info "extrusion direction cannot be zero" {})))
++  (when (not= 1 (count holes))
++    (throw (ex-info "extrude-polygon-with-holes supports exactly one hole"
++                    {:holes (count holes)})))
++  (let [axis (direction-axis direction)
++        ai (get axis-index axis)
++        [i0 i1] (get plane-indices axis)
++        outer (ensure-ccw (mapv vec points))
++        hole (ensure-ccw (mapv vec (first holes)))
++        n (count outer)]
++    (when (or (< n 3) (not= n (count (distinct outer))))
++      (throw (ex-info "extrusion needs three distinct polygon points" {:points points})))
++    (when (or (< (count hole) 3) (not= (count hole) (count (distinct hole))))
++      (throw (ex-info "hole needs three distinct points" {:hole (vec (first holes))})))
++    (when-not (convex-polygon? outer) (throw (ex-info "outer loop must be convex" {:outer outer})))
++    (when-not (convex-polygon? hole) (throw (ex-info "hole loop must be convex" {:hole hole})))
++    (when (not= n (count hole))
++      (throw (ex-info "hole loop must have the same vertex count as the outer loop (index-paired cap strips)"
++                      {:outer n :hole (count hole)})))
++    (planar-loop-coord ai outer)
++    (planar-loop-coord ai hole)
++    (let [proj-outer (mapv #(vector (nth % i0) (nth % i1)) outer)
++          proj-hole (mapv #(vector (nth % i0) (nth % i1)) hole)
++          strictly-inside?
++          (fn [[u v]]
++            (every? (fn [[a b]]
++                      (let [side (- (* (- (first b) (first a)) (- v (second a)))
++                                    (* (- (second b) (second a)) (- u (first a))))]
++                        (> side boolean-eps)))
++                    (map vector proj-outer (concat (rest proj-outer) [(first proj-outer)]))))]
++      (doseq [p proj-hole]
++        (when-not (strictly-inside? p)
++          (throw (ex-info "hole must lie strictly inside the outer loop" {:point p}))))
++      (let [j (fn [i] (mod (inc i) n))
++            signed-area
++            (fn [[ax ay] [bx by] [cx cy]] (* 0.5 (- (* (- bx ax) (- cy ay)) (* (- by ay) (- cx ax)))))]
++        ;; Refuse crossed cap pairings before building anything.
++        (doseq [i (range n)]
++          (let [ji (j i)
++                o (nth proj-outer i) o' (nth proj-outer ji)
++                h (nth proj-hole i) h' (nth proj-hole ji)]
++            (when (or (<= (signed-area o o' h) boolean-eps)
++                      (<= (signed-area o' h' h) boolean-eps))
++              (throw (ex-info "hole loop pairing crosses the cap strips; rotate the hole loop's start index to align with the outer loop"
++                              {:index i})))))
++        (let [ib (fn [i] (+ (* 2 n) i))
++              it (fn [i] (+ (* 3 n) i))
++              top-tris (mapv (fn [i] (let [ji (j i)]
++                                       [[(+ n i) (+ n ji) (it i)]
++                                        [(+ n ji) (it ji) (it i)]]))
++                             (range n))
++              bottom-tris (mapv (fn [t] (mapv #(nth t %) [2 1 0]))
++                                (mapcat identity
++                                        (mapv (fn [i] (let [ji (j i)]
++                                                        [[i ji (ib i)]
++                                                         [ji (ib ji) (ib i)]]))
++                                              (range n))))
++              sides (mapv (fn [i] (let [ji (j i)] [i ji (+ n ji) (+ n i)])) (range n))
++              hole-walls (mapv (fn [i] (let [ji (j i)]
++                                         [(it i) (it ji) (ib ji) (ib i)]))
++                               (range n))
++              vertices (-> (vec points)
++                           (into (mapv #(mapv + % direction) points))
++                           (into hole)
++                           (into (mapv #(mapv + % direction) hole)))
++              result (solid vertices
++                            (vec (concat (mapcat identity top-tris) bottom-tris sides hole-walls)))]
++          (when-not (watertight-solid? result)
++            (throw (ex-info "extrusion with hole produced invalid topology" {})))
++          result)))))
++
++;; ── solid mass properties (centroid + inertia) ──────────────────────────
++
++(defn- v3-dot [u v] (reduce + 0.0 (map * u v)))
++
++(defn- v3-cross [u v]
++  [(- (* (nth u 1) (nth v 2)) (* (nth u 2) (nth v 1)))
++   (- (* (nth u 2) (nth v 0)) (* (nth u 0) (nth v 2)))
++   (- (* (nth u 0) (nth v 1)) (* (nth u 1) (nth v 0)))])
++
++(defn solid-mass-properties
++  "Geometric centroid and inertia (second-moment) tensor of a watertight
++  solid, computed exactly from its triangulated boundary mesh
++  (`solid-mesh`) by summing oriented tetrahedra from the origin.
++
++  This is the smallest CAE-facing addition to the parametric 3D layer: the
++  engine already builds solids (`extrude-polygon`, `revolve`, annulus
++  extrusion, booleans), measures them (`solid-volume`, `bounds`), and
++  places them (`translate-solid`, `rotate-solid`, ...), but nothing on main
++  turns a measured solid into the mass-location / inertia inputs a
++  structural or dynamic CAE consumer needs. Without it a packaging
++  engineer placing the replaceable Mg/MgH2 cartridge inside the load-bearing
++  magnesium structure, or a dynamics engineer who needs a body's moment of
++  inertia, must re-triangulate the same mesh by hand and re-derive its
++  orientation convention — the exact duplication this contract removes.
++
++  The math is pure geometry — no material, density, or performance constant
++  is invented here (the system scope forbids inventing those). All results
++  are at UNIT density; a caller with a measured density multiplies the
++  reported values themselves. The basis is the solid's own vertex frame, so
++  the result is neutral-data-first and moves with the same rigid transforms
++  the rest of the engine applies. Orientation is never assumed: the signed
++  tetrahedron sum is normalized so the reported volume is positive, so an
++  inward- or outward-wound mesh yields the identical centroid and inertia.
++
++  Per boundary triangle (a, b, c), the oriented tetrahedron (0, a, b, c):
++    Vt  = det(a,b,c)/6                  (oriented volume)
++    sa  = a + b + c                     (vertex sum)
++    ∫ x dV  = Vt · sa/4                 (centroid contribution)
++    ∫x_i x_j dV = Vt/20 · ((a_i a_j + b_i b_j + c_i c_j) + sa_i·sa_j)
++  These are the exact simplex integrals (verified against the unit
++  tetrahedron), so a solid is integrated precisely, never sampled.
++
++  Returns {:volume (== `solid-volume`, positive)
++           :centroid  [x y z]
++           :inertia-about-origin    3x3 matrix about the world origin
++           :inertia-about-centroid  3x3 tensor about the centroid
++                                    (parallel-axis reduced)}
++  all at unit density. Refuses a non-watertight or zero-volume solid."
++  [s]
++  (when-not (watertight-solid? s)
++    (throw (ex-info "solid-mass-properties needs a watertight solid" {})))
++  (let [{:keys [positions indices]} (solid-mesh s)
++        ;; state = [V m0 m1 m2  S00 S01 S02  S10 S11 S12  S20 S21 S22]
++        init (vec (repeat 13 0.0))
++        step (fn [st [ai bi ci]]
++               (let [a (nth positions ai)
++                     b (nth positions bi)
++                     c (nth positions ci)
++                     vt (double (/ (v3-dot a (v3-cross b c)) 6.0))
++                     sa (mapv (fn [i] (+ (nth a i) (nth b i) (nth c i))) (range 3))
++                     d  (fn [i j] (+ (* (nth a i) (nth a j))
++                                     (* (nth b i) (nth b j))
++                                     (* (nth c i) (nth c j))))
++                     acc (fn [i j] (* vt (/ (+ (d i j) (* (nth sa i) (nth sa j))) 20.0)))]
++                 [(+ (nth st 0) vt)
++                  (+ (nth st 1) (* vt (nth sa 0) 0.25)) (+ (nth st 2) (* vt (nth sa 1) 0.25)) (+ (nth st 3) (* vt (nth sa 2) 0.25))
++                  (+ (nth st 4)  (acc 0 0)) (+ (nth st 5)  (acc 0 1)) (+ (nth st 6)  (acc 0 2))
++                  (+ (nth st 7)  (acc 1 0)) (+ (nth st 8)  (acc 1 1)) (+ (nth st 9)  (acc 1 2))
++                  (+ (nth st 10) (acc 2 0)) (+ (nth st 11) (acc 2 1)) (+ (nth st 12) (acc 2 2))]))
++        raw (reduce step init (partition 3 indices))
++        sgn (if (neg? (double (nth raw 0))) -1.0 1.0)
++        st  (mapv #(* sgn %) raw)
++        V   (nth st 0)
++        m   (mapv (fn [i] (nth st (inc i))) (range 3))
++        S   (mapv (fn [i] (mapv (fn [j] (nth st (+ 4 (* i 3) j))) (range 3))) (range 3))]
++    (when-not (pos? (double V))
++      (throw (ex-info "solid-mass-properties: zero-volume solid" {:volume V})))
++    (let [centroid (mapv double (mapv #(/ % V) m))
++          tr  (reduce + (mapv (fn [i] (get-in S [i i])) (range 3)))
++          ;; inertia about origin I = tr(S)·I3 − S
++          io  (mapv (fn [i]
++                      (mapv (fn [j] (if (= i j) (- tr (get-in S [i i])) (- (get-in S [i j]))))
++                            (range 3)))
++                    (range 3))
++          ;; parallel-axis to centroid: I^c = I^o − V(‖c‖²·I3 − c⊗c)
++          c2  (reduce + (map #(* % %) centroid))
++          ic  (mapv (fn [i]
++                      (mapv (fn [j]
++                              (let [off (* V (nth centroid i) (nth centroid j))]
++                                (if (= i j) (- (get-in io [i i]) (- (* V c2) off))
++                                  (+ (get-in io [i j]) off))))
++                            (range 3)))
++                    (range 3))]
++      {:volume (double V)
++       :centroid centroid
++       :inertia-about-origin (mapv (fn [r] (mapv double r)) io)
++       :inertia-about-centroid (mapv (fn [r] (mapv double r)) ic)})))
+\ No newline at end of file
+diff --git a/test/kami/cad_test.cljc b/test/kami/cad_test.cljk
+similarity index 75%
+rename from test/kami/cad_test.cljc
+rename to test/kami/cad_test.cljk
+index 26d3c09..c37e4a3 100644
+--- a/test/kami/cad_test.cljc
++++ b/test/kami/cad_test.cljk
+@@ -1,4 +1,4 @@
+-(ns kami.cad-test (:require [clojure.test :refer [deftest is testing]] [kami.cad :as cad]))
++(ns kami.cad-test (:require [kotoba.test :refer [deftest is testing]] [kami.cad :as cad]))
+ (defn close-point? [a b]
+   (every? true? (map #(< (#?(:clj Math/abs :cljs js/Math.abs) (- %1 %2)) 1.0e-10) a b)))
+ (defn near-point? [a b]
+@@ -266,6 +266,76 @@
+     (testing "and the solver does not report a converged sketch for it"
+       (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs :default) (cad/solve-sketch s))))))
+ 
++(deftest annulus-extrusion-is-watertight-with-exact-volume
++  ;; Cartridge-body shape: square block pierced by a square hydrogen flow
++  ;; channel. Outer 4x4x2 (32) minus hole 2x2x2 (8) -> 24 world units^3.
++  (let [solid (cad/extrude-polygon-with-holes
++               [[0 0 0] [4 0 0] [4 4 0] [0 4 0]]
++               [[[1 1 0] [3 1 0] [3 3 0] [1 3 0]]]
++               [0 0 2])
++        mesh (cad/solid-mesh solid)]
++    (is (cad/watertight-solid? solid))
++    (is (== 24.0 (cad/solid-volume solid)))
++    (is (= 16 (count (:solid/vertices solid))))
++    ;; caps: 2n strip triangles top + 2n bottom; sides: n outer quads + n hole quads
++    ;; -> 8n mesh triangles = 32 for n=4
++    (is (= 96 (count (:indices mesh))))                    ; 32 triangles * 3
++    (is (every? #(< -1 % 16) (:indices mesh)))
++    ;; the hole is genuinely open: no face covers the channel centre axis
++    (is (not-any? (fn [face] (some #(= % [1.0 1.0 0.0]) (map (:solid/vertices solid) face)))
++                  (remove #(= 3 (count %)) (:solid/faces solid))))))
++
++(deftest annulus-extrusion-tube-cross-section-carries-through-volume
++  ;; The subtractive identity a cartridge designer needs: volume == outer
++  ;; prism volume minus hole prism volume, computed from the mesh alone.
++  (let [outer [[0 0 0] [6 0 0] [6 6 0] [0 6 0]]
++        hole [[[2 2 0] [4 2 0] [4 4 0] [2 4 0]]]
++        holed (cad/extrude-polygon-with-holes outer hole [0 0 3])
++        outer-vol (cad/solid-volume (cad/extrude-polygon outer [0 0 3]))
++        hole-vol (cad/solid-volume (cad/extrude-polygon (first hole) [0 0 3]))]
++    (is (cad/watertight-solid? holed))
++    (is (< (#?(:clj Math/abs :cljs js/Math.abs)
++            (- (cad/solid-volume holed) (- outer-vol hole-vol)))
++           1.0e-9))))
++
++(deftest annulus-extrusion-participates-in-feature-tree
++  (let [model (cad/feature-model
++               [(cad/feature :profile :source [] {:value [[0 0 0] [4 0 0] [4 4 0] [0 4 0]]})
++                (cad/feature :body :extrude-with-holes [:profile]
++                             {:holes [[[1 1 0] [3 1 0] [3 3 0] [1 3 0]]] :direction [0 0 2]})])
++        rebuilt (cad/recompute-feature-model model)]
++    (is (= :ok (get-in rebuilt [:feature-model/statuses :body :status])))
++    (is (== 24.0 (cad/solid-volume (get-in rebuilt [:feature-model/results :body]))))))
++
++(deftest annulus-extrusion-refuses-invalid-holes-loudly
++  (let [outer [[0 0 0] [4 0 0] [4 4 0] [0 4 0]]
++        aligned [[[1 1 0] [3 1 0] [3 3 0] [1 3 0]]]]
++    ;; two holes: out of scope, not silently reduced
++    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs :default) #"exactly one hole"
++                          (cad/extrude-polygon-with-holes outer [aligned aligned] [0 0 2])))
++    ;; hole outside the outer loop
++    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs :default) #"strictly inside"
++                          (cad/extrude-polygon-with-holes
++                           outer [[[10 10 0] [12 10 0] [12 12 0] [10 12 0]]] [0 0 2])))
++    ;; vertex-count mismatch (the pairing contract)
++    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs :default) #"same vertex count"
++                          (cad/extrude-polygon-with-holes
++                           outer [[[1 1 0] [3 1 0] [2 2 0]]] [0 0 2])))
++    ;; misaligned start index -> cap strips would cross -> refused
++    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs :default) #"crosses the cap strips"
++                          (cad/extrude-polygon-with-holes
++                           outer [[[3 3 0] [1 3 0] [1 1 0] [3 1 0]]] [0 0 2])))
++    ;; non-convex hole
++    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs :default) #"hole loop must be convex"
++                          (cad/extrude-polygon-with-holes
++                           outer [[[1 1 0] [3 1 0] [2 2 0] [3 3 0] [1 3 0]]] [0 0 2])))
++    ;; non-axis-aligned direction is out of scope for the planar-pairing math
++    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs :default) #"axis-aligned"
++                          (cad/extrude-polygon-with-holes outer aligned [1 0 1])))
++    ;; non-planar hole
++    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs :default) #"planar"
++                          (cad/extrude-polygon-with-holes
++                           outer [[[1 1 0] [3 1 0.5] [3 3 0] [1 3 0]]] [0 0 2])))))
+ (deftest rotation-matrix-known-angles
+   (let [m (cad/rotation-matrix [0 0 1] (/ Math/PI 2))
+         mv (fn [v] (mapv (fn [row] (reduce + (map * row v))) m))]
+@@ -447,3 +517,71 @@
+                  (cad/boolean-union s
+                                     (cad/extrude-polygon [[0 0 0] [1 0 0] [1 1 0] [0 1 0]]
+                                                          [0 0 1]))))))
++
++(deftest solid-mass-properties-verified-against-analytic-box
++  ;; Solid box 4x3x2: volume 24, centroid [2 1.5 1], inertia about centroid
++  ;; = V/12 · (ly²+lz², lx²+lz², lx²+ly²) = 2·(13, 20, 25).
++  (let [mp (cad/solid-mass-properties (cad/extrude-polygon [[0 0 0] [4 0 0] [4 3 0] [0 3 0]] [0 0 2]))]
++    (is (== 24.0 (:volume mp)))
++    (is (near-point? [2.0 1.5 1.0] (:centroid mp)))
++    (let [ic (:inertia-about-centroid mp)]
++      ;; diagonal dominant; off-diagonals ~0 for a box centered at its own centroid
++      (is (near-point? [26.0 40.0 50.0]
++                       [(get-in ic [0 0]) (get-in ic [1 1]) (get-in ic [2 2])]))
++      (is (every? #(< (#?(:clj Math/abs :cljs js/Math.abs) %) 1.0e-9)
++                  [(get-in ic [0 1]) (get-in ic [0 2]) (get-in ic [1 2])])))))
++
++(deftest solid-mass-properties-volume-consistent-with-solid-volume
++  (let [s (cad/extrude-polygon [[0 0 0] [6 0 0] [6 4 0] [0 4 0]] [0 0 3])
++        mp (cad/solid-mass-properties s)]
++    (is (== (cad/solid-volume s) (:volume mp)))
++    (is (== 72.0 (:volume mp)))
++    (is (near-point? [3.0 2.0 1.5] (:centroid mp)))))
++
++(deftest solid-mass-properties-translation-moves-centroid
++  ;; Translating a solid rigidly must shift the centroid by the same vector
++  ;; and preserve volume and centroid-inertia (a rigid body's own inertia
++  ;; tensor is translation-invariant).
++  (let [ms (cad/solid-mass-properties (cad/extrude-polygon [[0 0 0] [4 0 0] [4 3 0] [0 3 0]] [0 0 2]))
++        mt (cad/solid-mass-properties (cad/translate-solid
++                                       (cad/extrude-polygon [[0 0 0] [4 0 0] [4 3 0] [0 3 0]] [0 0 2])
++                                       [10 -5 2]))]
++    (is (near-point? (map + (:centroid ms) [10 -5 2]) (:centroid mt)))
++    (is (< (#?(:clj Math/abs :cljs js/Math.abs) (- (:volume ms) (:volume mt))) 1.0e-9))
++    (is (every? true? (map (fn [r1 r2]
++                             (every? true? (map (fn [x y]
++                                                  (< (#?(:clj Math/abs :cljs js/Math.abs) (- x y)) 1.0e-9))
++                                                r1 r2)))
++                           (:inertia-about-centroid ms) (:inertia-about-centroid mt))))))
++
++(deftest solid-mass-properties-annulus-centroid-and-volume
++  ;; 4x4x2 outer minus centered 2x2x2 hole -> volume 24, centroid [2 2 1]
++  ;; (the cartridge-body shape from the established annulus tests).
++  (let [s (cad/extrude-polygon-with-holes [[0 0 0] [4 0 0] [4 4 0] [0 4 0]]
++                                          [[[1 1 0] [3 1 0] [3 3 0] [1 3 0]]]
++                                          [0 0 2])
++        mp (cad/solid-mass-properties s)]
++    (is (== 24.0 (:volume mp)))
++    (is (near-point? [2.0 2.0 1.0] (:centroid mp)))))
++
++(deftest solid-mass-properties-orientation-independent
++  ;; Mirrored box flips winding without renumbering vertices; the centroid
++  ;; reflects but the volume and centroid-inertia tensor are unchanged and
++  ;; the centroid-relative inertia is mirror-invariant. Orientation is
++  ;; normalized, never assumed.
++  (let [box (cad/extrude-polygon [[0 0 0] [4 0 0] [4 3 0] [0 3 0]] [0 0 2])
++        mir (cad/mirror-solid box :x)
++        mb (cad/solid-mass-properties box)
++        mm (cad/solid-mass-properties mir)]
++    (is (== (:volume mb) (:volume mm)))
++    ;; mirror of [2 1.5 1] across x=0 is [-2 1.5 1]
++    (is (near-point? [-2.0 1.5 1.0] (:centroid mm)))
++    (is (every? true? (map (fn [r1 r2]
++                             (every? true? (map (fn [x y]
++                                                  (< (#?(:clj Math/abs :cljs js/Math.abs) (- x y)) 1.0e-9))
++                                                r1 r2)))
++                           (:inertia-about-centroid mb) (:inertia-about-centroid mm))))))
++
++(deftest solid-mass-properties-refuses-bad-input
++  (is (thrown? #?(:clj Exception :cljs js/Error)
++               (cad/solid-mass-properties (cad/solid [[0 0 0] [1 0 0] [0 1 0]] [[0 1 2]])))))
+\ No newline at end of file

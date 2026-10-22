@@ -1,0 +1,249 @@
+{
+  "repository": "kotoba-lang/kami-flow",
+  "default": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "commit": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "commit": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "500f795c5f741154e4cf9f9ec8ac1e8f79b751d4",
+      "commit": "500f795c5f741154e4cf9f9ec8ac1e8f79b751d4",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "9b125ba5c295a05a653eed6e55a722ddb8074729",
+      "commit": "9b125ba5c295a05a653eed6e55a722ddb8074729",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/fluid/pressure-drop-contract",
+      "object": "2511cb6e8191437ff1592233863b9564c562ef81",
+      "commit": "2511cb6e8191437ff1592233863b9564c562ef81",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-flow/pull/1",
+        "head": "2511cb6e8191437ff1592233863b9564c562ef81",
+        "merge": "b9488e1cc899c38570b5f44131b2ee719c506766",
+        "merge-base": "0fba8194f56c00e358fe4874e077535964a811ea",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "2a4604dab3af9a4b230e95310966e1cecbbd50b2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/fluid/pump-operating-point",
+      "object": "dd917b8185486cfbc92edf802edb5a2cae340a26",
+      "commit": "dd917b8185486cfbc92edf802edb5a2cae340a26",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "commit": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "2511cb6e8191437ff1592233863b9564c562ef81",
+      "commit": "2511cb6e8191437ff1592233863b9564c562ef81",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-flow/pull/1",
+        "head": "2511cb6e8191437ff1592233863b9564c562ef81",
+        "merge": "b9488e1cc899c38570b5f44131b2ee719c506766",
+        "merge-base": "0fba8194f56c00e358fe4874e077535964a811ea",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "2a4604dab3af9a4b230e95310966e1cecbbd50b2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-2",
+      "object": "dd917b8185486cfbc92edf802edb5a2cae340a26",
+      "commit": "dd917b8185486cfbc92edf802edb5a2cae340a26",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-3",
+      "object": "a04405c311832bbbfbb1c01a125426d144f64448",
+      "commit": "a04405c311832bbbfbb1c01a125426d144f64448",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/HEAD",
+      "object": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "commit": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/cljk-rename-20260911",
+      "object": "fc96f93d7f80612552b8bf336e013423bf346d65",
+      "commit": "fc96f93d7f80612552b8bf336e013423bf346d65",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/fluid/pressure-drop-contract",
+      "object": "2511cb6e8191437ff1592233863b9564c562ef81",
+      "commit": "2511cb6e8191437ff1592233863b9564c562ef81",
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-flow/pull/1",
+        "head": "2511cb6e8191437ff1592233863b9564c562ef81",
+        "merge": "b9488e1cc899c38570b5f44131b2ee719c506766",
+        "merge-base": "0fba8194f56c00e358fe4874e077535964a811ea",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "2a4604dab3af9a4b230e95310966e1cecbbd50b2"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/fluid/pump-operating-point",
+      "object": "dd917b8185486cfbc92edf802edb5a2cae340a26",
+      "commit": "dd917b8185486cfbc92edf802edb5a2cae340a26",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/full-sha",
+      "object": "d3cf188fb486f8c21e9007660d1458e582fdb7dc",
+      "commit": "d3cf188fb486f8c21e9007660d1458e582fdb7dc",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/jv/kotoba-text",
+      "object": "67e763f5cedd211877750a3af6216c250fe67ed5",
+      "commit": "67e763f5cedd211877750a3af6216c250fe67ed5",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/kbb-cutover-20260911",
+      "object": "6ea4c4fd825330acad5ff466430328626ba31d21",
+      "commit": "6ea4c4fd825330acad5ff466430328626ba31d21",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/kotoba-lang/main",
+      "object": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "commit": "9e8d356f657e17568891d8b55bcaef1f3b97d465",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": [],
+  "strong-merged-head-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-flow/pull/1",
+      "head": "2511cb6e8191437ff1592233863b9564c562ef81",
+      "merge": "b9488e1cc899c38570b5f44131b2ee719c506766",
+      "merge-base": "0fba8194f56c00e358fe4874e077535964a811ea",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2a4604dab3af9a4b230e95310966e1cecbbd50b2"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 2,
+      "url": "https://github.com/kotoba-lang/kami-flow/pull/2",
+      "head": "dd917b8185486cfbc92edf802edb5a2cae340a26",
+      "merge": "c06b05a5b4b69073f03032dd1f14c2d46a6f4aba",
+      "merge-base": "1902a27dd363200ad5f73a6384914427b448bbeb",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "src/flow/pump.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "2afed4f7ac53c2c7f992489fe69eab0153ace90f"
+          }
+        },
+        {
+          "path": "test/flow/pump_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1886f6f8163802f179232652e2df9b1168b7664c"
+          }
+        }
+      ]
+    },
+    {
+      "pull-request": 3,
+      "url": "https://github.com/kotoba-lang/kami-flow/pull/3",
+      "head": "a04405c311832bbbfbb1c01a125426d144f64448",
+      "merge": "0fba8194f56c00e358fe4874e077535964a811ea",
+      "merge-base": "c06b05a5b4b69073f03032dd1f14c2d46a6f4aba",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "21fff58a51155b781321dfa711a1f2d9d5fc5472"
+          }
+        },
+        {
+          "path": "src/flow/choked.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "326278b038111fb03a310702b472c01c40509388"
+          }
+        },
+        {
+          "path": "test/flow/choked_test.cljc",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "5aacb83eeacc00aa5775262be523fcf09075d872"
+          }
+        }
+      ]
+    }
+  ]
+}

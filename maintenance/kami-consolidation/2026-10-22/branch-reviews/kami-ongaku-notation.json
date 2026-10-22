@@ -1,0 +1,55 @@
+{
+  "repository": "kotoba-lang/kami-ongaku-notation",
+  "default": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+  "decisions": [
+    {
+      "ref": "HEAD",
+      "object": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "commit": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/audit/forest-maintenance/default",
+      "object": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "commit": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/main",
+      "object": "0a61b700a331876c9693a022ad469c671b42f44e",
+      "commit": "0a61b700a331876c9693a022ad469c671b42f44e",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/heads/manifest-rev",
+      "object": "088cedcfcc27f5112da89c8480317c021e23d5c4",
+      "commit": "088cedcfcc27f5112da89c8480317c021e23d5c4",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/heads/main",
+      "object": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "commit": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/preservation/kami-monorepo-20261022/pull-1",
+      "object": "e48247759740ce7a527849bec2aea080e309d4be",
+      "commit": "e48247759740ce7a527849bec2aea080e309d4be",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/HEAD",
+      "object": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "commit": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "decision": "default-history"
+    },
+    {
+      "ref": "refs/remotes/origin/main",
+      "object": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "commit": "40d158a141c27d9bf74ebe36fde12bdbf5528060",
+      "decision": "default-history"
+    }
+  ],
+  "pending-semantic-review": []
+}

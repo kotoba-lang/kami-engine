@@ -1,0 +1,101 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTUhBWw",
+    "databaseId": 1296580955,
+    "nameWithOwner": "kotoba-lang/kami-mangaka-expression",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-25T01:19:37Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "96fc3cef86a46f177470b6a4f253f28cc0a5a7de"
+      }
+    },
+    "heads": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "chore/bb-to-nbb-wave3",
+          "target": {
+            "oid": "27c4dbdde84f3fcded0841bc352efe1ffd41f9aa"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "96fc3cef86a46f177470b6a4f253f28cc0a5a7de"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 1
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "96fc3cef86a46f177470b6a4f253f28cc0a5a7de",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-mangaka-expression\nHEAD 96fc3cef86a46f177470b6a4f253f28cc0a5a7de\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 96fc3cef86a46f177470b6a4f253f28cc0a5a7de\nrefs/heads/main 58cbe998d08cf1f9a28e5abfba0e0b29db7c7d3d\nrefs/heads/manifest-rev 5e3bc8a296ba0da6204087dc05b55bde5b232eb8\nrefs/remotes/origin/HEAD 96fc3cef86a46f177470b6a4f253f28cc0a5a7de\nrefs/remotes/origin/chore/bb-to-nbb-wave3 27c4dbdde84f3fcded0841bc352efe1ffd41f9aa\nrefs/remotes/origin/cljk-rename-20260911 dbc1929d4b11bedb97be3e958df2d34f9c468cc8\nrefs/remotes/origin/jv/drop-nbb-cache 39475ccf25eb3b3eec6e818ec06865bb67c3d5d0\nrefs/remotes/origin/jv/full-sha 35a5c6270034152c58382a55fc21ae26997d9366\nrefs/remotes/origin/jv/kotoba-text 73fbfb327e841df19ad46f0ca0ff7b5e818faa0a\nrefs/remotes/origin/jv/kotoba-text-cljs 3ddb3f470a4c31359115b3c1a92a9cf083eef0d5\nrefs/remotes/origin/jv/nbb-declaration 13a8bab6698742d1b33b93c2af14688eb3d6420f\nrefs/remotes/origin/kbb-cutover-20260911 9e4485aefced743eebc9129dcffab030dd489cd0\nrefs/remotes/origin/main 96fc3cef86a46f177470b6a4f253f28cc0a5a7de"
+  },
+  "local-after-preservation": {
+    "HEAD": "96fc3cef86a46f177470b6a4f253f28cc0a5a7de",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-mangaka-expression\nHEAD 96fc3cef86a46f177470b6a4f253f28cc0a5a7de\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "96fc3cef86a46f177470b6a4f253f28cc0a5a7de",
+      "refs/heads/main": "58cbe998d08cf1f9a28e5abfba0e0b29db7c7d3d",
+      "refs/heads/manifest-rev": "5e3bc8a296ba0da6204087dc05b55bde5b232eb8",
+      "refs/preservation/kami-monorepo-20261022/heads/chore/bb-to-nbb-wave3": "27c4dbdde84f3fcded0841bc352efe1ffd41f9aa",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "96fc3cef86a46f177470b6a4f253f28cc0a5a7de",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "2ab39bbb3fb1806bad784fd703a305f2e50cc227",
+      "refs/remotes/origin/HEAD": "96fc3cef86a46f177470b6a4f253f28cc0a5a7de",
+      "refs/remotes/origin/chore/bb-to-nbb-wave3": "27c4dbdde84f3fcded0841bc352efe1ffd41f9aa",
+      "refs/remotes/origin/cljk-rename-20260911": "dbc1929d4b11bedb97be3e958df2d34f9c468cc8",
+      "refs/remotes/origin/jv/drop-nbb-cache": "39475ccf25eb3b3eec6e818ec06865bb67c3d5d0",
+      "refs/remotes/origin/jv/full-sha": "35a5c6270034152c58382a55fc21ae26997d9366",
+      "refs/remotes/origin/jv/kotoba-text": "73fbfb327e841df19ad46f0ca0ff7b5e818faa0a",
+      "refs/remotes/origin/jv/kotoba-text-cljs": "3ddb3f470a4c31359115b3c1a92a9cf083eef0d5",
+      "refs/remotes/origin/jv/nbb-declaration": "13a8bab6698742d1b33b93c2af14688eb3d6420f",
+      "refs/remotes/origin/kbb-cutover-20260911": "9e4485aefced743eebc9129dcffab030dd489cd0",
+      "refs/remotes/origin/main": "96fc3cef86a46f177470b6a4f253f28cc0a5a7de"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "feat: Hume-grounded manga eye and expression taxonomy",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/hume-manga-face-taxonomy-260823",
+      "headRefOid": "2ab39bbb3fb1806bad784fd703a305f2e50cc227",
+      "baseRefName": "main",
+      "baseRefOid": "e8d578fc3d4d0342d3a852e1b349e6c2e8146cb4",
+      "mergeCommit": {
+        "oid": "ef6b27a875664f4308c52fc670687d316668b09d"
+      },
+      "mergedAt": "2026-08-23T08:02:48Z",
+      "url": "https://github.com/kotoba-lang/kami-mangaka-expression/pull/1"
+    }
+  ]
+}

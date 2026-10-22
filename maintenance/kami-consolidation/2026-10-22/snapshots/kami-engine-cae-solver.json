@@ -1,0 +1,1051 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTGwthA",
+    "databaseId": 1282157956,
+    "nameWithOwner": "kotoba-lang/kami-engine-cae-solver",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-25T01:23:26Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "92dcd10b8d56d721073131d005d944077605bc5e"
+      }
+    },
+    "heads": {
+      "totalCount": 22,
+      "nodes": [
+        {
+          "name": "agent/cae-maturity-pages",
+          "target": {
+            "oid": "77a4991c59f381dffc2558c1f66f3e591f70318a"
+          }
+        },
+        {
+          "name": "agent/calculix-plastic-mesh-sensitivity",
+          "target": {
+            "oid": "6e79f91470d28e17098cf50bc63bfc5469c67549"
+          }
+        },
+        {
+          "name": "agent/calculix-runtime-evidence",
+          "target": {
+            "oid": "68ccad65cc89290cfca879eef4ca7a537f476233"
+          }
+        },
+        {
+          "name": "agent/fix-responsive-viewport",
+          "target": {
+            "oid": "2254cdb6790bbcefabc436b68f406c1ec5c6c9fc"
+          }
+        },
+        {
+          "name": "agent/h2-desorption-vant-hoff",
+          "target": {
+            "oid": "06e2bbb2c2b65fe46337740f019eddf5fc9c926f"
+          }
+        },
+        {
+          "name": "agent/i18n-simulator",
+          "target": {
+            "oid": "b2148e9750c6aa47c431b2590aa736f96323017d"
+          }
+        },
+        {
+          "name": "agent/industrial-vv-gates",
+          "target": {
+            "oid": "1201d9fcec88833ab7d47bb8d0b7ab76582224a1"
+          }
+        },
+        {
+          "name": "agent/interactive-physics-actions",
+          "target": {
+            "oid": "2f109d28109f7db1f8ea09308fcae38d6c79a307"
+          }
+        },
+        {
+          "name": "agent/nasa-experimental-validation-data",
+          "target": {
+            "oid": "ef751b238ccdc026d15745d2b2f784a7355f1974"
+          }
+        },
+        {
+          "name": "agent/nist-material-calibration",
+          "target": {
+            "oid": "9bceb71e420cdce7b28fe3dfd7ae316b865f09b7"
+          }
+        },
+        {
+          "name": "agent/openfoam-runtime-evidence",
+          "target": {
+            "oid": "486af37d1b3ce48ab204cadf6b9c9b79412b4aa9"
+          }
+        },
+        {
+          "name": "agent/reproducible-dataset-evidence",
+          "target": {
+            "oid": "2a9119e9951eb9a9b621f1296046f3f3fc3b6395"
+          }
+        },
+        {
+          "name": "agent/solver-generated-vv-evidence",
+          "target": {
+            "oid": "71264f8b3f577d75ba91d900bb44171c32d2b326"
+          }
+        },
+        {
+          "name": "agent/thermoplastic-mesh-sensitivity",
+          "target": {
+            "oid": "e911cfd821715384f4c3d519b131da97474d834e"
+          }
+        },
+        {
+          "name": "agent/thermoplastic-steady-convergence",
+          "target": {
+            "oid": "75f44315692a63043005cec44f519c6f1584cf5d"
+          }
+        },
+        {
+          "name": "cae/h2-delivery-setpoint",
+          "target": {
+            "oid": "f3dcf875267a37bc3fe01724f1adcc65a5bec87c"
+          }
+        },
+        {
+          "name": "cae/h2-desorption-kinetics",
+          "target": {
+            "oid": "c2cfa86cca994e4fa8fd685ec52be3aa8fe4ac0f"
+          }
+        },
+        {
+          "name": "cae/h2-heat-demand",
+          "target": {
+            "oid": "def08204eab94f0386cda2244277a8d3d470e639"
+          }
+        },
+        {
+          "name": "cae/h2-heater-limit",
+          "target": {
+            "oid": "a16cc381038f479fd40d7224674b77aab49f581f"
+          }
+        },
+        {
+          "name": "chore/maturity-ci",
+          "target": {
+            "oid": "863462fdd5055df77f6db347b44b425584fe2367"
+          }
+        },
+        {
+          "name": "fatigue/miner-spectrum",
+          "target": {
+            "oid": "a4574378cc0b3165d8b983ae1200238ab0b34b1c"
+          }
+        },
+        {
+          "name": "main",
+          "target": {
+            "oid": "92dcd10b8d56d721073131d005d944077605bc5e"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 52
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "92dcd10b8d56d721073131d005d944077605bc5e",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-cae-solver\nHEAD 92dcd10b8d56d721073131d005d944077605bc5e\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 92dcd10b8d56d721073131d005d944077605bc5e\nrefs/heads/main 37bbc496d2e00f3f34b70fa6b8c29f7b02a1ef5c\nrefs/heads/manifest-rev a3112a4f2e83cbf1f84ac4f97c31fe5797fed0aa\nrefs/remotes/origin/HEAD 92dcd10b8d56d721073131d005d944077605bc5e\nrefs/remotes/origin/agent/interactive-physics-actions 0e2cefb9e1e8b07087e6098c4c245186ec150143\nrefs/remotes/origin/main 92dcd10b8d56d721073131d005d944077605bc5e\nrefs/remotes/pr49 a16cc381038f479fd40d7224674b77aab49f581f"
+  },
+  "local-after-preservation": {
+    "HEAD": "92dcd10b8d56d721073131d005d944077605bc5e",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-engine-cae-solver\nHEAD 92dcd10b8d56d721073131d005d944077605bc5e\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "92dcd10b8d56d721073131d005d944077605bc5e",
+      "refs/heads/main": "37bbc496d2e00f3f34b70fa6b8c29f7b02a1ef5c",
+      "refs/heads/manifest-rev": "a3112a4f2e83cbf1f84ac4f97c31fe5797fed0aa",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/cae-maturity-pages": "77a4991c59f381dffc2558c1f66f3e591f70318a",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/calculix-plastic-mesh-sensitivity": "6e79f91470d28e17098cf50bc63bfc5469c67549",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/calculix-runtime-evidence": "68ccad65cc89290cfca879eef4ca7a537f476233",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/fix-responsive-viewport": "2254cdb6790bbcefabc436b68f406c1ec5c6c9fc",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/h2-desorption-vant-hoff": "06e2bbb2c2b65fe46337740f019eddf5fc9c926f",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/i18n-simulator": "b2148e9750c6aa47c431b2590aa736f96323017d",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/industrial-vv-gates": "1201d9fcec88833ab7d47bb8d0b7ab76582224a1",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/interactive-physics-actions": "2f109d28109f7db1f8ea09308fcae38d6c79a307",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/nasa-experimental-validation-data": "ef751b238ccdc026d15745d2b2f784a7355f1974",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/nist-material-calibration": "9bceb71e420cdce7b28fe3dfd7ae316b865f09b7",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/openfoam-runtime-evidence": "486af37d1b3ce48ab204cadf6b9c9b79412b4aa9",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/reproducible-dataset-evidence": "2a9119e9951eb9a9b621f1296046f3f3fc3b6395",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/solver-generated-vv-evidence": "71264f8b3f577d75ba91d900bb44171c32d2b326",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/thermoplastic-mesh-sensitivity": "e911cfd821715384f4c3d519b131da97474d834e",
+      "refs/preservation/kami-monorepo-20261022/heads/agent/thermoplastic-steady-convergence": "75f44315692a63043005cec44f519c6f1584cf5d",
+      "refs/preservation/kami-monorepo-20261022/heads/cae/h2-delivery-setpoint": "f3dcf875267a37bc3fe01724f1adcc65a5bec87c",
+      "refs/preservation/kami-monorepo-20261022/heads/cae/h2-desorption-kinetics": "c2cfa86cca994e4fa8fd685ec52be3aa8fe4ac0f",
+      "refs/preservation/kami-monorepo-20261022/heads/cae/h2-heat-demand": "def08204eab94f0386cda2244277a8d3d470e639",
+      "refs/preservation/kami-monorepo-20261022/heads/cae/h2-heater-limit": "a16cc381038f479fd40d7224674b77aab49f581f",
+      "refs/preservation/kami-monorepo-20261022/heads/chore/maturity-ci": "863462fdd5055df77f6db347b44b425584fe2367",
+      "refs/preservation/kami-monorepo-20261022/heads/fatigue/miner-spectrum": "a4574378cc0b3165d8b983ae1200238ab0b34b1c",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "92dcd10b8d56d721073131d005d944077605bc5e",
+      "refs/preservation/kami-monorepo-20261022/pull-1": "863462fdd5055df77f6db347b44b425584fe2367",
+      "refs/preservation/kami-monorepo-20261022/pull-10": "2f109d28109f7db1f8ea09308fcae38d6c79a307",
+      "refs/preservation/kami-monorepo-20261022/pull-11": "2254cdb6790bbcefabc436b68f406c1ec5c6c9fc",
+      "refs/preservation/kami-monorepo-20261022/pull-12": "b2148e9750c6aa47c431b2590aa736f96323017d",
+      "refs/preservation/kami-monorepo-20261022/pull-13": "1201d9fcec88833ab7d47bb8d0b7ab76582224a1",
+      "refs/preservation/kami-monorepo-20261022/pull-14": "71264f8b3f577d75ba91d900bb44171c32d2b326",
+      "refs/preservation/kami-monorepo-20261022/pull-15": "2a9119e9951eb9a9b621f1296046f3f3fc3b6395",
+      "refs/preservation/kami-monorepo-20261022/pull-16": "ef751b238ccdc026d15745d2b2f784a7355f1974",
+      "refs/preservation/kami-monorepo-20261022/pull-17": "486af37d1b3ce48ab204cadf6b9c9b79412b4aa9",
+      "refs/preservation/kami-monorepo-20261022/pull-18": "68ccad65cc89290cfca879eef4ca7a537f476233",
+      "refs/preservation/kami-monorepo-20261022/pull-19": "fc5c245d51e3130bc327d4f57694b81f8db7ed82",
+      "refs/preservation/kami-monorepo-20261022/pull-2": "77a4991c59f381dffc2558c1f66f3e591f70318a",
+      "refs/preservation/kami-monorepo-20261022/pull-20": "2ce49b832f1ce26f77a0085b02d9e8d31e26c0ab",
+      "refs/preservation/kami-monorepo-20261022/pull-21": "2e30f266f3a7108d5b9063e1494f553e49079907",
+      "refs/preservation/kami-monorepo-20261022/pull-22": "58331fa16fc4bf1442af4a67f1a69692c3a7486b",
+      "refs/preservation/kami-monorepo-20261022/pull-23": "b54d5816262744f7795b2616ad99a27e592a6051",
+      "refs/preservation/kami-monorepo-20261022/pull-24": "ae48797c7d0dd51c0d2863d762e5613051fff111",
+      "refs/preservation/kami-monorepo-20261022/pull-25": "6e79f91470d28e17098cf50bc63bfc5469c67549",
+      "refs/preservation/kami-monorepo-20261022/pull-26": "d6da6b68a44f6c97a1bc3840cefd5aa316186c9f",
+      "refs/preservation/kami-monorepo-20261022/pull-27": "9bceb71e420cdce7b28fe3dfd7ae316b865f09b7",
+      "refs/preservation/kami-monorepo-20261022/pull-28": "0d3cc94e388f8a98cdc32630d2a38a0df04270f1",
+      "refs/preservation/kami-monorepo-20261022/pull-29": "e911cfd821715384f4c3d519b131da97474d834e",
+      "refs/preservation/kami-monorepo-20261022/pull-3": "ab14646dc9e0c6bf948ec11d44fd8caf7c5fb85d",
+      "refs/preservation/kami-monorepo-20261022/pull-30": "75f44315692a63043005cec44f519c6f1584cf5d",
+      "refs/preservation/kami-monorepo-20261022/pull-31": "9bff4f6edb49b31413725e9d0869d4f146059a97",
+      "refs/preservation/kami-monorepo-20261022/pull-32": "5c1565b62f1c958985f073ae0e6d75769b467607",
+      "refs/preservation/kami-monorepo-20261022/pull-33": "dbc90475eb8125e4e22e28bdf9f9370dfce7b8e2",
+      "refs/preservation/kami-monorepo-20261022/pull-34": "932b8646779429180bcb9e9c8eb3fce68c20fc61",
+      "refs/preservation/kami-monorepo-20261022/pull-35": "2cba144600de3f020b6d14e8ea778836f2d43456",
+      "refs/preservation/kami-monorepo-20261022/pull-36": "1b0d790483fb4cdc266281c0a5a0a8bbf137d873",
+      "refs/preservation/kami-monorepo-20261022/pull-37": "4cf46032430c0be4a8e316f54be73f183e100787",
+      "refs/preservation/kami-monorepo-20261022/pull-38": "c2d4d4e003dcea14773c5128619c85bc34f23d5d",
+      "refs/preservation/kami-monorepo-20261022/pull-39": "0f20533d70a9f360df24c02a37d8905c05dbd724",
+      "refs/preservation/kami-monorepo-20261022/pull-4": "6982e2ae7e0e4f020063a9bb55cae79baef4094a",
+      "refs/preservation/kami-monorepo-20261022/pull-40": "e05e841fee113f1ac2b8f19e2b6df12fa7310b4c",
+      "refs/preservation/kami-monorepo-20261022/pull-41": "8c90a77a28c3409a9e33fde65efb55dc1fdc061f",
+      "refs/preservation/kami-monorepo-20261022/pull-42": "c818a87f12b37e4502cb291e63986191bab7a88f",
+      "refs/preservation/kami-monorepo-20261022/pull-43": "5daa5a5214c8244fe7deb2a9c3da79a052aa138d",
+      "refs/preservation/kami-monorepo-20261022/pull-44": "b19adcb79359cf0b5412d6b55efb75e9402e7cd1",
+      "refs/preservation/kami-monorepo-20261022/pull-45": "06e2bbb2c2b65fe46337740f019eddf5fc9c926f",
+      "refs/preservation/kami-monorepo-20261022/pull-46": "a4574378cc0b3165d8b983ae1200238ab0b34b1c",
+      "refs/preservation/kami-monorepo-20261022/pull-47": "c2cfa86cca994e4fa8fd685ec52be3aa8fe4ac0f",
+      "refs/preservation/kami-monorepo-20261022/pull-48": "def08204eab94f0386cda2244277a8d3d470e639",
+      "refs/preservation/kami-monorepo-20261022/pull-49": "a16cc381038f479fd40d7224674b77aab49f581f",
+      "refs/preservation/kami-monorepo-20261022/pull-5": "0574be8cc2a5e3dbfde58a3fdd4ddab458aa81ce",
+      "refs/preservation/kami-monorepo-20261022/pull-50": "032b380005a215cf82f65c1ec585fa65520dfa04",
+      "refs/preservation/kami-monorepo-20261022/pull-51": "f3dcf875267a37bc3fe01724f1adcc65a5bec87c",
+      "refs/preservation/kami-monorepo-20261022/pull-52": "1a1fd1f6cc144346e43a6ac7cfe31f961b381c5a",
+      "refs/preservation/kami-monorepo-20261022/pull-6": "6795a1859f64b210655caf9cfddd837639cf53ae",
+      "refs/preservation/kami-monorepo-20261022/pull-7": "745645e0fd36110e824f9949bf44f2018da654f6",
+      "refs/preservation/kami-monorepo-20261022/pull-8": "c9d3424969eeaa78bfc68781eaa93b3838f5f7c0",
+      "refs/preservation/kami-monorepo-20261022/pull-9": "067c2a58a211f367bc385cc8721ef2fb89db9536",
+      "refs/remotes/origin/HEAD": "92dcd10b8d56d721073131d005d944077605bc5e",
+      "refs/remotes/origin/agent/interactive-physics-actions": "0e2cefb9e1e8b07087e6098c4c245186ec150143",
+      "refs/remotes/origin/main": "92dcd10b8d56d721073131d005d944077605bc5e",
+      "refs/remotes/pr49": "a16cc381038f479fd40d7224674b77aab49f581f"
+    }
+  },
+  "historical-pulls": [
+    {
+      "number": 1,
+      "title": "chore(ci): add Clojure CI workflow + README badge",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "chore/maturity-ci",
+      "headRefOid": "863462fdd5055df77f6db347b44b425584fe2367",
+      "baseRefName": "main",
+      "baseRefOid": "a82eb6d5e5bcf3f89b7198f410b4d5daa2dad717",
+      "mergeCommit": {
+        "oid": "53e27f18ddcf10615a8a17adbb78018b1ab64a17"
+      },
+      "mergedAt": "2026-06-29T12:18:23Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/1"
+    },
+    {
+      "number": 2,
+      "title": "feat: mature CAE simulations and Pages report",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/cae-maturity-pages",
+      "headRefOid": "77a4991c59f381dffc2558c1f66f3e591f70318a",
+      "baseRefName": "main",
+      "baseRefOid": "7d3b87fd3d6b96442c7597078dd3a3f9a8afac54",
+      "mergeCommit": {
+        "oid": "b3a389d15066e336cf447bdcf9d66caaeb003954"
+      },
+      "mergedAt": "2026-07-10T12:16:46Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/2"
+    },
+    {
+      "number": 3,
+      "title": "feat: render Pages report with Kami WebGPU and WASM",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/kami-webgpu-pages",
+      "headRefOid": "ab14646dc9e0c6bf948ec11d44fd8caf7c5fb85d",
+      "baseRefName": "main",
+      "baseRefOid": "b3a389d15066e336cf447bdcf9d66caaeb003954",
+      "mergeCommit": {
+        "oid": "d5864fd44f069cfe876fdadd0b8b6c6bf431cb11"
+      },
+      "mergedAt": "2026-07-10T12:31:42Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/3"
+    },
+    {
+      "number": 4,
+      "title": "feat: add selectable 3d simulation scenes",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/kami-webgpu-pages",
+      "headRefOid": "6982e2ae7e0e4f020063a9bb55cae79baef4094a",
+      "baseRefName": "main",
+      "baseRefOid": "d5864fd44f069cfe876fdadd0b8b6c6bf431cb11",
+      "mergeCommit": {
+        "oid": "f9ecbdebd6b8515ae513851f8d7a8835530593b0"
+      },
+      "mergedAt": "2026-07-10T12:44:52Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/4"
+    },
+    {
+      "number": 5,
+      "title": "Add clean-room advanced CAE solvers and Kotoba Wasm hosting",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/advanced-cae-solvers",
+      "headRefOid": "0574be8cc2a5e3dbfde58a3fdd4ddab458aa81ce",
+      "baseRefName": "main",
+      "baseRefOid": "f9ecbdebd6b8515ae513851f8d7a8835530593b0",
+      "mergeCommit": {
+        "oid": "6db903053c6bb019607355bc20dbd55f103b862d"
+      },
+      "mergedAt": "2026-07-10T14:22:21Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/5"
+    },
+    {
+      "number": 6,
+      "title": "Add selectable advanced CAE WebGPU scenes",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/advanced-3d-scenes",
+      "headRefOid": "6795a1859f64b210655caf9cfddd837639cf53ae",
+      "baseRefName": "main",
+      "baseRefOid": "6db903053c6bb019607355bc20dbd55f103b862d",
+      "mergeCommit": {
+        "oid": "b86be99bfb7ddaa92ba1c34f88b6e15d54be8ebf"
+      },
+      "mergedAt": "2026-07-10T14:28:21Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/6"
+    },
+    {
+      "number": 7,
+      "title": "Drive WebGPU directly from ClojureScript",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/cljs-direct-webgpu",
+      "headRefOid": "745645e0fd36110e824f9949bf44f2018da654f6",
+      "baseRefName": "main",
+      "baseRefOid": "b86be99bfb7ddaa92ba1c34f88b6e15d54be8ebf",
+      "mergeCommit": {
+        "oid": "80794a481eabc1ad70a457b99312c651c52cdfd2"
+      },
+      "mergedAt": "2026-07-11T03:31:31Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/7"
+    },
+    {
+      "number": 8,
+      "title": "feat: realtime WebGPU physics demos",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/realtime-physics-demos",
+      "headRefOid": "c9d3424969eeaa78bfc68781eaa93b3838f5f7c0",
+      "baseRefName": "main",
+      "baseRefOid": "80794a481eabc1ad70a457b99312c651c52cdfd2",
+      "mergeCommit": {
+        "oid": "7f833c0d0b313ece1496b41f04267422872441c6"
+      },
+      "mergedAt": "2026-07-11T03:45:06Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/8"
+    },
+    {
+      "number": 9,
+      "title": "feat: interactive actions for realtime physics scenes",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/interactive-physics-actions",
+      "headRefOid": "067c2a58a211f367bc385cc8721ef2fb89db9536",
+      "baseRefName": "main",
+      "baseRefOid": "7f833c0d0b313ece1496b41f04267422872441c6",
+      "mergeCommit": {
+        "oid": "4fdb7e6ba9c0ba007c0393acdf7215e3550c0185"
+      },
+      "mergedAt": "2026-07-11T03:51:57Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/9"
+    },
+    {
+      "number": 10,
+      "title": "feat: Apple HIG-inspired single-screen simulator UI",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/interactive-physics-actions",
+      "headRefOid": "2f109d28109f7db1f8ea09308fcae38d6c79a307",
+      "baseRefName": "main",
+      "baseRefOid": "4fdb7e6ba9c0ba007c0393acdf7215e3550c0185",
+      "mergeCommit": {
+        "oid": "ef05d3334f962a6fd512d44677735081c39e8d3b"
+      },
+      "mergedAt": "2026-07-11T04:00:01Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/10"
+    },
+    {
+      "number": 11,
+      "title": "fix: preserve simulation viewport on compact screens",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/fix-responsive-viewport",
+      "headRefOid": "2254cdb6790bbcefabc436b68f406c1ec5c6c9fc",
+      "baseRefName": "main",
+      "baseRefOid": "ef05d3334f962a6fd512d44677735081c39e8d3b",
+      "mergeCommit": {
+        "oid": "c89d662ea650b0bace7d250a6161ed3c8b802d03"
+      },
+      "mergedAt": "2026-07-11T04:07:48Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/11"
+    },
+    {
+      "number": 12,
+      "title": "feat: localize simulator with kotoba-lang/i18n",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/i18n-simulator",
+      "headRefOid": "b2148e9750c6aa47c431b2590aa736f96323017d",
+      "baseRefName": "main",
+      "baseRefOid": "c89d662ea650b0bace7d250a6161ed3c8b802d03",
+      "mergeCommit": {
+        "oid": "950ded7f2b47bf3946dc2591139656e66eaf9eb5"
+      },
+      "mergedAt": "2026-07-11T06:08:40Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/12"
+    },
+    {
+      "number": 13,
+      "title": "feat: fail-closed industrial V&V gates",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/industrial-vv-gates",
+      "headRefOid": "1201d9fcec88833ab7d47bb8d0b7ab76582224a1",
+      "baseRefName": "main",
+      "baseRefOid": "950ded7f2b47bf3946dc2591139656e66eaf9eb5",
+      "mergeCommit": {
+        "oid": "6b7499b5ee861a8d5d7c7794e9771eff0ac22861"
+      },
+      "mergedAt": "2026-07-11T06:15:30Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/13"
+    },
+    {
+      "number": 14,
+      "title": "feat: solver-generated FVM and FEM V&V evidence",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/solver-generated-vv-evidence",
+      "headRefOid": "71264f8b3f577d75ba91d900bb44171c32d2b326",
+      "baseRefName": "main",
+      "baseRefOid": "6b7499b5ee861a8d5d7c7794e9771eff0ac22861",
+      "mergeCommit": {
+        "oid": "27fa2aa1c4b0ef43483fd65031513b10b3af1263"
+      },
+      "mergedAt": "2026-07-11T06:24:43Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/14"
+    },
+    {
+      "number": 15,
+      "title": "feat: reproducible external datasets and industrial release matrix",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/reproducible-dataset-evidence",
+      "headRefOid": "2a9119e9951eb9a9b621f1296046f3f3fc3b6395",
+      "baseRefName": "main",
+      "baseRefOid": "27fa2aa1c4b0ef43483fd65031513b10b3af1263",
+      "mergeCommit": {
+        "oid": "140bf44fda553dfc56fb96e5e607fdb481e55865"
+      },
+      "mergedAt": "2026-07-11T06:34:06Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/15"
+    },
+    {
+      "number": 16,
+      "title": "feat: NASA experimental validation evidence with uncertainty",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/nasa-experimental-validation-data",
+      "headRefOid": "ef751b238ccdc026d15745d2b2f784a7355f1974",
+      "baseRefName": "main",
+      "baseRefOid": "140bf44fda553dfc56fb96e5e607fdb481e55865",
+      "mergeCommit": {
+        "oid": "9db3f0522374f4d4756a6075c6b92d6a9a4ce4c2"
+      },
+      "mergedAt": "2026-07-11T06:43:49Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/16"
+    },
+    {
+      "number": 17,
+      "title": "feat: real digest-pinned OpenFOAM execution evidence",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/openfoam-runtime-evidence",
+      "headRefOid": "486af37d1b3ce48ab204cadf6b9c9b79412b4aa9",
+      "baseRefName": "main",
+      "baseRefOid": "9db3f0522374f4d4756a6075c6b92d6a9a4ce4c2",
+      "mergeCommit": {
+        "oid": "ad5a07f7633bbe7485c05a65c2448eddf3196c7f"
+      },
+      "mergedAt": "2026-07-11T07:07:45Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/17"
+    },
+    {
+      "number": 18,
+      "title": "feat: verify digest-pinned CalculiX execution",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/calculix-runtime-evidence",
+      "headRefOid": "68ccad65cc89290cfca879eef4ca7a537f476233",
+      "baseRefName": "main",
+      "baseRefOid": "ad5a07f7633bbe7485c05a65c2448eddf3196c7f",
+      "mergeCommit": {
+        "oid": "9b544072a9cc0c297f60ff486c4dba0284ce9b23"
+      },
+      "mergedAt": "2026-07-11T07:23:52Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/18"
+    },
+    {
+      "number": 19,
+      "title": "feat: verify real four-rank MPI runtime",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/mpi-runtime-evidence",
+      "headRefOid": "fc5c245d51e3130bc327d4f57694b81f8db7ed82",
+      "baseRefName": "main",
+      "baseRefOid": "9b544072a9cc0c297f60ff486c4dba0284ce9b23",
+      "mergeCommit": {
+        "oid": "e4b3cc533be2b6eac67330bee39271f68d537e38"
+      },
+      "mergedAt": "2026-07-11T07:36:32Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/19"
+    },
+    {
+      "number": 20,
+      "title": "feat: verify nonlinear 3D contact execution",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/calculix-nonlinear-contact",
+      "headRefOid": "2ce49b832f1ce26f77a0085b02d9e8d31e26c0ab",
+      "baseRefName": "main",
+      "baseRefOid": "e4b3cc533be2b6eac67330bee39271f68d537e38",
+      "mergeCommit": {
+        "oid": "afe4164f7714b1f3907c3178e54515c7d13056fc"
+      },
+      "mergedAt": "2026-07-11T07:47:58Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/20"
+    },
+    {
+      "number": 21,
+      "title": "feat: verify elastoplastic load-unload cycle",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/calculix-plastic-cycle",
+      "headRefOid": "2e30f266f3a7108d5b9063e1494f553e49079907",
+      "baseRefName": "main",
+      "baseRefOid": "afe4164f7714b1f3907c3178e54515c7d13056fc",
+      "mergeCommit": {
+        "oid": "1776c208125fc3558e4b260ba949c6ddb4c5788a"
+      },
+      "mergedAt": "2026-07-11T07:58:50Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/21"
+    },
+    {
+      "number": 22,
+      "title": "feat: quantify nonlinear FEM mesh convergence",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/calculix-mesh-convergence",
+      "headRefOid": "58331fa16fc4bf1442af4a67f1a69692c3a7486b",
+      "baseRefName": "main",
+      "baseRefOid": "1776c208125fc3558e4b260ba949c6ddb4c5788a",
+      "mergeCommit": {
+        "oid": "6ad5b39c1fec3c1b19d53908f8834eaeee5bb3f7"
+      },
+      "mergedAt": "2026-07-11T08:12:52Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/22"
+    },
+    {
+      "number": 23,
+      "title": "feat: reduce nonlinear FEM GCI with refinement",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/calculix-mesh-refinement",
+      "headRefOid": "b54d5816262744f7795b2616ad99a27e592a6051",
+      "baseRefName": "main",
+      "baseRefOid": "6ad5b39c1fec3c1b19d53908f8834eaeee5bb3f7",
+      "mergeCommit": {
+        "oid": "f44cd035b6adcc27084e3f8fbed3eb0c0d5a9629"
+      },
+      "mergedAt": "2026-07-11T08:22:34Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/23"
+    },
+    {
+      "number": 24,
+      "title": "feat: fail closed on unconverged contact pressure",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/calculix-contact-mesh-sensitivity",
+      "headRefOid": "ae48797c7d0dd51c0d2863d762e5613051fff111",
+      "baseRefName": "main",
+      "baseRefOid": "f44cd035b6adcc27084e3f8fbed3eb0c0d5a9629",
+      "mergeCommit": {
+        "oid": "093b933532c3556a3a5f3dc9914ce594cfa5491f"
+      },
+      "mergedAt": "2026-07-11T08:33:44Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/24"
+    },
+    {
+      "number": 25,
+      "title": "feat: qualify local plastic strain convergence",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/calculix-plastic-mesh-sensitivity",
+      "headRefOid": "6e79f91470d28e17098cf50bc63bfc5469c67549",
+      "baseRefName": "main",
+      "baseRefOid": "093b933532c3556a3a5f3dc9914ce594cfa5491f",
+      "mergeCommit": {
+        "oid": "46b295ff3dd0884d47282be86f0807db6fcdc56d"
+      },
+      "mergedAt": "2026-07-11T08:43:41Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/25"
+    },
+    {
+      "number": 26,
+      "title": "Add traceable material card qualification",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/material-card-provenance",
+      "headRefOid": "d6da6b68a44f6c97a1bc3840cefd5aa316186c9f",
+      "baseRefName": "main",
+      "baseRefOid": "46b295ff3dd0884d47282be86f0807db6fcdc56d",
+      "mergeCommit": {
+        "oid": "de72e429a74c4a4e302651ad78602b7c73e747aa"
+      },
+      "mergedAt": "2026-07-11T09:28:10Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/26"
+    },
+    {
+      "number": 27,
+      "title": "Add pinned NIST material calibration evidence",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/nist-material-calibration",
+      "headRefOid": "9bceb71e420cdce7b28fe3dfd7ae316b865f09b7",
+      "baseRefName": "main",
+      "baseRefOid": "de72e429a74c4a4e302651ad78602b7c73e747aa",
+      "mergeCommit": {
+        "oid": "054544877ffc8caf5dd01ca4df6ed687aed11745"
+      },
+      "mergedAt": "2026-07-11T11:36:27Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/27"
+    },
+    {
+      "number": 28,
+      "title": "Add real coupled thermoplastic evidence",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/calculix-thermoplastic-coupling",
+      "headRefOid": "0d3cc94e388f8a98cdc32630d2a38a0df04270f1",
+      "baseRefName": "main",
+      "baseRefOid": "054544877ffc8caf5dd01ca4df6ed687aed11745",
+      "mergeCommit": {
+        "oid": "983a172835ec4fc3b61b28f01d4e2e2e57263503"
+      },
+      "mergedAt": "2026-07-12T06:03:28Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/28"
+    },
+    {
+      "number": 29,
+      "title": "Add thermoplastic mesh sensitivity audit",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/thermoplastic-mesh-sensitivity",
+      "headRefOid": "e911cfd821715384f4c3d519b131da97474d834e",
+      "baseRefName": "main",
+      "baseRefOid": "983a172835ec4fc3b61b28f01d4e2e2e57263503",
+      "mergeCommit": {
+        "oid": "5fa46197b88c6217cec2a31ea0cc6b02876cb532"
+      },
+      "mergedAt": "2026-07-12T06:22:37Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/29"
+    },
+    {
+      "number": 30,
+      "title": "Qualify steady thermoplastic thermal convergence",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/thermoplastic-steady-convergence",
+      "headRefOid": "75f44315692a63043005cec44f519c6f1584cf5d",
+      "baseRefName": "main",
+      "baseRefOid": "5fa46197b88c6217cec2a31ea0cc6b02876cb532",
+      "mergeCommit": {
+        "oid": "21404117f212985c1797c9f0d21a0ac848effa43"
+      },
+      "mergedAt": "2026-07-12T06:29:06Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/30"
+    },
+    {
+      "number": 31,
+      "title": "Qualify ultrafine thermoplastic PEEQ convergence",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/thermoplastic-ultrafine-gci",
+      "headRefOid": "9bff4f6edb49b31413725e9d0869d4f146059a97",
+      "baseRefName": "main",
+      "baseRefOid": "21404117f212985c1797c9f0d21a0ac848effa43",
+      "mergeCommit": {
+        "oid": "2318177d53723dcac76f3f20c00ae99cc12a194d"
+      },
+      "mergedAt": "2026-07-12T06:39:58Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/31"
+    },
+    {
+      "number": 32,
+      "title": "Add real OpenFOAM NASA bump RANS evidence",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/openfoam-tmr-bump-rans",
+      "headRefOid": "5c1565b62f1c958985f073ae0e6d75769b467607",
+      "baseRefName": "main",
+      "baseRefOid": "2318177d53723dcac76f3f20c00ae99cc12a194d",
+      "mergeCommit": {
+        "oid": "757b06b67b373394ed717c77aa0beb152c0496e6"
+      },
+      "mergedAt": "2026-07-12T07:04:00Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/32"
+    },
+    {
+      "number": 33,
+      "title": "Add pinned NASA SBSE 3D geometry",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/nasa-sbse-3d-geometry",
+      "headRefOid": "dbc90475eb8125e4e22e28bdf9f9370dfce7b8e2",
+      "baseRefName": "main",
+      "baseRefOid": "757b06b67b373394ed717c77aa0beb152c0496e6",
+      "mergeCommit": {
+        "oid": "f4eabe2706262a0d2e8f96e661ac335596291441"
+      },
+      "mergedAt": "2026-07-12T07:11:27Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/33"
+    },
+    {
+      "number": 34,
+      "title": "Add verified OpenFOAM SBSE 3D volume mesh",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/openfoam-sbse-3d-mesh",
+      "headRefOid": "932b8646779429180bcb9e9c8eb3fce68c20fc61",
+      "baseRefName": "main",
+      "baseRefOid": "f4eabe2706262a0d2e8f96e661ac335596291441",
+      "mergeCommit": {
+        "oid": "f6f0b167196a5055c81d02eb2a5607f07fe4dbb4"
+      },
+      "mergedAt": "2026-07-12T07:21:16Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/34"
+    },
+    {
+      "number": 35,
+      "title": "Add NASA SBSE 3D RANS baseline",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/sbse-3d-rans-baseline",
+      "headRefOid": "2cba144600de3f020b6d14e8ea778836f2d43456",
+      "baseRefName": "main",
+      "baseRefOid": "f6f0b167196a5055c81d02eb2a5607f07fe4dbb4",
+      "mergeCommit": {
+        "oid": "a2d59da895aae8056c7cb46f19a5759e317e8a99"
+      },
+      "mergedAt": "2026-07-12T07:51:04Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/35"
+    },
+    {
+      "number": 36,
+      "title": "Integrate CAE with shared physics contract",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/unified-physics-backend",
+      "headRefOid": "1b0d790483fb4cdc266281c0a5a0a8bbf137d873",
+      "baseRefName": "main",
+      "baseRefOid": "a2d59da895aae8056c7cb46f19a5759e317e8a99",
+      "mergeCommit": {
+        "oid": "71ce0c27a675bc4f792759a23232aaff546813e8"
+      },
+      "mergedAt": "2026-07-12T08:17:03Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/36"
+    },
+    {
+      "number": 37,
+      "title": "Add wall-resolved SBSE grid family",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/sbse-wall-resolved-grid-family",
+      "headRefOid": "4cf46032430c0be4a8e316f54be73f183e100787",
+      "baseRefName": "main",
+      "baseRefOid": "71ce0c27a675bc4f792759a23232aaff546813e8",
+      "mergeCommit": {
+        "oid": "c5ae3f6d258ccdf26c820f7d08b99e288acb1512"
+      },
+      "mergedAt": "2026-07-12T09:29:08Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/37"
+    },
+    {
+      "number": 38,
+      "title": "Add wall-resolved SBSE URANS pilot",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/sbse-urans-pilot",
+      "headRefOid": "c2d4d4e003dcea14773c5128619c85bc34f23d5d",
+      "baseRefName": "main",
+      "baseRefOid": "c5ae3f6d258ccdf26c820f7d08b99e288acb1512",
+      "mergeCommit": {
+        "oid": "9d4932a88c6926f014995c07906275ad81bbbc44"
+      },
+      "mergedAt": "2026-07-12T11:01:25Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/38"
+    },
+    {
+      "number": 39,
+      "title": "Add safe SBSE URANS checkpoint continuation",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/sbse-urans-checkpoint-continuation",
+      "headRefOid": "0f20533d70a9f360df24c02a37d8905c05dbd724",
+      "baseRefName": "main",
+      "baseRefOid": "9d4932a88c6926f014995c07906275ad81bbbc44",
+      "mergeCommit": {
+        "oid": "4890a412c5deb31a58d7b27a6a98c96c47fb98f3"
+      },
+      "mergedAt": "2026-07-12T12:45:00Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/39"
+    },
+    {
+      "number": 40,
+      "title": "Gate SBSE URANS by flow-through coverage",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/sbse-urans-temporal-coverage",
+      "headRefOid": "e05e841fee113f1ac2b8f19e2b6df12fa7310b4c",
+      "baseRefName": "main",
+      "baseRefOid": "4890a412c5deb31a58d7b27a6a98c96c47fb98f3",
+      "mergeCommit": {
+        "oid": "39a1a13e09750ff7286ea489ec9b7e24b07dbf68"
+      },
+      "mergedAt": "2026-07-12T12:50:50Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/40"
+    },
+    {
+      "number": 41,
+      "title": "Add repo-wide maturity datoms",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/repo-wide-maturity-datoms",
+      "headRefOid": "8c90a77a28c3409a9e33fde65efb55dc1fdc061f",
+      "baseRefName": "main",
+      "baseRefOid": "39a1a13e09750ff7286ea489ec9b7e24b07dbf68",
+      "mergeCommit": {
+        "oid": "a4093631878a0463cd37c6830d8278f360b6d07c"
+      },
+      "mergedAt": "2026-07-12T13:27:23Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/41"
+    },
+    {
+      "number": 42,
+      "title": "Gate Hugging Face datasets by license",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/license-safe-hf-datasets",
+      "headRefOid": "c818a87f12b37e4502cb291e63986191bab7a88f",
+      "baseRefName": "main",
+      "baseRefOid": "a4093631878a0463cd37c6830d8278f360b6d07c",
+      "mergeCommit": {
+        "oid": "ba61340447a8d09c2157eb02de20d5355a22e55f"
+      },
+      "mergedAt": "2026-07-12T13:44:59Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/42"
+    },
+    {
+      "number": 43,
+      "title": "Verify Z24 experimental dataset semantics",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/z24-semantic-verification",
+      "headRefOid": "5daa5a5214c8244fe7deb2a9c3da79a052aa138d",
+      "baseRefName": "main",
+      "baseRefOid": "ba61340447a8d09c2157eb02de20d5355a22e55f",
+      "mergeCommit": {
+        "oid": "bfe609d333852d90080dadddc83a2d5fc6d9cc80"
+      },
+      "mergedAt": "2026-07-12T14:01:06Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/43"
+    },
+    {
+      "number": 44,
+      "title": "Gate Z24 FEM validation readiness",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/z24-fem-readiness-gate",
+      "headRefOid": "b19adcb79359cf0b5412d6b55efb75e9402e7cd1",
+      "baseRefName": "main",
+      "baseRefOid": "bfe609d333852d90080dadddc83a2d5fc6d9cc80",
+      "mergeCommit": {
+        "oid": "37bbc496d2e00f3f34b70fa6b8c29f7b02a1ef5c"
+      },
+      "mergedAt": "2026-07-12T14:22:52Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/44"
+    },
+    {
+      "number": 45,
+      "title": "cae: generic metal-hydride H2 desorption equilibrium (van't Hoff) contract",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/h2-desorption-vant-hoff",
+      "headRefOid": "06e2bbb2c2b65fe46337740f019eddf5fc9c926f",
+      "baseRefName": "main",
+      "baseRefOid": "214a1907890b75cbb5ed6781cf3dea8cba0f4351",
+      "mergeCommit": {
+        "oid": "0fc94c0efb1ea0db08dc8e816bdc73b5428baf4b"
+      },
+      "mergedAt": "2026-09-01T14:37:37Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/45"
+    },
+    {
+      "number": 46,
+      "title": "fatigue: Miner cumulative-damage contract over a caller-supplied load spectrum",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "fatigue/miner-spectrum",
+      "headRefOid": "a4574378cc0b3165d8b983ae1200238ab0b34b1c",
+      "baseRefName": "main",
+      "baseRefOid": "5d86542470331a78ba6a25593648f20364e19d52",
+      "mergeCommit": {
+        "oid": "704096fe2918b0d19a14f7e3c0b4cda7105606fa"
+      },
+      "mergedAt": "2026-09-01T14:45:46Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/46"
+    },
+    {
+      "number": 47,
+      "title": "cae: metal-hydride H2 desorption kinetics \u2014 transient first-order contract (:h2-desorption-kinetics)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "cae/h2-desorption-kinetics",
+      "headRefOid": "c2cfa86cca994e4fa8fd685ec52be3aa8fe4ac0f",
+      "baseRefName": "main",
+      "baseRefOid": "214a1907890b75cbb5ed6781cf3dea8cba0f4351",
+      "mergeCommit": {
+        "oid": "b2d47dfab74a0c82fb50dfd84be3c1c6d5408a81"
+      },
+      "mergedAt": "2026-09-01T14:37:48Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/47"
+    },
+    {
+      "number": 48,
+      "title": "cae: desorption heat-demand source term (:h2-desorption-heat-demand)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "cae/h2-heat-demand",
+      "headRefOid": "def08204eab94f0386cda2244277a8d3d470e639",
+      "baseRefName": "main",
+      "baseRefOid": "214a1907890b75cbb5ed6781cf3dea8cba0f4351",
+      "mergeCommit": {
+        "oid": "5d86542470331a78ba6a25593648f20364e19d52"
+      },
+      "mergedAt": "2026-09-01T14:37:55Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/48"
+    },
+    {
+      "number": 49,
+      "title": "cae: heater-limited H2 supply feasibility gate (:h2-desorption-heater-limit)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "cae/h2-heater-limit",
+      "headRefOid": "a16cc381038f479fd40d7224674b77aab49f581f",
+      "baseRefName": "main",
+      "baseRefOid": "704096fe2918b0d19a14f7e3c0b4cda7105606fa",
+      "mergeCommit": {
+        "oid": "f4bd9bb38f62378f44ef7f5b9e57740f17806b50"
+      },
+      "mergedAt": "2026-09-05T01:13:13Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/49"
+    },
+    {
+      "number": 50,
+      "title": "cae: hydrogen tank storage inventory from measured P/T (:h2-tank-storage)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "bot/h2-tank-storage-20260904",
+      "headRefOid": "032b380005a215cf82f65c1ec585fa65520dfa04",
+      "baseRefName": "main",
+      "baseRefOid": "704096fe2918b0d19a14f7e3c0b4cda7105606fa",
+      "mergeCommit": {
+        "oid": "b1430ace055c779e73377c4a065bf92ab84599d5"
+      },
+      "mergedAt": "2026-09-04T03:33:46Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/50"
+    },
+    {
+      "number": 51,
+      "title": "cae: H2 delivery-line pressure-drop + cell-inlet feasibility gate (:h2-line-drop)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "cae/h2-delivery-setpoint",
+      "headRefOid": "f3dcf875267a37bc3fe01724f1adcc65a5bec87c",
+      "baseRefName": "main",
+      "baseRefOid": "b1430ace055c779e73377c4a065bf92ab84599d5",
+      "mergeCommit": {
+        "oid": "728518c054927303018af815f9f9af05a7b010c2"
+      },
+      "mergedAt": "2026-09-05T01:13:16Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/51"
+    },
+    {
+      "number": 52,
+      "title": "Rewire clojure.edn to kotoba-lang/edn (bounded reader)",
+      "state": "MERGED",
+      "isDraft": false,
+      "headRefName": "agent/clojure-edn-to-kotoba-lang-edn",
+      "headRefOid": "1a1fd1f6cc144346e43a6ac7cfe31f961b381c5a",
+      "baseRefName": "main",
+      "baseRefOid": "728518c054927303018af815f9f9af05a7b010c2",
+      "mergeCommit": {
+        "oid": "ad7b81f357d6456cabaf69fc6a1fbc246e61bce5"
+      },
+      "mergedAt": "2026-09-07T00:11:49Z",
+      "url": "https://github.com/kotoba-lang/kami-engine-cae-solver/pull/52"
+    }
+  ]
+}

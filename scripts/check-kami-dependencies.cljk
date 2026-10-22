@@ -1,0 +1,100 @@
+(ns kami-maintenance.check-dependencies
+  (:require [cljs.reader :as edn]
+            [clojure.string :as str]
+            ["node:fs" :as fs]
+            ["node:path" :as path]))
+
+(def root (.resolve path (.dirname path *file*) ".."))
+(defn read-json [file]
+  ;; Preserve slash-bearing file keys and namespaced coordinate strings.
+  (js->clj (js/JSON.parse (.readFileSync fs (.join path root file) "utf8"))))
+(def imports (read-json "maintenance/kami-source-imports.json"))
+(def changes (read-json "maintenance/kami-dependency-transitions.json"))
+(def transitions (get changes "transitions"))
+(def by-file (group-by #(get % "file") transitions))
+(def by-repository (into {} (for [row (get imports "repositories")
+                                :when (get row "source-id")]
+                            [(get row "repository") row])))
+(def seen (atom #{}))
+
+(defn display-value [value]
+  (cond
+    (map? value) (into {} (for [[k v] value] [(str k) (display-value v)]))
+    (coll? value) (mapv display-value value)
+    (or (keyword? value) (symbol? value)) (str value)
+    :else value))
+
+(defn target-name [coordinate value]
+  (or (some->> (get value ":git/url")
+               (re-find #"github\.com[:/]kotoba-lang/([^/]+?)(?:\.git)?$") second
+               (str "kotoba-lang/"))
+      (when (str/starts-with? coordinate "io.github.kotoba-lang/")
+        (str "kotoba-lang/" (last (str/split coordinate #"/"))))))
+
+(defn validate-transition [relative repository original-file transition]
+  (let [before (get transition "before") after (get transition "after")
+        kind (get transition "kind") target (get transition "target-repository")
+        imported (get by-repository target)]
+    (assert (= relative (get transition "file")))
+    (assert (map? before))
+    (case kind
+      "internal-source-relocation"
+      (do
+        (assert imported "Internal dependency must name a selected source project")
+        (assert (or (get before ":local/root")
+                    (= target (target-name (get transition "coordinate") before)))
+                "Internal dependency target differs from original coordinate")
+        (let [destination (.join path root (get imported "destination")
+                                 (or (get before ":deps/root") ""))
+              expected (.relative path (.dirname path (.join path root relative)) destination)]
+          (assert (= {":local/root" expected} after) "Internal dependency path mismatch")
+          (assert (.isDirectory (.statSync fs destination)))))
+      "external-development-path-relocation"
+      (let [local (get before ":local/root")
+            original-directory (.resolve path "/forest" repository (.dirname path original-file))
+            new-directory (.resolve path "/forest/kotoba-lang/kami-engine" (.dirname path relative))
+            expected (.relative path new-directory (.resolve path original-directory local))]
+        (assert (string? local))
+        (assert (= (assoc before ":local/root" expected) after)
+                "External canonical checkout semantics changed"))
+      (throw (ex-info "Undeclared dependency change kind" {:kind kind})))))
+
+(defn validate-config [relative repository original-file original-text]
+  (let [before (display-value (edn/read-string original-text))
+        actual (display-value (edn/read-string (.readFileSync fs (.join path root relative) "utf8")))
+        selected (get by-file relative [])
+        expected
+        (reduce
+         (fn [value transition]
+           (let [site (conj (get transition "site") (get transition "coordinate"))]
+             (assert (= (get transition "before") (get-in value site))
+                     (str "Dependency preimage mismatch: " relative " " site))
+             (validate-transition relative repository original-file transition)
+             (assoc-in value site (get transition "after")))) before selected)]
+    (assert (= expected actual)
+            (str "An undeclared dependency, alias, option or path changed: " relative))
+    (swap! seen conj relative)))
+
+(doseq [row (get imports "repositories")
+        file (get row "original-files")
+        :let [original-file (get file "path")]
+        :when (contains? #{"deps.edn" "nbb.edn" "shadow-cljs.edn" "bb.edn"}
+                         (.basename path original-file))]
+  (let [repository (get row "repository") name (last (str/split repository #"/"))
+        relative (str (get row "destination") "/" original-file)
+        saved (.join path root "maintenance/kami-original-configs" name original-file)
+        original (.readFileSync fs (if (.existsSync fs saved) saved (.join path root relative)) "utf8")]
+    (assert (or (.existsSync fs saved) (empty? (get by-file relative)))
+            "Changed configuration has no saved original")
+    (validate-config relative repository original-file original)))
+
+(doseq [file ["deps.edn" "nbb.edn" "kami-gameplay/deps.edn" "kami-gameplay/nbb.edn"
+             "kami-render/deps.edn" "kami-physics/deps.edn"
+             "kami-clj-play/games/survivors/deps.edn"]]
+  (validate-config file "kotoba-lang/kami-engine" file
+                   (.readFileSync fs (.join path root "maintenance/kami-original-configs/kami-engine" file) "utf8")))
+(assert (every? @seen (keys by-file)) "Dependency substitutions outside reviewed project manifests")
+(assert (= [] (:paths (edn/read-string (.readFileSync fs (.join path root "deps.edn") "utf8"))))
+        "The owner must not acquire an implicit aggregate classpath")
+(println "Kami dependency contracts:" (count @seen) "literal manifests," (count transitions)
+         "explicit relocations; every other external floor, alias and option is unchanged")

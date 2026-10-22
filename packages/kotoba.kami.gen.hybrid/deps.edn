@@ -1,0 +1,55 @@
+{:paths ["src"],
+ :deps
+ #:io.github.kotoba-lang{image
+                         #:git{:sha
+                               "ed0b4dc89268073384c9493bdc80fa72dc17500b"},
+                         bytes
+                         #:git{:sha
+                               "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"},
+                         io
+                         #:git{:sha
+                               "1b60ca825c1e705bd195f857ca4549133653a9f3"},
+                         test
+                         #:git{:url
+                               "https://github.com/kotoba-lang/test.git",
+                               :sha
+                               "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"},
+                         character
+                         #:git{:url
+                               "https://github.com/kotoba-lang/character.git",
+                               :sha
+                               "197410ae8fab61c2bc46c690fc6affbec046928f"},
+                         comfyui
+                         #:git{:url
+                               "https://github.com/kotoba-lang/comfyui.git",
+                               :sha
+                               "d3e1c2e62eb2c4fade64583d676ea54090da115a"},
+                         org-vrmc-vrm
+                         #:git{:url
+                               "https://github.com/kotoba-lang/org-vrmc-vrm.git",
+                               :sha
+                               "8d8725af2feb4666cfd9573a30cc879b5fd43878"}},
+ :aliases
+ {:dev
+  {:override-deps
+   #:io.github.kotoba-lang{langchain
+                           #:local{:root "../../../langchain"}}},
+  :test
+  {:extra-paths ["test"],
+   :extra-deps
+   #:io.github.cognitect-labs{test-runner
+                              #:git{:tag "v0.5.1",
+                                    :sha
+                                    "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}},
+   :main-opts ["-m" "cognitect.test-runner"],
+   :exec-fn cognitect.test-runner.api/test},
+  :lint
+  {:replace-deps #:clj-kondo{clj-kondo #:mvn{:version "2024.11.14"}},
+   :main-opts
+   ["-m"
+    "clj-kondo.main"
+    "--lint"
+    "src"
+    "test"
+    "--fail-level"
+    "error"]}}}

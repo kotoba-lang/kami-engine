@@ -1,0 +1,66 @@
+(ns character-scene.face-rig-test
+  "Tests ported 1:1 from the original legacy kami-character-scene Rust
+  crate's `src/face_rig.rs` `#[cfg(test)]` and `tests/face_rig_parity.rs`
+  (deleted in kotoba-lang/kami-engine PR #82). The parity oracle is the
+  REAL `character.control-rig/metahuman-face-rig` (called here, not
+  transcribed)."
+  (:require [character-scene.face-rig :as face-rig]
+            [character.control-rig :as control-rig]
+            [kotoba.test :refer [deftest is testing]]))
+
+;; --- ported from face_rig.rs `#[cfg(test)]` ----------------------------------------------
+
+(deftest shipped-has-nineteen-au-rows
+  (let [[status rows] (face-rig/shipped-au-bones)]
+    (is (= :ok status))
+    (is (= 19 (count rows)) "19 AU->bone mappings")))
+
+(deftest rebuilt-rig-has-three-nodes-per-row
+  (let [[status rig] (face-rig/shipped-face-rig)]
+    (is (= :ok status))
+    (is (= (* 19 3) (count (:nodes rig))) "control + multiply + rotation per AU")
+    (is (= (count (:nodes rig)) (count (:eval-order rig))))))
+
+(deftest non-map-root-is-an-error
+  (let [[status err] (face-rig/au-bones-from-edn "42")]
+    (is (= :error status))
+    (is (= :not-a-map (:type err)))))
+
+(deftest missing-table-is-an-error
+  (let [[status err] (face-rig/au-bones-from-edn "{:other 1}")]
+    (is (= :error status))
+    (is (= :no-au-bones (:type err)))))
+
+(deftest int-bone-and-float-angle-coerce
+  (let [[status rows] (face-rig/au-bones-from-edn
+                        "{:character/face-rig {:au-bones [{:au \"X\" :bone 5 :axis [1 0 0] :max-angle 1}]}}")]
+    (is (= :ok status))
+    (is (= 5 (:bone (first rows))))
+    (is (= [1.0 0.0 0.0] (:axis (first rows))) "int vector coerces")
+    (is (= 1.0 (:max-angle (first rows))) "int angle coerces")))
+
+;; --- ported from tests/face_rig_parity.rs -------------------------------------------------
+
+(deftest face-rig-edn-matches-builtin-nodes
+  (let [oracle (control-rig/metahuman-face-rig)
+        [status edn] (face-rig/shipped-face-rig)]
+    (is (= :ok status))
+    (is (= (count (:nodes oracle)) (count (:nodes edn))) "node count parity")
+    (is (= (:eval-order oracle) (:eval-order edn)) "eval order parity")
+    (is (= (:nodes oracle) (:nodes edn))
+        "face-rig nodes are node-for-node identical to metahuman-face-rig")))
+
+(deftest rebuilt-rig-evaluates-like-builtin
+  (let [[status edn] (face-rig/shipped-face-rig)
+        _ (is (= :ok status))
+        set-controls (fn [rig]
+                       (-> rig
+                           (control-rig/set-control "AU12_L" 0.8)
+                           (control-rig/set-control "AU12_R" 0.8)
+                           (control-rig/set-control "AU26" 0.3)))
+        edn' (control-rig/evaluate (set-controls edn))
+        oracle' (control-rig/evaluate (set-controls (control-rig/metahuman-face-rig)))]
+    (doseq [bone [34 35 8]]
+      (is (= (contains? (:bone-outputs edn') bone) (contains? (:bone-outputs oracle') bone))
+          (str "bone " bone " driven by both rigs"))
+      (is (contains? (:bone-outputs edn') bone) (str "bone " bone " present")))))

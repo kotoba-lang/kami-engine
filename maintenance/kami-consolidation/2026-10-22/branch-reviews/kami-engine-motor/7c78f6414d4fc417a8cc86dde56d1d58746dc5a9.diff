@@ -1,0 +1,918 @@
+diff --git a/.gitignore b/.gitignore
+index d2400ff..fbbf973 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,3 +1,4 @@
+ .cpcache/
+ .clj-kondo/.cache/
+ .lsp/
++.nbb/
+diff --git a/README.md b/README.md
+index 9c26949..412b8e0 100644
+--- a/README.md
++++ b/README.md
+@@ -5,7 +5,7 @@
+ Reduced-order traction-motor solver (`:rom-motor`) — air-gap shear sizing + loss-fraction efficiency → torque density, peak power, mass. A kami-emag magnetostatic FEA registers `:emag-fea` on the same contract.
+ 
+ Part of the clean-sheet vehicle-design / CAE stack (purpose-split shared libs).
+-Zero-dep portable `.cljc`. Run `clojure -M:test`.
++Zero-dep portable `.cljc`. Run `kbb -M:test`.
+ 
+ ## `motor.bldc` (`:rom-bldc`) — small motors, calibrated instead of extrapolated
+ 
+@@ -45,3 +45,14 @@ ideal line and the amount is not modeled here: every above-base point carries
+ the caller — rotor burst speed is a mechanical limit of the actual rotor and
+ nothing in this library measures it, so there is no default to invent. Claims
+ past `:rpm-max` refuse loudly.
++## `motor.dcbus` (`:dcbus-balance`) — DC-bus power balance + buffer-battery SoC
++Per-interval split of a demand series between the fuel cell (capped at
++`:p-fc-max-kW`) and the buffer battery (capped by `:p-bat-dis-max-kW` /
++`:p-bat-chg-max-kW`, confined to the `:soc-min`..`:soc-max` window), with a
++uniform `:dt-h`. Unmet power and regen power that cannot be absorbed are
++reported per interval and summed — never silently shifted onto another
++component. The bus is idealized lossless; converter efficiency, battery
++round-trip loss, and the fuel-cell partial-load curve are all declared
++`:unmeasured` on the result. Registers `:dcbus-balance` on the shared
++`cae.solver/solve` contract. Zero-dep portable `.cljc`; run with
++`kbb -M:test`.
+diff --git a/cljk-origin.edn b/cljk-origin.edn
+new file mode 100644
+index 0000000..c8ee04b
+--- /dev/null
++++ b/cljk-origin.edn
+@@ -0,0 +1,16 @@
++{:format :kotoba.cljk-origin/v1
++ :renamed-on "2026-09-11"
++ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
++ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
++ :origins
++ {"src/motor/bldc.cljk" ".cljc"
++  "src/motor/dcbus.cljk" ".cljc"
++  "src/motor/envelope.cljk" ".cljc"
++  "src/motor/esc.cljk" ".cljc"
++  "src/motor/solver.cljk" ".cljc"
++  "test/motor/bldc_test.cljk" ".clj"
++  "test/motor/dcbus_test.cljk" ".clj"
++  "test/motor/envelope_test.cljk" ".clj"
++  "test/motor/esc_drive_test.cljk" ".clj"
++  "test/motor/esc_test.cljk" ".clj"
++  "test/motor/solver_test.cljk" ".clj"}}
+diff --git a/deps.edn b/deps.edn
+index 6fdf10c..2ea8316 100644
+--- a/deps.edn
++++ b/deps.edn
+@@ -3,12 +3,16 @@
+  ;; Registers :rom-motor on the cae-solver contract; turns the design's peak-kW
+  ;; assumption into a sized motor (torque density + efficiency). A high-fidelity
+  ;; kami-emag magnetostatic FEA registers :emag-fea on the same contract later.
+- :deps {io.github.kotoba-lang/datom                {:git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}io.github.kotoba-lang/datom                {:git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
+         io.github.kotoba-lang/kami-engine-cae-solver {:git/sha "53e27f18ddcf10615a8a17adbb78018b1ab64a17"}}
+  :aliases
+  {:test {:extra-paths ["test"]
+          :extra-deps {io.github.cognitect-labs/test-runner
+-                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
++                      {:git/tag "v0.5.1" :git/sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
+          :main-opts ["-m" "cognitect.test-runner"]
+          :exec-fn cognitect.test-runner.api/test}
+   :dev {:override-deps {io.github.kotoba-lang/datom                {:local/root "../datom"}
+diff --git a/nbb.edn b/nbb.edn
+new file mode 100644
+index 0000000..af416ec
+--- /dev/null
++++ b/nbb.edn
+@@ -0,0 +1,9 @@
++;; nbb.edn -- the kbb engine reads :deps HERE, not from deps.edn (kbb -M:test
++;; puts no git coordinate from deps.edn on the classpath). Created by
++;; scripts/migrate-clojure-test-to-kotoba-test.cljk; :paths copied from deps.edn.
++{:paths ["src"]
++ :deps {
++        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
++        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
++        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
++                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}}
+diff --git a/src/motor/bldc.cljc b/src/motor/bldc.cljk
+similarity index 100%
+rename from src/motor/bldc.cljc
+rename to src/motor/bldc.cljk
+diff --git a/src/motor/dcbus.cljk b/src/motor/dcbus.cljk
+new file mode 100644
+index 0000000..ac7c9b0
+--- /dev/null
++++ b/src/motor/dcbus.cljk
+@@ -0,0 +1,196 @@
++(ns motor.dcbus
++  "DC-bus power balance + buffer-battery SoC (:dcbus-balance).
++
++  This is the contract the kami-engine-motor README documents and that
++  `motor.esc` composes against as an existing bus plane ('the already-net
++  kW number' that converter losses/limits are the next plane up from). On
++  main the namespace was documented but never landed — PR #4 added only the
++  README section. This file implements exactly the documented contract so a
++  caller (a vehicle energy-flow designer on the `:dc-bus` / `:buffer-battery`
++  boundary, or a motor sizing composition) actually has something to call.
++
++  Contract (as documented, preserved verbatim in behavior):
++
++    Per-interval split of a demand series between the fuel cell (capped
++    at `:p-fc-max-kW`) and the buffer battery (capped by
++    `:p-bat-dis-max-kW` / `:p-bat-chg-max-kW`, confined to the
++    `:soc-min`..`:soc-max` window), with a uniform `:dt-h`. Unmet power
++    and regen power that cannot be absorbed are reported per interval
++    and summed — never silently shifted onto another component.
++
++  Dispatch policy (deterministic, disclosed):
++    - positive demand: the fuel cell serves min(demand, :p-fc-max-kW);
++      the deficit above the fc rating comes from the battery, bounded by
++      the discharge cap AND the deliverable energy to `:soc-min`. Anything
++      still unmet (fc exhausted + battery at `:soc-min` or discharge-capped)
++      is reported as `:unmet-kw` — never silently absorbed by a guessed
++      third source.
++    - negative demand (regen): the fc contributes nothing and the regen
++      flow charges the battery, bounded by the charge cap AND the headroom
++      to `:soc-max`. Regen that cannot be absorbed is reported per interval
++      as `:regen-not-absorbed-kw` and summed — never dumped into a resistor
++      the model did not declare.
++
++  The bus is idealized LOSSLESS: converter efficiency, battery round-trip
++  loss, and the fuel-cell partial-load curve are all declared `:unmeasured`
++  on every result, so a consumer cannot read the bookkeeping as a measured
++  efficiency claim. No physical constant is invented here — every limit is a
++  caller-supplied number and only conservation-of-energy arithmetic runs.
++
++  Refusals (fail closed): non-sequential/non-numeric demand, non-positive
++  `:p-fc-max-kW`, non-positive `:p-bat-dis-max-kW` / `:p-bat-chg-max-kW`,
++  non-positive `:dt-h`, `:soc-min` / `:soc-max` outside [0,∞) or
++  `:soc-min` > `:soc-max`, `:soc-init` outside the `:soc-min`..`:soc-max`
++  window.
++
++  Registers `:dcbus-balance` on the shared `cae.solver/solve` contract."
++  (:require [cae.solver :as cae]))
++
++(defn- finite-num? [x]
++  ;; NaN is the only number not equal to itself.
++  (and (number? x) (== x x) (not= x ##Inf) (not= x ##-Inf)))
++
++(defn- finite-nonneg? [x]
++  (and (finite-num? x) (>= x 0.0)))
++
++(defn- pos-num [x]
++  (and (finite-num? x) (pos? x)))
++
++(defn- require-number-seq [xs what]
++  (when-not (and (sequential? xs) (seq xs))
++    (throw (ex-info (str "dcbus: " what " must be a non-empty sequential demand series (kW)")
++                    {what xs})))
++  (doseq [[i v] (map-indexed vector xs)]
++    ;; demand may be negative (regen into the bus) — only non-finite values refuse
++    (when-not (finite-num? v)
++      (throw (ex-info (str "dcbus: " what " interval " i " is not a finite number")
++                      {:index i :value v :what what})))))
++
++(defn balance
++  "Power-balance a demand series against a capped fuel cell and a buffer
++  battery confined to the `:soc-min`..`:soc-max` window.
++
++  case:
++    :demand-kw          sequential per-interval net bus demand (kW); positive
++                        = drive load, negative = regen returning to the bus.
++    :dt-h               uniform interval length (hours), > 0.
++    :p-fc-max-kW        fuel-cell rating cap (kW), > 0. The fc serves
++                        min(demand, rating) on positive intervals only.
++    :p-bat-dis-max-kW   battery discharge cap (kW), > 0.
++    :p-bat-chg-max-kW   battery charge cap (kW), > 0.
++    :soc-min-kWh        battery SoC window lower bound (kWh), >= 0.
++    :soc-max-kWh        battery SoC window upper bound (kWh), >= :soc-min-kWh.
++    :soc-init-kWh       starting SoC (kWh), inside the window. Defaults to
++                        :soc-max-kWh (full) when omitted.
++
++  Returns
++    {:solver :dcbus-balance
++     :intervals [{:i :demand-kw :fc-kw :batt-dis-kw :batt-chg-kw
++                  :soc-end-kWh :unmet-kw :regen-not-absorbed-kw} ...]
++     :energy {:demand-kWh :fc-kWh :batt-discharge-kWh :batt-charge-kWh
++              :unmet-kWh :regen-not-absorbed-kWh}
++     :soc {:init-kWh :min-kWh :end-kWh}
++     :feasible? boolean   ; no unmet power AND no unabsorbed regen
++     :provenance {:p-fc-max-kW .. :p-bat-dis-max-kW .. :p-bat-chg-max-kW ..
++                  :soc-min-kWh .. :soc-max-kWh .. :soc-init-kWh .. :dt-h ..}
++     :unmeasured {:bus-converter-losses true :battery-round-trip-loss true
++                  :fc-partial-load-curve true}}"
++  [{:keys [demand-kw dt-h p-fc-max-kW p-bat-dis-max-kW p-bat-chg-max-kW
++           soc-min-kWh soc-max-kWh soc-init-kWh]}]
++  (require-number-seq demand-kw :demand-kw)
++  (when-not (pos-num dt-h)
++    (throw (ex-info "dcbus: :dt-h must be a positive number of hours" {:dt-h dt-h})))
++  (doseq [[k v] [[:p-fc-max-kW p-fc-max-kW]
++                 [:p-bat-dis-max-kW p-bat-dis-max-kW]
++                 [:p-bat-chg-max-kW p-bat-chg-max-kW]]]
++    (when-not (pos-num v)
++      (throw (ex-info (str "dcbus: " (name k) " must be a positive number (kW)")
++                      {k v}))))
++  (when-not (and (number? soc-min-kWh) (finite-nonneg? soc-min-kWh))
++    (throw (ex-info "dcbus: :soc-min-kWh must be a finite number >= 0"
++                    {:soc-min-kWh soc-min-kWh})))
++  (when-not (and (number? soc-max-kWh) (finite-nonneg? soc-max-kWh)
++                 (>= soc-max-kWh soc-min-kWh))
++    (throw (ex-info "dcbus: :soc-max-kWh must be a finite number >= :soc-min-kWh"
++                    {:soc-min-kWh soc-min-kWh :soc-max-kWh soc-max-kWh})))
++  (let [fc-max  (double p-fc-max-kW)
++        dis-max (double p-bat-dis-max-kW)
++        chg-max (double p-bat-chg-max-kW)
++        smin    (double soc-min-kWh)
++        smax    (double soc-max-kWh)
++        s-init  (if (nil? soc-init-kWh)
++                  smax
++                  (do (when-not (and (number? soc-init-kWh)
++                                     (finite-nonneg? soc-init-kWh)
++                                     (<= smin soc-init-kWh smax))
++                        (throw (ex-info
++                                "dcbus: :soc-init-kWh must be inside the :soc-min..:soc-max window"
++                                {:soc-init-kWh soc-init-kWh
++                                 :soc-min-kWh soc-min-kWh
++                                 :soc-max-kWh soc-max-kWh})))
++                      (double soc-init-kWh)))
++        step    (fn [{:keys [soc] :as acc} [i demand]]
++                  (let [demand (double demand)
++                        dt-s   (* dt-h 3600.0)
++                        ;; dispatch
++                        fc-kw (if (pos? demand) (min demand fc-max) 0.0)
++                        deficit0 (- demand fc-kw)
++                        ;; discharge: cover deficit, bounded by cap and soc floor
++                        deliverable-dis (* (- soc smin) (/ 3600.0 dt-s))
++                        batt-dis (if (pos? deficit0)
++                                   (min deficit0 dis-max deliverable-dis)
++                                   0.0)
++                        soc-after-dis (- soc (* batt-dis dt-s (/ 3600.0)))
++                        unmet (max 0.0 (- deficit0 batt-dis))
++                        ;; regen / charge: negative demand charges battery, bounded
++                        ;; by charge cap and soc ceiling
++                        headroom (* (- smax soc-after-dis) (/ 3600.0 dt-s))
++                        regen-in (if (neg? demand) (- demand) 0.0)
++                        batt-chg (min regen-in chg-max headroom)
++                        soc-end (+ soc-after-dis (* batt-chg dt-s (/ 3600.0)))
++                        regen-unabs (- regen-in batt-chg)
++                        row {:i i
++                             :demand-kw demand
++                             :fc-kw fc-kw
++                             :batt-dis-kw batt-dis
++                             :batt-chg-kw batt-chg
++                             :soc-end-kWh soc-end
++                             :unmet-kw unmet
++                             :regen-not-absorbed-kw (max 0.0 regen-unabs)}]
++                    (-> acc
++                        (update :intervals conj row)
++                        (update :min-soc min soc-end)
++                        (update :unmet-kWh + (* unmet dt-h))
++                        (update :regen-kWh + (* (max 0.0 regen-unabs) dt-h))
++                        (update :batt-dis-kWh + (* batt-dis dt-h))
++                        (update :batt-chg-kWh + (* batt-chg dt-h))
++                        (update :fc-kWh + (* fc-kw dt-h))
++                        (update :demand-kWh + (* demand dt-h))
++                        (assoc :soc soc-end))))
++        init {:intervals [] :min-soc s-init :soc s-init
++              :unmet-kWh 0.0 :regen-kWh 0.0 :batt-dis-kWh 0.0
++              :batt-chg-kWh 0.0 :fc-kWh 0.0 :demand-kWh 0.0}
++        out  (reduce step init (map-indexed vector demand-kw))
++        rows (:intervals out)]
++    {:solver :dcbus-balance
++     :intervals rows
++     :energy {:demand-kWh (:demand-kWh out)
++              :fc-kWh (:fc-kWh out)
++              :batt-discharge-kWh (:batt-dis-kWh out)
++              :batt-charge-kWh (:batt-chg-kWh out)
++              :unmet-kWh (:unmet-kWh out)
++              :regen-not-absorbed-kWh (:regen-kWh out)}
++     :soc {:init-kWh s-init :min-kWh (:min-soc out) :end-kWh (:soc out)}
++     :feasible? (and (zero? (:unmet-kWh out)) (zero? (:regen-kWh out)))
++     :provenance {:p-fc-max-kW (double p-fc-max-kW)
++                  :p-bat-dis-max-kW (double p-bat-dis-max-kW)
++                  :p-bat-chg-max-kW (double p-bat-chg-max-kW)
++                  :soc-min-kWh smin
++                  :soc-max-kWh smax
++                  :soc-init-kWh s-init
++                  :dt-h (double dt-h)}
++     :unmeasured {:bus-converter-losses true
++                  :battery-round-trip-loss true
++                  :fc-partial-load-curve true}}))
++
++(defmethod cae/solve :dcbus-balance [case] (balance case))
+\ No newline at end of file
+diff --git a/src/motor/envelope.cljc b/src/motor/envelope.cljk
+similarity index 100%
+rename from src/motor/envelope.cljc
+rename to src/motor/envelope.cljk
+diff --git a/src/motor/esc.cljk b/src/motor/esc.cljk
+new file mode 100644
+index 0000000..46ab725
+--- /dev/null
++++ b/src/motor/esc.cljk
+@@ -0,0 +1,183 @@
++(ns motor.esc
++  "ESC (inverter) feasibility of one torque-speed operating point against a DC
++  bus (:esc-feasibility) and of a whole torque-speed drive profile (:drive-feasibility).
++
++  This is the missing link between the bus plane and the mechanical planes of
++  this library: `motor.dcbus` treats the traction load as an already-net kW
++  number and explicitly leaves converter losses/limits to another plane;
++  `motor.solver` / `motor.envelope` speak torque and speed. This contract takes
++  ONE operating point (torque, speed) and the machine + ESC electrical
++  parameters, and answers: can this ESC deliver this torque at this speed from
++  this bus?
++
++  No physical constant is invented here. Everything that sets a limit or a
++  gain is REQUIRED from the caller:
++
++    :torque-Nm       demanded shaft torque, N·m (>= 0; braking is out of scope)
++    :rpm             shaft speed, rpm (>= 0)
++    :kt-Nm-per-A     motor torque constant, N·m per ampere
++    :ke-Vs-per-rad   motor back-EMF constant, V·s per rad/s. NOT assumed equal
++                     to :kt-Nm-per-A: phase conventions (RMS vs peak, phase vs
++                     line) make the identity convention-dependent, so the
++                     caller supplies the constant in the same convention used
++                     for :r-phase-ohm and :v-ceiling-V.
++    :r-phase-ohm     winding resistance seen by the ESC (same convention)
++    :i-max-A         ESC current limit, A
++    :v-ceiling-V     maximum voltage magnitude the ESC can present to the
++                     winding from this bus, V. The modulation strategy (SVPWM,
++                     six-step, ...) is the caller's decision — this contract
++                     does not assume sqrt(3)·Vdc or any modulation factor.
++
++  Model: quasi-static DC-equivalent. i = T/kt; back-EMF e = ke·omega; the
++  voltage the ESC must present is v = e + i·R; electrical input power is
++  e·i + i²R; mechanical power is T·omega. Copper loss is the only electrical
++  loss modeled. Iron loss, mechanical (friction/windage) loss, switching loss,
++  and ESC thermal capability are real and unmeasured here — the result marks
++  them `:unmeasured` so a consumer cannot read the reported efficiency as a
++  measured one."
++  (:require [cae.solver :as cae]))
++
++(defn- require-num
++  [m key & [allow-zero?]]
++  (let [v (get m key)]
++    (when-not (and (number? v)
++                   (if allow-zero? (>= v 0) (pos? v)))
++      (throw (ex-info (str "esc needs a positive number for " (name key)
++                           (when allow-zero? " (zero allowed)"))
++                      {:key key :value v})))
++    (double v)))
++
++(defn solve
++  "Feasibility of one operating point. See the namespace docstring for the
++  required case keys — none have defaults, by design.
++
++  Returns:
++    :omega-rad-s    shaft speed, rad/s
++    :i-A            phase current magnitude implied by the torque demand, A
++    :back-emf-V     back-EMF magnitude at :rpm, V (caller's convention)
++    :v-required-V   voltage the ESC must present, V (= e + i·R)
++    :p-mech-kW      shaft power, kW
++    :p-elec-kW      electrical input power (e·i + i²R), kW
++    :copper-loss-kW i²R, kW
++    :eff            p-mech/p-elec (nil when p-elec is zero)
++    :current-ok?    i <= :i-max-A
++    :voltage-ok?    v-required <= :v-ceiling-V
++    :feasible?      both above
++    :headroom-A     :i-max-A - :i-A (may be negative)
++    :headroom-V     :v-ceiling-V - :v-required-V (may be negative)
++    :unmeasured     losses this model does not capture
++    :solver         :esc-feasibility"
++  [case]
++  (let [t   (require-num case :torque-Nm true)
++        rpm (require-num case :rpm true)
++        kt  (require-num case :kt-Nm-per-A)
++        ke  (require-num case :ke-Vs-per-rad)
++        r   (require-num case :r-phase-ohm)
++        imax (require-num case :i-max-A)
++        vceil (require-num case :v-ceiling-V)
++        omega (* rpm (/ (* 2.0 Math/PI) 60.0))
++        i (/ t kt)
++        e (* ke omega)
++        v-req (+ e (* i r))
++        p-mech (* t omega)
++        cu (* i i r)
++        p-elec (+ (* e i) cu)
++        eff (when (pos? p-elec) (/ p-mech p-elec))
++        i-ok (<= i imax)
++        v-ok (<= v-req vceil)]
++    {:omega-rad-s omega
++     :i-A i
++     :back-emf-V e
++     :v-required-V v-req
++     :p-mech-kW (/ p-mech 1000.0)
++     :p-elec-kW (/ p-elec 1000.0)
++     :copper-loss-kW (/ cu 1000.0)
++     :eff eff
++     :current-ok? i-ok
++     :voltage-ok? v-ok
++     :feasible? (and i-ok v-ok)
++     :headroom-A (- imax i)
++     :headroom-V (- vceil v-req)
++     :unmeasured [:iron-loss :friction-windage-loss :switching-loss
++                  :esc-thermal-derating :regeneration-braking]
++     :solver :esc-feasibility}))
++(defn- require-profile
++  [profile]
++  (when-not (and (sequential? profile) (seq profile))
++    (throw (ex-info "esc: :profile must be a non-empty sequential of {:rpm .. :torque-Nm ..} points"
++                    {:profile profile})))
++  (when-not (every? (fn [pt]
++                      (and (map? pt)
++                           (number? (:rpm pt))
++                           (number? (:torque-Nm pt))))
++                    profile)
++    (throw (ex-info "esc: :profile must contain only {:rpm .. :torque-Nm ..} maps"
++                    {:profile profile}))))
++
++(defn drive-feasibility
++  "Verify a motor + ESC over a uniformly-sampled, torque-speed drive profile —
++  the mission-level companion to `solve`, which checks ONE operating point.
++  Composes `solve` per point (identical quasi-static DC-equivalent math, no
++  physical constant is invented) and integrates electrical, mechanical, and
++  copper energy exactly: E = P*dt over each uniform interval.
++
++  case:
++    :profile       non-empty sequential of {:rpm r :torque-Nm t} operating
++                   points (r >= 0, t >= 0; a 0/0 idle point is allowed), each
++                   held for :dt-s seconds.
++    :dt-s          uniform sample interval, seconds, > 0.
++    :kt-Nm-per-A / :ke-Vs-per-rad / :r-phase-ohm / :i-max-A / :v-ceiling-V
++                   the same ESC+machine constants as `solve`, REQUIRED with no
++                   defaults (shared across the whole profile; validated per
++                   point by `solve`).
++
++  Returns:
++    {:solver :drive-feasibility
++     :points [{:i :rpm :torque-Nm ...every `solve` field, plus
++              :elec-kWh :mech-kWh :copper-kWh} ...]
++     :energy {:elec-kWh :mech-kWh :copper-kWh :overall-eff}
++     :all-feasible?    boolean (every point feasible?)
++     :infeasible-count int
++     :duration-s       dt-s x profile length
++     :unmeasured       union of point-level losses `solve` does not model
++     :provenance       {:dt-s .. :profile-count ..}}
++
++  Refusals (fail closed): empty/non-map :profile, non-positive :dt-s, or a
++  missing/non-physical electrical constant (surfaced by `solve` per point)."
++  [{:keys [profile dt-s] :as case}]
++  (require-profile profile)
++  (when-not (and (number? dt-s) (pos? dt-s))
++    (throw (ex-info "esc: :dt-s must be a positive number of seconds"
++                    {:dt-s dt-s})))
++  (let [esc-params (select-keys case
++                                [:kt-Nm-per-A :ke-Vs-per-rad :r-phase-ohm
++                                 :i-max-A :v-ceiling-V])
++        dt-h  (/ (double dt-s) 3600.0)
++        pts   (mapv (fn [i pt]
++                      (let [r (solve (merge esc-params
++                                            {:torque-Nm (:torque-Nm pt)
++                                             :rpm       (:rpm pt)}))]
++                        (assoc r
++                               :i i
++                               :rpm (:rpm pt)
++                               :torque-Nm (:torque-Nm pt)
++                               :elec-kWh   (* (:p-elec-kW r) dt-h)
++                               :mech-kWh   (* (:p-mech-kW r) dt-h)
++                               :copper-kWh (* (:copper-loss-kW r) dt-h))))
++                    (range)
++                    profile)
++        elec   (reduce + 0.0 (map :elec-kWh pts))
++        mech   (reduce + 0.0 (map :mech-kWh pts))
++        copper (reduce + 0.0 (map :copper-kWh pts))
++        eff    (when (pos? elec) (/ mech elec))]
++    {:solver :drive-feasibility
++     :points pts
++     :energy {:elec-kWh elec :mech-kWh mech :copper-kWh copper :overall-eff eff}
++     :all-feasible? (every? :feasible? pts)
++     :infeasible-count (count (remove :feasible? pts))
++     :duration-s (* (double dt-s) (count pts))
++     :unmeasured (vec (distinct (reduce into [] (map :unmeasured pts))))
++     :provenance {:dt-s (double dt-s) :profile-count (count pts)}}))
++
++(defmethod cae/solve :esc-feasibility [case] (solve case))
++(defmethod cae/solve :drive-feasibility [case] (drive-feasibility case))
+\ No newline at end of file
+diff --git a/src/motor/solver.cljc b/src/motor/solver.cljk
+similarity index 76%
+rename from src/motor/solver.cljc
+rename to src/motor/solver.cljk
+index e4501a7..10befec 100644
+--- a/src/motor/solver.cljc
++++ b/src/motor/solver.cljk
+@@ -58,15 +58,23 @@
+ (defmethod cae/solve :rom-motor [case]
+   (if (:p-peak-kW case) (size-for-power case) (solve case)))
+ 
+-(defn run [case]
+-  (let [r   (solve case)
++(defn run
++  "Datom-writing path. Routes through the SAME :rom-motor dispatch as
++  `cae/solve`, so a case carrying `:p-peak-kW` records the motor sized for
++  that target — not the default geometry. (Previously `run` called `solve`
++  directly, silently writing a ~110 kW-class default motor's datoms under
++  the caller's case id when a power target was present.)"
++  [case]
++  (let [r   (cae/solve (merge {:solver {:kind :rom-motor}} case))
+         cid (or (:case/id case) "motor-0")
+         ent (d/entity "motor" :MotorRun cid
+-                      {:magnet (name (:magnet r))
+-                       :Nm     (Math/round (double (:torque-Nm r)))
+-                       :kW     (Math/round (double (:p-peak-kW r)))
+-                       :massKg (Math/round (double (:mass-kg r)))
+-                       :NmPerKg (Math/round (* 100.0 (:Nm-per-kg r)))
+-                       :effPct (Math/round (* 100.0 (:eff-peak r)))})
++                      (merge {:magnet (name (:magnet r))
++                              :Nm     (Math/round (double (:torque-Nm r)))
++                              :kW     (Math/round (double (:p-peak-kW r)))
++                              :massKg (Math/round (double (:mass-kg r)))
++                              :NmPerKg (Math/round (* 100.0 (:Nm-per-kg r)))
++                              :effPct (Math/round (* 100.0 (:eff-peak r)))}
++                             (when (:sized-for-kW r)
++                               {:sizedKW (Math/round (double (:sized-for-kW r)))})))
+         led (d/log [ent])]
+     (assoc r :datoms (:datoms led) :datom-count (:count led))))
+diff --git a/test/motor/bldc_test.clj b/test/motor/bldc_test.cljk
+similarity index 98%
+rename from test/motor/bldc_test.clj
+rename to test/motor/bldc_test.cljk
+index d3be40d..3502653 100644
+--- a/test/motor/bldc_test.clj
++++ b/test/motor/bldc_test.cljk
+@@ -2,7 +2,7 @@
+   "The fit is checked against the five published motors it was fitted to, and
+   the disagreement with the traction-motor model at drone scale is pinned as a
+   fact rather than left as a footnote — it is the reason this namespace exists."
+-  (:require [clojure.test :refer [deftest testing is]]
++  (:require [kotoba.test :refer [deftest testing is]]
+             [cae.solver :as cae]
+             [motor.bldc :as bldc]
+             [motor.solver :as motor]))
+diff --git a/test/motor/dcbus_test.cljk b/test/motor/dcbus_test.cljk
+new file mode 100644
+index 0000000..c227852
+--- /dev/null
++++ b/test/motor/dcbus_test.cljk
+@@ -0,0 +1,118 @@
++(ns motor.dcbus-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [motor.dcbus :as dcbus]
++            [cae.solver :as cae]))
++
++(defn- approx= [a b & [tol]]
++  (<= (Math/abs (- (double a) (double b))) (or tol 1e-9)))
++
++(def ^:private base-case
++  {:demand-kw [10.0 30.0 20.0 -5.0 15.0]
++   :dt-h 0.1
++   :p-fc-max-kW 20.0
++   :p-bat-dis-max-kW 15.0
++   :p-bat-chg-max-kW 10.0
++   :soc-min-kWh 1.0
++   :soc-max-kWh 5.0
++   :soc-init-kWh 4.0})
++
++(deftest hand-checked-balance
++  (testing "fc caps at rating; battery covers the deficit; regen charges"
++    (let [r (dcbus/balance base-case)
++          rows (:intervals r)
++          [i0 i1 i2 i3 i4] rows]
++      ;; interval 0: demand 10 <= fc 20 → fc serves 10, battery idle
++      (is (approx= 10.0 (:fc-kw i0)))
++      (is (approx= 0.0 (:batt-dis-kw i0)))
++      (is (approx= 0.0 (:unmet-kw i0)))
++      ;; interval 1: demand 30, fc caps at 20, deficit 10 from battery
++      (is (approx= 20.0 (:fc-kw i1)))
++      (is (approx= 10.0 (:batt-dis-kw i1)))
++      (is (approx= 0.0 (:unmet-kw i1)))
++      ;; interval 2: demand 20 == fc rating → no battery draw
++      (is (approx= 20.0 (:fc-kw i2)))
++      (is (approx= 0.0 (:batt-dis-kw i2)))
++      ;; interval 3: regen -5 kWh? no, -5 kW → battery charges 5 (cap 10)
++      (is (approx= 0.0 (:fc-kw i3)))
++      (is (approx= 5.0 (:batt-chg-kw i3)))
++      (is (approx= 0.0 (:regen-not-absorbed-kw i3)))
++      ;; interval 4: demand 15 <= 20 → fc serves it
++      (is (approx= 15.0 (:fc-kw i4)))
++      (is (approx= 0.0 (:batt-dis-kw i4)))
++      (is (true? (:feasible? r)))
++      (is (= :dcbus-balance (:solver r))))))
++
++(deftest soc-window-respected
++  (testing "discharge stops at :soc-min and reports unmet"
++    ;; demand 60 (fc caps 20, deficit 40) for dt=1h; battery cap 15 kW but
++    ;; only 3 kWh of energy to the floor: max deliverable = 3 kW·h / 1 h = 3 kW
++    (let [r (dcbus/balance {:demand-kw [60.0]
++                            :dt-h 1.0
++                            :p-fc-max-kW 20.0
++                            :p-bat-dis-max-kW 15.0
++                            :p-bat-chg-max-kW 10.0
++                            :soc-min-kWh 1.0
++                            :soc-max-kWh 5.0
++                            :soc-init-kWh 4.0})
++          row (first (:intervals r))]
++      (is (approx= 20.0 (:fc-kw row)))
++      ;; deliverable to floor = 4-1 = 3 kWh over 1 h = 3 kW
++      (is (approx= 3.0 (:batt-dis-kw row)))
++      (is (approx= 37.0 (:unmet-kw row)))   ; 40 - 3
++      (is (approx= 1.0 (:soc-end-kWh row)))
++      ;; energy sums reflect the same
++      (is (approx= 37.0 (:unmet-kWh (:energy r))))
++      (is (false? (:feasible? r))))))
++
++(deftest regen-not-absorbed
++  (testing "regen above charge cap or above headroom is reported, never dropped"
++    ;; -30 kW regen, charge cap 10, headroom from soc=4 to max=5 = 1 kWh
++    ;; over dt 1h = 1 kW. So absorbed = min(30, 10, 1) = 1 kW, unabsorbed 29.
++    (let [r (dcbus/balance {:demand-kw [-30.0]
++                            :dt-h 1.0
++                            :p-fc-max-kW 20.0
++                            :p-bat-dis-max-kW 15.0
++                            :p-bat-chg-max-kW 10.0
++                            :soc-min-kWh 1.0
++                            :soc-max-kWh 5.0
++                            :soc-init-kWh 4.0})
++          row (first (:intervals r))]
++      (is (approx= 0.0 (:fc-kw row)))
++      (is (approx= 1.0 (:batt-chg-kw row)))
++      (is (approx= 29.0 (:regen-not-absorbed-kw row)))
++      (is (approx= 5.0 (:soc-end-kWh row)))
++      (is (approx= 29.0 (:regen-not-absorbed-kWh (:energy r))))
++      (is (false? (:feasible? r))))))
++
++(deftest energy-conservation-sum
++  (testing "per-interval energy = kWh sums across the series"
++    (let [r (dcbus/balance base-case)
++          e (:energy r)]
++      (is (approx= (* 0.1 (+ 10 30 20 -5 15)) (:demand-kWh e)))
++      (is (approx= 0.0
++                   (- (+ (:batt-discharge-kWh e) (:fc-kWh e))
++                      (+ (:batt-charge-kWh e) (:unmet-kWh e)
++                         (:demand-kWh e))))))))
++
++(deftest refusals
++  (testing "missing/non-positive numbers refuse loudly (no invented constants)"
++    (doseq [[k v] [[:p-fc-max-kW 0.0] [:p-bat-dis-max-kW -1.0]
++                   [:p-bat-chg-max-kW 0.0] [:dt-h -0.5]]]
++      (is (thrown? Exception (dcbus/balance (assoc base-case k v)))
++          (str "non-positive " (name k) " must throw"))))
++  (testing "soc window inverted or init outside window refuses"
++    (is (thrown? Exception (dcbus/balance (assoc base-case :soc-max-kWh 0.9))))
++    (is (thrown? Exception (dcbus/balance (assoc base-case :soc-init-kWh 6.0))))
++    (is (thrown? Exception (dcbus/balance (assoc base-case :soc-init-kWh 0.0))))))
++
++(deftest unmeasured-declared
++  (testing "result names what it does NOT model"
++    (let [r (dcbus/balance base-case)]
++      (is (true? (:bus-converter-losses (:unmeasured r))))
++      (is (true? (:battery-round-trip-loss (:unmeasured r))))
++      (is (true? (:fc-partial-load-curve (:unmeasured r)))))))
++
++(deftest registered-on-cae-solver-contract
++  (testing "dispatchable through the shared cae.solver contract"
++    (is (= :dcbus-balance
++           (:solver (cae/solve (assoc base-case :solver {:kind :dcbus-balance})))))))
+\ No newline at end of file
+diff --git a/test/motor/envelope_test.clj b/test/motor/envelope_test.cljk
+similarity index 97%
+rename from test/motor/envelope_test.clj
+rename to test/motor/envelope_test.cljk
+index 56593dc..e9949d6 100644
+--- a/test/motor/envelope_test.clj
++++ b/test/motor/envelope_test.cljk
+@@ -1,5 +1,5 @@
+ (ns motor.envelope-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [motor.solver :as motor]
+             [motor.envelope :as env]
+             [cae.solver :as cae]))
+diff --git a/test/motor/esc_drive_test.cljk b/test/motor/esc_drive_test.cljk
+new file mode 100644
+index 0000000..9e3205f
+--- /dev/null
++++ b/test/motor/esc_drive_test.cljk
+@@ -0,0 +1,92 @@
++(ns motor.esc-drive-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [motor.esc :as esc]
++            [cae.solver :as cae]))
++
++(def ^:private esc-params
++  {:kt-Nm-per-A 0.1 :ke-Vs-per-rad 0.1 :r-phase-ohm 0.05
++   :i-max-A 60.0 :v-ceiling-V 42.0})
++
++(defn- approx=
++  ([a b] (approx= a b 1e-6))
++  ([a b tol] (< (Math/abs (- (double a) (double b))) tol)))
++
++(deftest single-point-matches-solve-and-integrates-energy
++  (testing "one operating point reproduces esc/solve and integrates E = P*dt"
++    (let [case (merge esc-params
++                      {:profile [{:rpm 3000.0 :torque-Nm 5.0}] :dt-s 60.0})
++          d   (esc/drive-feasibility case)
++          pt  (first (:points d))
++          ref (esc/solve (merge esc-params {:rpm 3000.0 :torque-Nm 5.0}))]
++      (is (= 1 (count (:points d))))
++      (is (approx= (:i-A ref) (:i-A pt)))
++      (is (approx= (:p-mech-kW ref) (:p-mech-kW pt)))
++      (is (approx= (:p-elec-kW ref) (:p-elec-kW pt)))
++      (is (approx= (:eff ref) (:eff pt)))
++      ;; energy identity: dt 60s = 1/60 h
++      (is (approx= (* (:p-elec-kW pt) (/ 60.0 3600.0)) (:elec-kWh pt)))
++      (is (approx= (* (:p-mech-kW pt) (/ 60.0 3600.0)) (:mech-kWh pt)))
++      (is (approx= (get-in d [:energy :elec-kWh]) (:elec-kWh pt)))
++      (is (true? (:all-feasible? d)))
++      (is (= 0 (:infeasible-count d)))
++      (is (= :drive-feasibility (:solver d))))))
++
++(deftest integrates-over-multi-point-profile
++  (testing "energy sums across points; idle draws nothing"
++    (let [profile [{:rpm 0.0 :torque-Nm 0.0}
++                   {:rpm 3000.0 :torque-Nm 5.0}
++                   {:rpm 3000.0 :torque-Nm 5.0}]
++          d  (esc/drive-feasibility (merge esc-params {:profile profile :dt-s 100.0}))
++          pts (:points d)
++          elec (reduce + 0.0 (map :elec-kWh pts))
++          mech (reduce + 0.0 (map :mech-kWh pts))]
++      (is (= 3 (count pts)))
++      (is (approx= 0.0 (:mech-kWh (nth pts 0))))
++      (is (approx= (:mech-kWh (nth pts 1)) (:mech-kWh (nth pts 2))))
++      (is (approx= (get-in d [:energy :elec-kWh]) elec))
++      (is (approx= (get-in d [:energy :mech-kWh]) mech))
++      ;; round-trip overall efficiency identity
++      (is (approx= (get-in d [:energy :overall-eff]) (/ mech elec)))
++      (is (approx= (* 100.0 3) (:duration-s d))))))
++
++(deftest infeasible-points-flagged
++  (testing "a point beyond the ESC current limit is counted, not hidden"
++    (let [d (esc/drive-feasibility (merge esc-params
++                                          {:i-max-A 40.0
++                                           :profile [{:rpm 3000.0 :torque-Nm 5.0}
++                                                     {:rpm 3000.0 :torque-Nm 5.0}]
++                                           :dt-s 60.0}))]
++      (is (false? (:all-feasible? d)))
++      (is (= 2 (:infeasible-count d)))
++      (is (every? #(false? (:feasible? %)) (:points d))))))
++
++(deftest refusals
++  (testing "fail closed: empties, non-positive dt, missing constant"
++    (is (thrown? clojure.lang.ExceptionInfo
++                 (esc/drive-feasibility (assoc esc-params :profile []))))
++    (is (thrown? clojure.lang.ExceptionInfo
++                 (esc/drive-feasibility (assoc esc-params :profile [{:rpm 3000 :torque-Nm 5}] :dt-s 0.0))))
++    (is (thrown? clojure.lang.ExceptionInfo
++                 (esc/drive-feasibility (assoc (dissoc esc-params :i-max-A)
++                                               :profile [{:rpm 3000 :torque-Nm 5}]
++                                               :dt-s 60.0))))
++    (is (thrown? clojure.lang.ExceptionInfo
++                 (esc/drive-feasibility (assoc esc-params :profile "not-a-profile" :dt-s 60.0))))))
++
++(deftest registered-on-cae-solver-contract
++  (testing "dispatchable through the shared cae.solver contract"
++    (let [case (merge esc-params {:profile [{:rpm 3000.0 :torque-Nm 5.0}]
++                                   :dt-s 60.0})
++          direct (esc/drive-feasibility case)
++          via    (cae/solve (assoc case :solver {:kind :drive-feasibility}))]
++      (is (= (:solver direct) (:solver via)))
++      (is (= (:energy direct) (:energy via)))
++      (is (= (:all-feasible? direct) (:all-feasible? via))))))
++
++(deftest unmeasured-losses-declared
++  (testing "the drive contract names what it does NOT model"
++    (let [d (esc/drive-feasibility (merge esc-params
++                                          {:profile [{:rpm 3000.0 :torque-Nm 5.0}]
++                                           :dt-s 60.0}))]
++      (is (contains? (set (:unmeasured d)) :iron-loss))
++      (is (every? :feasible? (:points d))))))
+\ No newline at end of file
+diff --git a/test/motor/esc_test.cljk b/test/motor/esc_test.cljk
+new file mode 100644
+index 0000000..8aeb2fd
+--- /dev/null
++++ b/test/motor/esc_test.cljk
+@@ -0,0 +1,75 @@
++(ns motor.esc-test
++  (:require [kotoba.test :refer [deftest is testing]]
++            [motor.esc :as esc]
++            [cae.solver :as cae]))
++
++(def ^:private base-case
++  ;; Hand-checkable numbers: kt = ke = 0.1 (matching conventions), R = 0.05 Ω.
++  ;; T = 5 N·m → i = 50 A; 3000 rpm → ω = 100π ≈ 314.159 rad/s →
++  ;; e ≈ 31.4159 V; v-req ≈ 33.9159 V; p-mech = 5·100π ≈ 1570.80 W;
++  ;; copper = 125 W; p-elec ≈ 1695.80 W.
++  {:torque-Nm 5.0 :rpm 3000.0
++   :kt-Nm-per-A 0.1 :ke-Vs-per-rad 0.1 :r-phase-ohm 0.05
++   :i-max-A 60.0 :v-ceiling-V 42.0})
++
++(defn- approx= ([a b] (approx= a b 1e-9)) ([a b tol] (< (Math/abs (- a b)) tol)))
++
++(deftest hand-checked-operating-point
++  (testing "quasi-static electrical model matches closed-form values"
++    (let [r (esc/solve base-case)]
++      (is (approx= 50.0 (:i-A r)))
++      (is (approx= 100.0 Math/PI (:omega-rad-s r)))
++      (is (approx= (* 10.0 Math/PI) (:back-emf-V r)))
++      (is (approx= (+ (* 10.0 Math/PI) 2.5) (:v-required-V r)))
++      (is (approx= 1.5707963 (:p-mech-kW r) 1e-5))
++      (is (approx= 1.6957963 (:p-elec-kW r) 1e-5))
++      (is (approx= 0.125 (:copper-loss-kW r)))
++      (is (approx= (/ 1.5707963 1.6957963) (:eff r) 1e-6))
++      (is (true? (:feasible? r)))
++      (is (approx= 10.0 (:headroom-A r)))
++      (is (approx= (- 42.0 (+ (* 10.0 Math/PI) 2.5)) (:headroom-V r))))))
++
++(deftest current-limit-violation
++  (testing "demand beyond the ESC current limit is loudly infeasible"
++    (let [r (esc/solve (assoc base-case :i-max-A 40.0))]
++      (is (false? (:current-ok? r)))
++      (is (true? (:voltage-ok? r)))
++      (is (false? (:feasible? r)))
++      (is (neg? (:headroom-A r))))))
++
++(deftest voltage-ceiling-violation
++  (testing "back-EMF + IR drop beyond the bus ceiling is loudly infeasible"
++    (let [r (esc/solve (assoc base-case :v-ceiling-V 30.0))]
++      (is (true? (:current-ok? r)))
++      (is (false? (:voltage-ok? r)))
++      (is (false? (:feasible? r)))
++      (is (neg? (:headroom-V r))))))
++
++(deftest missing-constant-throws
++  (testing "no invented constants: every required key throws when missing"
++    (doseq [k (butlast [:torque-Nm :rpm :kt-Nm-per-A :ke-Vs-per-rad
++                        :r-phase-ohm :i-max-A :v-ceiling-V])]
++      ;; :torque-Nm and :rpm allow zero, so drop them by zeroing, not removing
++      (is (thrown? Exception
++                   (esc/solve (if (#{:torque-Nm :rpm} k)
++                                (dissoc base-case k)
++                                (dissoc base-case k))))
++          (str "missing " k " must throw")))))
++
++(deftest zero-torque-idle
++  (testing "zero torque at speed draws no current; efficiency is nil, not 0"
++    (let [r (esc/solve (assoc base-case :torque-Nm 0.0))]
++      (is (zero? (:i-A r)))
++      (is (approx= (* 10.0 Math/PI) (:back-emf-V r)))
++      (is (approx= (* 10.0 Math/PI) (:v-required-V r)))
++      (is (nil? (:eff r)))
++      (is (true? (:feasible? r))))))
++
++(deftest registered-on-cae-solver-contract
++  (testing "dispatchable through the shared cae.solver contract"
++    (is (= (:solver (esc/solve base-case))
++           (:solver (cae/solve (assoc base-case :solver {:kind :esc-feasibility})))))))
++
++(deftest unmeasured-losses-declared
++  (testing "the result names what it does NOT model"
++    (is (contains? (set (:unmeasured (esc/solve base-case))) :iron-loss))))
+diff --git a/test/motor/solver_test.clj b/test/motor/solver_test.cljk
+similarity index 58%
+rename from test/motor/solver_test.clj
+rename to test/motor/solver_test.cljk
+index a2b3a51..3035164 100644
+--- a/test/motor/solver_test.clj
++++ b/test/motor/solver_test.cljk
+@@ -1,5 +1,5 @@
+ (ns motor.solver-test
+-  (:require [clojure.test :refer [deftest is testing]]
++  (:require [kotoba.test :refer [deftest is testing]]
+             [motor.solver :as motor]
+             [cae.solver :as cae]))
+ 
+@@ -36,6 +36,31 @@
+   (testing "contract routes to inverse sizing when a power target is present"
+     (is (= 110 (:sized-for-kW (cae/solve {:p-peak-kW 110 :solver {:kind :rom-motor}}))))))
+ 
++(deftest run-respects-power-target
++  ;; Regression: `run` used to call `solve` directly, bypassing the
++  ;; :rom-motor dispatch, so a case with :p-peak-kW recorded the DEFAULT
++  ;; geometry (199.86 kW / 101.2 kg) under the caller's case id — for a
++  ;; 30 kW target that is a 6.7x mass error written as datoms.
++  (let [r (motor/run {:case/id "run-power-30" :p-peak-kW 30})]
++    (testing "datoms reflect the motor sized for the target"
++      (is (< 29 (:p-peak-kW r) 31) (str "delivered " (:p-peak-kW r) " kW"))
++      (is (= 30 (:sized-for-kW r)))
++      (is (= 30 (some (fn [[_ attr v]] (when (= attr :motor.MotorRun/sizedKW) v))
++                      (:datoms r))))
++      (testing "mass matches size-for-power, not the default geometry"
++        (is (< (:mass-kg r) 20) (str "mass=" (:mass-kg r) " kg (default is ~101 kg)"))
++        (is (= (:mass-kg (motor/size-for-power {:p-peak-kW 30})) (:mass-kg r)))))
++    (testing "datom fields agree with the returned result"
++      (is (= 30 (some (fn [[_ attr v]] (when (= attr :motor.MotorRun/kW) v)) (:datoms r))))
++      (is (= 15 (some (fn [[_ attr v]] (when (= attr :motor.MotorRun/massKg) v)) (:datoms r))))))
++
++  (testing "no-power case still records the default geometry"
++    (let [r  (motor/run {:case/id "run-default"})
++          d  (motor/solve {})]
++      (is (= (:p-peak-kW d) (:p-peak-kW r)))
++      (is (nil? (:sized-for-kW r)))
++      (is (nil? (some (fn [[_ attr _]] (= attr :motor.MotorRun/sizedKW)) (:datoms r)))))))
++
+ (deftest datafied
+   (is (pos? (:datom-count (motor/run {:case/id "sedan/motor"})))))
+ 

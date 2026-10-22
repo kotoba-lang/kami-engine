@@ -1,0 +1,73 @@
+{
+  "repository-before": {
+    "id": "R_kgDOTLUsSw",
+    "databaseId": 1286941771,
+    "nameWithOwner": "kotoba-lang/kami-character-scene",
+    "isPrivate": false,
+    "isArchived": false,
+    "pushedAt": "2026-09-24T06:39:21Z",
+    "homepageUrl": null,
+    "defaultBranchRef": {
+      "name": "main",
+      "target": {
+        "oid": "9dcf24641bcb7675e54282b464d0665737a8f286"
+      }
+    },
+    "heads": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "main",
+          "target": {
+            "oid": "9dcf24641bcb7675e54282b464d0665737a8f286"
+          }
+        }
+      ]
+    },
+    "tags": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "openPRs": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "allPRs": {
+      "totalCount": 0
+    },
+    "openIssues": {
+      "totalCount": 0
+    },
+    "releases": {
+      "totalCount": 0
+    }
+  },
+  "local-before-preservation": {
+    "HEAD": "9dcf24641bcb7675e54282b464d0665737a8f286",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-character-scene\nHEAD 9dcf24641bcb7675e54282b464d0665737a8f286\ndetached",
+    "refs": "refs/audit/forest-maintenance/default 9dcf24641bcb7675e54282b464d0665737a8f286\nrefs/heads/main 6ff46512ae1382e05e726df57b9bdf078bff2eb8\nrefs/heads/manifest-rev 6287eb9b057b65c045d8c580c974bb33dc50afe6\nrefs/remotes/kotoba-lang/HEAD 9dcf24641bcb7675e54282b464d0665737a8f286\nrefs/remotes/kotoba-lang/cljk-rename-20260911 96e33720eb5f959ef48226732d769d6284b984b9\nrefs/remotes/kotoba-lang/jv/full-sha ca1afdc15f23cef7babcaa064a7228612dda928f\nrefs/remotes/kotoba-lang/jv/kotoba-text 9b6ca27242d55b67497fe2f468a9f5c5045d9cca\nrefs/remotes/kotoba-lang/kbb-cutover-20260911 7399afcb2a87e771c7fd6814dd4883045a5eae4a\nrefs/remotes/kotoba-lang/main 9dcf24641bcb7675e54282b464d0665737a8f286"
+  },
+  "local-after-preservation": {
+    "HEAD": "9dcf24641bcb7675e54282b464d0665737a8f286",
+    "branch": "",
+    "status": "",
+    "stashes": "",
+    "worktrees": "worktree <github>/kotoba-lang/kami-character-scene\nHEAD 9dcf24641bcb7675e54282b464d0665737a8f286\ndetached",
+    "refs": {
+      "refs/audit/forest-maintenance/default": "9dcf24641bcb7675e54282b464d0665737a8f286",
+      "refs/heads/main": "6ff46512ae1382e05e726df57b9bdf078bff2eb8",
+      "refs/heads/manifest-rev": "6287eb9b057b65c045d8c580c974bb33dc50afe6",
+      "refs/preservation/kami-monorepo-20261022/heads/main": "9dcf24641bcb7675e54282b464d0665737a8f286",
+      "refs/remotes/kotoba-lang/HEAD": "9dcf24641bcb7675e54282b464d0665737a8f286",
+      "refs/remotes/kotoba-lang/cljk-rename-20260911": "96e33720eb5f959ef48226732d769d6284b984b9",
+      "refs/remotes/kotoba-lang/jv/full-sha": "ca1afdc15f23cef7babcaa064a7228612dda928f",
+      "refs/remotes/kotoba-lang/jv/kotoba-text": "9b6ca27242d55b67497fe2f468a9f5c5045d9cca",
+      "refs/remotes/kotoba-lang/kbb-cutover-20260911": "7399afcb2a87e771c7fd6814dd4883045a5eae4a",
+      "refs/remotes/kotoba-lang/main": "9dcf24641bcb7675e54282b464d0665737a8f286"
+    }
+  },
+  "historical-pulls": []
+}

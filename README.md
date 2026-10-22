@@ -1,5 +1,13 @@
 # kami-engine
 
+Portable-family consolidation is being qualified under
+[ADR 2610220800](90-docs/adr/2610220800-portable-kami-source-monorepo.md).
+`packages/catalog.json` names the selected portable projects and exact legacy
+aliases. `node scripts/kami-sources.mjs --json kotoba.kami.engine.animation`
+reads a source descriptor; it does not activate a runtime or provider. Native
+foundations and product deployment boundaries remain separate. Qualification
+and retirement are still in progress.
+
 `kami-physics` integrates the shared Kotoba physics scene contract with
 realtime rigid bodies, vehicle reduced-order models and high-fidelity CAE.
 Game and spatial-authoring callers use one CLJC router while fidelity remains

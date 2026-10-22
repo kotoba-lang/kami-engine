@@ -1,0 +1,143 @@
+{
+  "repository": "kotoba-lang/kami-usd-native",
+  "default": "b1dc1c4593dadddd65b92a9b6c5ac7ad26080a0f",
+  "heads": {
+    "7b8c4b9438db58094d0eba9f9664936195b6ae8f": {
+      "decision": "merged-squash-exact-postimages",
+      "proof": {
+        "pull-request": 1,
+        "url": "https://github.com/kotoba-lang/kami-usd-native/pull/1",
+        "head": "7b8c4b9438db58094d0eba9f9664936195b6ae8f",
+        "merge": "e56fffc291406a5871ee4cd11969a42e8ece3bd2",
+        "merge-base": "b185f48efdfdb15059b7d22daf8a9671a462b7ab",
+        "merge-is-ancestor-of-current-default": true,
+        "exact-postimages": [
+          {
+            "path": ".github/workflows/ci.yml",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "0a10db5b66f6a429b6d2ff87e577f5207e1c2f83"
+            }
+          },
+          {
+            "path": "README.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "1abb3fc47d09140bc6c21d64536eaae4a25cb548"
+            }
+          },
+          {
+            "path": "deps.edn",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "e20e78e344a0378b0a35e648d91cd7dedc817826"
+            }
+          },
+          {
+            "path": "docs/adr/0001-kotoba-source-authority.md",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "e8f1d4a4eefc763bf12610b31afcddd62c303403"
+            }
+          },
+          {
+            "path": "src/usd_native.cljc",
+            "entry": null
+          },
+          {
+            "path": "src/usd_native.kotoba",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "c16a7ab8b84af02bb59bff274ea56edc61aac353"
+            }
+          },
+          {
+            "path": "test/usd_native/core_test.clj",
+            "entry": {
+              "mode": "100644",
+              "type": "blob",
+              "oid": "34ec422a9bb65a1bd5f805a2347118a835c46439"
+            }
+          },
+          {
+            "path": "test/usd_native/core_test.cljc",
+            "entry": null
+          }
+        ]
+      }
+    }
+  },
+  "merged-PR-proofs": [
+    {
+      "pull-request": 1,
+      "url": "https://github.com/kotoba-lang/kami-usd-native/pull/1",
+      "head": "7b8c4b9438db58094d0eba9f9664936195b6ae8f",
+      "merge": "e56fffc291406a5871ee4cd11969a42e8ece3bd2",
+      "merge-base": "b185f48efdfdb15059b7d22daf8a9671a462b7ab",
+      "merge-is-ancestor-of-current-default": true,
+      "exact-postimages": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "0a10db5b66f6a429b6d2ff87e577f5207e1c2f83"
+          }
+        },
+        {
+          "path": "README.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "1abb3fc47d09140bc6c21d64536eaae4a25cb548"
+          }
+        },
+        {
+          "path": "deps.edn",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "e20e78e344a0378b0a35e648d91cd7dedc817826"
+          }
+        },
+        {
+          "path": "docs/adr/0001-kotoba-source-authority.md",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "e8f1d4a4eefc763bf12610b31afcddd62c303403"
+          }
+        },
+        {
+          "path": "src/usd_native.cljc",
+          "entry": null
+        },
+        {
+          "path": "src/usd_native.kotoba",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "c16a7ab8b84af02bb59bff274ea56edc61aac353"
+          }
+        },
+        {
+          "path": "test/usd_native/core_test.clj",
+          "entry": {
+            "mode": "100644",
+            "type": "blob",
+            "oid": "34ec422a9bb65a1bd5f805a2347118a835c46439"
+          }
+        },
+        {
+          "path": "test/usd_native/core_test.cljc",
+          "entry": null
+        }
+      ]
+    }
+  ]
+}
