@@ -141,5 +141,20 @@
     "https://linear.app/com-junkawasaki/issue/JUN-198",
     "https://linear.app/com-junkawasaki/issue/JUN-269",
     "https://linear.app/kotobalabs/issue/AWAI-53"
-  ]
+  ],
+  "current-upstream-source-observation": {
+    "repository": "kotoba-lang/amu",
+    "main": "7872d10f587a2d4a0b92bc124037915e34c0cf26",
+    "path": "seed/21-check.kotoba",
+    "git-blob": "2328702571350e8bcde7652e6d5b5e51faa4c248",
+    "sha256": "4228b2afeb923ea0cf5dd6e07205b03716ff830cbea340b1b231eef38dd9ba2f",
+    "identical-to-qualified-pin": true,
+    "symbol-occurrences": {
+      "document-f64": 0,
+      "document-f64-value": 0,
+      "document-print": 0,
+      "document-read": 0
+    },
+    "qualification": "current source observation only; exact runtime refusals measured with pinned self-built G3"
+  }
 }

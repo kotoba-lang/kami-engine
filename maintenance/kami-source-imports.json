@@ -14207,7 +14207,7 @@
   "native-component-contracts": [
     {
       "file": "maintenance/kami-input-map-native-contract.json",
-      "sha256": "c692a8784d74548cf030eb9f3b9e4175dce4f72aaafc4d7b3360e80afcb58a01",
+      "sha256": "cc106379de845982ba156102054978b78db750c1a7cbbb5411578d9e9fb1452d",
       "state": "compiler-refused"
     }
   ]
