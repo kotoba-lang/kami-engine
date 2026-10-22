@@ -69,13 +69,15 @@
     "fuel-refusal-required": true
   },
   "gate": {
-    "path": "scripts/test-kami-native-input-map.sh",
+    "path": "maintenance/kami-consolidation/2026-10-22/historical-native-input-map-gate.txt",
     "sha256": "41056da484f7c4c3b83c468185f87c70089e01388f7a2aa03c89410c0562c050",
     "requires-hosted-executable-denial-controls": 12,
     "requires-full-source-readback": true,
     "no-hosted-fallback": true,
     "current-exit": 1,
-    "current-first-diagnostic": "seed: E2101 unknown or unsupported form 'document-f64-value' (byte 597)"
+    "current-first-diagnostic": "seed: E2101 unknown or unsupported form 'document-f64-value' (byte 597)",
+    "kind": "historical-C-loader-recipe; non-operational evidence",
+    "current-acceptance": false
   },
   "compiler": {
     "status": "pass",
@@ -156,5 +158,24 @@
       "document-read": 0
     },
     "qualification": "current source observation only; exact runtime refusals measured with pinned self-built G3"
+  },
+  "evidence-classification": "Historical trusted-C supervisor diagnostics only; not current native/selfhost/Q9/CDCI qualification",
+  "current-acceptance": {
+    "policy-repository": "kotoba-lang/amu",
+    "policy-commit": "7872d10f587a2d4a0b92bc124037915e34c0cf26",
+    "policy-paths": [
+      "AGENTS.md",
+      "docs/selfhost-priority.md"
+    ],
+    "required": "canonical Kotoba and complete Amu-selfhost-produced loaderless native closure; no legacy language host, C compiler/loader/runtime",
+    "CDCI-target": "x86_64-linux-static ELF; no interpreter/shared-runtime dependence",
+    "qualification": "not achieved; no accepted loaderless component gate currently recorded",
+    "original-CLJK": "preserved migration input, not a paired final surface"
+  },
+  "upstream-implementation-candidate": {
+    "repository": "kotoba-lang/amu",
+    "pull-request": 1443,
+    "head": "f2e60a75caa753dfb05dd66572c4310062b2eda6",
+    "scope": "Kotoba binary64 text core and native corpus; unexecuted/unqualified, primitive lowering not integrated"
   }
 }

@@ -65,13 +65,16 @@ or application deployment ownership. Source discovery grants no admission.
 ## Native migration acceptance
 
 The owner's current target is Kotoba components with normal build and execution
-independent of JVM, GraalVM, CLJS/Node and nbb. Follow
+independent of JVM, GraalVM, CLJS/Node, nbb and C compiler/loader/runtime. Follow
 `90-docs/adr/261022-native-kami-migration.md` and
 `maintenance/kami-native-migration.json`. Existing CLJK sources and the commands
-below are compatibility inputs, not proof of native migration. Do not expand
+below are migration inputs, not a paired final surface or proof of native migration. Do not expand
 hosted test infrastructure as the path to completion. Qualify each selected
 public component and its full dependency closure with the Amu/native route,
-including hosted-executable denial controls. Missing native coverage stays
+including full build/package/launch closure and forbidden-process controls.
+Only Amu-selfhost-produced loaderless artifacts qualify; CDCI uses
+`x86_64-linux-static` ELF. Historical pinned C-loader receipts do not qualify.
+Missing native coverage stays
 open; no smaller substitute or hosted fallback qualifies the component.
 
 Portable Kotoba library logic belongs in this source owner. Amu and execution

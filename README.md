@@ -12,9 +12,10 @@ The migration target is host-independent Kotoba components. Source co-location
 and historical JVM/SCI/CLJS test results do not prove that target. Follow the
 [native migration decision](90-docs/adr/261022-native-kami-migration.md) and
 [per-project inventory](maintenance/kami-native-migration.json). The normal
-build and runtime must qualify through Amu without JVM, GraalVM, CLJS/Node or
-nbb, for the complete selected component and its dependency closure. CLJK
-sources and hosted test commands remain explicit compatibility inputs.
+build and runtime must qualify through Amu selfhost-produced loaderless
+artifacts without JVM, GraalVM, CLJS/Node, nbb or C compiler/loader/runtime,
+for the complete selected component and its dependency closure. CLJK sources
+and hosted test commands are migration inventory, not required final surfaces.
 
 The source catalog contains 70 canonical dotted IDs and 152 exact aliases.
 IDs follow the Kotoba naming Spec; multiword segments use lowerCamelCase.

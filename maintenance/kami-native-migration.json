@@ -5,19 +5,21 @@
   "catalog-head": "e570ec69a0c66302c6520a6b2cab56bc63620d72",
   "state": "incomplete; source co-location and hosted oracle results do not satisfy native migration",
   "acceptance": {
-    "normal-build-and-runtime": "Amu-produced Kotoba native artifacts; JVM/GraalVM/CLJS/Node/nbb unavailable",
+    "normal-build-and-runtime": "canonical Kotoba, Amu selfhost-produced loaderless artifacts; JVM/GraalVM/CLJS/Node/nbb and C compiler/loader/runtime unavailable",
     "component-scope": "the selected component public API and its complete dependency closure; a scalar kernel or source suffix is insufficient",
-    "verification": "actual compile, link and execution with source/tool digests, semantic/authority/resource refusals and hosted-executable denial controls",
-    "compatibility": "existing CLJK APIs, aliases, data and historical tests remain explicit compatibility inputs; hosted oracle results alone cannot clear a native migration hold",
+    "verification": "complete native compile/build/link/package/launch closure, pinned sources/locks, process traces and artifact evidence excluding legacy hosts and C; actual semantics/authority/resource refusals",
+    "compatibility": "CLJK/CLJC/CLJS and old host tests are preserved migration inventory only, not required paired final surfaces or native acceptance",
     "fallback": "unsupported native behavior remains an open blocker; no implicit hosted fallback or replacement with an easier subset",
-    "repository-boundary": "Amu and execution foundations remain separate; no Actions settings, pin holds or deployments are changed"
+    "repository-boundary": "Amu and execution foundations remain separate; no Actions settings, pin holds or deployments are changed",
+    "CDCI": "Amu selfhost and Kotoba native loaderless x86_64-linux-static ELF only"
   },
   "current-toolchain-reference": {
     "repository": "kotoba-lang/kotoba",
     "commit": "2de9ccd18a2e559dbb75019968d413435fb0a087",
     "policy": "docs/native-cli-migration.md",
     "gate": "scripts/build-selfhost-toolchain.sh and scripts/test-native-libraries.sh",
-    "qualification-boundary": "macOS arm64 compiler/runtime and declared library fixtures; public CLI cutover and all70 Kami components are not proved"
+    "qualification-boundary": "does not qualify the current loaderless native closure",
+    "evidence-classification": "historical trusted-C route only; not current acceptance"
   },
   "observed-launcher": {
     "path": "kotoba-lang/kotoba/bin/kotoba",
@@ -1362,5 +1364,17 @@
   "tracking": [
     "https://linear.app/com-junkawasaki/issue/JUN-269",
     "https://linear.app/kotobalabs/issue/AWAI-53"
-  ]
+  ],
+  "current-acceptance-policy": {
+    "policy-repository": "kotoba-lang/amu",
+    "policy-commit": "7872d10f587a2d4a0b92bc124037915e34c0cf26",
+    "policy-paths": [
+      "AGENTS.md",
+      "docs/selfhost-priority.md"
+    ],
+    "required": "canonical Kotoba and complete Amu-selfhost-produced loaderless native closure; no legacy language host, C compiler/loader/runtime",
+    "CDCI-target": "x86_64-linux-static ELF; no interpreter/shared-runtime dependence",
+    "qualification": "not achieved; no accepted loaderless component gate currently recorded",
+    "original-CLJK": "preserved migration input, not a paired final surface"
+  }
 }

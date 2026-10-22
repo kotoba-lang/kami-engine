@@ -4822,9 +4822,9 @@
         {
           "path": "packages/kotoba.kami.engine.input-map/README.md",
           "original-sha256": "31e6a8ca99566f9a6f626314f99c81809f3070360641a228fd2e40328409a0f3",
-          "rewritten-sha256": "55cd115a86f80191c8d9994b09f80adf8d511d508b6cd8d665e4f17b50b70a10",
+          "rewritten-sha256": "b4078ab855bf2f6cda36f6bfb058fb93bfef75406f06e44d9da73abfa4bad869",
           "kind": "native-migration-documentation",
-          "reason": "Record allfive candidate operations, required selfhost primitives and actual refusal; retained historical CLJK source/APIs/tests are unchanged."
+          "reason": "Record candidate source and historical trusted-C diagnostics, retire the task-created C-loader gate from operational paths, and require current loaderless Amu selfhost closure; CLJK remains preserved migration input only."
         }
       ],
       "config-changes": [],
@@ -14207,8 +14207,8 @@
   "native-component-contracts": [
     {
       "file": "maintenance/kami-input-map-native-contract.json",
-      "sha256": "cc106379de845982ba156102054978b78db750c1a7cbbb5411578d9e9fb1452d",
-      "state": "compiler-refused"
+      "sha256": "182dffdffff03dd89d4d36a520a0f09bf3c95d3354a72cb5d189e287d36579f4",
+      "state": "unqualified; loaderless selfhost closure and native document primitives required"
     }
   ]
 }

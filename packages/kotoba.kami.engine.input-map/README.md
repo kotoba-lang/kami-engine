@@ -12,22 +12,23 @@ operation input-map component: `stick`, `axes`, `apply-dead-zone`,
 `button-edges`, and `update`. It uses typed f64 arithmetic and language-owned
 document operations, retains immutable detector state and sorted press/release
 vectors, and has no JVM, CLJS/Node, device-I/O or Wasm-host dependency.
-The `.cljk` reading is retained for explicit compatibility.
+The `.cljk` reading is preserved as migration input, not a paired final surface.
 
 The candidate is **not qualified**. The pinned self-built Amu compiler rejects
 `document-f64-value`; isolated compiler probes also confirm that
 `document-f64`, `document-print`, and `document-read` are unsupported. Native
-f64 arithmetic itself compiled and executed successfully. Keep the full
+f64 arithmetic itself compiled and executed in that historical trusted-C route. Keep the full
 component blocked until its required value operations are supported; no
 integer-only replacement or hosted fallback is used.
 
 `maintenance/kami-input-map-native-contract.json` at the owner root records
-the API, actual refusal, toolchain and whole-component test scope. The owner
-command is `KOTOBA_NATIVE_HOME=/path/to/kotoba bash
-scripts/test-kami-native-input-map.sh TOOLCHAIN NEW_OUTPUT`. It denies twelve
-hosted executables and requires the actual two-module closure, all eight
-semantic groups, input/fuel refusals and source digest readback. Its current
-compiler refusal is a failure, not a migration pass.
+the API, historical refusal, toolchain and whole-component test scope. The
+former C-loader recipe is preserved as non-operational text in the owner
+consolidation evidence; it is not a current build or qualification command.
+Acceptance requires the complete Amu-selfhost-produced loaderless closure,
+with no legacy language host or C compiler/loader/runtime, all eight semantic
+groups, input/fuel refusals, process traces and source/artifact readback. That
+qualifying route is still open; no migration pass is claimed.
 
 # Historical compatibility reading: input_map only
 

@@ -27,17 +27,24 @@ evidence is accurate; calling it native or host-independent evidence is not.
 
 Kotoba source and the complete selected component are the migration target.
 Preserved CLJK APIs, aliases, source, tests, branches and WIP remain explicit
-compatibility inputs. Source co-location, compatibility regression results,
+preserved migration inputs, not paired final surfaces. Source co-location, compatibility regression results,
 native migration and runtime admission are separate states.
 
 For each selected component, define its public API and full dependency closure,
 port that closure to Kotoba, and build, link and execute the actual artifacts
 through the owning Amu/native route. Required verification must run with JVM,
-GraalVM, CLJS/Node and nbb unavailable, including a control proving those
+GraalVM, CLJS/Node, nbb and C compiler/loader/runtime unavailable, including controls proving those
 executables are denied. Check semantic results, source/tool digests, bounded
 resources and authority/refusal behavior. Do not replace a component with a
 scalar shadow or a smaller kernel to pass the gate. Unsupported APIs remain
 explicit native blockers, with no implicit hosted fallback.
+
+The current Amu owner contract at `7872d10f587a2d4a0b92bc124037915e34c0cf26`
+supersedes its historical C-loader and hosted-bootstrap exceptions. Qualify
+the complete build, package and launch closure using Amu-selfhost-produced
+loaderless artifacts. CDCI uses only `x86_64-linux-static` ELF with no legacy
+interpreter or C runtime dependence. A pinned C-loader fixed point remains
+historical evidence and does not satisfy this gate.
 
 Historical oracle runs may explain regressions. New hosted test infrastructure
 must not become the default completion path or a new production/build
@@ -60,9 +67,10 @@ This wave records no whole-component native qualification for the70 projects;
 the suffix count itself does not measure API coverage. Existing scalar,
 generated-JavaScript and typed-Wasm probes do not establish that missing proof.
 
-The pinned self-built compiler and native standard-library gate in Kotoba are
-the starting route. Their existing fixture scope does not prove the normal
-public CLI cutover or these Kami components. Inventory required APIs and
+The earlier trusted-C compiler and standard-library fixtures are historical
+diagnostics, not a qualifying starting route under the current Amu contract.
+The task-created C-loader gate is retained only as non-operational historical
+text in the consolidation evidence. Inventory required APIs and
 dependencies, then port and test real closures. Preserve current functional
 branch corrections and the historical test results without presenting their
 JVM/SCI/compiled success as native migration completion.
