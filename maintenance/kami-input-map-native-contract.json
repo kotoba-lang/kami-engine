@@ -138,7 +138,7 @@
       }
     ]
   },
-  "next-required-work": "Qualify decimal/document/x86 float candidates through complete loaderless Amu selfhost compiler, runtime, project/link, package and launch closure; run all native positive/refusal/fuel/ABI controls and unchanged full input-map semantic corpus. No repository retirement before merged owner-main evidence.",
+  "next-required-work": "Qualify decimal/document/hash/x86 float candidates through the complete loaderless Amu selfhost compiler/runtime/project/link/package/launch closure, including the full existing document payload domain; run all native positive/refusal/fuel/ABI controls and unchanged full input-map corpus. No repository retirement before merged owner-main evidence.",
   "tracking": [
     "https://linear.app/com-junkawasaki/issue/JUN-198",
     "https://linear.app/com-junkawasaki/issue/JUN-269",
@@ -175,8 +175,8 @@
   "upstream-implementation-candidate": {
     "repository": "kotoba-lang/amu",
     "pull-request": 1443,
-    "head": "d6cab8fb077baa27ae7277a9074cb8624990ea98",
-    "scope": "native decimal/document lowering and all 36 existing x86 floating SIR tags; source candidate only, all native type/selfbuild/run qualification pending",
+    "head": "0893264f018110e752d4c3885d72831850f23eae",
+    "scope": "native decimal/document including pure SHA-256 and 36 x86 floating SIR source lowerings; all native type/selfbuild/full-domain/run qualification pending",
     "source-contract": "seed/runtime/document-runtime.json",
     "qualification": "not achieved",
     "literal-contract": "seed/decimal-literals.json",
@@ -208,5 +208,17 @@
     "native-typecheck-build-run": "not performed",
     "actual-generated-artifacts-checked": false,
     "unchanged-component-gate": "full five-API/eight-group fixture; no test narrowing"
+  },
+  "compiler-document-hash": {
+    "source-contract": "seed/runtime/document-runtime.json",
+    "canonical-core": "src/kotoba/compiler/sha256_bits.kotoba",
+    "implementation": "pure integer SHA-256 of validated raw canonical document bytes; no host hash/capability",
+    "source-review": "eight-function alpha-equivalence, helper/primitive arities, 64 round constants/eight IV words and independent anchor-data checks",
+    "unchanged-owning-language-anchor-bodies": 26,
+    "required-full-existing-document-payload": 65536,
+    "native-typecheck-build-run": "not performed",
+    "full-domain-qualification": "not achieved; existing EDN/string-pool representation gaps must not be hidden by skipping large cases",
+    "complete-SHA2-library-qualified": false,
+    "test-narrowing": false
   }
 }
