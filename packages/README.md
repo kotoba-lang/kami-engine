@@ -67,3 +67,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-web](kami-web) | `2c4064b` | Pure-Clojure port of kami-engine's kami-web (WASM entry): matrix math, render-IR schema, PPTX layout, entry catalog |
 | [douga](douga) | `93639cd` | Pure timeline→ffmpeg render-plan builder + command builders — CLJC craft lib |
 | [cad](cad) | `161b152` | Open-source CAD/CAM workbench as EDN geometry data + portable CLJC model. |
+| [biomech](biomech) | `c85ffb9` | Biomechanics simulation domain layer — 筋肉/骨/皮膚/内臓. Pure Clojure. kotoba-lang capability. |
