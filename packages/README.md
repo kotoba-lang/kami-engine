@@ -37,3 +37,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-eizo-compositor](kami-eizo-compositor) | `2e4382d` | VFX compositing node data model (chroma-key/roto/tracking/blend) — kotoba-lang eizo domain, ADR-2607121400 |
 | [kami-eizo-grade](kami-eizo-grade) | `f960c23` | ASC CDL / monotone curves / .cube LUT / waveform+vectorscope color-grading data model (kami-eizo family, ADR-2607121400) |
 | [kami-engine-vphysics](kami-engine-vphysics) | `7ff753e` | shared vehicle-physics primitives (road load, aero force, range) |
+| [kami-engine-aero](kami-engine-aero) | `fabfd90` | reduced-order aero Cd solver (component build-up) + design range loop |
