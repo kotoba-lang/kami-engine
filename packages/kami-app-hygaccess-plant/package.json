@@ -1,0 +1,14 @@
+{
+  "name": "kami-app-hygaccess-plant",
+  "private": true,
+  "version": "0.1.0",
+  "description": "kami-app-hygaccess-plant render verification — WebGPU render-IR browser smoke test (2026-07-18 addendum to docs/adr/0001-architecture.md Decision 4).",
+  "scripts": {
+    "compile:render-demo": "amu compile --target wasm32-browser render-demo",
+    "test:clj": "kbb -M:test"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.28.20",
+    "playwright": "^1.48.0"
+  }
+}

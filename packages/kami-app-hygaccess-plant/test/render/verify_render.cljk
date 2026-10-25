@@ -1,0 +1,67 @@
+(ns verify-render
+  "Real-browser WebGPU verification for the mixing-tank render-IR (2026-07-18
+  addendum to README.md 'Render status' / docs/adr/0001-architecture.md
+  Decision 4), run via nbb FROM THIS REPO'S ROOT (paths below are
+  cwd-relative, not `*file*`-relative — clj-kondo doesn't know nbb's `*file*`
+  var, so this sidesteps a false \"Unresolved symbol\" lint error rather than
+  suppressing it):
+
+    kbb --backend sci -cp test/render test/render/verify_render.cljk
+
+  Loads the shadow-cljs-compiled `public/render-demo.html`
+  (kami-app-hygaccess-plant.render-demo/init! — runs the real
+  `cae.solver/solve :hygaccess-mixing-tank` scenario, builds the render-IR
+  via `render/tank-render-ir`, draws one real frame via `kami.webgpu`) in a
+  full headless Chromium and asserts WebGPU was actually available and
+  `#out` reports \"ok ...\" (no JS/WebGPU exception), plus captures a
+  screenshot for visual confirmation. Mirrors
+  `kotoba-lang/kami-app-amenominaka`'s `test/render/verify_m2_render.cljs`
+  (ADR-2607100100 M2) — same harness, same technique, new consumer."
+  (:require ["node:path" :as path]
+            [lib.webgpu-harness :as harness]))
+
+(def public-dir (.join path (.cwd js/process) "public"))
+(def screenshot-dir (.join path (.cwd js/process) "test" "render"))
+
+(defn- report! [m]
+  (println (js/JSON.stringify (clj->js m) nil 2)))
+
+(defn- screenshot-and-report! [page out-text]
+  (let [screenshot-path (.join path screenshot-dir "render-screenshot.png")]
+    (-> (.screenshot page #js {:path screenshot-path})
+        (.then (fn []
+                 (report! {:available true :outText out-text
+                           :ok (boolean (and out-text (.startsWith out-text "ok")))
+                           :screenshotPath screenshot-path})
+                 (when-not (and out-text (.startsWith out-text "ok"))
+                   (set! (.-exitCode js/process) 1)))))))
+
+(defn- verify-render [page base-url]
+  (-> (.goto page (str base-url "/render-demo.html") #js {:waitUntil "load"})
+      (.then (fn [] (harness/wait-for-out-text page 30000)))
+      (.then (fn [out-text] (screenshot-and-report! page out-text)))))
+
+(defn- verify-page [page base-url]
+  (-> (harness/check-webgpu-available page (str base-url "/render-demo.html"))
+      (.then (fn [availability]
+               (if (.-available availability)
+                 (verify-render page base-url)
+                 (do
+                   (report! {:skipped true :reason (.-reason availability)})
+                   ;; WebGPU unavailability is an environment gap, not a pass —
+                   ;; fail loudly rather than silently reporting green.
+                   (set! (.-exitCode js/process) 1)))))))
+
+(defn- run-verification [browser base-url]
+  (-> (.newPage browser)
+      (.then (fn [page] (verify-page page base-url)))))
+
+(defn -main []
+  (-> (harness/start-static-server public-dir)
+      (.then (fn [server]
+               (-> (harness/with-headless-browser
+                    (fn [browser] (run-verification browser (.-baseUrl server))))
+                   (.then (fn [] ((.-close server)))))))
+      (.catch (fn [e] (js/console.error e) (set! (.-exitCode js/process) 1)))))
+
+(-main)

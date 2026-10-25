@@ -1,0 +1,111 @@
+(ns kami-app-hygaccess-plant.render
+  "Render-IR construction for the mixing tank — colour-mapped concentration,
+  one instance per finite-volume cell.
+
+  ## Why this mirrors kami.webgpu.ir instead of depending on it
+
+  `kotoba-lang/webgpu`'s `kami.webgpu.ir` (render-IR shape + pure constructors)
+  and `kami.webgpu` (the browser `init!`/`draw!` executor) are the workspace's
+  canonical WebGPU-first-with-WebGL-2.0-fallback rendering path
+  (ADR-2607102200). This repo does NOT declare `io.github.kotoba-lang/webgpu`
+  as a `deps.edn` git dependency, because it does not resolve standalone:
+  `kotoba-lang/webgpu`'s own `deps.edn` declares ~20 sibling deps
+  (`org-w3-webgpu`, `wgsl`, `expr`, `gpu`, `webgl`, `sky`, `render`, …) purely
+  via `:local/root \"../X\"`, which only resolves when this repo is checked out
+  as a sibling inside the west-managed `kotoba-lang` workspace
+  (`orgs/kotoba-lang/*`) alongside all of those. Confirmed empirically
+  (`kbb -Stree` against a standalone deps.edn referencing
+  `io.github.kotoba-lang/webgpu` by git SHA): `Error building classpath. Local
+  lib io.github.kotoba-lang/expr not found`. See docs/adr/0001-architecture.md
+  Decision 4 and README.md 'Render status' for the full account, including how
+  to actually wire this into `kami.webgpu/init!`/`draw!` from inside that
+  workspace.
+
+  So: the functions below build EDN that is STRUCTURALLY IDENTICAL to
+  `kami.webgpu.ir`'s documented contract (`sky`/`instance`/`render-ir`/`valid?`,
+  the same keys: `:globals {:sky {:horizon :sun-dir :sun} :eye :target}
+  :instances [{:pos :color :size :yaw}]`) — a portable description any
+  `kami.webgpu.ir`-compatible executor (browser WebGPU, WebGL 2.0 fallback, or
+  a future native executor reading the same EDN contract) can consume, without
+  this repo importing kami.webgpu.ir's actual Var. This is NOT vendoring
+  kami.webgpu.ir's logic (there is none to vendor — it is a thin data
+  constructor); it is authoring data to its published shape."
+  )
+
+;; ---------------------------------------------------------------------------
+;; render-IR primitives (mirrors kami.webgpu.ir 1:1 — see ns docstring)
+;; ---------------------------------------------------------------------------
+
+(defn sky
+  [horizon sun-dir sun]
+  {:horizon horizon :sun-dir sun-dir :sun sun})
+
+(defn instance
+  "An instanced cuboid. `size` is `[width height depth]`. Pure data."
+  [pos color size & {:keys [yaw] :or {yaw 0}}]
+  {:pos pos :color color :size size :yaw yaw})
+
+(defn render-ir
+  ([sky-map instances] {:globals {:sky sky-map} :instances (vec instances)})
+  ([sky-map instances eye target]
+   {:globals {:sky sky-map :eye eye :target target} :instances (vec instances)}))
+
+(defn valid?
+  "A cheap structural check — enough to catch obvious authoring mistakes.
+  Mirrors kami.webgpu.ir/valid? exactly (see ns docstring)."
+  [ir]
+  (and (map? ir)
+       (map? (:globals ir))
+       (sequential? (:instances ir))
+       (every? (fn [i] (and (vector? (:pos i)) (vector? (:color i)) (vector? (:size i))))
+               (:instances ir))))
+
+;; ---------------------------------------------------------------------------
+;; Concentration colormap
+;; ---------------------------------------------------------------------------
+
+(defn concentration->color
+  "3-stop sequential colormap, normalized `t` in `[0,1]`: pale blue (dilute /
+  clean-water end) -> teal (mid) -> amber-red (concentrated / NaOCl-rich end).
+  A domain colour choice for this illustrative visualization, not a validated
+  design-system palette — the render step itself is wired-but-unverified (see
+  README.md 'Render status'), so this is a placeholder pending real review."
+  [t]
+  (let [t (max 0.0 (min 1.0 (double t)))
+        stops [[0.65 0.80 0.92] [0.20 0.55 0.55] [0.85 0.35 0.10]]
+        [c0 c1] (if (< t 0.5) [(nth stops 0) (nth stops 1)] [(nth stops 1) (nth stops 2)])
+        local-t (if (< t 0.5) (* t 2.0) (* (- t 0.5) 2.0))]
+    (mapv (fn [a b] (+ a (* local-t (- b a)))) c0 c1)))
+
+;; ---------------------------------------------------------------------------
+;; Tank frame assembly
+;; ---------------------------------------------------------------------------
+
+(defn tank-render-ir
+  "Build one render-IR frame from a `mixing/run-mixing-scenario` result: one
+  thin box instance per finite-volume cell, positioned at the cell centroid
+  (x = mesh x, z = mesh y — the 2-D CFD cross-section laid flat in the x-z
+  plane, y is a fixed small thickness) and coloured by normalized
+  concentration. `result` is the map `mixing/run-mixing-scenario` /
+  `cae.solver/solve :hygaccess-mixing-tank` returns."
+  [{:keys [mesh concentration-field-pct]}]
+  (let [{:keys [nx ny dx dy]} mesh
+        values concentration-field-pct
+        vmin (reduce min values)
+        vmax (reduce max values)
+        span (max 1.0e-9 (- vmax vmin))
+        thickness (* 0.5 (min dx dy))
+        instances (vec
+                   (for [j (range ny) i (range nx)]
+                     (let [cid (+ (* j nx) i)
+                           v (double (nth values cid))
+                           t (/ (- v vmin) span)
+                           x (* (+ i 0.5) dx)
+                           z (* (+ j 0.5) dy)]
+                       (instance [x 0.0 z] (concentration->color t) [dx thickness dy]))))
+        extent-x (* nx dx)
+        extent-z (* ny dy)
+        eye [(* 1.6 extent-x) (* 1.2 (max extent-x extent-z)) (* 1.6 extent-z)]
+        target [(* 0.5 extent-x) 0.0 (* 0.5 extent-z)]]
+    (render-ir (sky [0.74 0.84 0.95] [-0.4 -0.85 -0.35] [1.0 0.96 0.85])
+               instances eye target)))

@@ -1,0 +1,28 @@
+(ns kami-app-hygaccess-plant.solve-test
+  "Proves the mixing-tank scenario is reachable through the SHARED
+  `cae.solver/solve` dispatch contract (kami-engine-cae-solver), the same way
+  every other CAE domain in that repo is invoked — not just as a direct
+  function call into `mixing.cljc`."
+  (:require [kotoba.test :refer [deftest is]]
+            [cae.solver :as solver]
+            [kami-app-hygaccess-plant.solve]
+            [kami-app-hygaccess-plant.mixing :as mixing]
+            [kami-app-hygaccess-plant.process :as process]))
+
+(deftest hygaccess-mixing-tank-is-registered
+  (is (contains? (solver/backends) :hygaccess-mixing-tank)))
+
+(deftest solve-with-no-case-data-uses-the-default-tank-and-process
+  (let [result (solver/solve {:solver {:kind :hygaccess-mixing-tank}})]
+    (is (= :hygaccess-mixing-tank (:solver result)))
+    (is (number? (:mixing-homogeneity-cov-pct result)))
+    (is (= :finite-volume-reference (:fidelity result)))
+    (is (= :screening-only (:status result)))))
+
+(deftest solve-dispatch-matches-a-direct-mixing-call
+  (let [via-dispatch (solver/solve {:solver {:kind :hygaccess-mixing-tank}
+                                     :tank (process/default-tank)
+                                     :process process/default-process})
+        via-direct   (mixing/run-mixing-scenario
+                      {:tank (process/default-tank) :process process/default-process})]
+    (is (= via-dispatch via-direct))))

@@ -1,0 +1,20 @@
+{:format :kotoba.cljk-origin/v1
+ :renamed-on "2026-09-11"
+ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
+ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
+ :origins
+ {"src/kami_app_hygaccess_plant.cljk" ".cljc"
+  "src/kami_app_hygaccess_plant/mixing.cljk" ".cljc"
+  "src/kami_app_hygaccess_plant/process.cljk" ".cljc"
+  "src/kami_app_hygaccess_plant/render.cljk" ".cljc"
+  "src/kami_app_hygaccess_plant/render_demo.cljk" ".cljs"
+  "src/kami_app_hygaccess_plant/solve.cljk" ".cljc"
+  "src/kami_app_hygaccess_plant/tank.cljk" ".cljc"
+  "test/kami_app_hygaccess_plant/mixing_test.cljk" ".cljc"
+  "test/kami_app_hygaccess_plant/process_test.cljk" ".cljc"
+  "test/kami_app_hygaccess_plant/render_test.cljk" ".cljc"
+  "test/kami_app_hygaccess_plant/smoke_test.cljk" ".cljc"
+  "test/kami_app_hygaccess_plant/solve_test.cljk" ".cljc"
+  "test/kami_app_hygaccess_plant/tank_test.cljk" ".cljc"
+  "test/render/lib/webgpu_harness.cljk" ".cljs"
+  "test/render/verify_render.cljk" ".cljs"}}
