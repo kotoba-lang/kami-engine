@@ -1,0 +1,70 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-vegetation-scene",
+      "commit": "d7ba32cca64ea5376c7367286b957f9311d73ce4",
+      "tree": "2fbf351c9a796e67bde9a68b2935723b43732654",
+      "url": "https://github.com/kotoba-lang/kami-vegetation-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "8dc39c3c5043a684293c61adb6120b47d9fab3cea6e64321baa50e6b8f49cbbb",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "255b109180ebca873ccb65c2e4803183dbe921f9c7a4234b48741ef135f23344",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "68a9ebb4b172720a86d8ed51d37ce36f5daf09d8424d3e39477defcad667e82a",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "2a9d8da7dbe9250e8aca1aa8c8d9595d85f102640de530049427f8c2a4095a10",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "c6fe035540c7c3b2c345f36718f91ba9b6e2b4a063b2f8ccd87d9670ab08ba4c",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/vegetation.edn",
+          "path": "resources/vegetation.edn",
+          "sha256": "1dbb1e7b548c6e442c7c801821094ad7e653a7b5cb6360e2b1f0bd7b0c48ee10",
+          "mode": "100644"
+        },
+        {
+          "source": "src/vegetation_scene.cljk",
+          "path": "src/vegetation_scene.cljk",
+          "sha256": "69b9c5d8a5bf7e7a27d71c67e394455a3c1eea2d8f3d54609b106748a5f619bc",
+          "mode": "100644"
+        },
+        {
+          "source": "test/vegetation_scene_test.cljk",
+          "path": "test/vegetation_scene_test.cljk",
+          "sha256": "d21f7a8af2bf0f78f0325adf72aedfb245fd35b33b026f6245363e7d455d8aa7",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}
