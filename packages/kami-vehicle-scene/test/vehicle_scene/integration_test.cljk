@@ -1,0 +1,9 @@
+(ns vehicle-scene.integration-test
+  (:require [kotoba.test :refer [deftest is]] [kotoba.physics.vehicle :as shared]
+            [vehicle-scene.integration :as integration]))
+(deftest authored-garage-realizes-shared-document
+  (let [doc (integration/realized-document :sports)]
+    (is (shared/document? doc))
+    (is (= :sports (:vehicle/preset doc)))
+    (is (= 86 (count (get-in doc [:vehicle/structure :nodes]))))
+    (is (seq (get-in doc [:vehicle/structure :beams])))))

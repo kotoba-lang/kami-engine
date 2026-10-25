@@ -1,0 +1,36 @@
+;; solar-helix.edn — canonical CONFIG/DATA for the solar-system "helical
+;; model": circular/coplanar orbital elements for the Sun + 8 planets, plus
+;; the Sun's own translation through the galaxy.
+;;
+;; Orbit data is a first-order schematic (circular, coplanar orbits using
+;; the real semi-major axis as radius and the real sidereal period) — real
+;; eccentricity/inclination-to-ecliptic are NOT modeled. This is enough to
+;; illustrate the helix/pitch geometry; it is NOT an ephemeris (use a
+;; VSOP/DE440 source for true positions).
+;;
+;; :sun-speed-km-s: the Sun's circular speed around the Galactic Center.
+;; ~220 km/s is the traditional IAU-era Local Standard of Rest value;
+;; modern Gaia-based fits commonly land ~225-240 km/s depending on R0 and
+;; the rotation curve used. 220.0 is kept here as a rounded, documented
+;; CONFIG default, not a precision astrometric claim.
+;;
+;; :ecliptic-tilt-deg: the angle this model uses between the ecliptic
+;; plane and the Sun's direction of galactic travel. ~60 degrees is the
+;; commonly cited popular-science rounding for the ecliptic-to-Galactic-
+;; plane inclination; kept at that precision deliberately (not pinned to
+;; sub-degree accuracy, which would require a full spherical-astronomy
+;; frame transform this schematic model does not attempt — see
+;; `galactic-frame-position-au` docstring in `src/solar_helix_scene.cljk`).
+{:helix/bodies
+ {:sun     {:orbit-radius-au 0.0     :period-days 0.0      :color [1.0  0.86 0.2]}
+  :mercury {:orbit-radius-au 0.38710 :period-days 87.9691  :color [0.6  0.6  0.6]}
+  :venus   {:orbit-radius-au 0.72333 :period-days 224.701  :color [0.9  0.85 0.6]}
+  :earth   {:orbit-radius-au 1.0     :period-days 365.256  :color [0.25 0.5  0.9]}
+  :mars    {:orbit-radius-au 1.52366 :period-days 686.980  :color [0.8  0.35 0.2]}
+  :jupiter {:orbit-radius-au 5.20336 :period-days 4332.59  :color [0.85 0.65 0.4]}
+  :saturn  {:orbit-radius-au 9.53707 :period-days 10759.22 :color [0.9  0.8  0.55]}
+  :uranus  {:orbit-radius-au 19.1913 :period-days 30688.5  :color [0.55 0.85 0.9]}
+  :neptune {:orbit-radius-au 30.069  :period-days 60182.0  :color [0.2  0.35 0.85]}}
+ :helix/galactic-frame
+ {:sun-speed-km-s    220.0
+  :ecliptic-tilt-deg 60.0}}

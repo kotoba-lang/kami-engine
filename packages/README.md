@@ -57,3 +57,11 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-gen-ml3d](kami-gen-ml3d) | `e7388b6` | Imported `kami-gen-ml3d` (no repository description) |
 | [kami-gen-procedural](kami-gen-procedural) | `ec78fba` | Imported `kami-gen-procedural` (no repository description) |
 | [kami-genre-base-systems](kami-genre-base-systems) | `c9abd0e` | Base/foundation gameplay systems, one per PlayStation-Store-style genre category (generic archetypes, kami-clj subset) |
+| [kami-mangaka-expression](kami-mangaka-expression) | `96fc3ce` | kami.mangaka.expression + patterns EDN (ADR-2607102200 addendum 12) |
+| [kami-mangaka-reader](kami-mangaka-reader) | `01823ab` | kami-mangaka-reader domain logic (ClojureScript/shadow-cljs), split out of kami-engine's kami-mangaka-reader-clj (ADR-2607010930). |
+| [kami-sensor-sim](kami-sensor-sim) | `caae678` | Camera / lidar / IMU / contact sensor synth, isaacsim.sensors API-compat target (analytic CPU sensor models: pinhole camera projection+depth, analytic ray-cast lidar VLP-16/toy, body-frame IMU, sphere-vs-primitive contact). Restored from legacy kami-sensor-sim crate (deleted #82). ADR-2607010930. |
+| [kami-solar-helix-scene](kami-solar-helix-scene) | `fcc22d7` | Imported `kami-solar-helix-scene` (no repository description) |
+| [kami-studio](kami-studio) | `5693307` | Imported `kami-studio` (no repository description) |
+| [kami-vehicle](kami-vehicle) | `50d5e29` | BeamNG-grade soft-body vehicle physics: node-beam mass-spring network, Pacejka tire, full powertrain (engine/clutch/gearbox/diff), plastic deformation, JBeam-subset loader. Restored from legacy kami-vehicle crate (deleted #82). ADR-2607010930. |
+| [kami-vehicle-scene](kami-vehicle-scene) | `da9a156` | EDN authoring surface for kami-vehicle ground/garage/powertrain CONFIG (surface grip table, demo-circuit zone map, engine/gearbox/tire presets, 6 garage SedanSpecs). Restored from legacy kami-vehicle-scene crate (kotoba-lang/kami-engine, deleted PR #82). ADR-2607010930. |
+| [kami-web](kami-web) | `2c4064b` | Pure-Clojure port of kami-engine's kami-web (WASM entry): matrix math, render-IR schema, PPTX layout, entry catalog |

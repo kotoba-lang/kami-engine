@@ -1,0 +1,27 @@
+;; kami-mangaka-reader — work-agnostic manga READER (ADR-2606282101).
+;;
+;; One set of hiccup components (.cljc) renders TWO ways:
+;;   - static build : SSR via kami.mangaka.hiccup (clj/babashka) → HTML pages
+;;   - interactive  : reagent + re-frame (cljs) → live locale switch in-browser
+;; Image stays language-neutral; only the text overlay re-renders per locale.
+;;
+;; Sibling of kami-mangaka-text (the lettering layer it composes) and
+;; kami-mangaka-render / -page / -scene.
+{:paths ["src"]
+
+ :deps {
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
+        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
+        ;; this repo silently rides whatever a sibling happens to name.
+        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+        gftd/kami-mangaka-text   {:git/url "https://github.com/kotoba-lang/kami-mangaka-text.git"
+                                  :sha "978b9c252dcb953ad8c420f5c22152da1ab70478"}}
+
+ :aliases
+ {;; Browser app: reagent + re-frame over the SAME cljc views.
+
+  :test {:extra-paths ["test"]}}}
