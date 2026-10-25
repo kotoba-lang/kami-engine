@@ -22,3 +22,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-app-character-creator](kami-app-character-creator) | `8e776d9` | EDN-native VRM character creator (ADR-2607031200) — Phase 1: CharacterDoc -> real .vrm export, built on kotoba-lang/{vrm,character} |
 | [kami-engine-cae-solver](kami-engine-cae-solver) | `92dcd10` | CAE solver contract — solve multimethod dispatch (:rom ↔ :lbm) |
 | [kami-app-hygaccess-plant](kami-app-hygaccess-plant) | `a7451e7` | Mixing-tank CFD simulation (nagare + kami-engine-cae-solver) for the sodium-hypochlorite dilution step of cloud-itonami-hygiene-access's water-purification-drops |
+| [kami-engine-modeling](kami-engine-modeling) | `c514bc8` | Imported `kami-engine-modeling` (no repository description) |
