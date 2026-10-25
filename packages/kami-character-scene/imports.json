@@ -1,0 +1,106 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-character-scene",
+      "commit": "9dcf24641bcb7675e54282b464d0665737a8f286",
+      "tree": "ff5c92a80914533bb641c55c989c69576fc6e318",
+      "url": "https://github.com/kotoba-lang/kami-character-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "2529f247cddaed607f524528c40d361448446c8b840cc042a12bbe781fadd6fa",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "529b982302627604fd26d80147b3708cc4d020d8c18b43d0f90e868f56fc817d",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "a51d963628fd458745864f6d419ce0849cc9a75730088baa87cd981c79296bda",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "b650329f78dbef99bc4b6da44841e57be5d8f8a8b10b08f6d3a60b3cb5535e08",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "d004613c9fa288623b90149dd357fadd2ee9efdd55d8e5f8aec89aa01cc3d616",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/character_scene/anim_blueprint.edn",
+          "path": "resources/character_scene/anim_blueprint.edn",
+          "sha256": "55a479e9f7e1e430c1fc8698c4e00b24ec4741db34439de25ef6f4338db197e6",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/character_scene/face_rig.edn",
+          "path": "resources/character_scene/face_rig.edn",
+          "sha256": "b4f4492cbcc40fe95e8dd102c3bae67c834c76f33ffce0e46b465045e5fd8596",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/character_scene/hair.edn",
+          "path": "resources/character_scene/hair.edn",
+          "sha256": "6e8b7d7882d33539d0b59ae38d3d17255779da884facce90ca140f789076f170",
+          "mode": "100644"
+        },
+        {
+          "source": "src/character_scene.cljk",
+          "path": "src/character_scene.cljk",
+          "sha256": "6035067a2d48d99b1c23100a2eb5d391e59086a3da71a529c4c5a55179f863ba",
+          "mode": "100644"
+        },
+        {
+          "source": "src/character_scene/anim_blueprint.cljk",
+          "path": "src/character_scene/anim_blueprint.cljk",
+          "sha256": "7aea84fdfc90beecc401815662fb25bcdca97215caa1ee9837d33f2e66c8731f",
+          "mode": "100644"
+        },
+        {
+          "source": "src/character_scene/face_rig.cljk",
+          "path": "src/character_scene/face_rig.cljk",
+          "sha256": "8dd71920c9c4cf1c3b915b84b6eb3db1ea3aaddb7cee60fdc6c093c06b11f7af",
+          "mode": "100644"
+        },
+        {
+          "source": "test/character_scene/anim_blueprint_test.cljk",
+          "path": "test/character_scene/anim_blueprint_test.cljk",
+          "sha256": "1b63694608d6c5bfebb6afde12942abdbe67cad9cd6b37ec160f72c7591ea61f",
+          "mode": "100644"
+        },
+        {
+          "source": "test/character_scene/face_rig_test.cljk",
+          "path": "test/character_scene/face_rig_test.cljk",
+          "sha256": "433b9094166a2a784868170e2663ab969892b20062019e4252ddbfc306235ac4",
+          "mode": "100644"
+        },
+        {
+          "source": "test/character_scene_test.cljk",
+          "path": "test/character_scene_test.cljk",
+          "sha256": "445a2c2ee70ff3624fefbffac79d7cbb1f68f2f12de212a7245414725c8e104f",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

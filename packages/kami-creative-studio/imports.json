@@ -1,0 +1,136 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-creative-studio",
+      "commit": "2652dd373458694627daa06f56c60cdb7001f813",
+      "tree": "9b5c239b6b4be7bbd2cef2133e4a054785e5fe6f",
+      "url": "https://github.com/kotoba-lang/kami-creative-studio.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "798a7af4d113f4dee29beb1c25e0f8b070738af148cfe925fd1eb3766a902176",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "MATURITY.md",
+          "path": "MATURITY.md",
+          "sha256": "bd9b69ae313e2fcde53be4c8be5d2c6bd85c5f57709219a605dbc966aabc5a4d",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "494dfd597d1ee22ca7084395048b62bdfeb08c9b4253748a5d586b0e69011d6d",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "c853455802ea2e410d3d86c217d96f976792d36f2863f9345991f061a5c6e256",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "b98e36deeb21634537e92107e0ba160729e1d5c987a07e3a08adc71a20268934",
+          "mode": "100644"
+        },
+        {
+          "source": "kami.creative-project.schema.json",
+          "path": "kami.creative-project.schema.json",
+          "sha256": "939b3e6cfee810e65ec5ab786a2483bd8dd24eca4820887e63c930960f507202",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "54eeb7b623afd69c183344177b5576ec5a93551cc6e5872f65a96e92a89cbb03",
+          "mode": "100644"
+        },
+        {
+          "source": "package-lock.json",
+          "path": "package-lock.json",
+          "sha256": "71c3f7f66c6e7e0679a3a4fb1d3c31b8f0910eaf44520658765481e8a8982740",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "df592a66b6334c085d5166774950497ccf7252a7729414574e26dc80fe2ff836",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/samples/kami-sample.edn",
+          "path": "resources/samples/kami-sample.edn",
+          "sha256": "7e30f74f9ed0120cb49448c38109e048d4df8b5ae4d3bba0c72acce39a27eaf2",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/samples/media-project.edn",
+          "path": "resources/samples/media-project.edn",
+          "sha256": "6a6bf9b3fa6c00244a696e4ce32913c29882ad135b0d77483c5e0e4ac48151ab",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "0912489aed47e5f9b53bf2ccb28f0faa9235a84be812f4e89b322638a87e3b22",
+          "mode": "100644"
+        },
+        {
+          "source": "src/dev/build.cljk",
+          "path": "src/dev/build.cljk",
+          "sha256": "00681ce22efec4e495c55525f6db68eb60d8b3964c1c63530c827275b7ef0d13",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/creative_studio/core.cljk",
+          "path": "src/main/kami/creative_studio/core.cljk",
+          "sha256": "7505f049b27d0d9a1625ec9388aa24c309335f7e10a0beb424c78323515884c2",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/creative_studio/media.cljk",
+          "path": "src/main/kami/creative_studio/media.cljk",
+          "sha256": "911ac8ba941cbfda9220a9a03f5e744ee9cf94178d95917802d91ec26b3fa927",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/creative_studio/ui.cljk",
+          "path": "src/main/kami/creative_studio/ui.cljk",
+          "sha256": "73c7ebe464f3e2b07ef8d6dd5cc8a7b973c945fbab5a43776728d2701dfce752",
+          "mode": "100644"
+        },
+        {
+          "source": "test-e2e/kami/creative_studio/media_render_e2e_test.cljk",
+          "path": "test-e2e/kami/creative_studio/media_render_e2e_test.cljk",
+          "sha256": "ddb9dd8ba11e4c0d9225de223286a3bf4993b969ba2e22e19d708825d1b439cb",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/creative_studio/core_test.cljk",
+          "path": "test/kami/creative_studio/core_test.cljk",
+          "sha256": "df1d83b0487922372d4d1cd3fd009ce8f6882e89da98483aa875775c5909b5f0",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/creative_studio/media_test.cljk",
+          "path": "test/kami/creative_studio/media_test.cljk",
+          "sha256": "9a5df250808f8c330a4e496b8f53c55c28f263d2b39e5d75a195c813e4bee17e",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/pages.yml"
+      ]
+    }
+  ]
+}

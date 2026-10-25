@@ -1,0 +1,17 @@
+{:sample/id "kami-octa-01"
+ :sample/name "KAMI Prism"
+ :sample/brief "Mint and indigo realtime character-volume sample"
+ :sample/motion :idle
+ :sample/duration 4
+ :mesh/positions [[0.0 1.35 0.0]
+                  [0.0 -1.35 0.0]
+                  [-0.9 0.0 0.0]
+                  [0.9 0.0 0.0]
+                  [0.0 0.0 0.9]
+                  [0.0 0.0 -0.9]]
+ :mesh/triangles [[0 4 3] [0 2 4] [0 5 2] [0 3 5]
+                  [1 3 4] [1 4 2] [1 2 5] [1 5 3]]
+ :material/base-color [0.36 0.91 0.78 1.0]
+ :character/operations [{:op/type "expression/set"
+                         :expression/name "relaxed"
+                         :expression/weight 0.35}]}

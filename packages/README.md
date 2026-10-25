@@ -28,3 +28,13 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-mangaka-page](kami-mangaka-page) | `555e18a` | kami-mangaka-page domain logic, split out of kami-engine's kami-mangaka-page-clj (ADR-2607010930). |
 | [kami-app-sip](kami-app-sip) | `54ae09a` | kami-app-sip (SIP game) domain logic, split out of kami-engine's kami-app-sip-clj (ADR-2607010930). |
 | [kami-app-suji](kami-app-suji) | `d6347be` | 姿勢がつくる負荷を、ブラウザ内で解いて 3D で見せる single-page app（suji + WebGPU） |
+| [kami-autodrive-scene](kami-autodrive-scene) | `8922de8` | EDN authoring surface for kami-autodrive per-vehicle-class GNC presets (limits + autopilot tuning). Restored from legacy kami-autodrive-scene crate (deleted #82). ADR-2607010930. |
+| [kami-cam-scene](kami-cam-scene) | `c40307f` | EDN authoring surface for kami-cam (kotoba-lang/cnc) STOCK MATERIAL presets — tolerant EDN accessors from kotoba-lang/scene, parity-tested against kotoba.cam.stock/material-presets. Restored from legacy kami-cam-scene crate (deleted #82). ADR-2607010930. |
+| [kami-character-scene](kami-character-scene) | `9dcf246` | EDN authoring surface for kami-character MetaHuman hair-style presets, FACS face-rig, and default animation blueprint. Restored from legacy kami-character-scene crate (deleted #82). ADR-2607010930. |
+| [kami-eizo-timeline](kami-eizo-timeline) | `226e1c1` | Portable .cljc EDL/timeline data model (track/clip/transition/marker) + SMPTE drop-frame timecode — the missing NLE data model, ADR-2607121400 |
+| [kami-ongaku-project](kami-ongaku-project) | `6dccb9e` | DAW-session data model (track/bus-graph/clip/automation/tempo-map) — L3 SSoT of the ongaku engine stack, ADR-2607121400 |
+| [kami-creative-studio](kami-creative-studio) | `2652dd3` | Imported `kami-creative-studio` (no repository description) |
+| [kami-eizo-compositor](kami-eizo-compositor) | `2e4382d` | VFX compositing node data model (chroma-key/roto/tracking/blend) — kotoba-lang eizo domain, ADR-2607121400 |
+| [kami-eizo-grade](kami-eizo-grade) | `f960c23` | ASC CDL / monotone curves / .cube LUT / waveform+vectorscope color-grading data model (kami-eizo family, ADR-2607121400) |
+| [kami-engine-vphysics](kami-engine-vphysics) | `7ff753e` | shared vehicle-physics primitives (road load, aero force, range) |
+| [kami-engine-aero](kami-engine-aero) | `fabfd90` | reduced-order aero Cd solver (component build-up) + design range loop |

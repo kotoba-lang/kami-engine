@@ -1,0 +1,86 @@
+(ns character-scene-test
+  "Tests ported 1:1 from the original legacy kami-character-scene Rust
+  crate's `src/lib.rs` `#[cfg(test)] mod tests` (deleted in
+  kotoba-lang/kami-engine PR #82), plus a namespace-loads smoke test
+  for the root namespace."
+  (:require [character-scene :as cs]
+            [character-scene.face-rig]
+            [character-scene.anim-blueprint]
+            [kotoba.test :refer [deftest is testing]]))
+
+(deftest namespace-loads-smoke-test
+  (testing "root namespace and both submodules load and resolve"
+    (is (fn? cs/shipped-hair-styles))
+    (is (fn? cs/shipped-hair-style))
+    (is (fn? cs/hair-styles-from-edn))
+    (is (fn? cs/hair-style-from-edn))
+    (is (some? cs/hair-edn))
+    (is (some? cs/default-hair-style))
+    (is (= 5 (count cs/all-hair-style-names)))))
+
+;; --- ported from lib.rs `#[cfg(test)]` ---------------------------------------------------
+
+(deftest shipped-has-all-styles
+  (let [[status h] (cs/shipped-hair-styles)]
+    (is (= :ok status))
+    (is (= 5 (count h)))
+    (doseq [name cs/all-hair-style-names]
+      (is (contains? h name) (str name " present in EDN")))))
+
+(deftest unknown-builtin-style-is-none
+  (is (nil? (cs/builtin-hair-style "does-not-exist"))))
+
+(deftest unknown-style-from-edn-is-an-error
+  (let [[status err] (cs/hair-style-from-edn cs/hair-edn "rainbow-mohawk")]
+    (is (= :error status))
+    (is (= :style-not-found (:type err)))))
+
+(deftest non-map-root-is-an-error
+  (let [[status err] (cs/hair-styles-from-edn "42")]
+    (is (= :error status))
+    (is (= :not-a-map (:type err)))))
+
+(deftest missing-table-is-an-error
+  (let [[status err] (cs/hair-styles-from-edn "{:other 1}")]
+    (is (= :error status))
+    (is (= :no-table (:type err)))))
+
+(deftest hair-type-id-round-trips
+  (doseq [t [:straight :wavy :curly :afro :braided]]
+    (is (= t (cs/hair-type-from-id (cs/id-from-hair-type t))))))
+
+(deftest spec-round-trips-through-hair-style
+  ;; Original: HairStyleSpec::from_hair_style / to_hair_style round-trip.
+  ;; Here hair-style *is* the plain map, so the round trip is via
+  ;; to-hair-style re-parsing an EDN rendering of it — instead we assert
+  ;; the simpler, equivalent property: re-deriving a style from its own
+  ;; EDN-shaped map is idempotent.
+  (let [h (cs/builtin-hair-style "red-wavy")
+        edn-map (assoc h :style (keyword (cs/id-from-hair-type (:style h))))
+        back (cs/to-hair-style edn-map)]
+    (is (= h back))))
+
+;; --- additional coverage: full shipped-hair-style parity against builtin table -----------
+
+(deftest shipped-hair-styles-match-builtin-table
+  (let [[status h] (cs/shipped-hair-styles)]
+    (is (= :ok status))
+    (doseq [name cs/all-hair-style-names]
+      (is (= (cs/builtin-hair-style name) (get h name)) name))))
+
+(deftest blonde-long-is-default
+  (let [[status h] (cs/shipped-hair-style "blonde-long")]
+    (is (= :ok status))
+    (is (= cs/default-hair-style h))))
+
+(deftest missing-key-falls-back-to-default
+  (let [[status h] (cs/hair-style-from-edn "{:character/hair-styles {:partial {:style :wavy}}}" "partial")]
+    (is (= :ok status))
+    (is (= :wavy (:style h)))
+    (is (= (:length cs/default-hair-style) (:length h)))
+    (is (= (:color cs/default-hair-style) (:color h)))
+    (is (= (:head-radius cs/default-hair-style) (:head-radius h)))
+    (is (= (:head-center-y cs/default-hair-style) (:head-center-y h))))
+  (let [[status h] (cs/hair-style-from-edn "{:character/hair-styles {:e {}}}" "e")]
+    (is (= :ok status))
+    (is (= cs/default-hair-style h))))

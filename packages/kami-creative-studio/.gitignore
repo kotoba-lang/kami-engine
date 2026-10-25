@@ -1,0 +1,5 @@
+node_modules/
+public/
+.shadow-cljs/
+.cpcache/
+.nbb/

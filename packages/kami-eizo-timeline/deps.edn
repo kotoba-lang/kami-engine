@@ -1,0 +1,16 @@
+{:paths ["src"]
+ :deps {
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}
+ :aliases
+ {:test {:extra-paths ["test"]}
+  ;; Real-browser render-proof E2E (test/e2e/, ADR-2607121400): compiles
+  ;; kami.eizo.timeline.e2e.entry, which pulls in both this repo's own
+  ;; timeline query layer and org-w3-webcodecs's raw WebCodecs binding, into
+  ;; one browser bundle via scripts/build-e2e-bundle.sh. See test/e2e/ and
+  ;; the README's "Real-browser render proof" section.
+  :e2e {:extra-paths ["test/e2e/src"]
+        :extra-deps {io.github.kotoba-lang/org-w3-webcodecs
+                     {:git/sha "b14dc397e248f5aab0f5ad9e7845e2f80b2cf5a3"}}}}}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kotoba-lang.github.io/kami-creative-studio/kami.creative-project.schema.json",
+  "title": "KAMI Creative Project",
+  "type": "object",
+  "required": ["schema", "id", "name", "brief", "stages", "character", "policy"],
+  "properties": {
+    "schema": { "const": "kami.creative-project/v1" },
+    "id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "brief": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "stages": {
+      "type": "array", "minItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["id", "modality", "model", "requires", "output"],
+        "properties": {
+          "id": { "enum": ["model", "rig", "motion", "music"] },
+          "modality": { "enum": ["3d", "rig", "motion", "music"] },
+          "model": { "type": "string" },
+          "requires": { "enum": ["remote-gpu-capability", "mac-mini-control-worker"] },
+          "output": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "character": {
+      "type": "object",
+      "required": ["editor", "operations"],
+      "properties": {
+        "editor": { "const": "kotoba-lang/kisekae" },
+        "operations": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "required": ["schema", "dimension", "workload", "samples", "budgets", "stopOnFirstViolation"],
+      "properties": {
+        "schema": { "const": "kami.performance-plan/v1" },
+        "dimension": { "enum": ["2d", "3d"] },
+        "workload": { "type": "string", "minLength": 1 },
+        "samples": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["entities", "durationMs", "warmupFrames"],
+            "properties": {
+              "entities": { "type": "integer", "minimum": 1 },
+              "durationMs": { "type": "integer", "minimum": 1 },
+              "warmupFrames": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "budgets": {
+          "type": "object",
+          "required": ["frameTimeP95Ms", "memoryMaxMiB"],
+          "properties": {
+            "frameTimeP95Ms": { "type": "number", "exclusiveMinimum": 0 },
+            "memoryMaxMiB": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "stopOnFirstViolation": { "const": true }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": ["noSilentFallback", "artifactAddressing", "credentialsInManifest"],
+      "properties": {
+        "noSilentFallback": { "const": true },
+        "artifactAddressing": { "const": "CID" },
+        "credentialsInManifest": { "const": false }
+      }
+    }
+  }
+}
