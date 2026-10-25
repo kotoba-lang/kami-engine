@@ -56,3 +56,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-gen-hybrid](kami-gen-hybrid) | `4082aa2` | Imported `kami-gen-hybrid` (no repository description) |
 | [kami-gen-ml3d](kami-gen-ml3d) | `e7388b6` | Imported `kami-gen-ml3d` (no repository description) |
 | [kami-gen-procedural](kami-gen-procedural) | `ec78fba` | Imported `kami-gen-procedural` (no repository description) |
+| [kami-genre-base-systems](kami-genre-base-systems) | `c9abd0e` | Base/foundation gameplay systems, one per PlayStation-Store-style genre category (generic archetypes, kami-clj subset) |
