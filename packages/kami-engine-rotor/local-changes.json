@@ -1,0 +1,10 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "58a5f5ea5fd5411dcd355ef7333cc06cd0549d764f4f02d30d601be4fff2419f",
+      "sha256": "04222b54207432a069af9837b00362735dabde6eb161373f74e3072dc9d793f1",
+      "reason": "Git dependencies on kami-* repositories that are bundled here (kami-engine-cae-solver) become local roots so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :lint): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+    }
+  }
+}
