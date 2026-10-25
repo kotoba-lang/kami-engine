@@ -1,0 +1,605 @@
+(ns kami.app-suji.scene-test
+  "The scene layer, checked without a browser.
+
+  What is worth asserting here is not that a cylinder appears — the browser check
+  does that — but that the picture and the numbers are the SAME claim: a segment
+  the physics says is loaded has to be a colour the legend calls loaded, and the
+  camera has to frame what is actually on screen."
+  (:require [kotoba.lang.coll]
+            [kotoba.test :refer [deftest is]]
+            [kami.app-suji.core :as core]
+            [suji.methods.attachment :as attachment]
+            [kami.app-suji.scene :as scene]
+            [suji.methods.math :as math]
+            [suji.methods.muscle :as muscle]
+            [suji.methods.pose :as pose]
+            [suji.methods.posture :as posture]
+            [suji.methods.segment :as segment]
+            [suji.methods.spine :as spine]
+            [suji.methods.strain :as strain]))
+
+(def ^:private body (segment/build-body 70.0 1.70))
+(defn- for-ws [w] (scene/solve-and-scene body (posture/posture-from-workstation w)))
+
+(deftest every-placed-segment-gets-exactly-one-draw
+  (let [{:keys [scene]} (for-ws posture/laptop-on-lap)]
+    (is (= (count (get-in scene [:pose :segments])) (count (:bones scene))))
+    (is (= (set (map :name (get-in scene [:pose :segments])))
+           (set (map :label (:bones scene)))))
+    (is (seq (:joints scene)))))
+
+(deftest a-bone-with-no-muscle-is-not-drawn-as-unloaded
+  ;; nil is not zero. The pelvis has no solved muscle acting about it, and must be
+  ;; shown in the neutral colour rather than in the "low load" green — the picture
+  ;; would otherwise assert something the model never computed.
+  (let [{:keys [scene]} (for-ws posture/laptop-on-lap)
+        pelvis (first (filter #(= "pelvis" (:label %)) (:bones scene)))]
+    (is (nil? (:mvc-pct pelvis)))
+    (is (nil? (:band pelvis)))
+    (is (= scene/unloaded-rgb (:color pelvis)))
+    (is (not= (scene/ramp-rgb 0.0) (:color pelvis))
+        "the base segment must be distinguishable from a segment at zero load")))
+
+(deftest colour-tracks-load-monotonically
+  ;; the ramp has to be ordered: more load can never be drawn greener. Compared on
+  ;; the red-minus-green channel, which is what the eye reads off this ramp.
+  (let [heat (fn [pct] (let [[r g _] (scene/ramp-rgb pct)] (- r g)))
+        pcts [0.5 3.0 8.0 14.0 20.0 28.0 40.0 80.0]]
+    (is (every? (fn [[a b]] (<= (heat a) (heat b))) (partition 2 1 pcts))
+        (str "ramp must not go backwards: " (mapv heat pcts)))))
+
+(deftest bands-agree-with-the-legend
+  ;; ⚠ The first assertion here is a TAUTOLOGY and is kept only because deleting it
+  ;; would look like a regression: `:legend` is built by mapping over
+  ;; `load-bands`, so comparing their `:band` values compares a projection with
+  ;; its own source. It cannot fail. The second assertion is the one that carries
+  ;; weight — it checks that each DRAWN bone's band is the band its %MVC falls in,
+  ;; which is a different computation from the legend's.
+  (let [{:keys [scene]} (for-ws posture/laptop-on-lap)]
+    (is (= (mapv :band scene/load-bands) (mapv :band (:bands (:legend scene)))))
+    (doseq [b (remove #(nil? (:mvc-pct %)) (:bones scene))]
+      (is (= (:band b) (:band (scene/band-for (:mvc-pct b))))
+          (str (:label b) ": the drawn band and the legend's band must agree")))))
+
+(deftest the-legend-says-which-quantity-it-bands
+  ;; The picture and the table share four words — low / moderate / high /
+  ;; very-high — for two different quantities, and this namespace's docstring
+  ;; asserted for months that they were one scale and therefore could not
+  ;; disagree. Measured at a 120-minute session they disagree at almost every
+  ;; load: 9 %MVC is `moderate` in the picture and `very-high` in the table,
+  ;; 5 %MVC is `moderate` and `low`. Both are true — one is an instantaneous load
+  ;; and the other a dose over time — so the legend has to say which it is.
+  (let [{:keys [scene]} (for-ws posture/laptop-on-lap)]
+    (is (= :mvc-pct (:quantity (:legend scene)))
+        (str "the legend does not name its quantity: " (pr-str (:legend scene)))))
+  ;; and the two really are different scales, or this would be pedantry
+  (let [disagreeing
+        (for [m [5.0 9.0 12.0 15.0 20.0 25.0]
+              :let [pic (:band (scene/band-for m))
+                    tbl (strain/stiffness-band
+                         (:stiffness-index (strain/muscle-strain
+                                            {:name "x" :mvc-pct m :task :t} 120.0)))]
+              :when (not= pic tbl)]
+          [m pic tbl])]
+    (is (seq disagreeing)
+        "the picture and the table agree everywhere sampled, so naming the quantity is pedantry")))
+
+(deftest the-camera-frames-the-body-it-draws
+  ;; `bounds` looked `bone-radius-m` up by `:name`, which is the INSTANCE
+  ;; (`upper_arm/left`), while the table is keyed by segment — so every paired
+  ;; limb missed and fell to the 0.03 default. The camera framed a different body
+  ;; from the one drawn, under a docstring saying it frames what is on screen.
+  ;;
+  ;; ⚠ The first version of this test asserted the X axis only, and the break
+  ;; (keying by `:name` again) did NOT fail it: in X the wrong key happens to give
+  ;; a LARGER frame, because the extremal segment there is the hand, drawn at
+  ;; 0.020 against a 0.030 default. The clipping is in Y, where the seated shank
+  ;; is drawn at 0.033 and the frame stopped 3 mm above its surface. A test that
+  ;; checks one axis of a two-axis frame is a test that measured the axis where
+  ;; the bug is invisible.
+  ;;
+  ;; So: every drawn surface point, on both axes, and across postures — because
+  ;; which segment is extremal changes with the posture.
+  (doseq [preset ["laptop-on-lap" "standing-neutral" "deep-squat"]]
+    (let [st (assoc core/initial-state :posture (core/preset-posture preset))
+          body (core/body-of st)
+          p (pose/solve-pose body (:posture st))
+          b (scene/bounds p)]
+      (doseq [{:keys [proximal distal base]} (:segments p)]
+        (let [r (get scene/bone-radius-m base 0.03)]
+          (doseq [[px py _] [proximal distal]]
+            (is (<= (- (:min-x b) 1e-9) (- px r))
+                (str preset " " base ": drawn to x=" (- px r)
+                     " but the frame starts at " (:min-x b)))
+            (is (>= (+ (:max-x b) 1e-9) (+ px r))
+                (str preset " " base ": drawn to x=" (+ px r)
+                     " but the frame ends at " (:max-x b)))
+            (is (<= (- (:min-y b) 1e-9) (- py r))
+                (str preset " " base ": drawn to y=" (- py r)
+                     " but the frame starts at " (:min-y b)))
+            (is (>= (+ (:max-y b) 1e-9) (+ py r))
+                (str preset " " base ": drawn to y=" (+ py r)
+                     " but the frame ends at " (:max-y b)))))))))
+
+(deftest the-picture-uses-the-same-numbers-as-the-table
+  ;; the failure this prevents: a view that recomputes its own loads and drifts
+  ;; from the readout beside it
+  (let [{:keys [tensions scene]} (for-ws posture/laptop-on-lap)
+        ;; the segment that hangs from C7 —  until suji 1c7ad97 split
+        ;; the neck into three,  since
+        head-bone (first (filter #(= "lower_cervical" (:label %)) (:bones scene)))
+        cerv (first (filter #(= "cervical_extensors" (:name %)) tensions))]
+    (is (math/nearly= (:mvc-pct cerv) (:mvc-pct head-bone) 1e-12))))
+
+(deftest camera-frames-the-whole-body
+  ;; a camera that crops the head is a correct-looking failure. Check that every
+  ;; drawn point falls inside the frustum's half-extent at the body's plane.
+  (doseq [w posture/reference-workstations
+          aspect [1.0 (/ 4.0 3.0) 2.0]]
+    (let [{:keys [scene]} (for-ws w)
+          p (:pose scene)
+          {:keys [eye target]} (scene/camera p aspect)
+          {:keys [min-x max-x min-y max-y]} (scene/bounds p)
+          dist (math/vlen (math/v- eye target))
+          half-h (* dist (Math/tan (/ math/pi 6.0)))   ;; fov/2 = pi/6
+          half-w (* half-h aspect)
+          cy (second eye)]
+      (is (math/nearly= scene/base-azimuth-deg (:azimuth-deg (scene/camera p aspect)) 1e-9)
+          "a symmetric posture always gets the same angle, so two can be compared")
+      (is (<= (- cy half-h) min-y) (str (:name w) " @" aspect ": bottom is cut off"))
+      (is (>= (+ cy half-h) max-y) (str (:name w) " @" aspect ": top is cut off"))
+      ;; horizontal framing now has to cover the body's WIDTH as well as its
+      ;; depth, since both arms are placed; the vertical bound is the tight one
+      (is (>= (* 2.0 half-w) (- max-x min-x)) (str (:name w) " @" aspect ": too narrow")))))
+
+(deftest a-refused-segment-is-neither-green-nor-red
+  ;; With the trunk bent hard sideways, all three of this model's girdle
+  ;; suspenders on the raised side would pull the shoulder DOWN, and `suji`
+  ;; declines to give them a force. A real shoulder there rests on the ribcage,
+  ;; which this model has no element for. The picture must decline too: green
+  ;; would say the posture is easy, red would say it is hard, and the model said
+  ;; neither.
+  ;;
+  ;; The trigger has moved twice as the model improved — first away from 90° of
+  ;; shoulder flexion when wrapping surfaces landed, then away from a folded head
+  ;; when the middle trapezius did. The behaviour under test has not.
+  (let [state (-> core/initial-state
+                  (assoc-in [:posture :trunk-flexion-deg] 60.0)
+                  (assoc-in [:posture :trunk-lateral-bend-deg] 40.0))
+        {:keys [tensions scene]} (core/solved state)
+        refused (remove :antagonist? (filter :refused tensions))
+        arm-bone (first (filter #(= "upper_arm/right" (:label %)) (:bones scene)))]
+    (is (seq refused) "the premise of this test: suji refuses somebody here")
+    (is (= :refused (:state arm-bone)))
+    (is (= scene/refused-rgb (:color arm-bone)))
+    (is (nil? (:mvc-pct arm-bone)) "a refused segment has no %MVC to show")
+    (is (not= scene/refused-rgb scene/unloaded-rgb)
+        "'not answered' must be distinguishable from 'no muscle here'")
+    (is (not= scene/refused-rgb scene/antagonist-rgb)
+        "and from 'not being asked', which is a different thing again")
+    (doseq [pct [0.0 5.0 20.0 60.0 120.0]]
+      (is (not= scene/refused-rgb (scene/ramp-rgb pct))
+          (str "the refusal colour must not collide with the load ramp at " pct "%")))))
+
+(deftest an-antagonist-does-not-make-a-segment-look-unanswered
+  ;; For a mirror-paired task exactly one side resists and the other is refused as
+  ;; its antagonist. Colouring the segment purple for that would mark most of the
+  ;; body unanswerable in any posture with a frontal component.
+  (let [state (assoc-in core/initial-state [:posture :shoulder-abduction-deg] 45.0)
+        {:keys [tensions scene]} (core/solved state)]
+    (is (some :antagonist? tensions) "the premise: this posture has antagonists")
+    (doseq [b (:bones scene)]
+      (is (not= :refused (:state b))
+          (str (:label b) ": an antagonist must not read as an unanswered load")))))
+
+(deftest the-wrapped-and-the-covered-joints-are-no-longer-refused
+  ;; two postures that used to come back unanswerable, kept as tests because the
+  ;; wrapping surfaces and the middle trapezius are load-bearing for this app
+  (doseq [[label st] [["90° shoulder flexion"
+                       (-> core/initial-state
+                           (assoc-in [:posture :shoulder-flexion-deg] 90.0)
+                           (assoc-in [:posture :elbow-flexion-deg] 0.0))]
+                      ["head and trunk folded"
+                       (-> core/initial-state
+                           (assoc-in [:posture :head-flexion-deg] 60.0)
+                           (assoc-in [:posture :trunk-flexion-deg] 60.0))]]]
+    (let [{:keys [tensions loads]} (core/solved st)]
+      (is (:complete? (muscle/tension-summary tensions loads))
+          (str label " must now be answerable")))))
+
+(deftest the-summary-does-not-call-an-incomplete-answer-complete
+  (let [complete (core/solved core/initial-state)
+        refused (core/solved (-> core/initial-state
+                                 (assoc-in [:posture :trunk-flexion-deg] 60.0)
+                                 (assoc-in [:posture :trunk-lateral-bend-deg] 40.0)))]
+    (is (:complete? (muscle/tension-summary (:tensions complete) (:loads complete))))
+    (is (not (:complete? (muscle/tension-summary (:tensions refused) (:loads refused)))))))
+
+(deftest out-of-plane-input-reaches-the-picture
+  ;; the frontal plane is new; a control that changes nothing on screen is a lie
+  (let [flat (core/solved core/initial-state)
+        abducted (core/solved (assoc-in core/initial-state
+                                        [:posture :shoulder-abduction-deg] 60.0)) 
+        y-of (fn [r label] (nth (:com (first (filter #(= label (:name %))
+                                                     (get-in r [:scene :pose :segments])))) 1))]
+    ;; abduction lifts each hand relative to its own shoulder — the sagittal
+    ;; z-check this replaced stopped meaning anything once both arms were placed
+    (is (> (y-of abducted "hand/left") (y-of flat "hand/left"))
+        "abduction must raise the hand")
+    (is (math/nearly= (y-of abducted "hand/left") (y-of abducted "hand/right") 1e-9)
+        "and must do it symmetrically")))
+
+(deftest the-camera-swings-with-asymmetry-not-with-width
+  ;; Before the model was bilateral, reaching out of the sagittal plane and being
+  ;; asymmetric were the same thing. Now the body is ALWAYS out of plane — both
+  ;; arms hang off the midline — and a symmetric posture is still readable head-on.
+  ;; Swinging for mere width would rotate every posture and make none of them
+  ;; comparable, which is what happened when this test first failed.
+  (let [sym (get-in (core/solved core/initial-state) [:scene :camera])
+        bent (get-in (core/solved (assoc-in core/initial-state
+                                            [:posture :trunk-lateral-bend-deg] 30.0))
+                     [:scene :camera])]
+    (is (> (:out-of-plane-m sym) 0.1) "a bilateral body is always out of plane")
+    (is (math/nearly= 0.0 (:asymmetry-m sym) 1e-9) "but a symmetric posture is symmetric")
+    (is (math/nearly= scene/base-azimuth-deg (:azimuth-deg sym) 1e-9))
+    (is (> (:asymmetry-m bent) 0.05) "leaning sideways makes the two halves differ")
+    (is (> (:azimuth-deg bent) (:azimuth-deg sym)) "and that is what earns extra swing")
+    (is (<= (:azimuth-deg bent) (+ scene/base-azimuth-deg scene/extra-azimuth-deg))
+        "the swing is bounded")))
+
+(deftest leaning-forward-hands-the-trunk-from-the-muscles-to-the-ligaments
+  ;; REWRITTEN 2026-09-07. This test used to assert that the erector spinae falls
+  ;; SILENT in deep flexion and the segment goes quiet. That silence was not the
+  ;; phenomenon — it was `lumbosacral-moment` understating the demand by about
+  ;; half (it omitted the arms and placed the head's weight at C7), so `recruit`
+  ;; clamped a negative remainder to zero. With the moment corrected the erector
+  ;; spinae is still at 43.7 %MVC at 60 degrees.
+  ;;
+  ;; What survives the correction, and is the thing worth drawing, is the SHIFT:
+  ;; measured on this pin, ligament against erector spinae is 429 N vs 1398 N at
+  ;; 30 degrees, 1572 vs 1367 at 45, and 3989 vs 635 at 60. The tissue holding
+  ;; the spine changes, and that changes what would unload it — "relax your back"
+  ;; helps in the first regime and not in the second.
+  ;; ⚠ THE SEGMENT IT READS IS DERIVED, not typed. It was `"thorax_abdomen"`, and
+  ;; suji 3d494ba split the trunk at T12/L1 — so this test asked for a segment that
+  ;; is no longer placed, `first` returned nil, and every assertion below failed
+  ;; against `nil` rather than against a bone. The ligaments hang from whichever
+  ;; segment `joint-muscles` puts them on, so ask that map: a future re-segmenting
+  ;; moves this test with the model instead of breaking it.
+  (let [ligament-base (first (for [[base groups] scene/joint-muscles
+                                   :when (contains? groups "posterior_lumbar_ligaments")]
+                               base))
+        state-at (fn [flex]
+                   (let [st (assoc-in core/initial-state [:posture :trunk-flexion-deg] flex)
+                         {:keys [scene]} (core/solved st)]
+                     (first (filter #(= ligament-base (:label %)) (:bones scene)))))]
+    (is (some? ligament-base)
+        "no segment is coloured by the posterior lumbar ligaments, so this asserts nothing")
+    (is (some? (state-at 0.0))
+        (str "no bone is labelled " (pr-str ligament-base) " — the segment was renamed"))
+    ;; the muscles carry it first
+    (let [shallow (state-at 15.0)]
+      (is (= :loaded (:state shallow))
+          (str "at 15 degrees the muscles carry it, got " (:state shallow))))
+    ;; and the ligaments take over
+    (let [deep (state-at 60.0)]
+      (is (= :ligament (:state deep))
+          (str "at 60 degrees the ligaments carry more, got " (:state deep)))
+      (is (= scene/ligament-rgb (:color deep)))
+      (is (> (:ligament-n deep) (:muscle-n deep))
+          (str "the state fired without the ligaments carrying more: "
+               (select-keys deep [:ligament-n :muscle-n])))
+      (is (> (:ligament-n deep) scene/ligament-load-floor-n))
+      (is (not= scene/ligament-rgb (scene/ramp-rgb 0.0))
+          "and must not collide with the low end of the load ramp")
+      (is (not= scene/ligament-rgb scene/refused-rgb)
+          "nor with 'not answered' — this one IS answered"))
+    ;; the control: the transition is a real crossing, not a threshold that fires
+    ;; everywhere. If every flexion read :ligament the assertions above would hold
+    ;; and mean nothing.
+    (is (= :loaded (:state (state-at 0.0)))
+        "an upright trunk must not read as ligament-carried")))
+
+(deftest the-load-ramp-does-not-saturate-across-the-voluntary-range
+  ;; The top band's `:max-mvc-pct` is infinite, which made the interpolation
+  ;; coefficient zero and painted EVERY value above 30 %MVC one colour. Measured
+  ;; 2026-09-07 before the fix: the trunk read the same heat at 46.8, 76.6 and
+  ;; 43.7 %MVC, so the picture carried about one bit where the model had a range.
+  (let [heat (fn [m] (let [[r g _] (scene/ramp-rgb (double m))] (- r g)))
+        xs (range 0 101 10)
+        hs (map heat xs)]
+    (is (every? (fn [[a b]] (<= a (+ b 1e-9))) (map vector hs (rest hs)))
+        (str "the ramp is not monotonic: " (pr-str (map vector xs hs))))
+    ;; and it actually moves in the top band, which is where it used to stand still
+    (is (> (heat 100.0) (+ (heat 30.0) 0.1))
+        (str "30 %MVC reads " (heat 30.0) " and 100 %MVC reads " (heat 100.0)))
+    ;; anchored at maximum voluntary contraction, not at an arbitrary ceiling
+    (is (math/nearly= (heat 100.0) (heat 130.0) 1e-9)
+        "above MVC the ramp holds; `over-mvc?` is what says the model was asked for more")))
+
+(deftest a-ligament-has-no-band
+  ;; the lowest band is "low", and a structure carrying 1,500 N must not be
+  ;; labelled the least loaded thing on the page
+  (is (nil? (scene/band-for nil)))
+  (is (some? (scene/band-for 0.0)))
+  (is (= "low" (:band (scene/band-for 1.0)))))
+
+(deftest every-segment-the-model-places-has-an-entry-in-joint-muscles
+  ;; `joint-muscles` is keyed by segment name, and a segment with NO entry is
+  ;; drawn unloaded — no error, no missing bone, just a body part that silently
+  ;; stops reporting its own load. That is what happened on 2026-09-07: suji split
+  ;; `head_neck` into three, this map still said `head_neck`, and the neck would
+  ;; have gone grey while looking entirely normal.
+  (let [placed (set (map :base (:segments (pose/solve-pose body (:posture core/initial-state)))))
+        keyed (set (keys scene/joint-muscles))]
+    (is (seq placed) "no segments placed, so this asserts nothing")
+    (is (empty? (kotoba.lang.coll/difference placed keyed))
+        (str "segments the model places with no entry here: "
+             (pr-str (sort (kotoba.lang.coll/difference placed keyed)))))
+    (is (empty? (kotoba.lang.coll/difference keyed placed))
+        (str "entries here for segments the model no longer places: "
+             (pr-str (sort (kotoba.lang.coll/difference keyed placed)))))))
+
+(deftest every-muscle-group-the-model-solves-is-assigned-to-a-segment
+  ;; The other direction. A muscle group that reaches no segment contributes to no
+  ;; colour, so a newly added muscle would be computed, tabled, and invisible in
+  ;; the picture — which is how the frontal-plane muscles could have arrived
+  ;; without anything on screen changing.
+  (let [{:keys [tensions]} (core/solved core/initial-state)
+        solved (set (map :group tensions))
+        assigned (set (mapcat identity (vals scene/joint-muscles)))]
+    (is (seq solved) "nothing solved, so this asserts nothing")
+    (is (empty? (kotoba.lang.coll/difference solved assigned))
+        (str "muscle groups the model solves that no segment is coloured by: "
+             (pr-str (sort (kotoba.lang.coll/difference solved assigned)))))
+    (is (empty? (kotoba.lang.coll/difference assigned solved))
+        (str "groups named here that the model does not solve: "
+             (pr-str (sort (kotoba.lang.coll/difference assigned solved)))))))
+
+(deftest disc-geometry-still-computes
+  ;; `disc-draws` is deliberately not in the frame — a disc is ~24 mm at L5/S1
+  ;; inside a trunk drawn at 62 mm, so every one would be hidden. It was kept
+  ;; because "the geometry is right and computing it costs nothing".
+  ;;
+  ;; It was not right. `spine/level-compression` took a posture on 2026-09-07 and
+  ;; this call still passed the old four arguments; shadow-cljs calls an arity
+  ;; mismatch a warning, so the build succeeded, and nothing in the suite called
+  ;; the function — its only mention anywhere was a comment asserting it worked.
+  ;; Code nothing calls has no correctness, only a claim about it. This is the
+  ;; evidence for the claim.
+  (let [st core/initial-state
+        b (core/body-of st)
+        pd (pose/solve-pose b (:posture st))
+        {:keys [tensions]} (core/solved st)
+        draws (scene/disc-draws pd b (:posture st) tensions)]
+    (is (= (count spine/levels) (count draws))
+        (str "one draw per level: " (count spine/levels) " levels, " (count draws) " draws"))
+    (doseq [d draws]
+      (is (number? (:stress-mpa d)) (str (:label d) ": no stress"))
+      (is (pos? (:radius-m d)) (str (:label d) ": radius " (:radius-m d)))
+      (is (= 3 (count (:translation (:transform d)))) (str (:label d) ": bad translation")))
+    ;; and the radii really differ by level — a constant would mean the disc areas
+    ;; never reached the geometry
+    (is (< 1 (count (distinct (map :radius-m draws))))
+        (str "every disc has the same radius: " (pr-str (distinct (map :radius-m draws)))))))
+
+(deftest every-colour-a-draw-can-take-is-in-the-key
+  ;; A colour with no entry in the key leaves the reader to guess, and both
+  ;; available guesses are claims the model did not make. The antagonist colour
+  ;; had no entry for as long as it existed: it is assigned to MUSCLE lines, and
+  ;; the key was written while looking at the segments. Measured over the sweep
+  ;; below, 1,308 muscle draws carry it.
+  ;;
+  ;; A draw's colour is either the load ramp AT ITS OWN %MVC or one of the named
+  ;; colours. Deciding that by recomputing `ramp-rgb` from the draw is exact;
+  ;; my first version enumerated the ramp at integer %MVC and called every
+  ;; genuine ramp colour unkeyed, because the real values are continuous.
+  (let [keyed (set (map first scene/no-load-colours))
+        seen (atom {})]
+    (doseq [tf [0.0 20.0 40.0 60.0] hf [0.0 30.0 60.0] ab [0.0 45.0 90.0]
+            preset ["laptop-on-lap" "standing-neutral" "deep-squat"]]
+      (let [st (-> (assoc core/initial-state :posture (core/preset-posture preset))
+                   (assoc-in [:posture :trunk-flexion-deg] tf)
+                   (assoc-in [:posture :head-flexion-deg] hf)
+                   (assoc-in [:posture :shoulder-abduction-deg] ab))
+            {:keys [scene]} (core/solved st)]
+        (doseq [d (concat (:bones scene) (:muscles scene))]
+          (let [ramp? (and (number? (:mvc-pct d))
+                           (= (:color d) (scene/ramp-rgb (:mvc-pct d))))]
+            (when-not ramp?
+              (swap! seen update (:color d) (fnil inc 0)))))))
+    (is (seq @seen) "no non-ramp colour was drawn at all, so this asserts nothing")
+    (let [unkeyed (remove keyed (keys @seen))]
+      (is (empty? unkeyed)
+          (str "colours drawn with no entry in the key: "
+               (pr-str (map (fn [c] [c (get @seen c)]) unkeyed)))))
+    ;; the control: the key must not explain a colour nothing ever draws
+    (let [unused (remove @seen keyed)]
+      (is (empty? unused)
+          (str "the key explains colours no draw takes: " (pr-str unused))))
+    ;; and the antagonist colour specifically, since it is the one that was missing
+    (is (pos? (get @seen scene/antagonist-rgb 0))
+        "no antagonist draw in the sweep, so this does not cover the case it was written for")))
+
+(deftest the-skull-is-coloured-by-both-sides-of-its-joint
+  ;; suji 1af4590 gave the atlanto-occipital joint FLEXORS, so the skull now has
+  ;; muscles on both sides of the joint it hangs from. `joint-muscles` has to name
+  ;; both or the flexors are computed, tabled and invisible — the guard test above
+  ;; makes that unshippable, and this one says WHICH side each is on, so a future
+  ;; edit that drops the flexors and keeps the count fails here.
+  (let [head-groups (get scene/joint-muscles "head")]
+    (is (contains? head-groups "longus_capitis"))
+    (is (contains? head-groups "rectus_capitis_anterior"))
+    (is (contains? head-groups "rectus_capitis_posterior_major"))
+    ;; and the flexors are the ones whose moment arm about that joint is negative,
+    ;; read off suji's geometry rather than off their names
+    (let [pd (pose/solve-pose body (:posture core/initial-state))
+          arm #(attachment/moment-arm pd (:stature-m body) (attachment/instance %)
+                                      (get-in pd [:joints :atlanto-occipital]))]
+      (is (neg? (arm "longus_capitis")))
+      (is (neg? (arm "rectus_capitis_anterior")))
+      (is (pos? (arm "rectus_capitis_posterior_major"))))))
+
+(deftest the-upper-cervical-flexors-are-solved-with-the-extensors-not-after-them
+  ;; ⚠ THIS TEST SAID THE OPPOSITE UNTIL 2026-09-08, and it was right when it was
+  ;; written. It was called `the-upper-cervical-flexors-carry-nothing-this-app-can-
+  ;; reach` and it asserted zero force at every corner of the reachable box, on the
+  ;; reasoning that a flexor takes load only when the skull's centre of mass sits
+  ;; behind the condyles — a head tipped back, which these sliders cannot reach.
+  ;;
+  ;; That reasoning belonged to the CLOSED FORM. `recruit/share` solved one
+  ;; equilibrium at a time, so the flexion side of the atlanto-occipital joint was
+  ;; a separate task with its own load, and that load was gravity's alone. With
+  ;; `recruit/solve` the two neck joints are one system: the extensors sized at C7
+  ;; over-extend the joint above them, and the optimum answers by giving the
+  ;; flexors force. Measured at head 0 / trunk 30: longus capitis 2.85 N, 2.58 %MVC.
+  ;;
+  ;; So the old assertion did not detect a regression — it recorded a property of a
+  ;; solver that has been replaced. What is worth pinning is the STRUCTURE that
+  ;; replaced it: these muscles are members of the coupled neck group, the group
+  ;; converged, and their own-joint coefficient is negative because `:coeff` is now
+  ;; a raw signed arm rather than one turned to face its task.
+  (let [head (first (filter #(= [:posture :head-flexion-deg] (:path %)) core/controls))
+        trunk (first (filter #(= [:posture :trunk-flexion-deg] (:path %)) core/controls))]
+    (is (= 0 (:min head))
+        (str "the head-flexion slider starts at 0, so this app cannot reach a head "
+             "tipped back: " head))
+    (is (= 0 (:min trunk)) (str "and neither can the trunk: " trunk))
+    (doseq [h [(:min head) 30 (:max head)]
+            t [(:min trunk) 30 (:max trunk)]]
+      (let [st (-> core/initial-state
+                   (assoc-in [:posture :head-flexion-deg] (double h))
+                   (assoc-in [:posture :trunk-flexion-deg] (double t)))
+            by (into {} (map (juxt :name identity)) (:tensions (core/solved st)))]
+        (doseq [m ["longus_capitis" "rectus_capitis_anterior"]]
+          (is (nil? (:refused (by m)))
+              (str m " at head " h " trunk " t " must not be refused: " (by m)))
+          (is (= :neck (:coupled-group (by m)))
+              (str m " is solved in the coupled neck group: " (by m)))
+          (is (= [:c7 :atlanto-occipital] (:coupled-joints (by m)))
+              (str m " spans both neck constraints: " (by m)))
+          (is (true? (:coupled-converged? (by m)))
+              (str m " at head " h " trunk " t " came from a converged solve: " (by m)))
+          (is (neg? (:coeff (by m)))
+              (str m "'s own-joint coefficient is the raw signed arm, which is "
+                   "negative for a flexor: " (by m))))))
+    ;; the change itself, stated as a number rather than as a direction: somewhere
+    ;; in the reachable box these muscles now take force, which is what the old
+    ;; assertion denied.
+    (let [st (assoc-in core/initial-state [:posture :trunk-flexion-deg] 30.0)
+          by (into {} (map (juxt :name identity)) (:tensions (core/solved st)))]
+      (is (pos? (:active-n (by "longus_capitis")))
+          (str "the coupled optimum gives the flexors force where the closed form "
+               "gave them none: " (by "longus_capitis"))))))
+
+;; --- the trunk is two segments now, and the picture has to say so ------------
+
+(deftest the-trunk-is-drawn-as-two-bones
+  ;; ⚠ THE COUNT, NOT THE APPEARANCE. This repo has twice shipped a picture that
+  ;; disagreed with the model and looked entirely plausible: six cervical bones
+  ;; drawn as one bar, and both legs drawn unloaded. Neither was visible in a
+  ;; screenshot. So this asks the model how many trunk segments it places and
+  ;; requires that many bones, rather than asking whether the picture looks split.
+  ;;
+  ;; `segment/trunk-bases` is suji's own list of what `thorax_abdomen` became, so a
+  ;; third trunk segment fails here on the day it arrives instead of being drawn
+  ;; and never noticed.
+  (let [{:keys [scene]} (for-ws posture/laptop-on-lap)
+        bones (:bones scene)
+        trunk (filterv #(contains? (set segment/trunk-bases) (:label %)) bones)]
+    (is (= (count segment/trunk-bases) (count trunk))
+        (str "suji places " (count segment/trunk-bases) " trunk segments "
+             (pr-str segment/trunk-bases) " and the scene draws "
+             (count trunk) " of them: " (pr-str (mapv :label bones))))
+    (is (= 2 (count trunk))
+        "the split is two segments; if suji changed that, the sentences on the
+         method page that say `two` are derived and will follow, but this number
+         is the one a reader of this test needs")
+    ;; each is a bone of its own, with its own mesh — not one bone with a seam
+    (is (= (count (distinct (map :geo trunk))) (count trunk))
+        (str "the two trunk segments are drawn as the same shape: "
+             (pr-str (mapv (juxt :label :geo) trunk))))
+    (is (= (count (distinct (map (comp :radius-m :mesh) trunk))) (count trunk))
+        (str "the two trunk segments are drawn at the same girth: "
+             (pr-str (mapv (juxt :label (comp :radius-m :mesh)) trunk))))
+    ;; and they are joined end to end, which is what makes them one spine
+    (let [placed (into {} (map (juxt :base identity)) (get-in scene [:pose :segments]))
+          lumbar (get placed "lumbar")
+          thorax (get placed "thorax")]
+      (is (and lumbar thorax) "the model no longer places lumbar and thorax")
+      (is (every? #(< (Math/abs (double %)) 1e-12)
+                  (map - (:distal lumbar) (:proximal thorax)))
+          (str "the lumbar's distal end " (pr-str (:distal lumbar))
+               " is not the thorax's proximal end " (pr-str (:proximal thorax))))
+      ;; the joint the split created is drawn, or the two bones read as one rod
+      (let [t12l1 (get-in scene [:pose :joints :t12l1])]
+        (is (some? t12l1) "suji no longer publishes the T12/L1 joint")
+        (is (some #(= "t12l1" (:label %)) (:joints scene))
+            (str "no landmark is drawn at T12/L1: "
+                 (pr-str (mapv :label (:joints scene)))))))))
+
+(deftest every-trunk-segment-is-keyed-in-both-scene-tables
+  ;; The two tables a segment falls through silently. `joint-muscles` with no entry
+  ;; draws it unloaded; `bone-radius-m` with no entry falls to the 0.03 default
+  ;; while `bounds` frames it at that default too, so nothing looks wrong. Both
+  ;; were keyed `thorax_abdomen` when the pin moved.
+  (doseq [base segment/trunk-bases]
+    (is (contains? scene/joint-muscles base)
+        (str base " has no entry in joint-muscles, so it is drawn unloaded"))
+    (is (contains? scene/bone-radius-m base)
+        (str base " has no drawn radius, so it falls to the default"))
+    (is (contains? scene/bone-shape-by-segment base)
+        (str base " has no shape, so it falls back to a generic long bone"))))
+
+(deftest the-thorax-is-unloaded-because-nothing-is-solved-at-t12l1
+  ;; A DELIBERATELY EMPTY ENTRY, and the distinction it holds. The thorax hangs
+  ;; from T12/L1; suji places that joint and writes no equilibrium at it, so no
+  ;; muscle acts about the joint this segment hangs from. `{:kind :none}` is the
+  ;; honest answer, and the key already explains that colour.
+  ;;
+  ;; Asserted from the SOLVE rather than from the empty set: if suji ever solves a
+  ;; muscle about T12/L1, this fails and the empty entry has to be filled, which
+  ;; is the direction the mistake would come from.
+  (let [{:keys [scene tensions]} (for-ws posture/laptop-on-lap)
+        thorax (first (filter #(= "thorax" (:label %)) (:bones scene)))]
+    (is (some? thorax))
+    (is (empty? (get scene/joint-muscles "thorax"))
+        "the thorax has muscle groups assigned; this test's premise changed")
+    (is (= :none (:state thorax)))
+    (is (= scene/unloaded-rgb (:color thorax)))
+    ;; the control: the lumbar segment below it IS loaded, so `:none` here is a
+    ;; statement about T12/L1 and not about the whole trunk being missed
+    (let [lumbar (first (filter #(= "lumbar" (:label %)) (:bones scene)))]
+      (is (= :loaded (:state lumbar))
+          (str "the lumbar segment is not loaded either, so the trunk is simply "
+               "unkeyed: " (pr-str (:state lumbar)))))
+    ;; and no tension names a joint the thorax hangs from
+    (is (not-any? #(= :t12l1 (:crosses-joint %)) tensions)
+        "a muscle is solved across T12/L1 now")))
+
+(deftest tilting-the-pelvis-turns-the-pelvis-and-the-lumbar-chord-but-not-the-thorax
+  ;; THE DEGREE OF FREEDOM, asserted where it is drawn. `pelvic-tilt-deg` rotates
+  ;; the pelvis, and the lumbar spine's lower end with it; the thorax's own tilt is
+  ;; still `trunk-flexion-deg` alone. If the picture did not move, the slider would
+  ;; be changing numbers under a body that never turns — which is how this repo's
+  ;; legs came to be drawn unloaded through a whole squat.
+  (let [rot (fn [tilt base]
+              (let [p (pose/solve-pose body (assoc (posture/posture-from-workstation
+                                                    posture/laptop-on-lap)
+                                                   :pelvic-tilt-deg tilt))]
+                (:euler-z (first (filter #(= base (:base %)) (:segments p))))))
+        d (fn [base] (- (rot 30.0 base) (rot 0.0 base)))]
+    (is (> (Math/abs (double (d "pelvis"))) 1e-6)
+        (str "the pelvis did not turn: " (d "pelvis")))
+    (is (> (Math/abs (double (d "lumbar"))) 1e-6)
+        (str "the lumbar chord did not turn: " (d "lumbar")))
+    (is (< (Math/abs (double (d "thorax"))) 1e-12)
+        (str "the thorax turned, and only the trunk-flexion slider may do that: "
+             (d "thorax")))
+    ;; the chord is the MEAN of the two ends, which is the constant-curvature
+    ;; assumption suji states — so it turns half as far as the pelvis does
+    (is (math/nearly= (Math/abs (double (d "lumbar")))
+                      (* 0.5 (Math/abs (double (d "pelvis"))))
+                      1e-9)
+        (str "the lumbar chord moved " (d "lumbar") " for a pelvis moving "
+             (d "pelvis") "; the arc's chord bisects its end tangents"))))

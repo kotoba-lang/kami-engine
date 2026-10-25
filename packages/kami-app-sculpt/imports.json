@@ -1,0 +1,130 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-app-sculpt",
+      "commit": "5f4a69cf0eb98ebb9aa31f11e580a126e7d17318",
+      "tree": "52f26652e6590db2749ccfb14a537d67e3bef046",
+      "url": "https://github.com/kotoba-lang/kami-app-sculpt.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "8d4f145ebbae670e5d6b703ce9e85fbc02bab32815af2f3e8de293321031f672",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "f22f58f15ac7a49a62002040ddf78da3f47a1f79085b6f557a32185592822ce2",
+          "mode": "100644"
+        },
+        {
+          "source": "build.cljk",
+          "path": "build.cljk",
+          "sha256": "b546b847a717c4656c87e6a0fc634bf8c0b9f51cb1ecf4077a98750ed15de1c0",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "5569ff41dc6e797a02c52e6412cac5ddbe2cd9adb265238f9fd634c2b0a409ec",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "a600f6ea47dee89b22235348c6ff46e63c48f051c9086f52de56cc67f8b3a937",
+          "mode": "100644"
+        },
+        {
+          "source": "kotoba.app.edn",
+          "path": "kotoba.app.edn",
+          "sha256": "34e15fb1460a3c8d23cfade4d050820b82cadb3f67e092e765c8a20b7c3292f0",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "ea93300eec067019584d53f2bad3c36f8df98e50919604039b9a1ee1182b6b1f",
+          "mode": "100644"
+        },
+        {
+          "source": "package-lock.json",
+          "path": "package-lock.json",
+          "sha256": "b27942b3665465a221cbf738c710d2f551663fe5ccabb3244c6e4540d404afdc",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "a5d37eb0363722d881c8a1accb4e7dfc51ca70b16d83157fd1aa3e12b6c9436b",
+          "mode": "100644"
+        },
+        {
+          "source": "public/index.html",
+          "path": "public/index.html",
+          "sha256": "eeaca1f61075a9851e6978f6b56e48549f4ea97e8519035bb1c2fb8950ec3b90",
+          "mode": "100644"
+        },
+        {
+          "source": "public/index.html.ids",
+          "path": "public/index.html.ids",
+          "sha256": "eef553099c2b61c5cb4e7d432d7ccfadcc7d94f49082e0850ad8c57545eb28a5",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/app.js",
+          "path": "public/js/app.js",
+          "sha256": "fcb001c8ecd4c237a25105a33394346ce131ecef01f844fa249ee2c98fc8ee66",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/manifest.edn",
+          "path": "public/js/manifest.edn",
+          "sha256": "842a420e7369bb82efabc3860930bfe33c6ab51f3c5e0a896a443a291d520e20",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "3895e82f3d2077135f808481b93ec06c0e97aead787b599e37ccb756e36b2005",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/sculpt/app.cljk",
+          "path": "src/kami/sculpt/app.cljk",
+          "sha256": "36b844f403e1ebed3ca597faa4d8283ca8fc689301986246f4a2cbc84526f5e5",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/sculpt/project.cljk",
+          "path": "src/kami/sculpt/project.cljk",
+          "sha256": "74acc75aeb8d164639c8bfbaf297008e658923bb1e472ec313e988121660143e",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/sculpt/ui.cljk",
+          "path": "src/kami/sculpt/ui.cljk",
+          "sha256": "fb2974bdcd657dee8dab3b748ba72adff9bd9ad45de10a624c680ca6f45b7134",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/sculpt/project_test.cljk",
+          "path": "test/kami/sculpt/project_test.cljk",
+          "sha256": "c58ca22e832493c95caa84d7937eaa270c695d41a85108466f5b1b7dc679df5b",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/pages.yml"
+      ]
+    }
+  ]
+}

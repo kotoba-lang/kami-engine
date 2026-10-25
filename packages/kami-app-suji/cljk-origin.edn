@@ -1,0 +1,22 @@
+{:format :kotoba.cljk-origin/v1
+ :renamed-on "2026-09-11"
+ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
+ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
+ :origins
+ {"scripts/gen-page.cljk" ".cljs"
+  "scripts/nbb_test.cljk" ".cljs"
+  "scripts/publish-pages.cljk" ".cljs"
+  "scripts/verify-browser.cljk" ".cljs"
+  "src/main/kami/app_suji/core.cljk" ".cljc"
+  "src/main/kami/app_suji/coverage.cljk" ".cljc"
+  "src/main/kami/app_suji/route.cljk" ".cljc"
+  "src/main/kami/app_suji/scene.cljk" ".cljc"
+  "src/main/kami/app_suji/theme.cljk" ".cljc"
+  "src/main/kami/app_suji/ui.cljk" ".cljs"
+  "src/main/kami/app_suji/viewport.cljk" ".cljs"
+  "test/kami/app_suji/bone_shape_test.cljk" ".cljc"
+  "test/kami/app_suji/core_test.cljk" ".cljc"
+  "test/kami/app_suji/coverage_test.cljk" ".cljc"
+  "test/kami/app_suji/repo_test.cljk" ".clj"
+  "test/kami/app_suji/route_test.cljk" ".cljc"
+  "test/kami/app_suji/scene_test.cljk" ".cljc"}}

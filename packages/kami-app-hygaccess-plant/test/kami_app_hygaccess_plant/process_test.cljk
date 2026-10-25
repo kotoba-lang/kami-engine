@@ -1,0 +1,40 @@
+(ns kami-app-hygaccess-plant.process-test
+  "Pins the process figures back to their sources (see process.cljc docstring
+  and README.md 'Where the numbers come from') so a future edit that silently
+  drifts the target/efficacy-window numbers away from
+  cloud-itonami-hygiene-access's own registered data fails loudly."
+  (:require [kotoba.test :refer [deftest is]]
+            [kami-app-hygaccess-plant.process :as process]
+            [kami-app-hygaccess-plant.tank :as tank]))
+
+(deftest default-process-pins-cloud-itonami-hygiene-access-figures
+  (is (= "int.hygaccess.water-purification-drops" (:process/product-sku process/default-process)))
+  (is (= :sodium-hypochlorite (:process/active process/default-process)))
+  (is (= 1.0 (:process/target-concentration-pct process/default-process))
+      "products.edn :hygaccess.product/concentration-pct 1.0")
+  (is (= [0.5 1.5] (:process/efficacy-window-pct process/default-process))
+      "registry.cljc efficacy-window-pct [:sodium-hypochlorite :water-purification-drops]")
+  (is (= :mixing-homogeneity-cov-pct (:process/qc-field-reference process/default-process))))
+
+(deftest target-concentration-is-within-the-registered-efficacy-window
+  (is (process/within-efficacy-window?
+       process/default-process (:process/target-concentration-pct process/default-process))))
+
+(deftest dilution-ratio-is-stock-over-target
+  (is (= 12.0 (process/dilution-ratio process/default-process))))
+
+(deftest within-efficacy-window-checks-the-closed-interval
+  (let [p #:process{:efficacy-window-pct [0.5 1.5]}]
+    (is (process/within-efficacy-window? p 0.5))
+    (is (process/within-efficacy-window? p 1.5))
+    (is (process/within-efficacy-window? p 1.0))
+    (is (not (process/within-efficacy-window? p 0.49)))
+    (is (not (process/within-efficacy-window? p 1.51)))))
+
+(deftest default-tank-is-a-well-formed-tank-map-consumable-by-tank-cljc
+  (let [t (process/default-tank)]
+    (is (= "int.hygaccess.water-purification-drops" (:tank/product-sku t)))
+    (is (pos? (tank/cross-section-area-m2 t)))
+    (is (pos? (tank/batch-volume-l t)))
+    (is (= [24 24] (:tank/mesh-resolution t)))
+    (is (= 0.5 (tank/agitation-drive-velocity-m-s t)))))

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Spirit in Physics — 水の都の心音</title>
+  <meta name="description" content="水の都・東京2065。のんびり暮らし、学び、誰かに寄り添う、癒しのオンラインゲーム。">
+  <!-- PWA (P4-A): installable + offline app shell -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#6b5b95">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="心音">
+  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #f4f1fb; }
+    #sip-canvas { width: 100%; height: 100%; display: block; }
+    /* gentle, ARIA-like loading — no urgency, no spinner-of-doom */
+    #intro {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px; z-index: 50;
+      background: radial-gradient(120% 120% at 50% 25%, #fbf7ff 0%, #efe9fb 55%, #e7eef7 100%);
+      transition: opacity 1.2s ease; font-family: ui-sans-serif, system-ui, "Hiragino Sans", sans-serif;
+    }
+    #intro.hidden { opacity: 0; pointer-events: none; }
+    .title { font-size: clamp(28px, 6vw, 52px); font-weight: 700; letter-spacing: .04em; color: #6b5b95; }
+    .sub   { font-size: 15px; color: #9a8fb5; letter-spacing: .12em; }
+    .hint  { margin-top: 18px; font-size: 12px; color: #b3a9c9; }
+    .drop  { width: 8px; height: 8px; border-radius: 50%; background: #c9bbe6; margin-top: 14px;
+             animation: breathe 3.2s ease-in-out infinite; }
+    @keyframes breathe { 0%,100% { transform: scale(1); opacity:.5 } 50% { transform: scale(1.6); opacity:1 } }
+  </style>
+</head>
+<body>
+  <canvas id="sip-canvas"></canvas>
+
+  <div id="intro">
+    <div class="title">Spirit in Physics</div>
+    <div class="sub">水の都の心音 · the heartbeat of the water city</div>
+    <div class="drop"></div>
+    <div class="hint">WebGPU を準備しています…</div>
+  </div>
+
+  <script type="module">
+    // The cljs bundle (shadow-cljs :app build) exposes window.sip.{ui,web}.
+    import './js/sip.js?b=7';
+
+    // The game is playable from the pure session FSM (sip.ui) without WebGPU;
+    // the 3D water-city scene is a best-effort backdrop layered behind it. The
+    // kami-clj-host wasm is loaded *dynamically* so a missing/failed wasm never
+    // blocks the HUD (static import would fail the whole module).
+    async function boot3d() {
+      if (!navigator.gpu) { console.warn('WebGPU unavailable — running 2D HUD only'); return; }
+      try {
+        const mod = await import('/wasm/kami_clj_host.js');   // wasm-pack build kami-clj-host --target web --features host
+        await mod.default();                    // wasm-bindgen init
+        window.KamiCljHost = mod.KamiCljHost;   // global the backend resolves
+        await window.sip.web.boot('sip-canvas', '/snapshot.edn');
+      } catch (err) {
+        console.warn('3D scene unavailable — continuing with HUD only', err);
+      }
+    }
+
+    async function go() {
+      window.sip.ui.mount();                    // playable HUD (always)
+      document.getElementById('intro').classList.add('hidden');
+      boot3d();                                 // non-fatal, best-effort backdrop
+      // PWA: register the service worker (offline app shell). Non-fatal.
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch((e) => console.warn('SW register failed', e));
+      }
+    }
+    window.addEventListener('load', go);
+  </script>
+</body>
+</html>

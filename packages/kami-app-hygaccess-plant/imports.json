@@ -1,0 +1,172 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-app-hygaccess-plant",
+      "commit": "a7451e7122ec110204f608dcad4bfed5ca7fe13c",
+      "tree": "2051400ac4b11e36f4bb73c2f15661ce62a695f4",
+      "url": "https://github.com/kotoba-lang/kami-app-hygaccess-plant.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "3ed1b328a9998877c99ceb746da88e0b976d6138b8bf24e624a9723df407e815",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "ec74813c37d17cd942b5e630ae0388fe5d3f0be043cec80d5fa9e76860a4e89c",
+          "mode": "100644"
+        },
+        {
+          "source": "NOTICE",
+          "path": "NOTICE",
+          "sha256": "4f411fd5ea9cd8ebcd11ac510d1c0868ce7a46dce1267344432aae10c953d916",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "b100eb03947c67f4d65cd72cf3e2bd2efa05128fb1d5d4e8b4c96f870a7487db",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "8b89d3cdb5ac76d50bf704d50e5e0e0dc79e1ae73288f15b714530d09f99eb74",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "5ab02da212a0d114783ae31253127b618fb222eb58f05bd361e595dc312d1aa2",
+          "mode": "100644"
+        },
+        {
+          "source": "docs/adr/0001-architecture.md",
+          "path": "docs/adr/0001-architecture.md",
+          "sha256": "c74e770014b6d60129ff4858e8038dfe142f352dba1bd292588f14a374cf1869",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "6074756ee422647402697a68dac1828e6ea273ccc449e23eb4169d2030ad4d54",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "7065d02dc1a3acc24256dc9b3c846086e6a674b914f1c878f47141fb7180e9eb",
+          "mode": "100644"
+        },
+        {
+          "source": "public/render-demo.html",
+          "path": "public/render-demo.html",
+          "sha256": "4bd3fa89948c389a6b3f501d33dde34ec9547d1cfc9a22267591d28142515bb5",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "447da6d17130659fd15161062c74768ba418e69f4a90a7bd4acdffb5b7457590",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami_app_hygaccess_plant.cljk",
+          "path": "src/kami_app_hygaccess_plant.cljk",
+          "sha256": "49ef5f7aee829a88c2ac2e0d1efc3a05a1c29d060cc8ff2a78e461c017401207",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami_app_hygaccess_plant/mixing.cljk",
+          "path": "src/kami_app_hygaccess_plant/mixing.cljk",
+          "sha256": "5808705661e496568a6848b59ebf427b805ec59053f7be4ada16d646d864a1e7",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami_app_hygaccess_plant/process.cljk",
+          "path": "src/kami_app_hygaccess_plant/process.cljk",
+          "sha256": "cbf6335b3f9817fe236cde4e33423852f079217f8cd7a0e6b87a2911aae08997",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami_app_hygaccess_plant/render.cljk",
+          "path": "src/kami_app_hygaccess_plant/render.cljk",
+          "sha256": "03cf5a1ef56227771215c970a937e2b15ab3b27367c2e1517c76814fc4bb603e",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami_app_hygaccess_plant/render_demo.cljk",
+          "path": "src/kami_app_hygaccess_plant/render_demo.cljk",
+          "sha256": "999da741700f061e61df85df52ba1cf0ecb214bb88075cfb887ca068800c24df",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami_app_hygaccess_plant/solve.cljk",
+          "path": "src/kami_app_hygaccess_plant/solve.cljk",
+          "sha256": "11e44c1244ac7e094fb942a5e79e7f856d2c7ec26daac792a56b70c7f7bf6d2a",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami_app_hygaccess_plant/tank.cljk",
+          "path": "src/kami_app_hygaccess_plant/tank.cljk",
+          "sha256": "69badd4ac2d16cf514997819fb4d996fef994b3c1ee316daac9287970ee226b9",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami_app_hygaccess_plant/mixing_test.cljk",
+          "path": "test/kami_app_hygaccess_plant/mixing_test.cljk",
+          "sha256": "ef6c92cf5d7453cecd6cdc82597b99f7148003990de8b76ba7bc2a8fae8e8fed",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami_app_hygaccess_plant/process_test.cljk",
+          "path": "test/kami_app_hygaccess_plant/process_test.cljk",
+          "sha256": "d4f207f059ae90f7db3203daf32f11bb1a21b91b218ffa658ec3a297eb6d9d6c",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami_app_hygaccess_plant/render_test.cljk",
+          "path": "test/kami_app_hygaccess_plant/render_test.cljk",
+          "sha256": "4f647b513223fb25dc26c036ce7cf1eded3d7d2c609272bea8613b47e1ffa382",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami_app_hygaccess_plant/smoke_test.cljk",
+          "path": "test/kami_app_hygaccess_plant/smoke_test.cljk",
+          "sha256": "7b8d3ff4748e9c572b2a652a56e2e3fe56bb524d0b25b5ce283988ea7285bfa4",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami_app_hygaccess_plant/solve_test.cljk",
+          "path": "test/kami_app_hygaccess_plant/solve_test.cljk",
+          "sha256": "5a060d1c7a2f226c320c8e0b7c1153b8a06217225c50209783fac79a380a7a54",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami_app_hygaccess_plant/tank_test.cljk",
+          "path": "test/kami_app_hygaccess_plant/tank_test.cljk",
+          "sha256": "61278f91a12737b26cfe8cccdabc667f7fb8b3bf3b4e80a6179f1cc7dc4462ce",
+          "mode": "100644"
+        },
+        {
+          "source": "test/render/lib/webgpu_harness.cljk",
+          "path": "test/render/lib/webgpu_harness.cljk",
+          "sha256": "2aa2e6edc3be00908145af733fe424e63357446f24dddfcdc58648510b218d58",
+          "mode": "100644"
+        },
+        {
+          "source": "test/render/verify_render.cljk",
+          "path": "test/render/verify_render.cljk",
+          "sha256": "5eab13347e21b20d7e050632069513af91eb95085bc54d1817ca7a68c9dbd7cf",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

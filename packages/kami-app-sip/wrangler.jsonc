@@ -1,0 +1,29 @@
+{
+  // Spirit in Physics — https://sip.etzhayyim.com
+  // Static assets (the cljs bundle + wasm host + snapshot) served from Cloudflare.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sip",
+  "compatibility_date": "2026-03-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "vars": {
+    "APP_DISPLAY_NAME": "Spirit in Physics",
+    "APP_DESCRIPTION": "A cozy slow-life healing MMO in water-city Tokyo 2065. Live, learn, accompany. clj + Datomic + Kotoba on kami-engine.",
+    "APP_FRAMEWORK": "shadow-cljs + kami-engine-sdk-clj + kami-render(wasm)",
+    "APP_UI_TYPE": "kami-webgpu"
+  },
+  // The kami-clj-host wasm is a CompiledWasm module.
+  "rules": [
+    { "type": "CompiledWasm", "globs": ["**/*.wasm"] }
+  ],
+  "routes": [
+    { "pattern": "sip.etzhayyim.com/*", "zone_name": "etzhayyim.com" }
+  ],
+  // assets-only Worker (no script) — a binding is only for a Worker that reads
+  // assets in code, which this static site has none of.
+  "assets": {
+    "directory": "./public",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "single-page-application"
+  }
+}

@@ -1,0 +1,1 @@
+{:deps {:aliases [:cljs]} :builds {:app {:target :browser :output-dir "public/js" :asset-path "./js" :modules {:app {:init-fn kami.sculpt.app/init!}}}}}

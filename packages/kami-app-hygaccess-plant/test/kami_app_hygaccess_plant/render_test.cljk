@@ -1,0 +1,44 @@
+(ns kami-app-hygaccess-plant.render-test
+  "Tests the render-IR construction PORTABLY (JVM/cljs, no browser, no WebGPU
+  context) — this is the 'wired' half of Step 3's 'wired-but-unverified': we
+  can prove the EDN render-IR is well-formed and deterministic, but not that a
+  browser actually draws it (see README.md 'Render status')."
+  (:require [kotoba.test :refer [deftest is]]
+            [kami-app-hygaccess-plant.process :as process]
+            [kami-app-hygaccess-plant.mixing :as mixing]
+            [kami-app-hygaccess-plant.render :as render]))
+
+(def ^:private result
+  (delay (mixing/run-mixing-scenario
+          {:tank (process/default-tank) :process process/default-process})))
+
+(defn- approx= [a b] (every? (fn [[x y]] (< (Math/abs (- (double x) (double y))) 1.0e-9)) (map vector a b)))
+
+(deftest concentration-colormap-is-a-clamped-rgb-triple
+  (is (approx= [0.65 0.80 0.92] (render/concentration->color 0.0)))
+  (is (approx= [0.85 0.35 0.10] (render/concentration->color 1.0)))
+  (is (every? #(<= 0.0 % 1.0) (render/concentration->color 0.5)))
+  (is (= (render/concentration->color 0.0) (render/concentration->color -5.0))
+      "clamps below 0")
+  (is (= (render/concentration->color 1.0) (render/concentration->color 5.0))
+      "clamps above 1"))
+
+(deftest render-ir-primitives-match-the-documented-shape
+  (let [ir (render/render-ir (render/sky [0 0 0] [0 -1 0] [1 1 1])
+                              [(render/instance [0 0 0] [1 0 0] [1 1 1])]
+                              [1 1 1] [0 0 0])]
+    (is (render/valid? ir))
+    (is (= [0 0 0] (get-in ir [:globals :sky :horizon])))
+    (is (= [1 1 1] (get-in ir [:globals :eye])))
+    (is (= 1 (count (:instances ir))))))
+
+(deftest tank-render-ir-is-one-instance-per-mesh-cell-and-is-valid
+  (let [r @result
+        ir (render/tank-render-ir r)]
+    (is (render/valid? ir))
+    (is (= (get-in r [:mesh :n-cells]) (count (:instances ir))))
+    (is (every? (fn [i] (every? #(<= 0.0 % 1.0) (:color i))) (:instances ir)))))
+
+(deftest tank-render-ir-is-deterministic
+  (let [r @result]
+    (is (= (render/tank-render-ir r) (render/tank-render-ir r)))))

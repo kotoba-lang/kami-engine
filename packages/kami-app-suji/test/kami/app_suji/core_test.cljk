@@ -1,0 +1,565 @@
+(ns kami.app-suji.core-test
+  "The views are pure functions of state, so they can be asserted on directly.
+
+  What is worth asserting here is not that hiccup renders — it is that the page
+  does not make a claim the numbers do not support. The spine table is the case
+  that has already been wrong once: `suji` reported muscle and ligament axial
+  force added together in a field named `:muscle-n`, and a reader taking the name
+  literally would have read a spine compressed by muscle where it is compressed
+  by ligament — a different statement about the posture, and about what would
+  change it."
+  (:require [kotoba.lang.coll]
+            [kotoba.lang.text :as str]
+            [kotoba.test :refer [deftest is]]
+            [kami.app-suji.core :as core]
+            [suji.methods.attachment :as attachment]
+            [suji.methods.math :as math]
+            [suji.methods.pose :as pose]
+            [suji.methods.posture :as posture]
+            [suji.methods.segment :as segment]
+            [suji.methods.spine :as spine]))
+
+(defn- flat-text
+  "Every string anywhere in a hiccup tree, joined."
+  [x]
+  (cond (string? x) x
+        (sequential? x) (str/join " " (map flat-text x))
+        :else ""))
+
+(defn- nodes
+  "Every hiccup element in the tree whose tag is `tag`."
+  [tag x]
+  (cond (and (vector? x) (= tag (first x)))
+        (cons x (mapcat #(nodes tag %) x))
+        (sequential? x) (mapcat #(nodes tag %) x)
+        :else nil))
+
+(defn- text-of
+  "The strings directly inside one hiccup element."
+  [el]
+  (str/join (filter string? el)))
+
+(defn- headers
+  "The column headings of the first table in a view.
+
+  Read out of the rendered `[:th …]` elements rather than out of the prose,
+  because prose that TALKS about a column reads the same to `str/includes?` as a
+  column that exists. That is not hypothetical: the first version of this test
+  went on passing after the column was deleted, because the paragraph above the
+  table names both terms."
+  [view]
+  (mapv text-of (nodes :th view)))
+
+(defn- flexed [deg]
+  (assoc-in core/initial-state [:posture :trunk-flexion-deg] (double deg)))
+
+(deftest a-direction-cosine-is-never-printed-as-millimetres
+  ;; `recruit` returns a moment arm in metres for a moment equilibrium and a
+  ;; dimensionless direction cosine for a suspended force. The unit guard in
+  ;; `coeff-label` looked the task up in a GROUP-keyed map by INSTANCE name, so it
+  ;; returned nil for every paired muscle and never fired: the default view shipped
+  ;; six rows reading "343.3 mm" / "480.9 mm" / "176.9 mm" — a 34 cm moment arm at
+  ;; the shoulder.
+  ;;
+  ;; Asserted through `coeff-label` on real solved tensions rather than on a
+  ;; hand-built map, because the defect was the shape of the real data (instance
+  ;; names) and a constructed entry would have been given the shape the code
+  ;; expected.
+  (let [ts (:tensions (core/solved core/initial-state))
+        susp (filter #(= :scapular-suspension (:task %)) ts)
+        moments (filter #(and (:task %) (not= :scapular-suspension (:task %))
+                              (number? (:coeff %))) ts)]
+    (is (seq susp) "the default posture must actually contain suspension tasks")
+    (is (every? #(str/includes? (core/coeff-label %) "(cos)") susp)
+        (str "suspension coefficients are cosines, got "
+             (pr-str (mapv (juxt :name core/coeff-label) susp))))
+    (is (not-any? #(str/includes? (core/coeff-label %) "mm") susp)
+        (str "no suspension row may carry a length unit, got "
+             (pr-str (mapv (juxt :name core/coeff-label) susp))))
+    ;; The control: without it this test would also pass if EVERY row lost its "mm".
+    (is (seq moments) "the default posture must also contain moment tasks")
+    (is (every? #(str/includes? (core/coeff-label %) "mm") moments)
+        (str "moment-arm coefficients are still millimetres, got "
+             (pr-str (mapv (juxt :name core/coeff-label) moments))))))
+
+(deftest the-spine-table-names-muscle-and-ligament-separately
+  (let [hs (headers (core/spine-view (flexed 60)))]
+    (is (some #{"筋ぶん"} hs) (str "headers were " hs))
+    (is (some #{"靭帯ぶん"} hs)
+        (str "the table must carry the ligament term as its own column, headers were " hs))))
+
+(deftest every-spine-row-fills-every-column
+  ;; A header added without its cell (or the reverse) silently shifts every
+  ;; figure one column to the left, which is worse than omitting it.
+  (let [view (core/spine-view (flexed 60))
+        n    (count (headers view))
+        rows (map #(count (nodes :td %)) (nodes :tr view))]
+    (is (pos? n))
+    (is (every? #(or (zero? %) (= n %)) rows)
+        (str "expected " n " cells per row, got " (vec rows)))))
+
+(deftest deep-flexion-puts-the-compression-on-the-ligaments-not-the-muscles
+  ;; The reason the split has to reach the page. At 60° of trunk flexion the
+  ;; erector spinae fall silent (flexion-relaxation) and the posterior
+  ;; ligamentous system takes the moment — so the lumbar levels are compressed
+  ;; by tissue that no amount of "relax your back" would unload.
+  (let [state (flexed 60)
+        rows  (spine/profile (core/body-of state)
+                             (:posture state)
+                             (:tensions (core/solved state)))
+        l5s1  (first (filter #(= "L5/S1" (:name %)) rows))]
+    (is (some? l5s1))
+    (is (number? (:ligament-n l5s1)))
+    (is (> (:ligament-n l5s1) (:muscle-n l5s1))
+        (str "at 60° the ligament term should exceed the muscle term, got "
+             (select-keys l5s1 [:muscle-n :ligament-n])))
+    ;; And the two really are separate quantities, not one value copied twice.
+    (is (not= (:ligament-n l5s1) (:muscle-n l5s1)))))
+
+(deftest upright-puts-it-back-on-the-muscles
+  ;; The control for the test above: the same assertion must NOT hold upright,
+  ;; or it is measuring the field name rather than the posture.
+  (let [state (flexed 0)
+        rows  (spine/profile (core/body-of state)
+                             (:posture state)
+                             (:tensions (core/solved state)))
+        l5s1  (first (filter #(= "L5/S1" (:name %)) rows))]
+    (is (zero? (:ligament-n l5s1))
+        (str "upright, the posterior ligaments are slack, got "
+             (select-keys l5s1 [:muscle-n :ligament-n])))))
+
+;; --- the lower limb reaches the page ----------------------------------------
+
+(deftest every-preset-the-panel-offers-can-actually-be-applied
+  ;; The panel rendered its buttons from one list and the click handler resolved
+  ;; them against another, so a preset added to the panel would have rendered as a
+  ;; button that did nothing when pressed — visibly live, silently inert. Both now
+  ;; read `core/presets`; this asserts they agree by resolving every button.
+  (let [named (map :name core/presets)]
+    (is (seq named) "no presets, so this asserts nothing")
+    (doseq [n named]
+      (is (some? (core/preset-posture n))
+          (str "the panel offers `" n "` and nothing resolves it")))
+    ;; and the buttons the panel actually renders carry those same names
+    (let [rendered (->> (core/control-panel core/initial-state)
+                        (nodes :button)
+                        (keep #(get-in % [1 :data-preset]))
+                        set)]
+      (is (= (set named) rendered)
+          (str "buttons rendered " rendered " for presets " (set named))))))
+
+(deftest both-support-regimes-are-reachable-from-the-panel
+  ;; The support mode is the largest single fact in the lower-limb model and it is
+  ;; not a slider, so the only way to reach standing is a preset. If every preset
+  ;; were seated, the whole standing half of the model would be unreachable from
+  ;; the browser while looking fully present in the physics.
+  (let [modes (set (map #(posture/support-mode (:posture %)) core/presets))]
+    (is (contains? modes :seated) "no seated preset")
+    (is (contains? modes :standing) "no standing preset")))
+
+(deftest the-panel-says-which-regime-the-numbers-came-from
+  ;; Same joint angles, two different answers. Without this the reader cannot tell
+  ;; a 10 N ankle from a 333 N one except by knowing the model.
+  (let [seated (core/control-panel core/initial-state)
+        standing (core/control-panel
+                  (assoc core/initial-state :posture (core/preset-posture "standing-neutral")))]
+    (is (str/includes? (flat-text seated) "座位"))
+    (is (str/includes? (flat-text standing) "立位"))
+    (is (not= (flat-text seated) (flat-text standing))
+        "the panel reads identically in both regimes")))
+
+(deftest the-lower-limb-joints-have-controls
+  (let [paths (set (map :path core/controls))]
+    (doseq [p [[:posture :hip-flexion-deg] [:posture :knee-flexion-deg]
+               [:posture :ankle-dorsiflexion-deg]]]
+      (is (contains? paths p) (str "no control for " p)))))
+
+(deftest the-support-regime-reaches-the-page-as-a-figure
+  ;; The physics claim, asserted through the app so a pin bump that broke it fails
+  ;; here rather than only in the library.
+  ;;
+  ;; I first wrote this against the ankle JOINT MOMENT and it read 0.0 in both
+  ;; regimes — correctly. A body stacked over its ankles asks nothing of its
+  ;; calves, and `lower-limb-loads` puts the centre of pressure under the line of
+  ;; gravity rather than taking it as a parameter, so a neutral stand has almost
+  ;; no ankle moment. The regime shows in the GROUND REACTION, which is the one
+  ;; force the whole difference consists of.
+  (let [sup (fn [preset]
+              (:support (:loads (core/solved
+                                 (assoc core/initial-state
+                                        :posture (core/preset-posture preset))))))
+        st (sup "standing-neutral")
+        se (sup "laptop-on-lap")]
+    (is (= :standing (:mode st)))
+    (is (= :seated (:mode se)))
+    (is (zero? (:ground-reaction-per-foot-n se))
+        "a seated body pushes on no floor")
+    ;; half the body weight per foot, which is the whole of the difference
+    (is (< 0.45 (/ (:ground-reaction-per-foot-n st) (:body-weight-n st)) 0.55)
+        (str "ground reaction " (:ground-reaction-per-foot-n st)
+             " N against a body weight of " (:body-weight-n st) " N"))
+    ;; And it is on the page as a FIGURE, not merely in the map.
+    ;;
+    ;; Asserted on the readout item's structure, not by searching the page text —
+    ;; the paragraph above the figures explains what the ground reaction is and
+    ;; uses the same word, so a text search stays green after the figure is
+    ;; deleted. (Measured: it did. This is the third time this exact shape has
+    ;; been found in this repo in two days, twice in checks I wrote myself.)
+    (let [items (->> (core/simulate-view
+                      (assoc core/initial-state
+                             :posture (core/preset-posture "standing-neutral")))
+                     (nodes :div)
+                     (filter #(= "suji-readout-item" (:class (second %)))))
+          labelled (fn [label]
+                     (first (filter #(str/includes? (flat-text %) label) items)))
+          grf (labelled "床反力")]
+      (is (some? grf)
+          (str "no readout figure for the ground reaction; labels present: "
+               (pr-str (mapv #(last (str/split (str/trim (flat-text %)) #"\s+")) items))))
+      (is (re-find #"\d" (flat-text grf))
+          (str "the ground-reaction figure carries no number: " (pr-str (flat-text grf)))))))
+
+(deftest the-spine-table-names-the-muscles-crossing-each-level
+  ;; The 筋ぶん column is a sum, and a sum cannot be checked. When `spine/crosses?`
+  ;; was a half-space test on height, the whole C3/C4 row was carried by the two
+  ;; wrist extensors — a force that transmits to the forearm, credited to a neck —
+  ;; and no reader of this page could have seen it, because the page printed only
+  ;; the total. This column is what makes the next error of that kind visible.
+  (let [view (core/spine-view (flexed 20))
+        hs (headers view)
+        rows (map #(mapv text-of (nodes :td %)) (nodes :tr view))
+        body (core/body-of (flexed 20))
+        model (spine/profile body (:posture (flexed 20))
+                             (:tensions (core/solved (flexed 20))))]
+    (is (some #{"跨いでいる筋"} hs) (str "no crossing column; headers were " hs))
+    (let [i (first (keep-indexed #(when (= "跨いでいる筋" %2) %1) hs))
+          cells (keep #(when (= (count hs) (count %)) (nth % i)) rows)]
+      (is (= (count model) (count cells))
+          (str "the model has " (count model) " levels and the table has "
+               (count cells) " crossing cells"))
+      ;; every muscle the model says crosses a level is named in that level's cell
+      (doseq [[r cell] (map vector model cells)]
+        (doseq [m (map first (:muscle-crossing r))]
+          (is (str/includes? cell (str/replace m "_" " "))
+              (str (:name r) ": " m " crosses it and is not in the cell: " cell))))
+      ;; ⚠ The "no muscle crosses this level" case is NOT asserted here. At 20° of
+      ;; trunk flexion every level has something crossing it, so a `when (empty?
+      ;; …)` guard would have run its body zero times and passed while measuring
+      ;; nothing — which is what the first version of this test did, and the break
+      ;; that rendered an empty set as a blank cell did not fail it. Measured over
+      ;; 360 level-samples across twelve postures, 13 are empty, and all of them
+      ;; are at trunk 0°. It gets its own test below, at a posture where the case
+      ;; actually occurs.
+      )))
+
+(deftest a-level-with-no-muscle-crossing-it-says-so-rather-than-rendering-blank
+  ;; A blank cell reads as a rendering failure. `L1/L2` genuinely has nothing
+  ;; crossing it upright — the muscles that span the lumbar column insert below
+  ;; it — and the page has to say that rather than leave a hole.
+  ;;
+  ;; The posture is chosen because the case OCCURS there, and the test asserts it
+  ;; occurs before asserting what it renders as: 13 of 360 level-samples across
+  ;; twelve postures are empty and every one is at trunk 0°.
+  (let [st (-> core/initial-state
+               (assoc-in [:posture :trunk-flexion-deg] 0.0)
+               (assoc-in [:posture :head-flexion-deg] 0.0))
+        model (spine/profile (core/body-of st) (:posture st) (:tensions (core/solved st)))
+        empty-levels (filter #(empty? (:muscle-crossing %)) model)
+        view (core/spine-view st)
+        hs (headers view)
+        i (first (keep-indexed #(when (= "跨いでいる筋" %2) %1) hs))
+        cells (->> (nodes :tr view)
+                   (map #(mapv text-of (nodes :td %)))
+                   (keep #(when (= (count hs) (count %)) (nth % i))))]
+    (is (seq empty-levels)
+        "no level is empty at this posture, so this test asserts nothing")
+    (doseq [[r cell] (map vector model cells)]
+      (when (empty? (:muscle-crossing r))
+        (is (str/includes? cell "なし")
+            (str (:name r) ": no muscle crosses it and the cell is " (pr-str cell)))))))
+
+(deftest the-crossing-column-is-not-the-same-for-every-level
+  ;; The control. Without it a cell that printed the whole muscle set, or one
+  ;; constant string, would satisfy every assertion above.
+  (let [view (core/spine-view (flexed 20))
+        hs (headers view)
+        i (first (keep-indexed #(when (= "跨いでいる筋" %2) %1) hs))
+        cells (->> (nodes :tr view)
+                   (map #(mapv text-of (nodes :td %)))
+                   (keep #(when (= (count hs) (count %)) (nth % i))))]
+    (is (< 1 (count (distinct cells)))
+        (str "every level lists the same muscles: " (pr-str (distinct cells))))
+    ;; a lumbar level and a cervical level must not agree — they share no muscle
+    (let [model (spine/profile (core/body-of (flexed 20)) (:posture (flexed 20))
+                               (:tensions (core/solved (flexed 20))))
+          named (fn [region]
+                  (set (mapcat #(map first (:muscle-crossing %))
+                               (filter #(= region (:region %)) model))))]
+      (is (empty? (kotoba.lang.coll/intersection (named :lumbar) (named :cervical)))
+          (str "a muscle crosses both a lumbar and a cervical level: "
+               (pr-str (kotoba.lang.coll/intersection (named :lumbar) (named :cervical))))))))
+
+;; --- the page that says what is true ----------------------------------------
+
+(deftest the-method-page-does-not-call-unimplemented-what-is-implemented
+  ;; On 2026-09-07 this page listed 腱の巻き付き面, 椎間板の個別モデル and the
+  ;; frontal-plane muscles as 未実装, and called the dose layer Rohmert's model.
+  ;; All four were false: 19 muscle groups declare a wrap, 10 disc levels exist,
+  ;; 5 frontal-axis muscles exist, and `strain/model-form` reports :family :power
+  ;; with :provenance :could-not-obtain.
+  ;;
+  ;; Prose about a model goes stale the moment the model moves, and this one moves
+  ;; about once an hour. So the counts on that page are computed — and this test
+  ;; asserts that anything the page still calls absent really is absent.
+  (let [text (flat-text (core/method-view core/initial-state))
+        unimplemented-section (second (str/split text #"まだ無いもの"))]
+    (is (some? unimplemented-section) "the page has no `まだ無いもの` section")
+    ;; things that exist must not be named there
+    (doseq [[label present?]
+            [["巻き付き" (seq (filter :wrap (vals attachment/muscles)))]
+             ["椎間板の個別" (seq spine/levels)]
+             ["前額面の筋" (seq (filter #(= :frontal (:axis %)) (vals attachment/muscles)))]]]
+      (when present?
+        (is (not (str/includes? unimplemented-section label))
+            (str "`" label "` is listed as absent and " (count (vals attachment/muscles))
+                 " muscle groups say otherwise"))))
+    ;; and the dose model is named by what it is, not by what it was called
+    (is (not (str/includes? text "Rohmert"))
+        "the page still calls the dose layer Rohmert's model")))
+
+(deftest the-method-page-counts-agree-with-the-model
+  ;; The counts are computed, so this asserts the computation reaches the page
+  ;; rather than being shadowed by a literal someone typed beside it.
+  ;;
+  ;; ⚠ Asserted inside the LIST ITEM that names each count, not anywhere in the
+  ;; page text. Written the loose way it did not discriminate: replacing the
+  ;; computed ten disc levels with a hard-coded "7" still passed, because "10"
+  ;; occurs in "10% 以内" further up. A bare number searched for in prose finds
+  ;; the wrong number.
+  (let [items (map flat-text (nodes :li (core/method-view core/initial-state)))
+        item-with (fn [label] (first (filter #(str/includes? % label) items)))]
+    (is (seq items) "the page has no list items, so this asserts nothing")
+    (doseq [[label want]
+            [["椎間板レベル" (count spine/levels)]
+             ["巻き付き面を持つ筋群" (count (filter :wrap (vals attachment/muscles)))]
+             ["前額面" (count (filter #(= :frontal (:axis %)) (vals attachment/muscles)))]]]
+      (let [item (item-with label)]
+        (is (some? item) (str "no list item mentions " label))
+        (is (str/includes? (or item "") (str want))
+            (str label ": the model says " want " and the item reads " (pr-str item)))))
+    (doseq [m (map :name (filter #(= :frontal (:axis %)) (vals attachment/muscles)))]
+      (is (str/includes? (or (item-with "前額面") "") m)
+          (str m " acts in the frontal plane and is not named in that item")))))
+
+(deftest the-method-page-states-which-side-of-each-cross-check-is-validated
+  ;; Three cross-checks, one validated quantity. A page that showed three ratios
+  ;; without saying which direction validation runs in would invite the reader to
+  ;; treat a ratio near 1 as agreement — which this repo has twice recorded is not
+  ;; what it means.
+  (let [text (flat-text (core/method-view core/initial-state))]
+    (is (str/includes? text "Hansraj"))
+    (is (str/includes? text "Wilke"))
+    (is (str/includes? text "検証ではない")
+        "the page does not say that a ratio near 1 is not a validation")
+    ;; the lumbar model is outside Wilke's spread today; the page must say so
+    (let [l (spine/lumbar-cross-check)]
+      (is (false? (:within-reference-spread? l))
+          "the lumbar model is now inside the reference spread — this test's premise changed")
+      (is (str/includes? text "基準の幅の外")
+          "the page does not report that the lumbar model falls outside the reference"))))
+
+;; --- the pelvis, and the sentences it made possible --------------------------
+
+(deftest the-pelvis-has-a-control
+  ;; A degree of freedom the model has and the page cannot reach is not covered.
+  ;; suji 3d494ba added `:pelvic-tilt-deg`, and nothing in the compiler, the JVM
+  ;; suite or the browser check would have noticed a slider that was never added:
+  ;; the model would simply have gone on being solved at zero.
+  (let [c (first (filter #(= [:posture :pelvic-tilt-deg] (:path %)) core/controls))]
+    (is (some? c) "no control for the pelvic tilt")
+    ;; and every preset gives it a value, or the slider renders with no `:value`
+    (doseq [{:keys [name posture]} core/presets]
+      (is (number? (:pelvic-tilt-deg posture))
+          (str "preset " name " has no pelvic tilt, so its slider has no value")))))
+
+(deftest the-pelvic-tilt-slider-reaches-every-measured-posture
+  ;; The range is not a taste. `posture/lumbar-lordosis` is the set of postures
+  ;; suji has a measured lordosis for, and a slider that cannot reach one of them
+  ;; makes that measurement unusable from this page — silently, because a slider
+  ;; that stops short looks exactly like a slider that does not.
+  (let [[lo hi] (core/pelvic-tilt-range)
+        rows (core/measured-lordosis)]
+    (is (seq rows) "no measured lordosis at all, so this asserts nothing")
+    (doseq [{:keys [posture slider-reaches]} rows]
+      (is slider-reaches
+          (str "the slider spans [" lo ", " hi "] and " posture " needs "
+               (posture/pelvic-tilt-for posture))))
+    ;; the control: a narrower slider must fail this, or the loop above is
+    ;; asserting a property of the table rather than of the page
+    (let [narrow (core/measured-lordosis core/presets [-1.0 1.0])]
+      (is (some (complement :slider-reaches) narrow)
+          "a slider spanning [-1, 1] reaches every measured posture, so the
+           reachability computation is not reading the range"))))
+
+(deftest the-preset-lordosis-sentence-is-derived-from-the-presets
+  ;; ⚠ THE CLAIM THIS DEFENDS. suji's reference postures state no pelvic tilt, so
+  ;; every preset on this panel — INCLUDING THE STANDING ONES — is solved at zero
+  ;; lordosis, where Cho measures standing at 47.1 deg. That is an upstream gap and
+  ;; the page says so. It must not say so as a typed sentence: `method-view`'s own
+  ;; docstring lists five claims this page has shipped that were false, every one
+  ;; of them true on the day it was written.
+  ;;
+  ;; So the sentence is fed doctored presets, and has to change.
+  (let [real (core/preset-lordosis)
+        text (fn [m] (flat-text (core/preset-lordosis-note m)))]
+    (is (:every-preset-straight? real)
+        "a preset now carries a lordosis — this test's premise changed, and the
+         page's other branch is the one to check")
+    (is (= [0.0] (:standing-carries real))
+        (str "the standing presets carry " (pr-str (:standing-carries real))))
+    ;; the measured figure and the gap are the model's, not this app's
+    (is (str/includes? (text real) "47.1") "the page does not state Cho's standing lordosis")
+    (is (str/includes? (text real) "46.5") "the page does not state the gap")
+    (is (str/includes? (text real) "上流") "the page does not say whose gap it is")
+    ;; now give a standing preset the tilt suji does not, and the sentence must
+    ;; stop saying every preset is straight
+    (let [tilted (mapv (fn [p]
+                         (if (= :standing (:group p))
+                           (assoc-in p [:posture :pelvic-tilt-deg]
+                                     (posture/pelvic-tilt-for :standing))
+                           p))
+                       core/presets)
+          m (core/preset-lordosis tilted)]
+      (is (false? (:every-preset-straight? m))
+          "a standing preset carries 46.5 deg and the summary still says every
+           preset is straight")
+      (is (= [46.5] (:standing-carries m)))
+      (is (not (str/includes? (text m) "上流"))
+          "the upstream-gap sentence survives the gap being closed")
+      (is (not= (text real) (text m))
+          "the sentence reads identically with and without the gap, so it is
+           typed rather than derived"))))
+
+(deftest the-t12l1-sentence-follows-the-joint-table
+  ;; The page states that the joint the trunk split created carries no equilibrium.
+  ;; True today; a sentence, so it can rot. It is read off the joint-moment table
+  ;; the page itself prints — and both branches are exercised here, because a
+  ;; branch nothing reaches is a claim nobody has checked.
+  (let [{:keys [loads]} (core/solved core/initial-state)]
+    (is (false? (core/t12l1-solved? loads))
+        "the model solves an equilibrium at T12/L1 now — the page's other branch
+         is the true one and this test's premise changed")
+    (is (true? (core/t12l1-solved?
+                (update loads :joints conj {:joint "t12l1" :moment-nm 1.0 :note ""})))
+        "a t12l1 row in the joint table is not recognised")
+    ;; and the rendered page carries the branch that is true
+    (let [text (flat-text (core/simulate-view core/initial-state))]
+      (is (str/includes? text "そこで解く平衡はまだ無い")
+          "the simulator does not say that T12/L1 is unsolved")
+      (is (not (str/includes? text "T12/L1 でも平衡を解いている"))
+          "the simulator says T12/L1 is solved, which the joint table denies"))))
+
+(deftest the-method-page-counts-the-trunk-segments-and-the-pelvic-muscles
+  ;; Both numbers are the model's. The trunk was ONE segment until suji 3d494ba and
+  ;; the page would have gone on saying whatever was typed; the pelvic-origin count
+  ;; is why the rotation matters at all, since those are the muscles whose origins
+  ;; and moment arms it moves.
+  ;;
+  ;; ⚠ ASSERTED AS THE EXACT TEXT OF THE `<strong>` THAT CARRIES IT, and the first
+  ;; version was not. It asked `(str/includes? item "2")` and I broke it by
+  ;; hard-coding a THREE — and it passed, because the same sentence contains
+  ;; `T12/L1` and `T12` contains a 2. That is the identical defect
+  ;; `the-method-page-counts-agree-with-the-model` already records one screenful
+  ;; up: a hard-coded 7 survived because `10` occurs in `10% 以内`. Writing a test
+  ;; beside the note describing the bug is not the same as reading it.
+  (let [items (nodes :li (core/method-view core/initial-state))
+        item-with (fn [label] (first (filter #(str/includes? (flat-text %) label) items)))
+        ;; the exact reading of each [:strong …] in an element. A count checked by
+        ;; substring against the whole sentence is not checked.
+        strongs (fn [el] (set (map #(str/trim (flat-text %)) (nodes :strong el))))
+        trunk (item-with "体幹の分節")
+        pelvic (item-with "骨盤の回転")
+        on-pelvis (filter #(= "pelvis" (:segment (:origin %))) (vals attachment/muscles))]
+    (is (some? trunk) "the method page does not count the trunk segments")
+    (is (contains? (strongs trunk) (str (count segment/trunk-bases)))
+        (str "suji names " (pr-str (vec segment/trunk-bases)) " and the item's "
+             "emphasised figures are " (pr-str (strongs trunk))))
+    (doseq [b segment/trunk-bases]
+      (is (str/includes? (flat-text trunk) b)
+          (str b " is a trunk segment and is not named")))
+    (is (some? pelvic) "the method page does not mention the pelvic rotation")
+    (is (contains? (strongs pelvic) (str (count on-pelvis)))
+        (str (count on-pelvis) " muscle groups originate on the pelvis and the "
+             "item's emphasised figures are " (pr-str (strongs pelvic))))))
+
+(deftest the-standing-comparison-is-the-models-numbers-and-its-caveat
+  ;; Wilke's relaxed standing entry was REFUSED until the pelvis could rotate, and
+  ;; the page had nothing to say about standing at L4/L5. It says something now,
+  ;; and every part of it has to be the model's:
+  ;;
+  ;;   - the two forces and the ratio, so a reader can see the model OVERSHOOTS
+  ;;   - the caveat, VERBATIM, because suji states more carefully than a UI would
+  ;;     why the agreement in direction proves nothing: any lordosis of either sign
+  ;;     raises compression here, so the sign could not have come out otherwise.
+  (let [c (spine/sitting-standing-comparison)
+        text (flat-text (core/method-view core/initial-state))]
+    (is (str/includes? text (:direction-is-not-evidence c))
+        "the page does not carry the model's own caveat about the direction, so a
+         reader could take the agreement in sign for evidence")
+    (doseq [[label v] [["standing model force" (:model-force-n (:standing c))]
+                       ["sitting model force" (:model-force-n (:sitting c))]
+                       ["model difference" (:model-difference-n c)]
+                       ["reference difference" (:reference-difference-n c)]]]
+      ;; ⚠ `format` IS JVM-ONLY. The first version of this test used
+      ;; `(format "%.1f" v)`, passed on the JVM, and made the ClojureScript runner
+      ;; refuse to start at all — `Unable to resolve symbol: format`, before a
+      ;; single test ran. That is the host split this repo already has a recorded
+      ;; case of (`digit?` returning false for every digit under cljs), arriving in
+      ;; a test file rather than in the code. `math/fmt-fixed` is portable AND is
+      ;; the function the page itself prints with, so this compares against the
+      ;; rendering rather than against a second opinion about it.
+      (is (str/includes? text (math/fmt-fixed v 1))
+          (str label " (" v ") is not on the page")))
+    (is (str/includes? text (math/fmt-fixed (:difference-ratio c) 3))
+        "the ratio is not on the page")
+    ;; and the premise: the model is ABOVE the reference standing, which is the
+    ;; whole reason this is worth printing rather than celebrating
+    (is (false? (:within-reference-spread? (:standing c)))
+        "the model now lands inside Wilke's standing spread — this test's premise
+         changed and the page's wording should be re-read")
+    (is (= :model-above-reference (:direction (:standing c))))
+    (is (> (:difference-ratio c) 2.0)
+        (str "the model's standing-minus-sitting difference is only "
+             (:difference-ratio c) "x the reference's; the page calls this the
+             finding and the wording assumes it is large"))))
+
+(deftest the-lordosis-readout-is-the-models-own-number
+  ;; The census claims the two lordosis figures are on the page BY THEIR LABELS,
+  ;; because probing them by their digits passed with the figures deleted — the
+  ;; differential found 25.0 as the `25` in a muscle row reading `25 N (24 / 1)`.
+  ;; A label check says the figure exists and says nothing about what is in it, so
+  ;; the number is asserted here, exactly, against the function that produces it.
+  (let [st (assoc-in core/initial-state [:posture :pelvic-tilt-deg] 25.0)
+        pst (:posture st)
+        items (nodes :div (core/simulate-view st))
+        readout (fn [label]
+                  (first (for [d items
+                               :let [t (flat-text d)]
+                               :when (and (str/includes? (str (:class (second d))) "suji-readout-item")
+                                          (str/includes? t label))]
+                           t)))]
+    (doseq [[label want]
+            [["腰椎前弯（Cobb L1–S1）" (pose/lumbar-lordosis-deg pst)]
+             ["腰椎の弦の傾き" (pose/lumbar-chord-tilt-deg (:trunk-flexion-deg pst)
+                                                          (:pelvic-tilt-deg pst))]]]
+      (let [t (readout label)]
+        (is (some? t) (str "no readout item is labelled " label))
+        (is (str/includes? (or t "") (math/fmt-fixed want 1))
+            (str label " should read " (math/fmt-fixed want 1)
+                 " and the item reads " (pr-str t)))))
+    ;; the control: at a different tilt the same items read differently, so the
+    ;; assertion above is reading the figure and not a constant
+    (let [flat0 (flat-text (core/simulate-view
+                            (assoc-in core/initial-state [:posture :pelvic-tilt-deg] 0.0)))
+          flat25 (flat-text (core/simulate-view st))]
+      (is (not= flat0 flat25) "the simulate view reads identically at 0 and 25 deg"))))

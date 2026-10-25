@@ -1,0 +1,22 @@
+{
+  "name": "kami-app-suji",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "release": "rm -rf public/js && mkdir -p public/js && amu compile --target wasm32-browser app",
+    "check": "kbb -M:test",
+    "check:cljs": "kbb --backend sci --classpath \"$(kbb -Spath):test\" scripts/nbb_test.cljk",
+    "page": "kbb --backend sci --classpath \"$(kbb -Spath)\" scripts/gen-page.cljk",
+    "page:check": "kbb --backend sci --classpath \"$(kbb -Spath)\" scripts/gen-page.cljk --check",
+    "verify:browser": "kbb --backend sci --classpath \"$(kbb -Spath)\" scripts/verify-browser.cljk",
+    "publish:pages": "kbb --backend sci --classpath \"$(kbb -Spath)\" scripts/publish-pages.cljk"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "shadow-cljs": "2.28.20"
+  },
+  "devDependencies": {
+    "playwright": "1.48.0"
+  }
+}

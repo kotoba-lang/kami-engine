@@ -1,0 +1,117 @@
+(ns sip.preview
+  "Preview gallery — the rendered panels, assembled by QUERYING the world (the
+  datalevin store IS the source of truth). Each card joins a `:sip.render` output
+  back to its `:sip.panel` (id, chapter, composed prompt) and `:sip.area` (title).
+  Emits a static HTML page (Nintendo cream theme per kami-engine house style) you
+  open in the browser. JVM authoring helper — no GPU, no server."
+  (:require [datalevin.core :as d]
+            [sip.store :as store]
+            [kotoba.lang.text :as str]
+            [kotoba.io :as io]))
+
+(defn rows
+  "Query every render output joined to its panel + area, newest grouping by
+  chapter/page. Returns sorted maps."
+  [db]
+  (->> (d/q '[:find ?pid ?chap ?page ?path ?prompt ?title ?seed ?ms
+              :keys id chapter page path prompt area seed ms
+              :where
+              [?r :sip.render/panel ?p]
+              [?r :sip.render/path ?path]
+              [?r :sip.render/seed ?seed]
+              [?r :sip.render/ms ?ms]
+              [?p :sip.panel/id ?pid]
+              [?p :sip.panel/chapter ?chap]
+              [?p :sip.panel/prompt ?prompt]
+              [?p :sip.panel/area ?a]
+              [?a :sip.area/title ?title]
+              [(get-else $ ?p :sip.panel/page 0) ?page]]
+            db)
+       (sort-by (juxt :chapter :page :id))
+       vec))
+
+(defn- esc [s]
+  (-> (str s) (str/replace "&" "&amp;") (str/replace "<" "&lt;") (str/replace ">" "&gt;")))
+
+(defn- card [{:keys [id chapter page path prompt area seed ms]}]
+  (format
+   (str "<figure class=card>"
+        "<img loading=lazy src=\"file://%s\" alt=\"%s\">"
+        "<figcaption><div class=hd><span class=pid>%s</span>"
+        "<span class=meta>Ch.%s · p.%s · %s</span></div>"
+        "<p class=prompt>%s</p>"
+        "<div class=foot>seed %s · %.1fs</div></figcaption></figure>")
+   path (esc id) (esc id) chapter page (esc area) (esc prompt)
+   seed (/ (double ms) 1000.0)))
+
+(defn html [rs]
+  (str
+   "<!doctype html><html lang=ja><head><meta charset=utf-8>"
+   "<meta name=viewport content=\"width=device-width, initial-scale=1\">"
+   "<title>Spirit in Physics — render preview</title><style>"
+   ":root{--cream:#f0ead6;--ink:#3a3a36;--card:#fffdf7;}"
+   "*{box-sizing:border-box}"
+   "body{margin:0;background:var(--cream);color:var(--ink);"
+   "font-family:'Nunito','Hiragino Maru Gothic ProN',sans-serif;padding:28px}"
+   "h1{font-weight:800;letter-spacing:.02em;margin:.2em 0}"
+   ".sub{opacity:.65;margin:0 0 22px}"
+   ".grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}"
+   ".card{margin:0;background:var(--card);border-radius:16px;overflow:hidden;"
+   "box-shadow:0 6px 18px rgba(0,0,0,.10);display:flex;flex-direction:column}"
+   ".card img{width:100%;aspect-ratio:3/4;object-fit:cover;background:#e9e3cf}"
+   "figcaption{padding:12px 14px}"
+   ".hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}"
+   ".pid{font-weight:800;font-size:1.05em}"
+   ".meta{font-size:.78em;opacity:.6}"
+   ".prompt{font-size:.74em;line-height:1.45;opacity:.82;margin:.5em 0 .4em;"
+   "max-height:5.2em;overflow:auto}"
+   ".foot{font-size:.72em;opacity:.5}"
+   "</style></head><body>"
+   "<h1>🌸 Spirit in Physics — render preview</h1>"
+   "<p class=sub>" (count rs) " panels · composed style-first + token-budgeted · "
+   "AnimagineXL 4.0 (tag-only) · queried from the datalevin world</p>"
+   "<div class=grid>" (str/join (map card rs)) "</div>"
+   "</body></html>"))
+
+;; --- graphic-novel reader (composed pages, book-style) ----------------------
+
+(defn book-html
+  "A paged graphic-novel reader for composed page PNGs (absolute paths, in order)."
+  [page-paths]
+  (str
+   "<!doctype html><html lang=ja><head><meta charset=utf-8>"
+   "<meta name=viewport content=\"width=device-width, initial-scale=1\">"
+   "<title>Spirit in Physics — graphic novel</title><style>"
+   "*{box-sizing:border-box} body{margin:0;background:#2a2622;color:#f0ead6;"
+   "font-family:'Nunito','Hiragino Maru Gothic ProN',sans-serif}"
+   "header{position:sticky;top:0;background:#211d1a;padding:10px 18px;"
+   "box-shadow:0 2px 10px rgba(0,0,0,.4);z-index:9}"
+   "header b{font-weight:800} header span{opacity:.6;font-size:.85em;margin-left:10px}"
+   ".reader{display:flex;flex-direction:column;align-items:center;gap:26px;padding:26px}"
+   ".page{position:relative;width:min(92vw,720px);box-shadow:0 10px 30px rgba(0,0,0,.5);"
+   "border-radius:6px;overflow:hidden;background:#f0ead6}"
+   ".page img{display:block;width:100%}"
+   ".page .no{position:absolute;left:10px;bottom:8px;font-size:.72em;color:#3a3a36;"
+   "background:rgba(255,253,247,.8);border-radius:8px;padding:1px 8px}"
+   "</style></head><body>"
+   "<header><b>🌸 Spirit in Physics</b> — Vol.1 Water City"
+   "<span>graphic-novel pages · 左→右 / 上→下読み · composed via sip.page (mangaka flow)</span></header>"
+   "<div class=reader>"
+   (str/join (map-indexed
+              (fn [i p] (format "<div class=page><img loading=lazy src=\"file://%s\"><span class=no>p.%d</span></div>"
+                                p (inc i)))
+              page-paths))
+   "</div></body></html>"))
+
+(defn -main
+  "preview [world-dir] [out.html] — query the world, write a gallery, print path."
+  [& [dir out]]
+  (let [dir  (or dir (str (System/getProperty "java.io.tmpdir") "/sip-world"))
+        out  (or out (str (or (System/getenv "SIP_IP_ROOT") "../../com-junkawasaki/org-spirit-in-physics-comics")
+                          "/resources/images/review-260618/preview.html"))
+        conn (store/connect dir)
+        rs   (rows (store/db conn))]
+    (io/make-parents out)
+    (spit out (html rs))
+    (println "wrote" out "(" (count rs) "panels )")
+    (flush)))

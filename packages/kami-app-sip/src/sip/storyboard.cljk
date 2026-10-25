@@ -1,0 +1,87 @@
+(ns sip.storyboard
+  "Read the canonical manga storyboards (the ネーム) from the story-bible IP repo
+  into plain Clojure panel maps. The bible is now EDN (not JSON-LD), so keys are
+  namespaced keywords (`:gh/pageNumber`, `:gh/panelId`, …). JVM authoring helper.
+
+  Source repo: ../../com-junkawasaki/org-spirit-in-physics-comics (override with $SIP_IP_ROOT),
+  files volumes/<vol>/chapter<NN>/storyboard.edn. We read ONLY the semantic
+  fields; the render prompt is (re)composed by `sip.render`."
+  (:require [kotoba.lang.edn :as edn]
+            [kotoba.io :as io]
+            [kotoba.lang.text :as str]))
+
+(def ip-root (or (System/getenv "SIP_IP_ROOT") "../../com-junkawasaki/org-spirit-in-physics-comics"))
+
+(defn- read-edn [f] (edn/read-string (slurp f)))
+
+(defn- chapter-num [^String panel-id]
+  (some-> (re-find #"^(\d+)-" panel-id) second Long/parseLong))
+
+(defn- vol-key [vol-dir] (keyword vol-dir))
+
+(defn- panel->map [vol-dir page panel]
+  (let [pid (:gh/panelId panel)]
+    {:id          pid
+     :area        (vol-key vol-dir)
+     :chapter     (chapter-num pid)
+     :page        (some-> (:gh/pageNumber page) long)
+     :layout      (:layout page)
+     :size        (:gh/size panel)
+     :camera      (:camera panel)
+     :location    (:location panel)
+     :description (:gh/description panel)
+     :emotion     (:emotion panel)
+     :colorNote   (:colorNote panel)
+     :dialogue    (->> (:dialogue panel [])
+                      (mapv (fn [d] {:speaker (:speaker d) :text (:text d)})))
+     :narration   (:narration panel)
+     :characters  (->> (:characters panel [])
+                       (map #(-> (str %) (str/replace #"^character:" "") keyword))
+                       vec)}))
+
+(defn- storyboard->panels [vol-dir f]
+  (let [doc (read-edn f)]
+    (for [page (:gh/pages doc)
+          panel (or (:panels page) (:gh/panels page))
+          :when (:gh/panelId panel)]
+      (panel->map vol-dir page panel))))
+
+(defn panels
+  "All storyboard panels across all volumes/chapters found under the IP repo, as
+  plain maps. Returns [] if the repo isn't present."
+  []
+  (let [vols (io/file ip-root "volumes")]
+    (if-not (io/directory? vols)
+      []
+      (vec
+       (for [vol-dir (sort (io/list-names vols))
+             :let [vd (io/file vols vol-dir)]
+             :when (io/directory? vd)
+             chap (sort (io/list-names vd))
+             :let [sb (io/file vd chap "storyboard.edn")]
+             :when (io/exists? sb)
+             panel (storyboard->panels vol-dir sb)]
+         panel)))))
+
+(defn panels-for-volume [vol-key]
+  (filterv #(= (:area %) vol-key) (panels)))
+
+(defn panel-by-id [pid]
+  (first (filter #(= (:id %) pid) (panels))))
+
+(defn pages
+  "Group panels into pages: one map per storyboard page, panels in reading order.
+  {:area :chapter :page :layout :panels [panel ...]}."
+  ([] (pages nil))
+  ([vol-key]
+   (->> (cond->> (panels) vol-key (filter #(= (:area %) vol-key)))
+        (group-by (juxt :area :chapter :page))
+        (map (fn [[[area chapter page] ps]]
+               (let [ps (vec ps)]
+                 {:area area :chapter chapter :page page
+                  :layout (:layout (first ps)) :panels ps})))
+        (sort-by (juxt :chapter :page))
+        vec)))
+
+(defn page-by [chapter page]
+  (first (filter #(and (= (:chapter %) chapter) (= (:page %) page)) (pages))))

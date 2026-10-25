@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Kami Modeler</title><style>aside:last-child { border-left: 1px solid #293456; border-right: 0; }
+header span,.hint { color: #9ca9c9; font-size: 12px; }
+.gpu-fallback { position: absolute; inset: 45% auto auto 50%; transform: translate(-50%,-50%); color: #ffb9b9; }
+* { box-sizing: border-box; }
+.primary { background: #6f8fff; color: #071127; border: 0; font-weight: 700; }
+.viewport { position: relative; overflow: hidden; background: radial-gradient(circle at 50% 42%,#1e315a,#0a0f1e 62%); }
+body { margin: 0; height: 100vh; display: grid; grid-template-rows: 54px 1fr; font-family: Inter,ui-sans-serif,system-ui; background: #0b1020; color: #e8ecf8; }
+.modifier-row { display: grid; grid-template-columns: 1fr 30px 30px 30px; gap: 4px; align-items: center; font-size: 11px; }
+.outliner-row { display: grid; grid-template-columns: 1fr 38px 38px; gap: 4px; }
+.outliner-row button { padding: 6px; }
+header strong { color: #9eb8ff; letter-spacing: .04em; }
+label { display: grid; gap: 8px; color: #bfcbe8; }
+h2 { margin: 8px 0 3px; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #91a1ca; }
+header button { margin-left: auto; }
+main { display: grid; grid-template-columns: 230px 1fr 260px; min-height: 0; }
+.status { right: 18px; bottom: 16px; display: flex; gap: 14px; background: #0b1020bb; padding: 8px; border-radius: 6px; }
+.modifier-row button { padding: 5px; text-align: center; }
+.axis { bottom: 24px; left: 26px; color: #ffadb7; }
+#gpu-canvas { width: 100%; height: 100%; display: block; }
+button:hover,.selected { border-color: #7d9cff; background: #293a70; }
+.axis,.status { position: absolute; font-family: ui-monospace; font-size: 12px; color: #b8caff; }
+aside { padding: 18px; background: #101733; display: flex; flex-direction: column; gap: 9px; border-right: 1px solid #293456; }
+input,select { accent-color: #8aa8ff; background: #171f3b; color: #e8ecf8; border: 1px solid #35446e; padding: 8px; }
+header { display: flex; align-items: center; gap: 20px; padding: 0 18px; background: #111936; border-bottom: 1px solid #293456; }
+button { border: 1px solid #35446e; border-radius: 7px; background: #171f3b; color: #e8ecf8; padding: 9px 10px; text-align: left; cursor: pointer; } :focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }</style></head>
+  <body>
+    <header><strong>KAMI MODELER</strong><a href="https://kotoba-lang.github.io/kami-studio/">Studio</a><span>WebGPU polygon workspace</span><span id="project-status">clean · r0</span><button id="new-cube">New Cube</button><button id="save-project">Save</button><button id="load-project">Load</button><button id="import">Import Project</button><input id="import-file" aria-label="Import Modeler project file" type="file" accept=".edn,.kami-modeler.edn" style="display:none;"><button id="import-gltf">Import glTF</button><input id="import-gltf-file" aria-label="Import glTF 2.0 file" type="file" accept=".gltf,model/gltf+json" style="display:none;"><button id="export">Export Project</button><button id="export-gltf">Export glTF</button></header>
+    <main>
+      <aside>
+        <h2>Scene</h2>
+        <button class="primary" id="mode-toggle">Edit Mode</button>
+        <div id="scene-tree"></div>
+        <button id="duplicate-object">Duplicate object</button>
+        <button id="delete-object">Delete object</button>
+        <h2>Component mode</h2>
+        <button id="component-vertex">1 · Vertex</button>
+        <button id="component-edge">2 · Edge</button>
+        <button class="selected" id="component-face">3 · Face</button>
+        <h2>Edit tools</h2>
+        <button class="selected" data-command="select">Select Face</button>
+        <button id="select-all-faces">Select All Components</button>
+        <button id="box-select">Box Select</button>
+        <label>Grid snap<input id="snap-increment" type="number" min="0.000001" step="0.05" value="0.25"></label>
+        <button id="snap-selection">Snap Selection</button>
+        <h2>Transform Axis</h2><div><button id="axis-x">X</button><button id="axis-y">Y</button><button class="selected" id="axis-z">Z</button></div>
+        <button id="inset">Inset</button>
+        <button id="bevel">Bevel Face</button>
+        <button id="loop-cut">Loop Cut Face</button>
+        <button id="knife">Knife Face Center</button>
+        <button id="flip-normals">Flip Selected Normals</button>
+        <button id="orient-outward">Orient Mesh Outward</button>
+        <button id="bridge" disabled>Bridge Two Faces</button>
+        <button id="scale">Scale Face</button>
+        <button id="move">Move Face</button>
+        <button id="delete-face">Delete Face</button>
+        <h2>Interaction profile</h2>
+        <select id="profile" aria-label="Interaction profile">
+          <option value="blender">Blender</option>
+          <option value="maya">Maya</option>
+          <option value="max">3ds Max</option>
+          <option value="c4d">Cinema 4D</option>
+        </select>
+        <p class="hint" id="shortcutHint">Click Select · E Extrude · MMB Orbit · Ctrl+Z Undo</p>
+      </aside>
+      <section class="viewport">
+        <canvas id="gpu-canvas" aria-label="WebGPU mesh viewport"></canvas>
+        <div id="selection-box" style="display:none;position:fixed;border:1px solid #8aa8ff;background:#6f8fff33;pointer-events:none;z-index:10;"></div>
+        <div class="gpu-fallback" id="gpu-status">Initializing WebGPU…</div>
+        <div class="axis">Y
+│
+└── X</div>
+        <div id="transform-gizmo" aria-label="Transform axis gizmo" style="position:absolute;left:50%;bottom:28px;display:flex;gap:4px;transform:translateX(-50%);"><button id="gizmo-x" style="color:#ff6b6b">X</button><button id="gizmo-y" style="color:#69db7c">Y</button><button class="selected" id="gizmo-z" style="color:#74c0fc">Z</button></div>
+        <div class="status">
+          <span id="tool">Select Face</span>
+          <span id="meshStats">8 vertices · 6 faces</span>
+        </div>
+      </section>
+      <aside>
+        <h2>Object Inspector</h2>
+        <label>Name<input id="object-name"></label>
+        <label>Location X<input id="tx" type="number" step="0.1"></label>
+        <label>Location Y<input id="ty" type="number" step="0.1"></label>
+        <label>Location Z<input id="tz" type="number" step="0.1"></label>
+        <label>Parent<select id="object-parent"><option value="">None</option></select></label>
+        <button id="apply-transform">Apply object transform</button>
+        <h2>Boolean</h2><label>Target<select id="boolean-target"></select></label>
+        <button id="boolean-union" disabled>Union</button><button id="boolean-intersection" disabled>Intersection</button><button id="boolean-difference" disabled>Difference</button>
+        <h2>Material</h2>
+        <label>Base Color<input id="base-color" type="color" value="#597fff"></label>
+        <label>Metallic <output id="metallic-value">0.00</output><input id="metallic" type="range" min="0" max="1" step="0.01" value="0"></label>
+        <label>Roughness <output id="roughness-value">0.50</output><input id="roughness" type="range" min="0" max="1" step="0.01" value="0.5"></label>
+        <label>Base Color Texture<input id="texture-file" type="file" accept="image/png,image/jpeg,image/webp"></label>
+        <button id="remove-texture">Remove Texture</button><span id="texture-status">No texture</span>
+        <h2>UV Mapping</h2>
+        <label>Projection axis<select id="unwrap-axis"><option value="z">Z · Front</option><option value="y">Y · Top</option><option value="x">X · Side</option></select></label>
+        <button id="unwrap-uv">Planar Unwrap</button>
+        <label>Offset U<input id="uv-offset-u" type="number" step="0.05" value="0"></label>
+        <label>Offset V<input id="uv-offset-v" type="number" step="0.05" value="0"></label>
+        <label>Scale U<input id="uv-scale-u" type="number" min="0.001" step="0.1" value="1"></label>
+        <label>Scale V<input id="uv-scale-v" type="number" min="0.001" step="0.1" value="1"></label>
+        <label>Rotation °<input id="uv-rotation" type="number" step="15" value="0"></label>
+        <button id="transform-uv">Transform Selected UVs</button>
+        <h2>Modifiers</h2>
+        <button id="add-mirror">＋ Mirror X</button>
+        <button id="add-subdivision">＋ Subdivision</button>
+        <button id="add-array">＋ Array</button>
+        <label>Catalog<select id="modifier-kind"><option value="translate">translate</option><option value="scale">scale</option><option value="triangulate">triangulate</option><option value="flip-normals">flip-normals</option><option value="weld">weld</option><option value="solidify">solidify</option><option value="planar-unwrap">planar-unwrap</option><option value="rotate">rotate</option><option value="shear">shear</option><option value="taper">taper</option><option value="twist">twist</option><option value="bend">bend</option><option value="spherize">spherize</option><option value="decimate">decimate</option><option value="remove-degenerate">remove-degenerate</option><option value="orient-outward">orient-outward</option><option value="snap-grid">snap-grid</option><option value="axis-project">axis-project</option><option value="center-origin">center-origin</option><option value="clamp">clamp</option><option value="radial-wave">radial-wave</option><option value="deterministic-jitter">deterministic-jitter</option></select></label>
+        <button id="add-catalog-modifier">＋ Add Modifier</button>
+        <div id="modifier-stack"></div>
+        <h2>Face Inspector</h2>
+        <p id="selection">Face 1 selected</p>
+        <label>Operation amount <output id="distanceValue">0.50</output><input id="distance" type="range" min="0.05" max="2" step="0.05" value="0.5"></label>
+        <button class="primary" id="extrude">Extrude selected face</button>
+        <button id="undo">Undo</button>
+        <button id="redo">Redo</button>
+      </aside>
+    </main>
+    <span id="debug-state" style="display:none;"></span>
+    <canvas id="large-scene-canvas" aria-label="Large scene WebGPU verification canvas" style="position:fixed;left:-10000px;top:0;width:512px;height:512px"></canvas>
+    <script src="./js/app.js"></script>
+  </body>
+</html>

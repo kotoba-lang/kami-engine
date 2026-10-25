@@ -1,0 +1,27 @@
+# clojure / shadow build artifacts
+.cpcache/
+.shadow-cljs/
+.nrepl-port
+*.jar
+target/
+.clj-kondo/.cache/
+
+# node / cloudflare
+node_modules/
+.wrangler/
+
+# built browser bundle (regenerate: kbb -M:shadow release app)
+/public/js/
+
+# GPU host wasm (copy from ../kami-clj-host/pkg or wasm-pack build)
+/public/wasm/
+
+# authored world snapshot (regenerate: kbb -M:datomic:build)
+/public/snapshot.edn
+
+# datalevin stores
+*.mdb
+/sip-world/
+
+# nbb dependency cache -- a build artifact, not source
+.nbb/

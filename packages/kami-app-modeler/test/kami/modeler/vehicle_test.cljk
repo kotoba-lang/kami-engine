@@ -1,0 +1,19 @@
+(ns kami.modeler.vehicle-test
+  (:require [kotoba.test :refer [deftest is]] [kami.modeler.project :as project]
+            [kami.modeler.vehicle :as importer] [kotoba.physics.vehicle :as vehicle]))
+(deftest shared-vehicle-opens-as-modeler-project
+  (let [doc (vehicle/document {:id :tiny :structure {:nodes [{:id 1 :position {:x 0 :y 1 :z 2}}]
+                                                            :beams []}})
+        model (importer/open-document doc)]
+    (is (project/valid? model))
+    (is (= :vehicle-physics (get-in model [:project/interaction :profile])))
+    (is (= :physics-node (get-in model [:project/scene :scene/objects 0 :object/mesh :mesh/type])))
+    (is (every? #(contains? (:object/mesh %) :mesh/vertices)
+                (get-in model [:project/scene :scene/objects])))))
+
+(deftest studio-workspace-sample-has-renderable-node-beam-structure
+  (let [model (importer/open-document (importer/sample-document))
+        objects (get-in model [:project/scene :scene/objects])]
+    (is (= 24 (count objects)))
+    (is (= #{:physics-node :physics-beam}
+           (set (map #(get-in % [:object/mesh :mesh/type]) objects))))))

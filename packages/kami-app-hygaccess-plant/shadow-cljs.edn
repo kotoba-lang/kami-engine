@@ -1,0 +1,12 @@
+;; 2026-07-18 addendum to Decision 4 (docs/adr/0001-architecture.md) — real
+;; WebGPU render verification. `:deps {:aliases [:cljs]}` tells shadow-cljs
+;; to resolve its Clojure classpath through deps.edn's `:cljs` alias, which
+;; is where `io.github.kotoba-lang/webgpu` lives (kept out of the base
+;; `:deps` map so `kbb -M:test`/`-M:lint` stay standalone-resolvable).
+{:deps  {:aliases [:cljs]}
+ :builds
+ {:render-demo
+  {:target     :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   :modules    {:render-demo {:init-fn kami-app-hygaccess-plant.render-demo/init!}}}}}

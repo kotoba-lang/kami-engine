@@ -1,0 +1,44 @@
+(ns kami-app-hygaccess-plant.render-demo
+  "Real-browser WebGPU render verification entry point (2026-07-18, follow-up
+  to README.md 'Render status' / docs/adr/0001-architecture.md Decision 4) —
+  NOT part of the library surface (that stays JVM-portable `.cljc`, unaffected
+  by this file). Runs the actual mixing-tank CFD scenario
+  (`cae.solver/solve :hygaccess-mixing-tank`, the exact same solve the JVM
+  tests exercise — no fixture, no fake data), builds this repo's render-IR
+  from the real result (`render/tank-render-ir`), and draws ONE real frame
+  through `kami.webgpu/init!`+`draw!` — the workspace's canonical WebGPU-
+  first/WebGL-2.0-fallback executor (ADR-2607102200), consumed here for the
+  first time by this repo. Only resolvable/compilable inside the west-managed
+  `kotoba-lang` sibling checkout (`orgs/kotoba-lang/*`) — see deps.edn's
+  `:cljs` alias.
+
+  Writes 'ok' / 'error: ...' to `#out` for
+  `test/render/verify_render.cljk`'s Playwright harness to read, mirroring
+  the pattern established in `kotoba-lang/kami-app-amenominaka`'s
+  `render_demo.cljs` (ADR-2607100100 M2)."
+  (:require [cae.solver :as solver]
+            [kami-app-hygaccess-plant.solve]
+            [kami-app-hygaccess-plant.process :as process]
+            [kami-app-hygaccess-plant.render :as render]
+            [kami.webgpu :as webgpu]))
+
+(defn- set-out! [text]
+  (when-let [el (.getElementById js/document "out")]
+    (set! (.-textContent el) text)))
+
+(defn init! []
+  (set-out! "loading...")
+  (try
+    (let [result (solver/solve {:solver {:kind :hygaccess-mixing-tank}
+                                 :tank (process/default-tank)
+                                 :process process/default-process})
+          ir (render/tank-render-ir result)
+          canvas (.getElementById js/document "canvas")]
+      (-> (webgpu/init! canvas)
+          (.then (fn [ctx]
+                   (webgpu/draw! ctx ir)
+                   (set-out! (str "ok cov=" (:mixing-homogeneity-cov-pct result)
+                                   " instances=" (count (:instances ir))))))
+          (.catch (fn [err] (set-out! (str "error: " err))))))
+    (catch :default e
+      (set-out! (str "error: " e)))))

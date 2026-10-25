@@ -1,0 +1,105 @@
+(ns lib.webgpu-harness
+  "Real-browser WebGPU verification harness, run via nbb (ClojureScript-on-
+  Node) — not hand-written JS (AGENTS.md: Node-side verification/test
+  harnesses are written in nbb, not `.mjs`/`.cjs`).
+
+  Ported verbatim (same technique, same findings) from
+  `kotoba-lang/kami-app-amenominaka`'s `test/render/lib/webgpu_harness.cljk`
+  (ADR-2607100100 M2), which itself ported the technique proven in
+  `kotoba-lang/wasm-webcomponent`'s `test/render/lib/webgpu-harness.mjs`
+  (ADR-2607078000 Addendum 8):
+
+  1. Playwright's default headless launch can silently resolve to the
+     stripped-down \"headless shell\" Chromium variant, which has no
+     `navigator.gpu` at all. `chromium.executablePath()` (a public
+     Playwright API) reliably returns the full-binary path regardless of
+     the `headless` option, so every launch here goes through it
+     explicitly.
+  2. `navigator.gpu` is only populated on a real http(s) origin, not on
+     `about:blank` — always navigate before checking/using it.
+  3. Verified reliable on macOS (real Metal-backed GPU process); Linux/
+     SwiftShader software rendering was found unreliable elsewhere in
+     this org and is out of scope here too."
+  (:require ["playwright" :refer [chromium]]
+            ["node:http" :as http]
+            ["node:path" :as path]
+            ["node:fs/promises" :refer [readFile]]))
+
+(def mime-types
+  {".html" "text/html; charset=utf-8"
+   ".css"  "text/css; charset=utf-8"
+   ".js"   "text/javascript"
+   ".mjs"  "text/javascript"
+   ".cjs"  "text/javascript"
+   ".wasm" "application/wasm"
+   ".json" "application/json"
+   ".kotoba" "text/plain"
+   ".edn"  "text/plain"})
+
+(defn start-static-server
+  "Serve `root-dir` over plain HTTP on an OS-assigned localhost port (no
+  external dependency — Node's own `http` module). Returns a Promise of
+  `{:base-url :close}`."
+  [root-dir]
+  (js/Promise.
+   (fn [resolve reject]
+     (let [server
+           (http/createServer
+            (fn [req res]
+              (-> (let [url-path (js/decodeURIComponent (first (.split (.-url req) "?")))
+                        file-path (.join path root-dir url-path)]
+                    (if-not (.startsWith file-path root-dir)
+                      (do (.writeHead res 403) (.end res "forbidden") (js/Promise.resolve nil))
+                      (-> (readFile file-path)
+                          (.then (fn [data]
+                                   (let [ext (.extname path file-path)]
+                                     (.writeHead res 200 #js {"Content-Type" (get mime-types ext "application/octet-stream")})
+                                     (.end res data)))))))
+                  (.catch (fn [e]
+                            (.writeHead res 404)
+                            (.end res (str "not found: " (.-message e))))))))]
+       (.on server "error" reject)
+       (.listen server 0 "127.0.0.1"
+                (fn []
+                  (let [port (.-port (.address server))]
+                    (resolve #js {:baseUrl (str "http://127.0.0.1:" port)
+                                  :close (fn [] (js/Promise. (fn [r] (.close server r))))}))))))))
+
+(defn with-headless-browser
+  "Launch the full (non-headless-shell) Chromium build headless, run
+  `(f browser)`, always close the browser afterward. Returns a Promise."
+  [f]
+  (let [executable-path (.executablePath chromium)]
+    (-> (.launch chromium #js {:headless true :executablePath executable-path})
+        (.then (fn [browser]
+                 (-> (js/Promise.resolve (f browser))
+                     (.finally (fn [] (.close browser)))))))))
+
+(defn check-webgpu-available
+  "Navigate `page` to `url` and report whether a real WebGPU device is
+  obtainable. Never rejects — resolves `{:available false :reason ...}`
+  on any failure so callers can skip cleanly instead of crashing."
+  [page url]
+  (-> (.goto page url #js {:waitUntil "load"})
+      (.then (fn []
+               (.evaluate page
+                          "(async () => {
+                             if (!navigator.gpu) return { available: false, reason: 'navigator.gpu is undefined' };
+                             try {
+                               const adapter = await navigator.gpu.requestAdapter();
+                               if (!adapter) return { available: false, reason: 'navigator.gpu.requestAdapter() returned null' };
+                               const device = await adapter.requestDevice();
+                               return { available: !!device, reason: device ? undefined : 'adapter.requestDevice() returned null' };
+                             } catch (e) { return { available: false, reason: String(e) }; }
+                           })()")))))
+
+(defn wait-for-out-text
+  "Wait for `#out`'s textContent to stop reading \"loading...\", then
+  return it. `timeout` in ms."
+  ([page] (wait-for-out-text page 20000))
+  ([page timeout]
+   (-> (.waitForFunction page
+                          "() => { const el = document.getElementById('out');
+                                   return el && el.textContent && !el.textContent.includes('loading'); }"
+                          nil #js {:timeout timeout})
+       (.then (fn [] (.evaluate page "document.getElementById('out').textContent"))))))

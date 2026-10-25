@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>character-creator Phase 2 preview (skin/morph WebGPU proof)</title>
+<style>
+  body { background: #111; color: #eee; font-family: sans-serif; margin: 0; padding: 12px; }
+  #gpu-canvas { width: 900px; height: 500px; display: block; background: #000; border: 1px solid #444; }
+  #status { padding: 6px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+<h3>ADR-2607031200 Phase 2 + /loop maturity pass — left: real character-creator head mesh (3185 real vertices) crossfading through REAL VRM expression presets; middle: synthetic 2-bone skinned strip bending; right: the real character-creator BODY mesh, now really skinned, posed by rotating the "hips" bone (window.__hipsTheta overrides the animation for deterministic screenshots)</h3>
+<p style="max-width:900px;color:#aaa;font-size:13px">
+  <code>character.blendshape/generate-arkit-targets</code> now computes real per-vertex deltas
+  (procedural region falloffs, not captured scan data — see that namespace's <code>targets-spec</code>)
+  for the 32 ARKit targets <code>character-creator.expression-bridge</code> references, covering every
+  VRM 1.0 preset. The left mesh cycles through <code>neutral → happy → surprised → angry → sad</code>
+  using the real <code>character-creator.gpu-adapter/preset-weight-vector</code> weights, crossfading
+  linearly between adjacent presets. The right mesh is the real, now-skinned body mesh
+  (<code>character.body/skin-body</code>, JOINTS_0/WEIGHTS_0 auto-skinning) posed by rotating its "hips"
+  bone.
+</p>
+<div id="status">loading…</div>
+<canvas id="gpu-canvas"></canvas>
+<script>window.__hipsTheta = 0.6;</script>
+<script src="dev/out/preview_demo.js"></script>
+</body>
+</html>

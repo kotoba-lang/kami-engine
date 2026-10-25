@@ -1,0 +1,20 @@
+(ns kami-app-hygaccess-plant.smoke-test
+  "Namespace-loads smoke test: every namespace in this repo requires cleanly
+  and exposes its documented public vars (mirrors kami-app-giemon-factory's
+  smoke_test.cljc convention)."
+  (:require [kotoba.test :refer [deftest is]]
+            [kami-app-hygaccess-plant :as root]
+            [kami-app-hygaccess-plant.tank :as tank]
+            [kami-app-hygaccess-plant.process :as process]
+            [kami-app-hygaccess-plant.mixing :as mixing]
+            [kami-app-hygaccess-plant.solve]
+            [kami-app-hygaccess-plant.render :as render]
+            [cae.solver :as solver]))
+
+(deftest namespaces-load-and-expose-their-public-vars
+  (is (= "int.hygaccess.water-purification-drops" (:product-sku root/scope)))
+  (is (fn? tank/cross-section-area-m2))
+  (is (map? process/default-process))
+  (is (fn? mixing/run-mixing-scenario))
+  (is (fn? render/tank-render-ir))
+  (is (contains? (solver/backends) :hygaccess-mixing-tank)))

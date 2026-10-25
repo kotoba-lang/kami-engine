@@ -1,0 +1,119 @@
+(ns kami.app-suji.bone-shape-test
+  "The mapping from a segment name to a bone shape, and the one property the
+  whole drawing scheme rests on.
+
+  `kami.webgpu.geometry` proves the meshes are sound; this file proves the app
+  asks for the right one, keeps asking when suji grows a segment nobody here has
+  heard of, and that drawing a unit template through the transform is the same
+  mesh as generating it at the simulator's size."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kami.app-suji.scene :as scene]
+            [kami.webgpu.geometry :as geom]
+            [suji.methods.posture :as posture]
+            [suji.methods.segment :as segment]))
+
+(def ^:private body (segment/build-body 70.0 1.70))
+
+(deftest every-drawn-segment-asks-for-a-real-shape
+  (let [{:keys [scene]} (scene/solve-and-scene body (posture/posture-from-workstation
+                                                     posture/laptop-on-lap))]
+    (is (seq (:bones scene)))
+    (is (every? #(contains? scene/bone-shapes (:geo %)) (:bones scene))
+        "every bone's :geo must be a key of the shape catalogue")
+    (is (not-any? #(= :cylinder (:geo %)) (:bones scene))
+        "no bone is still a cylinder")
+    (is (> (count (distinct (map :geo (:bones scene)))) 1)
+        "the axial segments and the limb segments are not the same shape")))
+
+(deftest a-segment-this-app-has-never-heard-of-still-gets-a-bone
+  ;; suji is growing a lower limb and a scapulothoracic element in other hands.
+  ;; A name that is not in the table must fall back, not return nil: a nil shape
+  ;; is a draw that silently does not appear, which looks like an amputation.
+  (testing "names that do not exist here"
+    (doseq [unknown ["scapulothoracic" "toe" "" "clavicle_2026"]]
+      (is (= scene/default-bone-shape (scene/bone-shape unknown)))
+      (is (contains? scene/bone-shapes (scene/bone-shape unknown)))))
+  (testing "names the lower-limb work will add are already mapped"
+    (doseq [[seg expected] {"thigh" :femur "shank" :tibia "foot" :short-bone}]
+      (is (= expected (scene/bone-shape seg))))))
+
+(deftest every-catalogued-shape-generates
+  (doseq [[kind {:keys [generator params]}] scene/bone-shapes]
+    (let [m (case generator
+              :vertebral-body (geom/vertebral-body (assoc params :length 1.0 :radius 1.0))
+              (geom/long-bone (assoc params :length 1.0 :shaft-radius 1.0)))]
+      (is (pos? (geom/tri-count m)) (str kind " must tessellate"))
+      (is (= (count (:positions m)) (count (:normals m))) (str kind)))))
+
+(deftest a-bone-is-tessellated-at-its-own-size-not-at-unit-size-and-scaled
+  ;; The premise the first draft of this app was built on — build one unit
+  ;; template, scale it by [r L r] — is FALSE for these shapes, and this is the
+  ;; test that says so. `loft` splits a ring into a hard edge when its two bands
+  ;; meet too sharply, and how sharp that is depends on the aspect ratio, so a
+  ;; bone drawn as a scaled unit template has hard shading edges where the real
+  ;; bone is smooth. (It would also need the inverse transpose for its normals,
+  ;; which `mesh/model-matrix` does not apply.)
+  (let [params (:params (:humerus scene/bone-shapes))
+        L 0.31 r 0.032
+        unit (geom/long-bone (assoc params :length 1.0 :shaft-radius 1.0))
+        sized (geom/long-bone (assoc params :length L :shaft-radius r))]
+    (is (not= (count (:positions unit)) (count (:positions sized)))
+        "measured 2026-09-07: the unit-aspect mesh and the real-humerus mesh
+         disagree on vertex count because they crease differently —
+         if this ever becomes equal the bucketing below is no longer needed, but
+         until then a unit template is a DIFFERENT MESH, not the same one smaller")
+    (let [ys (map second (:positions sized))
+          xs (map first (:positions sized))]
+      (is (< (Math/abs (- L (- (apply max ys) (apply min ys)))) 1e-12)
+          "the sized mesh really is L tall")
+      (is (< (Math/abs (- (* 2 r (max (:proximal-flare params) (:distal-flare params)))
+                          (- (apply max xs) (apply min xs))))
+             1e-12)
+          "and 2*flare*r wide, so the girth is the app's bone-radius-m and not a scale factor"))))
+
+(deftest the-length-bucket-bounds-both-the-error-and-the-uploads
+  ;; The bucket is the whole reason a stature slider does not allocate a GPU
+  ;; buffer per frame. Two properties, both of which have to hold at once.
+  (let [lengths (map #(* 0.001 %) (range 100 601))]   ;; 0.10 m .. 0.60 m
+    (testing "the residual scale the draw has to apply is small"
+      (doseq [l lengths]
+        (let [ratio (/ l (scene/bone-mesh-length-m l))]
+          (is (< (Math/abs (- 1.0 ratio)) 0.0248)
+              (str l " m bucketed to " (scene/bone-mesh-length-m l)
+                   " leaves a residual scale of " ratio)))))
+    (testing "and the number of distinct meshes over that range is small"
+      (is (< (count (distinct (map scene/bone-mesh-length-m lengths))) 40)
+          "0.10-0.60 m must not need one mesh per millimetre")))
+  (testing "bucketing is idempotent: a bucketed length is its own bucket"
+    (doseq [l [0.12 0.26 0.31 0.44]]
+      (let [b (scene/bone-mesh-length-m l)]
+        (is (< (Math/abs (- b (scene/bone-mesh-length-m b))) 1e-12))))))
+
+(deftest every-bone-draw-carries-a-buildable-mesh-request
+  (let [{:keys [scene]} (scene/solve-and-scene body (posture/posture-from-workstation
+                                                     posture/laptop-on-lap))]
+    (doseq [{:keys [mesh transform label]} (:bones scene)]
+      (is (contains? scene/bone-shapes (:kind mesh)) (str label))
+      (is (pos? (:length-m mesh)) (str label))
+      (is (pos? (:radius-m mesh)) (str label))
+      ;; the leftover on the transform must be the bucket residual and nothing
+      ;; else — if this drifts, the drawn bone is a different size from the mesh
+      (let [[_ sy _] (:scale transform)]
+        (is (< (Math/abs (- 1.0 (/ sy (:length-m mesh)))) 0.0248)
+            (str label ": residual y-scale " (/ sy (:length-m mesh))))))))
+
+(deftest a-bone-shape-is-not-the-cylinder-it-replaced
+  ;; The app-side statement of the discriminating check. A cylinder has one radius
+  ;; at every height; each catalogued shape must not.
+  (let [radii (fn [m] (->> (:positions m)
+                           (group-by #(Math/round (* 1e6 (double (nth % 1)))))
+                           (map (fn [[_ ps]] (apply max (map (fn [[x _ z]]
+                                                               (Math/sqrt (+ (* x x) (* z z)))) ps))))
+                           (remove #(< % 1e-9))))]
+    (doseq [[kind {:keys [generator params]}] scene/bone-shapes]
+      (let [m (case generator
+                :vertebral-body (geom/vertebral-body (assoc params :length 1.0 :radius 1.0))
+                (geom/long-bone (assoc params :length 1.0 :shaft-radius 1.0)))
+            rs (radii m)]
+        (is (> (/ (apply max rs) (apply min rs)) 1.15)
+            (str kind ": widest ring / narrowest ring must exceed 1.15; a cylinder's is 1.0"))))))

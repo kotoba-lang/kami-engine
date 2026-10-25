@@ -1,0 +1,159 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-apps",
+      "commit": "6843e5571e25ff332e2cdd926258b72352f9a25d",
+      "tree": "70977a571fd7281fc4313437893ff197ac100cc6",
+      "url": "https://github.com/kotoba-lang/kami-apps.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "306fd52e74fca6746e12acc750f232de15e71da917756a1270d74c91f5eb7368",
+          "mode": "100644"
+        },
+        {
+          "source": "Cargo.lock",
+          "path": "Cargo.lock",
+          "sha256": "ce63d2d33d2d2104546db2fd3614fa1972f992c58aaca1bd84f5ff35082a7e16",
+          "mode": "100644"
+        },
+        {
+          "source": "Cargo.toml",
+          "path": "Cargo.toml",
+          "sha256": "9a6b8f2a113ec03a7031e56f6317b293d81661d6452777d3e4a8bd0a6106f079",
+          "mode": "100644"
+        },
+        {
+          "source": "README.edn",
+          "path": "README.edn",
+          "sha256": "4a9b7b7eaf47209b1df4d22ae33630c17eca9ef670cf994c67b1b3f6a42a4124",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "2cbf29b283f92ebdadf6694f3b1af861386106598d790d22e4438c420cb03d0b",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-animeka-timeline/Cargo.toml",
+          "path": "kami-app-animeka-timeline/Cargo.toml",
+          "sha256": "5d954a3553105002e02e91c61ef64fc1c3b5c764bc3a645b043c7b666d4d7e71",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-animeka-timeline/src/lib.rs",
+          "path": "kami-app-animeka-timeline/src/lib.rs",
+          "sha256": "dd58fa67fbb5718d9cf44840863f03a5dd29496df6c33350c005192458d19179",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-animeka-timeline/src/onion_skin.rs",
+          "path": "kami-app-animeka-timeline/src/onion_skin.rs",
+          "sha256": "c52c45580a5b0cc1fae65d93300357b049013a52c9e909dca4a68211edbeb618",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-animeka-timeline/src/xsheet.rs",
+          "path": "kami-app-animeka-timeline/src/xsheet.rs",
+          "sha256": "8729e5994f83e0c6f8678dbf483f9c0c23ffcd2aa093c0432c0d1fd651153fc0",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-bim/Cargo.toml",
+          "path": "kami-app-bim/Cargo.toml",
+          "sha256": "bc19cd26eb1eb1cca2e2874164631f50114599670182a1fbbf19068d1cf9adef",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-bim/src/lib.rs",
+          "path": "kami-app-bim/src/lib.rs",
+          "sha256": "6b2469aba3698b16d28d8a67d03128cd8b4b239cb576964510db57b591827816",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-cad/Cargo.toml",
+          "path": "kami-app-cad/Cargo.toml",
+          "sha256": "d80c6553f4e972048a3894c9fe77a4d9353a47a4cdc9cede057798df191745cb",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-cad/src/lib.rs",
+          "path": "kami-app-cad/src/lib.rs",
+          "sha256": "28e622c212e3139d0179e52a9f75e2cd7eccbb7005b92f5e30f3c626c4269523",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-live/Cargo.toml",
+          "path": "kami-app-live/Cargo.toml",
+          "sha256": "b23725e1fb6400fd0ad01efd5d0c921c484cf1c88b02334fbecddacc0f57bcc5",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-live/src/lib.rs",
+          "path": "kami-app-live/src/lib.rs",
+          "sha256": "71b6897a2a6fbe1719aa28269cee1cebabc75678293e2c96263df08523cdfcce",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-live/src/room_dto.rs",
+          "path": "kami-app-live/src/room_dto.rs",
+          "sha256": "3e5e0aa45fa72b54e7d4b3fa2ea12e62e980b5c471a514dc8cda0ba94e86c0dc",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-maps3d/Cargo.toml",
+          "path": "kami-app-maps3d/Cargo.toml",
+          "sha256": "f883a87a069e172570cfdb499e127355d98850dfca0ea410aefafb5dad26571d",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-maps3d/src/atoms.rs",
+          "path": "kami-app-maps3d/src/atoms.rs",
+          "sha256": "8f6df84f74e4a9520ebab174c6d75a0c61ae5f7b07884303427c0c17151c9d55",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-maps3d/src/buildings.rs",
+          "path": "kami-app-maps3d/src/buildings.rs",
+          "sha256": "b07bb6603d365a329a4be752f78d0a8017c4ff12ad3d77717496d35526af0cc3",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-maps3d/src/gsplat.rs",
+          "path": "kami-app-maps3d/src/gsplat.rs",
+          "sha256": "6ff9b2fdf449cd5bb1b6027a73058bb99d844218dac677a29dd2c7903177a3b6",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-maps3d/src/lib.rs",
+          "path": "kami-app-maps3d/src/lib.rs",
+          "sha256": "548aefb2dbbd2dc37a499439da8aef16aee3024179efb05d5e40fb3d3c21ed43",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-maps3d/src/mesh_tiles.rs",
+          "path": "kami-app-maps3d/src/mesh_tiles.rs",
+          "sha256": "694de72f8947e2617e95a29f7fc6cdfb51658989ae757ac134bc85268d6f7660",
+          "mode": "100644"
+        },
+        {
+          "source": "kami-app-maps3d/src/vegetation.rs",
+          "path": "kami-app-maps3d/src/vegetation.rs",
+          "sha256": "c2e4de53ab86db48f3a7720e55675065f6fcdc06d5c698d6723b64a595b4312c",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644",
+          "added": "Apache-2.0 text added by owner decision 2026-10-25; the source repository has no LICENSE file"
+        }
+      ],
+      "excluded": []
+    }
+  ]
+}

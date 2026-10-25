@@ -1,0 +1,52 @@
+(ns kami.modeler.project-test
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kami.modeler.project :as project]
+            [kami.modeling :as modeling]))
+
+(def scene (modeling/scene [(modeling/object 7 "Cube" (modeling/cube 2))]))
+
+(deftest document-round-trip
+  (let [p (project/document {:id "demo" :name "Demo" :scene scene
+                             :selection {:object-id 7 :face-id 2 :mode :edit}
+                             :camera {:azimuth 1 :elevation 0.5}
+                             :interaction {:profile :maya}})]
+    (is (project/valid? p))
+    (is (= p (project/open p)))
+    (is (= 2 (:kami/version p)))))
+
+(deftest legacy-scene-migration
+  (let [p (project/open scene)]
+    (is (= :modeler-project (:kami/document p)))
+    (is (= 7 (get-in p [:project/selection :object-id])))
+    (is (= :blender (get-in p [:project/interaction :profile])))))
+
+(deftest version-two-projects-receive-default-materials
+  (let [legacy-object (dissoc (first (:scene/objects scene)) :object/material)
+        p (project/document {:scene (modeling/scene [legacy-object])
+                             :selection {} :camera {} :interaction {}})
+        opened (project/open p)]
+    (is (= project/default-material
+           (get-in opened [:project/scene :scene/objects 0 :object/material])))))
+
+(deftest rejects-unknown-or-corrupt-documents
+  (testing "unknown version"
+    (is (thrown? #?(:clj Exception :cljs js/Error)
+                 (project/open {:kami/document :modeler-project :kami/version 99}))))
+  (testing "unrelated EDN"
+    (is (thrown? #?(:clj Exception :cljs js/Error) (project/open {:hello :world})))))
+
+(deftest rejects-structurally-dangerous-projects
+  (let [valid (project/document {:id "safe" :name "Safe" :scene scene
+                                 :selection {:object-id 7}
+                                 :camera {:azimuth 0.7 :elevation 0.45}
+                                 :interaction {:profile :blender}})]
+    (testing "duplicate object identifiers"
+      (is (thrown? #?(:clj Exception :cljs js/Error)
+                   (project/open (update-in valid [:project/scene :scene/objects]
+                                            #(conj % (first %)))))))
+    (testing "selection must reference an object in the scene"
+      (is (thrown? #?(:clj Exception :cljs js/Error)
+                   (project/open (assoc-in valid [:project/selection :object-id] 999)))))
+    (testing "camera values must be numeric"
+      (is (thrown? #?(:clj Exception :cljs js/Error)
+                   (project/open (assoc-in valid [:project/camera :azimuth] "east")))))))

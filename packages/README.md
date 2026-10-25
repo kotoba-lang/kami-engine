@@ -19,3 +19,13 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-app-animator](kami-app-animator) | `bd00b69` | Imported `kami-app-animator` (no repository description) |
 | [kami-app-bim-editor](kami-app-bim-editor) | `544cb5d` | Imported `kami-app-bim-editor` (no repository description) |
 | [kami-app-cad](kami-app-cad) | `db874d8` | Browser NURBS/CAD authoring workspace: loft sections, a dimension-constrained sketch, extruded solids with limited Boolean ops, feature history and EDN projects. Geometry comes from kami-engine-cad, rendering from kotoba-lang/webgpu; requires WebGPU. |
+| [kami-app-character-creator](kami-app-character-creator) | `8e776d9` | EDN-native VRM character creator (ADR-2607031200) — Phase 1: CharacterDoc -> real .vrm export, built on kotoba-lang/{vrm,character} |
+| [kami-engine-cae-solver](kami-engine-cae-solver) | `92dcd10` | CAE solver contract — solve multimethod dispatch (:rom ↔ :lbm) |
+| [kami-app-hygaccess-plant](kami-app-hygaccess-plant) | `a7451e7` | Mixing-tank CFD simulation (nagare + kami-engine-cae-solver) for the sodium-hypochlorite dilution step of cloud-itonami-hygiene-access's water-purification-drops |
+| [kami-engine-modeling](kami-engine-modeling) | `c514bc8` | Imported `kami-engine-modeling` (no repository description) |
+| [kami-app-modeler](kami-app-modeler) | `091b260` | Imported `kami-app-modeler` (no repository description) |
+| [kami-app-sculpt](kami-app-sculpt) | `5f4a69c` | Imported `kami-app-sculpt` (no repository description) |
+| [kami-mangaka-page](kami-mangaka-page) | `555e18a` | kami-mangaka-page domain logic, split out of kami-engine's kami-mangaka-page-clj (ADR-2607010930). |
+| [kami-app-sip](kami-app-sip) | `54ae09a` | kami-app-sip (SIP game) domain logic, split out of kami-engine's kami-app-sip-clj (ADR-2607010930). |
+| [kami-app-suji](kami-app-suji) | `d6347be` | 姿勢がつくる負荷を、ブラウザ内で解いて 3D で見せる single-page app（suji + WebGPU） |
+| [kami-apps](kami-apps) | `6843e55` | kami-engine product apps (bim/cad/live/maps3d/animeka-timeline) — split from etzhayyim/root 40-engine (ADR-2607171000) |

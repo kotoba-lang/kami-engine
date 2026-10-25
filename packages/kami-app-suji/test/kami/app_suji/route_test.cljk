@@ -1,0 +1,29 @@
+(ns kami.app-suji.route-test
+  "Views are data and the nav is generated from them; these are the invariants
+  that keeps honest."
+  (:require [kotoba.lang.text :as str]
+            [kotoba.test :refer [deftest is]]
+            [kami.app-suji.core :as core]
+            [kami.app-suji.route :as route]))
+
+(deftest every-view-is-reachable-and-dispatchable
+  (doseq [{:keys [id fragment]} route/views]
+    (is (= id (:id (route/fragment->view fragment)))
+        (str fragment " must resolve to " id))
+    ;; the dispatch in core/app must render something for every declared view —
+    ;; a view in the nav that the dispatch does not know is a dead link
+    (is (vector? (core/app (assoc core/initial-state :view id)))
+        (str id " must render"))))
+
+(deftest the-nav-lists-every-view
+  (let [html (pr-str (route/nav :simulate))]
+    (doseq [{:keys [fragment label]} route/views]
+      (is (str/includes? html fragment) (str fragment " must appear in the nav"))
+      (is (str/includes? html label) (str label " must appear in the nav")))))
+
+(deftest a-bad-fragment-lands-on-the-default-not-on-nothing
+  (doseq [f [nil "" "#" "#/nope" "#garbage" "#/compare?x=1"]]
+    (is (some? (route/fragment->view f)) (str (pr-str f) " must resolve"))
+    (is (contains? (set (map :id route/views)) (:id (route/fragment->view f)))))
+  (is (= :compare (:id (route/fragment->view "#/compare?x=1")))
+      "a query on the fragment must not lose the view"))

@@ -1,0 +1,10 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "ee8155a9a42a37223639b855549ae0c6c5542ad20665cc897bd03b7df1bc6237",
+      "sha256": "f18d9b8b113ac8462bec419aa5f5574d6dd50d3b86afa937fe4bb4381c9822e0",
+      "reason": "Git dependencies on kami-* repositories that are bundled here (kami-mangaka-page) become local roots so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (dep org.clojure/clojure, alias :datomic, alias :dev, alias :build, alias :render, alias :shadow, alias :test reduced to :extra-paths, alias :lint): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+    }
+  }
+}
