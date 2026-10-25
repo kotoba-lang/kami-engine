@@ -54,3 +54,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-flow](kami-flow) | `9e8d356` | KAMI Flow — RTL->PnR->GDSII->Verify/Power/DFT/SI/Yield->STA->DRC/LVS->Signoff orchestration pipeline. Restored from legacy kami-flow crate (deleted #82). ADR-2607010930. |
 | [kami-game-scene](kami-game-scene) | `f7f97c5` | EDN authoring surface for kami-game's ANIMATION-STATE presets, Godot game catalog, brainrot evolution/characters, Sabiotoshi item catalog, battle-royale storm/consumables/weapons, and Pokoa dex/items. Restored from legacy kami-game-scene crate (deleted #82). ADR-2607010930. |
 | [kami-gen-hybrid](kami-gen-hybrid) | `4082aa2` | Imported `kami-gen-hybrid` (no repository description) |
+| [kami-gen-ml3d](kami-gen-ml3d) | `e7388b6` | Imported `kami-gen-ml3d` (no repository description) |
