@@ -1,0 +1,181 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-app-modeler",
+      "commit": "091b260063745e30e3768dfc6d84d2561f030d91",
+      "tree": "e3d4b25f589860ee9252c780d87e252bbde483d0",
+      "url": "https://github.com/kotoba-lang/kami-app-modeler.git",
+      "files": [
+        {
+          "source": ".clj-kondo/config.edn",
+          "path": ".clj-kondo/config.edn",
+          "sha256": "113dec5fe89be2e97db8c6d53132eebed5b66520857135554aafd350b0882e09",
+          "mode": "100644"
+        },
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "808d8c95b23fe4f78843664a675c8ec18e350a84b97c163657ac645276a4c140",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "4285e44b7f7ed0efaef39db92e681ac7c87447cb78dcc220dbe3650c06f1a18e",
+          "mode": "100644"
+        },
+        {
+          "source": "build.cljk",
+          "path": "build.cljk",
+          "sha256": "5d91e566d9e7add5db75ffc8216799fd81bbe30fc4f6014784a45f0a87313624",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "c0abec5c2f578d84733a57aa5f518c2ac9e35fa5f5d6dc3364ff967cec90dae8",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "11c6af0b6c328702a7833e73fa3e4a7f6b197d08d86f04c8256605ad468844f0",
+          "mode": "100644"
+        },
+        {
+          "source": "docs/tutorial.md",
+          "path": "docs/tutorial.md",
+          "sha256": "66638e26b6d8b1c96094b665c5d7a6ac8e00950330222a4b3a574f78e19db7c3",
+          "mode": "100644"
+        },
+        {
+          "source": "kotoba.app.edn",
+          "path": "kotoba.app.edn",
+          "sha256": "4507cf78e649c46d35009172135270c3270db6d31cc2d8f0224abdf7ebc1e0c3",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "ea93300eec067019584d53f2bad3c36f8df98e50919604039b9a1ee1182b6b1f",
+          "mode": "100644"
+        },
+        {
+          "source": "package-lock.json",
+          "path": "package-lock.json",
+          "sha256": "6f34588a24e3ac25ea461e3fff0efc51b0bc122937505e2a4e07226c54401ac2",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "07ea064acc7e8df72bae3cf0d1d2f52c1f385d8cd7ed31d016e879c5f9ee32b5",
+          "mode": "100644"
+        },
+        {
+          "source": "public/index.html",
+          "path": "public/index.html",
+          "sha256": "36fe71c7eee0156f7e4dc3b9ed09fb93d776b502824f29465d2cd14bfd414e5c",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/app.js",
+          "path": "public/js/app.js",
+          "sha256": "4b37b91b2736b1d4a3d092c0d19191f2c2d61e7ae4b8bfa59da20761a9b4b678",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/manifest.edn",
+          "path": "public/js/manifest.edn",
+          "sha256": "bd31fb37d620a99d42520438f4c8738bb74a27ecdb150191aeb82307e93ab749",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "76b280f95d865408157b3f5ab30ee7a420edc0fc48c5cf950c33a19225609dc9",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/modeler/app.cljk",
+          "path": "src/kami/modeler/app.cljk",
+          "sha256": "b0836efd83997e810c3e66b2afca87ebf75d2fafc228c60c17c756f44c19988d",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/modeler/project.cljk",
+          "path": "src/kami/modeler/project.cljk",
+          "sha256": "48ab27d2859009949f9038cef54b49329f46395abb11fffbf3b34962f8561322",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/modeler/ui.cljk",
+          "path": "src/kami/modeler/ui.cljk",
+          "sha256": "0883444334d77c7482daa73f51087d2f7180e2dbe7e9949a2d3b7da494ea1b84",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/modeler/vehicle.cljk",
+          "path": "src/kami/modeler/vehicle.cljk",
+          "sha256": "db98396ce2a60bb785c6c9a2a536d4f7f319119edfcb88fd912d538df789af2e",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/modeler/browser.cljk",
+          "path": "test/kami/modeler/browser.cljk",
+          "sha256": "ffb0b32ec1da69aa113d59308cbf2ebee321be5ee6d5c5b57c0dbea96457a3ea",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/modeler/project_test.cljk",
+          "path": "test/kami/modeler/project_test.cljk",
+          "sha256": "e5ea1f731cd27c073b6ed25dded5aae7b1282a30469c3da5f375caaa9ca618b9",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/modeler/ui_test.cljk",
+          "path": "test/kami/modeler/ui_test.cljk",
+          "sha256": "51c7a590224336fc4daf867d2914a6a4e97db8cf81bb3f6022bd48535e280a72",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/modeler/vehicle_test.cljk",
+          "path": "test/kami/modeler/vehicle_test.cljk",
+          "sha256": "e99fab62761f4ec696237ae3dc23004fbb05d5939a96b1019e2d42cf11bcef71",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/modeler/verify_compat.cljk",
+          "path": "test/kami/modeler/verify_compat.cljk",
+          "sha256": "f8dd1fb17a8d8b0ed8e72c1979a3a7b47c3ea4afad74b4743e30307cdf535447",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/modeler/verify_webgl2.cljk",
+          "path": "test/kami/modeler/verify_webgl2.cljk",
+          "sha256": "b579333e9c99aaa19b58e1c737cdb95af59f7492493883d7f5c331ad9359cfb8",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/modeler/verify_webgpu.cljk",
+          "path": "test/kami/modeler/verify_webgpu.cljk",
+          "sha256": "6c50814a17b20a4fe275105f9a8d4ddc520dc5d8db46e574ba993c858261bdcc",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/actions/checkout-workspace/action.yml",
+        ".github/workflows/ci.yml",
+        ".github/workflows/pages.yml",
+        ".github/workflows/release.yml"
+      ]
+    }
+  ]
+}

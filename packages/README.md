@@ -23,3 +23,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-engine-cae-solver](kami-engine-cae-solver) | `92dcd10` | CAE solver contract — solve multimethod dispatch (:rom ↔ :lbm) |
 | [kami-app-hygaccess-plant](kami-app-hygaccess-plant) | `a7451e7` | Mixing-tank CFD simulation (nagare + kami-engine-cae-solver) for the sodium-hypochlorite dilution step of cloud-itonami-hygiene-access's water-purification-drops |
 | [kami-engine-modeling](kami-engine-modeling) | `c514bc8` | Imported `kami-engine-modeling` (no repository description) |
+| [kami-app-modeler](kami-app-modeler) | `091b260` | Imported `kami-app-modeler` (no repository description) |

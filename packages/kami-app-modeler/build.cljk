@@ -1,0 +1,2 @@
+(require '[kotoba.io :as io] '[kami.modeler.ui :as ui])
+(spit (io/file "public" "index.html") (ui/page))
