@@ -1,0 +1,174 @@
+(ns postfx-scene-test
+  "Tests for `postfx-scene`. Ports every original Rust `#[test]` from
+  `kami-postfx-scene/src/lib.rs`'s `mod tests` (9 tests) and
+  `kami-postfx-scene/tests/postfx_parity.rs` (4 tests) 1:1, plus a
+  namespace-loads smoke test.
+
+  `kami_postfx::PostEffect` / `PostFxPipeline` derive only `Debug, Clone` (no
+  `PartialEq`) in the original Rust, which is why the original needed a
+  hand-rolled `EffectSpec` projection type to compare pipelines field-by-
+  field. In `kotoba-lang/postfx`, effects/pipelines are already plain
+  Clojure maps, which compare structurally via `=` for free — so the parity
+  assertions below compare `postfx-scene/pipeline-specs` (or the raw
+  pipeline maps) directly with `=`, no projection type needed."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [postfx-scene :as ps]
+            [postfx :as postfx]))
+
+;; ════════════════════════════════════════════════════════════════════════
+;; smoke test
+;; ════════════════════════════════════════════════════════════════════════
+
+(deftest smoke-test
+  (is (= ["nintendo" "retro" "final-fantasy" "baminiku-character"]
+         ps/all-preset-names))
+  (is (string? ps/postfx-edn)))
+
+;; ════════════════════════════════════════════════════════════════════════
+;; ported from kami-postfx-scene/src/lib.rs `mod tests`
+;; ════════════════════════════════════════════════════════════════════════
+
+(deftest shipped-has-all-presets
+  (let [p (ps/shipped-presets)]
+    (is (= 4 (count p)))
+    (doseq [name ps/all-preset-names]
+      (testing (str name " present in EDN")
+        (is (contains? p name))))))
+
+(deftest preset-lengths-match-builtin
+  ;; Effect counts (and thus order positions) match the hardcoded pipelines.
+  (is (= 3 (count (:effects (ps/shipped-preset "nintendo")))))
+  (is (= 2 (count (:effects (ps/shipped-preset "retro")))))
+  (is (= 10 (count (:effects (ps/shipped-preset "final-fantasy")))))
+  (is (= 6 (count (:effects (ps/shipped-preset "baminiku-character"))))))
+
+(deftest rebuilt-pipeline-is-enabled
+  ;; `postfx/new-pipeline` sets `:enabled true`, like every hardcoded preset.
+  (is (true? (:enabled (ps/shipped-preset "nintendo")))))
+
+(deftest unknown-builtin-preset-is-none
+  (is (nil? (ps/builtin-preset "does-not-exist"))))
+
+(deftest unknown-preset-from-edn-is-an-error
+  (let [ex (try (ps/preset-from-edn ps/postfx-edn "cinematic")
+                nil
+                (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? ex))
+    (is (= :preset-not-found (:postfx-scene/error (ex-data ex))))))
+
+(deftest non-map-root-is-an-error
+  (let [ex (try (ps/presets-from-edn "42")
+                nil
+                (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? ex))
+    (is (= :not-a-map (:postfx-scene/error (ex-data ex))))))
+
+(deftest missing-presets-table-is-an-error
+  (let [ex (try (ps/presets-from-edn "{:other 1}")
+                nil
+                (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? ex))
+    (is (= :no-presets (:postfx-scene/error (ex-data ex))))))
+
+(deftest unknown-effect-is-an-error
+  (let [ex (try (ps/presets-from-edn "{:postfx/presets {:p [{:effect :no-such-fx}]}}")
+                nil
+                (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? ex))
+    (is (= :unknown-effect (:postfx-scene/error (ex-data ex))))))
+
+(deftest effect-id-round-trips
+  (doseq [name ps/all-preset-names]
+    (doseq [e (:effects (ps/builtin-preset name))]
+      ;; `effect-id` reads `:type` directly; this restates the same
+      ;; computation independently for a clearer assertion.
+      (is (= (ps/effect-id e) (some-> (:type e) clojure.core/name))))))
+
+;; ════════════════════════════════════════════════════════════════════════
+;; ported from kami-postfx-scene/tests/postfx_parity.rs
+;; ════════════════════════════════════════════════════════════════════════
+
+(defn- oracle
+  "Map a preset name to the REAL `postfx` builder result (the oracle
+  source)."
+  [name]
+  (case name
+    "nintendo" (postfx/nintendo)
+    "retro" (postfx/retro)
+    "final-fantasy" (postfx/final-fantasy)
+    "baminiku-character" (postfx/baminiku-character)
+    (throw (ex-info (str "unknown preset " name) {}))))
+
+(defn- assert-pipeline-eq
+  "Assert the EDN-rebuilt pipeline equals the hardcoded `postfx/*` oracle:
+  same effect count, same `:enabled`, and every effect (each field) in the
+  same order."
+  [name loaded]
+  (let [o (oracle name)]
+    (is (= (:enabled loaded) (:enabled o)) (str name ": enabled"))
+    (let [got (ps/pipeline-specs loaded)
+          want (ps/pipeline-specs o)]
+      (is (= (count got) (count want)) (str name ": effect count"))
+      (doseq [[i [g w]] (map-indexed vector (map vector got want))]
+        (is (= g w) (str name ": effect[" i "] (variant + fields, in order)")))
+      (is (= got want) (str name ": full pipeline parity (ordered)")))))
+
+(deftest presets-edn-matches-builtin
+  ;; For each shipped preset, the rebuilt pipeline == the value from the REAL
+  ;; `postfx/*` builder — every effect + every param, in order.
+  (let [loaded (ps/presets-from-edn ps/postfx-edn)]
+    (is (= 4 (count loaded)) "all presets present in EDN")
+    (doseq [name ps/all-preset-names]
+      (assert-pipeline-eq name (get loaded name))
+      ;; The `builtin-preset` oracle helper agrees with what we read off the
+      ;; builders.
+      (let [built (ps/builtin-preset name)]
+        (is (= (ps/pipeline-specs (get loaded name)) (ps/pipeline-specs built))
+            (str name ": EDN == builtin-preset"))))
+    ;; The shipped-presets convenience loader yields the same thing.
+    (let [shipped (ps/shipped-presets)]
+      (doseq [name ps/all-preset-names]
+        (is (= (ps/pipeline-specs (get shipped name)) (ps/pipeline-specs (get loaded name)))
+            (str name ": shipped == loaded"))))))
+
+(deftest single-preset-from-edn-matches
+  ;; `preset-from-edn` rebuilds one preset identical to the hardcoded builder.
+  (doseq [name ps/all-preset-names]
+    (let [got (ps/preset-from-edn ps/postfx-edn name)]
+      (assert-pipeline-eq name got))))
+
+(deftest effectspec-round-trips-through-post-effect
+  ;; Since `postfx` effects are plain maps, the "round trip" is trivial
+  ;; identity — kept as a named test to mirror the original Rust assertion
+  ;; (`EffectSpec::from_post_effect . to_post_effect` is the identity here).
+  (doseq [name ps/all-preset-names]
+    (let [o (oracle name)]
+      (doseq [e (:effects o)]
+        (is (= e e))))))
+
+(deftest tolerant-parse-errors
+  ;; Unknown effect -> error, unknown preset -> error, non-map root -> error,
+  ;; missing table -> error.
+  (let [ex1 (try (ps/preset-from-edn ps/postfx-edn "cinematic")
+                 nil (catch #?(:clj Exception :cljs js/Error) e e))
+        ex2 (try (ps/presets-from-edn "{:postfx/presets {:p [{:effect :bogus-fx}]}}")
+                 nil (catch #?(:clj Exception :cljs js/Error) e e))
+        ex3 (try (ps/presets-from-edn "123")
+                 nil (catch #?(:clj Exception :cljs js/Error) e e))
+        ex4 (try (ps/presets-from-edn "{:x 1}")
+                 nil (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (= :preset-not-found (:postfx-scene/error (ex-data ex1))))
+    (is (= :unknown-effect (:postfx-scene/error (ex-data ex2))))
+    (is (= :not-a-map (:postfx-scene/error (ex-data ex3))))
+    (is (= :no-presets (:postfx-scene/error (ex-data ex4))))))
+
+;; ════════════════════════════════════════════════════════════════════════
+;; additional coverage: chain-from-render-ir (not directly Rust-tested by
+;; name in the original file, but exercises the render-IR path 1:1)
+;; ════════════════════════════════════════════════════════════════════════
+
+(deftest chain-from-render-ir-tolerant
+  (is (= [] (:effects (ps/chain-from-render-ir "42"))))
+  (is (= [] (:effects (ps/chain-from-render-ir "{:other 1}"))))
+  (is (= 1 (count (:effects (ps/chain-from-render-ir
+                              "{:post [{:effect :bloom :threshold 0.8 :intensity 0.3 :radius 4.0}]}"))))))

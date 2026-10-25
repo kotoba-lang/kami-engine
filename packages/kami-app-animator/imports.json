@@ -1,0 +1,124 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-app-animator",
+      "commit": "bd00b69c9d7146ad8f21695ce409afa64a8bdd85",
+      "tree": "2197847c9ea668045060af1fb10859469d59de06",
+      "url": "https://github.com/kotoba-lang/kami-app-animator.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "509b92ab041352f477caaa7851c919b7c22c8553a08c2d11003a95f6f6638dde",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "445e30f63923659b7dde8a6e377f761538572d1b040836a594f8ab7a76105168",
+          "mode": "100644"
+        },
+        {
+          "source": "build.cljk",
+          "path": "build.cljk",
+          "sha256": "11e7dc4c4acdbc69d0efc2155377795e77737deb3a33978cdaa1491bd72be47b",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "8b92c262138c324b7f8b6a0ace0af4f6a309f8e1e559031a5ecdd46806b46bfb",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "2f29341cfd41fcf917045fdb005a4eb2c8e535975405910ba80f355c48f36b30",
+          "mode": "100644"
+        },
+        {
+          "source": "kotoba.app.edn",
+          "path": "kotoba.app.edn",
+          "sha256": "9e688640ee3bbd325003d96d9d8211294535eb23d4bfea2f663997aef4322d48",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "0b6d316cac2b900d2a93f1d2f04b5d781c6318e4db310e1fa59ae64543881be0",
+          "mode": "100644"
+        },
+        {
+          "source": "package-lock.json",
+          "path": "package-lock.json",
+          "sha256": "ccb44808c11b61ed5d855efec78b642764d81c314c40b56f0cb63166fd743ba4",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "e4d6ab15fa555f30768af34da21e66b771e5329faf634a80450c2d1638638210",
+          "mode": "100644"
+        },
+        {
+          "source": "public/index.html",
+          "path": "public/index.html",
+          "sha256": "0d956a6021de04715200a2d462a773e267134d163763a989cd7fbc4bee734b20",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/app.js",
+          "path": "public/js/app.js",
+          "sha256": "a54cbcc029001fe85e7aed7733372322f04cd073387cdd348e26e46979febd71",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/manifest.edn",
+          "path": "public/js/manifest.edn",
+          "sha256": "6e0659d0bc2917eb23b1c744beb8565aebad1ea4e81a67089996ce6f0d27cde1",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "29984cc6d2696f934661e8c550575679c9668fc8cc08198ea5d18bde69b25e9b",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/animator/app.cljk",
+          "path": "src/kami/animator/app.cljk",
+          "sha256": "db6b7ee0c25dc532b9890e5d387bb5659101a7c410d2c17aa7f49b2da887091f",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/animator/project.cljk",
+          "path": "src/kami/animator/project.cljk",
+          "sha256": "4b69d8af98df0834177023f00c619f884c874eb233e95b206af0aee368cf757b",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/animator/ui.cljk",
+          "path": "src/kami/animator/ui.cljk",
+          "sha256": "14f175f73f5cb7c18d5ba9fff5524d3e1a655b46fecf26e68cb1ff6b4df2aee5",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/animator/project_test.cljk",
+          "path": "test/kami/animator/project_test.cljk",
+          "sha256": "dcf46e8f4ef03b4a16b82c776c445d305fd2dc88ed77e3128d76ffdccc2958cf",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/pages.yml"
+      ]
+    }
+  ]
+}

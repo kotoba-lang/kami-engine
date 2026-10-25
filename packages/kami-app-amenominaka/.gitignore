@@ -1,0 +1,11 @@
+/.cpcache/
+/target/
+/out/
+/.shadow-cljs/
+/node_modules/
+/package-lock.json
+/public/js/
+/public/vendor/kotoba-ui.css
+/test/render/m2-render-screenshot.png
+/test/render/m5-ui-screenshot.png
+.nbb/

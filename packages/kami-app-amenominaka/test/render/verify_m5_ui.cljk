@@ -1,0 +1,181 @@
+(ns verify-m5-ui
+  "M5 (ADR-2607100100) real-browser UI-shell verification, run via nbb FROM
+  THIS REPO'S ROOT:
+    kbb --backend sci -cp test/render test/render/verify_m5_ui.cljk
+  Loads the shadow-cljs-compiled `public/shell.html`
+  (kotoba.amenominaka.ui/init!) in a full (non-headless-shell) Chromium via
+  Playwright and asserts, all against the REAL live app (no mocks):
+    1. WebGPU actually available (skips render-dependent checks if not,
+       same pattern as verify_m2_render/verify_m4_stress).
+    2. The env panel's four preset <select>s (#field-weather/-terrain/
+       -postfx/-vegetation) and the WebGPU canvas (#viewport) exist in the
+       DOM after mount.
+    3. #debug-state (same idiom as M2/M4's #out — a plain DOM text node,
+       since WebGPU canvas pixel readback was found unreliable in this
+       Chromium build) initially reflects the DEFAULT preset state.
+    4. Driving a real `page.selectOption` on #field-weather to \"clear\"
+       actually flows through React's onChange -> (recompute-scene!) and
+       is reflected in #debug-state — this is the concrete behavioral
+       proof that the hand-rolled `preset-select` controlled-component
+       workaround (ui.cljs docstring: kotoba-ui's real `menu-select` bug,
+       an uncontrolled <select>/<option> with no :value/:key) actually
+       works, not just that it compiles.
+    5. Dragging the mouse across #viewport actually orbits the camera —
+       compared via two REAL Chromium screenshots (`page.screenshot`,
+       clipped to the canvas) taken before/after the drag, not JS-side
+       canvas pixel readback (found unreliable for a WebGPU-context canvas
+       in this Chromium build, see verify_m2_render's docstring).
+    6. No console errors were logged during any of the above.
+  Also captures a screenshot for visual confirmation."
+  (:require ["node:path" :as path]
+            [lib.webgpu-harness :as harness]))
+
+(def public-dir (.join path (.cwd js/process) "public"))
+(def screenshot-dir (.join path (.cwd js/process) "test" "render"))
+
+(defn- report! [m]
+  (println (js/JSON.stringify (clj->js m) nil 2)))
+
+(defn- fail! [reason]
+  (println (str "FAIL: " reason))
+  (set! (.-exitCode js/process) 1))
+
+(defn- sleep [ms]
+  (js/Promise. (fn [resolve] (js/setTimeout resolve ms))))
+
+(defn- poll-truthy [f timeout]
+  (let [deadline (+ (js/Date.now) timeout)]
+    (letfn [(check []
+              (-> (f)
+                  (.then (fn [v]
+                           (cond
+                             v v
+                             (> (js/Date.now) deadline) v
+                             :else (-> (sleep 200) (.then check)))))))]
+      (check))))
+
+(defn- eval-js [page expr] (.evaluate page expr))
+
+(defn- dom-shape-present? [page]
+  (poll-truthy
+   #(eval-js page
+             "(() => {
+                const ids = ['field-weather','field-terrain','field-postfx','field-vegetation','viewport','debug-state'];
+                return ids.every(id => !!document.getElementById(id));
+              })()")
+   20000))
+
+(defn- debug-state [page]
+  (eval-js page "document.getElementById('debug-state').textContent"))
+
+(defn- select-weather-clear! [page]
+  (.selectOption page "#field-weather" "clear"))
+
+(defn- debug-element-count [page]
+  (-> (debug-state page) (.then (fn [text] (.-elementCount (js/JSON.parse text))))))
+
+(defn- verify-scene-editor! [page]
+  (-> (.click page "#add-scene-wall")
+      (.then (fn [] (poll-truthy
+                      #(-> (debug-element-count page) (.then (fn [n] (when (= n 2) n))))
+                      10000)))
+      (.then (fn [count-after-add]
+               (when-not (= count-after-add 2) (fail! "Add Wall did not update semantic scene"))
+               (.fill page "#element-length" "6.5")))
+      (.then (fn [] (.press page "#element-length" "Tab")))
+      (.then (fn [] (.click page "#delete-scene-element")))
+      (.then (fn [] (poll-truthy
+                      #(-> (debug-element-count page) (.then (fn [n] (when (= n 1) n))))
+                      10000)))
+      (.then (fn [count-after-delete]
+               (when-not (= count-after-delete 1) (fail! "Delete did not update semantic scene"))
+               (.click page "#undo-scene")))
+      (.then (fn [] (poll-truthy
+                      #(-> (debug-element-count page) (.then (fn [n] (when (= n 2) n))))
+                      10000)))
+      (.then (fn [count-after-undo]
+               (if (= count-after-undo 2)
+                 (report! {:sceneEditor true :add 2 :delete 1 :undo 2})
+                 (fail! "Undo did not restore semantic scene"))))))
+
+(defn- canvas-screenshot [page]
+  (let [canvas (.locator page "#viewport")]
+    (.screenshot canvas #js {:type "png"})))
+
+(defn- drag-orbit! [page]
+  (-> (.boundingBox (.locator page "#viewport"))
+      (.then (fn [box]
+               (let [cx (+ (.-x box) (/ (.-width box) 2))
+                     cy (+ (.-y box) (/ (.-height box) 2))]
+                 (-> (.move (.-mouse page) cx cy)
+                     (.then (fn [] (.down (.-mouse page))))
+                     (.then (fn [] (.move (.-mouse page) (+ cx 180) (- cy 40) #js {:steps 12})))
+                     (.then (fn [] (.up (.-mouse page))))
+                     (.then (fn [] (sleep 300)))))))))
+
+(defn- verify-orbit-camera [page]
+  (-> (canvas-screenshot page)
+      (.then (fn [before]
+               (-> (drag-orbit! page)
+                   (.then (fn [] (canvas-screenshot page)))
+                   (.then (fn [after]
+                            (if (.equals before after)
+                              (fail! "dragging #viewport did not change the rendered frame (orbit camera may be broken)")
+                              (report! {:orbitCameraChangedFrame true
+                                        :beforeBytes (.-length before) :afterBytes (.-length after)})))))))))
+
+(defn- verify-ui [page base-url console-errors]
+  (-> (.goto page (str base-url "/shell.html") #js {:waitUntil "load"})
+      (.then (fn [] (dom-shape-present? page)))
+      (.then (fn [shape-ok]
+               (if-not shape-ok
+                 (do (fail! "DOM shape incomplete: one or more of #field-weather/#field-terrain/#field-postfx/#field-vegetation/#viewport/#debug-state missing after load")
+                     nil)
+                 (-> (debug-state page)
+                     (.then (fn [initial]
+                              (let [initial-map (js/JSON.parse initial)]
+                                (when-not (= (.-weather initial-map) "overcast")
+                                  (fail! (str "expected initial weather=overcast, got " initial)))
+                                (-> (select-weather-clear! page)
+                                    (.then (fn [] (poll-truthy
+                                                   #(-> (debug-state page)
+                                                        (.then (fn [t] (when (.includes t "\"clear\"") t))))
+                                                   10000)))
+                                    (.then (fn [after]
+                                             (if (and after (.includes after "\"clear\""))
+                                               (report! {:ok true :initial initial :afterSelectWeatherClear after})
+                                               (fail! (str "changing #field-weather to clear did not flow through to #debug-state (controlled-select workaround may be broken); last seen: " after)))))
+                                    (.then (fn [] (verify-scene-editor! page)))
+                                    (.then (fn [] (verify-orbit-camera page)))))))))))
+      (.then (fn []
+               (let [shot (.join path screenshot-dir "m5-ui-screenshot.png")]
+                 (-> (.screenshot page #js {:path shot})
+                     (.then (fn []
+                              (report! {:screenshotPath shot})
+                              (when (seq @console-errors)
+                                (fail! (str "console errors logged: " (pr-str @console-errors))))))))))))
+
+(defn- run-verification [browser base-url]
+  (-> (.newPage browser)
+      (.then (fn [page]
+               (let [console-errors (atom [])]
+                 (.on page "console"
+                      (fn [msg]
+                        (when (= (.type msg) "error")
+                          (swap! console-errors conj (.text msg)))))
+                 (.on page "pageerror" (fn [err] (swap! console-errors conj (str err))))
+                 (-> (harness/check-webgpu-available page (str base-url "/shell.html"))
+                     (.then (fn [availability]
+                              (if (.-available availability)
+                                (verify-ui page base-url console-errors)
+                                (report! {:skipped true :reason (.-reason availability)}))))))))))
+
+(defn -main []
+  (-> (harness/start-static-server public-dir)
+      (.then (fn [server]
+               (-> (harness/with-headless-browser
+                    (fn [browser] (run-verification browser (.-baseUrl server))))
+                   (.then (fn [] ((.-close server)))))))
+      (.catch (fn [e] (js/console.error e) (set! (.-exitCode js/process) 1)))))
+
+(-main)

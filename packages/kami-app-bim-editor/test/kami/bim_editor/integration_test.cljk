@@ -1,0 +1,187 @@
+(ns kami.bim-editor.integration-test
+  (:require [kotoba.test :refer [deftest is]]
+            #?(:clj [kotoba.lang.edn :as edn] :cljs [cljs.reader :as edn])
+            [bim]
+            [ifc.core :as ifc]
+            [pdf.core :as pdf]
+            [kami.bim-editor.integration :as integration]))
+
+(defn model []
+  (let [level (bim/storey {:id 3 :name "Ground" :elevation 0 :height 3
+                           :placement :identity :spaces [] :elements []})]
+    (-> (bim/project "House")
+        (assoc :id "house-1")
+        (update :sites conj
+                (bim/site {:id 1 :name "Site" :placement :identity
+                           :buildings [(bim/building {:id 2 :name "House" :placement :identity
+                                                      :reference-elevation 0 :storeys [level]})]}))
+        (bim/add-element 3 (bim/wall {:id 10 :start [0 0 0] :end [5 0 0]})))))
+
+(deftest publishes-one-coordinated-revision
+  (let [bundle (integration/coordinated-revision
+                {:project (model) :project-id "house-1" :project-name "House"
+                 :revision 4 :events []})]
+    (is (= :coordinated-bim-revision (:kami/document bundle)))
+    (is (= 1 (get-in bundle [:project/federation :federation/schema-version])))
+    (is (= :floor-plan (get-in bundle [:project/drawings :drawing/views 0 :view/kind])))
+    (is (= "IFC4X3_ADD2" (get-in bundle [:project/ifc :ifc/schema])))
+    (is (= :design/revision-published
+           (get-in bundle [:project/cloud-itonami :itonami/event])))
+    (is (= 4 (get-in bundle [:project/cloud-itonami :design/revision])))))
+
+(deftest coordinates-analysis-and-mep-into-every-exchange-view
+  (let [structure {:structural/nodes [{:structural.node/id :n1}]}
+        system {:mep/id :supply :mep/segments [] :mep/fittings [] :mep/equipment []}
+        coordinated (integration/coordinated-model (model) structure [system])
+        bundle (integration/coordinated-revision
+                {:project (model) :project-id "house-1" :project-name "House"
+                 :revision 5 :events [] :structural-model structure
+                 :mep-systems [system]})]
+    (is (= structure (:structural/model coordinated)))
+    (is (= [system] (:mep/systems coordinated)))
+    (is (= structure (get-in bundle [:project/model :structural/model])))
+    (is (= [system] (get-in bundle [:project/model :mep/systems])))))
+
+(deftest reconciles-mep-member-snapshots-with-authored-model
+  (let [segment (assoc (bim/wall {:id 10 :name "Current" :start [0 0 0] :end [5 0 0]})
+                       :kind :mep-segment)
+        project (bim/update-element (model) 3 10 (constantly segment))
+        stale (assoc segment :name "Stale")
+        missing {:id 999 :kind :mep-fitting}
+        system {:mep/id :supply :mep/segments [stale] :mep/fittings [missing]
+                :mep/equipment []}
+        reconciled (first (integration/reconcile-mep-systems project [system]))]
+    (is (= "Current" (get-in reconciled [:mep/segments 0 :name])))
+    (is (empty? (:mep/fittings reconciled)))))
+
+(deftest plans-metadata-first-large-model-view
+  (let [elements [{:id 1 :spatial/bounds {:min [0 0 0] :max [1 1 1]}}
+                  {:id 2 :spatial/bounds {:min [20 20 0] :max [21 21 1]}}]
+        view (integration/large-model-view
+              elements {:min [-1 -1 -1] :max [5 5 5]} [0 0 10] 1000
+              {:cell-size 5 :batch-size 1 :max-resident 10 :max-loads 10})]
+    (is (= [1] (get-in view [:workspace/query :spatial/element-ids])))
+    (is (= 1 (count (get-in view [:workspace/stream-delta :stream/load]))))
+    (is (nil? (get-in view [:workspace/stream-plan 0 :stream/entries 0 :element])))))
+
+(deftest derives-tight-streaming-bounds-without-unbounded-grid-walks
+  (is (= {:min [-2 0 0] :max [4 5 3]}
+         (integration/model-bounds
+          [{:id 1 :spatial/bounds {:min [0 0 0] :max [4 2 3]}}
+           {:id 2 :spatial/bounds {:min [-2 1 1] :max [1 5 2]}}]))))
+
+(deftest reports-integrated-workspace-readiness
+  (let [status (integration/capability-status
+                {:project (model)
+                 :family-catalog {:family-catalog/families {:door {}}}
+                 :structural-model {:structural/nodes []}
+                 :mep-systems [{:mep/id :supply}]
+                 :drawing-set {:drawing/views [{:view/id :plan}]}
+                 :review-topics [{:bcf.topic/guid "topic"}]
+                 :cloud-state {:opencde/projects {}}
+                 :electrical-distribution {:electrical.distribution/total-load-va 1000.0}})]
+    (is (every? true? (vals status)))))
+
+(deftest imports-shared-ifc-spf
+  (let [source (model)
+        text (ifc/write-spf (integration/coordinated-ifc source))]
+    (is (= source (integration/import-ifc-spf text)))))
+
+(deftest binds-cloud-opencde-publication-to-durable-collaboration-head
+  (let [sync {:itonami/event :design/collaboration-synchronized
+              :design/project-id "house-1" :design/head-revision "main-42"}
+        topic {:bcf.topic/guid "clash-1" :bcf.topic/title "Clash"}
+        package (integration/cloud-opencde-publication
+                 sync {:document-id "federated-ifc" :name "House.ifc"
+                       :content "ISO-10303-21;..."
+                       :content-ref "blob://ifc/main-42" :content-hash "sha256:42"
+                       :base-version 4 :timestamp 100
+                       :topic-revisions {"clash-1" 2} :topics [topic]})]
+    (is (= "house-1" (get-in package [:document :project-id])))
+    (is (= "ISO-10303-21;..." (get-in package [:document :content])))
+    (is (= "main-42" (get-in package [:document :design-revision])))
+    (is (= "house-1:main-42:federated-ifc:sha256:42"
+           (get-in package [:document :idempotency-key])))
+    (is (= "application/ifc" (get-in package [:document :media-type])))
+    (is (= 2 (get-in package [:topics 0 :expected-revision])))
+    (is (= "house-1:main-42:bcf:clash-1:2"
+           (get-in package [:topics 0 :idempotency-key])))))
+
+(deftest publishes-non-ifc-analysis-result-documents-with-their-own-media-type
+  (let [sync {:itonami/event :design/collaboration-synchronized
+              :design/project-id "house-1" :design/head-revision "main-42"}
+        package (integration/cloud-opencde-publication
+                 sync {:document-id "electrical-distribution"
+                       :name "House-electrical-distribution.edn"
+                       :content "{:electrical.distribution/total-load-va 1000.0}"
+                       :content-ref "blob://electrical/main-42" :content-hash "sha256:99"
+                       :base-version 0 :timestamp 100
+                       :media-type "application/edn"})]
+    (is (= "application/edn" (get-in package [:document :media-type])))
+    (is (= "house-1:main-42:electrical-distribution:sha256:99"
+           (get-in package [:document :idempotency-key])))))
+
+(deftest advances-and-serializes-replay-safe-cloud-sync
+  (let [initial (assoc (model) :id "house-1" :name "House")
+        first-package (integration/cloud-sync-package nil nil initial "architect")
+        first-envelope (:envelope first-package)
+        checkpoint {:sync/revisions (set (keys (:design/revisions first-envelope)))}
+        changed (assoc initial :description "Issued")
+        second-package (integration/cloud-sync-package (:workspace first-package)
+                                                       checkpoint changed "architect")
+        replay (integration/cloud-sync-package (:workspace second-package)
+                                               checkpoint changed "architect")
+        request (integration/cloud-sync-request
+                 {:base-url "https://itonami.cloud/" :org "acme" :repo "tower"
+                  :cacao "signed"}
+                 (:envelope second-package))
+        publication {:document {:content "ISO-10303-21;..."} :topics []}
+        publication-request
+        (integration/cloud-sync-request
+         {:base-url "https://itonami.cloud/" :org "acme" :repo "tower"
+          :cacao "signed"}
+         (:envelope second-package) publication)]
+    (is (= :design/collaboration-synchronized (:itonami/event first-envelope)))
+    (is (= "editor-1" (get-in second-package [:envelope :design/head-revision])))
+    (is (= (:workspace second-package) (:workspace replay)))
+    (is (= (:envelope second-package) (:envelope replay)))
+    (is (= "https://itonami.cloud/api/acme/tower/design/sync" (:url request)))
+    (is (= "CACAO signed" (get-in request [:headers "authorization"])))
+    (is (= (:envelope second-package)
+           (-> request :body :envelopeEdn edn/read-string)))
+    (is (= publication
+           (-> publication-request :body :publicationEdn edn/read-string)))))
+
+(deftest exports-pdf-and-dxf-through-shared-libraries
+  (let [project (model)
+        drawings {3 {:view/annotations
+                     [{:annotation/id 1 :kind :leader :points [[1 0] [1 1] [2 1]]
+                       :text "Rated wall"}]}}
+        dxf (integration/export-drawing project 3 :dxf drawings)
+        pdf (integration/export-drawing project 3 :pdf drawings)
+        pdf-text (apply str (map char (:content pdf)))]
+    (is (= "application/dxf" (:media-type dxf)))
+    (is (re-find #"0\nSECTION\n2\nENTITIES" (:content dxf)))
+    (is (re-find #"Rated wall" (:content dxf)))
+    (is (= "application/pdf" (:media-type pdf)))
+    (is (= "%PDF" (subs pdf-text 0 4)))
+    (is (re-find #"Rated wall" pdf-text))))
+
+(deftest publishes-persistent-semantic-drawing-set
+  (let [project (model)
+        drawing-set {:drawing/views
+                     [{:view/id "plan-3" :view/kind :floor-plan
+                       :view/name "Ground Plan" :view/storey-id 3}]
+                     :drawing/schedules []
+                     :drawing/sheets
+                     [{:sheet/id "cover" :sheet/number "G-001" :sheet/name "Cover"
+                       :sheet/views []}
+                      {:sheet/id "plan" :sheet/number "A-101" :sheet/name "Floor Plans"
+                       :sheet/views ["plan-3"]
+                       :sheet/title-block {:title-block/project "House"}}]}
+        export (integration/export-drawing project 3 :pdf {} nil drawing-set)
+        parsed (pdf/parse (:content export))
+        pages (pdf/pages parsed)]
+    (is (= 2 (count pages)))
+    (is (= "G-001  Cover" (first (pdf/page-text (:objects parsed) (first pages)))))
+    (is (= "A-101  Floor Plans" (first (pdf/page-text (:objects parsed) (second pages)))))))

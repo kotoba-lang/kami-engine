@@ -1,0 +1,10 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "b6ffbbd72e8bd92c8683902e30b45b482622268455b5fa10d8a176b14baf374a",
+      "sha256": "5cda3a293d4abb3d419028eded8084be400933d6a59a73f60e13ba7a33e184e8",
+      "reason": "Git dependencies on kami-* repositories that are bundled here (kami-atmosphere-scene, kami-postfx-scene, kami-terrain-scene, kami-vegetation-scene) become local roots so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :lint, alias :cljs): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+    }
+  }
+}

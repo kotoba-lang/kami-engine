@@ -1,0 +1,84 @@
+(ns kotoba.amenominaka.application-test
+  "Ported from kami-nv-compat's amenominaka.application-test (ADR-2607100100 M3)."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kotoba.amenominaka.application :as app]
+            [kotoba.amenominaka.extension :as ext]))
+
+(defn make-rec [log id]
+  (let [ticks (atom 0)]
+    {:ext   (reify ext/IExt
+              (ext/on-startup  [_ _]  (swap! log conj (str "up:" id)))
+              (ext/on-update   [_ _]  (swap! ticks inc))
+              (ext/on-shutdown [_]    (swap! log conj (str "down:" id))))
+     :ticks ticks}))
+
+(deftest application-register-lifecycle
+  (testing "re-registering an id replaces it (count stays 1)"
+    (let [a (app/application)]
+      (app/register-extension! a "e" (ext/default-ext))
+      (app/register-extension! a "e" (ext/default-ext))
+      (is (= 1 (app/num-extensions a)))))
+
+  (testing "unregister shuts down a started extension and removes it"
+    (let [log (atom [])
+          a   (app/application)
+          {:keys [ext]} (make-rec log "e")]
+      (app/register-extension! a "e" ext)
+      (app/startup-all a)
+      (is (= 1 (app/num-started a)))
+      (app/unregister-extension! a "e")
+      (is (some #{"down:e"} @log))
+      (is (nil? (app/get-extension a "e")))
+      (is (= 0 (app/num-extensions a)))
+      (app/unregister-extension! a "missing")))
+
+  (testing "update only ticks started extensions"
+    (let [log (atom [])
+          a   (app/application)
+          {:keys [ext ticks]} (make-rec log "e")]
+      (app/register-extension! a "e" ext)
+      (app/update! a 0.1)
+      (is (zero? @ticks))
+      (app/startup-all a)
+      (app/update! a 0.1)
+      (app/update! a 0.1)
+      (is (= 2 @ticks))))
+
+  (testing "get-extension-ids reflects registration"
+    (let [a (app/application)]
+      (app/register-extension! a "x" (ext/default-ext))
+      (app/register-extension! a "y" (ext/default-ext))
+      (is (= ["x" "y"] (sort (app/get-extension-ids a))))))
+
+  (testing "topological startup respects depends-on (parents before children)"
+    (let [a (app/application)]
+      (app/register-extension! a "a" (ext/default-ext))
+      (app/register-extension! a "b" (ext/default-ext)
+                               {:dependencies {"a" {}}})
+      (is (= ["a" "b"] (app/startup-all a)))))
+
+  (testing "shutdown reverses startup order"
+    (let [log (atom [])
+          a   (app/application)
+          {ext-a :ext} (make-rec log "a")
+          {ext-b :ext} (make-rec log "b")]
+      (app/register-extension! a "a" ext-a)
+      (app/register-extension! a "b" ext-b {:dependencies {"a" {}}})
+      (app/startup-all a)
+      (reset! log [])
+      (app/shutdown-all a)
+      (is (= ["down:b" "down:a"] @log))))
+
+  (testing "a cycle throws on startup"
+    (let [a (app/application)]
+      (app/register-extension! a "a" (ext/default-ext) {:dependencies {"b" {}}})
+      (app/register-extension! a "b" (ext/default-ext) {:dependencies {"a" {}}})
+      (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core/ExceptionInfo)
+                   (app/startup-all a))))))
+
+(deftest global-app-singleton-test
+  (app/reset-app!)
+  (let [a1 (app/get-app)
+        a2 (app/get-app)]
+    (is (identical? a1 a2)))
+  (app/reset-app!))

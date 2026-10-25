@@ -1,0 +1,19 @@
+{
+  "name": "kami-app-amenominaka",
+  "private": true,
+  "version": "0.1.0",
+  "description": "kotoba amenominaka app shell — M2 WebGPU render-IR browser smoke test, M5 interactive UI shell (ADR-2607100100).",
+  "scripts": {
+    "compile:m2-demo": "amu compile --target wasm32-browser m2-demo",
+    "compile:shell": "amu compile --target wasm32-browser shell",
+    "test:clj": "kbb -M:test"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.28.20",
+    "playwright": "^1.48.0"
+  }
+}

@@ -1,0 +1,75 @@
+(ns vegetation-scene-test
+  "Tests for `vegetation-scene`, ported 1:1 from the original
+  `kami-vegetation-scene` Rust crate's `#[cfg(test)] mod tests` (deleted
+  in kotoba-lang/kami-engine PR #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [vegetation-scene :as vegetation-scene]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'vegetation-scene)))))
+
+;; Rust: shipped_has_all_profiles
+(deftest shipped-has-all-profiles
+  (let [p (vegetation-scene/shipped-profiles)]
+    (is (= 7 (count p)))
+    (doseq [name vegetation-scene/all-profile-names]
+      (is (contains? p name) (str name " present in EDN")))))
+
+;; Rust: unknown_builtin_profile_is_none
+(deftest unknown-builtin-profile-is-none
+  (is (nil? (vegetation-scene/builtin-profile "does-not-exist"))))
+
+;; Rust: unknown_profile_from_edn_is_an_error
+(deftest unknown-profile-from-edn-is-an-error
+  (let [err (try
+              (vegetation-scene/profile-from-edn vegetation-scene/vegetation-edn "bamboo")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :profile-not-found (:vegetation-scene/error (ex-data err))))))
+
+;; Rust: non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try
+              (vegetation-scene/profiles-from-edn "42")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :not-a-map (:vegetation-scene/error (ex-data err))))))
+
+;; Rust: missing_profiles_table_is_an_error
+(deftest missing-profiles-table-is-an-error
+  (let [err (try
+              (vegetation-scene/profiles-from-edn "{:other 1}")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :no-profiles (:vegetation-scene/error (ex-data err))))))
+
+;; Rust: missing_key_falls_back_to_default
+(deftest missing-key-falls-back-to-default
+  (testing "a profile that only sets :leaf-count: every other field inherits the engine moss() fallback"
+    (let [p (vegetation-scene/profiles-from-edn "{:vegetation/profiles {:p {:leaf-count 9}}}")
+          spec (get p "p")
+          d vegetation-scene/profile-spec-defaults]
+      (is (= 9 (:leaf-count spec)))
+      (is (= (:leaf-size d) (:leaf-size spec)) "absent -> default leaf-size")
+      (is (= (:canopy d) (:canopy spec)) "absent -> default canopy")
+      (is (= (:stem-radius-base d) (:stem-radius-base spec)) "absent -> default stem"))))
+
+;; Rust: int_leaf_count_coerces_to_u32
+(deftest int-leaf-count-coerces-to-u32
+  (let [p (vegetation-scene/profiles-from-edn "{:vegetation/profiles {:p {:leaf-count 6}}}")]
+    (is (= 6 (:leaf-count (get p "p"))))))
+
+;; Rust: int_field_coerces_to_float
+(deftest int-field-coerces-to-float
+  (testing "`:leaf-size 1` (an int) coerces to 1.0 via scene/num"
+    (let [p (vegetation-scene/profiles-from-edn "{:vegetation/profiles {:p {:leaf-size 1}}}")]
+      (is (= 1.0 (:leaf-size (get p "p")))))))
+
+;; Rust: canopy_id_round_trips
+(deftest canopy-id-round-trips
+  (doseq [c [:blade :fan :dome :cone :radial :column :carpet]]
+    (is (= c (vegetation-scene/canopy-from-id (vegetation-scene/id-from-canopy c))))))

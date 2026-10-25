@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Kami BIM Editor</title><style>aside:last-child { border-left: 1px solid #2d3e68; border-right: 0; }
+.stats { position: absolute; right: 14px; bottom: 14px; padding: 8px; background: #08101dcc; }
+* { box-sizing: border-box; }
+.primary { background: #7da2f3; color: #071226; font-weight: 700; }
+.viewport { position: relative; }
+body { margin: 0; height: 100vh; display: grid; grid-template-rows: 52px 1fr; font-family: Inter,system-ui; background: #09101c; color: #e7ecfa; }
+.selected { border-color: #9fb9ff; background: #314a82; }
+label { display: grid; gap: 4px; margin: 9px 0; }
+.snap-marker { position: absolute; width: 12px; height: 12px; transform: translate(-50%,-50%) rotate(45deg); border: 2px solid #fbbf24; background: #111827aa; pointer-events: none; }
+h2 { font-size: 11px; margin-top: 20px; text-transform: uppercase; letter-spacing: .1em; color: #a7b9e0; }
+button,input,select { width: 100%; margin: 5px 0; padding: 8px; background: #20315b; border: 1px solid #526fa9; border-radius: 5px; color: #e7ecfa; }
+.selection-box { position: absolute; border: 1px solid #60a5fa; background: #3b82f633; pointer-events: none; }
+.drag-measure { transform: translateX(-50%); color: #ffd28a; font-size: 12px; top: 18px; background: #09101cee; padding: 7px 10px; position: absolute; border: 1px solid #f59e0b; pointer-events: none; left: 50%; }
+main { display: grid; grid-template-columns: 260px 1fr 300px; min-height: 0; }
+header .spacer { flex: 1; }
+#gpu-canvas { width: 100%; height: 100%; display: block; }
+#gpu-status { position: absolute; left: 50%; top: 45%; transform: translate(-50%,-50%); color: #ffb0b0; }
+header button,header select { width: auto; white-space: nowrap; }
+aside { padding: 16px; overflow-y: auto; background: #111a34; border-right: 1px solid #2d3e68; }
+.viewport-help { position: absolute; left: 14px; bottom: 14px; padding: 8px; background: #08101dcc; color: #b9c8e8; font-size: 11px; pointer-events: none; }
+header { padding: 0 16px; display: flex; align-items: center; gap: 8px; overflow-x: auto; background: #121c38; }
+button { cursor: pointer; text-align: left; }</style></head>
+  <body>
+    <header><strong>KAMI BIM EDITOR</strong><span>Semantic building workspace</span><span class="spacer"></span><select id="profile" aria-label="Interaction profile">
+      <option value="revit">Revit</option>
+      <option value="archicad">Archicad</option>
+      <option value="vectorworks">Vectorworks</option>
+    </select><button id="undo">Undo</button><button id="redo">Redo</button><button id="save-project">Save</button><button id="load-project">Load</button><button id="import">Import</button><input id="import-file" type="file" accept=".edn,.kami-bim.edn" style="display:none;"><button id="export">Export Project</button><button id="export-ifc">Export IFC</button><button id="import-ifc">Import IFC</button><input id="import-ifc-file" type="file" accept=".ifc" style="display:none;"><button id="publish-opencde">Publish OpenCDE</button><button id="export-bcf">Export BCF</button><button id="refresh-stream">Refresh LOD</button><span id="workspace-status">Workspace ready</span><select id="drawing-kind" aria-label="Drawing kind">
+      <option value="plan">Plan</option>
+      <option value="section">Section</option>
+      <option value="elevation">Elevation</option>
+      <option value="sheet">Sheet</option>
+    </select><select id="drawing-format" aria-label="Drawing format">
+      <option value="svg">SVG</option>
+      <option value="pdf">PDF</option>
+      <option value="dxf">DXF</option>
+    </select><button id="export-drawing">Export Drawing</button></header>
+    <main>
+      <aside>
+        <h2>Elements</h2>
+        <p id="profile-hint">WA Wall · DR Door · WN Window · LL Level · FL Floor</p>
+        <button class="primary" id="add-wall">＋ Wall</button>
+        <button id="add-slab">＋ Floor slab</button>
+        <label>Roof width (m)<input id="roof-width" type="number" min="0.1" step="0.5" value="8"></label>
+        <label>Roof depth (m)<input id="roof-depth" type="number" min="0.1" step="0.5" value="6"></label>
+        <label>Roof slope (deg)<input id="roof-slope" type="number" min="1" max="89" step="1" value="30"></label>
+        <label>Roof thickness (m)<input id="roof-thickness" type="number" min="0.01" step="0.05" value="0.2"></label>
+        <button id="add-roof">＋ Gable roof (RF)</button>
+        <label>Stair width (m)<input id="stair-width" type="number" min="0.1" step="0.1" value="1.2"></label>
+        <label>Stair run (m)<input id="stair-run" type="number" min="0.1" step="0.1" value="3.6"></label>
+        <label>Stair rise (m)<input id="stair-rise" type="number" min="0.1" step="0.1" value="3.2"></label>
+        <label>Risers<input id="stair-risers" type="number" min="2" step="1" value="18"></label>
+        <button id="add-stair">＋ Straight stair (ST)</button>
+        <label>Railing path (x,y,z; …)<input id="railing-path" value="0,0,0;4,0,0;4,3,0"></label>
+        <label>Railing height (m)<input id="railing-height" type="number" min="0.1" step="0.1" value="1.1"></label>
+        <label>Post spacing (m)<input id="railing-spacing" type="number" min="0.1" step="0.1" value="1.0"></label>
+        <button id="add-railing">＋ Path railing (RL)</button>
+        <label>Curtain width (m)<input id="curtain-width" type="number" min="0.1" step="0.5" value="8"></label>
+        <label>Curtain height (m)<input id="curtain-height" type="number" min="0.1" step="0.5" value="4"></label>
+        <label>Curtain columns<input id="curtain-columns" type="number" min="1" step="1" value="4"></label>
+        <label>Curtain rows<input id="curtain-rows" type="number" min="1" step="1" value="2"></label>
+        <button id="add-curtain">＋ Curtain wall (CW)</button>
+        <button id="add-door">＋ Door in selected wall</button>
+        <button id="add-window">＋ Window in selected wall</button>
+        <h2>Families</h2>
+        <label>Definition<select id="family-definition">
+          <option value="casework">Casework</option>
+        </select></label>
+        <label>Type<select id="family-type"></select></label>
+        <label>Family ID<input id="family-id" value="casework"></label>
+        <label>Family name<input id="family-name" value="Casework"></label>
+        <label>Category<select id="family-category"><option value="furniture">furniture</option><option value="door">door</option><option value="window">window</option><option value="equipment">equipment</option><option value="generic-model">generic-model</option></select></label>
+        <label>Type width (m)<input id="family-width" type="number" min="0.01" step="0.1" value="0.8"></label>
+        <label>Depth (m)<input id="family-depth" type="number" value="0.6"></label>
+        <label>Height (m)<input id="family-height" type="number" value="0.9"></label>
+        <label>Material<input id="family-material" value="Oak"></label>
+        <label>Shared family<input id="family-shared" type="checkbox"></label>
+        <label>Parameters (EDN)<textarea id="family-parameters" rows="6">{}</textarea></label>
+        <label>Lookup tables (EDN)<textarea id="family-lookup-tables" rows="5">{}</textarea></label>
+        <label>Formulas (EDN)<textarea id="family-formulas" rows="3">{}</textarea></label>
+        <label>Reference planes (EDN)<textarea id="family-reference-planes" rows="3">{}</textarea></label>
+        <label>Constraints (EDN)<textarea id="family-constraints" rows="3">[]</textarea></label>
+        <label>Sketches (EDN)<textarea id="family-sketches" rows="5">{}</textarea></label>
+        <label>Family template (EDN)<textarea id="family-template" rows="8">{}</textarea></label>
+        <button id="save-family-definition">Save family definition</button>
+        <label>Type name<input id="family-type-name" value="Standard"></label>
+        <button id="save-family-type">Save family type</button>
+        <label>Display detail<select id="family-detail">
+          <option value="coarse">Coarse</option>
+          <option value="medium" selected>Medium</option>
+          <option value="fine">Fine</option>
+        </select></label>
+        <button class="primary" id="add-family-instance">＋ Family instance</button>
+        <div id="family-status">Family ready</div>
+        <h2>Engineering</h2>
+        <label>Structural role<select id="structural-role">
+          <option value="beam">Beam</option>
+          <option value="column">Column</option>
+          <option value="shear-wall">Shear wall</option>
+          <option value="diaphragm">Diaphragm</option>
+        </select></label>
+        <label>Section width (m)<input id="structural-width" type="number" min="0.01" value="0.25"></label>
+        <label>Section depth (m)<input id="structural-depth" type="number" min="0.01" value="0.5"></label>
+        <button id="assign-structural-role">Assign selected structural role</button>
+        <button id="generate-structural-model">Generate analytical model</button>
+        <label>Floor load (kPa)<input id="structural-area-load" type="number" min="0" value="3"></label>
+        <label>Wind pressure (kPa)<input id="structural-wind-pressure" type="number" min="0" value="1"></label>
+        <label>Seismic coefficient<input id="structural-seismic-coefficient" type="number" min="0.001" step="0.05" value="0.2"></label>
+        <button id="generate-structural-loads">Generate design loads</button>
+        <label>Deformation scale<input id="structural-deformation-scale" type="number" min="0" value="100"></label>
+        <button id="run-structural-analysis">Run ULS + show results</button>
+        <button id="run-3d-frame-analysis">Run six-DOF 3D frame analysis</button>
+        <label>Structural span (m)<input id="structural-span" type="number" value="6"></label>
+        <label>Axial load (kN)<input id="structural-load" type="number" value="100"></label>
+        <button id="analyze-structure">Analyze member</button>
+        <label>Pipe start<input id="pipe-start" value="0,3,2.5"></label>
+        <label>Pipe end<input id="pipe-end" value="8,3,2.5"></label>
+        <label>Pipe diameter (m)<input id="pipe-diameter" type="number" value="0.1"></label>
+        <label>Design flow (L/s)<input id="pipe-flow" type="number" min="0" value="5"></label>
+        <label>Gravity slope (%)<input id="pipe-slope" type="number" min="0" step="0.1" value="0"></label>
+        <button id="route-pipe">Route pipe</button>
+        <div id="engineering-status">Ready</div>
+        <h3>Branched pipe network</h3>
+        <label>Source<input id="mep-network-source" value="0,2,2.5"></label>
+        <label>Junction<input id="mep-network-junction" value="4,2,2.5"></label>
+        <label>Terminal A<input id="mep-network-terminal-a" value="8,1,2.5"></label>
+        <label>Terminal B<input id="mep-network-terminal-b" value="8,4,2.5"></label>
+        <label>Terminal A demand (L/s)<input id="mep-network-demand-a" type="number" min="0.001" value="3"></label>
+        <label>Terminal B demand (L/s)<input id="mep-network-demand-b" type="number" min="0.001" value="2"></label>
+        <label>Maximum velocity (m/s)<input id="mep-network-max-velocity" type="number" min="0.1" value="2"></label>
+        <button id="design-mep-network">Design + route branched network</button>
+        <h3>Closed-loop pipe network</h3>
+        <label>Source<input id="closed-loop-source" value="0,2,2.5"></label>
+        <label>Left<input id="closed-loop-left" value="4,0,2.5"></label>
+        <label>Right<input id="closed-loop-right" value="4,4,2.5"></label>
+        <label>Terminal<input id="closed-loop-terminal" value="8,2,2.5"></label>
+        <label>Pipe diameter (m)<input id="closed-loop-diameter" type="number" min="0.01" value="0.1"></label>
+        <label>Source pressure (kPa)<input id="closed-loop-source-pressure" type="number" min="0" value="300"></label>
+        <label>Terminal demand (L/s)<input id="closed-loop-demand" type="number" min="0.001" value="4"></label>
+        <button id="design-closed-loop-mep-network">Solve closed-loop network</button>
+        <h3>Supply-air duct</h3>
+        <label>Duct start<input id="duct-start" value="0,1,2.8"></label>
+        <label>Duct end<input id="duct-end" value="8,5,2.8"></label>
+        <label>Design airflow (m³/s)<input id="duct-flow" type="number" min="0.001" step="0.1" value="1.2"></label>
+        <label>Maximum air velocity (m/s)<input id="duct-max-velocity" type="number" min="0.1" value="6"></label>
+        <button id="route-duct">Size + route rectangular duct</button>
+        <h3>Electrical panel</h3>
+        <label>Panel location<input id="panel-point" value="1,1,1.5"></label>
+        <label>Lighting load (VA)<input id="panel-load-a" type="number" min="1" value="2300"></label>
+        <label>Lighting run (m)<input id="panel-length-a" type="number" min="0.1" value="30"></label>
+        <label>Socket load (VA)<input id="panel-load-b" type="number" min="1" value="1800"></label>
+        <label>Socket run (m)<input id="panel-length-b" type="number" min="0.1" value="20"></label>
+        <label>Equipment load (VA)<input id="panel-load-c" type="number" min="1" value="1500"></label>
+        <label>Equipment run (m)<input id="panel-length-c" type="number" min="0.1" value="15"></label>
+        <label>Demand factor (%)<input id="panel-demand-factor" type="number" min="1" max="100" value="80"></label>
+        <label>Main rating (A)<input id="panel-main-rating" type="number" min="1" value="63"></label>
+        <button id="design-electrical-panel">Design panel + circuits</button>
+        <h3>Radial electrical distribution</h3>
+        <label>Topology (EDN: :root-panel/:panels/:feeders/:protective-device-catalog)<textarea id="electrical-distribution-topology" rows="10">{:root-panel :main
+ :panels [{:id :main :phases [:l1 :l2 :l3] :line-voltage-v 400.0 :main-rating-a 100.0 :circuits []}]
+ :feeders []
+ :protective-device-catalog [{:id :mccb-63 :rating-a 63.0 :breaking-capacity-a 10000.0 :instantaneous-trip-multiple 10.0}]}</textarea></label>
+        <button class="primary" id="analyze-electrical-distribution">Analyze radial distribution</button>
+        <div id="electrical-distribution-status">No distribution analysis</div>
+        <label>Equipment kind<select id="mep-equipment-kind">
+          <option value="pump">Pump</option>
+          <option value="air-terminal">Air terminal</option>
+          <option value="fixture">Plumbing fixture</option>
+        </select></label>
+        <label>Equipment point<input id="mep-equipment-point" value="0,3,2.5"></label>
+        <label>Connector domain<select id="mep-connector-domain">
+          <option value="piping">Piping</option>
+          <option value="hvac">HVAC</option>
+        </select></label>
+        <label>Connector size (m)<input id="mep-connector-size" type="number" min="0.001" value="0.1"></label>
+        <button id="add-mep-equipment">Add equipment / terminal</button>
+        <label>Connector A ID<input id="mep-connector-a"></label>
+        <label>Connector B ID<input id="mep-connector-b"></label>
+        <button id="connect-mep-elements">Connect MEP elements</button>
+        <div id="structural-model-status">No analytical model</div>
+        <h2>Rooms</h2>
+        <label>Width (m)<input id="room-width" type="number" value="4"></label>
+        <label>Depth (m)<input id="room-depth" type="number" value="3"></label>
+        <button id="add-room">＋ Room</button>
+        <button id="auto-rooms">Generate enclosed rooms (RM)</button>
+        <div id="rooms"></div>
+        <label>Room name<input id="room-name" value="Room"></label>
+        <label>Use<select id="room-category"><option value="residential">residential</option><option value="office">office</option><option value="circulation">circulation</option><option value="service">service</option><option value="mechanical-room">mechanical-room</option><option value="other">other</option></select></label>
+        <button id="apply-room">Apply room properties</button>
+        <button id="delete-room">Delete room</button>
+        <h2>Levels</h2>
+        <button id="add-level">＋ Add level</button>
+        <div id="levels"></div>
+        <h2>Model tree</h2>
+        <div id="tree"></div>
+        <h2>Quantity schedule</h2>
+        <button id="export-schedule">Export CSV</button>
+        <div id="quantity-schedule"></div>
+        <h2>Drawing annotations</h2>
+        <label>View top<input id="view-range-top" type="number" step="0.1" value="3.2"></label>
+        <label>Cut plane<input id="view-range-cut" type="number" step="0.1" value="1.2"></label>
+        <label>View bottom<input id="view-range-bottom" type="number" step="0.1" value="0"></label>
+        <label>View depth<input id="view-range-depth" type="number" step="0.1" value="-1"></label>
+        <button id="apply-view-range">Apply view range</button>
+        <label>Kind<select id="drawing-annotation-kind">
+          <option value="dimension">Dimension</option>
+          <option value="tag">Tag</option>
+          <option value="leader">Leader note</option>
+          <option value="revision-cloud">Revision cloud</option>
+        </select></label>
+        <label>Points (x,y; …)<input id="drawing-annotation-points" value="0,0;6,0"></label>
+        <label>Text<input id="drawing-annotation-text" value="Note"></label>
+        <label>Revision<input id="drawing-annotation-revision" value="P01"></label>
+        <label>Tag family<select id="annotation-family"></select></label>
+        <button id="auto-tag-elements">Auto-tag matching elements</button>
+        <button class="primary" id="save-drawing-annotation">Add annotation</button>
+        <button id="new-drawing-annotation">New annotation</button>
+        <div id="drawing-annotations"></div>
+        <div id="drawing-annotation-status">Annotations ready</div>
+        <h2>Print setup</h2>
+        <label>Paper<select id="print-paper"><option value="a0">a0</option><option value="a1" selected>a1</option><option value="a2">a2</option><option value="a3">a3</option><option value="a4">a4</option><option value="letter">letter</option><option value="legal">legal</option><option value="tabloid">tabloid</option></select></label>
+        <label>Orientation<select id="print-orientation">
+          <option value="landscape">Landscape</option>
+          <option value="portrait">Portrait</option>
+        </select></label>
+        <label>Scale denominator<input id="print-scale" type="number" min="1" value="100"></label>
+        <label>Color<select id="print-color">
+          <option value="color">Color</option>
+          <option value="grayscale">Grayscale</option>
+          <option value="black-lines">Black lines</option>
+        </select></label>
+        <button id="apply-print-setting">Apply print setup</button>
+        <div id="print-status">Print ready</div>
+        <h2>Drawing sheets</h2>
+        <label>Organization<input id="title-block-organization" value="Kotoba Architects"></label>
+        <label>Client<input id="title-block-client" value="Client"></label>
+        <label>Drawn by<input id="title-block-drawn-by" value="Designer"></label>
+        <label>Checked by<input id="title-block-checked-by" value="Checker"></label>
+        <button class="primary" id="generate-drawing-set">Generate plans, sections + sheet</button>
+        <div id="drawing-set-status">No drawing set</div>
+        <h2>Clash Detection</h2>
+        <button class="primary" id="run-clashes">Run Clash Check</button>
+        <button id="export-clashes">Export Clash CSV</button>
+        <div id="clash-results">No clashes</div>
+      </aside>
+      <section class="viewport">
+        <canvas id="gpu-canvas" aria-label="BIM WebGPU viewport"></canvas>
+        <div id="gpu-status">Initializing WebGPU…</div>
+        <div class="viewport-help">Click: select · Orbit tool: drag view · Move tool: drag element · Esc: cancel</div>
+        <div class="drag-measure" id="drag-measure" style="display:none;"></div>
+        <div class="snap-marker" id="snap-marker" style="display:none;"></div>
+        <div class="selection-box" id="selection-box" style="display:none;"></div>
+        <div class="stats" id="stats">Loading model…</div>
+      </section>
+      <aside>
+        <h2 id="inspector-title">Selected element</h2>
+        <label>Name<input id="name"></label>
+        <label>Length (m)<input id="length" type="number" step="0.1"></label>
+        <label>Height (m)<input id="height" type="number" step="0.1"></label>
+        <label>Thickness (m)<input id="thickness" type="number" step="0.05"></label>
+        <label>Material<input id="material"></label>
+        <button class="primary" id="apply">Apply properties</button>
+        <h2>Transform</h2>
+        <label>Viewport tool<select id="viewport-tool">
+          <option value="orbit">Orbit</option>
+          <option value="move">Move selected</option>
+          <option value="box">Box select</option>
+        </select></label>
+        <label>ΔX (m)<input id="move-x" type="number" step="0.1" value="1"></label>
+        <label>ΔY (m)<input id="move-y" type="number" step="0.1" value="0"></label>
+        <label>ΔZ (m)<input id="move-z" type="number" step="0.1" value="0"></label>
+        <button class="primary" id="move-element">Move (MV)</button>
+        <button id="copy-element">Copy (CO)</button>
+        <label>Snapping<input id="snap-enabled" type="checkbox" checked></label>
+        <label>Grid (m)<input id="snap-grid" type="number" min="0.001" step="0.1" value="0.5"></label>
+        <label>Tolerance (m)<input id="snap-tolerance" type="number" min="0.001" step="0.01" value="0.15"></label>
+        <div id="snap-status">Snap ready</div>
+        <label>Angle (deg)<input id="transform-angle" type="number" step="1" value="90"></label>
+        <label>Pivot X<input id="pivot-x" type="number" step="0.1" value="0"></label>
+        <label>Pivot Y<input id="pivot-y" type="number" step="0.1" value="0"></label>
+        <label>Pivot Z<input id="pivot-z" type="number" step="0.1" value="0"></label>
+        <button id="rotate-element">Rotate (RO)</button>
+        <label>Mirror normal X<input id="mirror-x" type="number" step="0.1" value="1"></label>
+        <label>Mirror normal Y<input id="mirror-y" type="number" step="0.1" value="0"></label>
+        <label>Mirror normal Z<input id="mirror-z" type="number" step="0.1" value="0"></label>
+        <button id="mirror-element">Mirror (MM)</button>
+        <label>Array kind<select id="array-kind">
+          <option value="linear">Linear</option>
+          <option value="radial">Radial</option>
+        </select></label>
+        <label>Copies<input id="array-count" type="number" min="1" max="100" step="1" value="3"></label>
+        <button id="array-element">Array (AR)</button>
+        <h2>Modify geometry</h2>
+        <label>Align axis<select id="align-axis">
+          <option value="x">X</option>
+          <option value="y">Y</option>
+          <option value="z">Z</option>
+        </select></label>
+        <label>Reference anchor<select id="align-reference-anchor">
+          <option value="min">Minimum</option>
+          <option value="center">Center</option>
+          <option value="max">Maximum</option>
+        </select></label>
+        <label>Moving anchor<select id="align-moving-anchor">
+          <option value="min">Minimum</option>
+          <option value="center">Center</option>
+          <option value="max">Maximum</option>
+        </select></label>
+        <button id="align-elements">Align (AL)</button>
+        <label>Wall offset (m)<input id="wall-offset" type="number" step="0.1" value="0.2"></label>
+        <button id="offset-walls">Offset walls (OF)</button>
+        <button id="trim-walls">Trim / Extend walls (TR)</button>
+        <label>Join style<select id="wall-join-style">
+          <option value="butt">Butt / clean solids</option>
+          <option value="centerline">Centerline</option>
+        </select></label>
+        <label>Join priority<select id="wall-join-priority">
+          <option value="left">First selected</option>
+          <option value="right">Second selected</option>
+        </select></label>
+        <button id="join-walls">Join walls (WJ)</button>
+        <label>Wall layers (material:thickness:category)<input id="wall-layers" type="text" value="Gypsum:0.013:gypsum,Insulation:0.09:insulation,Concrete:0.20:concrete"></label>
+        <button id="apply-wall-layers">Apply wall layers (WL)</button>
+        <label>Slab layers (material:thickness:category)<input id="slab-layers" type="text" value="Finish:0.02:finish,Concrete:0.20:concrete"></label>
+        <button id="apply-slab-layers">Apply slab layers (SL)</button>
+        <label>Slab vertex elevations (m)<input id="slab-elevations" type="text" value="0,0,0,0"></label>
+        <button id="apply-slab-shape">Apply slab shape (SE)</button>
+        <h2>Cloud collaboration</h2>
+        <label>cloud-itonami URL<input id="cloud-base-url" type="url" value="https://itonami.cloud"></label>
+        <label>Organization<input id="cloud-org" value="gftdcojp"></label>
+        <label>Repository<input id="cloud-repo" value="cloud-itonami"></label>
+        <label>CACAO capability token<input id="cloud-cacao" type="password" autocomplete="off"></label>
+        <label>Shaft X (m)<input id="shaft-x" type="number" step="0.1" value="3"></label>
+        <label>Shaft Y (m)<input id="shaft-y" type="number" step="0.1" value="2"></label>
+        <label>Shaft width (m)<input id="shaft-width" type="number" min="0.1" step="0.1" value="1"></label>
+        <label>Shaft depth (m)<input id="shaft-depth" type="number" min="0.1" step="0.1" value="1"></label>
+        <button id="add-shaft-opening">Add shaft opening (SO)</button>
+        <label>Hosted offset (m)<input id="host-offset" type="number" min="0" step="0.1" value="1"></label>
+        <label>Hosted sill (m)<input id="host-sill" type="number" min="0" step="0.1" value="0"></label>
+        <button id="rehost-element">Rehost door/window (RH)</button>
+        <div id="authoring-status">Modify ready</div>
+        <button id="delete">Delete element</button>
+      </aside>
+    </main>
+    <span id="debug-state" style="display:none;"></span>
+    <script src="./js/app.js"></script>
+  </body>
+</html>

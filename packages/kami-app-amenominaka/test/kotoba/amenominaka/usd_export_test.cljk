@@ -1,0 +1,119 @@
+(ns kotoba.amenominaka.usd-export-test
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kotoba.lang.text :as str]
+            [bim]
+            [kotoba.amenominaka.scene :as amenominaka-scene]
+            [kotoba.amenominaka.usd-export :as usd-export]))
+
+(defn- sample-building
+  "Same fixture as kotoba.amenominaka.scene-test: one exterior wall,
+  axis [0,0,0]->[10,0,0], rectangle profile thickness=0.2 height=3.5."
+  []
+  (-> (bim/project "Quarry Walk Lodge")
+      (update :sites conj
+              (bim/site
+               {:id 1 :name "Site 1" :geo nil :placement :identity
+                :buildings
+                [(bim/building
+                  {:id 2 :name "Lodge" :placement :identity :reference-elevation 0.0
+                   :storeys
+                   [(bim/storey
+                     {:id 3 :name "L1" :elevation 0.0 :height 3.5 :placement :identity
+                      :spaces []
+                      :elements
+                      [(bim/element
+                        {:id 4 :kind :wall :name "Wall 1" :global-id "GUID-0004"
+                         :placement :identity
+                         :geometry (bim/axis-sweep-geometry
+                                    [[0.0 0.0 0.0] [10.0 0.0 0.0]]
+                                    (bim/rectangle-profile 0.2 3.5))})]})]})]}))))
+
+(deftest axis-sweep-rectangle->box-mesh-test
+  (testing "hand-computed box mesh for the sample wall (axis along +X, thickness in Y, height in Z)"
+    (let [mesh (usd-export/axis-sweep-rectangle->box-mesh
+                {:axis [[0.0 0.0 0.0] [10.0 0.0 0.0]]
+                 :profile {:kind :rectangle :thickness 0.2 :height 3.5}})]
+      (is (= [[0.0 -0.1 0.0] [0.0 0.1 0.0] [10.0 0.1 0.0] [10.0 -0.1 0.0]
+              [0.0 -0.1 3.5] [0.0 0.1 3.5] [10.0 0.1 3.5] [10.0 -0.1 3.5]]
+             (:points mesh)))
+      (is (= 8 (count (:points mesh))))
+      (is (= [0 3 2 1  4 5 6 7  0 1 5 4  2 3 7 6  3 0 4 7  1 2 6 5]
+             (:face-vertex-indices mesh)))
+      (is (= [4 4 4 4 4 4] (:face-vertex-counts mesh))))))
+
+(deftest scene->usda-building-only-test
+  (let [scene (amenominaka-scene/compose {:building (sample-building)})
+        usda (usd-export/scene->usda scene)]
+    (testing "well-formed usda layer header"
+      (is (str/starts-with? usda "#usda 1.0\n"))
+      (is (str/includes? usda "defaultPrim = \"Quarry_Walk_Lodge\""))
+      (is (str/includes? usda "upAxis = \"Z\"")))
+    (testing "hierarchy: project -> site -> building -> storey -> mesh"
+      (is (str/includes? usda "def Xform \"Quarry_Walk_Lodge\""))
+      (is (str/includes? usda "def Xform \"site_1\""))
+      (is (str/includes? usda "def Xform \"building_2\""))
+      (is (str/includes? usda "def Xform \"storey_3\""))
+      (is (str/includes? usda "def Mesh \"wall_4\"")))
+    (testing "real mesh geometry, not a placeholder"
+      (is (str/includes? usda "point3f[] points"))
+      (is (str/includes? usda "(0.0, -0.1, 0.0)"))
+      (is (str/includes? usda "int[] faceVertexIndices"))
+      (is (str/includes? usda "int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]")))
+    (testing "no Environment scope when no presets were requested"
+      (is (not (str/includes? usda "Environment"))))
+    (testing "balanced braces (well-formed block nesting)"
+      (is (= (count (re-seq #"\{" usda)) (count (re-seq #"\}" usda)))))))
+
+(deftest scene->usda-full-scene-with-environment-test
+  (let [scene (amenominaka-scene/compose
+               {:building (sample-building)
+                :weather "overcast"
+                :vegetation ["grass"]
+                :terrain "plains"
+                :postfx "nintendo"})
+        usda (usd-export/scene->usda scene)]
+    (testing "Environment scope present with all four domains recorded"
+      (is (str/includes? usda "def Scope \"Environment\""))
+      (is (str/includes? usda "string kotobaAtmosphere"))
+      (is (str/includes? usda "string kotobaVegetation"))
+      (is (str/includes? usda "string kotobaTerrain"))
+      (is (str/includes? usda "string kotobaPostfx")))
+    (testing "still balanced"
+      (is (= (count (re-seq #"\{" usda)) (count (re-seq #"\}" usda)))))))
+
+(deftest scene->usda-non-rectangle-geometry-is-honest-placeholder-test
+  (let [building (-> (bim/project "P")
+                      (update :sites conj
+                              (bim/site
+                               {:id 1 :name "S" :geo nil :placement :identity
+                                :buildings
+                                [(bim/building
+                                  {:id 2 :name "B" :placement :identity :reference-elevation 0.0
+                                   :storeys
+                                   [(bim/storey
+                                     {:id 3 :name "L1" :elevation 0.0 :height 3.0 :placement :identity
+                                      :spaces []
+                                      :elements
+                                      [(bim/element
+                                        {:id 5 :kind :column :name "Column 1" :global-id "GUID-0005"
+                                         :placement :identity
+                                         :geometry (bim/no-geometry)})]})]})]})))
+        scene (amenominaka-scene/compose {:building building})
+        usda (usd-export/scene->usda scene)]
+    (testing "no-geometry element exports as an honest Xform placeholder, not a fake mesh"
+      (is (str/includes? usda "def Xform \"column_5\""))
+      (is (not (str/includes? usda "def Mesh \"column_5\"")))
+      (is (str/includes? usda "string kotobaGeometryKind = \"none\"")))))
+
+(deftest scene->usda-invalid-scene-throws-test
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core/ExceptionInfo)
+               (usd-export/scene->usda {}))))
+
+(deftest default-material-mtlx-test
+  (let [mtlx (usd-export/default-material-mtlx)]
+    (is (str/starts-with? mtlx "<?xml version=\"1.0\"?>\n"))
+    (is (str/includes? mtlx "<materialx"))
+    (is (str/includes? mtlx "<standard_surface name=\"default_surface\" type=\"surfaceshader\">"))
+    (is (str/includes? mtlx "value=\"0.6, 0.6, 0.6\""))
+    (is (str/includes? mtlx "<surfacematerial name=\"DefaultMaterial\" type=\"material\">"))
+    (is (str/includes? mtlx "</materialx>"))))

@@ -1,0 +1,177 @@
+(ns terrain-scene-test
+  "Tests for `terrain-scene`, ported 1:1 from the original
+  `kami-terrain-scene` Rust crate's `#[cfg(test)] mod tests` in `src/lib.rs`
+  and `tests/biome_parity.rs` (deleted in kotoba-lang/kami-engine PR #82),
+  plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [terrain-scene :as terrain-scene]
+            [terrain :as terrain]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'terrain-scene)))))
+
+;; Rust (src/lib.rs): resolve_biome_is_driven_by_edn
+(deftest resolve-biome-is-driven-by-edn
+  (testing "resolve-biome is driven by the shipped EDN"
+    (doseq [name terrain-scene/all-biome-names]
+      (is (= (terrain-scene/resolve-biome name)
+             (terrain-scene/shipped-biome name))
+          (str name ": resolve-biome driven by biomes.edn")))
+    (is (nil? (terrain-scene/resolve-biome "volcano")) "unknown -> nil")))
+
+;; The two known callers: kami-app-isekai's voxel_world (plains) and
+;; kami-app-quarry-walk (quarry) both call `resolve_biome` by name.
+(deftest resolve-biome-known-caller-names
+  (is (some? (terrain-scene/resolve-biome "plains")))
+  (is (some? (terrain-scene/resolve-biome "quarry"))))
+
+;; Rust (src/lib.rs): shipped_has_all_biomes
+(deftest shipped-has-all-biomes
+  (let [b (terrain-scene/shipped-biomes)]
+    (is (= 4 (count b)))
+    (doseq [name terrain-scene/all-biome-names]
+      (is (contains? b name) (str name " present in EDN")))))
+
+;; Rust (src/lib.rs): unknown_builtin_biome_is_none
+(deftest unknown-builtin-biome-is-none
+  (is (nil? (terrain-scene/builtin-biome "does-not-exist"))))
+
+;; Rust (src/lib.rs): unknown_biome_from_edn_is_an_error
+(deftest unknown-biome-from-edn-is-an-error
+  (let [err (try
+              (terrain-scene/biome-from-edn terrain-scene/biomes-edn "jungle")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :biome-not-found (:terrain-scene/error (ex-data err))))))
+
+;; Rust (src/lib.rs): non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try
+              (terrain-scene/biomes-from-edn "42")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :not-a-map (:terrain-scene/error (ex-data err))))))
+
+;; Rust (src/lib.rs): missing_biomes_table_is_an_error
+(deftest missing-biomes-table-is-an-error
+  (let [err (try
+              (terrain-scene/biomes-from-edn "{:other 1}")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :no-biomes (:terrain-scene/error (ex-data err))))))
+
+;; Rust (src/lib.rs): missing_heightmap_key_falls_back_to_default
+(deftest missing-heightmap-key-falls-back-to-default
+  (let [b (terrain-scene/biomes-from-edn
+           "{:terrain/biomes {:p {:heightmap {:max-height 50.0}}}}")
+        hm (:heightmap (get b "p"))
+        d terrain-scene/heightmap-spec-defaults]
+    (is (= 50.0 (:max-height hm)))
+    (is (= (:frequency d) (:frequency hm)) "absent -> default frequency")
+    (is (= (:octaves d) (:octaves hm)) "absent -> default octaves")
+    (is (= (:lacunarity d) (:lacunarity hm)) "absent -> default lacunarity")
+    (is (= (:persistence d) (:persistence hm)) "absent -> default persistence")))
+
+;; Rust (src/lib.rs): int_octaves_coerces_to_u32
+(deftest int-octaves-coerces-to-u32
+  (let [b (terrain-scene/biomes-from-edn
+           "{:terrain/biomes {:p {:heightmap {:octaves 8}}}}")]
+    (is (= 8 (:octaves (:heightmap (get b "p")))))))
+
+;; Rust (src/lib.rs): int_threshold_coerces_to_float
+(deftest int-threshold-coerces-to-float
+  (let [b (terrain-scene/biomes-from-edn
+           "{:terrain/biomes {:p {:splat {:sand-line 7}}}}")]
+    (is (= 7.0 (:sand-line (:splat (get b "p")))))))
+
+;; ════════════════════════════════════════════════════════════════════════
+;; Parity tests, ported 1:1 from tests/biome_parity.rs. The oracle is the
+;; REAL `terrain.biome` functions (called here, not transcribed).
+;; ════════════════════════════════════════════════════════════════════════
+
+(def eps 1e-6)
+
+(defn- close? [a b] (< (Math/abs (double (- a b))) eps))
+
+(defn- assert-biome-eq [name edn]
+  (let [b (keyword name)
+        oracle (terrain-scene/biome->spec b)
+        hm (:heightmap edn)
+        oh (:heightmap oracle)]
+    (is (close? (:max-height hm) (:max-height oh)) (str name ": max-height"))
+    (is (close? (:frequency hm) (:frequency oh)) (str name ": frequency"))
+    (is (= (:octaves hm) (:octaves oh)) (str name ": octaves"))
+    (is (close? (:lacunarity hm) (:lacunarity oh)) (str name ": lacunarity"))
+    (is (close? (:persistence hm) (:persistence oh)) (str name ": persistence"))
+
+    (let [s (:splat edn) os (:splat oracle)]
+      (is (close? (:sand-line s) (:sand-line os)) (str name ": sand-line"))
+      (is (close? (:snow-line s) (:snow-line os)) (str name ": snow-line"))
+      (is (close? (:rock-slope s) (:rock-slope os)) (str name ": rock-slope")))
+
+    (doseq [layer (range 4) ch (range 3)]
+      (is (close? (get-in edn [:palette :base layer ch])
+                  (get-in oracle [:palette :base layer ch]))
+          (str name ": base[" layer "][" ch "]"))
+      (is (close? (get-in edn [:palette :tip layer ch])
+                  (get-in oracle [:palette :tip layer ch]))
+          (str name ": tip[" layer "][" ch "]")))
+
+    (is (= edn oracle) (str name ": full BiomeSpec parity"))))
+
+;; Rust (tests/biome_parity.rs): biomes_edn_matches_builtin
+(deftest biomes-edn-matches-builtin
+  (let [loaded (terrain-scene/biomes-from-edn terrain-scene/biomes-edn)]
+    (is (= 4 (count loaded)) "all biomes present in EDN")
+    (doseq [name terrain-scene/all-biome-names]
+      (assert-biome-eq name (get loaded name))
+      (is (= (get loaded name) (terrain-scene/builtin-biome name))
+          (str name ": EDN == builtin-biome")))
+    (let [shipped (terrain-scene/shipped-biomes)]
+      (doseq [name terrain-scene/all-biome-names]
+        (is (= (get shipped name) (get loaded name))
+            (str name ": shipped == loaded"))))))
+
+;; Rust (tests/biome_parity.rs): converters_match_hardcoded
+(deftest converters-match-hardcoded
+  (let [loaded (terrain-scene/biomes-from-edn terrain-scene/biomes-edn)
+        seed 123.5]
+    (doseq [name terrain-scene/all-biome-names]
+      (let [b (keyword name)
+            spec (get loaded name)
+
+            hc (terrain-scene/biome-spec->heightmap-config spec seed)
+            oh (terrain/biome-heightmap-config b seed)]
+        (is (close? (:seed hc) (:seed oh)) (str name ": seed threaded"))
+        (is (close? (:max-height hc) (:max-height oh)) (str name ": hc max-height"))
+        (is (close? (:frequency hc) (:frequency oh)) (str name ": hc frequency"))
+        (is (= (:octaves hc) (:octaves oh)) (str name ": hc octaves"))
+        (is (close? (:lacunarity hc) (:lacunarity oh)) (str name ": hc lacunarity"))
+        (is (close? (:persistence hc) (:persistence oh)) (str name ": hc persistence"))
+
+        (let [st (terrain-scene/biome-spec->splat-thresholds spec)
+              ot (terrain/biome-splat-thresholds b)]
+          (is (close? (:sand-line st) (:sand-line ot)) (str name ": st sand-line"))
+          (is (close? (:snow-line st) (:snow-line ot)) (str name ": st snow-line"))
+          (is (close? (:rock-slope st) (:rock-slope ot)) (str name ": st rock-slope")))
+
+        (let [mp (terrain-scene/biome-spec->material-palette spec)
+              op (terrain/biome-palette b)]
+          (is (= (:base mp) (:base op)) (str name ": palette base"))
+          (is (= (:tip mp) (:tip op)) (str name ": palette tip")))))))
+
+;; Rust (tests/biome_parity.rs): omitted_heightmap_fields_inherit_defaults
+(deftest omitted-heightmap-fields-inherit-defaults
+  (let [loaded (terrain-scene/biomes-from-edn
+                "{:terrain/biomes {:p {:heightmap {:max-height 50.0}}}}")
+        hm (:heightmap (get loaded "p"))
+        d terrain-scene/heightmap-spec-defaults]
+    (is (= 50.0 (:max-height hm)))
+    (is (= (:frequency d) (:frequency hm)) "absent -> default frequency")
+    (is (= (:octaves d) (:octaves hm)) "absent -> default octaves")
+    (is (= (:lacunarity d) (:lacunarity hm)) "absent -> default lacunarity")
+    (is (= (:persistence d) (:persistence hm)) "absent -> default persistence")))

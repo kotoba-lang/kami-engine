@@ -1,0 +1,30 @@
+(ns kotoba.amenominaka.extensions-test
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kotoba.amenominaka.application :as app]
+            [kotoba.amenominaka.extensions :as extensions]))
+
+(deftest load!-registers-both-extensions-test
+  (let [{:keys [app order]} (extensions/load!)]
+    (is (= 2 (app/num-extensions app)))
+    (is (= 2 (app/num-started app)))
+    (is (= #{"scene" "render-ir"} (set (app/get-extension-ids app))))
+    (testing "dependency order: scene starts before render-ir"
+      (is (= ["scene" "render-ir"] order)))))
+
+(deftest load!-startup-log-test
+  (let [{:keys [log]} (extensions/load!)]
+    (is (= [[:startup "scene"] [:startup "render-ir"]] log))))
+
+(deftest load!-shutdown-reverses-order-test
+  (let [{:keys [app]} (extensions/load!)]
+    (is (= ["render-ir" "scene"] (app/shutdown-all app)))))
+
+(deftest manifests-declare-the-real-dependency-test
+  (is (= {} (:dependencies extensions/scene-manifest)))
+  (is (= #{"scene"} (set (keys (:dependencies extensions/render-ir-manifest))))))
+
+(deftest load!-is-independent-across-calls-test
+  (testing "each load! call gets its own application (not the global singleton)"
+    (let [{app1 :app} (extensions/load!)
+          {app2 :app} (extensions/load!)]
+      (is (not (identical? app1 app2))))))

@@ -1,0 +1,70 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-postfx-scene",
+      "commit": "585f2f0c6947b4a9e8927ca34f611f115dc9c7a0",
+      "tree": "e4c18d5b0573bbb2ae1330f59aeafa00ac82e661",
+      "url": "https://github.com/kotoba-lang/kami-postfx-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "2529f247cddaed607f524528c40d361448446c8b840cc042a12bbe781fadd6fa",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "62dc2382781056e367c8292da09f9746179a4ff3b29120cb89092905e897c305",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "22169efdb004a4c3834d8814f82d4b7dbb096177230bf01c8d51e17f966e8648",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "640b9db7618440b7b9e9bf53bfe9263193d3c92f8e64e9fbe006f625d1f604dd",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "d004613c9fa288623b90149dd357fadd2ee9efdd55d8e5f8aec89aa01cc3d616",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/postfx.edn",
+          "path": "resources/postfx.edn",
+          "sha256": "76e2503c27296dd52176b1f5d261b323e7d4ca2c9bbce84e25b59e7927258d82",
+          "mode": "100644"
+        },
+        {
+          "source": "src/postfx_scene.cljk",
+          "path": "src/postfx_scene.cljk",
+          "sha256": "d1409ccf2d8cc484042306a06f7cba9145f2fb04abec242436755ac48c5fbc70",
+          "mode": "100644"
+        },
+        {
+          "source": "test/postfx_scene_test.cljk",
+          "path": "test/postfx_scene_test.cljk",
+          "sha256": "fb0758a8eb98a2cca5707b4be1c21ff4bb2d419e09d50c363efe97021e540579",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

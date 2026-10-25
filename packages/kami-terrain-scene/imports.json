@@ -1,0 +1,88 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-terrain-scene",
+      "commit": "1087f9354664d7146fab05886801407a7cef3742",
+      "tree": "f3db7678ec8982618992324a45c85878313a869a",
+      "url": "https://github.com/kotoba-lang/kami-terrain-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "2529f247cddaed607f524528c40d361448446c8b840cc042a12bbe781fadd6fa",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "edb6092cc8b9b12b49beebae19a492628d07f0a3e19d24a491856887f70d2ed8",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "2ee2a31d93f5ebabafb345aecb55375f813be7efbe77ddf43eae7bdfb2061999",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "ca652c1713e22ad068865a8b12fed31883a8bf871b8d3a7954562501371a685e",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "d004613c9fa288623b90149dd357fadd2ee9efdd55d8e5f8aec89aa01cc3d616",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/biomes.edn",
+          "path": "resources/biomes.edn",
+          "sha256": "caa7387a04aae8565bead1fdb7555da00a2a2aa798057ca90e077b5ace93447f",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/waves.edn",
+          "path": "resources/waves.edn",
+          "sha256": "78db7f292743a67bd3fa77636de9c681980ed768908757e977417e4bc416cbd9",
+          "mode": "100644"
+        },
+        {
+          "source": "src/terrain_scene.cljk",
+          "path": "src/terrain_scene.cljk",
+          "sha256": "1e4f34881e6e5021b87af25ca6f7bb184491ef4377f6743a8a6a26f5fff3687c",
+          "mode": "100644"
+        },
+        {
+          "source": "src/terrain_scene/waves.cljk",
+          "path": "src/terrain_scene/waves.cljk",
+          "sha256": "0d155e97b890cd9da67b369fbe67a2295dddf062104a9c8238a9404df06afb78",
+          "mode": "100644"
+        },
+        {
+          "source": "test/terrain_scene/waves_test.cljk",
+          "path": "test/terrain_scene/waves_test.cljk",
+          "sha256": "a781b2f416af471378d5e1302e7720b7568efe5a73fba3dd8875a6d4b00bca5f",
+          "mode": "100644"
+        },
+        {
+          "source": "test/terrain_scene_test.cljk",
+          "path": "test/terrain_scene_test.cljk",
+          "sha256": "990649a2738fefa616a7716fcf6e7d5412e0759696f85bcaba2e2cfedf737ab8",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

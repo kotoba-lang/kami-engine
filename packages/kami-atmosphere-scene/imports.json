@@ -1,0 +1,70 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-atmosphere-scene",
+      "commit": "a06aaf93dbb85be4f94745b50b97c2348e0f83f7",
+      "tree": "cf9fb5f527e423b9711e0cab12e3a50080b39c3b",
+      "url": "https://github.com/kotoba-lang/kami-atmosphere-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "2529f247cddaed607f524528c40d361448446c8b840cc042a12bbe781fadd6fa",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "73f46e52658c7109b4209503fa3b3ec847f14cddcd299a823dabba2c66249a8a",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "501ec313ccb2ccd3016007fe35855232d4fba6cab693a9341be4cf8e0038ac0a",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "75f40d77ea20c6210482e6b24482f1e580d2450da80d00e96a07dbf8f53bc67f",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "c6fe035540c7c3b2c345f36718f91ba9b6e2b4a063b2f8ccd87d9670ab08ba4c",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/weather.edn",
+          "path": "resources/weather.edn",
+          "sha256": "b029a07bb47af382df8dad16a47d8a0ee1a809ebb7af10d512d88082e3fe508f",
+          "mode": "100644"
+        },
+        {
+          "source": "src/atmosphere_scene.cljk",
+          "path": "src/atmosphere_scene.cljk",
+          "sha256": "b2ba7186b1f94c90f94084f320f5906df678af2cf1b0b40f7c84583b7744a7fa",
+          "mode": "100644"
+        },
+        {
+          "source": "test/atmosphere_scene_test.cljk",
+          "path": "test/atmosphere_scene_test.cljk",
+          "sha256": "d20d2156841c19572cc00b3ba393a92d3086feaa0506f5883935c81011d3dc26",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

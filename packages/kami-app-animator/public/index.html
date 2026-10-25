@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Kami Animator</title><style>aside:last-child { border-left: 1px solid #293456; border-right: 0; }
+* { box-sizing: border-box; }
+.primary { background: #6f8fff; color: #071127; font-weight: 700; }
+.viewport { position: relative; }
+#scrub { width: calc(100% - 36px); }
+#curve-graph { width: calc(100% - 36px); height: 150px; margin: 0 18px; background: #09101e; }
+.graph-grid { stroke: #263554; stroke-width: 1; }
+.curve-path { fill: none; stroke: #82a7ff; stroke-width: 3; }
+.graph-key { fill: #ffd18f; stroke: #09101e; stroke-width: 2; cursor: pointer; }
+.graph-key.selected { fill: #ff6f87; }
+body { margin: 0; height: 100vh; display: grid; grid-template-rows: 52px 1fr 340px; font-family: Inter,system-ui; background: #090d18; color: #e8ecf8; }
+.playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #ff6f87; pointer-events: none; }
+label { display: grid; gap: 5px; margin-bottom: 10px; }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #91a1ca; }
+.tracks { padding: 14px; border-right: 1px solid #334267; }
+.key { position: absolute; top: 17px; width: 14px; height: 14px; border: 0; padding: 0; background: #87a7ff; transform: translateX(-50%) rotate(45deg); }
+.inspector { padding: 14px; border-left: 1px solid #334267; }
+.key.selected { background: #ffd18f; }
+header .spacer { flex: 1; }
+#gpu-canvas { width: 100%; height: 100%; display: block; }
+#gpu-status { position: absolute; left: 50%; top: 45%; transform: translate(-50%,-50%); color: #ffb5b5; }
+.timeline { display: grid; grid-template-columns: 220px 1fr 250px; background: #0e1427; border-top: 1px solid #334267; }
+aside { padding: 14px; background: #10172b; border-right: 1px solid #293456; overflow-y: auto; }
+.lane { position: relative; margin: 42px 18px; height: 50px; background: repeating-linear-gradient(90deg,#2b385b 0 1px,transparent 1px 10%); }
+button,select,input { background: #18213c; color: #eef2ff; border: 1px solid #40517d; border-radius: 5px; padding: 7px 10px; }
+header { display: flex; align-items: center; gap: 18px; padding: 0 16px; background: #111936; border-bottom: 1px solid #293456; }
+.workspace { display: grid; grid-template-columns: 220px 1fr 250px; min-height: 0; }
+button { cursor: pointer; } :focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }</style></head>
+  <body>
+    <header>
+      <strong>KAMI ANIMATOR</strong>
+      <a href="https://kotoba-lang.github.io/kami-studio/">Studio</a>
+      <span>WebGPU animation workspace</span>
+      <span class="spacer"></span>
+      <button id="undo">Undo</button>
+      <button id="redo">Redo</button>
+      <button id="save-project">Save</button>
+      <button id="load-project">Load</button>
+      <button id="import">Import</button>
+      <input id="import-file" aria-label="Import Animator project file" type="file" accept=".edn,.kami-animator.edn" style="display:none;">
+      <button id="export">Export Project</button>
+    </header>
+    <section class="workspace">
+      <aside>
+        <h2>Outliner</h2>
+        <button>◆ Cube</button>
+        <h2>Skeleton</h2>
+        <button class="primary" id="bone-root">◇ Root</button>
+        <button id="bone-spine">&nbsp;&nbsp;◇ Spine</button>
+        <button id="bone-head">&nbsp;&nbsp;&nbsp;&nbsp;◇ Head</button>
+        <h2>Channels</h2>
+        <button class="primary" id="channel-x">Location X</button>
+        <button id="channel-y">Location Y</button>
+        <button id="channel-z">Location Z</button>
+        <button id="channel-rotation-x">Rotation X</button>
+        <button id="channel-rotation-y">Rotation Y</button>
+        <button id="channel-rotation-z">Rotation Z</button>
+        <button id="channel-scale-x">Scale X</button>
+        <button id="channel-scale-y">Scale Y</button>
+        <button id="channel-scale-z">Scale Z</button>
+      </aside>
+      <main class="viewport">
+        <canvas id="gpu-canvas" aria-label="Animated WebGPU viewport"></canvas>
+        <div id="gpu-status">Initializing WebGPU…</div>
+      </main>
+      <aside>
+        <h2>Pose Mode</h2>
+        <strong id="pose-bone-name">Root</strong>
+        <label>Translate X<input id="pose-tx" type="number" step="0.1" value="0"></label>
+        <label>Translate Y<input id="pose-ty" type="number" step="0.1" value="0"></label>
+        <label>Translate Z<input id="pose-tz" type="number" step="0.1" value="0"></label>
+        <label>Rotate X<input id="pose-rx" type="number" step="0.05" value="0"></label>
+        <label>Rotate Y<input id="pose-ry" type="number" step="0.05" value="0"></label>
+        <label>Rotate Z<input id="pose-rz" type="number" step="0.05" value="0"></label>
+        <button class="primary" id="key-bone-pose">Key Bone Pose</button>
+        <h2>Two-Bone IK</h2>
+        <label>Target X<input id="ik-target-x" type="number" step="0.1" value="1"></label>
+        <label>Target Y<input id="ik-target-y" type="number" step="0.1" value="1"></label>
+        <label>Elbow / Pole<select id="ik-elbow"><option value="positive">Positive</option><option value="negative">Negative</option></select></label>
+        <button class="primary" id="solve-ik">Solve Root → Spine</button>
+        <p id="ik-status" role="status">Target reached</p>
+        <h2>Constraints</h2>
+        <label>Target<select id="constraint-target"><option value="root">Root</option><option value="spine">Spine</option><option value="head">Head</option></select></label>
+        <button id="add-copy-constraint">＋ Copy Translation</button><button id="add-limit-constraint">＋ Rotation Limit</button>
+        <div id="constraint-stack"></div>
+        <h2>Playback</h2>
+        <button class="primary" id="play">▶ Play</button>
+        <button id="add-key">＋ Key at playhead</button>
+        <button id="delete-key">Delete selected</button>
+        <label><input id="loop" type="checkbox">Loop range</label>
+        <label>Loop start<input id="loop-start" type="number" min="0" max="2" step="0.1" value="0"></label>
+        <label>Loop end<input id="loop-end" type="number" min="0" max="2" step="0.1" value="2"></label>
+        <label>Playback rate<input id="playback-rate" type="number" min="0.1" max="4" step="0.1" value="1"></label>
+        <label>Frame rate<select id="fps"><option value="24">24 fps</option><option value="25">25 fps</option><option value="30">30 fps</option><option value="60">60 fps</option></select></label>
+        <label>Duration (s)<input id="duration" type="number" min="0.1" step="0.1" value="2"></label>
+        <label><input id="frame-snap" type="checkbox" checked>Snap keys to frames</label>
+        <h2>Profile</h2>
+        <select id="profile" aria-label="Interaction profile">
+          <option value="maya">Maya</option>
+          <option value="blender">Blender</option>
+          <option value="max">3ds Max</option>
+          <option value="c4d">Cinema 4D</option>
+        </select>
+        <p id="profile-hint">S Set Key · Alt+V Play · Delete Key</p>
+      </aside>
+    </section>
+    <section class="timeline">
+      <div class="tracks">
+        <strong>Cube</strong>
+        <p id="active-channel">Location X</p>
+      </div>
+      <div><div class="lane" id="lane">
+        <div class="playhead" id="playhead"></div>
+      </div><svg id="curve-graph" viewBox="0 0 800 160" role="img" aria-label="Active channel animation curve"></svg><input id="scrub" aria-label="Timeline playhead" type="range" min="0" max="2" step="0.01" value="0"><span id="time">0.00 / 2.00 s</span></div>
+      <div class="inspector">
+        <h2>Keyframe</h2>
+        <div><button id="copy-key">Copy</button><button id="paste-key">Paste</button><button id="duplicate-key">Duplicate +1 frame</button><button id="nudge-left">Move selected −1 frame</button><button id="nudge-right">Move selected +1 frame</button></div>
+        <label>Time<input id="key-time" type="number" step="0.1"></label>
+        <label>Value<input id="key-value" type="number" step="0.1"></label>
+        <label>Interpolation<select id="interpolation">
+          <option value="linear">Linear</option>
+          <option value="smooth">Smooth</option>
+          <option value="hermite">Hermite</option>
+          <option value="step">Step</option>
+        </select></label>
+        <label>Tangent in<input id="tangent-in" type="number" step="0.1" value="0"></label>
+        <label>Tangent out<input id="tangent-out" type="number" step="0.1" value="0"></label>
+        <button id="auto-tangents">Auto tangents</button>
+      </div>
+    </section>
+    <span id="debug-state" style="display:none;"></span>
+    <script src="./js/app.js"></script>
+  </body>
+</html>

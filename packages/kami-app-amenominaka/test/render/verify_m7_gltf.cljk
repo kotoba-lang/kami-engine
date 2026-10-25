@@ -1,0 +1,72 @@
+(ns verify-m7-gltf
+  "M7 (ADR-2607100100) real-browser glTF-export verification, run via nbb
+  FROM THIS REPO'S ROOT:
+    kbb --backend sci -cp test/render:../org-khronos-gltf/src:../org-khronos-glb/src test/render/verify_m7_gltf.cljk
+  Loads the shadow-cljs-compiled `public/shell.html`, clicks the real
+  \"Export glTF\" button (`#export-gltf`), captures the REAL browser
+  download it triggers (Playwright's `download` event — the button does a
+  genuine `Blob`+`<a download>` click, not a mock), reads the downloaded
+  `.glb` bytes off disk, and parses them with `org-khronos-gltf`'s own
+  `gltf/parse-gltf` to assert real structural correctness — not just
+  \"a file got saved\", but that it's an actually-valid, actually-
+  decodable glTF document with the expected node/mesh shape for the
+  app's sample building (same fixture `kotoba.amenominaka.ui`'s
+  `sample-building` and the JVM `gltf-export-test` both use: one wall,
+  one storey/building/site/project node each, 24 real mesh vertices)."
+  (:require ["node:path" :as path]
+            ["node:fs/promises" :refer [readFile]]
+            [lib.webgpu-harness :as harness]
+            [gltf]))
+
+(def public-dir (.join path (.cwd js/process) "public"))
+
+(defn- report! [m]
+  (println (js/JSON.stringify (clj->js m) nil 2)))
+
+(defn- fail! [reason]
+  (println (str "FAIL: " reason))
+  (set! (.-exitCode js/process) 1))
+
+(defn- click-and-capture-download! [page selector]
+  (-> (js/Promise.all #js [(.waitForEvent page "download")
+                            (.click page selector)])
+      (.then (fn [results] (first results)))))
+
+(defn- verify-gltf-export [page base-url]
+  (-> (.goto page (str base-url "/shell.html") #js {:waitUntil "load"})
+      (.then (fn [] (.waitForSelector page "#export-gltf" #js {:timeout 20000})))
+      (.then (fn [] (click-and-capture-download! page "#export-gltf")))
+      (.then (fn [download]
+               (-> (.path download)
+                   (.then (fn [file-path] (readFile file-path))))))
+      (.then (fn [buf]
+               (let [byte-seq (vec (js/Array.from buf))
+                     parsed (gltf/parse-gltf byte-seq)
+                     json (:json parsed)]
+                 (report! {:downloadedBytes (count byte-seq)
+                           :nodeCount (count (:nodes json))
+                           :meshCount (count (:meshes parsed))
+                           :materialCount (count (:materials json))})
+                 (when-not (= (subvec (vec byte-seq) 0 4) (gltf/u32->le-bytes gltf/glb-magic))
+                   (fail! "downloaded file does not start with the glTF magic bytes"))
+                 (when-not (= 5 (count (:nodes json)))
+                   (fail! (str "expected 5 nodes (project/site/building/storey/wall), got " (count (:nodes json)))))
+                 (when-not (= 1 (count (:meshes parsed)))
+                   (fail! (str "expected exactly 1 mesh (the wall), got " (count (:meshes parsed)))))
+                 (let [positions (-> parsed :meshes first :primitives first :positions)]
+                   (when-not (= 24 (count positions))
+                     (fail! (str "expected 24 real mesh vertices (6 faces x 4, not the shared 8), got " (count positions))))))))))
+
+(defn- run-verification [browser base-url]
+  (-> (.newPage browser #js {:acceptDownloads true})
+      (.then (fn [page] (verify-gltf-export page base-url)))))
+
+(defn -main []
+  (-> (harness/start-static-server public-dir)
+      (.then (fn [server]
+               (-> (harness/with-headless-browser
+                    (fn [browser] (run-verification browser (.-baseUrl server))))
+                   (.then (fn [] ((.-close server)))))))
+      (.catch (fn [e] (js/console.error e) (set! (.-exitCode js/process) 1)))))
+
+(-main)

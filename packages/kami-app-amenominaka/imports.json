@@ -1,0 +1,295 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-app-amenominaka",
+      "commit": "ae215e91b9003afbde17c555e34e33f0b44a406b",
+      "tree": "27c3599896f6f16f1f12e0fbe3b5dc29dc436dd7",
+      "url": "https://github.com/kotoba-lang/kami-app-amenominaka.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "f483437be9a00c40c5201f57b8e150b24496834f52d371034d838c95de5a3b91",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "0f5d1203bc349a2604cb61d1bd58ffd8a4225721c9d82619767ced5ef0a55f01",
+          "mode": "100644"
+        },
+        {
+          "source": "bb.edn",
+          "path": "bb.edn",
+          "sha256": "bba8d6a172b8337ab72a91eae3cb40dae2d461caca6ab60be18b66f1e8db9c94",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "4ab1c6178ff82ef3ff98918e9e5505c11f2ce65a27f30505de103423bd2f7b67",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "b6ffbbd72e8bd92c8683902e30b45b482622268455b5fa10d8a176b14baf374a",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "9fea039279321761778432e394cdbb6b2d000bb320d40f5c8b46af9029f69ee9",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "7c991dfe4b43f16f7b9c0fc423a69d8ed4deaadbb9145e228d1eaa94c4bb8a23",
+          "mode": "100644"
+        },
+        {
+          "source": "public/index.html",
+          "path": "public/index.html",
+          "sha256": "fdf1d672321ee3000a9dc513e90e5d41fbc7f2cef87d28ad34b0fbb71ca809eb",
+          "mode": "100644"
+        },
+        {
+          "source": "public/m2-demo.html",
+          "path": "public/m2-demo.html",
+          "sha256": "e7ccc1f0c0f512f9a9f079eb60da009e1edc080315209c496a8e40e79fa2511d",
+          "mode": "100644"
+        },
+        {
+          "source": "public/m4-stress-demo.html",
+          "path": "public/m4-stress-demo.html",
+          "sha256": "7c9ebe2da9d8a8fb9b89e6e9dbfaee813ecc9a0a85175f3574bde42e616301d5",
+          "mode": "100644"
+        },
+        {
+          "source": "public/shell.html",
+          "path": "public/shell.html",
+          "sha256": "28f89d4bc28d8f263767beda921302741e77341c9318480b6ac4329c8a0a2acc",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/build_pages.cljk",
+          "path": "scripts/build_pages.cljk",
+          "sha256": "bf46a6fd931872a3a22c7361c3a6a0f91872898dd94cc6669b2496055a2a934c",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/gen_kotoba_ui_css.cljk",
+          "path": "scripts/gen_kotoba_ui_css.cljk",
+          "sha256": "6ce7b31bdc47cdb5c3eced223241acd172543d363e30bf8ce3cc2fef41d1c3f7",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "22f0e44df95eb2b0b4a8722d581cae4a51d41847faf89db9bf67066d8444377f",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka.cljk",
+          "path": "src/kotoba/amenominaka.cljk",
+          "sha256": "0e272f76c86d292c0b3e721366f544a3f5690234d2209b825a636a6dc4292400",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/application.cljk",
+          "path": "src/kotoba/amenominaka/application.cljk",
+          "sha256": "ff88c73209da6123f58f4695abfcbf048132e9095adf258e4a2b9e9d8bde9074",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/extension.cljk",
+          "path": "src/kotoba/amenominaka/extension.cljk",
+          "sha256": "078f32b6c3cfc51cdb2e9a289ce8d267b0907db417388ee49813e86a2aafe4de",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/extensions.cljk",
+          "path": "src/kotoba/amenominaka/extensions.cljk",
+          "sha256": "4ef24e2cea109e91e2143046902492ec797847920cbd21fcac0a4fa674435e05",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/gltf_export.cljk",
+          "path": "src/kotoba/amenominaka/gltf_export.cljk",
+          "sha256": "464ec7a2fbf559c2b18ffec6c441a791ebd4da8c00b2b6ca753f337b410b7585",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/pages.cljk",
+          "path": "src/kotoba/amenominaka/pages.cljk",
+          "sha256": "563cad2927582d592cbc140d27df361fb6a08da2ffef4c0a3a8a4dafbcff992f",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/project.cljk",
+          "path": "src/kotoba/amenominaka/project.cljk",
+          "sha256": "6e0aced1876a11455fe45335732fedba2a63538b300cc67553c37004d59b8aed",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/render_demo.cljk",
+          "path": "src/kotoba/amenominaka/render_demo.cljk",
+          "sha256": "b02d3df7d9fcdfa060ca6a290cdc4f83fb93f9de4a2b4cda896b4a80de8416aa",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/render_ir.cljk",
+          "path": "src/kotoba/amenominaka/render_ir.cljk",
+          "sha256": "665f8b91ba077c9c9dae9cecaa139cd6c6b60debaeaf585f0602a90ef31ea17d",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/render_stress_demo.cljk",
+          "path": "src/kotoba/amenominaka/render_stress_demo.cljk",
+          "sha256": "077cf3014f4917f6df94bb50ba3d873cc3e656a4483d55166b284cd2186e3a0b",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/scene.cljk",
+          "path": "src/kotoba/amenominaka/scene.cljk",
+          "sha256": "21339289e13a8486ab228cb6b30022d17bb070f757bc09511e214b3fb37d3470",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/timeline.cljk",
+          "path": "src/kotoba/amenominaka/timeline.cljk",
+          "sha256": "13f705c86de36f4f6e4e3a55d7546621e86b1a86749985e53d4bd1f5bf159001",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/ui.cljk",
+          "path": "src/kotoba/amenominaka/ui.cljk",
+          "sha256": "aff080ca5b07348519d48def7f73b3e9ccef6020acc1fdcf46daa28a7acdbcb5",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kotoba/amenominaka/usd_export.cljk",
+          "path": "src/kotoba/amenominaka/usd_export.cljk",
+          "sha256": "163966028578ea3cf025fd41dc71cd7fcc4bfd375e2225a37546183bd26fdfd6",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka/application_test.cljk",
+          "path": "test/kotoba/amenominaka/application_test.cljk",
+          "sha256": "aa388e32f410ac064603b182acd709db96ab233f9d76124d57c979bff65502b6",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka/extension_test.cljk",
+          "path": "test/kotoba/amenominaka/extension_test.cljk",
+          "sha256": "68ab6b4f76b86b2a3aee043891ebfbf12270feb56a966d7d0776a803b854b347",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka/extensions_test.cljk",
+          "path": "test/kotoba/amenominaka/extensions_test.cljk",
+          "sha256": "b2bd0df4a466d1a7a63013d6e13f1c3636719438774874570bcfbc4ce43d72eb",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka/gltf_export_test.cljk",
+          "path": "test/kotoba/amenominaka/gltf_export_test.cljk",
+          "sha256": "17e0628913304b27824ab3a16593d82a4b006ef234ad80b0f4dd3da6ab63208a",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka/project_test.cljk",
+          "path": "test/kotoba/amenominaka/project_test.cljk",
+          "sha256": "c12df9b8c8485b527c32fefd71a19b4142fe3b355c6b4cccc85c0bbbac3d1099",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka/render_ir_test.cljk",
+          "path": "test/kotoba/amenominaka/render_ir_test.cljk",
+          "sha256": "fb2bf43f757cbae11809312e5db5ebd4f0c331bb1e6628953858225ab54ab558",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka/scene_test.cljk",
+          "path": "test/kotoba/amenominaka/scene_test.cljk",
+          "sha256": "aef7f11ee2bd82399ecc7accc4a021a5ff0c3eb20b1eef820ca4bf739ddc437d",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka/timeline_test.cljk",
+          "path": "test/kotoba/amenominaka/timeline_test.cljk",
+          "sha256": "dbe4d5326fe8c7066759333c8419739ad8a4b644320720a468ba2020fd78c5d4",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka/usd_export_test.cljk",
+          "path": "test/kotoba/amenominaka/usd_export_test.cljk",
+          "sha256": "01efaa0aa566f4bd7747d638b82252a85234146e9c7db2d03c3b71e0644e42b4",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kotoba/amenominaka_test.cljk",
+          "path": "test/kotoba/amenominaka_test.cljk",
+          "sha256": "420db45ce02984606284672a36f53db391482293e53e02955daa054e8d1178eb",
+          "mode": "100644"
+        },
+        {
+          "source": "test/render/lib/webgpu_harness.cljk",
+          "path": "test/render/lib/webgpu_harness.cljk",
+          "sha256": "d7ff5f70cd1d673e4a9032bda03112cb0e6336af3fc8d5ecc56c884727724fff",
+          "mode": "100644"
+        },
+        {
+          "source": "test/render/verify_m2_render.cljk",
+          "path": "test/render/verify_m2_render.cljk",
+          "sha256": "b81fe39f46d98134501b3dd8074dbfc564bff62fc801729273c224a283aca7d4",
+          "mode": "100644"
+        },
+        {
+          "source": "test/render/verify_m4_stress.cljk",
+          "path": "test/render/verify_m4_stress.cljk",
+          "sha256": "3513a7b8ebdeea708f0d48d74605124d8b36f959cdd52d1821a5d509289f2b24",
+          "mode": "100644"
+        },
+        {
+          "source": "test/render/verify_m5_ui.cljk",
+          "path": "test/render/verify_m5_ui.cljk",
+          "sha256": "58909d0dbd79fac61ee5b80e9990dc9598f59aa48a7f34f8cf0f5645963d2e80",
+          "mode": "100644"
+        },
+        {
+          "source": "test/render/verify_m7_gltf.cljk",
+          "path": "test/render/verify_m7_gltf.cljk",
+          "sha256": "99d6a7f9a28f4cd1f3ae83458f1039696b0e7a261adb04b573b1acf39263dba4",
+          "mode": "100644"
+        },
+        {
+          "source": "test/render/verify_m8_fly_camera.cljk",
+          "path": "test/render/verify_m8_fly_camera.cljk",
+          "sha256": "06520afee76bd05c3f48177abefd37040cc27394254c52096c14f968188f1e71",
+          "mode": "100644"
+        },
+        {
+          "source": "test/render/verify_m9_timeline.cljk",
+          "path": "test/render/verify_m9_timeline.cljk",
+          "sha256": "f6b8718d6fcdadfcc72c01f6275d3eb6aa6acb3ee727ef9eb550005467e2efc5",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/pages.yml",
+        "public/js/shell.js",
+        "public/vendor/kotoba-ui.css"
+      ]
+    }
+  ]
+}

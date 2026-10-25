@@ -1,0 +1,14 @@
+(ns kami.cad.dimensional-sketch-test (:require [kotoba.test :refer [deftest is]] [kami.cad :as cad]
+                                               [kami.cad.dimensional-sketch :as sketch]))
+
+(deftest dimensions-drive-every-loft-section
+  (let [sections [(cad/curve [[-2 0 0] [0 2 0] [2 0 0]] [1 1 1])
+                  (cad/curve [[-2 0 3] [0 3 3] [2 0 3]] [1 1 1])]
+        {:keys [sections solver]} (sketch/solve-sections sections {:width 6 :height 2.5})]
+    (is (true? (:converged? solver)))
+    (is (< (:max-residual solver) 1.0e-6))
+    (is (= [[-3.0 0 0] [0.0 2.5 0] [3.0 0 0]] (:cad/control-points (first sections))))
+    (is (= [[-3.0 0 3] [0.0 2.5 3] [3.0 0 3]] (:cad/control-points (second sections))))))
+
+(deftest rejects-invalid-dimensions
+  (is (thrown? #?(:clj Exception :cljs js/Error) (sketch/solve-dimensions {:width 0 :height 2}))))

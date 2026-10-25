@@ -1,0 +1,60 @@
+(ns verify-m2-render
+  "M2 (ADR-2607100100) real-browser WebGPU verification, run via nbb FROM
+  THIS REPO'S ROOT (paths below are cwd-relative, not `*file*`-relative —
+  clj-kondo doesn't know nbb's `*file*` var, so this sidesteps a false
+  \"Unresolved symbol\" lint error rather than suppressing it):
+    kbb --backend sci -cp test/render test/render/verify_m2_render.cljk
+  Loads the shadow-cljs-compiled `public/m2-demo.html` (kotoba.amenominaka.
+  render-demo/init! — composes the M0 sample scene, bridges it via
+  kotoba.amenominaka.render-ir, draws one real frame via kami.webgpu) in a
+  full headless Chromium and asserts WebGPU was actually available and
+  `#out` reports \"ok\" (no JS/WebGPU exception), plus captures a
+  screenshot for visual confirmation. (An earlier version also sampled
+  canvas pixels via a same-page `drawImage` into a 2D canvas to assert
+  non-flat colour — that reads back an empty/cleared buffer for a
+  `webgpu`-context canvas in this Chromium build even when the actual
+  composited frame is correct, a false negative confirmed by comparing
+  against the real screenshot; dropped rather than left as a misleading
+  check.)"
+  (:require ["node:path" :as path]
+            [lib.webgpu-harness :as harness]))
+
+(def public-dir (.join path (.cwd js/process) "public"))
+(def screenshot-dir (.join path (.cwd js/process) "test" "render"))
+
+(defn- report! [m]
+  (println (js/JSON.stringify (clj->js m) nil 2)))
+
+(defn- screenshot-and-report! [page out-text]
+  (let [screenshot-path (.join path screenshot-dir "m2-render-screenshot.png")]
+    (-> (.screenshot page #js {:path screenshot-path})
+        (.then (fn []
+                 (report! {:available true :outText out-text :ok (= out-text "ok")
+                           :screenshotPath screenshot-path})
+                 (when (not= out-text "ok") (set! (.-exitCode js/process) 1)))))))
+
+(defn- verify-render [page base-url]
+  (-> (.goto page (str base-url "/m2-demo.html") #js {:waitUntil "load"})
+      (.then (fn [] (harness/wait-for-out-text page 20000)))
+      (.then (fn [out-text] (screenshot-and-report! page out-text)))))
+
+(defn- verify-page [page base-url]
+  (-> (harness/check-webgpu-available page (str base-url "/m2-demo.html"))
+      (.then (fn [availability]
+               (if (.-available availability)
+                 (verify-render page base-url)
+                 (report! {:skipped true :reason (.-reason availability)}))))))
+
+(defn- run-verification [browser base-url]
+  (-> (.newPage browser)
+      (.then (fn [page] (verify-page page base-url)))))
+
+(defn -main []
+  (-> (harness/start-static-server public-dir)
+      (.then (fn [server]
+               (-> (harness/with-headless-browser
+                    (fn [browser] (run-verification browser (.-baseUrl server))))
+                   (.then (fn [] ((.-close server)))))))
+      (.catch (fn [e] (js/console.error e) (set! (.-exitCode js/process) 1)))))
+
+(-main)

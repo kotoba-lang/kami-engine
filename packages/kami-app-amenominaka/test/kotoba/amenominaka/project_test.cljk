@@ -1,0 +1,27 @@
+(ns kotoba.amenominaka.project-test
+  (:require [kotoba.test :refer [deftest is]] [bim]
+            [kotoba.amenominaka.project :as project]))
+
+(defn building []
+  (-> (bim/project "Studio")
+      (update :sites conj
+              (bim/site {:id 1 :name "Site" :placement :identity :buildings
+                         [(bim/building {:id 2 :name "Building" :placement :identity :reference-elevation 0
+                                         :storeys [(bim/storey {:id 3 :name "Ground" :elevation 0 :height 3
+                                                                :placement :identity :spaces [] :elements []})]})]}))))
+
+(deftest versioned-project-roundtrip
+  (let [doc (project/document {:id "studio-1" :name "Studio" :building (building)
+                               :environment {:weather :clear} :camera {:mode :orbit}
+                               :timeline [{:time 0}] :updated-at 42})]
+    (is (project/valid-document? doc))
+    (is (= 2 (:amenominaka/version doc)))
+    (is (= "studio-1:42" (project/revision-key doc)))
+    (is (= doc (project/migrate doc)))))
+
+(deftest legacy-building-migration
+  (let [doc (project/migrate (building))]
+    (is (project/valid-document? doc))
+    (is (= "migrated-bim" (:project/id doc)))
+    (is (= "Studio" (:project/name doc))))
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs js/Error) (project/migrate {:broken true}))))

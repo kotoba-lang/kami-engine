@@ -1,0 +1,160 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-app-cad",
+      "commit": "db874d87924d14b2eb9f433436fd2b720e2dc6a8",
+      "tree": "02beba897317c7447141148521e65dfdc4e8a3b9",
+      "url": "https://github.com/kotoba-lang/kami-app-cad.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "8d4f145ebbae670e5d6b703ce9e85fbc02bab32815af2f3e8de293321031f672",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "ff1a9b6de0fa912c7905cbe8ccfa5bb430a74562d1415b8e1c66c6bb3b6a6d77",
+          "mode": "100644"
+        },
+        {
+          "source": "build.cljk",
+          "path": "build.cljk",
+          "sha256": "c6a4ff2003e3571a33dd13afda95a48355b4ade221d4d1c4fa2c959124ef7c98",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "df5bd58691c3c63e1d636eefa8811d9f18e14bda7233818e065df020ea4e277f",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "a586fb1128897a2e9ebdfb0fe3db563887120ca13ef1ff8c1d9f85d82f923821",
+          "mode": "100644"
+        },
+        {
+          "source": "hermes/README.md",
+          "path": "hermes/README.md",
+          "sha256": "6f291c982fd8d4cb535f07b6da9f67cd8543a72d0c99d8425e9d84f63bfad09e",
+          "mode": "100644"
+        },
+        {
+          "source": "hermes/profiles/cad-app-maint/SOUL.md",
+          "path": "hermes/profiles/cad-app-maint/SOUL.md",
+          "sha256": "35f1c981bfe00e440f5fc0bbaf4e8523f8e6de70b833ed9416b53960bc59a118",
+          "mode": "100644"
+        },
+        {
+          "source": "hermes/profiles/cad-app-maint/config.yaml",
+          "path": "hermes/profiles/cad-app-maint/config.yaml",
+          "sha256": "f7bf167f9429b9a8d40125a92fadf9735404a85be8179521f5c6beab4a649db9",
+          "mode": "100644"
+        },
+        {
+          "source": "hermes/profiles/cad-app-maint/profile.yaml",
+          "path": "hermes/profiles/cad-app-maint/profile.yaml",
+          "sha256": "361bc33bd666de37aca634dac8d2bef0d1d938c8bcf52ec9d127b033fa980a36",
+          "mode": "100644"
+        },
+        {
+          "source": "kotoba.app.edn",
+          "path": "kotoba.app.edn",
+          "sha256": "2b8acfe64e3c034512821290f5a50c6ac394d49c2e40470d966381182c9bd8b1",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "ea93300eec067019584d53f2bad3c36f8df98e50919604039b9a1ee1182b6b1f",
+          "mode": "100644"
+        },
+        {
+          "source": "package-lock.json",
+          "path": "package-lock.json",
+          "sha256": "2023409a004053e0e5e7918e88c9d7ebc977a95c538fe8693b5777d2ef68ad07",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "e33ecbbfb57a7f5d85b4ef732ed175fd91ef268ba602db80dd4f99796ae5df4f",
+          "mode": "100644"
+        },
+        {
+          "source": "public/index.html",
+          "path": "public/index.html",
+          "sha256": "013382da9eeeb8cf7da085ed598e9d45e9b22cd5d211e02bdec17af1d0348494",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/app.js",
+          "path": "public/js/app.js",
+          "sha256": "c3bf6134a606762cf3a0be25e72d5ab27ee722942b03ad3c99181c81ca7f8b16",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/manifest.edn",
+          "path": "public/js/manifest.edn",
+          "sha256": "867f2817d2482fb7e206ac64cdc514b71c17412c46cc911df16c8e23c9323f39",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "3cd21b2c403b3770acf98cdc22be504a3741a3d1992051bf5870ec6de47d4530",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/cad/app.cljk",
+          "path": "src/kami/cad/app.cljk",
+          "sha256": "b22f6ae0aad5fc8de5ae85739658d91a20a6786ad257328eb0faea63ae5a4a0e",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/cad/dimensional_sketch.cljk",
+          "path": "src/kami/cad/dimensional_sketch.cljk",
+          "sha256": "f17139d72cc3bce45e302d2d0d699a0b9d9764c5c71fddfb805c9c6bffb440f6",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/cad/project.cljk",
+          "path": "src/kami/cad/project.cljk",
+          "sha256": "2f1db0026cbda8cb83409a736c1553ce7de424b9f4ed854bb050694e77b66308",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/cad/ui.cljk",
+          "path": "src/kami/cad/ui.cljk",
+          "sha256": "2f79ad83711fc20741fa90a06e14bdd774cb6f53af453f340149e4f83f621ea3",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/cad/dimensional_sketch_test.cljk",
+          "path": "test/kami/cad/dimensional_sketch_test.cljk",
+          "sha256": "13b4cabbb9add9b167c3905e43456385faa0813c2e2de0465fb418a72647bd4f",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/cad/project_test.cljk",
+          "path": "test/kami/cad/project_test.cljk",
+          "sha256": "a7e5a61bd06809c124758c9eb4beaae1b595bb7e8e5930ba6ea1c7364380ee23",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/pages.yml"
+      ]
+    }
+  ]
+}

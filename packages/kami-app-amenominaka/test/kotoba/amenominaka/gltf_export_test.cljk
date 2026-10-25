@@ -1,0 +1,128 @@
+(ns kotoba.amenominaka.gltf-export-test
+  (:require [kotoba.test :refer [deftest is testing]]
+            [bim]
+            [kotoba.amenominaka.scene :as amenominaka-scene]
+            [kotoba.amenominaka.usd-export :as usd-export]
+            [kotoba.amenominaka.gltf-export :as gltf-export]
+            [gltf]))
+
+(defn- sample-building
+  "Same fixture as usd-export-test/scene-test: one exterior wall, axis
+  [0,0,0]->[10,0,0], rectangle profile thickness=0.2 height=3.5."
+  []
+  (-> (bim/project "Quarry Walk Lodge")
+      (update :sites conj
+              (bim/site
+               {:id 1 :name "Site 1" :geo nil :placement :identity
+                :buildings
+                [(bim/building
+                  {:id 2 :name "Lodge" :placement :identity :reference-elevation 0.0
+                   :storeys
+                   [(bim/storey
+                     {:id 3 :name "L1" :elevation 0.0 :height 3.5 :placement :identity
+                      :spaces []
+                      :elements
+                      [(bim/element
+                        {:id 4 :kind :wall :name "Wall 1" :global-id "GUID-0004"
+                         :placement :identity
+                         :geometry (bim/axis-sweep-geometry
+                                    [[0.0 0.0 0.0] [10.0 0.0 0.0]]
+                                    (bim/rectangle-profile 0.2 3.5))})]})]})]}))))
+
+(deftest zup->yup-test
+  (is (= [1.0 3.0 -2.0] (gltf-export/zup->yup [1.0 2.0 3.0])))
+  (is (= [0.0 0.0 0.0] (gltf-export/zup->yup [0.0 0.0 0.0]))))
+
+(deftest box-mesh->gltf-mesh-test
+  (testing "the sample wall's USD box mesh, triangulated for glTF"
+    (let [usd-mesh (usd-export/axis-sweep-rectangle->box-mesh
+                    {:axis [[0.0 0.0 0.0] [10.0 0.0 0.0]]
+                     :profile {:kind :rectangle :thickness 0.2 :height 3.5}})
+          gltf-mesh (gltf-export/box-mesh->gltf-mesh usd-mesh)]
+      (testing "24 vertices (4 per face × 6 faces), 36 indices (2 tris × 3 × 6 faces) — not the shared 8/24"
+        (is (= 24 (:vertex-count gltf-mesh)))
+        (is (= 36 (:index-count gltf-mesh)))
+        (is (= (* 24 8) (count (:vertices gltf-mesh)))) ;; interleaved stride 8
+        (is (= 36 (count (:indices gltf-mesh)))))
+      (testing "first face (bottom, USD indices [0 3 2 1], reversed to wind correctly) converted Z-up->Y-up, with a real flat normal"
+        (let [verts (:vertices gltf-mesh)
+              vertex-at (fn [i] (subvec verts (* i 8) (+ (* i 8) 8)))
+              p0 (subvec (vertex-at 0) 0 3)
+              n0 (subvec (vertex-at 0) 3 6)
+              uv0 (subvec (vertex-at 0) 6 8)]
+          ;; reversed bottom face's first point = USD point 1 [0.0 0.1 0.0] -> zup->yup -> [0.0 0.0 -0.1]
+          (is (= [0.0 0.0 -0.1] p0))
+          (is (= [0.0 0.0] uv0))
+          ;; bottom face's real outward normal points straight down (-Y) in Y-up
+          (is (< (Math/abs (- (nth n0 1) -1.0)) 1e-9))
+          (is (< (Math/abs (nth n0 0)) 1e-9))
+          (is (< (Math/abs (nth n0 2)) 1e-9)))))))
+
+(deftest scene->gltf-node-tree-hierarchy-test
+  (let [scene (amenominaka-scene/compose {:building (sample-building)})
+        tree (gltf-export/scene->gltf-node-tree scene)]
+    (testing "project -> site -> building -> storey -> mesh node, same names as usd-export"
+      (is (= "Quarry Walk Lodge" (:name tree)))
+      (let [site (first (:children tree))
+            building (first (:children site))
+            storey (first (:children building))
+            wall (first (:children storey))]
+        (is (= "site_1" (:name site)))
+        (is (= "building_2" (:name building)))
+        (is (= "storey_3" (:name storey)))
+        (is (= "wall_4" (:name wall)))
+        (testing "real mesh on the leaf, not a placeholder"
+          (is (some? (:mesh wall)))
+          (is (= 24 (:vertex-count (:mesh wall)))))))))
+
+(deftest scene->gltf-node-tree-non-rectangle-geometry-is-honest-placeholder-test
+  (let [building (-> (bim/project "P")
+                      (update :sites conj
+                              (bim/site
+                               {:id 1 :name "S" :geo nil :placement :identity
+                                :buildings
+                                [(bim/building
+                                  {:id 2 :name "B" :placement :identity :reference-elevation 0.0
+                                   :storeys
+                                   [(bim/storey
+                                     {:id 3 :name "L1" :elevation 0.0 :height 3.0 :placement :identity
+                                      :spaces []
+                                      :elements
+                                      [(bim/element
+                                        {:id 5 :kind :column :name "Column 1" :global-id "GUID-0005"
+                                         :placement :identity
+                                         :geometry (bim/no-geometry)})]})]})]})))
+        scene (amenominaka-scene/compose {:building building})
+        tree (gltf-export/scene->gltf-node-tree scene)
+        column (-> tree :children first :children first :children first :children first)]
+    (testing "no-geometry element exports as a plain transform-only node (glTF's Xform-equivalent), no :mesh"
+      (is (= "column_5" (:name column)))
+      (is (nil? (:mesh column))))))
+
+(deftest scene->gltf-node-tree-invalid-scene-throws-test
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core/ExceptionInfo)
+               (gltf-export/scene->gltf-node-tree {}))))
+
+(defn- approx= [a b] (< (Math/abs (double (- a b))) 1e-4))
+(defn- approx=v [a b] (every? true? (map approx= a b)))
+
+(deftest scene->glb-byte-seq-real-glb-round-trip-test
+  (let [scene (amenominaka-scene/compose {:building (sample-building)})
+        glb-bytes (gltf-export/scene->glb-byte-seq scene)
+        parsed (gltf/parse-gltf glb-bytes)]
+    (testing "well-formed GLB header"
+      (let [glb (vec glb-bytes)]
+        (is (= (subvec glb 0 4) (gltf/u32->le-bytes gltf/glb-magic)))
+        (is (= (gltf/le-bytes->u32 (subvec glb 8 12)) (count glb)))))
+    (testing "5 nodes: wall(mesh) -> storey -> building -> site -> project"
+      (is (= 5 (count (:nodes (:json parsed))))))
+    (testing "exactly one mesh (the wall), 24 vertices, real decoded positions include the known Y-up corner
+             (float32-tolerance compare — export truncates f64->f32)"
+      (is (= 1 (count (:meshes parsed))))
+      (let [positions (-> parsed :meshes first :primitives first :positions)]
+        (is (= 24 (count positions)))
+        (is (some #(approx=v [0.0 0.0 -0.1] %) positions))))
+    (testing "default neutral-gray material present (no per-element material data in bim)"
+      (is (= 1 (count (:materials (:json parsed)))))
+      (is (= [0.62 0.60 0.66 1.0]
+             (-> parsed :json :materials first :pbrMetallicRoughness :baseColorFactor))))))

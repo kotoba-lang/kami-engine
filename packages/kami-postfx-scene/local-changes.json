@@ -1,0 +1,10 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "640b9db7618440b7b9e9bf53bfe9263193d3c92f8e64e9fbe006f625d1f604dd",
+      "sha256": "94363bcd766dd777f5c36d1671d7b0a5e3a319a0ec1b107b9994113d66f58d69",
+      "reason": "JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :lint): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+    }
+  }
+}

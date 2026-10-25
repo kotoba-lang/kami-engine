@@ -1,0 +1,22 @@
+;; M5 (ADR-2607100100): babashka task for static CSS generation, same
+;; shape as murakumo-studio's bb.edn (ADR-2607022800 pattern).
+{:paths ["scripts"
+         ;; kotoba-ui CSS generation (kbb -M:ui-css) reads these design-system
+         ;; namespaces — all pure .cljc, babashka-safe, no build step.
+         "../shitsuke/src"
+         "../liquid-glass-ui/src"
+         "../css/src"]
+ :deps {
+        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
+        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
+        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
+        ;; sha it is shown.
+        io.github.kotoba-lang/io {:git/sha "1b60ca825c1e705bd195f857ca4549133653a9f3"}
+        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
+        ;; only from nbb.edn, so every project file this repo has names it.
+        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}}
+ :tasks
+ {ui-css
+  {:doc "Generate the static kotoba-ui (liquid-glass) CSS into public/vendor/."
+   :task (load-file "scripts/gen_kotoba_ui_css.cljk")}}}
