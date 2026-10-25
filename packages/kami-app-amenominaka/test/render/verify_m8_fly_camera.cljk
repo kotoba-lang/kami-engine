@@ -1,0 +1,136 @@
+(ns verify-m8-fly-camera
+  "M8 (ADR-2607100100) real-browser fly-camera verification, run via nbb
+  FROM THIS REPO'S ROOT:
+    kbb --backend sci -cp test/render test/render/verify_m8_fly_camera.cljk
+  Loads the shadow-cljs-compiled `public/shell.html` in a full (non-
+  headless-shell) Chromium via Playwright and asserts, against the REAL
+  live app — no mocks:
+    1. Initial camera mode is \"orbit\" (via `#debug-state`, same idiom as
+       M2/M4/M5's `#out`/`#debug-state`).
+    2. Clicking `#toggle-camera-mode` switches to \"fly\" and back to
+       \"orbit\" — both directions, both reflected in `#debug-state`.
+    3. Holding a real `w` key down (Playwright's `page.keyboard.down`/
+       `up`, a genuine `keydown`/`keyup` pair — not a synthetic state
+       mutation) for a real span of wall-clock time actually moves
+       `:fly :pos` in `#debug-state` — proving the requestAnimationFrame-
+       driven movement loop (`fly-loop!`/`move-fly!`) is real and
+       framerate-driven, not just a per-event delta.
+    4. The movement is also visible in the actual rendered frame —
+       compared via two REAL Chromium screenshots (`page.screenshot`,
+       clipped to `#viewport`) taken before/after, not JS canvas pixel
+       readback (found unreliable for a WebGPU-context canvas in this
+       Chromium build, see verify_m2_render's docstring)."
+  (:require ["node:path" :as path]
+            [lib.webgpu-harness :as harness]))
+
+(def public-dir (.join path (.cwd js/process) "public"))
+(def screenshot-dir (.join path (.cwd js/process) "test" "render"))
+
+(defn- report! [m]
+  (println (js/JSON.stringify (clj->js m) nil 2)))
+
+(defn- fail! [reason]
+  (println (str "FAIL: " reason))
+  (set! (.-exitCode js/process) 1))
+
+(defn- sleep [ms]
+  (js/Promise. (fn [resolve] (js/setTimeout resolve ms))))
+
+(defn- debug-state [page]
+  (.evaluate page "JSON.parse(document.getElementById('debug-state').textContent)"))
+
+(defn- canvas-screenshot [page]
+  (.screenshot (.locator page "#viewport") #js {:type "png"}))
+
+;; React 18's automatic batching means a Reagent :on-click swap! doesn't
+;; necessarily flush to the DOM before Playwright's .click() promise
+;; resolves — poll instead of reading #debug-state exactly once right
+;; after a click (same idiom as verify_m4_stress.cljs's poll-out-text).
+(defn- poll-camera-mode [page expected timeout]
+  (let [deadline (+ (js/Date.now) timeout)]
+    (letfn [(check []
+              (-> (debug-state page)
+                  (.then (fn [s]
+                           (cond
+                             (= expected (.-cameraMode s)) s
+                             (> (js/Date.now) deadline) s
+                             :else (-> (sleep 100) (.then check)))))))]
+      (check))))
+
+(defn- verify-camera-toggle [page]
+  (-> (debug-state page)
+      (.then (fn [initial]
+               (when-not (= "orbit" (.-cameraMode initial))
+                 (fail! (str "expected initial cameraMode=orbit, got " (.-cameraMode initial))))
+               (-> (.click page "#toggle-camera-mode")
+                   (.then (fn [] (poll-camera-mode page "fly" 5000)))
+                   (.then (fn [after-toggle]
+                            (if (= "fly" (.-cameraMode after-toggle))
+                              (report! {:toggleToFly true})
+                              (fail! (str "expected cameraMode=fly after toggle, got " (.-cameraMode after-toggle))))
+                            after-toggle))))))) ;; return the (possibly failed) state for chaining
+
+(defn- verify-fly-movement [page]
+  (-> (debug-state page)
+      (.then (fn [before-state]
+               (let [before-pos (.-flyPos before-state)]
+                 (-> (canvas-screenshot page)
+                     (.then (fn [before-shot]
+                              (-> (.down (.-keyboard page) "w")
+                                  (.then (fn [] (sleep 600)))
+                                  (.then (fn [] (.up (.-keyboard page) "w")))
+                                  (.then (fn [] (js/Promise.all #js [(debug-state page) (canvas-screenshot page)])))
+                                  (.then (fn [results]
+                                           (let [after-state (aget results 0)
+                                                 after-shot (aget results 1)
+                                                 after-pos (.-flyPos after-state)
+                                                 moved-z (js/Math.abs (- (aget after-pos 2) (aget before-pos 2)))]
+                                             (report! {:beforePos (js->clj before-pos) :afterPos (js->clj after-pos)
+                                                       :movedZ moved-z})
+                                             (when-not (> moved-z 0.5)
+                                               (fail! (str "holding 'w' for 600ms should move :fly :pos meaningfully along Z"
+                                                            " (yaw=0 -> forward=+Z); moved only " moved-z)))
+                                             (when (.equals before-shot after-shot)
+                                               (fail! "holding 'w' did not change the rendered frame (fly movement may be broken)"))
+                                             (report! {:frameChanged (not (.equals before-shot after-shot))})))))))))))))
+
+(defn- verify-toggle-back [page]
+  (-> (.click page "#toggle-camera-mode")
+      (.then (fn [] (poll-camera-mode page "orbit" 5000)))
+      (.then (fn [after]
+               (if (= "orbit" (.-cameraMode after))
+                 (report! {:toggleBackToOrbit true})
+                 (fail! (str "expected cameraMode=orbit after toggling back, got " (.-cameraMode after))))))))
+
+(defn- verify-ui [page base-url]
+  (-> (.goto page (str base-url "/shell.html") #js {:waitUntil "load"})
+      (.then (fn [] (.waitForSelector page "#toggle-camera-mode" #js {:timeout 20000})))
+      (.then (fn [] (verify-camera-toggle page)))
+      (.then (fn [] (verify-fly-movement page)))
+      (.then (fn [] (verify-toggle-back page)))))
+
+(defn- run-verification [browser base-url]
+  (-> (.newPage browser)
+      (.then (fn [page]
+               (let [console-errors (atom [])]
+                 (.on page "console" (fn [msg] (when (= (.type msg) "error") (swap! console-errors conj (.text msg)))))
+                 (.on page "pageerror" (fn [err] (swap! console-errors conj (str err))))
+                 (-> (harness/check-webgpu-available page (str base-url "/shell.html"))
+                     (.then (fn [availability]
+                              (if (.-available availability)
+                                (-> (verify-ui page base-url)
+                                    (.then (fn []
+                                             (when (seq @console-errors)
+                                               (fail! (str "console errors logged: " (pr-str @console-errors)))))))
+                                (report! {:skipped true :reason (.-reason availability)})))))))))
+  )
+
+(defn -main []
+  (-> (harness/start-static-server public-dir)
+      (.then (fn [server]
+               (-> (harness/with-headless-browser
+                    (fn [browser] (run-verification browser (.-baseUrl server))))
+                   (.then (fn [] ((.-close server)))))))
+      (.catch (fn [e] (js/console.error e) (set! (.-exitCode js/process) 1)))))
+
+(-main)

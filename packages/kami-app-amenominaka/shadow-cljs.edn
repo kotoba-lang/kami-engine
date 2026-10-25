@@ -1,0 +1,20 @@
+{:deps  {:aliases [:cljs]}
+ :builds
+ {:m2-demo
+  {:target     :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   :modules    {:m2-demo {:init-fn kotoba.amenominaka.render-demo/init!}}}
+  ;; M4 investigation (ADR-2607100100 D6-b) — reusable perf-regression
+  ;; check, not throwaway; see test/render/verify_m4_stress.cljk.
+  :m4-stress-demo
+  {:target     :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   :modules    {:m4-stress-demo {:init-fn kotoba.amenominaka.render-stress-demo/init!}}}
+  ;; M5 (ADR-2607100100) — the interactive UI shell (public/shell.html).
+  :shell
+  {:target     :browser
+   :output-dir "public/js"
+   :asset-path "/js"
+   :modules    {:shell {:init-fn kotoba.amenominaka.ui/init!}}}}}

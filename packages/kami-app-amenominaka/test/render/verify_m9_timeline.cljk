@@ -1,0 +1,178 @@
+(ns verify-m9-timeline
+  "M9 (ADR-2607100100) real-browser omni.timeline (camera-path) real-
+  browser verification, run via nbb FROM THIS REPO'S ROOT:
+    kbb --backend sci -cp test/render test/render/verify_m9_timeline.cljk
+  Loads the shadow-cljs-compiled `public/shell.html` in a full (non-
+  headless-shell) Chromium via Playwright and asserts, against the REAL
+  live app — no mocks:
+    1. Initial state: 0 keyframes, playhead 0.0.
+    2. Clicking `#record-keyframe` from the default orbit view, then
+       switching to fly mode and holding a real `d` keydown (strafe) to
+       move to a genuinely different position before recording a second
+       keyframe, produces 2 keyframes 2.0s apart (kotoba.amenominaka.
+       timeline's auto-spacing) — confirmed via `#debug-state`.
+    3. Scrubbing `#timeline-scrub` (set via a real DOM `.value` write +
+       dispatched `input`/`change` events, since Playwright's `.fill()`
+       does not support `type=range` inputs — \"Malformed value\", a real
+       finding of this verification script itself) to the midpoint
+       (t=1.0) actually moves the render-IR's `:eye` to the arithmetic
+       mean of the two recorded eyes — real linear interpolation, not
+       just a UI-state change.
+    4. Clicking `#toggle-play` really plays back over real wall-clock
+       time (a genuine requestAnimationFrame loop, not an instant jump):
+       polls until playback auto-stops at the end (`playing` -> false,
+       `playhead` at the path's duration), and confirms the rendered
+       frame visibly changed at least once during playback (two real
+       Chromium screenshots, not JS canvas readback — see
+       verify_m2_render's docstring for why).
+    5. `#clear-timeline` resets keyframe count and playhead to 0.
+
+  Every state-changing click is followed by a POLL, not a single
+  immediate `#debug-state` read — React 18's automatic event-handler
+  batching means a Reagent `:on-click` `swap!` doesn't necessarily flush
+  to the DOM before Playwright's `.click()` promise resolves. This was
+  found to be a real, intermittent (not deterministic) race by this
+  script during development, the same class of bug M8's verification
+  found for its camera-mode toggle — same fix (poll instead of a single
+  read), applied consistently here for every click."
+  (:require ["node:path" :as path]
+            [lib.webgpu-harness :as harness]))
+
+(def public-dir (.join path (.cwd js/process) "public"))
+
+(defn- report! [m]
+  (println (js/JSON.stringify (clj->js m) nil 2)))
+
+(defn- fail! [reason]
+  (println (str "FAIL: " reason))
+  (set! (.-exitCode js/process) 1))
+
+(defn- sleep [ms]
+  (js/Promise. (fn [resolve] (js/setTimeout resolve ms))))
+
+(defn- debug-state [page]
+  (.evaluate page "JSON.parse(document.getElementById('debug-state').textContent)"))
+
+(defn- canvas-screenshot [page]
+  (.screenshot (.locator page "#viewport") #js {:type "png"}))
+
+(defn- poll [page pred timeout]
+  (let [deadline (+ (js/Date.now) timeout)]
+    (letfn [(check []
+              (-> (debug-state page)
+                  (.then (fn [s]
+                           (cond
+                             (pred s) s
+                             (> (js/Date.now) deadline) s
+                             :else (-> (sleep 100) (.then check)))))))]
+      (check))))
+
+;; Playwright's locator.fill() does not support type=range ("Malformed
+;; value" — a real finding of this script) — set .value directly and
+;; dispatch real input/change events instead, the standard workaround.
+(defn- set-range-value! [page selector value]
+  (.evaluate page
+             (str "(() => {"
+                  "  const el = document.querySelector('" selector "');"
+                  "  el.value = '" value "';"
+                  "  el.dispatchEvent(new Event('input', {bubbles: true}));"
+                  "  el.dispatchEvent(new Event('change', {bubbles: true}));"
+                  "})()")))
+
+(defn- verify-initial [page]
+  (-> (debug-state page)
+      (.then (fn [s]
+               (when-not (= 0 (.-keyframeCount s))
+                 (fail! (str "expected 0 keyframes initially, got " (.-keyframeCount s))))
+               (report! {:initialKeyframeCount (.-keyframeCount s)})))))
+
+(defn- verify-record-two-keyframes [page]
+  (-> (.click page "#record-keyframe")
+      (.then (fn [] (poll page #(= 1 (.-keyframeCount %)) 5000)))
+      (.then (fn [after-first]
+               (report! {:eyeAfterFirstKeyframe (js->clj (.-renderEye after-first))})
+               (-> (.click page "#toggle-camera-mode") ;; orbit -> fly
+                   (.then (fn [] (poll page #(= "fly" (.-cameraMode %)) 5000)))
+                   (.then (fn [] (.down (.-keyboard page) "d")))
+                   (.then (fn [] (sleep 500)))
+                   (.then (fn [] (.up (.-keyboard page) "d")))
+                   (.then (fn [] (.click page "#record-keyframe")))
+                   (.then (fn [] (poll page #(= 2 (.-keyframeCount %)) 5000)))
+                   (.then (fn [after-second]
+                            (report! {:keyframeCount (.-keyframeCount after-second)
+                                      :eyeAfterSecondKeyframe (js->clj (.-renderEye after-second))})
+                            (when-not (= 2 (.-keyframeCount after-second))
+                              (fail! (str "expected 2 keyframes, got " (.-keyframeCount after-second))))
+                            [after-first after-second])))))))
+
+(defn- verify-scrub-midpoint [page eye-a eye-b]
+  (-> (set-range-value! page "#timeline-scrub" "1.0")
+      (.then (fn [] (poll page #(> (.-playhead %) 0.99) 5000)))
+      (.then (fn [s]
+               (let [mid (mapv (fn [a b] (/ (+ a b) 2.0)) eye-a eye-b)
+                     actual (vec (.-renderEye s))]
+                 (report! {:playhead (.-playhead s) :expectedMidpoint mid :actualEye actual})
+                 (when-not (every? true? (map (fn [e a] (< (js/Math.abs (- e a)) 0.5)) mid actual))
+                   (fail! (str "scrubbing to t=1.0 (midpoint) should put :eye near " mid ", got " actual))))))))
+
+(defn- verify-playback [page]
+  (-> (canvas-screenshot page)
+      (.then (fn [before-shot]
+               (-> (.click page "#toggle-play")
+                   (.then (fn [] (poll page #(true? (.-playing %)) 5000))) ;; confirm it actually started
+                   (.then (fn [] (poll page #(false? (.-playing %)) 8000))) ;; then wait for it to auto-stop
+                   (.then (fn [s]
+                            (report! {:finalPlayhead (.-playhead s) :playing (.-playing s)})
+                            (when (.-playing s)
+                              (fail! "playback did not auto-stop within 8s"))
+                            (when-not (>= (.-playhead s) 1.9)
+                              (fail! (str "expected playhead near the path duration (2.0) after playback, got " (.-playhead s))))))
+                   (.then (fn [] (canvas-screenshot page)))
+                   (.then (fn [after-shot]
+                            (if (.equals before-shot after-shot)
+                              (fail! "playback did not change the rendered frame")
+                              (report! {:frameChangedDuringPlayback true})))))))))
+
+(defn- verify-clear [page]
+  (-> (.click page "#clear-timeline")
+      (.then (fn [] (poll page #(= 0 (.-keyframeCount %)) 5000)))
+      (.then (fn [s]
+               (if (and (= 0 (.-keyframeCount s)) (zero? (.-playhead s)))
+                 (report! {:clearedOk true})
+                 (fail! (str "expected keyframeCount=0 playhead=0 after clear, got "
+                             (.-keyframeCount s) " " (.-playhead s))))))))
+
+(defn- verify-ui [page base-url]
+  (-> (.goto page (str base-url "/shell.html") #js {:waitUntil "load"})
+      (.then (fn [] (.waitForSelector page "#record-keyframe" #js {:timeout 20000})))
+      (.then (fn [] (verify-initial page)))
+      (.then (fn [] (verify-record-two-keyframes page)))
+      (.then (fn [[after-first after-second]]
+               (verify-scrub-midpoint page (vec (.-renderEye after-first)) (vec (.-renderEye after-second)))))
+      (.then (fn [] (verify-playback page)))
+      (.then (fn [] (verify-clear page)))))
+
+(defn- run-verification [browser base-url]
+  (-> (.newPage browser)
+      (.then (fn [page]
+               (let [console-errors (atom [])]
+                 (.on page "console" (fn [msg] (when (= (.type msg) "error") (swap! console-errors conj (.text msg)))))
+                 (.on page "pageerror" (fn [err] (swap! console-errors conj (str err))))
+                 (-> (harness/check-webgpu-available page (str base-url "/shell.html"))
+                     (.then (fn [availability]
+                              (if (.-available availability)
+                                (-> (verify-ui page base-url)
+                                    (.then (fn []
+                                             (when (seq @console-errors)
+                                               (fail! (str "console errors logged: " (pr-str @console-errors)))))))
+                                (report! {:skipped true :reason (.-reason availability)}))))))))))
+
+(defn -main []
+  (-> (harness/start-static-server public-dir)
+      (.then (fn [server]
+               (-> (harness/with-headless-browser
+                    (fn [browser] (run-verification browser (.-baseUrl server))))
+                   (.then (fn [] ((.-close server)))))))
+      (.catch (fn [e] (js/console.error e) (set! (.-exitCode js/process) 1)))))
+
+(-main)

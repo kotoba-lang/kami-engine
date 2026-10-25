@@ -1,0 +1,64 @@
+(ns kotoba.amenominaka.timeline-test
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kotoba.amenominaka.timeline :as timeline]))
+
+(deftest empty-timeline-test
+  (is (= 0.0 (timeline/duration [])))
+  (is (nil? (timeline/eval-at [] 5.0))))
+
+(deftest add-keyframe-auto-spacing-test
+  (let [t (-> [] (timeline/add-keyframe [0.0 0.0 0.0] [0.0 0.0 1.0])
+              (timeline/add-keyframe [10.0 0.0 0.0] [10.0 0.0 1.0])
+              (timeline/add-keyframe [20.0 0.0 0.0] [20.0 0.0 1.0]))]
+    (is (= 3 (count t)))
+    (is (= [0.0 2.0 4.0] (mapv :t t)))
+    (is (= 4.0 (timeline/duration t)))))
+
+(deftest single-keyframe-test
+  (let [t (timeline/add-keyframe [] [1.0 2.0 3.0] [4.0 5.0 6.0])]
+    (is (= 0.0 (timeline/duration t)))
+    (testing "before/at/after all clamp to the one keyframe"
+      (is (= {:eye [1.0 2.0 3.0] :target [4.0 5.0 6.0]} (timeline/eval-at t -1.0)))
+      (is (= {:eye [1.0 2.0 3.0] :target [4.0 5.0 6.0]} (timeline/eval-at t 0.0)))
+      (is (= {:eye [1.0 2.0 3.0] :target [4.0 5.0 6.0]} (timeline/eval-at t 5.0))))))
+
+(deftest linear-interpolation-test
+  (let [t (-> [] (timeline/add-keyframe [0.0 0.0 0.0] [0.0 0.0 0.0])
+              (timeline/add-keyframe [10.0 0.0 0.0] [10.0 0.0 0.0]))]
+    (testing "keyframes at t=0.0 and t=2.0 (auto-spacing)"
+      (is (= [0.0 2.0] (mapv :t t))))
+    (testing "midpoint (t=1.0, halfway between 0.0 and 2.0) is the arithmetic mean"
+      (is (= {:eye [5.0 0.0 0.0] :target [5.0 0.0 0.0]} (timeline/eval-at t 1.0))))
+    (testing "quarter-point (t=0.5) is 25% of the way"
+      (is (= {:eye [2.5 0.0 0.0] :target [2.5 0.0 0.0]} (timeline/eval-at t 0.5))))
+    (testing "exactly at a keyframe returns it exactly"
+      (is (= {:eye [0.0 0.0 0.0] :target [0.0 0.0 0.0]} (timeline/eval-at t 0.0)))
+      (is (= {:eye [10.0 0.0 0.0] :target [10.0 0.0 0.0]} (timeline/eval-at t 2.0))))
+    (testing "before the first / after the last clamps"
+      (is (= {:eye [0.0 0.0 0.0] :target [0.0 0.0 0.0]} (timeline/eval-at t -5.0)))
+      (is (= {:eye [10.0 0.0 0.0] :target [10.0 0.0 0.0]} (timeline/eval-at t 99.0))))))
+
+(deftest three-keyframe-path-interpolates-within-the-right-segment-test
+  (let [t (-> [] (timeline/add-keyframe [0.0 0.0 0.0] [0.0 0.0 1.0])
+              (timeline/add-keyframe [100.0 0.0 0.0] [100.0 0.0 1.0])
+              (timeline/add-keyframe [0.0 0.0 100.0] [0.0 0.0 101.0]))]
+    ;; keyframes at t=[0.0 2.0 4.0]
+    (testing "t=3.0 interpolates within the SECOND segment (kf1->kf2), not the first"
+      (is (= {:eye [50.0 0.0 50.0] :target [50.0 0.0 51.0]} (timeline/eval-at t 3.0))))
+    (testing "t=1.0 interpolates within the first segment (kf0->kf1)"
+      (is (= {:eye [50.0 0.0 0.0] :target [50.0 0.0 1.0]} (timeline/eval-at t 1.0))))))
+
+(deftest clear-test
+  (let [t (timeline/add-keyframe [] [1.0 2.0 3.0] [4.0 5.0 6.0])]
+    (is (= [] (timeline/clear t)))))
+
+(deftest edit-camera-keyframes-test
+  (let [path (-> [] (timeline/add-keyframe [0 0 0] [0 0 1])
+                 (timeline/add-keyframe [2 0 0] [2 0 1])
+                 (timeline/add-keyframe [4 0 0] [4 0 1]))
+        moved (timeline/move-keyframe path 1 1.25)
+        deleted (timeline/delete-keyframe moved 1)]
+    (is (= [0.0 1.25 4.0] (mapv :t moved)))
+    (is (= [[0 0 0] [4 0 0]] (mapv :eye deleted)))
+    (is (thrown? #?(:clj Exception :cljs js/Error) (timeline/move-keyframe path 1 4.0)))
+    (is (thrown? #?(:clj Exception :cljs js/Error) (timeline/delete-keyframe path 9)))))

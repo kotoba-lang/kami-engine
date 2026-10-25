@@ -1,0 +1,112 @@
+(ns kotoba.amenominaka.render-ir-test
+  (:require [kotoba.test :refer [deftest is testing]]
+            [bim]
+            [atmosphere]
+            [kami.webgpu.ir :as ir]
+            [kotoba.amenominaka.scene :as amenominaka-scene]
+            [kotoba.amenominaka.render-ir :as render-ir]))
+
+(defn- sample-building
+  "Same fixture as M0/M1 tests: one exterior wall, axis [0,0,0]->[10,0,0],
+  rectangle profile thickness=0.2 height=3.5, storey elevation 0.0."
+  []
+  (-> (bim/project "Quarry Walk Lodge")
+      (update :sites conj
+              (bim/site
+               {:id 1 :name "Site 1" :geo nil :placement :identity
+                :buildings
+                [(bim/building
+                  {:id 2 :name "Lodge" :placement :identity :reference-elevation 0.0
+                   :storeys
+                   [(bim/storey
+                     {:id 3 :name "L1" :elevation 0.0 :height 3.5 :placement :identity
+                      :spaces []
+                      :elements
+                      [(bim/element
+                        {:id 4 :kind :wall :name "Wall 1" :global-id "GUID-0004"
+                         :placement :identity
+                         :geometry (bim/axis-sweep-geometry
+                                    [[0.0 0.0 0.0] [10.0 0.0 0.0]]
+                                    (bim/rectangle-profile 0.2 3.5))})]})]})]}))))
+
+(deftest element->instance-test
+  (testing "axis-sweep + rectangle profile -> a massing-block instance (footprint=length, height=profile height)"
+    (is (= (ir/instance [5.0 0.0 0.0] render-ir/default-element-color [10.0 3.5])
+           (render-ir/element->instance
+            {:geometry (bim/axis-sweep-geometry [[0.0 0.0 0.0] [10.0 0.0 0.0]]
+                                                 (bim/rectangle-profile 0.2 3.5))}))))
+  (testing "non-axis-sweep geometry has no positional data -> nil, not a faked instance"
+    (is (nil? (render-ir/element->instance {:geometry (bim/no-geometry)})))
+    (is (nil? (render-ir/element->instance {:geometry (bim/brep-geometry {:opaque true})})))
+    (is (nil? (render-ir/element->instance {:geometry (bim/mesh-ref-geometry "blob-1" 12)})))))
+
+(deftest scene->render-ir-building-only-test
+  (let [scene (amenominaka-scene/compose {:building (sample-building)})
+        result (render-ir/scene->render-ir scene)]
+    (testing "well-formed render-IR"
+      (is (ir/valid? result)))
+    (testing "one massing-block instance for the wall, no ground plane without terrain"
+      (is (= [(ir/instance [5.0 0.0 0.0] render-ir/default-element-color [10.0 3.5])]
+             (:instances result))))
+    (testing "default sky when no :weather was requested"
+      (is (= render-ir/default-sky (get-in result [:globals :sky]))))
+    (testing "camera framed on the building's footprint centroid (5,0)"
+      (is (= (ir/rig->camera {} [5.0 0.0]) (select-keys (:globals result) [:eye :target]))))))
+
+(deftest scene->render-ir-full-scene-test
+  (let [scene (amenominaka-scene/compose
+               {:building (sample-building)
+                :weather "overcast"
+                :terrain "plains"})
+        result (render-ir/scene->render-ir scene)
+        expected-sky (render-ir/atmosphere->sky (:scene/atmosphere scene))]
+    (testing "well-formed render-IR"
+      (is (ir/valid? result)))
+    (testing "sky derived from the real atmosphere/day-night-to-uniform (not a hardcoded default)"
+      (is (not= render-ir/default-sky (get-in result [:globals :sky])))
+      (is (= expected-sky (get-in result [:globals :sky])))
+      (let [uniform (atmosphere/day-night-to-uniform (get-in scene [:scene/atmosphere :day-night]))]
+        (is (= (ir/sky (:fog-color uniform) (:sun-dir uniform) (:sun-color uniform))
+               (get-in result [:globals :sky])))))
+    (testing "ground-plane instance appended, tinted by the biome's base palette"
+      (is (= 2 (count (:instances result))))
+      (let [ground (last (:instances result))
+            expected-color (first (get-in scene [:scene/terrain :palette :base]))]
+        (is (= expected-color (:color ground)))
+        (is (= render-ir/ground-plane-size (:size ground)))))
+    (testing "camera centroid excludes the ground plane (still framed on the wall alone)"
+      (is (= (ir/rig->camera {} [5.0 0.0]) (select-keys (:globals result) [:eye :target]))))))
+
+(deftest atmosphere->sky-nil-without-day-night-test
+  (is (nil? (render-ir/atmosphere->sky {}))))
+
+(deftest terrain->ground-instance-nil-without-palette-test
+  (is (nil? (render-ir/terrain->ground-instance {}))))
+
+(deftest scene->render-ir-invalid-scene-throws-test
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core/ExceptionInfo)
+               (render-ir/scene->render-ir {}))))
+
+(deftest scene->render-ir-multi-storey-elevation-test
+  (testing "storey :elevation is applied as an additive Y offset to instances on that storey"
+    (let [building (-> (bim/project "Two Storey")
+                        (update :sites conj
+                                (bim/site
+                                 {:id 1 :name "S" :geo nil :placement :identity
+                                  :buildings
+                                  [(bim/building
+                                    {:id 2 :name "B" :placement :identity :reference-elevation 0.0
+                                     :storeys
+                                     [(bim/storey
+                                       {:id 3 :name "L2" :elevation 3.5 :height 3.0 :placement :identity
+                                        :spaces []
+                                        :elements
+                                        [(bim/element
+                                          {:id 6 :kind :wall :name "Wall 2" :global-id "GUID-0006"
+                                           :placement :identity
+                                           :geometry (bim/axis-sweep-geometry
+                                                      [[0.0 0.0 0.0] [4.0 0.0 0.0]]
+                                                      (bim/rectangle-profile 0.2 3.0))})]})]})]})))
+          scene (amenominaka-scene/compose {:building building})
+          result (render-ir/scene->render-ir scene)]
+      (is (= [2.0 3.5 0.0] (:pos (first (:instances result))))))))

@@ -1,0 +1,73 @@
+(ns kotoba.amenominaka.scene-test
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kotoba.lang.edn :as edn]
+            [bim]
+            [kotoba.amenominaka.scene :as amenominaka-scene]))
+
+(defn- sample-building
+  "A minimal single-storey building: one exterior wall on Storey L1,
+  authored with `bim`'s real construction API (not a fixture literal)."
+  []
+  (-> (bim/project "Quarry Walk Lodge")
+      (update :sites conj
+              (bim/site
+               {:id 1 :name "Site 1" :geo nil :placement :identity
+                :buildings
+                [(bim/building
+                  {:id 2 :name "Lodge" :placement :identity :reference-elevation 0.0
+                   :storeys
+                   [(bim/storey
+                     {:id 3 :name "L1" :elevation 0.0 :height 3.5 :placement :identity
+                      :spaces []
+                      :elements
+                      [(bim/element
+                        {:id 4 :kind :wall :name "Wall 1" :global-id "GUID-0004"
+                         :placement :identity
+                         :geometry (bim/axis-sweep-geometry
+                                    [[0.0 0.0 0.0] [10.0 0.0 0.0]]
+                                    (bim/rectangle-profile 0.2 3.5))})]})]})]}))))
+
+(deftest bim-project?-test
+  (testing "a real bim/project passes"
+    (is (true? (amenominaka-scene/bim-project? (sample-building)))))
+  (testing "non-project shapes fail"
+    (is (false? (amenominaka-scene/bim-project? {})))
+    (is (false? (amenominaka-scene/bim-project? nil)))
+    (is (false? (amenominaka-scene/bim-project? {:sites "not-a-coll"})))))
+
+(deftest compose-building-only-test
+  (let [scene (amenominaka-scene/compose {:building (sample-building)})]
+    (is (amenominaka-scene/valid-scene? scene))
+    (is (= (sample-building) (:scene/building scene)))
+    (is (not (contains? scene :scene/atmosphere)))
+    (is (not (contains? scene :scene/vegetation)))
+    (is (not (contains? scene :scene/terrain)))
+    (is (not (contains? scene :scene/postfx)))))
+
+(deftest compose-full-walkthrough-scene-test
+  (testing "building + one preset from every kami-*-scene domain composes into one validated scene.edn"
+    (let [scene (amenominaka-scene/compose
+                 {:building (sample-building)
+                  :weather "overcast"
+                  :vegetation ["grass"]
+                  :terrain "plains"
+                  :postfx "nintendo"})]
+      (is (amenominaka-scene/valid-scene? scene))
+      (is (map? (:scene/atmosphere scene)))
+      (is (contains? (:scene/vegetation scene) "grass"))
+      (is (map? (get (:scene/vegetation scene) "grass")))
+      (is (map? (:scene/terrain scene)))
+      (is (map? (:scene/postfx scene)))
+      (testing "round-trips through edn print/read (this IS the scene.edn artifact)"
+        (let [round-tripped (edn/read-string (pr-str scene))]
+          (is (= scene round-tripped))
+          (is (amenominaka-scene/valid-scene? round-tripped)))))))
+
+(deftest compose-missing-building-throws-test
+  (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core/ExceptionInfo)
+               (amenominaka-scene/compose {}))))
+
+(deftest compose-unknown-preset-name-propagates-domain-error-test
+  (testing "an unknown preset name throws the underlying domain's own ex-info, unmodified"
+    (is (thrown? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core/ExceptionInfo)
+                 (amenominaka-scene/compose {:building (sample-building) :weather "nonexistent-preset"})))))

@@ -1,0 +1,35 @@
+(ns kotoba.amenominaka-test
+  (:require [kotoba.lang.text :as str]
+            [kotoba.test :refer [deftest is testing]]
+            [kotoba.amenominaka :as amenominaka]))
+
+(defn- non-blank-string? [x]
+  (and (string? x) (not (str/blank? x))))
+
+(deftest constants-test
+  (testing "each constant is a non-blank string with the expected value"
+    (is (non-blank-string? amenominaka/adr))
+    (is (= "ADR-2605261800" amenominaka/adr))
+
+    (is (non-blank-string? amenominaka/phase))
+    (is (= "R1.0-path-reservation" amenominaka/phase))
+
+    (is (non-blank-string? amenominaka/kami-name))
+    (is (= "amenominaka" amenominaka/kami-name))
+
+    (is (non-blank-string? amenominaka/nv-compat-target))
+    (is (= "Omniverse Kit (app shell + extension system)"
+           amenominaka/nv-compat-target))
+
+    (is (non-blank-string? amenominaka/extension-manifest-format))
+    (is (= "extension.toml" amenominaka/extension-manifest-format))))
+
+(deftest path-reservation-map-test
+  (testing "path-reservation gathers the same 5 constants"
+    (is (= {:adr amenominaka/adr
+            :phase amenominaka/phase
+            :kami-name amenominaka/kami-name
+            :nv-compat-target amenominaka/nv-compat-target
+            :extension-manifest-format amenominaka/extension-manifest-format}
+           amenominaka/path-reservation))
+    (is (= 5 (count amenominaka/path-reservation)))))
