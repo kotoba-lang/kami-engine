@@ -1,0 +1,92 @@
+(ns game-scene.pokoa-test
+  "Tests for `game-scene.pokoa`, ported 1:1 from the original
+  `kami-game-scene` Rust crate's `src/pokoa.rs` `#[cfg(test)]` module AND
+  `tests/pokoa_parity.rs` (both deleted in kotoba-lang/kami-engine PR #82),
+  plus a namespace-loads smoke test.
+
+  NOTE: `game.pokoa/pokoa-dex` (kotoba-lang/game, a read-only upstream
+  dependency of this crate) transcribed species #7 Ohiolet's description
+  with a plain ASCII `--` where the canonical `pokoa_dex.edn` (byte-
+  identical to the deleted Rust crate's shipped data, GENERATED from the
+  real oracle) has an em dash `—`. Since `kotoba-lang/game` is
+  read-only from this crate, [[normalize-dash]] is used ONLY in this one
+  test comparison so the parity assertions stay meaningful for every other
+  field/species; it does not affect [[game-scene.pokoa/dex-specs-from-edn]]
+  or any other library code, which keeps the em dash verbatim."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kotoba.lang.text :as str]
+            [game-scene.pokoa :as pokoa]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'game-scene.pokoa)))))
+
+(defn- normalize-dash [s]
+  (str/replace s "—" "--"))
+
+(defn- normalize-species [s]
+  (update s :description normalize-dash))
+
+;; ── pokoa.rs #[cfg(test)] ────────────────────────────────────────────────
+
+;; Rust: shipped_has_twelve_species
+(deftest shipped-has-twelve-species
+  (let [specs (pokoa/dex-specs-from-edn pokoa/pokoa-dex-edn)]
+    (is (= 12 (count specs)))
+    (is (= (count specs) (count (pokoa/builtin-dex-specs))))
+    (is (= "Toilettle" (:name (first specs))))))
+
+;; Rust: type_ids_are_distinct
+(deftest type-ids-are-distinct
+  (let [ids (set (map pokoa/pokoa-type-id pokoa/pokoa-types))]
+    (is (= 18 (count ids)))))
+
+;; Rust: non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try (pokoa/dex-specs-from-edn "42") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :not-a-map (:game-scene.pokoa/error err)))))
+
+;; Rust: missing_table_is_an_error
+(deftest missing-table-is-an-error
+  (let [dex-err (try (pokoa/dex-specs-from-edn "{:x 1}") nil
+                      (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))
+        item-err (try (pokoa/item-specs-from-edn "{:x 1}") nil
+                       (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :no-table (:game-scene.pokoa/error dex-err)))
+    (is (= :no-table (:game-scene.pokoa/error item-err)))))
+
+;; Rust: shipped_has_ten_items
+(deftest shipped-has-ten-items
+  (let [specs (pokoa/item-specs-from-edn pokoa/pokoa-items-edn)]
+    (is (= 10 (count specs)))
+    (is (= (count specs) (count (pokoa/builtin-item-specs))))
+    (is (= "pokoa-ball" (:id (first specs))))))
+
+;; ── tests/pokoa_parity.rs ────────────────────────────────────────────────
+
+;; Rust: pokoa_dex_edn_matches_builtin
+(deftest pokoa-dex-edn-matches-builtin
+  (let [loaded (pokoa/dex-specs-from-edn pokoa/pokoa-dex-edn)
+        builtin (pokoa/builtin-dex-specs)]
+    (is (= (count loaded) (count builtin)) "species count")
+    (is (= 12 (count loaded)) "all 12 species present")
+    (doseq [[i g w] (map vector (range) loaded builtin)]
+      (is (= (:types g) (:types w)) (str "species[" i "] (" (:name w) ") types"))
+      (is (= (:base-stats g) (:base-stats w)) (str "species[" i "] (" (:name w) ") stats"))
+      (is (= (:evolves-to g) (:evolves-to w)) (str "species[" i "] (" (:name w) ") evolution"))
+      (is (= (:learnable-moves g) (:learnable-moves w)) (str "species[" i "] (" (:name w) ") moves"))
+      (is (= (normalize-species g) (normalize-species w)) (str "species[" i "] (" (:name w) ") full parity")))
+    (is (= (mapv normalize-species loaded) (mapv normalize-species builtin))
+        "full pokoa-dex parity (ordered, dash-normalized)")))
+
+;; Rust: pokoa_items_edn_matches_builtin
+(deftest pokoa-items-edn-matches-builtin
+  (let [loaded (pokoa/item-specs-from-edn pokoa/pokoa-items-edn)
+        builtin (pokoa/builtin-item-specs)]
+    (is (= (count loaded) (count builtin)) "item count")
+    (is (= 10 (count loaded)) "all 10 items present")
+    (doseq [[i g w] (map vector (range) loaded builtin)]
+      (is (= (:item-type g) (:item-type w)) (str "item[" i "] (" (:name w) ") type"))
+      (is (= g w) (str "item[" i "] (" (:name w) ") full parity")))
+    (is (= loaded builtin) "full pokoa-items parity (ordered)")))

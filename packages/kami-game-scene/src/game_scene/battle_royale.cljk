@@ -1,0 +1,223 @@
+(ns game-scene.battle-royale
+  "Battle-royale data tier — `game`'s storm-phase schedule
+  (`game.battle-royale/default-storm-phases`), weapon pool
+  (`game.battle-royale/weapon-pool`), and consumable pool
+  (`game.battle-royale/consumable-pool`) as parity-tested EDN. Restored
+  from the legacy kami-engine/kami-game-scene Rust crate's
+  `battle_royale.rs` (deleted in kotoba-lang/kami-engine PR #82) as part of
+  the clj-wgsl migration (ADR-2607010930, com-junkawasaki/root).
+
+  The storm simulation and heal/shield/ballistics logic stay native
+  `game.battle-royale`; only the init-time **descriptions** — the phase
+  schedule, weapon table, and consumable item table — move to EDN
+  (ADR-0046 / ADR-0038). [[storm-phases-from-edn]] / [[weapons-from-edn]] /
+  [[consumables-from-edn]] rebuild the real `game.battle-royale` maps,
+  asserted `=` the compiled-in oracles in
+  `test/game_scene/battle_royale_test.cljk`.
+
+  `game.battle-royale`'s rarity/consumable-type/weapon-type keywords are
+  already hyphenated ids (e.g. `:small-shield`, `:assault-rifle`), so
+  id<->keyword conversion is just `name`/`keyword` here; explicit
+  valid-sets give tolerant fallback for unknown ids (mirroring the
+  original's `_ => <default variant>` match arms).
+
+  Zero-dep portable CLJC."
+  (:require [scene :as scene]
+            [game.battle-royale :as br]))
+
+(def storm-phases-edn
+  "The canonical storm-phase CONFIG shipped with this crate. Embedded as a
+  literal string; kept byte-identical to
+  `resources/game_scene/battle_royale_storm.edn`."
+";; battle_royale_storm.edn — canonical CONFIG/DATA for kami-game's battle-royale storm
+;; phase schedule (`battle_royale::default_storm_phases()`).
+;;
+;; ADR-0046 / ADR-0038: the storm simulation (circle shrink, damage tick) stays native
+;; Rust; only the init-time DESCRIPTION — the per-phase schedule (wait/shrink timing,
+;; end radius, damage/s) — moves to EDN here. kami-game is untouched; `default_storm_phases()`
+;; stays the builtin fallback AND the parity oracle (asserted phase-for-phase `==` it, in
+;; order, in tests/battle_royale_parity.rs).
+{:battle-royale/storm-phases
+ [{:phase 0 :wait 120.0 :shrink 90.0 :end-radius 700.0 :dps 1.0}
+  {:phase 1 :wait 90.0  :shrink 75.0 :end-radius 450.0 :dps 2.0}
+  {:phase 2 :wait 75.0  :shrink 60.0 :end-radius 280.0 :dps 5.0}
+  {:phase 3 :wait 60.0  :shrink 45.0 :end-radius 150.0 :dps 8.0}
+  {:phase 4 :wait 45.0  :shrink 30.0 :end-radius 70.0  :dps 10.0}
+  {:phase 5 :wait 30.0  :shrink 20.0 :end-radius 25.0  :dps 15.0}
+  {:phase 6 :wait 20.0  :shrink 15.0 :end-radius 5.0   :dps 20.0}
+  {:phase 7 :wait 15.0  :shrink 10.0 :end-radius 0.0   :dps 25.0}]}
+")
+
+(def consumables-edn
+  "The canonical consumable-pool CONFIG shipped with this crate. Embedded
+  as a literal string; kept byte-identical to
+  `resources/game_scene/battle_royale_consumables.edn`."
+";; battle_royale_consumables.edn — canonical CONFIG/DATA for kami-game's battle-royale
+;; consumable pool (`battle_royale::consumable_pool()`).
+;;
+;; ADR-0046 / ADR-0038: the heal/shield application + timing logic stays native Rust;
+;; only the init-time DESCRIPTION — the consumable item table — moves to EDN here.
+;; kami-game is untouched; `consumable_pool()` stays the builtin fallback AND the parity
+;; oracle (asserted item-for-item `==` it, in order, in tests/battle_royale_parity.rs).
+;; :type is a ConsumableType keyword id; :rarity a Rarity keyword id.
+{:battle-royale/consumables
+ [{:type :small-shield  :name \"Mini Shield\"   :rarity :common    :use-time 2.0  :hp-restore 0   :shield-restore 25 :hp-cap 100 :shield-cap 50  :stack 6}
+  {:type :large-shield  :name \"Shield Potion\" :rarity :uncommon  :use-time 5.0  :hp-restore 0   :shield-restore 50 :hp-cap 100 :shield-cap 100 :stack 2}
+  {:type :mini-hp       :name \"Bandage\"       :rarity :common    :use-time 3.5  :hp-restore 15  :shield-restore 0  :hp-cap 75  :shield-cap 100 :stack 15}
+  {:type :medkit        :name \"Med Kit\"       :rarity :uncommon  :use-time 10.0 :hp-restore 100 :shield-restore 0  :hp-cap 100 :shield-cap 100 :stack 3}
+  {:type :chug          :name \"Chug Jug\"      :rarity :legendary :use-time 15.0 :hp-restore 100 :shield-restore 100 :hp-cap 100 :shield-cap 100 :stack 1}
+  {:type :small-fry     :name \"Small Fry\"     :rarity :common    :use-time 1.0  :hp-restore 25  :shield-restore 0  :hp-cap 75  :shield-cap 100 :stack 6}
+  {:type :flopper       :name \"Flopper\"       :rarity :uncommon  :use-time 1.0  :hp-restore 100 :shield-restore 0  :hp-cap 100 :shield-cap 100 :stack 4}
+  {:type :shield-fish   :name \"Shield Fish\"   :rarity :rare      :use-time 1.0  :hp-restore 0   :shield-restore 50 :hp-cap 100 :shield-cap 100 :stack 3}
+  {:type :grimace-shake :name \"Grimace Shake\" :rarity :legendary :use-time 8.0  :hp-restore 100 :shield-restore 100 :hp-cap 100 :shield-cap 100 :stack 1}
+  {:type :gyatt-energy  :name \"Gyatt Energy\"  :rarity :rare      :use-time 0.5  :hp-restore 0   :shield-restore 75 :hp-cap 100 :shield-cap 100 :stack 3}
+  {:type :ohio-milk     :name \"Ohio Milk\"     :rarity :uncommon  :use-time 2.0  :hp-restore 50  :shield-restore 0  :hp-cap 100 :shield-cap 100 :stack 5}]}
+")
+
+(def weapons-edn
+  "The canonical weapon-pool CONFIG shipped with this crate (generated
+  from the oracle). Embedded as a literal string; kept byte-identical to
+  `resources/game_scene/battle_royale_weapons.edn`."
+";; battle_royale_weapons.edn — canonical CONFIG/DATA for kami-game's battle-royale weapon
+;; pool (`battle_royale::weapon_pool()`). GENERATED from the Rust oracle (exact values).
+;;
+;; ADR-0046 / ADR-0038: ballistics / damage application stay native Rust; only the
+;; init-time DESCRIPTION — the 25-weapon stat table — moves to EDN. kami-game is untouched;
+;; `weapon_pool()` stays the builtin fallback AND the parity oracle (asserted weapon-for-
+;; weapon `==` it, in order, in tests/battle_royale_parity.rs). :type is a WeaponType
+;; keyword id; :rarity a Rarity keyword id. Whole-number stats are ints (coerced to f32).
+{:battle-royale/weapons
+ [
+  {:type :assault-rifle    :name \"Assault Rifle\"        :rarity :common     :damage  30 :headshot-mult 1.5 :fire-rate 5.5 :magazine 30 :reload-time 2.3 :spread 2.5 :damage-falloff 50 :range 200 :projectile-speed 500}
+  {:type :assault-rifle    :name \"Assault Rifle\"        :rarity :uncommon   :damage  31 :headshot-mult 1.5 :fire-rate 5.5 :magazine 30 :reload-time 2.2 :spread 2.3 :damage-falloff 55 :range 200 :projectile-speed 500}
+  {:type :assault-rifle    :name \"Assault Rifle\"        :rarity :rare       :damage  33 :headshot-mult 1.5 :fire-rate 5.5 :magazine 30 :reload-time 2.1 :spread 2 :damage-falloff 60 :range 200 :projectile-speed 500}
+  {:type :assault-rifle    :name \"SCAR\"                 :rarity :epic       :damage  35 :headshot-mult 1.5 :fire-rate 5.5 :magazine 30 :reload-time 2 :spread 1.5 :damage-falloff 65 :range 200 :projectile-speed 500}
+  {:type :assault-rifle    :name \"SCAR\"                 :rarity :legendary  :damage  36 :headshot-mult 1.5 :fire-rate 5.5 :magazine 30 :reload-time 2 :spread 1.2 :damage-falloff 70 :range 200 :projectile-speed 500}
+  {:type :shotgun          :name \"Pump Shotgun\"         :rarity :common     :damage  80 :headshot-mult 2 :fire-rate 0.7 :magazine  5 :reload-time 4.5 :spread 6 :damage-falloff 10 :range 30 :projectile-speed 400}
+  {:type :shotgun          :name \"Pump Shotgun\"         :rarity :uncommon   :damage  85 :headshot-mult 2 :fire-rate 0.7 :magazine  5 :reload-time 4.3 :spread 5.5 :damage-falloff 12 :range 30 :projectile-speed 400}
+  {:type :shotgun          :name \"Pump Shotgun\"         :rarity :rare       :damage  90 :headshot-mult 2 :fire-rate 0.7 :magazine  5 :reload-time 4 :spread 5 :damage-falloff 14 :range 30 :projectile-speed 400}
+  {:type :shotgun          :name \"Spaz-12\"              :rarity :epic       :damage 100 :headshot-mult 2 :fire-rate 0.7 :magazine  5 :reload-time 3.8 :spread 4.5 :damage-falloff 15 :range 30 :projectile-speed 400}
+  {:type :shotgun          :name \"Spaz-12\"              :rarity :legendary  :damage 110 :headshot-mult 2 :fire-rate 0.7 :magazine  5 :reload-time 3.5 :spread 4 :damage-falloff 16 :range 30 :projectile-speed 400}
+  {:type :smg              :name \"SMG\"                  :rarity :common     :damage  17 :headshot-mult 1.5 :fire-rate 12 :magazine 30 :reload-time 2 :spread 3.5 :damage-falloff 25 :range 100 :projectile-speed 450}
+  {:type :smg              :name \"SMG\"                  :rarity :uncommon   :damage  18 :headshot-mult 1.5 :fire-rate 12 :magazine 30 :reload-time 1.9 :spread 3.2 :damage-falloff 28 :range 100 :projectile-speed 450}
+  {:type :smg              :name \"Rapid Fire SMG\"       :rarity :rare       :damage  15 :headshot-mult 1.5 :fire-rate 15 :magazine 26 :reload-time 1.7 :spread 4 :damage-falloff 22 :range 80 :projectile-speed 450}
+  {:type :sniper-rifle     :name \"Bolt-Action Sniper\"   :rarity :rare       :damage 105 :headshot-mult 2.5 :fire-rate 0.33 :magazine  1 :reload-time 3 :spread 0 :damage-falloff 200 :range 500 :projectile-speed 800}
+  {:type :sniper-rifle     :name \"Heavy Sniper\"         :rarity :epic       :damage 132 :headshot-mult 2.5 :fire-rate 0.25 :magazine  1 :reload-time 4 :spread 0 :damage-falloff 250 :range 500 :projectile-speed 900}
+  {:type :sniper-rifle     :name \"Heavy Sniper\"         :rarity :legendary  :damage 150 :headshot-mult 2.5 :fire-rate 0.25 :magazine  1 :reload-time 4 :spread 0 :damage-falloff 250 :range 500 :projectile-speed 900}
+  {:type :pistol           :name \"Pistol\"               :rarity :common     :damage  24 :headshot-mult 1.5 :fire-rate 6.75 :magazine 16 :reload-time 1.3 :spread 3 :damage-falloff 30 :range 100 :projectile-speed 400}
+  {:type :pistol           :name \"Pistol\"               :rarity :uncommon   :damage  25 :headshot-mult 1.5 :fire-rate 6.75 :magazine 16 :reload-time 1.2 :spread 2.8 :damage-falloff 35 :range 100 :projectile-speed 400}
+  {:type :rocket-launcher  :name \"Rocket Launcher\"      :rarity :epic       :damage 110 :headshot-mult 1 :fire-rate 0.75 :magazine  1 :reload-time 3 :spread 0 :damage-falloff 0 :range 300 :projectile-speed 100}
+  {:type :rocket-launcher  :name \"Rocket Launcher\"      :rarity :legendary  :damage 121 :headshot-mult 1 :fire-rate 0.75 :magazine  1 :reload-time 2.8 :spread 0 :damage-falloff 0 :range 300 :projectile-speed 100}
+  {:type :rocket-launcher  :name \"Skibidi Launcher\"     :rarity :epic       :damage 125 :headshot-mult 1 :fire-rate 0.6 :magazine  1 :reload-time 3.5 :spread 0 :damage-falloff 0 :range 250 :projectile-speed 90}
+  {:type :assault-rifle    :name \"Ohio Anomaly Rifle\"   :rarity :legendary  :damage  38 :headshot-mult 2 :fire-rate 6 :magazine 25 :reload-time 1.8 :spread 1 :damage-falloff 80 :range 250 :projectile-speed 550}
+  {:type :sniper-rifle     :name \"Sigma Sniper\"         :rarity :legendary  :damage 165 :headshot-mult 3 :fire-rate 0.2 :magazine  1 :reload-time 4.5 :spread 0 :damage-falloff 300 :range 600 :projectile-speed 1000}
+  {:type :pistol           :name \"Rizz Pistol\"          :rarity :epic       :damage  30 :headshot-mult 1.5 :fire-rate 8 :magazine 12 :reload-time 1 :spread 2 :damage-falloff 40 :range 120 :projectile-speed 450}
+  {:type :shotgun          :name \"Fanum Shotgun\"        :rarity :legendary  :damage 120 :headshot-mult 2 :fire-rate 0.8 :magazine  6 :reload-time 3 :spread 3.5 :damage-falloff 18 :range 35 :projectile-speed 420}
+ ]}
+")
+
+;; ── enum id maps ────────────────────────────────────────────────────────
+
+(def ^:private rarities #{:common :uncommon :rare :epic :legendary})
+(defn rarity-id [r] (name r))
+(defn rarity-from-id [id]
+  (let [k (keyword id)] (if (contains? rarities k) k :common)))
+
+(def ^:private consumable-types
+  #{:small-shield :large-shield :mini-hp :medkit :chug :small-fry :flopper
+    :shield-fish :grimace-shake :gyatt-energy :ohio-milk})
+(defn consumable-type-id [t] (name t))
+(defn consumable-type-from-id [id]
+  (let [k (keyword id)] (if (contains? consumable-types k) k :small-shield)))
+
+(def ^:private weapon-types
+  #{:assault-rifle :shotgun :smg :sniper-rifle :pistol :rocket-launcher :grenade-launcher})
+(defn weapon-type-id [t] (name t))
+(defn weapon-type-from-id [id]
+  (let [k (keyword id)] (if (contains? weapon-types k) k :assault-rifle)))
+
+;; ── readers ─────────────────────────────────────────────────────────────
+
+(defn- str-at [m key] (or (scene/mget m key) ""))
+(defn- u-at [m key] (let [v (scene/mget m key)] (if (integer? v) (max 0 v) 0)))
+(defn- kw-at [m key] (or (scene/kw-key (scene/mget m key)) ""))
+
+(defn storm-phase-from-map [m]
+  {:phase-index (u-at m "phase") :wait-seconds (scene/num (scene/mget m "wait"))
+   :shrink-seconds (scene/num (scene/mget m "shrink")) :end-radius (scene/num (scene/mget m "end-radius"))
+   :damage-per-second (scene/num (scene/mget m "dps"))})
+
+(defn consumable-from-map [m]
+  {:consumable-type (consumable-type-from-id (kw-at m "type")) :name (str-at m "name")
+   :rarity (rarity-from-id (kw-at m "rarity")) :use-time (scene/num (scene/mget m "use-time"))
+   :hp-restore (u-at m "hp-restore") :shield-restore (u-at m "shield-restore")
+   :hp-cap (u-at m "hp-cap") :shield-cap (u-at m "shield-cap") :stack-size (u-at m "stack")})
+
+(defn weapon-from-map [m]
+  {:weapon-type (weapon-type-from-id (kw-at m "type")) :name (str-at m "name")
+   :rarity (rarity-from-id (kw-at m "rarity")) :damage (u-at m "damage")
+   :headshot-multiplier (scene/num (scene/mget m "headshot-mult")) :fire-rate (scene/num (scene/mget m "fire-rate"))
+   :magazine-size (u-at m "magazine") :reload-time (scene/num (scene/mget m "reload-time"))
+   :spread (scene/num (scene/mget m "spread")) :damage-falloff (scene/num (scene/mget m "damage-falloff"))
+   :range (scene/num (scene/mget m "range")) :projectile-speed (scene/num (scene/mget m "projectile-speed"))})
+
+(defn- table
+  "Parse `src`, returning the ordered vector of maps under `key` (a
+  \"ns/name\" string). Throws `ex-info` with `:game-scene.battle-royale/error`
+  of `:not-a-map` or `:no-table` (with `:game-scene.battle-royale/table`
+  naming the missing key) — mirroring the original
+  `BattleRoyaleError::NotAMap` / `BattleRoyaleError::NoTable`."
+  [src key]
+  (let [root (scene/root-map src)]
+    (when (nil? root)
+      (throw (ex-info "battle-royale EDN root is not a map" {:game-scene.battle-royale/error :not-a-map})))
+    (let [entries (scene/mget root key)]
+      (when-not (vector? entries)
+        (throw (ex-info (str "`" key "` missing or not a vector")
+                         {:game-scene.battle-royale/error :no-table :game-scene.battle-royale/table key})))
+      (filter map? entries))))
+
+(defn storm-phases-from-edn
+  "Parse the `:battle-royale/storm-phases` table from EDN `src`."
+  [src]
+  (mapv storm-phase-from-map (table src "battle-royale/storm-phases")))
+
+(defn consumables-from-edn
+  "Parse the `:battle-royale/consumables` table from EDN `src`."
+  [src]
+  (mapv consumable-from-map (table src "battle-royale/consumables")))
+
+(defn weapons-from-edn
+  "Parse the `:battle-royale/weapons` table from EDN `src`."
+  [src]
+  (mapv weapon-from-map (table src "battle-royale/weapons")))
+
+(defn builtin-storm-phases
+  "The compiled-in oracle: `default-storm-phases`."
+  []
+  (br/default-storm-phases))
+
+(defn builtin-consumables
+  "The compiled-in oracle: `consumable-pool`."
+  []
+  (br/consumable-pool))
+
+(defn builtin-weapons
+  "The compiled-in oracle: `weapon-pool`."
+  []
+  (br/weapon-pool))
+
+(defn shipped-storm-phases
+  "Convenience: storm phases from the crate-shipped [[storm-phases-edn]]."
+  []
+  (storm-phases-from-edn storm-phases-edn))
+
+(defn shipped-consumables
+  "Convenience: consumables from the crate-shipped [[consumables-edn]]."
+  []
+  (consumables-from-edn consumables-edn))
+
+(defn shipped-weapons
+  "Convenience: weapons from the crate-shipped [[weapons-edn]]."
+  []
+  (weapons-from-edn weapons-edn))
