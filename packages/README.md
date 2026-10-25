@@ -60,3 +60,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-mangaka-expression](kami-mangaka-expression) | `96fc3ce` | kami.mangaka.expression + patterns EDN (ADR-2607102200 addendum 12) |
 | [kami-mangaka-reader](kami-mangaka-reader) | `01823ab` | kami-mangaka-reader domain logic (ClojureScript/shadow-cljs), split out of kami-engine's kami-mangaka-reader-clj (ADR-2607010930). |
 | [kami-sensor-sim](kami-sensor-sim) | `caae678` | Camera / lidar / IMU / contact sensor synth, isaacsim.sensors API-compat target (analytic CPU sensor models: pinhole camera projection+depth, analytic ray-cast lidar VLP-16/toy, body-frame IMU, sphere-vs-primitive contact). Restored from legacy kami-sensor-sim crate (deleted #82). ADR-2607010930. |
+| [kami-solar-helix-scene](kami-solar-helix-scene) | `fcc22d7` | Imported `kami-solar-helix-scene` (no repository description) |

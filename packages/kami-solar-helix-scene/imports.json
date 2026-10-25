@@ -1,0 +1,70 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-solar-helix-scene",
+      "commit": "fcc22d7c1923f372be47ce8fdeeb79141dee6143",
+      "tree": "2653f1da9eb51225223d7be90c3293a4d11626e2",
+      "url": "https://github.com/kotoba-lang/kami-solar-helix-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "2529f247cddaed607f524528c40d361448446c8b840cc042a12bbe781fadd6fa",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "35dba944fdd716f1f33736ebb2f8669f0c0c9a663a642cd1cb694390ba86f8a0",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "7bef398df4e68e7ebbab9ba94c8c674e66390e920fd46250f3940a5db536096a",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "065a62f51b54bf9dd776fa18a39006901a295c33c04d2fea6d40d3fca05590a3",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "c6fe035540c7c3b2c345f36718f91ba9b6e2b4a063b2f8ccd87d9670ab08ba4c",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/solar-helix.edn",
+          "path": "resources/solar-helix.edn",
+          "sha256": "87911c542b2fd2ebe07ff6dd7fbca9af328c5784dafbd4ae65ff91b809743b64",
+          "mode": "100644"
+        },
+        {
+          "source": "src/solar_helix_scene.cljk",
+          "path": "src/solar_helix_scene.cljk",
+          "sha256": "a9a398c1fa2e97f172982fd30da5fc2afeda4f85a13076afa4aff6a61aa62a9a",
+          "mode": "100644"
+        },
+        {
+          "source": "test/solar_helix_scene_test.cljk",
+          "path": "test/solar_helix_scene_test.cljk",
+          "sha256": "b62d99dc6bbebbe0504d1fac6c5bd4e75fa9cd7688ddde487251b3d17004e0cf",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}
