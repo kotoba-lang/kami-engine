@@ -1,0 +1,119 @@
+(ns skeleton-scene-test
+  "Tests for `skeleton-scene`, ported 1:1 from the original
+  kami-skeleton-scene Rust crate's `src/lib.rs` `#[cfg(test)] mod
+  tests` and `tests/humanoid_parity.rs` (deleted kotoba-lang/kami-
+  engine PR #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [skeleton-scene :as skeleton-scene]
+            [skeleton :as skeleton]
+            [scene :as scene]))
+
+;; ── Smoke test ───────────────────────────────────────────────────
+
+(deftest smoke-test
+  (testing "namespace loads and exposes its public vars"
+    (is (some? skeleton-scene/humanoid-edn))
+    (is (= 13 (count skeleton-scene/all-joint-names)))
+    (is (fn? skeleton-scene/shipped-humanoid-constraints))
+    (is (fn? skeleton-scene/clip-from-edn))
+    (is (fn? skeleton-scene/vmd-to-clip))
+    (is (fn? skeleton-scene/pmx-to-model))
+    (is (fn? skeleton-scene/pmx-to-skeleton))))
+
+;; ── Ported from src/lib.rs #[cfg(test)] mod tests ────────────────
+
+(deftest shipped-has-all-joints-in-order
+  (let [table (skeleton-scene/shipped-humanoid-constraints)]
+    (is (= 13 (count table)) "13 joints shipped")
+    (doseq [i (range 13)]
+      (is (= (nth skeleton-scene/all-joint-names i) (first (nth table i)))
+          (str "joint[" i "] name in order")))))
+
+(deftest deg-to-rad-matches-source-factor
+  (let [d (/ Math/PI 180.0)]
+    (is (= skeleton-scene/deg-to-rad d))
+    (is (= (* 60.0 skeleton-scene/deg-to-rad) (* 60.0 d)))))
+
+(deftest non-map-root-is-an-error
+  (let [e (try (skeleton-scene/humanoid-constraints-from-edn "42")
+               (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (= ::skeleton-scene/not-a-map (:type (ex-data e))))))
+
+(deftest missing-table-is-an-error
+  (let [e (try (skeleton-scene/humanoid-constraints-from-edn "{:other 1}")
+               (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (= ::skeleton-scene/no-table (:type (ex-data e))))))
+
+;; ── Ported from tests/humanoid_parity.rs ─────────────────────────
+;;
+;; The oracle is the REAL `skeleton/default-humanoid-constraints`
+;; (called here, not transcribed). Order is load-bearing (the table is
+;; declaration-ordered), so the comparison walks the vec index-by-
+;; index. `JointConstraint`'s original Rust type had no `PartialEq`
+;; (hence `limits_eq`/exact-array comparisons in the original); a CLJC
+;; `joint-constraint` is plain immutable data, so `=` already compares
+;; it exactly — `assert-constraint-eq` below is a thin wrapper kept
+;; for 1:1 structural parity with the original test.
+
+(defn- assert-constraint-eq [name loaded want]
+  (is (skeleton-scene/limits-eq (:min loaded) (:min want)) (str name ": min exact"))
+  (is (skeleton-scene/limits-eq (:max loaded) (:max want)) (str name ": max exact")))
+
+(deftest humanoid-edn-matches-builtin
+  (let [loaded (skeleton-scene/humanoid-constraints-from-edn skeleton-scene/humanoid-edn)
+        oracle (skeleton/default-humanoid-constraints)]
+    (is (= 13 (count loaded)) "13 joints loaded from EDN")
+    (is (= 13 (count oracle)) "13 joints in the CLJC oracle")
+    (is (= (count loaded) (count oracle)) "EDN vs builtin joint count")
+
+    (dotimes [i (count loaded)]
+      (let [[lname lc] (nth loaded i)
+            [oname oc] (nth oracle i)]
+        (is (= lname oname) (str "joint[" i "] name in order"))
+        (is (= lname (nth skeleton-scene/all-joint-names i)) (str "joint[" i "] name == all-joint-names"))
+        (assert-constraint-eq lname lc oc)))
+
+    (let [built (skeleton-scene/builtin-humanoid-constraints)]
+      (is (= (count built) (count loaded)) "builtin len")
+      (dotimes [i (count built)]
+        (let [[bn bc] (nth built i)
+              [ln lc] (nth loaded i)]
+          (is (= bn ln) (str "builtin[" i "] name"))
+          (assert-constraint-eq bn bc lc))))
+
+    (let [shipped (skeleton-scene/shipped-humanoid-constraints)]
+      (is (= (count shipped) (count loaded)))
+      (dotimes [i (count shipped)]
+        (let [[sn sc] (nth shipped i)
+              [ln lc] (nth loaded i)]
+          (is (= sn ln) (str "shipped[" i "] name"))
+          (assert-constraint-eq sn sc lc))))))
+
+(deftest exact-degree-conversion
+  (let [d (/ Math/PI 180.0)
+        loaded (skeleton-scene/shipped-humanoid-constraints)
+        lla (second (first (filter #(= "leftLowerArm" (first %)) loaded)))
+        head (second (first (filter #(= "head" (first %)) loaded)))]
+    (is (= 0.0 (nth (:min lla) 1)) "0.0 deg -> exactly 0.0 rad")
+    (is (= (* 145.0 d) (nth (:max lla) 1)) "145.0 * d exact")
+    (is (= (* 60.0 d) (nth (:max head) 0)) "60.0 * d exact")))
+
+(deftest single-constraint-from-map
+  (let [root (scene/root-map "{:m {:min-deg [-30.0 -45.0 -30.0] :max-deg [30.0 45.0 30.0]}}")
+        m (scene/mget root "m")
+        c (skeleton-scene/constraint-from-map m)
+        d (/ Math/PI 180.0)]
+    ;; == the `neck` row of the CLJC oracle.
+    (is (= (* -30.0 d) (nth (:min c) 0)))
+    (is (= (* 45.0 d) (nth (:max c) 1)))))
+
+(deftest tolerant-parse-errors
+  (is (= ::skeleton-scene/not-a-map
+         (:type (ex-data (try (skeleton-scene/humanoid-constraints-from-edn "123")
+                               (catch #?(:clj Exception :cljs js/Error) e e))))))
+  (is (= ::skeleton-scene/no-table
+         (:type (ex-data (try (skeleton-scene/humanoid-constraints-from-edn "{:x 1}")
+                               (catch #?(:clj Exception :cljs js/Error) e e))))))
+  (is (= ::skeleton-scene/no-table
+         (:type (ex-data (try (skeleton-scene/humanoid-constraints-from-edn "{:skeleton/humanoid-constraints 5}")
+                               (catch #?(:clj Exception :cljs js/Error) e e)))))))

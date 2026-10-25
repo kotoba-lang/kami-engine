@@ -1,0 +1,70 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-input-scene",
+      "commit": "3e840f5042f5039008467e0c40e6ca3d295bbf3c",
+      "tree": "36f12366129d556d19b3eedaf9464c6ba07e0892",
+      "url": "https://github.com/kotoba-lang/kami-input-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "2529f247cddaed607f524528c40d361448446c8b840cc042a12bbe781fadd6fa",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "6e12e7750b3b02fef560a23a4e17927b69ff84441fad508d70f04bb00232bfef",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "1a9d334efd96c25f071d4b81b5143350d9bacde68c84eea772ae66b9f137e88b",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "b764f341a5b5dc84c419f9c1e7d0b0c51c7d5b28beea269a3d44e8666336e133",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "d004613c9fa288623b90149dd357fadd2ee9efdd55d8e5f8aec89aa01cc3d616",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/input.edn",
+          "path": "resources/input.edn",
+          "sha256": "b0fcf21de08676c6e3b7949bb0143e49cca7ec6fa5bba1bbd6364fa8aa2dd786",
+          "mode": "100644"
+        },
+        {
+          "source": "src/input_scene.cljk",
+          "path": "src/input_scene.cljk",
+          "sha256": "4eb0d08d629eb5284915777be1fb4361e1814d6b067ff7485269c3cbbd670920",
+          "mode": "100644"
+        },
+        {
+          "source": "test/input_scene_test.cljk",
+          "path": "test/input_scene_test.cljk",
+          "sha256": "5040ea6c2d9d262d2e50413ca49495a1a523af0ca410bbf705a9fe30e406466d",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

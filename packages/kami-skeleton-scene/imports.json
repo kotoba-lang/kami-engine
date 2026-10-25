@@ -1,0 +1,106 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-skeleton-scene",
+      "commit": "58d4d3a143ec08f917df905a8a016f0ab3f5a1a0",
+      "tree": "e514d269ffa8c8219687edd3bdc88310ee81a177",
+      "url": "https://github.com/kotoba-lang/kami-skeleton-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "2529f247cddaed607f524528c40d361448446c8b840cc042a12bbe781fadd6fa",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "5215d93f74f3abc8d6ebfefeecd1377ab1f360c4b51bbea8234475f81770c357",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "86308d15d8773c816a9e6dd244532b57642b28713939d24a826b8f9132d0ed57",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "3968eb3af73919ec7c73a48e73194fec33f84b8030a1c6cf16473aad84e6e865",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "d004613c9fa288623b90149dd357fadd2ee9efdd55d8e5f8aec89aa01cc3d616",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/humanoid.edn",
+          "path": "resources/humanoid.edn",
+          "sha256": "2ea0a91b593f525b6db2973ec9b987b98802b1329219d5998076e6a00abd2438",
+          "mode": "100644"
+        },
+        {
+          "source": "src/skeleton_scene.cljk",
+          "path": "src/skeleton_scene.cljk",
+          "sha256": "abe2e3dda2c8d1c96b4c3abaae226b69178b9b9167516f9a673d57dc3235a2cc",
+          "mode": "100644"
+        },
+        {
+          "source": "src/skeleton_scene/clip.cljk",
+          "path": "src/skeleton_scene/clip.cljk",
+          "sha256": "d51b176c8b1d38232c8793591a73fa636eb6c86a644d40d5b0a34a6946a23d1d",
+          "mode": "100644"
+        },
+        {
+          "source": "src/skeleton_scene/pmx.cljk",
+          "path": "src/skeleton_scene/pmx.cljk",
+          "sha256": "ca6b401020203513ad67e38ce2d3a122f767b4d86b170b99f5b92cc583678970",
+          "mode": "100644"
+        },
+        {
+          "source": "src/skeleton_scene/vmd.cljk",
+          "path": "src/skeleton_scene/vmd.cljk",
+          "sha256": "e6f7588d551a1d581e7323371a7876af3ca19e395fc087e4f786a7d28875fc7e",
+          "mode": "100644"
+        },
+        {
+          "source": "test/skeleton_scene/clip_test.cljk",
+          "path": "test/skeleton_scene/clip_test.cljk",
+          "sha256": "107794efe1bc69d345f824abd3c3a651e3cd47a4f6996b04ae582f389ea58873",
+          "mode": "100644"
+        },
+        {
+          "source": "test/skeleton_scene/pmx_test.cljk",
+          "path": "test/skeleton_scene/pmx_test.cljk",
+          "sha256": "342a89f99e40c47fc429dae75301178b455e37c1364a336b9c89a836b0340895",
+          "mode": "100644"
+        },
+        {
+          "source": "test/skeleton_scene/vmd_test.cljk",
+          "path": "test/skeleton_scene/vmd_test.cljk",
+          "sha256": "5c2b9c82e5b7069c598d91e8c25c54d5cca9dda38042a7552933c2ed25e9b73b",
+          "mode": "100644"
+        },
+        {
+          "source": "test/skeleton_scene_test.cljk",
+          "path": "test/skeleton_scene_test.cljk",
+          "sha256": "cdc73177ada1a256985bd287591f537621b8e5abc698fd7aa802306f95a95b81",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}
