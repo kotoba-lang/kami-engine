@@ -1,0 +1,77 @@
+(ns atmosphere-scene-test
+  "Tests for `atmosphere-scene`, ported 1:1 from the original
+  `kami-atmosphere-scene` Rust crate's `#[cfg(test)] mod tests` (deleted in
+  kotoba-lang/kami-engine PR #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [atmosphere-scene :as atmosphere-scene]
+            [atmosphere :as atmosphere]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'atmosphere-scene)))))
+
+;; Rust: resolve_weather_is_driven_by_edn
+(deftest resolve-weather-is-driven-by-edn
+  (testing "resolve-weather is driven by the shipped EDN"
+    (doseq [name atmosphere-scene/all-preset-names]
+      (let [edn (atmosphere-scene/shipped-weather name)
+            got (atmosphere-scene/resolve-weather name)]
+        (is (some? got) (str name ": preset resolves"))
+        (is (= (atmosphere-scene/weather->preset got)
+               (atmosphere-scene/weather->preset edn))
+            (str name ": resolve-weather driven by weather.edn"))))
+    (is (nil? (atmosphere-scene/resolve-weather "monsoon")) "unknown -> nil")))
+
+;; Rust: shipped_has_both_presets
+(deftest shipped-has-both-presets
+  (let [p (atmosphere-scene/shipped-presets)]
+    (is (= 2 (count p)))
+    (doseq [name atmosphere-scene/all-preset-names]
+      (is (contains? p name) (str name " present in EDN")))))
+
+;; Rust: unknown_builtin_preset_is_none
+(deftest unknown-builtin-preset-is-none
+  (is (nil? (atmosphere-scene/builtin-preset "does-not-exist"))))
+
+;; Rust: unknown_preset_from_edn_is_an_error
+(deftest unknown-preset-from-edn-is-an-error
+  (let [err (try
+              (atmosphere-scene/preset-weather-from-edn atmosphere-scene/weather-edn "monsoon")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :preset-not-found (:atmosphere-scene/error (ex-data err))))))
+
+;; Rust: non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try
+              (atmosphere-scene/presets-from-edn "42")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :not-a-map (:atmosphere-scene/error (ex-data err))))))
+
+;; Rust: missing_presets_table_is_an_error
+(deftest missing-presets-table-is-an-error
+  (let [err (try
+              (atmosphere-scene/presets-from-edn "{:other 1}")
+              nil
+              (catch #?(:clj Exception :cljs js/Error) e e))]
+    (is (some? err))
+    (is (= :no-presets (:atmosphere-scene/error (ex-data err))))))
+
+;; Rust: missing_key_falls_back_to_default
+(deftest missing-key-falls-back-to-default
+  (let [p (atmosphere-scene/presets-from-edn "{:weather/presets {:p {:cloud-coverage 0.5}}}")
+        spec (get p "p")
+        d atmosphere-scene/weather-preset-defaults]
+    (is (= 0.5 (:cloud-coverage spec)))
+    (is (= (:cloud-density d) (:cloud-density spec)) "absent -> default density")
+    (is (= (:cloud-altitude d) (:cloud-altitude spec)) "absent -> default altitude")
+    (is (= (:wind-speed d) (:wind-speed spec)) "absent -> default wind speed")
+    (is (= (:time d) (:time spec)) "absent -> default time")))
+
+;; Rust: int_coerces_to_float
+(deftest int-coerces-to-float
+  (let [p (atmosphere-scene/presets-from-edn "{:weather/presets {:p {:wind-speed 6}}}")]
+    (is (= 6.0 (:wind-speed (get p "p"))))))

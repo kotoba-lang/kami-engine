@@ -10,3 +10,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-input-scene](kami-input-scene) | `3e840f5` | Default device-to-action input-binding maps (`fps` / `graph`) as portable CLJC |
 | [kami-skeleton-scene](kami-skeleton-scene) | `58d4d3a` | Humanoid skeleton scene data with clip, PMX and VMD helpers as portable CLJC |
 | [kami-app](kami-app) | `a5d45be` | builder SDK (KamiApp, RenderPipeline trait, Camera, RAF) CLJC — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
+| [kami-atmosphere-scene](kami-atmosphere-scene) | `a06aaf9` | EDN authoring surface for kami-atmosphere weather config, merges weather.edn presets onto kotoba-lang/atmosphere defaults. Restored from legacy kami-atmosphere-scene crate (deleted #82). ADR-2607010930. |
