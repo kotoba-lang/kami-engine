@@ -43,3 +43,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-engine-echem](kami-engine-echem) | `8b7b449` | reduced-order PEM fuel-cell solver (:rom-fc) |
 | [kami-engine-engine](kami-engine-engine) | `66fd75a` | umbrella (World+Clock+Net) — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
 | [kami-engine-io](kami-engine-io) | `87868b4` | engine I/O — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
+| [kami-engine-motor](kami-engine-motor) | `c465afd` | reduced-order traction-motor solver (:rom-motor) |
