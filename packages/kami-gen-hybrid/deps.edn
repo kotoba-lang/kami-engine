@@ -1,0 +1,38 @@
+{:paths ["src"]
+ ;; Three `:local/root` deps per ADR-2607051130: `character` (deterministic
+ ;; body/rig), `comfyui` (texture node-graph execution engine, renamed from
+ ;; com-junkawasaki/comfyui-clj -- GitHub-transferred to kotoba-lang), `vrm`
+ ;; (final .vrm assembly/export, renamed to org-vrmc-vrm). comfyui itself
+ ;; depends on langchain (git dep, resolved transitively); the :dev alias
+ ;; below overrides that to a local checkout for offline workspace
+ ;; development, same convention as the "actor" repos (AGENTS.md Actors
+ ;; section).
+ :deps {
+        ;; kotoba.image replaced java.awt.image.BufferedImage / javax.imageio here (2026-09-25).
+        ;; An explicit floor: tools.deps takes the NEWEST sha it is shown.
+        io.github.kotoba-lang/image {:git/sha "ed0b4dc89268073384c9493bdc80fa72dc17500b"}
+        ;; kotoba.bytes replaced UTF-8 .getBytes / String. here (2026-09-24). An explicit
+        ;; floor: tools.deps takes the NEWEST sha it is shown.
+        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
+        ;; kotoba.io replaced clojure.java.io / java.io.File here (2026-09-24).
+        ;; An explicit floor: the java.io.File method functions (exists?, file?,
+        ;; parent-file, canonical-path, mkdirs, list-files ...) are in kotoba.io
+        ;; from this sha, and tools.deps takes the NEWEST sha it is shown.
+        io.github.kotoba-lang/io {:git/sha "1b60ca825c1e705bd195f857ca4549133653a9f3"}
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}io.github.kotoba-lang/character
+        {:git/url "https://github.com/kotoba-lang/character.git"
+                                     :git/sha "197410ae8fab61c2bc46c690fc6affbec046928f"}
+        io.github.kotoba-lang/comfyui
+        {:git/url "https://github.com/kotoba-lang/comfyui.git"
+                                     :git/sha "d3e1c2e62eb2c4fade64583d676ea54090da115a"}
+        io.github.kotoba-lang/org-vrmc-vrm
+        {:git/url "https://github.com/kotoba-lang/org-vrmc-vrm.git"
+                                     :git/sha "8d8725af2feb4666cfd9573a30cc879b5fd43878"}}
+ :aliases
+ {:dev {:override-deps
+        {io.github.kotoba-lang/langchain
+         {:local/root "../langchain"}}}
+  :test {:extra-paths ["test"]}}}
