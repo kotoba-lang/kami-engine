@@ -66,3 +66,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-vehicle-scene](kami-vehicle-scene) | `da9a156` | EDN authoring surface for kami-vehicle ground/garage/powertrain CONFIG (surface grip table, demo-circuit zone map, engine/gearbox/tire presets, 6 garage SedanSpecs). Restored from legacy kami-vehicle-scene crate (kotoba-lang/kami-engine, deleted PR #82). ADR-2607010930. |
 | [kami-web](kami-web) | `2c4064b` | Pure-Clojure port of kami-engine's kami-web (WASM entry): matrix math, render-IR schema, PPTX layout, entry catalog |
 | [douga](douga) | `93639cd` | Pure timeline→ffmpeg render-plan builder + command builders — CLJC craft lib |
+| [cad](cad) | `161b152` | Open-source CAD/CAM workbench as EDN geometry data + portable CLJC model. |
