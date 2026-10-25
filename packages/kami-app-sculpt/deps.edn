@@ -1,0 +1,23 @@
+{:paths ["src" "test"]
+ :deps {
+        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
+        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
+        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
+        ;; sha it is shown.
+        io.github.kotoba-lang/io {:git/sha "98045c7ad26c71c3505cb8fefdcbe0dcdf98f925"}
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}io.github.kotoba-lang/html {:git/url "https://github.com/kotoba-lang/html.git"
+                                     :git/sha "aa57f2730c87b7c2752151ed1a5f2e402c2ac71e"}
+        io.github.kotoba-lang/css {:git/url "https://github.com/kotoba-lang/css.git"
+                                     :git/sha "7fc8167c4fb97a92b7c21545e6a92a86cc58a9ca"}
+        io.github.kotoba-lang/sculpt {:git/url "https://github.com/kotoba-lang/kami-engine-sculpt.git"
+                                     :git/sha "df4d5bd0fe4858ef70392a34843bfd33751b03c3"}
+        io.github.kotoba-lang/webgpu {:git/url "https://github.com/kotoba-lang/webgpu.git"
+                                     :git/sha "88597ebb6d33f435e62f9e2c3847189e2482a6be"}
+        io.github.kotoba-lang/org-w3-webgpu {:git/url "https://github.com/kotoba-lang/org-w3-webgpu.git"
+                                     :git/sha "05b7b9914e28cf53ab7ba73e2e0040f6de68e616"}
+        io.github.kotoba-lang/expr {:git/url "https://github.com/kotoba-lang/expr.git"
+                                     :git/sha "3bf48bff59aa1fb1ea48a0b84103d63fd2b507ff"}}
+ :aliases {}}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Kami Sculpt</title><style>aside:last-child { border-left: 1px solid #51375e; border-right: 0; }
+.stats { position: absolute; right: 14px; bottom: 14px; background: #170d1dcc; padding: 8px; }
+* { box-sizing: border-box; }
+.viewport { position: relative; }
+body { margin: 0; height: 100vh; display: grid; grid-template-rows: 52px 1fr; font-family: Inter,system-ui; background: #17131d; color: #f7efff; }
+label { display: grid; gap: 5px; margin: 12px 0; }
+.selected,.primary { background: #d18ab9; color: #271225; font-weight: 700; }
+h2 { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #d6afd8; }
+button,input,select { width: 100%; margin: 5px 0; padding: 9px; background: #51375e; color: #fff; border: 1px solid #a87eb5; border-radius: 6px; }
+main { display: grid; grid-template-columns: 240px 1fr 250px; min-height: 0; }
+header .spacer { flex: 1; }
+#gpu-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
+#gpu-status { position: absolute; left: 50%; top: 45%; transform: translate(-50%,-50%); color: #ffb0b0; }
+aside { padding: 16px; background: #21192a; border-right: 1px solid #51375e; }
+header { display: flex; align-items: center; gap: 18px; padding: 0 16px; background: #2a2034; }
+:focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
+button { cursor: pointer; text-align: left; }</style></head>
+  <body>
+    <header><strong>KAMI SCULPT · DIGITAL CLAY</strong><a href="https://kotoba-lang.github.io/kami-studio/">Studio</a><span>WebGPU brush workspace</span><span class="spacer"></span><select id="profile" aria-label="Interaction profile">
+      <option value="zbrush">ZBrush</option>
+      <option value="blender">Blender Sculpt</option>
+      <option value="mudbox">Mudbox</option>
+    </select><button id="undo">Undo stroke</button><button id="redo">Redo</button><button id="save-project">Save</button><button id="load-project">Load</button><button id="import">Import</button><input id="import-file" aria-label="Import Sculpt project file" type="file" accept=".edn,.kami-sculpt.edn" style="display:none;"><button id="export">Export Project</button></header>
+    <main>
+      <aside>
+        <h2>Brushes</h2>
+        <p id="profile-hint">B,I Inflate · B,S Smooth · B,P Pinch · M Mask</p>
+        <button class="selected" data-mode="inflate">Inflate</button>
+        <button data-mode="smooth">Smooth</button>
+        <button data-mode="pinch">Pinch</button>
+        <button data-mode="mask">Mask</button>
+        <button data-mode="mask-erase">Erase mask</button>
+        <h2>Mask</h2>
+        <button id="clear-mask">Clear mask</button>
+        <button id="invert-mask">Invert mask</button>
+        <button id="blur-mask">Blur mask</button>
+        <button id="sharpen-mask">Sharpen mask</button>
+        <button id="grow-mask">Grow mask</button>
+        <button id="shrink-mask">Shrink mask</button>
+        <h2>Symmetry</h2>
+        <label><input id="symmetry-x" type="checkbox" checked>X mirror</label>
+        <label><input id="symmetry-y" type="checkbox">Y mirror</label>
+        <label><input id="symmetry-z" type="checkbox">Z mirror</label>
+      </aside>
+      <section class="viewport">
+        <canvas id="gpu-canvas" aria-label="Sculpt WebGPU viewport"></canvas>
+        <div id="gpu-status">Initializing WebGPU…</div>
+        <div class="stats" id="stats">153 vertices · 256 triangles · 0 strokes</div>
+      </section>
+      <aside>
+        <h2>Brush settings</h2>
+        <label>Radius<output id="radius-value">0.60</output><input id="radius" type="range" min="0.1" max="1.5" step="0.05" value="0.6"></label>
+        <label>Strength<output id="strength-value">0.12</output><input id="strength" type="range" min="-0.3" max="0.3" step="0.01" value="0.12"></label>
+        <label>Stroke spacing<input id="spacing" type="range" min="0.02" max="0.5" step="0.01" value="0.12"></label>
+        <h2>Sculpt layers</h2>
+        <div id="layers"></div>
+        <button id="add-layer">＋ Layer</button>
+        <button id="delete-layer">Delete layer</button>
+        <label>Layer name<input id="layer-name" value="Base detail"></label>
+        <button id="rename-layer">Rename layer</button>
+        <button id="duplicate-layer">Duplicate layer</button>
+        <button id="layer-up">Move layer up</button>
+        <button id="layer-down">Move layer down</button>
+        <button id="bake-layer">Bake selected layer</button>
+        <label>Layer opacity<input id="layer-opacity" type="range" min="0" max="1" step="0.05" value="1"></label>
+        <p>Double-click a layer to toggle visibility. Ctrl+Shift+N adds a layer.</p>
+        <h2>Topology</h2>
+        <button class="primary" id="subdivide">Bake &amp; subdivide</button>
+        <label>Voxel size<input id="remesh-cell-size" type="number" min="0.01" step="0.01" value="0.15"></label>
+        <button class="primary" id="voxel-remesh">Voxel Remesh</button>
+        <p id="remesh-result">Not remeshed</p>
+        <h2>Topology Diagnostics</h2>
+        <p id="topology-result">Analyzing…</p>
+        <button id="repair-topology">Repair Topology</button>
+        <p id="repair-result">Not repaired</p>
+        <button id="fill-holes">Fill Boundary Holes</button>
+        <p id="hole-fill-result">No fill operation</p>
+      </aside>
+    </main>
+    <span id="debug-state" style="display:none;"></span>
+    <script src="./js/app.js"></script>
+  </body>
+</html>

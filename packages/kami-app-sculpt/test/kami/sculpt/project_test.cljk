@@ -1,0 +1,10 @@
+(ns kami.sculpt.project-test (:require [kotoba.test :refer [deftest is]] [kami.sculpt :as sculpt] [kami.sculpt.project :as project]))
+(def doc (-> (sculpt/sculpt-document (sculpt/sphere-mesh 1 8 6)) (sculpt/add-layer "Detail")))
+(deftest round-trip
+  (let [p (project/document {:id "head" :name "Head" :sculpt-document doc :brush {:mode :pinch :radius 0.3 :strength 0.1 :spacing 0.05}
+                             :symmetry [:x :y] :interaction {:profile :zbrush} :strokes 12})]
+    (is (project/valid? p)) (is (= p (project/open p))) (is (= 12 (:project/strokes p)))))
+(deftest legacy-migration (let [p (project/open doc)] (is (= doc (:project/sculpt p))) (is (= [:x] (:project/symmetry p)))))
+(deftest rejects-invalid
+  (is (thrown? #?(:clj Exception :cljs js/Error) (project/open {:positions []})))
+  (is (thrown? #?(:clj Exception :cljs js/Error) (project/open {:kami/document :sculpt-project :kami/version 99}))))
