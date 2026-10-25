@@ -1,0 +1,198 @@
+(ns kami.app-suji.coverage-test
+  "The coverage census, and whether it can fail.
+
+  THE MEASUREMENT THESE TESTS DEFEND. `suji` produces a few hundred numbers per
+  posture and this app renders some of them. Nothing else in this repo notices
+  when the model gains a quantity and no view reads it — the new key sits in a map,
+  the compiler is happy, every test stays green, and the page silently answers a
+  smaller question than the model can. `kami.app-suji.coverage` counts that, and
+  these tests are what stop the count being a sentence somebody typed.
+
+  Three things are asserted, and the third is the one that matters:
+
+    1. every quantity the model produces is classified, and the classification
+       names nothing the model has stopped producing;
+    2. every quantity claimed `:shown` is found on a rendered page;
+    3. THE PROBE CAN SAY NO. A check that only ever passes is not a check, and
+       this repo's own record has three cases of one searching flattened page text
+       and finding the prose beside the thing it was looking for. So a page with a
+       view removed is probed too, and the quantities that lived in that view have
+       to come back absent while the ones that did not have to stay found."
+  (:require [kotoba.lang.text :as str]
+            [kotoba.test :refer [deftest is]]
+            [kami.app-suji.core :as core]
+            [kami.app-suji.coverage :as coverage]))
+
+(def probe-states
+  "Postures the census is taken at.
+
+  MORE THAN ONE, because the probe is a difference. A quantity is `shown` when a
+  value it takes at one posture is on the page there and NOT on the page at a
+  posture where the model does not give it that value — a figure matching by
+  coincidence matches at both, because the coincidence does not move when the
+  posture does. One posture cannot ask that question at all.
+
+  Each of these is here for a quantity that the others leave unprobeable:
+  a bigger body moves the disc areas, which are otherwise constant; the
+  out-of-plane posture is the only one with a frontal-plane moment; standing is
+  the only one with a ground reaction and a centre of pressure."
+  [core/initial-state
+   (assoc-in core/initial-state [:posture :head-flexion-deg] 45.0)
+   (-> core/initial-state
+       (assoc-in [:posture :trunk-flexion-deg] 55.0)
+       (assoc-in [:posture :head-flexion-deg] 50.0)
+       (assoc-in [:posture :shoulder-flexion-deg] 60.0)
+       (assoc :session-minutes 300.0))
+   (-> core/initial-state
+       (assoc-in [:body :stature-m] 1.95)
+       (assoc-in [:body :total-mass-kg] 110.0))
+   (-> core/initial-state
+       (assoc-in [:posture :trunk-lateral-bend-deg] 35.0)
+       (assoc-in [:posture :shoulder-abduction-deg] 80.0)
+       (assoc-in [:posture :head-rotation-deg] 60.0))
+   (assoc core/initial-state :posture
+          (:posture (first (filter #(= :standing (:group %)) core/presets))))
+   ;; ⚠ AND ONE WITH THE PELVIS TILTED, which is the seventh and the reason it is
+   ;; here. `:pose/lumbar-lordosis-deg` is zero at every other posture in this list
+   ;; — every preset suji ships states no pelvic tilt — and `significant?` rejects
+   ;; every rendering of zero on purpose, so the differential has nothing to look
+   ;; for. Without this state the two pose quantities come back `:inconclusive`,
+   ;; which `every-shown-quantity-is-actually-on-the-page` treats as a failure and
+   ;; not as a pass: a claim nobody can check is not a claim that has been checked.
+   (assoc-in core/initial-state [:posture :pelvic-tilt-deg] 25.0)])
+
+(defn- render-views [state views]
+  (map #(core/app (assoc state :view %)) views))
+
+(defn- scenes-for [views]
+  (mapv (fn [st]
+          (coverage/scene (core/body-of st) (:posture st) (core/solved st)
+                          #(render-views st views)))
+        probe-states))
+
+(def ^:private all-views [:simulate :compare :spine :method])
+
+(def ^:private scenes (delay (scenes-for all-views)))
+
+(deftest every-quantity-the-model-produces-is-classified
+  ;; The half of the census that is NOT written by hand. `produced` walks the
+  ;; actual solve, so a key `suji` adds arrives here on its own and has to be
+  ;; classified before this passes — which is the whole mechanism. Measured
+  ;; 2026-09-08 when suji moved to the coupled solve: eleven keys arrived and
+  ;; seven left in one commit, and this is what said so.
+  (let [produced (into #{} (mapcat #(keys (:produced %))) @scenes)
+        classified (set (keys coverage/registry))]
+    (is (seq produced) "no quantities were enumerated, so this asserts nothing")
+    (is (< 100 (count produced))
+        (str "only " (count produced) " quantities found — the walk is not reaching "
+             "the solve"))
+    (is (empty? (remove classified produced))
+        (str "the model produces quantities nothing has classified: "
+             (pr-str (sort (remove classified produced)))))
+    (is (empty? (remove produced classified))
+        (str "the registry names quantities the model no longer produces: "
+             (pr-str (sort (remove produced classified)))))))
+
+(deftest every-state-in-the-registry-is-one-of-the-two
+  (is (empty? (remove #{:shown :computed-not-shown} (map :state (vals coverage/registry))))
+      (str "unknown states: "
+           (pr-str (remove #{:shown :computed-not-shown} (map :state (vals coverage/registry)))))))
+
+(deftest every-shown-quantity-is-actually-on-the-page
+  ;; `:inconclusive` is a failure here, not a pass. It means the probe could not
+  ;; tell — every value rounds to zero at every posture, say — and a claim nobody
+  ;; can check is not a claim that has been checked. The fix when it appears is to
+  ;; add a posture that gives the quantity a value, which is why `probe-states`
+  ;; has six.
+  (let [verdicts (coverage/audit @scenes)
+        bad (sort (for [[q v] verdicts :when (not= :found v)] [q v]))]
+    (is (< 40 (count verdicts))
+        (str "only " (count verdicts) " shown quantities were probed"))
+    (is (empty? bad)
+        (str "claimed shown but not found on any rendered view: " (pr-str bad)))))
+
+(deftest the-probe-says-no-when-a-view-is-removed
+  ;; ⚠ THE TEST THAT MAKES THE OTHERS MEAN SOMETHING. Everything above passes on a
+  ;; probe that returns `:found` unconditionally, and this repo has caught three
+  ;; checks that did exactly that in spirit — searching `body.innerText` and
+  ;; matching the paragraph that explains the figure rather than the figure.
+  ;;
+  ;; So the same probe is run against a page rendered WITHOUT the simulator. The
+  ;; quantities that only the simulator renders have to come back absent; the ones
+  ;; the spine view renders have to stay found. Both halves are asserted, because
+  ;; a probe that says absent to everything is as useless as one that says found.
+  (let [reduced (scenes-for [:compare :spine :method])
+        verdict (fn [q] (coverage/probe reduced q (get coverage/registry q)))]
+    ;; gone with the simulator
+    (doseq [q [:tension/price :tension/coeffs :tension/task-load-nm
+               :tension/secondary-arm-m :tension/coupled-residual-nm
+               :summary/inactive :summary/antagonists :tension/inactive?
+               :tension/coupled-converged? :load.support/body-weight-n]]
+      (is (= :absent (verdict q))
+          (str q " is rendered only by the simulator, so removing it must make the "
+               "probe say absent — it said " (verdict q))))
+    ;; still there without it
+    (doseq [q [:spine.level/stress-mpa :spine.level/disc-area-cm2
+               :spine.level/muscle-n :spine.cervical-check/ratio
+               :spine.lumbar-check/model-force-n]]
+      (is (= :found (verdict q))
+          (str q " is rendered by the spine view, which is still present — the "
+               "probe said " (verdict q))))))
+
+(deftest every-unrequested-probe-actually-reaches-suji
+  ;; The `not-computed` count is the number of quantities `suji` would return from
+  ;; entry points no view calls, and it is derived by CALLING them. A thunk that
+  ;; started throwing, or that upstream renamed away, would quietly shrink the
+  ;; count and make the page look better than it is.
+  (let [st core/initial-state
+        body (core/body-of st)
+        sol (core/solved st)]
+    (is (<= 5 (count coverage/unrequested-probes))
+        "the floor list has shrunk to almost nothing")
+    (doseq [[id f] coverage/unrequested-probes]
+      (let [m (f body (:posture st) sol)]
+        (is (map? m) (str id " no longer returns a map: " (pr-str m)))
+        (is (seq m) (str id " returns an empty map, so it contributes nothing"))))))
+
+(deftest the-census-counts-are-the-lengths-of-the-census-lists
+  ;; The three numbers the method view prints are read off `:counts`, and the three
+  ;; lists it prints are read off the same map. If they were computed twice they
+  ;; could disagree; this asserts they are one computation.
+  (let [st core/initial-state
+        c (coverage/census (core/body-of st) (:posture st) (core/solved st))]
+    (is (= (count (:shown c)) (:shown (:counts c))))
+    (is (= (count (:computed-not-shown c)) (:computed-not-shown (:counts c))))
+    (is (= (count (:not-computed c)) (:not-computed (:counts c))))
+    (is (pos? (:computed-not-shown (:counts c)))
+        "a census reporting nothing hidden is either finished or broken, and it is "
+        )
+    (is (empty? (:unclassified c)) (pr-str (:unclassified c)))
+    (is (empty? (:stale-registry-entries c)) (pr-str (:stale-registry-entries c)))))
+
+(deftest the-method-view-prints-the-computed-counts-and-not-a-literal
+  ;; The page's three numbers have to BE the census's three numbers. Read out of
+  ;; the rendered table structurally — the row whose first cell is the state name —
+  ;; rather than by searching the page text, because the paragraph above the table
+  ;; talks about the same three states and a text search would match it after the
+  ;; table was gone.
+  (let [st (assoc core/initial-state :view :method)
+        c (coverage/census (core/body-of st) (:posture st) (core/solved st))
+        rows (atom [])
+        walk (fn walk [n]
+               (when (vector? n)
+                 (when (= :tr (first n))
+                   (let [cells (filterv #(and (vector? %) (contains? #{:td :th} (first %)))
+                                        (rest n))]
+                     (swap! rows conj (mapv (fn [c] (str/join "" (filter string? (rest c))))
+                                            cells))))
+                 (doseq [x (rest n)] (walk x)))
+               (when (seq? n) (doseq [x n] (walk x))))
+        _ (walk (core/app st))
+        by-label (into {} (for [r @rows :when (= 3 (count r))] [(first r) (second r)]))]
+    (is (seq @rows) "no table rows were found in the method view")
+    (doseq [[label k] [["出している" :shown]
+                       ["出していない" :computed-not-shown]
+                       ["訊いていない" :not-computed]]]
+      (is (= (str (get-in c [:counts k])) (get by-label label))
+          (str "the method view says " (pr-str (get by-label label)) " for " label
+               " and the census computes " (get-in c [:counts k]))))))

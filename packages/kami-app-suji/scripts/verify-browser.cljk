@@ -1,0 +1,900 @@
+(ns verify-browser
+  "Drive the built app in a real browser and assert what neither the compiler nor
+  the JVM tests can see.
+
+  Four claims, each of which is invisible in the source:
+
+  1. **A GPU backend was actually obtained.** `init-canvas!` falls back from
+     WebGPU to WebGL 2.0 silently, and an app that fell back looks exactly like
+     one that did not. The page states the backend it got, and this reads it.
+  2. **Pixels were drawn.** A viewport that initialises and renders nothing is a
+     correct-looking failure — every object present, every promise resolved, and
+     a black rectangle. This samples the canvas and requires that it is not one
+     uniform colour.
+  3. **The physics runs in the browser.** Moving a slider must change the
+     readout. Until 2026-09-06 `suji` could not load under ClojureScript at all,
+     so this assertion could not have passed at any earlier commit.
+  4. **The bones are the meshes this source generates.** A rendered something is
+     not evidence — the check that pixels exist passed on cylinders too. The
+     viewport publishes the vertex and index counts it read back off the GPU
+     buffer handles, and this recomputes them from `kami.webgpu.geometry` under
+     nbb. A bone drawn with the wrong mesh is then a disagreement between two
+     runtimes over one `.cljc`, not a claim the page makes about itself.
+  5. **Crossing a view does not load a document.** This is the single-page claim
+     and it is unobservable from the code — a nav reads the same whether it
+     routes or navigates. A value is left on `window`, the view is crossed, and
+     the value has to still be there.
+
+  Run (after a release build and gen-page, with public/ served):
+    SUJI_URL=… kbb --backend sci --classpath \"$(kbb -Spath)\" scripts/verify-browser.cljk"
+  (:require ["node:fs" :as fs]
+            ["node:process" :as process]
+            ["playwright$default" :as pw]
+            [kotoba.lang.text :as str]
+            ;; the SAME sources the browser is running, so the bone-mesh check
+            ;; below can be a disagreement between two runtimes over one .cljc
+            ;; rather than the page grading its own homework
+            [kami.app-suji.core :as core]
+            [kami.app-suji.coverage :as coverage]
+            [kami.app-suji.scene :as scene]
+            [kami.webgpu.geometry :as geom]
+            ;; the model, so the standing/sitting figures and the trunk's segment
+            ;; names are recomputed here rather than read off the page
+            [suji.methods.math :as math]
+            [suji.methods.posture :as posture]
+            [suji.methods.segment :as segment]
+            [suji.methods.spine :as spine]
+            [promesa.core :as p]))
+
+(def url (or (.. process -env -SUJI_URL) "http://localhost:8741/"))
+(def root-url (if (str/ends-with? url "/") url (str url "/")))
+(def readout-js
+  "Each readout figure as `<value> <unit> <label>`.
+
+  Reads the readout ITEMS rather than the page text: the paragraph above them
+  explains what the ground reaction is and uses the same word, so a text search
+  stays green after the figure is deleted — measured, in the JVM test for the same
+  thing, which passed with the figure removed until it was rewritten this way."
+  "Array.from(document.querySelectorAll('.suji-readout-item'))
+     .map(e => e.innerText.replace(/\\s+/g, ' ').trim())")
+
+(def refused-rows-js
+  "Names of the muscle-table rows whose %MVC cell reads 適用範囲外.
+
+  Reads the CELL, not the page text: `適用範囲外` also appears in the colour legend
+  at every posture, so a `body.innerText` search cannot tell a refused row from the
+  legend that explains what a refused row looks like."
+  "Array.from(document.querySelectorAll('tbody tr'))
+     .filter(r => Array.from(r.querySelectorAll('td')).some(c => c.innerText.trim() === '適用範囲外'))
+     .map(r => r.querySelector('td').innerText.trim())")
+
+(def rot-z-js
+  "Each bone's rotation about Z in the draw list the encoder was given, by segment.
+
+  Read off `window.__sujiGeometry`, which `viewport/report-geometry!` publishes
+  from the list it actually encoded — not from the scene map, so a regression in
+  the draw path is visible here and not only a change in `scene`."
+  "(() => {
+     const g = window.__sujiGeometry;
+     if (!g) return null;
+     const out = {};
+     for (const b of g.bones) out[b.label] = b.transform.rotation[2];
+     return out;
+   })()")
+
+(def canvas-alive-js
+  "Whether the canvas is a live drawing surface: its backing store against its CSS
+  box, and how many distinct colours are in it.
+
+  A REMOUNTED CANVAS FAILS BOTH. React destroys the canvas when the reader leaves
+  the simulator and builds a new one on the way back; if nothing rebinds the GL
+  context, the new element keeps the HTML default 300x150 backing store inside a
+  708x531 box and no draw ever lands on it. Measured 2026-09-09 — that is exactly
+  what happened, and the numbers went on updating beside it."
+  "(() => {
+     const c = document.getElementById('suji-canvas');
+     if (!c) return null;
+     const o = document.createElement('canvas'); o.width = c.width; o.height = c.height;
+     const g = o.getContext('2d'); g.drawImage(c, 0, 0);
+     const d = g.getImageData(0, 0, o.width, o.height).data;
+     const s = new Set();
+     for (let i = 0; i < d.length; i += 4 * 97) s.add(d[i] + ',' + d[i+1] + ',' + d[i+2]);
+     return {w: c.width, h: c.height, cw: c.clientWidth, ch: c.clientHeight, colours: s.size};
+   })()")
+
+(def shot-path (or (.. process -env -SUJI_SHOT) "/tmp/kami-app-suji.png"))
+
+(defonce results (atom []))
+
+(defn- check! [label ok? detail]
+  (swap! results conj {:label label :ok? (boolean ok?) :detail detail})
+  (println (if ok? "  PASS" "  FAIL") label (if ok? "" (str "-- " detail))))
+
+(def launch-opts
+  (let [o #js {:headless true
+               ;; software rasterisation still yields a WebGL2 context in headless
+               ;; Chromium; without these the canvas can come back uninitialised on
+               ;; a machine with no display.
+               :args #js ["--use-gl=swiftshader" "--enable-unsafe-swiftshader"
+                          "--enable-features=Vulkan"]}
+        channel (str (or (.. process -env -PW_CHANNEL) ""))]
+    (when (seq channel) (aset o "channel" channel))
+    o))
+
+(defn- text-of [page sel]
+  (p/let [el (.$ page sel)]
+    (if el (.textContent el) "")))
+
+(defn- run-all [thunks]
+  (reduce (fn [acc t] (p/then acc (fn [_] (t)))) (p/resolved nil) thunks))
+
+(defn- checks [page]
+  [;; 0. the page under test is the build in `public/`, and not somebody else's.
+   ;;
+   ;; This machine runs many agent sessions at once and they collide on ports. It
+   ;; has now happened twice: once a check failed because another session's server
+   ;; held the port, and once — measured 2026-09-07 — a `python3 -m http.server`
+   ;; silently failed to bind and every subsequent check ran against a stranger's
+   ;; three-line test fixture, reporting "the app mounted" as a failure of THIS
+   ;; app. A `curl -o /dev/null -w '%{http_code}'` returns 200 from the wrong
+   ;; server exactly as readily as from the right one.
+   ;;
+   ;; Skipped for a remote URL, where there is no local build to compare against —
+   ;; and SAID to be skipped, so a skip cannot read as a pass.
+   ;;
+   ;; ⚠ IT COMPARED SIZES UNTIL 2026-09-08 and that was the wrong quantity. The
+   ;; served document is the file plus whatever the app rendered into it, so the
+   ;; two agree only while the page renders about as much markup as the shell
+   ;; contains. Adding the coupled-solve tables put the served DOM 25% over the
+   ;; file and the check failed — correctly by its own rule, and about nothing.
+   ;; A size window cannot separate `another server answered` from `this app drew
+   ;; more`, so it compares IDENTITY instead: the title and the bundle path this
+   ;; build wrote, both read out of `public/index.html` rather than restated here.
+   (fn []
+     (if-not (str/starts-with? root-url "http://localhost")
+       (do (println "  SKIP the served page is this build — remote URL, nothing local to compare")
+           nil)
+       (p/let [served-title (.evaluate page "document.title")
+               served-src (.evaluate page
+                           "Array.from(document.querySelectorAll('script[src]'))
+                              .map(e => e.getAttribute('src')).join(' ')")]
+         (let [local (try (fs/readFileSync "public/index.html" "utf8")
+                          (catch :default _ nil))
+               local-title (second (re-find #"<title>([^<]*)</title>" (or local "")))
+               local-src (second (re-find #"<script[^>]*src=\"([^\"]+)\"" (or local "")))]
+           (check! "the served page is the build in public/"
+                   (and local-title local-src
+                        (= local-title served-title)
+                        (str/includes? (or served-src "") local-src))
+                   (str "public/index.html is titled " (pr-str local-title)
+                        " and loads " (pr-str local-src) "; the page served "
+                        (pr-str served-title) " loading " (pr-str served-src)
+                        " — the port is probably serving another session"))))))
+
+
+   ;; 1. mounted
+   (fn []
+     (p/let [t (text-of page "h1")]
+       (check! "the app mounted and rendered its heading" (str/includes? (or t "") "suji") t)))
+
+   ;; 2. a GPU backend was obtained, and the page says which
+   (fn []
+     (p/let [_ (.waitForTimeout page 1200)
+             b (text-of page ".suji-backend")]
+       (check! "a GPU backend was obtained (webgpu or webgl2)"
+               (contains? #{"webgpu" "webgl2"} (str/trim (or b "")))
+               (str "backend reported: " (pr-str b)))))
+
+   ;; 3. the canvas actually has pixels — not one uniform colour
+   (fn []
+     (p/let [uniq (.evaluate page
+                   "(() => {
+                      const c = document.getElementById('suji-canvas');
+                      if (!c) return -1;
+                      const o = document.createElement('canvas');
+                      o.width = c.width; o.height = c.height;
+                      const g = o.getContext('2d');
+                      g.drawImage(c, 0, 0);
+                      const d = g.getImageData(0, 0, o.width, o.height).data;
+                      const s = new Set();
+                      for (let i = 0; i < d.length; i += 4 * 97)
+                        s.add(d[i] + ',' + d[i+1] + ',' + d[i+2]);
+                      return s.size;
+                    })()")]
+       (check! "the viewport drew more than one colour (geometry is on screen)"
+               (and (number? uniq) (> uniq 3))
+               (str "distinct sampled colours: " uniq))))
+
+   ;; 4. the bones are anatomical meshes, and they are the ones this source makes
+   (fn []
+     (p/let [g (.evaluate page "window.__sujiGeometry || null")]
+       (let [g (js->clj g :keywordize-keys true)
+             bones (:bones g)
+             cyl-v (:cylinderVertices g)]
+         (check! "the viewport reported the meshes it uploaded for the bones"
+                 (seq bones) (str "window.__sujiGeometry was " (pr-str g)))
+         (check! "no bone is drawn as the cylinder it replaced"
+                 (and (seq bones)
+                      (not-any? #(= "cylinder" (:shape %)) bones)
+                      (not-any? #(= cyl-v (:vertices %)) bones))
+                 (str "shapes " (vec (distinct (map :shape bones)))
+                      ", vertex counts " (vec (map :vertices bones))
+                      ", the cylinder's is " cyl-v))
+         (check! "the axial and limb segments are not the same shape"
+                 (> (count (distinct (map :shape bones))) 1)
+                 (str "shapes drawn: " (vec (distinct (map :shape bones)))))
+         (check! "every bone has its own GPU buffer (a shared one draws one bone)"
+                 (and (seq bones) (= (:distinctBuffers g) (count bones)))
+                 (str (:distinctBuffers g) " distinct upload serials for "
+                      (count bones) " bones: " (vec (map :buffer bones))))
+         (let [bad (for [b bones
+                         :let [kind (keyword (:shape b))
+                               {:keys [generator params]}
+                               (get scene/bone-shapes kind
+                                    (get scene/bone-shapes scene/default-bone-shape))
+                               m (case generator
+                                   :vertebral-body (geom/vertebral-body
+                                                    (assoc params :length (:meshLengthM b)
+                                                           :radius (:meshRadiusM b)))
+                                   (geom/long-bone (assoc params :length (:meshLengthM b)
+                                                          :shaft-radius (:meshRadiusM b))))
+                               want [(count (:positions m)) (count (:indices m))]
+                               got [(:vertices b) (:indices b)]]
+                         :when (not= want got)]
+                     [(:label b) (:shape b) :want want :got got])]
+           (check! "every uploaded bone mesh is exactly what kami.webgpu.geometry generates here"
+                   (and (seq bones) (empty? bad))
+                   (str (count bad) " mismatched, e.g. " (pr-str (first bad))))))))
+
+   ;; 5. the mesh follows the anthropometry: change the body, change the bone
+   (fn []
+     (p/let [before (.evaluate page
+                     "window.__sujiGeometry.bones.map(b => [b.label, b.meshLengthM, b.vertices])")
+             _ (.evaluate page
+                "(() => { const el = document.getElementById('body-stature-m');
+                          el.value = 2.02; el.dispatchEvent(new Event('input', {bubbles: true})); })()")
+             _ (.waitForTimeout page 500)
+             after (.evaluate page
+                    "window.__sujiGeometry.bones.map(b => [b.label, b.meshLengthM, b.vertices])")]
+       (let [b (js->clj before) a (js->clj after)
+             len (fn [rows] (mapv second rows))]
+         (check! "a taller body gets longer bone MESHES, not a stretched picture"
+                 (and (seq b) (= (count a) (count b))
+                      (every? true? (map (fn [x y] (> y x)) (len b) (len a))))
+                 (str "mesh lengths " (len b) " -> " (len a)))
+         (check! "and they are still whole meshes after the rebuild"
+                 (every? #(> (nth % 2) 0) a)
+                 (str "vertex counts after: " (mapv #(nth % 2) a))))
+       ;; put the body back so the later checks see the same figure as before
+       (p/let [_ (.evaluate page
+                  "(() => { const el = document.getElementById('body-stature-m');
+                            el.value = 1.70; el.dispatchEvent(new Event('input', {bubbles: true})); })()")
+               _ (.waitForTimeout page 300)]
+         nil)))
+
+   ;; 6. the physics runs in the browser: a slider changes the answer
+   (fn []
+     (p/let [before (text-of page ".suji-figure")
+             _ (.evaluate page
+                "(() => {
+                   const el = document.getElementById('posture-head-flexion-deg');
+                   el.value = 55;
+                   el.dispatchEvent(new Event('input', {bubbles: true}));
+                 })()")
+             _ (.waitForTimeout page 300)
+             after (text-of page ".suji-figure")]
+       (check! "moving the head-flexion slider changes the computed load"
+               (and (seq (str/trim (or before ""))) (not= before after))
+               (str (pr-str before) " -> " (pr-str after)))))
+
+   ;; 5. the model's refusal reaches the page as a refusal
+   (fn []
+     (p/let [_ (.evaluate page
+                "(() => {
+                   const set = (id, v) => { const el = document.getElementById(id);
+                     el.value = v; el.dispatchEvent(new Event('input', {bubbles: true})); };
+                   set('posture-trunk-flexion-deg', 60);
+                   set('posture-trunk-lateral-bend-deg', 40);
+                 })()")
+             _ (.waitForTimeout page 400)
+             body (.evaluate page "document.body.innerText")]
+       (check! "a posture outside the model is shown as refused, not as a number"
+               (str/includes? (or body "") "適用範囲外")
+               "expected the out-of-range marker in the muscle table")
+       (check! "and the reason is given, not just a dash"
+               (str/includes? (or body "") "力を計算していない")
+               "expected the refusal to state why")))
+
+   ;; 5a2. the dose layer says how long, not only how bad.
+   ;;
+   ;; `strain` computes a holding time, whether that time is extrapolated, and the
+   ;; raw dose the four-band index is a saturating transform of. The page showed
+   ;; the band and nothing else, which cannot separate `9 %MVC, unbounded holding
+   ;; time, high 120-minute dose` from a muscle in trouble now. Read the HEADINGS:
+   ;; the paragraph above the table uses the same words.
+   (fn []
+     (p/let [_ (.click page "a[href='#/']")
+             _ (.waitForSelector page "#suji-canvas")
+             heads (.evaluate page
+                    "Array.from(document.querySelectorAll('th')).map(e => e.innerText.trim())")
+             marked (.evaluate page
+                     "Array.from(document.querySelectorAll('tbody td'))
+                        .map(e => e.innerText.trim())
+                        .filter(t => t.includes('当てはめ範囲') || t.startsWith('∞')).length")]
+       (let [heads (vec heads)]
+         (check! "the muscle table states a holding time and its caveat"
+                 (and (some #{"保持できる時間"} heads) (some #{"当てはめ範囲"} heads))
+                 (str "headings were " heads))
+         (check! "and the raw dose beside the band the index saturates into"
+                 (some #{"ドーズ"} heads)
+                 (str "headings were " heads))
+         (check! "every holding time carries whether it was extrapolated"
+                 (< 0 marked)
+                 (str "cells qualifying a holding time: " marked)))))
+
+   ;; 5b. the coupled solve reports itself, and the report is a table rather than a
+   ;; sentence about one.
+   ;;
+   ;; `recruit/solve` satisfies several equilibria at once and says so: which
+   ;; muscles it solved together, whether it converged, and the equilibrium error
+   ;; left at each joint. A coverage census of this app measured every one of those
+   ;; as computed and not shown, at the same moment the forces themselves moved a
+   ;; great deal — 22.1 to 39.2 %MVC at the cervical extensors. Read the COLUMN
+   ;; HEADINGS: the paragraph above the table explains what a residual is and uses
+   ;; the same words, so a body-text search would go on passing after the table was
+   ;; deleted, which is the failure this repo has recorded three times.
+   (fn []
+     (p/let [_ (.click page "a[href='#/']")
+             _ (.waitForSelector page "#suji-canvas")
+             _ (.waitForTimeout page 300)
+             heads (.evaluate page
+                    "Array.from(document.querySelectorAll('th')).map(e => e.innerText.trim())")
+             rows (.evaluate page
+                   "(() => {
+                      const want = ['関節','連立の残差','どの式にも入っていないモーメント'];
+                      for (const t of document.querySelectorAll('table')) {
+                        const h = Array.from(t.querySelectorAll('th')).map(e => e.innerText.trim());
+                        if (want.every(w => h.includes(w)))
+                          return Array.from(t.querySelectorAll('tbody tr'))
+                                      .map(r => Array.from(r.querySelectorAll('td'))
+                                                     .map(c => c.innerText.trim()));
+                      }
+                      return null;
+                    })()")]
+       (let [heads (vec heads)
+             rows (some-> rows js->clj)]
+         (check! "the coupled solve states which joints it satisfied together"
+                 (some #{"同時に満たした関節"} heads)
+                 (str "headings were " heads))
+         (check! "and reports the equilibrium error it left at each joint"
+                 (some #{"連立の残差"} heads)
+                 (str "headings were " heads))
+         (check! "the residual table has a row per joint, all columns filled"
+                 (and (seq rows) (<= 5 (count rows)) (every? #(= 3 (count %)) rows))
+                 (str "residual rows: " (pr-str rows)))
+         (check! "and the residual is a number, not a dash for every joint"
+                 (some (fn [r] (re-find #"[1-9]" (nth r 1 ""))) rows)
+                 (str "residual column: " (pr-str (map #(nth % 1 "") rows)))))))
+
+   ;; 5c. a muscle the optimum switched off is not drawn as a lightly loaded one.
+   ;;
+   ;; An inactive muscle is ANSWERED — force zero, %MVC zero — which is a different
+   ;; statement from refused, and `band-for 0.0` is `low`. Eleven muscles at the
+   ;; default posture were being banded as lightly loaded. Read the CELL: the
+   ;; legend, the notes and the coupled table all contain the word, so page text
+   ;; cannot tell a banded row from an explanation of what banding means.
+   (fn []
+     (p/let [cells (.evaluate page
+                    "Array.from(document.querySelectorAll('tbody tr'))
+                       .filter(r => Array.from(r.querySelectorAll('td'))
+                                         .some(c => c.innerText.trim() === '無活動（最適解が切っている）'))
+                       .map(r => r.querySelector('td').innerText.trim())")
+             body (.evaluate page "document.body.innerText")]
+       (let [cells (vec (js->clj cells))]
+         (check! "muscles the coupled optimum switched off are banded as inactive"
+                 (seq cells)
+                 "no muscle row's band cell reads 無活動（最適解が切っている）")
+         (check! "and their reason travels with them"
+                 (str/includes? (or body "") "最適解が切っている（力は 0 N")
+                 "expected the inactive note, which the page used to compute and drop"))))
+
+   ;; 4c. the picture shows the whole body, not as much of it as fits.
+   ;;
+   ;; The buffer pools used to be fixed constants — twelve bones, twelve joints,
+   ;; twenty muscles — and `draws-for` took that many and dropped the rest behind a
+   ;; `console.error` saying to raise the counts. They were never raised. Measured
+   ;; the day the lower limb landed: the scene produced 15 bones, 20 joints and 48
+   ;; muscles, so three bones, eight joints and TWENTY-EIGHT muscles were not
+   ;; drawn — over half the musculature — and the picture looked entirely
+   ;; plausible.
+   ;;
+   ;; So this compares what the scene asked for against what reached the GPU. It
+   ;; reads both off `window.__sujiGeometry`, which the render path publishes from
+   ;; the draw list it actually encoded, rather than off the scene map.
+   (fn []
+     (p/let [_ (.click page "a[href='#/']")
+             _ (.waitForSelector page "#suji-canvas")
+             _ (.waitForTimeout page 300)
+             g (.evaluate page "window.__sujiGeometry || null")]
+       (let [g (js->clj g :keywordize-keys true)
+             sc (:sceneCounts g)
+             asked (+ (:bones sc 0) (:joints sc 0) (:muscles sc 0) (:discs sc 0))]
+         (check! "the scene has more parts than the old fixed pools held"
+                 (and (< 12 (:bones sc 0)) (< 20 (:muscles sc 0)))
+                 (str "scene counts " (pr-str sc)
+                      " — if this shrinks below the old caps the next check stops"
+                      " discriminating"))
+         (check! "every part the scene produced was drawn"
+                 (= asked (:drawCount g))
+                 (str "scene asked for " asked " parts " (pr-str sc)
+                      " and the GPU was given " (:drawCount g))))))
+
+   ;; 5a. the standing preset reaches the browser.
+   ;;
+   ;; `apply-preset` lives in `ui.cljs` and is only reachable by a click, so the
+   ;; JVM suite can prove the preset TABLE is consistent and cannot prove that
+   ;; pressing the button does anything. The support mode is not a slider — a
+   ;; preset is the only way to reach standing at all — so if this wiring were
+   ;; broken, half the lower-limb model would be unreachable from the page while
+   ;; looking entirely present in the physics.
+   (fn []
+     (p/let [_ (.click page "a[href='#/']")
+             _ (.waitForSelector page "#suji-canvas")
+             before (.evaluate page readout-js)
+             _ (.click page "[data-preset='standing-neutral']")
+             _ (.waitForTimeout page 400)
+             after (.evaluate page readout-js)]
+       (let [b (js->clj before) a (js->clj after)]
+         (check! "pressing a standing preset changes the support regime"
+                 (and (not= b a) (some #(str/includes? % "立位") a))
+                 (str "readout before " (pr-str b) " after " (pr-str a)))
+         (check! "and the ground reaction under one foot is no longer zero"
+                 (some #(re-find #"[1-9]\d* N" %)
+                       (filter #(str/includes? % "床反力") a))
+                 (str "ground-reaction figures after standing: "
+                      (pr-str (filter #(str/includes? % "床反力") a)))))))
+
+   ;; 5b. …and the two checks above cannot fail on their own.
+   ;;
+   ;; Both strings are hard-coded literals that the page carries at EVERY posture:
+   ;; `適用範囲外` sits in the colour legend, and the default posture already has
+   ;; four antagonists producing `力を計算していない`. So check 5 held before either
+   ;; slider was touched, and would have gone on holding if the sliders did nothing
+   ;; at all. What it means to assert is that the extreme posture refuses MORE than
+   ;; the default one — so count the refused rows on both sides of the move.
+   (fn []
+     (p/let [_ (.click page "a[href='#/']")
+             _ (.waitForSelector page "#suji-canvas")
+             _ (.evaluate page "(() => {
+                   const set = (id, v) => { const el = document.getElementById(id);
+                     el.value = v; el.dispatchEvent(new Event('input', {bubbles: true})); };
+                   set('posture-trunk-flexion-deg', 0);
+                   set('posture-trunk-lateral-bend-deg', 0);
+                 })()")
+             _ (.waitForTimeout page 400)
+             before (.evaluate page refused-rows-js)
+             _ (.evaluate page "(() => {
+                   const set = (id, v) => { const el = document.getElementById(id);
+                     el.value = v; el.dispatchEvent(new Event('input', {bubbles: true})); };
+                   set('posture-trunk-flexion-deg', 60);
+                   set('posture-trunk-lateral-bend-deg', 40);
+                 })()")
+             _ (.waitForTimeout page 400)
+             after (.evaluate page refused-rows-js)]
+       (let [b (set (js->clj before)) a (set (js->clj after))]
+         (check! "moving to an extreme posture refuses rows the default posture does not"
+                 (seq (remove b a))
+                 (str "refused at default: " (pr-str (sort b))
+                      " — refused at trunk 60 / bend 40: " (pr-str (sort a))
+                      " (nothing new was refused, so check 5 measured a literal)")))))
+
+   ;; 6. an out-of-plane control actually moves the picture
+   (fn []
+     (p/let [before (.evaluate page "document.querySelector('.suji-figure').innerText")
+             _ (.evaluate page
+                "(() => { const el = document.getElementById('posture-trunk-lateral-bend-deg');
+                          el.value = 30; el.dispatchEvent(new Event('input', {bubbles: true})); })()")
+             _ (.waitForTimeout page 400)
+             uniq (.evaluate page
+                   "(() => { const c = document.getElementById('suji-canvas');
+                      const o = document.createElement('canvas'); o.width=c.width; o.height=c.height;
+                      const g = o.getContext('2d'); g.drawImage(c,0,0);
+                      const d = g.getImageData(0,0,o.width,o.height).data; const s = new Set();
+                      for (let i=0;i<d.length;i+=4*97) s.add(d[i]+','+d[i+1]+','+d[i+2]);
+                      return s.size; })()")]
+       (check! "the frontal-plane control still leaves a drawn body on screen"
+               (and (number? uniq) (> uniq 3)) (str "distinct colours: " uniq))))
+
+   ;; 7. the frontal load is reported as a number nobody is carrying
+   (fn []
+     (p/let [body (.evaluate page "document.body.innerText")]
+       (check! "the frontal-plane moment is stated as a figure"
+               (str/includes? (or body "") "前額面のモーメント")
+               "expected the frontal-plane figures")
+       (check! "and the page names the muscles that carry it"
+               (str/includes? (or body "") "腰方形筋")
+               "expected the frontal-plane muscles to be named")))
+
+   ;; 8. the spine view exists and carries the level table with its caveat
+   (fn []
+     (p/let [_ (.click page "a[href='#/spine']")
+             ;; Two sessions diagnosed this race independently and fixed it two
+             ;; different ways; this is both, because each catches something the
+             ;; other does not.
+             ;;
+             ;; WHICH VIEW. `waitForSelector "table"` returns instantly after the
+             ;; click, because the simulate view has tables too, so the assertions
+             ;; read the view we just left. Waiting on `tbody tr` does not fix that
+             ;; either: the simulate view has rows as well. Wait for a heading only
+             ;; the spine view has.
+             ;;
+             ;; WHETHER IT IS LAID OUT. `innerText` needs layout, and the element
+             ;; can exist a tick before its text is measurable. Hence the settle.
+             ;;
+             ;; It had been passing by luck. Two changes landing the same day — a
+             ;; check inserted earlier in the run, and the bone checks adding
+             ;; ~800ms and two extra renders ahead of it — both made it start
+             ;; losing, in one case failing three assertions at once while the
+             ;; structural check on the same table kept passing.
+             _ (.waitForFunction page
+                "() => Array.from(document.querySelectorAll('th')).some(e => e.innerText.trim() === 'レベル')"
+                #js {} #js {:timeout 8000})
+             _ (.waitForTimeout page 200)
+             body (.evaluate page "document.body.innerText")]
+       (check! "the spine view lists intervertebral levels"
+               (and (str/includes? (or body "") "L5/S1")
+                    (str/includes? (or body "") "C7/T1"))
+               "expected the level names")
+       (check! "with a stress, not only a force"
+               (str/includes? (or body "") "MPa") "expected MPa")
+       (check! "and it says the level profile is not the validated one"
+               (str/includes? (or body "") "検証されていない")
+               "expected the unvalidated caveat next to the table")
+       ;; Read the column HEADINGS, not the page text. The paragraph above the
+       ;; table names both 筋ぶん and 靭帯ぶん, so a body-text search would go on
+       ;; passing after the column itself was deleted — which is exactly what
+       ;; the first version of the JVM test for this did.
+       (p/let [heads (.evaluate page "Array.from(document.querySelectorAll('th')).map(e => e.innerText.trim())")
+               cells (.evaluate page "Array.from(document.querySelectorAll('tbody tr')).map(r => r.querySelectorAll('td').length)")]
+         (let [heads (vec heads) cells (vec cells)]
+           (check! "the spine table separates the muscle and ligament terms"
+                   (and (some #{"筋ぶん"} heads) (some #{"靭帯ぶん"} heads))
+                   (str "headings were " heads))
+           (check! "and every level fills every column"
+                   (and (seq cells) (every? #(= (count heads) %) cells))
+                   (str (count heads) " headings but rows of " cells))))
+       (p/let [_ (.click page "a[href='#/']")
+               _ (.waitForSelector page "#suji-canvas")]
+         nil)))
+
+   ;; 8c. the trunk is two segments now, and the picture has to be two bones.
+   ;;
+   ;; ⚠ THE COUNT, NOT THE APPEARANCE, and the count is read off the GPU. suji
+   ;; 3d494ba split `thorax_abdomen` at T12/L1, and three tables in `scene` were
+   ;; still keyed by the name it lost — both new segments drew unloaded, with no
+   ;; error and a picture that looked exactly right. The JVM guard catches the
+   ;; keying; this catches the upload, which is where six cervical bones once came
+   ;; out as a single rod because they shared one uniform buffer.
+   ;;
+   ;; The joint matters as much as the bones: two rods joined end to end with no
+   ;; landmark between them read as one rod, which is the failure mode this is
+   ;; guarding, so `t12l1` has to be among the drawn landmarks.
+   (fn []
+     (p/let [_ (.click page "a[href='#/']")
+             _ (.waitForSelector page "#suji-canvas")
+             _ (.waitForTimeout page 400)
+             g (.evaluate page "window.__sujiGeometry || null")]
+       (let [g (js->clj g :keywordize-keys true)
+             bones (:bones g)
+             want (set segment/trunk-bases)
+             trunk (filterv #(contains? want (:label %)) bones)
+             joints (set (:jointLabels g))]
+         (check! "the trunk reached the GPU as one bone per segment suji places"
+                 (= (count segment/trunk-bases) (count trunk))
+                 (str "suji places " (pr-str (vec segment/trunk-bases))
+                      " and the GPU was given " (pr-str (mapv :label trunk))
+                      " out of " (pr-str (mapv :label bones))))
+         (check! "each trunk segment got its own mesh and its own buffer"
+                 (and (seq trunk)
+                      (= (count trunk) (count (distinct (map :shape trunk))))
+                      (= (count trunk) (count (distinct (map :buffer trunk)))))
+                 (str "shapes " (pr-str (mapv :shape trunk))
+                      ", upload serials " (pr-str (mapv :buffer trunk))))
+         (check! "and the joint the split created is drawn between them"
+                 (contains? joints "t12l1")
+                 (str "landmarks drawn: " (pr-str (sort joints)))))))
+
+   ;; 8d. the pelvis is REACHABLE, and moving it moves the DRAW LIST.
+   ;;
+   ;; This is the whole point of the work: `:pelvic-tilt-deg` existed in the model
+   ;; and had no control, so every number on this page was computed at zero
+   ;; lordosis and nothing said so. A slider that renders and does nothing looks
+   ;; identical to one that works.
+   ;;
+   ;; ⚠ IT ASKS THE DRAW LIST, NOT THE PIXELS, and the pixels were the first
+   ;; attempt. Measured 2026-09-09 under headless Chromium with SwiftShader: a
+   ;; canvas screenshot is byte-identical across postures and refreshes only when
+   ;; the canvas is RESIZED — the same hash comes back after flexing the head 15
+   ;; degrees, after a preset, after tilting the pelvis. A pixel diff here reports
+   ;; `the picture did not move` for a viewport that is drawing correctly, which is
+   ;; a check that cannot say yes. So this reads the transforms the encoder was
+   ;; given, which is the last thing this app owns before the GPU.
+   ;;
+   ;; The claim is the JVM one, end to end: the pelvis turns, the lumbar chord
+   ;; turns HALF as far (a constant-curvature arc's chord bisects its end
+   ;; tangents), and the thorax does not turn at all — only `trunk-flexion` may
+   ;; move that.
+   (fn []
+     (p/let [_ (.evaluate page
+                "(() => { const el = document.getElementById('posture-pelvic-tilt-deg');
+                          if (!el) return; el.value = 0;
+                          el.dispatchEvent(new Event('input', {bubbles: true})); })()")
+             _ (.waitForTimeout page 500)
+             before (.evaluate page rot-z-js)
+             _ (.evaluate page
+                "(() => { const el = document.getElementById('posture-pelvic-tilt-deg');
+                          el.value = 40;
+                          el.dispatchEvent(new Event('input', {bubbles: true})); })()")
+             _ (.waitForTimeout page 600)
+             after (.evaluate page rot-z-js)
+             lord (.evaluate page
+                   "Array.from(document.querySelectorAll('.suji-readout-item'))
+                      .map(e => e.innerText.replace(/\\s+/g, ' ').trim())
+                      .filter(t => t.includes('腰椎前弯'))")]
+       (let [b (js->clj before) a (js->clj after)
+             d (fn [k] (when (and (get b k) (get a k))
+                         (- (get a k) (get b k))))]
+         (check! "the pelvic tilt has a control and the page reads a lordosis off it"
+                 (seq (js->clj lord))
+                 (str "no readout item mentions 腰椎前弯: " (pr-str (js->clj lord))))
+         (check! "tilting the pelvis turns the pelvis and the lumbar chord in the draw list"
+                 (and (d "pelvis") (d "lumbar")
+                      (> (Math/abs (d "pelvis")) 1e-6)
+                      (> (Math/abs (d "lumbar")) 1e-6))
+                 (str "rotations before " (pr-str b) " after " (pr-str a)))
+         (check! "and leaves the thorax alone, which only trunk flexion may turn"
+                 (and (d "thorax") (< (Math/abs (d "thorax")) 1e-9))
+                 (str "the thorax turned by " (d "thorax")))
+         ;; ⚠ THE FIRST CLAUSE IS NOT REDUNDANT. Without it this held when NOTHING
+         ;; moved: measured 2026-09-09 by zeroing every rotation in the draw list,
+         ;; `0 = 0.5 * 0` and the check reported a pass for a picture that had
+         ;; stopped turning at all. A ratio between two quantities has to require
+         ;; that they are not both zero, or it certifies the one state it cannot
+         ;; distinguish from success.
+         (check! "and the chord turns half as far as the pelvis, as the arc requires"
+                 (and (d "pelvis") (d "lumbar")
+                      (> (Math/abs (d "pelvis")) 1e-6)
+                      (< (Math/abs (- (Math/abs (d "lumbar"))
+                                      (* 0.5 (Math/abs (d "pelvis")))))
+                         1e-9))
+                 (str "the pelvis moved " (d "pelvis") " and the chord "
+                      (d "lumbar"))))
+       (p/let [_ (.evaluate page
+                  "(() => { const el = document.getElementById('posture-pelvic-tilt-deg');
+                            el.value = 0;
+                            el.dispatchEvent(new Event('input', {bubbles: true})); })()")
+               _ (.waitForTimeout page 400)]
+         nil)))
+
+   ;; 8e. the page says what lordosis its own presets carry.
+   ;;
+   ;; suji's reference postures state no pelvic tilt, so every preset here — the
+   ;; STANDING ones included — is solved at zero lordosis, where Cho measures
+   ;; standing at 47.1 deg. That is an upstream gap and the page has to say so
+   ;; rather than filling it in on this app's authority. Read out of the note
+   ;; element, and the figures are recomputed from suji's own table rather than
+   ;; restated here.
+   (fn []
+     (p/let [note (.evaluate page
+                   "(() => { const p = Array.from(document.querySelectorAll('p.suji-note'))
+                        .find(e => e.innerText.includes('参照姿勢の前弯'));
+                      return p ? p.innerText.replace(/\\s+/g, ' ') : null; })()")]
+       (let [n (or note "")
+             standing (:deg (:standing posture/lumbar-lordosis))
+             gap (posture/pelvic-tilt-for :standing)]
+         (check! "the page states what lordosis its presets carry"
+                 (seq n) "no note is labelled 参照姿勢の前弯")
+         (check! "and names the measured standing lordosis and the gap it leaves"
+                 (and (str/includes? n (math/fmt-fixed standing 1))
+                      (str/includes? n (math/fmt-fixed gap 1)))
+                 (str "Cho measures " standing " and the gap is " gap
+                      "; the note reads: " (pr-str n)))
+         (check! "and says whose gap it is instead of closing it here"
+                 (str/includes? n "上流")
+                 (str "the note reads: " (pr-str n))))))
+
+   ;; 8f. Wilke's relaxed STANDING entry, which this model refused twice.
+   ;;
+   ;; It could not stand; then it could stand and returned the same L4/L5 force
+   ;; for standing and sitting, because the two differed only below L5/S1. The
+   ;; pelvis rotating is what made the comparison possible, and the answer is that
+   ;; the model OVERSHOOTS — so the page has to carry the numbers and the model's
+   ;; own caveat, which says the agreement in DIRECTION is not evidence because any
+   ;; lordosis of either sign raises compression here. Recomputed under nbb and
+   ;; compared, the same disagreement-between-two-runtimes shape the bone-mesh
+   ;; check uses.
+   (fn []
+     (p/let [_ (.click page "a[href='#/method']")
+             _ (.waitForFunction page
+                "() => Array.from(document.querySelectorAll('th')).some(e => e.innerText.trim() === '入れた前弯')"
+                #js {} #js {:timeout 15000})
+             _ (.waitForTimeout page 300)
+             rows (.evaluate page
+                   "(() => {
+                      const want = ['姿勢','この模型','Wilke','比','入れた前弯','基準の幅'];
+                      for (const t of document.querySelectorAll('table')) {
+                        const h = Array.from(t.querySelectorAll('th')).map(e => e.innerText.trim());
+                        if (want.every(w => h.includes(w)))
+                          return Array.from(t.querySelectorAll('tbody tr'))
+                                      .map(r => Array.from(r.querySelectorAll('td'))
+                                                     .map(c => c.innerText.trim()));
+                      }
+                      return null;
+                    })()")
+             body (.evaluate page "document.body.innerText")]
+       (let [rows (some-> rows js->clj)
+             c (spine/sitting-standing-comparison)
+             cell? (fn [needle] (some (fn [r] (some #(str/includes? % needle) r)) rows))]
+         (check! "the method view compares standing against sitting at L4/L5"
+                 (and (seq rows) (= 2 (count rows)))
+                 (str "rows read: " (pr-str rows)))
+         (check! "and both model forces are the ones this checker computes"
+                 (and (seq rows)
+                      (cell? (math/fmt-fixed (:model-force-n (:standing c)) 1))
+                      (cell? (math/fmt-fixed (:model-force-n (:sitting c)) 1)))
+                 (str "this checker computes standing "
+                      (:model-force-n (:standing c)) " N and sitting "
+                      (:model-force-n (:sitting c)) " N; the table reads "
+                      (pr-str rows)))
+         (check! "and the model's own caveat about the direction is carried verbatim"
+                 (str/includes? (or body "") (:direction-is-not-evidence c))
+                 "the page paraphrases or drops the caveat, so a reader can take
+                  the agreement in sign for evidence"))
+       (p/let [_ (.click page "a[href='#/']")
+               _ (.waitForSelector page "#suji-canvas")]
+         nil)))
+
+   ;; 8b. the coverage census on the method view is computed, and it is the SAME
+   ;; computation this checker can do for itself.
+   ;;
+   ;; The three numbers are how much of what the model produces reaches a reader.
+   ;; A number like that written into the page as a literal is worse than absent:
+   ;; it looks measured. So the page is put back to exactly the state the checker
+   ;; can reproduce — every slider and both body sliders set to `initial-state`'s
+   ;; values — and then the checker runs `coverage/census` on its own copy of the
+   ;; same `.cljc` and compares. This is the disagreement-between-two-runtimes
+   ;; shape the bone-mesh check uses; the page is not grading its own homework.
+   ;;
+   ;; Read out of the table by ROW LABEL, not by searching the page: the paragraph
+   ;; above it names all three states, and a text search would keep passing after
+   ;; the table was gone.
+   (fn []
+     (p/let [_ (.click page "a[href='#/']")
+             _ (.waitForSelector page "#suji-canvas")
+             _ (.evaluate page
+                "(() => {
+                   const set = (id, v) => { const el = document.getElementById(id);
+                     if (!el) return; el.value = v;
+                     el.dispatchEvent(new Event('input', {bubbles: true})); };
+                   set('body-total-mass-kg', 70);
+                   set('body-stature-m', 1.7);
+                   set('session-minutes', 120);
+                 })()")
+             _ (.waitForTimeout page 200)
+             _ (.click page "[data-preset='laptop-on-lap']")
+             _ (.waitForTimeout page 400)
+             _ (.click page "a[href='#/method']")
+             _ (.waitForFunction page
+                "() => Array.from(document.querySelectorAll('td')).some(e => e.innerText.trim() === '出している')"
+                #js {} #js {:timeout 8000})
+             _ (.waitForTimeout page 200)
+             cells (.evaluate page
+                    "Array.from(document.querySelectorAll('tbody tr'))
+                       .map(r => Array.from(r.querySelectorAll('td')).map(c => c.innerText.trim()))
+                       .filter(r => r.length === 3)")]
+       (let [rows (js->clj cells)
+             by-label (into {} (for [[a b] rows] [a b]))
+             st core/initial-state
+             mine (:counts (coverage/census (core/body-of st) (:posture st) (core/solved st)))]
+         (check! "the method view carries a coverage census"
+                 (and (get by-label "出している") (get by-label "出していない")
+                      (get by-label "訊いていない"))
+                 (str "rows read: " (pr-str rows)))
+         (check! "and its three numbers are the ones this checker computes independently"
+                 (= [(str (:shown mine)) (str (:computed-not-shown mine))
+                     (str (:not-computed mine))]
+                    [(get by-label "出している") (get by-label "出していない")
+                     (get by-label "訊いていない")])
+                 (str "page says "
+                      (pr-str (mapv by-label ["出している" "出していない" "訊いていない"]))
+                      " and this checker computes " (pr-str mine)))
+         (check! "the census reports something hidden, so it is not answering by default"
+                 (pos? (:computed-not-shown mine))
+                 (str "counts " (pr-str mine))))))
+
+   ;; 9. it is one page: crossing a view must not load a document
+   (fn []
+     (p/let [_ (.evaluate page "window.__sujiSameDocument = 'yes'")
+             _ (.click page "a[href='#/compare']")
+             ;; wait on something that exists ONLY in this view — the nav link
+             ;; carries the same words, so waiting on the text matches before the
+             ;; view has rendered
+             _ (.waitForFunction page
+                "() => !document.getElementById('suji-canvas') && document.querySelector('table')"
+                #js {} #js {:timeout 8000})
+             ;; innerText needs layout; reading it in the same tick as the commit
+             ;; returns the shell without the view
+             _ (.waitForTimeout page 400)
+             marker (.evaluate page "window.__sujiSameDocument || 'LOST'")
+             body (.evaluate page "document.body.innerText")]
+       (check! "crossing to the comparison view did not load a document"
+               (= "yes" marker) (str "window marker after crossing: " (pr-str marker)))
+       (check! "the comparison view rendered its own content"
+               (and (str/includes? (or body "") "頭部前屈")
+                    (str/includes? (or body "") "×頭部重量"))
+               "expected the comparison table's own columns")))
+
+   ;; 8. and back, with the canvas alive again.
+   ;;
+   ;; ⚠ THIS CHECK WAS NAMED `with the canvas alive again` AND DID NOT LOOK AT THE
+   ;; CANVAS. It read a marker on `window`, which is a claim about the DOCUMENT.
+   ;; Measured 2026-09-09: after one round trip the canvas was 300x150 — the HTML
+   ;; default — inside a 708x531 box, carrying ONE colour, because `ensure-canvas!`
+   ;; only rebound when the viewport was nil and it never is after the first init.
+   ;; The GL context stayed bound to the destroyed element. Every other check in
+   ;; this file went on passing: `__sujiGeometry` is published from the draw list
+   ;; whether or not a pixel lands, and the only pixel checks ran before the first
+   ;; navigation.
+   ;;
+   ;; So it looks at the canvas now, and at the two things that separate a live
+   ;; surface from a remounted one: a backing store that matches its own CSS box,
+   ;; and more than one colour in it.
+   (fn []
+     (p/let [_ (.click page "a[href='#/']")
+             _ (.waitForSelector page "#suji-canvas")
+             _ (.waitForTimeout page 900)
+             marker (.evaluate page "window.__sujiSameDocument || 'LOST'")
+             c (.evaluate page canvas-alive-js)]
+       (check! "returning to the simulator stayed in the same document"
+               (= "yes" marker) (str "marker: " (pr-str marker)))
+       (let [c (js->clj c :keywordize-keys true)]
+         (check! "and the remounted canvas is bound to the GPU, not the default 300x150"
+                 (and c (= (:w c) (:cw c)) (= (:h c) (:ch c)) (< 150 (:h c)))
+                 (str "backing store " (:w c) "x" (:h c) " inside a CSS box of "
+                      (:cw c) "x" (:ch c)
+                      " — the canvas was rebuilt and nothing rebound the context"))
+         (check! "and it still has a body drawn on it after the round trip"
+                 (and c (> (:colours c) 3))
+                 (str "distinct sampled colours after returning: " (:colours c))))))
+
+   (fn [] (p/let [_ (.screenshot page #js {:path shot-path :fullPage true})]
+            (check! "screenshot written" (fs/existsSync shot-path) shot-path)))])
+
+(defn -main []
+  (p/let [browser (.launch (.-chromium pw) launch-opts)
+          page (.newPage browser #js {:viewport #js {:width 1280 :height 900}})
+          _ (.on page "pageerror" (fn [e] (println "  page error:" (str e))))
+          _ (.goto page root-url #js {:waitUntil "networkidle"})
+          _ (run-all (checks page))
+          _ (.close browser)]
+    (let [fails (remove :ok? @results)]
+      (println)
+      (println (str (count @results) " checks, " (count fails) " failed"))
+      ;; An evidence floor: a run that asserted almost nothing must not report a
+      ;; pass. Cf. the workspace rule that a check which could not run has to be
+      ;; distinguishable from a check that passed.
+      (cond
+        ;; 16 -> 22 when the bone-mesh checks landed, 22 -> 27 with the
+        ;; lower-limb preset checks, 31 -> 43 with the coupled-solve report, the
+        ;; dose columns and the coverage census, 43 -> 55 with the pelvic tilt, the
+        ;; trunk split and the remounted canvas: an evidence floor that does not
+        ;; move when the suite grows stops being a floor. One below the current
+        ;; count, so that a single check silently failing to register is caught
+        ;; while an intentional removal is a deliberate edit here.
+        (< (count @results) 54)
+        (do (println "REFUSING to report a pass: only" (count @results) "checks ran.")
+            (process/exit 2))
+        (seq fails) (process/exit 1)
+        :else (process/exit 0)))))
+
+(-main)

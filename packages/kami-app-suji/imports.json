@@ -1,0 +1,188 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-app-suji",
+      "commit": "d6347beff5fc424248f9e9ef321f8e116e9e0cfa",
+      "tree": "73de16541c2a6976cdd54f0bef226550d32411ae",
+      "url": "https://github.com/kotoba-lang/kami-app-suji.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "fa4a933ac48acae1d8097151e73ea8008f2526d7486822325bc039bfbd6ee849",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "05ab0781fd6c3ec8232e296dae24fdba9f245fe04c6ae29277a84202cf03cb67",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "e6c991d20102c83a15d4c7df2085e014db036b02eda7a6b3db6725ffbd9b7fc5",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "0f884fb5ab359bdea5b902a396a1d13d04133902289a44d3517538b7a770d247",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "1b1f8b7adebcdda7199e8735b262e23eac948d99242277ee0112df659768b1d4",
+          "mode": "100644"
+        },
+        {
+          "source": "package-lock.json",
+          "path": "package-lock.json",
+          "sha256": "00ad40f02505c7b89d6d5938ba4deffbd16e192d8bdcef1aeab9caa949d303fd",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "d1cfa1fdd4457b8f78c78eae5155b1aa759b527b0cc2086633c60fca63443e2f",
+          "mode": "100644"
+        },
+        {
+          "source": "public/.nojekyll",
+          "path": "public/.nojekyll",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": "100644"
+        },
+        {
+          "source": "public/404.html",
+          "path": "public/404.html",
+          "sha256": "98a20b2d203d1c32442c136048e2056ea35c4f9b02ca121d2bba2d0dda7c05b6",
+          "mode": "100644"
+        },
+        {
+          "source": "public/index.html",
+          "path": "public/index.html",
+          "sha256": "5790a5d7317fb1010201852006ba30a9089b108fe48db1a40fa54a76a44d30bf",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/gen-page.cljk",
+          "path": "scripts/gen-page.cljk",
+          "sha256": "daa78d918e5890f5d0676118bf8a7f3d31c0307de8802849f214a723aef69f51",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/nbb_test.cljk",
+          "path": "scripts/nbb_test.cljk",
+          "sha256": "7febc38cbeaa5eada27f3a737f4b45b030bf29dbba56d0168a8e5c3140898c5f",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/publish-pages.cljk",
+          "path": "scripts/publish-pages.cljk",
+          "sha256": "951d2e3e4dafdb0e1a040f483db141baa34694e975fee7d24dca43f072424bcf",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/verify-browser.cljk",
+          "path": "scripts/verify-browser.cljk",
+          "sha256": "c085b95a1fbae263ace2fa1ca0b3172d2fbf8cb56eb92e6347c0da483fe1c39c",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "3270963b474467facb4efc1e3f4fa16817ebef8d23c6b3e26272ed074390e3d8",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/app_suji/core.cljk",
+          "path": "src/main/kami/app_suji/core.cljk",
+          "sha256": "4b3e9f6450aa9969fc8d6b39af0ff18d03925579c35a5b09c6b86f649c0f3168",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/app_suji/coverage.cljk",
+          "path": "src/main/kami/app_suji/coverage.cljk",
+          "sha256": "1dd87663dec92371177f103ee72adf0b570a29eb8df6e7df35c1b93d31525628",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/app_suji/route.cljk",
+          "path": "src/main/kami/app_suji/route.cljk",
+          "sha256": "4d58b9fb2bca0064721a0948e8e66b400a1bd024e66d0d1beeaa7edc3d196e48",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/app_suji/scene.cljk",
+          "path": "src/main/kami/app_suji/scene.cljk",
+          "sha256": "0d11ee7989a4f80b1f9f075043cb4e6f53ba401e7b0722f5392f558e32896c34",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/app_suji/theme.cljk",
+          "path": "src/main/kami/app_suji/theme.cljk",
+          "sha256": "fe9108fd45128ddad9eb5b5389473dbb6ac2a3d5d05f0713ade3f9706fb33eea",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/app_suji/ui.cljk",
+          "path": "src/main/kami/app_suji/ui.cljk",
+          "sha256": "75bd7b8ba62cfbd9b026e379b56fa63a251cad52d050cbc3219b93d0b7aaf862",
+          "mode": "100644"
+        },
+        {
+          "source": "src/main/kami/app_suji/viewport.cljk",
+          "path": "src/main/kami/app_suji/viewport.cljk",
+          "sha256": "0398199d25320eb2684da63dc53279bfd6017cd5ae3cf0c3d0e0492fe6d2b0a6",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/app_suji/bone_shape_test.cljk",
+          "path": "test/kami/app_suji/bone_shape_test.cljk",
+          "sha256": "5e4e791be67f17f9e1cca2e0e1e0144ac07f941f9f567a76bc2e25ecbd104090",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/app_suji/core_test.cljk",
+          "path": "test/kami/app_suji/core_test.cljk",
+          "sha256": "c647156774e182293e20877ee7e81ddeadd1ccb5eaade0b5243b3ff8fe15454a",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/app_suji/coverage_test.cljk",
+          "path": "test/kami/app_suji/coverage_test.cljk",
+          "sha256": "fc715c9bc952b19e1bd1e4d95ab53db86c0bbddad409c246ecf250e7383fc811",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/app_suji/repo_test.cljk",
+          "path": "test/kami/app_suji/repo_test.cljk",
+          "sha256": "8209290921304b1a98489eb6dd627ed1dec0c7c48daf71600d7387b5c06c0daf",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/app_suji/route_test.cljk",
+          "path": "test/kami/app_suji/route_test.cljk",
+          "sha256": "a7d24f0851e1cb9016ceeadb8639112c369742ff3919f8d3b192b867903e9f5e",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/app_suji/scene_test.cljk",
+          "path": "test/kami/app_suji/scene_test.cljk",
+          "sha256": "52cf9bf746aa65deb0c43070f3a025c7dc2de69070f58783a6c9e35d65056e2b",
+          "mode": "100644"
+        }
+      ],
+      "excluded": []
+    }
+  ]
+}

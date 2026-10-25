@@ -1,0 +1,264 @@
+(ns kami.app-suji.viewport
+  "The 3-D viewport: the only namespace in this app that touches a GPU.
+
+  It owns no geometry and no camera maths. `kami.webgpu.geometry` tessellates the
+  primitives, `kami.app-suji.scene` places them, and `kami.webgpu.mesh` executes —
+  including the WebGPU→WebGL 2.0 fallback, which `init-canvas!` performs internally,
+  so this app never inspects `navigator.gpu` itself.
+
+  Meshes are uploaded ONCE and re-drawn per frame with a different transform each.
+  Re-uploading per frame would make every slider move allocate GPU buffers for
+  geometry that never changed — and stature IS a slider, so the bones have to
+  track a changing length without being re-tessellated. They do, because every
+  template is generated at unit length and unit shaft radius and the transform
+  carries the real size; see the note in `kami.app-suji.scene`."
+  (:require [kami.app-suji.scene :as scene]
+            [kami.webgpu.geometry :as geom]
+            [kami.webgpu.mesh :as mesh]))
+
+;; The bound GPU context, and WHICH CANVAS ELEMENT it is bound to.
+;;
+;; `:canvas` is not decoration. React destroys and recreates the canvas when the
+;; reader leaves the simulator view and comes back, and a viewport bound to the old
+;; element draws nowhere — with no error, because every object involved is still
+;; alive. `ui/ensure-canvas!` compares this by identity; a size comparison cannot
+;; see it, since the new element is laid out at exactly the old one's size.
+;;
+;; (A comment and not a docstring: `defonce` in ClojureScript takes no docstring,
+;; and shadow-cljs reports the extra argument as an arity error on this form.)
+(defonce state (atom {:viewport nil :canvas nil :backend nil :pool {} :bones {}}))
+
+(def ^:private unit-cylinder
+  "Radius 1, height 1, along +Y and centred. Still the right shape for a line of
+  action: a muscle in this model IS a line and has no cross-section, so giving it
+  anatomical bulk would be inventing a claim the physics does not make."
+  (geom/cylinder 1.0 1.0 20))
+
+(def ^:private joint-sphere (geom/sphere 1.0 10 16))
+
+(defn- bone-template
+  "The mesh for one bone, at ITS OWN length and girth — see the long note in
+  `kami.app-suji.scene` for why it is not a unit mesh scaled.
+
+  The app owns the catalogue of proportions; `kami.webgpu.geometry` owns every
+  number derived from them. This function is the whole of the app's contact with
+  tessellation, and it is a two-way dispatch with no arithmetic in it."
+  [{:keys [kind length-m radius-m]}]
+  (let [{:keys [generator params]} (get scene/bone-shapes kind
+                                        (get scene/bone-shapes scene/default-bone-shape))]
+    (case generator
+      :vertebral-body (geom/vertebral-body (assoc params :length length-m :radius radius-m))
+      (geom/long-bone (assoc params :length length-m :shaft-radius radius-m)))))
+
+;; ONE UPLOAD PER DRAWN OBJECT, not one per shape.
+;;
+;; `mesh/render-scene!` reads its per-draw uniforms — the MVP and the colour —
+;; out of the buffer handle that came back from `upload-mesh!`, writing them with
+;; `write-buffer!` as it encodes each draw. Every draw in the pass is encoded
+;; before any of them executes, so N draws that share one uploaded mesh all read
+;; the LAST uniform written: they land on top of each other and the frame shows
+;; one object. Measured 2026-09-06 — the six bones rendered as a single rod, with
+;; no error and a plausible-looking picture, which is the worst way for this to
+;; fail. The buffers are per-slot and re-transformed each frame; the sphere and
+;; the cylinder are tessellated once each at load, and each bone shape once the
+;; first time a segment asks for it.
+;; THE POOLS ARE NOT FIXED, AND THEY USED TO BE. Until 2026-09-07 this file
+;; declared twelve bone slots, twelve joint slots, twenty muscle slots and twelve
+;; disc slots, took that many draws and dropped the rest, and wrote a
+;; `console.error` saying to raise the counts. The counts were never raised.
+;;
+;; Measured on the default posture the day the lower limb landed: the scene
+;; produced 15 bones, 20 joints and 48 muscles. Three bones, eight joints and
+;; TWENTY-EIGHT muscles were not drawn — more than half the musculature — and the
+;; only symptom was a line in a console nobody reads, while the picture looked
+;; entirely plausible.
+;;
+;; A cap that is a constant is a cap that goes stale the moment the physics grows,
+;; which this physics does about once an hour. Buffers are allocated on demand and
+;; kept, so the pool settles at the largest scene the session has drawn.
+(defn- pooled!
+  "The buffer for `kind`'s slot `i`, uploading one if this slot has never been
+  drawn. One buffer per DRAWN OBJECT, not per shape — see the note above: draws
+  that share an uploaded mesh all read the last uniform written and land on top of
+  each other."
+  [ctx kind i geometry]
+  (let [k [kind i]]
+    (or (get-in @state [:pool k])
+        (let [b (mesh/upload-mesh! ctx geometry)]
+          (swap! state assoc-in [:pool k] b)
+          b))))
+
+;; Bone buffers are uploaded LAZILY, keyed by [slot shape], for two reasons that
+;; pull in opposite directions.
+;;
+;; They cannot be uploaded once per shape: the per-draw uniform note above means
+;; one buffer per DRAWN OBJECT, so slot 3 and slot 4 need their own even when they
+;; are the same shape. And they cannot all be uploaded up front: there are nine
+;; shapes and twelve slots, so eagerly covering the product is 108 uploads of
+;; which at most twelve are ever drawn.
+;;
+;; Lazily is also what makes a segment this app has never heard of safe. suji is
+;; growing a lower limb and a scapulothoracic element in other hands right now;
+;; a name that is not in the catalogue resolves to `default-bone-shape` and gets
+;; uploaded the first frame it appears, rather than needing this file edited.
+(defn- bone-buffers! [ctx slot spec]
+  (let [k [slot spec]]
+    (or (get-in @state [:bones k])
+        ;; ::upload is a serial stamped on the handle at upload time. It is the
+        ;; only way the browser check can tell "nine bones, nine buffers" from
+        ;; "nine bones, one buffer" — the first draft reported the SLOT INDEX,
+        ;; which is distinct by construction, so that check could not have failed
+        ;; however badly the cache was keyed.
+        (let [n (:upload-serial (swap! state update :upload-serial (fnil inc 0)))
+              b (assoc (mesh/upload-mesh! ctx (bone-template spec)) ::upload n)]
+          (swap! state assoc-in [:bones k] b)
+          b))))
+
+(defn- handle-counts
+  "What was actually uploaded, read back off the handle `upload-mesh!` returned.
+  The two backends name these differently — WebGPU gives :vertex-count/:idx-count,
+  WebGL 2.0 gives :index-count and keeps the source geometry — so this reads
+  whichever is there rather than trusting the mesh the app THINKS it uploaded."
+  [h]
+  {:vertices (or (:vertex-count h) (count (:positions (:geometry h))))
+   :indices (or (:idx-count h) (:index-count h))})
+
+(defn- draws-for
+  "scene → the draw list `render-scene!` consumes. The unit cylinder has radius 1,
+  so a bone's drawn thickness is a scale on X and Z; its length is the scale on Y,
+  which `scene` already put in the transform.
+
+  A draw with no slot is DROPPED and reported rather than silently overlapping an
+  earlier one — see the note above. If this ever fires, raise the slot counts."
+  [ctx {:keys [bones joints muscles discs]}]
+  (concat
+   ;; the mesh already carries the girth and (to within the length bucket) the
+   ;; length, so all that is left on the transform is the leftover bucket ratio
+   (map-indexed (fn [i {:keys [color transform mesh]}]
+                  (let [[_ sy _] (:scale transform)]
+                    {:buffers (bone-buffers! ctx i mesh)
+                     :color color
+                     :transform (assoc transform :scale [1.0 (/ sy (:length-m mesh)) 1.0])}))
+                bones)
+   (map-indexed (fn [i {:keys [color transform]}]
+                  {:buffers (pooled! ctx :joint i joint-sphere)
+                   :color color
+                   :transform (assoc transform :scale [0.026 0.026 0.026])})
+                joints)
+   ;; the muscles are the only geometry here that is not schematic: their
+   ;; endpoints are where suji says they attach, and their direction is the line
+   ;; whose moment arm it computed
+   (map-indexed (fn [i {:keys [color transform radius-m]}]
+                  (let [[sx sy sz] (:scale transform)]
+                    {:buffers (pooled! ctx :muscle i unit-cylinder) :color color
+                     :transform (assoc transform :scale [(* sx radius-m) sy (* sz radius-m)])}))
+                muscles)
+   (map-indexed (fn [i {:keys [color transform radius-m]}]
+                  (let [[sx sy sz] (:scale transform)]
+                    {:buffers (pooled! ctx :disc i unit-cylinder) :color color
+                     :transform (assoc transform :scale [(* sx radius-m) sy (* sz radius-m)])}))
+                discs)))
+
+(defn- report-geometry!
+  "Publish what the GPU was actually given for the bones, on `window`.
+
+  This exists for `scripts/verify-browser.cljk`, and it is deliberately read off
+  the buffer handles rather than off the scene: the check has to be able to fail
+  when the upload path regresses, not merely when the scene map changes. The
+  counts come back from `upload-mesh!`; the verifier recomputes the same numbers
+  from `kami.webgpu.geometry` under nbb and compares, so a bone drawn with the
+  wrong mesh is a mismatch between two runtimes rather than a claim this app
+  makes about itself.
+
+  `distinctBuffers` counts the upload serials actually stamped on the handles in
+  this frame. If it is ever smaller than the bone count, two bones are sharing one
+  uniform buffer and the frame is showing fewer bones than it thinks (see the note
+  above). It is deliberately not derived from the slot index, which would be
+  distinct no matter how the cache was keyed."
+  [ctx {:keys [bones joints muscles discs]} draws]
+  (let [drawn (map-indexed (fn [i {:keys [label geo mesh transform]}]
+                             (let [h (bone-buffers! ctx i mesh)
+                                   {:keys [vertices indices]} (handle-counts h)]
+                               {:label label :shape (name geo)
+                                :vertices vertices :indices indices
+                                :meshLengthM (:length-m mesh) :meshRadiusM (:radius-m mesh)
+                                ;; WHERE THE BONE WAS PUT, not only what mesh it
+                                ;; is. A posture control that changes the readout
+                                ;; and not the draw list would mean the picture and
+                                ;; the numbers are answering different states, and
+                                ;; nothing else published here can see that: the
+                                ;; mesh only changes with stature.
+                                ;;
+                                ;; Read pixels instead? Not reliably here.
+                                ;; Measured 2026-09-09 under headless SwiftShader,
+                                ;; a canvas screenshot is byte-identical across
+                                ;; postures and refreshes only when the canvas is
+                                ;; RESIZED — so a pixel diff reports `the picture
+                                ;; did not move` for a viewport that is drawing
+                                ;; correctly. This is the draw list the encoder was
+                                ;; actually given, which is the last thing this app
+                                ;; owns before the GPU.
+                                :transform transform
+                                :buffer (::upload h)}))
+                           bones)]
+    (set! (.-__sujiGeometry js/window)
+          (clj->js {:bones (vec drawn)
+                    ;; how many of each the SCENE asked for, so a check can assert
+                    ;; the picture is showing all of it. The counts used to be
+                    ;; capped by fixed pools and the excess dropped with only a
+                    ;; console line; measured the day the lower limb landed, 28 of
+                    ;; 48 muscles were not drawn.
+                    :sceneCounts {:bones (count bones) :joints (count joints)
+                                  :muscles (count muscles) :discs (count discs)}
+                    ;; the LANDMARK NAMES, added when the trunk split at T12/L1.
+                    ;; A count cannot answer `is the joint the split created
+                    ;; drawn` — the two trunk bones meet there, and two rods
+                    ;; joined end to end with no landmark between them read as one
+                    ;; rod, which is exactly how six cervical bones came to be
+                    ;; drawn as a single bar on 2026-09-06.
+                    :jointLabels (mapv :label joints)
+                    :drawCount (count draws)
+                    :distinctBuffers (count (distinct (map :buffer drawn)))
+                    ;; the shape that was there before, for the check that says
+                    ;; "not that one" without having to hard-code 84
+                    :cylinderVertices (count (:positions unit-cylinder))
+                    :cylinderIndices (count (:indices unit-cylinder))}))))
+
+(defn render!
+  "Draw one frame for a scene. A no-op before init completes, so the app can call
+  it from the same place whether or not the GPU is ready yet."
+  [scene]
+  (let [{:keys [viewport]} @state]
+    (when (and viewport scene)
+      (let [ctx (:mesh-context viewport)
+            canvas (.getElementById js/document "suji-canvas")
+            vp (if canvas (mesh/sync-canvas-size! viewport canvas) viewport)
+            ;; re-frame against the canvas' real aspect: `scene/camera` defaults
+            ;; to 4:3, and the stage is fluid.
+            {:keys [eye target]} (scene/camera (:pose scene)
+                                               (/ (double (:width vp)) (max 1 (:height vp))))]
+        (when-not (identical? vp viewport) (swap! state assoc :viewport vp))
+        (let [draws (draws-for ctx scene)]
+          (mesh/render-scene! vp draws eye target)
+          (report-geometry! ctx scene draws))))))
+
+(defn init!
+  "Bind the canvas and upload the primitives. Calls `on-ready` with the backend
+  keyword (`:webgpu` or `:webgl2`) so the UI can state which one it got — an app
+  that silently fell back to WebGL 2.0 looks exactly like one that did not."
+  [canvas on-ready on-error]
+  (-> (mesh/init-canvas! canvas)
+      (.then (fn [viewport]
+               (let [backend (or (:backend viewport) :webgl2)]
+                 ;; the buffer pools are allocated on demand by `pooled!` and
+                 ;; `bone-buffers!`, so there is nothing to upload up front. They
+                 ;; are reset here because they belong to the old GPU context.
+                 (reset! state {:viewport viewport :canvas canvas :backend backend
+                                :pool {} :bones {}})
+                 (on-ready backend))))
+      (.catch (fn [e]
+                ;; Neither backend available. Say so; do not fall back to a 2-D
+                ;; drawing that looks like the real viewport (the repo-wide 3D
+                ;; mandate forbids a DOM/Canvas2D stand-in for the viewport, and
+                ;; a silent one would be worse than an honest empty frame).
+                (on-error (or (.-message e) (str e)))))))

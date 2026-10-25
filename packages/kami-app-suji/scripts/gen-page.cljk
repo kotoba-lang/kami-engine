@@ -1,0 +1,80 @@
+(ns gen-page
+  "Generate this app's documents: `public/index.html` — the single page — and
+  `public/404.html`, the fallback a static host needs in order to serve it.
+
+  Both come from one `->page` call against `kami.app-suji.theme`, so the page
+  tracks the design system rather than a snapshot of it.
+
+  Run:   kbb --backend sci --classpath \"$(kbb -Spath)\" scripts/gen-page.cljk
+  Check: same, with --check (exit 1 if a committed file is stale)"
+  (:require ["node:fs" :as fs]
+            ["node:process" :as process]
+            [jp-go-dds.core :as dds]
+            [jp-go-dds.dark :as dds-dark]
+            [jp-go-dds.page :as dds-page]
+            [kami.app-suji.theme :as theme]))
+
+(def dds-root
+  (or (first (filter #(and % (fs/existsSync (str % "/resources/jp_go_dds/dds.css")))
+                     [(some-> js/process .-env .-DDS_ROOT)
+                      "orgs/kotoba-lang/jp-go-digital-design-system"
+                      "../jp-go-digital-design-system"
+                      "../../kotoba-lang/jp-go-digital-design-system"]))
+      (throw (js/Error. "jp-go-digital-design-system の dds.css が見つからない。DDS_ROOT で場所を渡すこと。")))) 
+
+(def dds-css (str (fs/readFileSync (str dds-root "/resources/jp_go_dds/dds.css") "utf8")))
+
+(def favicon
+  "Resolved from the vendored palette rather than stated, so a re-vendor moves the
+  mark with the design system."
+  (let [fill (dds-dark/resolve-dark dds-css "--color-key-900")
+        svg (str "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>"
+                 "<rect width='32' height='32' rx='8' fill='" fill "'/>"
+                 "<path d='M16 6 L16 26 M16 12 L23 19' stroke='white' stroke-width='2.5'"
+                 " fill='none' stroke-linecap='round'/></svg>")]
+    [:link {:rel "icon" :type "image/svg+xml"
+            :href (str "data:image/svg+xml," (js/encodeURIComponent svg))}]))
+
+(def title "筋 suji — 姿勢がつくる負荷")
+(def description
+  "姿勢から関節モーメント・頸椎圧縮荷重・筋の %MVC をブラウザ上で計算し、3D で表示する。力学量のみ、非診断。")
+
+(defn page []
+  (dds-page/->page
+   {:title title :description description :lang "ja"
+    :css dds-css :dark? true :app-css theme/app-css*
+    :head [favicon]}
+   [:div {:id "app"} "読み込み中…"]
+   [:noscript
+    "このページは姿勢の力学をブラウザ内で計算し WebGPU で描画するため、JavaScript が必要です。"]
+   [:script {:src "js/main.js"}]))
+
+(defn not-found-page []
+  (dds-page/->page
+   {:title title :description description :lang "ja"
+    :css dds-css :dark? true :app-css theme/app-css*
+    :head [favicon [:meta {:name "robots" :content "noindex"}]]}
+   [:main
+    (dds/container
+     (dds/section {}
+       (dds/heading 1 "このアドレスはありません")
+       [:p "求められた場所は suji の一部ではありません。"
+        [:a {:href "./"} "アプリを開く"] "。"]))]))
+
+(def documents [["public/index.html" page] ["public/404.html" not-found-page]])
+
+(defn -main [& args]
+  (let [check? (some #{"--check"} args)
+        stale (atom [])]
+    (doseq [[path render] documents]
+      (let [html (render)
+            current (when (fs/existsSync path) (str (fs/readFileSync path "utf8")))]
+        (cond
+          (and check? (= current html)) (println path "up to date")
+          check? (do (println "STALE:" path "differs from its generator.") (swap! stale conj path))
+          :else (do (fs/writeFileSync path html) (println "wrote" path (count html) "bytes")))))
+    (when (seq @stale)
+      (println "Run: kbb --backend sci --classpath \"$(kbb -Spath)\" scripts/gen-page.cljk")
+      (process/exit 1))))
+
+(apply -main (drop 2 (js->clj (.-argv process))))

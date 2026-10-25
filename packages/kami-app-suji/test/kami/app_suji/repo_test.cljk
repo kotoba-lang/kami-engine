@@ -1,0 +1,235 @@
+(ns kami.app-suji.repo-test
+  "Invariants about the repository itself, not about the physics.
+
+  JVM-only on purpose: it reads tracked files off disk, which is a property of
+  the checkout rather than of anything portable.
+
+  WHY THIS EXISTS. On 2026-09-07 a merge in this repo was committed with conflict
+  markers still in `scripts/verify-browser.cljk`, and the suite stayed green —
+  `kbb -M:test` compiles `src` and `test`, and the browser checker is an nbb
+  script on neither path. So the one file whose job is to catch things nothing
+  else catches was itself outside every check. The markers were found by reading
+  the file, which is not a method."
+  (:require [clojure.java.io :as io]
+            [kami.app-suji.core :as core]
+            [kami.app-suji.core-test]
+            [suji.methods.attachment :as attachment]
+            [suji.methods.recruit]
+            [kotoba.process :as shell]
+            [kotoba.lang.text :as str]
+            [kotoba.test :refer [deftest is]]))
+
+(defn- tracked-files []
+  (->> (:out (shell/sh "git" "ls-files"))
+       str/split-lines
+       (remove str/blank?)
+       (map io/file)
+       (filter #(.isFile ^java.io.File %))))
+
+(deftest no-tracked-file-carries-a-merge-conflict-marker
+  (let [files (tracked-files)
+        ;; Anchored to the line start: `<<<<<<<` can legitimately appear inside a
+        ;; string or a comment, and only a marker sits alone at column zero.
+        marker #"(?m)^(<{7}|={7}|>{7})(\s|$)"
+        hits (keep (fn [^java.io.File f]
+                     (let [s (slurp f)]
+                       (when (re-find marker s)
+                         (.getPath f))))
+                   files)]
+    (is (seq files) "git ls-files returned nothing — this test measured no files")
+    (is (empty? hits)
+        (str "conflict markers are still in: " (pr-str (vec hits))))))
+
+(defn- read-forms
+  "Read a script as Clojure data, returning `{:forms …}` or `{:error …}`.
+
+  The JVM reader has no reader function for ClojureScript's tagged literals
+  (`#js`), so hand it a passthrough. Without this the read errors on a checker's
+  own `#js {}` options map and reports a reader limitation as if the file were
+  broken — a check that fails for the wrong reason.
+
+  The read is CAUGHT rather than allowed to propagate, so an unreadable file fails
+  with the caller's label. Letting it throw discriminates too, but the run then
+  reports a reader exception rather than the thing being asserted."
+  [f]
+  (try
+    (binding [*default-data-reader-fn* (fn [_tag v] v)]
+      (with-open [r (java.io.PushbackReader. (io/reader f))]
+        {:forms (doall (take-while #(not= ::eof %)
+                                   (repeatedly #(read {:eof ::eof :read-cond :allow} r))))}))
+    (catch Exception e {:error (.getMessage e)})))
+
+(deftest every-script-is-at-least-readable
+  ;; None of these is compiled by this suite, so nothing else would notice one
+  ;; being syntactically broken until someone ran it — which has now happened
+  ;; twice.
+  ;;
+  ;; ⚠ IT CHECKED ONE FILE AND THERE ARE FOUR. On 2026-09-09 I put a measured JSON
+  ;; response into `publish-pages.cljs`'s docstring — an object with a quoted key —
+  ;; and the inner quotes CLOSED the docstring, so the first key became a symbol
+  ;; and the rest of the paragraph parsed as code. `kbb -M:test` stayed green,
+  ;; because that file is not on the classpath; `kbb -M:lint` stayed green,
+  ;; because it lints `src` and `test`. It failed at the moment I ran it to
+  ;; publish, with `enabled is not ISeqable`.
+  ;;
+  ;; That is the workspace's own recorded hazard — a quote inside a string that the
+  ;; reader accepts as the end of it — arriving in a `.cljs` docstring instead of
+  ;; an `.edn` document. The file list is DERIVED from the directory, so the next
+  ;; script added is covered without this test being edited, and a glob that
+  ;; reaches nothing fails rather than passing quietly.
+  (let [scripts (sort-by #(.getName ^java.io.File %)
+                         (filter #(let [n (.getName ^java.io.File %)] (or (.endsWith n ".cljk") (.endsWith n ".cljs")))
+                                 (seq (.listFiles (io/file "scripts")))))]
+    (is (<= 4 (count scripts))
+        (str "only " (count scripts) " scripts found in scripts/ — the listing is "
+             "not reaching them, and a check that reads nothing passes"))
+    (doseq [^java.io.File f scripts]
+      (let [result (read-forms f)]
+        (is (nil? (:error result))
+            (str "scripts/" (.getName f) " does not read as Clojure data: "
+                 (:error result)))
+        ;; A FLOOR AGAINST READING NOTHING, not a size claim. It was `> 5`, which
+        ;; was written for the 648-line browser checker and fails on
+        ;; `nbb_test.cljs` — five forms, all of them load-bearing. A floor that
+        ;; rejects a correct small file is a floor somebody loosens in a hurry.
+        ;; Three is what separates `the reader reached this file` from `the reader
+        ;; returned nothing`, which is the only thing this clause can tell.
+        (is (<= 3 (count (:forms result)))
+            (str "scripts/" (.getName f) " read as only "
+                 (count (:forms result)) " forms"))
+        ;; ⚠ READING IS NOT ENOUGH, and I found that out by breaking this test and
+        ;; watching it pass. The unbalanced-looking docstring above is BALANCED —
+        ;; four quotes — so `read` succeeds and hands back an `ns` form containing
+        ;; `enabled`, `":true,"`, `allowed_actions` as loose members before the
+        ;; `:require`. `nbb` then dies at load with `enabled is not ISeqable`.
+        ;;
+        ;; An `ns` form's members after the name and its docstring are all
+        ;; REFERENCE CLAUSES: lists starting with a keyword. A string that closed
+        ;; early scatters bare symbols and short strings in among them, which is
+        ;; exactly what this asserts against — the shape of the damage rather than
+        ;; the reader's opinion of it.
+        (when-let [nsf (first (filter #(and (seq? %) (= 'ns (first %))) (:forms result)))]
+          (let [after-name (drop 2 nsf)
+                body (if (string? (first after-name)) (rest after-name) after-name)
+                strays (remove #(and (sequential? %) (keyword? (first %))) body)]
+            (is (empty? strays)
+                (str "scripts/" (.getName f) " has an ns form with members that are "
+                     "not reference clauses — a docstring closed early: "
+                     (pr-str (mapv #(if (string? %) (subs % 0 (min 30 (count %))) %)
+                                   strays))))))))))
+
+(deftest the-readme-does-not-call-absent-what-the-model-has
+  ;; The README's "いま無いもの（正直に）" section had five items on 2026-09-07 and
+  ;; every one of them was false — each named something the model had acquired,
+  ;; and none had been corrected on the day it arrived. `method-view` had the same
+  ;; section go stale the same way; there the fix was to compute the counts, which
+  ;; a static file cannot do. This is the substitute: whatever the README says is
+  ;; absent has to actually be absent.
+  ;;
+  ;; Each probe is a fact about the model, not about the prose, so the test fails
+  ;; when the MODEL gains the thing rather than when someone rewords the sentence.
+  ;; Only the BULLETS are read, not the whole section. The section also carries a
+  ;; table recording what each false claim used to say — quoting a corrected claim
+  ;; is not making it, and a test that cannot tell a record from an assertion
+  ;; would force the document to drop the record to stay green.
+  (let [readme (slurp "README.md")
+        section (second (str/split readme #"## いま無いもの（正直に）"))
+        gaps (when section
+               (->> (str/split-lines section)
+                    (take-while #(not (str/starts-with? % "## ")))
+                    (filter #(str/starts-with? % "- "))
+                    (str/join "\n")))]
+    (is (some? section) "the README has no `いま無いもの` section")
+    (is (seq gaps) "the section has no bullets, so this asserts nothing")
+    (doseq [[phrase present? what]
+            [["前額面・回旋を持たない"
+              (seq (filter #(= :frontal (:axis %)) (vals attachment/muscles)))
+              "frontal-axis muscles"]
+             ["Crowninshield–Brand 型）を持たない"
+              (some? (resolve 'suji.methods.recruit/share))
+              "recruit/share"]
+             ["モーメントアームは角度に依存しない定数"
+              ;; the same muscle at two head angles, through the app's own solve
+              (let [arm (fn [d] (:coeff (first (filter #(= "cervical_extensors" (:name %))
+                                                       (:tensions (core/solved
+                                                                   (assoc-in core/initial-state
+                                                                             [:posture :head-flexion-deg] d)))))))]
+                (not= (arm 0.0) (arm 20.0)))
+              "a moment arm that changes with posture"]
+             ["骨の形状は円柱"
+              (not-any? #{:cylinder} (map :geo (:bones (:scene (core/solved core/initial-state)))))
+              "bones drawn as anatomical shapes"]
+             ;; the sixth, added 2026-09-08 the day it went false. The README said
+             ;; the closed form takes one equality constraint and a two-joint
+             ;; muscle's other joint is reported rather than satisfied; `suji`
+             ;; landed `recruit/solve`, which satisfies several at once. The claim
+             ;; is probed by the FACT — a solved group whose members carry a
+             ;; converged flag and more than one joint — rather than by the
+             ;; function's existence, so a rename upstream does not make this pass
+             ;; for the wrong reason.
+             ["閉形式は等式制約を 1 本しか取らない"
+              (let [ts (:tensions (core/solved core/initial-state))]
+                (and (some #(< 1 (count (:coupled-joints %))) ts)
+                     (some :coupled-converged? ts)))
+              "a solve that satisfies more than one equilibrium at once"]
+             ;; the eighth, added 2026-09-09 with the trunk split. The README says
+             ;; no equilibrium is solved at T12/L1, which is why the thorax is
+             ;; drawn in the `no muscle in the model crosses this joint` colour.
+             ;; Probed by the JOINT-MOMENT TABLE the page prints, the same source
+             ;; `core/t12l1-solved?` reads, so the README and the page cannot
+             ;; disagree about it.
+             ["T12/L1 で解かれる方程式"
+              (core/t12l1-solved? (:loads (core/solved core/initial-state)))
+              "an equilibrium solved at T12/L1"]
+             ;; the ninth. The README says every preset is solved at zero lordosis
+             ;; because suji's reference postures state no pelvic tilt. The day one
+             ;; of them does, that sentence is false — and the page's own derived
+             ;; note will already have started saying something else, which is the
+             ;; asymmetry this test exists to close: the page can compute, a static
+             ;; file cannot.
+             ;;
+             ;; ⚠ THE PHRASE HAS TO BE ON THE `- ` LINE. `gaps` keeps only lines
+             ;; that start a bullet and drops every continuation line, so a phrase
+             ;; wrapped onto the second line of a bullet is never searched and the
+             ;; probe is silently vacuous. Mine was, until I put it back on the
+             ;; first line.
+             ["すべて前弯 0°"
+              (not (:every-preset-straight? (core/preset-lordosis)))
+              "a preset that carries a lordosis"]
+             ["2 関節筋の他関節モーメントは計算して報告するだけ"
+              (let [ts (:tensions (core/solved core/initial-state))]
+                (some #(and (:crosses-joint %) (:secondary-fed? %)) ts))
+              "two-joint muscles whose second joint IS in the solved equilibrium"]]]
+      (when present?
+        (is (not (str/includes? gaps phrase))
+            (str "the README says `" phrase "` and the model has " what))))))
+
+(deftest the-readme-verification-table-is-not-stale
+  ;; The table carries its own warning that it had been stale once, and it went
+  ;; stale again: 17 tests / 126 assertions and 16 browser checks, against 53 and
+  ;; 31. A number written by hand beside a number that grows will be wrong; this
+  ;; makes it wrong loudly.
+  ;;
+  ;; A BOUND, not an equality. An exact match would make this test the thing that
+  ;; goes stale — every commit adding a test would have to edit the README too,
+  ;; and the first person in a hurry would loosen the assertion rather than the
+  ;; document. Half is chosen because the failure that actually happened was a
+  ;; factor of three, and a bound that cannot catch the failure it was written for
+  ;; is theatre.
+  ;;
+  ;; ⚠ My first version bounded against the deftests of ONE namespace, which 17
+  ;; satisfied — it passed on exactly the stale table it exists to catch.
+  (let [readme (slurp "README.md")
+        nss '[kami.app-suji.core-test kami.app-suji.scene-test
+              kami.app-suji.route-test kami.app-suji.bone-shape-test
+              kami.app-suji.repo-test]
+        actual (reduce + (for [n nss]
+                           (do (require n)
+                               (count (filter #(:test (meta %)) (vals (ns-publics n)))))))
+        claimed (some-> (re-find #"(\d+) tests / ([\d,]+) assertions" readme)
+                        second parse-long)]
+    (is (< 20 actual) (str "only " actual " deftests found, so the bound is meaningless"))
+    (is (some? claimed) "the verification table states no test count")
+    (is (<= (quot actual 2) claimed)
+        (str "the table claims " claimed " tests and the suite has " actual
+             " — more than a factor of two apart"))))

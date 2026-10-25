@@ -1,0 +1,94 @@
+;; kami-app-suji — the browser surface for cloud-itonami/suji.
+;;
+;; This repo owns the UI and the interaction. It owns NO physics and NO renderer:
+;;   simulation authority  → cloud-itonami/suji           (pure .cljc, runs in-browser)
+;;   render authority      → kotoba-lang/webgpu + webgl   (the same EDN render-IR)
+;;   design system         → kotoba-lang/jp-go-digital-design-system (DADS)
+;; per the repo-wide 3D mandate: kami-app-* holds UI and orchestration and does not
+;; duplicate geometry, simulation or render state.
+{:paths ["src/main" "resources"]
+ :deps {
+        ;; kotoba.process replaced clojure.java.shell here (2026-09-24). An explicit
+        ;; floor: kotoba.process/sh parses clojure.java.shell's options from db49ea9,
+        ;; and tools.deps takes the NEWEST sha it is shown.
+        io.github.kotoba-lang/process {:git/sha "db49ea936e53d0bc698be0db79bf96ad86b5f7d0"}
+        ;; kotoba.lang.coll replaced clojure.set here (2026-09-24). An explicit
+        ;; floor: kotoba.lang.coll carries clojure.set's union/intersection/
+        ;; difference/map-invert from 0ffd5f6, and tools.deps takes the NEWEST
+        ;; sha it is shown.
+        io.github.kotoba-lang/coll {:git/sha "f74e248f0a07e8ae572885f50fab6bdb39dc24be"}
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
+        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
+        ;; this repo silently rides whatever a sibling happens to name.
+        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+
+        ;; the physics. Portable .cljc since 2026-09-06 (it was JVM-only before
+        ;; that, which is why this app could not have existed). Moment arms are
+        ;; derived from the anatomy rather than tabulated, and a muscle whose
+        ;; leverage this model cannot resolve comes back REFUSED with no %MVC —
+        ;; the UI has to show that rather than a number.
+        io.github.cloud-itonami/suji
+        {:git/url "https://github.com/cloud-itonami/suji.git"
+         ;; 3d494ba gives the model A DEGREE OF FREEDOM IT DID NOT HAVE: the
+         ;; pelvis rotates (`:pelvic-tilt-deg`, anterior positive), and the trunk
+         ;; is split at T12/L1 into `lumbar` + `thorax` so the lumbar spine has an
+         ;; orientation the thorax does not give it. Lordosis is the pelvic tilt by
+         ;; definition (the Cobb L1-S1 angle); the lumbar chord is
+         ;; `trunk-flexion + pelvic-tilt/2`, a constant-curvature arc the model
+         ;; states as an assumption rather than as a measurement.
+         ;;
+         ;; ⚠ IT MOVES NUMBERS THAT DID NOT MOVE BEFORE. Eight muscle groups
+         ;; originate on the pelvis, so rotating it moves their origins and their
+         ;; moment arms. Relaxed standing becomes comparable against Wilke 1999 for
+         ;; the first time and OVERSHOOTS it; relaxed sitting moved 2.03 N. Every
+         ;; count in this repo's coverage census was re-measured after this pin
+         ;; moved rather than carried over — `segment/segments` grew a segment and
+         ;; the census, the scene's segment tables and the browser mesh counts all
+         ;; answer differently because of it.
+         ;;
+         ;; 101987a before it was `recruit/solve` — one Crowninshield-Brand
+         ;; optimisation over several equality constraints, one dual variable per
+         ;; joint — which is where `:coeff`, `:inactive?` and the coupled-solve
+         ;; quantities came from.
+         :git/sha "3d494ba728ea7510d4b9a981706270c41dfa86b0"}
+
+        ;; デジタル庁デザインシステム — the workspace's base design system
+        ;; (owner decision 2026-08-05). App CSS is written to the --hig-* token
+        ;; contract, which jp-go-dds.tokens/bridge-css redefines on top of DADS.
+        io.github.kotoba-lang/jp-go-digital-design-system
+        {:git/url "https://github.com/kotoba-lang/jp-go-digital-design-system.git"
+         :git/sha "cc8f4849af5def7ea535fd6c0b8a623ccca645e9"}
+
+        ;; fragment routing, shared with kami-app-daw / kami-app-nle
+        io.github.kotoba-lang/route
+        {:git/url "https://github.com/kotoba-lang/route.git"
+         :git/sha "351b02325a5a5cfa6c12c3e99660c6eb2d3703be"}
+
+        io.github.kotoba-lang/html
+        {:git/url "https://github.com/kotoba-lang/html.git"
+         :git/sha "44fe37a9120cb7753b974d921c7fc87448dace45"}
+
+        ;; The 3-D viewport. WebGPU first, WebGL 2.0 fallback — both execute the
+        ;; SAME EDN render-IR, per the repo-wide 3D mandate. `kami.webgpu.geometry`
+        ;; is the shared cross-platform mesh source; this app tessellates nothing
+        ;; of its own.
+        ;; kami.webgpu.geometry/{loft,long-bone,vertebral-body} — the anatomical
+        ;; shapes this app draws bones with. a66dcaf domes the ends of long-bone,
+        ;; which had been flat discs that rendered as black ellipses; that changed
+        ;; the triangle count from 26 to 30 per sector, so this pin and the mesh
+        ;; counts the browser check recomputes move together. Reachable from
+        ;; webgpu's main (it is the merge commit); never pin an unmerged branch.
+        io.github.kotoba-lang/webgpu
+        {:git/url "https://github.com/kotoba-lang/webgpu.git"
+         :git/sha "a66dcaf3900bfde208125c64ae51b40e7e54391d"}
+        io.github.kotoba-lang/webgl
+        {:git/url "https://github.com/kotoba-lang/webgl.git"
+         :git/sha "5ef9ffe794d1847a9f84eccee8fd5fa8ad174a20"}}
+
+ :aliases
+ {
+  :test {:extra-paths ["test"]}}}
