@@ -1,0 +1,70 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-cam-scene",
+      "commit": "c40307ff352cf9faf4ed2098cf05cfbd6a3bc770",
+      "tree": "a83ab80fa72c4515a4ae9e1595763616f62ae7cd",
+      "url": "https://github.com/kotoba-lang/kami-cam-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "2529f247cddaed607f524528c40d361448446c8b840cc042a12bbe781fadd6fa",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "17726d14e97b7bfc1afe83c6bbc66cb98be4179842393d5373ef03c49b71142f",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "315c21dca7437cb337e327b4c12ab58c1ed84a319b9f6e869c8e0ed955c05952",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "b2f32e0bf691c674449e95f2dcc8139a95bed8e104fb760c19a28dac3b96d8e3",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "c6fe035540c7c3b2c345f36718f91ba9b6e2b4a063b2f8ccd87d9670ab08ba4c",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/kami_cam_scene/materials.edn",
+          "path": "resources/kami_cam_scene/materials.edn",
+          "sha256": "c42c200630d00f8c7d31dbd588afd9ddd7643b5c2f244b751a69dc308750d5ff",
+          "mode": "100644"
+        },
+        {
+          "source": "src/cam_scene.cljk",
+          "path": "src/cam_scene.cljk",
+          "sha256": "39f20ff6ee38bde76972719205f67f6808492c4a5533cf78630baca830a52ecb",
+          "mode": "100644"
+        },
+        {
+          "source": "test/cam_scene_test.cljk",
+          "path": "test/cam_scene_test.cljk",
+          "sha256": "9f4ac829229237e7bcb2a0515f86f51055cecc193541f0bae8be864264600d60",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

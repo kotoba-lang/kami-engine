@@ -29,3 +29,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-app-sip](kami-app-sip) | `54ae09a` | kami-app-sip (SIP game) domain logic, split out of kami-engine's kami-app-sip-clj (ADR-2607010930). |
 | [kami-app-suji](kami-app-suji) | `d6347be` | 姿勢がつくる負荷を、ブラウザ内で解いて 3D で見せる single-page app（suji + WebGPU） |
 | [kami-autodrive-scene](kami-autodrive-scene) | `8922de8` | EDN authoring surface for kami-autodrive per-vehicle-class GNC presets (limits + autopilot tuning). Restored from legacy kami-autodrive-scene crate (deleted #82). ADR-2607010930. |
+| [kami-cam-scene](kami-cam-scene) | `c40307f` | EDN authoring surface for kami-cam (kotoba-lang/cnc) STOCK MATERIAL presets — tolerant EDN accessors from kotoba-lang/scene, parity-tested against kotoba.cam.stock/material-presets. Restored from legacy kami-cam-scene crate (deleted #82). ADR-2607010930. |
