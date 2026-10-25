@@ -1,0 +1,40 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-engine-engine",
+      "commit": "66fd75a89db81abfe430dab00bd38a5bb2dc94ca",
+      "tree": "55a12718178735c734ca34a14ab40566fd89d18a",
+      "url": "https://github.com/kotoba-lang/kami-engine-engine.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "42f0de6f6a8d9de393aa0e01ae6ac37ca3eb818b0e8ab8809f1adef0ae6316b2",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "30afe511a8cc8277807242fbda75044b2b9ba2f63f72b1cbdba0f3262d899ae3",
+          "mode": "100644"
+        },
+        {
+          "source": "docs/adr/0001-retire-empty-cljc-scaffold.md",
+          "path": "docs/adr/0001-retire-empty-cljc-scaffold.md",
+          "sha256": "36ccafd7968def95d7cfe86f558bd30189825d7f5b3668fc734cee2e21eeeafb",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}
