@@ -1,0 +1,12 @@
+{:format :kotoba.cljk-origin/v1
+ :renamed-on "2026-09-11"
+ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
+ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
+ :origins
+ {"build.cljk" ".clj"
+  "src/kami/cad/app.cljk" ".cljs"
+  "src/kami/cad/dimensional_sketch.cljk" ".cljc"
+  "src/kami/cad/project.cljk" ".cljc"
+  "src/kami/cad/ui.cljk" ".cljc"
+  "test/kami/cad/dimensional_sketch_test.cljk" ".cljc"
+  "test/kami/cad/project_test.cljk" ".cljc"}}

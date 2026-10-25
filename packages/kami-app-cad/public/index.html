@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Kami CAD</title><style>aside:last-child { border-left: 1px solid #32466e; border-right: 0; }
+.stats { position: absolute; right: 14px; bottom: 14px; background: #08101dcc; padding: 8px; }
+* { box-sizing: border-box; }
+.primary { background: #79a2ff; color: #071227; font-weight: 700; }
+.viewport { position: relative; }
+body { margin: 0; height: 100vh; display: grid; grid-template-rows: 52px 1fr; font-family: Inter,system-ui; background: #090e18; color: #edf2ff; }
+label { display: grid; gap: 4px; margin: 10px 0; }
+h2 { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #a8bce3; }
+button,input,select { width: 100%; margin: 5px 0; padding: 8px; background: #20345c; color: #fff; border: 1px solid #5878b4; border-radius: 5px; }
+main { display: grid; grid-template-columns: 230px 1fr 270px; min-height: 0; }
+header .spacer { flex: 1; }
+#gpu-canvas { width: 100%; height: 100%; display: block; }
+#gpu-status { position: absolute; left: 50%; top: 45%; transform: translate(-50%,-50%); color: #ffb0b0; }
+aside { padding: 16px; background: #101a2e; border-right: 1px solid #32466e; }
+header { display: flex; align-items: center; gap: 18px; padding: 0 16px; background: #17223b; }
+button { cursor: pointer; } :focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }</style></head>
+  <body>
+    <header>
+      <strong>KAMI CAD · NURBS</strong>
+      <a href="https://kotoba-lang.github.io/kami-studio/">Studio</a>
+      <span>WebGPU precision workspace</span>
+      <span class="spacer"></span>
+      <select id="profile" aria-label="Interaction profile">
+        <option value="rhino">Rhino</option>
+        <option value="autocad">AutoCAD</option>
+        <option value="fusion">Fusion</option>
+        <option value="plasticity">Plasticity</option>
+      </select>
+      <button id="undo">Undo</button>
+      <button id="redo">Redo</button>
+      <button id="save-project">Save</button>
+      <button id="load-project">Load</button>
+      <button id="import">Import</button>
+      <input id="import-file" aria-label="Import CAD project file" type="file" accept=".edn,.kami-cad.edn" style="display:none;">
+      <button id="export">Export Project</button>
+      <label>Crown height (m)<input id="sketch-height" type="number" min="0.1" step="0.1" value="2"></label>
+    </header>
+    <main>
+      <aside><h2>Command Line</h2><input id="command" placeholder="Type command…  / to focus" aria-label="CAD command"><p id="command-status">Ready</p><p id="profile-hint">Trim · Zoom Extents · SolveWidth</p><h2>Feature History</h2><div id="feature-tree"></div><button id="toggle-feature">Suppress / Resume</button><button id="recompute-features">Recompute All</button><h2>Model</h2><button class="primary">Loft Surface</button><h2>Dimensional sketch</h2><label>Section width (m)<input id="sketch-width" type="number" min="0.1" step="0.1" value="4"></label><button id="solve-width">Solve width constraint</button><p id="solver-status">Fully constrained</p><h2>Tools</h2><button id="fit">Fit View</button><button id="reset">Reset Sections</button><h2>Trim exact spans</h2><label>Start<input id="trim-start" type="number" min="0" max="1" step="0.05" value="0.1"></label><label>End<input id="trim-end" type="number" min="0" max="1" step="0.05" value="0.9"></label><button id="trim">Trim sections</button><h2>Precision</h2><select id="snap">
+        <option value="0.0001">Snap 0.1 mm</option>
+        <option value="0.0005">Snap 0.5 mm</option>
+        <option value="0.001" selected>Snap 1 mm</option>
+      </select></aside>
+      <section class="viewport">
+        <canvas id="gpu-canvas" aria-label="NURBS WebGPU viewport"></canvas>
+        <div id="gpu-status">Initializing WebGPU…</div>
+        <div class="stats" id="stats">2 sections · 34 vertices</div>
+      </section>
+      <aside>
+        <h2>Solid Extrusion</h2>
+        <button id="show-loft">Show Loft</button><button id="show-solid">Show Solid</button>
+        <label>Depth (m)<input id="solid-depth" type="number" min="0.1" step="0.1" value="3"></label>
+        <label>Height (m)<input id="extrude-height" type="number" min="0.01" step="0.1" value="2"></label>
+        <label>Corner radius (m)<input id="corner-radius" type="number" min="0" step="0.05" value="0"></label>
+        <button class="primary" id="extrude-solid">Extrude Watertight Solid</button><p id="solid-result">No solid</p>
+        <h2>Boolean Solid Ops</h2>
+        <button id="stash-solid-b">Stash Current Solid as B</button><p id="solid-b-status">No solid B</p>
+        <label>Operation<select id="boolean-op">
+          <option value="intersect">Intersect (A ∩ B)</option>
+          <option value="union">Union (A ∪ B, same profile only)</option>
+          <option value="difference">Difference (A − B, same profile only)</option>
+        </select></label>
+        <button id="apply-boolean">Apply Boolean (A ∘ B)</button><p id="boolean-result">No boolean result</p>
+        <h2>Measurements</h2>
+        <label>Tolerance (m)<input id="measurement-tolerance" type="number" min="0.0000000001" step="0.000001" value="0.000001"></label>
+        <p id="measurement-result">Measuring…</p>
+        <button id="export-measurements">Export measurements CSV</button>
+        <h2>Control Point</h2>
+        <label>Section<select id="section-index">
+          <option value="0">Section 1</option>
+          <option value="1">Section 2</option>
+        </select></label>
+        <button id="duplicate-section">Duplicate section</button>
+        <button id="delete-section">Delete section</button>
+        <button id="section-up">Move section up</button>
+        <button id="section-down">Move section down</button>
+        <label>Point<select id="point-index">
+          <option value="0">Point 1</option>
+          <option value="1" selected>Point 2</option>
+          <option value="2">Point 3</option>
+        </select></label>
+        <label>X (m)<input id="cp-x" type="number" step="0.0001" value="0"></label>
+        <label>Y (m)<input id="cp-y" type="number" step="0.0001" value="2"></label>
+        <label>Z (m)<input id="cp-z" type="number" step="0.0001" value="0"></label>
+        <label>Weight<input id="weight" type="number" min="0.1" step="0.1" value="1"></label>
+        <label>Tessellation<input id="segments" type="range" min="4" max="64" value="16"></label>
+        <button class="primary" id="apply">Apply exact values</button>
+      </aside>
+    </main>
+    <span id="debug-state" style="display:none;"></span>
+    <script src="./js/app.js"></script>
+  </body>
+</html>
