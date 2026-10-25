@@ -1,0 +1,14 @@
+{:paths ["src"]
+ :deps {
+        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
+        ;; this repo silently rides whatever a sibling happens to name.
+        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+        io.github.kotoba-lang/kami-ongaku-notation
+        {:git/url "https://github.com/kotoba-lang/kami-ongaku-notation"
+         :git/sha "76ac886986f208211f9f595e54b07ed7cebade9b"}
+        io.github.kotoba-lang/kami-ongaku-sequencer
+        {:git/url "https://github.com/kotoba-lang/kami-ongaku-sequencer"
+         :git/sha "6864b91fc0927bf5884b2649be426afee19e963a"}}
+ :aliases
+ {:test {:extra-paths ["test"]}}}
