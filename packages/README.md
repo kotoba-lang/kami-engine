@@ -38,3 +38,13 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-eizo-grade](kami-eizo-grade) | `f960c23` | ASC CDL / monotone curves / .cube LUT / waveform+vectorscope color-grading data model (kami-eizo family, ADR-2607121400) |
 | [kami-engine-vphysics](kami-engine-vphysics) | `7ff753e` | shared vehicle-physics primitives (road load, aero force, range) |
 | [kami-engine-aero](kami-engine-aero) | `fabfd90` | reduced-order aero Cd solver (component build-up) + design range loop |
+| [kami-engine-core](kami-engine-core) | `dcefa5a` | engine core — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
+| [kami-engine-crash](kami-engine-crash) | `849a2be` | reduced-order frontal-crash solver (:rom-crash) |
+| [kami-engine-echem](kami-engine-echem) | `8b7b449` | reduced-order PEM fuel-cell solver (:rom-fc) |
+| [kami-engine-engine](kami-engine-engine) | `66fd75a` | umbrella (World+Clock+Net) — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
+| [kami-engine-io](kami-engine-io) | `87868b4` | engine I/O — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
+| [kami-engine-motor](kami-engine-motor) | `c465afd` | reduced-order traction-motor solver (:rom-motor) |
+| [kami-engine-pack](kami-engine-pack) | `770965c` | Reduced-order lithium pack solver (:rom-pack) — pack-level energy with Peukert rate derating and IR sag. Power+endurance -> pack mass. |
+| [kami-engine-rotor](kami-engine-rotor) | `41ba842` | Reduced-order rotor solver (:rom-rotor) — momentum theory + figure of merit. Thrust → diameter, RPM, shaft power, torque, blade loading. |
+| [kami-engine-multirotor](kami-engine-multirotor) | `97377fa` | The multirotor mass spiral: payload + endurance -> MTOW, or a refusal. Over kami-engine-rotor/-pack/-motor. |
+| [kami-engine-render](kami-engine-render) | `87f0fd6` | engine render (wgpu bootstrap + scene pipelines CLJC IR) — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
