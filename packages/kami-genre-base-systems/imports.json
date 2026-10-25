@@ -1,0 +1,794 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-genre-base-systems",
+      "commit": "c9abd0e5ed1e6d9d60aed947485320cb9d7c56cc",
+      "tree": "52734f8aff99af9bb3dac8de52ba61f78b8c487a",
+      "url": "https://github.com/kotoba-lang/kami-genre-base-systems.git",
+      "files": [
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "e39d0862ad9867957ea2acd4e1d99e4b14ced90952b02c121766ded76afedbb7",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "e8118f15f639fa7e1c3686bdc93edcbf0812d0b5bd616d267f7e7c79fcf38c08",
+          "mode": "100644"
+        },
+        {
+          "source": "design/fighting.edn",
+          "path": "design/fighting.edn",
+          "sha256": "da15003c1dd1329d1c57e0cc84a6a13da1cc671ac0eae0312cb05dc454226ce6",
+          "mode": "100644"
+        },
+        {
+          "source": "design/free-to-play.edn",
+          "path": "design/free-to-play.edn",
+          "sha256": "27b54d4e7d63f307ded951171e0dacda8c78dc985c7cbd1ab92896969efd316d",
+          "mode": "100644"
+        },
+        {
+          "source": "design/horror.edn",
+          "path": "design/horror.edn",
+          "sha256": "bd12ad2594f820598630fa653a120b161e8869c4511a364434cad6804e0c6a52",
+          "mode": "100644"
+        },
+        {
+          "source": "design/indie.edn",
+          "path": "design/indie.edn",
+          "sha256": "9ff2274a30a5d2295b2abcbc4ccbb0a4ca28c8e42453a791860b769a4d93ef6b",
+          "mode": "100644"
+        },
+        {
+          "source": "design/kids-family.edn",
+          "path": "design/kids-family.edn",
+          "sha256": "bff33c0c45d1ab898d3af3a4550206af32991430102d0dfaf5902ee7226d2118",
+          "mode": "100644"
+        },
+        {
+          "source": "design/local-multiplayer.edn",
+          "path": "design/local-multiplayer.edn",
+          "sha256": "36a63409d57a248b984a453dd6d0409b41c5ba5732c259030b4f822d94bdbad7",
+          "mode": "100644"
+        },
+        {
+          "source": "design/modern-remake.edn",
+          "path": "design/modern-remake.edn",
+          "sha256": "c6d3e7806890a0d6ab75d94a4a21c4d7ab7cda11a8f2124f101b909ed1d92ba2",
+          "mode": "100644"
+        },
+        {
+          "source": "design/open-world.edn",
+          "path": "design/open-world.edn",
+          "sha256": "d08e92d244660864e1409c5ebdaac0f9ad86d86480cf8b4ac62562f159884ebc",
+          "mode": "100644"
+        },
+        {
+          "source": "design/platformer.edn",
+          "path": "design/platformer.edn",
+          "sha256": "211b4a7f5bda7f75532bdb8a8e898b8d970bf8eab22f93e6d6d7dbf2b4e60251",
+          "mode": "100644"
+        },
+        {
+          "source": "design/post-apocalyptic.edn",
+          "path": "design/post-apocalyptic.edn",
+          "sha256": "5d4166fa29f806075d6edabd13607ec4d44fcf530f6b8a7340a3bcf6b348796e",
+          "mode": "100644"
+        },
+        {
+          "source": "design/puzzle.edn",
+          "path": "design/puzzle.edn",
+          "sha256": "b480d83282cc0002b9f3114bb537de1c7f5beae3d00059aac8fc47ddb55b5291",
+          "mode": "100644"
+        },
+        {
+          "source": "design/relaxing.edn",
+          "path": "design/relaxing.edn",
+          "sha256": "238b774d17d84ba0ba8813a8946ef9969395b61852f0e84779373fcedd321a48",
+          "mode": "100644"
+        },
+        {
+          "source": "design/rhythm.edn",
+          "path": "design/rhythm.edn",
+          "sha256": "98739121f344273b656f52e967b0e71c1497aed2aa5ac429710717b1c00aafd7",
+          "mode": "100644"
+        },
+        {
+          "source": "design/single-player.edn",
+          "path": "design/single-player.edn",
+          "sha256": "3f247bc433b227bb901f79bdc931a8a75737fb123234cb4e9b90abe196d75141",
+          "mode": "100644"
+        },
+        {
+          "source": "design/sports.edn",
+          "path": "design/sports.edn",
+          "sha256": "2d3a947636147c0590a34253741061d625df81c807432c6a2432580b29ebee86",
+          "mode": "100644"
+        },
+        {
+          "source": "design/stealth.edn",
+          "path": "design/stealth.edn",
+          "sha256": "4f1a4b45dfe1e471d8f64463f8e32fa9df050344f554c5a28ecdd869f90f1ab8",
+          "mode": "100644"
+        },
+        {
+          "source": "design/strategy.edn",
+          "path": "design/strategy.edn",
+          "sha256": "5fa3a1329b4905fb7645d07fe6d001d367a20578fd26a8a39cc1fa47e94593fa",
+          "mode": "100644"
+        },
+        {
+          "source": "design/superhero.edn",
+          "path": "design/superhero.edn",
+          "sha256": "30970c3c03a0a7c906d686e65ef83cee8b9088706dee3edaa987a3e3cbb88f67",
+          "mode": "100644"
+        },
+        {
+          "source": "edn-datomize.bb",
+          "path": "edn-datomize.bb",
+          "sha256": "93bd32dfc12d2b60ab7dacb8ab7198d1cafe4a73b8e4ffa693a55e13a1fa1184",
+          "mode": "100644"
+        },
+        {
+          "source": "games/fighting/.gitignore",
+          "path": "games/fighting/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/fighting/author.cljk",
+          "path": "games/fighting/author.cljk",
+          "sha256": "d69b9481433c2e0c1cc4d5dc7c4103028e8a551d864d79bf53e608244f9322af",
+          "mode": "100644"
+        },
+        {
+          "source": "games/fighting/deps.edn",
+          "path": "games/fighting/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/fighting/logic.cljk",
+          "path": "games/fighting/logic.cljk",
+          "sha256": "a1305f5eb760b872d8ae6645ef082a37605914f1e6a5fbfe325e782805c79bbd",
+          "mode": "100644"
+        },
+        {
+          "source": "games/fighting/scene.edn",
+          "path": "games/fighting/scene.edn",
+          "sha256": "3c64d8927fac76842fa9d709c22838992146a046c1299e109d1079e7b03bcb2b",
+          "mode": "100644"
+        },
+        {
+          "source": "games/free-to-play/.gitignore",
+          "path": "games/free-to-play/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/free-to-play/author.cljk",
+          "path": "games/free-to-play/author.cljk",
+          "sha256": "789c08ab0dfdd5a229b37ebe34131457cc76d860339d35100c4ea0564b8acd52",
+          "mode": "100644"
+        },
+        {
+          "source": "games/free-to-play/deps.edn",
+          "path": "games/free-to-play/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/free-to-play/logic.cljk",
+          "path": "games/free-to-play/logic.cljk",
+          "sha256": "dc56428995eaf2b7e175b4b2b0e1fa19a56c3beccea666c3bb3bbe232b1d12c5",
+          "mode": "100644"
+        },
+        {
+          "source": "games/free-to-play/scene.edn",
+          "path": "games/free-to-play/scene.edn",
+          "sha256": "62b17d29cd16de564946e0f2340fc7b169ed407bdb57d65e4e6ae42451a307a1",
+          "mode": "100644"
+        },
+        {
+          "source": "games/horror/.gitignore",
+          "path": "games/horror/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/horror/author.cljk",
+          "path": "games/horror/author.cljk",
+          "sha256": "353da8ed317cf6b1a1e47c67c9edcc1e66a48236d28ff5c84ebb26329ba7ab77",
+          "mode": "100644"
+        },
+        {
+          "source": "games/horror/deps.edn",
+          "path": "games/horror/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/horror/logic.cljk",
+          "path": "games/horror/logic.cljk",
+          "sha256": "6883776c31c45531dcef7b43c9d06aee984ef296d4a37e0520126fc770bfdf0e",
+          "mode": "100644"
+        },
+        {
+          "source": "games/horror/scene.edn",
+          "path": "games/horror/scene.edn",
+          "sha256": "d31a2c0a4c4ead6b2145d7d297fa8c986002a81cb41e8fcc5ed48c0bf2bcf6d0",
+          "mode": "100644"
+        },
+        {
+          "source": "games/indie/.gitignore",
+          "path": "games/indie/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/indie/author.cljk",
+          "path": "games/indie/author.cljk",
+          "sha256": "b45452b23c1a94788243252492f0ee3d8870fa103e146ecad8e71311c9003d08",
+          "mode": "100644"
+        },
+        {
+          "source": "games/indie/deps.edn",
+          "path": "games/indie/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/indie/logic.cljk",
+          "path": "games/indie/logic.cljk",
+          "sha256": "3e3e189c5d89e8da2bbd59ba3db4f436fde5dccc3fb4faf726cd5fc0c1b58650",
+          "mode": "100644"
+        },
+        {
+          "source": "games/indie/scene.edn",
+          "path": "games/indie/scene.edn",
+          "sha256": "b8246ff94b71158b13baa00ccefa3faa7169303f167153f05892358c2b72d785",
+          "mode": "100644"
+        },
+        {
+          "source": "games/kids-family/.gitignore",
+          "path": "games/kids-family/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/kids-family/author.cljk",
+          "path": "games/kids-family/author.cljk",
+          "sha256": "a4888cf5b2d5879c3a3eb2eed228bedffd01f309aaa9772c33aa43a5b459b4fd",
+          "mode": "100644"
+        },
+        {
+          "source": "games/kids-family/deps.edn",
+          "path": "games/kids-family/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/kids-family/logic.cljk",
+          "path": "games/kids-family/logic.cljk",
+          "sha256": "f9648012f244378b5104311f0d5d2763cfa1b5a561c1d7080083bb2534877a57",
+          "mode": "100644"
+        },
+        {
+          "source": "games/kids-family/scene.edn",
+          "path": "games/kids-family/scene.edn",
+          "sha256": "824d3597a8d0a81571e71a04c159ad46149acf58a66047eeca515d11832f7197",
+          "mode": "100644"
+        },
+        {
+          "source": "games/local-multiplayer/.gitignore",
+          "path": "games/local-multiplayer/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/local-multiplayer/author.cljk",
+          "path": "games/local-multiplayer/author.cljk",
+          "sha256": "c50b29a0e647c2f4bd11619a1b4aa4ea0ab4cb9002b6a7822de095723012f319",
+          "mode": "100644"
+        },
+        {
+          "source": "games/local-multiplayer/deps.edn",
+          "path": "games/local-multiplayer/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/local-multiplayer/logic.cljk",
+          "path": "games/local-multiplayer/logic.cljk",
+          "sha256": "bef413d83f2e4c7cdc14b7ad0861cb799c1a7eb3e5be638e982ab306af8c7ffc",
+          "mode": "100644"
+        },
+        {
+          "source": "games/local-multiplayer/scene.edn",
+          "path": "games/local-multiplayer/scene.edn",
+          "sha256": "fd1e2686935646b54020a34825a57d96cf33838cb78d9d2b3c277ab18fd00564",
+          "mode": "100644"
+        },
+        {
+          "source": "games/modern-remake/.gitignore",
+          "path": "games/modern-remake/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/modern-remake/author.cljk",
+          "path": "games/modern-remake/author.cljk",
+          "sha256": "25c6cf67ac1926525ae08bdae8153c5e2be9ca4e314a893bbef6aa87af5bf2da",
+          "mode": "100644"
+        },
+        {
+          "source": "games/modern-remake/deps.edn",
+          "path": "games/modern-remake/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/modern-remake/logic.cljk",
+          "path": "games/modern-remake/logic.cljk",
+          "sha256": "c4f502aed12ab62df256c0c722474fecdf6ec57aac6273b934d1d760758512d7",
+          "mode": "100644"
+        },
+        {
+          "source": "games/modern-remake/scene.edn",
+          "path": "games/modern-remake/scene.edn",
+          "sha256": "928dc65cfcf48d4c80a8dfe0319c03e7fc831a7005159761beffcac2283a20d2",
+          "mode": "100644"
+        },
+        {
+          "source": "games/open-world/.gitignore",
+          "path": "games/open-world/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/open-world/author.cljk",
+          "path": "games/open-world/author.cljk",
+          "sha256": "2782812deb07510a0b22a7e83af5fd212502a831cdf5512293064c0c59d6b09c",
+          "mode": "100644"
+        },
+        {
+          "source": "games/open-world/deps.edn",
+          "path": "games/open-world/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/open-world/logic.cljk",
+          "path": "games/open-world/logic.cljk",
+          "sha256": "c17d7a55862c61184440d3bfddfee529ecf5f6e4dc2eecc1713cc5908960625b",
+          "mode": "100644"
+        },
+        {
+          "source": "games/open-world/scene.edn",
+          "path": "games/open-world/scene.edn",
+          "sha256": "d05f9ec6020771ca0b465019d7ddf18b5cac3a527897dc704c460884fc129565",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/.gitignore",
+          "path": "games/platformer/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/author.cljk",
+          "path": "games/platformer/author.cljk",
+          "sha256": "b652cd6321a1297e5301282f0d4c8bc4b7e869f3120efe27515068a6aeecd8b6",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/deps.edn",
+          "path": "games/platformer/deps.edn",
+          "sha256": "4f9e16bc1e0b491a9cd0323df9f40312e6c2af99de5daf7808adc3dadc16a553",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/logic.cljk",
+          "path": "games/platformer/logic.cljk",
+          "sha256": "2995151a6f2563504bc463a4343550f65f0948cf2f80c03af6a019dede0aad6d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/scene.edn",
+          "path": "games/platformer/scene.edn",
+          "sha256": "12fb2047db6248376191a813048a45339e8449a76b63a3156a9d504258f82348",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/src/kami_genre_base_systems/platformer/boss.cljk",
+          "path": "games/platformer/src/kami_genre_base_systems/platformer/boss.cljk",
+          "sha256": "51be9245df6267aed6cdf6d778a7c28420d8fa3b8029a5410fa22552cbb96b70",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/src/kami_genre_base_systems/platformer/camera.cljk",
+          "path": "games/platformer/src/kami_genre_base_systems/platformer/camera.cljk",
+          "sha256": "8118b712b0702a576505be15a64e0ed1f1127103a83f2cffd6cc1871173c0633",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/src/kami_genre_base_systems/platformer/stairs.cljk",
+          "path": "games/platformer/src/kami_genre_base_systems/platformer/stairs.cljk",
+          "sha256": "cc23cd3ae8371270e67d001d5ff59d5d09cb9cb88fbde8ff7e975325ebd65672",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/src/kami_genre_base_systems/platformer/style.cljk",
+          "path": "games/platformer/src/kami_genre_base_systems/platformer/style.cljk",
+          "sha256": "a1935e69c791fff4db39899025ffd020780d75ab866836019206c4059aaa5e66",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/src/kami_genre_base_systems/platformer/weapon.cljk",
+          "path": "games/platformer/src/kami_genre_base_systems/platformer/weapon.cljk",
+          "sha256": "64aca376ab5732d24102d73e0831e3d2ccbd73fd7bf8162bd812d35cb87bd56f",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/test/kami_genre_base_systems/platformer/boss_test.cljk",
+          "path": "games/platformer/test/kami_genre_base_systems/platformer/boss_test.cljk",
+          "sha256": "d6e2cbd381b644c8c3f216ff5d5a0a5631ad16989e21a3be2860bb80a9e96abc",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/test/kami_genre_base_systems/platformer/camera_test.cljk",
+          "path": "games/platformer/test/kami_genre_base_systems/platformer/camera_test.cljk",
+          "sha256": "28161804c043b56fc7cb658feb34d84ff33ecc2e4a689394ba01f78bbc57d85f",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/test/kami_genre_base_systems/platformer/style_test.cljk",
+          "path": "games/platformer/test/kami_genre_base_systems/platformer/style_test.cljk",
+          "sha256": "27dc6d13bb143bf070465458b346c5dcda8c34ae4fda124197f195874f154969",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/test/kami_genre_base_systems/platformer/test_runner.cljk",
+          "path": "games/platformer/test/kami_genre_base_systems/platformer/test_runner.cljk",
+          "sha256": "ba008bbaec8b98d992df5049523af45b389c86b97b912baf8b675728eb66f988",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/test/kami_genre_base_systems/platformer/weapon_test.cljk",
+          "path": "games/platformer/test/kami_genre_base_systems/platformer/weapon_test.cljk",
+          "sha256": "7c7a052dcca6a4848924609d195373e86ac1676bc2b752947de9f2e5db57b33c",
+          "mode": "100644"
+        },
+        {
+          "source": "games/platformer/test/run_portable.cljk",
+          "path": "games/platformer/test/run_portable.cljk",
+          "sha256": "939f88ff720167eaae0e985543a89c7193368428a80f84226299ccd9c77c4b0a",
+          "mode": "100644"
+        },
+        {
+          "source": "games/post-apocalyptic/.gitignore",
+          "path": "games/post-apocalyptic/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/post-apocalyptic/author.cljk",
+          "path": "games/post-apocalyptic/author.cljk",
+          "sha256": "7868ab1995a0faa9fecc178dd649620b3142acb29d98a2787804d942a8b8a60a",
+          "mode": "100644"
+        },
+        {
+          "source": "games/post-apocalyptic/deps.edn",
+          "path": "games/post-apocalyptic/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/post-apocalyptic/logic.cljk",
+          "path": "games/post-apocalyptic/logic.cljk",
+          "sha256": "dfe2432907c10bfd69d053aaeacc39852814e722ef1cd9ab85c799709e6c4a54",
+          "mode": "100644"
+        },
+        {
+          "source": "games/post-apocalyptic/scene.edn",
+          "path": "games/post-apocalyptic/scene.edn",
+          "sha256": "0532b4966400346c01c48d3e2e46e8a963be229e4e16a5b58fe717a181d0ce8e",
+          "mode": "100644"
+        },
+        {
+          "source": "games/puzzle/.gitignore",
+          "path": "games/puzzle/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/puzzle/author.cljk",
+          "path": "games/puzzle/author.cljk",
+          "sha256": "0e50bf3c211ec6de9c700b1fc3c59f2c8a827cb808394ab9f746d7ffdfa3f1fe",
+          "mode": "100644"
+        },
+        {
+          "source": "games/puzzle/deps.edn",
+          "path": "games/puzzle/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/puzzle/logic.cljk",
+          "path": "games/puzzle/logic.cljk",
+          "sha256": "d610fb99878218874bf0397ac31746d7e053e7eee68f530f12a729078b240bd0",
+          "mode": "100644"
+        },
+        {
+          "source": "games/puzzle/scene.edn",
+          "path": "games/puzzle/scene.edn",
+          "sha256": "4979bbb10b190be291630a001b54bb8096cb62cff9bc391fb03142e001a1b85d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/relaxing/.gitignore",
+          "path": "games/relaxing/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/relaxing/author.cljk",
+          "path": "games/relaxing/author.cljk",
+          "sha256": "7d90d7dfd8f40e145e44bf5a00e43293b9adc68c89101d2f5b4ba4085b5ecf74",
+          "mode": "100644"
+        },
+        {
+          "source": "games/relaxing/deps.edn",
+          "path": "games/relaxing/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/relaxing/logic.cljk",
+          "path": "games/relaxing/logic.cljk",
+          "sha256": "c1a5ecc00cf04e31fd46691e231a77fa786ca26d2650072b891e3b2d257cdf49",
+          "mode": "100644"
+        },
+        {
+          "source": "games/relaxing/scene.edn",
+          "path": "games/relaxing/scene.edn",
+          "sha256": "e3ceee87a9664c6adee5b712d2781b160916fb471250cbbc0848a8965425a58e",
+          "mode": "100644"
+        },
+        {
+          "source": "games/rhythm/.gitignore",
+          "path": "games/rhythm/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/rhythm/author.cljk",
+          "path": "games/rhythm/author.cljk",
+          "sha256": "60cbc44d38302ea9caba4268f0c0744cc893658c8c04ef6b28a8a16c371244e2",
+          "mode": "100644"
+        },
+        {
+          "source": "games/rhythm/deps.edn",
+          "path": "games/rhythm/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/rhythm/logic.cljk",
+          "path": "games/rhythm/logic.cljk",
+          "sha256": "5bdbbe7a2e8c20b179d2bef2dbad2ed7053feed1e225832f47bea905c791549d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/rhythm/scene.edn",
+          "path": "games/rhythm/scene.edn",
+          "sha256": "b57168df31aa85a5f4b44ed365e7c3a0eca5e15c8687354054d9ba75d3a6e50b",
+          "mode": "100644"
+        },
+        {
+          "source": "games/single-player/.gitignore",
+          "path": "games/single-player/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/single-player/author.cljk",
+          "path": "games/single-player/author.cljk",
+          "sha256": "b4dc5d0e040e19f08fe5dc49fb3a12f815058315302ecc314937251f18ce540e",
+          "mode": "100644"
+        },
+        {
+          "source": "games/single-player/deps.edn",
+          "path": "games/single-player/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/single-player/logic.cljk",
+          "path": "games/single-player/logic.cljk",
+          "sha256": "fb1999e803967e9b5d1ee82776f526a4b9de67f94a9c2416b555900c66ac8813",
+          "mode": "100644"
+        },
+        {
+          "source": "games/single-player/scene.edn",
+          "path": "games/single-player/scene.edn",
+          "sha256": "b84db4873092075c30aad1c8884ad2190dd1e7694d0928ec984cf8605a4c8bce",
+          "mode": "100644"
+        },
+        {
+          "source": "games/sports/.gitignore",
+          "path": "games/sports/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/sports/author.cljk",
+          "path": "games/sports/author.cljk",
+          "sha256": "c751e348cbc1780e7084a904f5dc5586ee853e8b5b0e71e7650494cb5516cc50",
+          "mode": "100644"
+        },
+        {
+          "source": "games/sports/deps.edn",
+          "path": "games/sports/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/sports/logic.cljk",
+          "path": "games/sports/logic.cljk",
+          "sha256": "644b9cbcd37086f3f49343fbfec1e1a5ba0e2e1b82bcf59685f181c0ed867a98",
+          "mode": "100644"
+        },
+        {
+          "source": "games/sports/scene.edn",
+          "path": "games/sports/scene.edn",
+          "sha256": "6796ba8a6b26e8e1a4c97be8c73ae500d03bf4767f300977e6aaa7755cb3b493",
+          "mode": "100644"
+        },
+        {
+          "source": "games/stealth/.gitignore",
+          "path": "games/stealth/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/stealth/author.cljk",
+          "path": "games/stealth/author.cljk",
+          "sha256": "7980c9f3a03bafd28e8ba8baa42396724cfbb0273c8520a227c22a1cc890bf88",
+          "mode": "100644"
+        },
+        {
+          "source": "games/stealth/deps.edn",
+          "path": "games/stealth/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/stealth/logic.cljk",
+          "path": "games/stealth/logic.cljk",
+          "sha256": "ac9022a9cd2c90a18031ed33eb8519a1a0dfb27985b67b784e228b9e3c8d828e",
+          "mode": "100644"
+        },
+        {
+          "source": "games/stealth/scene.edn",
+          "path": "games/stealth/scene.edn",
+          "sha256": "d53432ee08001f9afb60f7ddc26456b628c99fabb2104a31bb24ed0f55f03b33",
+          "mode": "100644"
+        },
+        {
+          "source": "games/strategy/.gitignore",
+          "path": "games/strategy/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/strategy/author.cljk",
+          "path": "games/strategy/author.cljk",
+          "sha256": "e7ce0b9a5c204f55b8b6424928b39296eeba6a3c29b1c6f0cc84234406afb5fb",
+          "mode": "100644"
+        },
+        {
+          "source": "games/strategy/deps.edn",
+          "path": "games/strategy/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/strategy/logic.cljk",
+          "path": "games/strategy/logic.cljk",
+          "sha256": "911628b8d45f2c5d04ebd1d0cadf1f2faf153f6cfea94fa38bea6915c18f4090",
+          "mode": "100644"
+        },
+        {
+          "source": "games/strategy/scene.edn",
+          "path": "games/strategy/scene.edn",
+          "sha256": "29d1af39c68044c0bfabd4112998060757797de0ca3987dac8038270c7dcf082",
+          "mode": "100644"
+        },
+        {
+          "source": "games/superhero/.gitignore",
+          "path": "games/superhero/.gitignore",
+          "sha256": "63613bf885b51035ca813543353fc773cb9f7f3deffda8e2bafd45da130d573d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/superhero/author.cljk",
+          "path": "games/superhero/author.cljk",
+          "sha256": "83d04de137122f7a4f16296f644c4bcf4ba4828e6054d34414fe20447b3f1a62",
+          "mode": "100644"
+        },
+        {
+          "source": "games/superhero/deps.edn",
+          "path": "games/superhero/deps.edn",
+          "sha256": "950f60ce67a5fced141abaf1eda8c94774b199efbc4e315dd620121c4d7d1ec8",
+          "mode": "100644"
+        },
+        {
+          "source": "games/superhero/logic.cljk",
+          "path": "games/superhero/logic.cljk",
+          "sha256": "90c5dca2bcb5e004d8b881714444f63b2e4b26125652d1969abf5037ffef2d3d",
+          "mode": "100644"
+        },
+        {
+          "source": "games/superhero/scene.edn",
+          "path": "games/superhero/scene.edn",
+          "sha256": "19e002c4b06632b536196cd38c8b9d87fccdae230266ad0624d42d9a5e1acf8d",
+          "mode": "100644"
+        },
+        {
+          "source": "schema.edn",
+          "path": "schema.edn",
+          "sha256": "e66c2ab123d83c67a0b29eb55c19627c2ecaec161e5fd14b75e2a3d0babfd4e4",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/verify/.gitignore",
+          "path": "scripts/verify/.gitignore",
+          "sha256": "09a84ac69f1e3fd138ae42e99fec40b02d5c7d4114cd277ff0ea6de53f266093",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/verify/README.md",
+          "path": "scripts/verify/README.md",
+          "sha256": "26bcc7ac67545f1e4e12403719371de560e2ff45b316fcdc002a9db98ae5283e",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/verify/deps.edn",
+          "path": "scripts/verify/deps.edn",
+          "sha256": "9b4abe3a9c2d284233880fa49392271af9243b6ec943ae1b8a15a2898d14be27",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/verify/run-verify.sh",
+          "path": "scripts/verify/run-verify.sh",
+          "sha256": "994df1eb982b5cd9b690d4f7fa9ce43a56554706935751aed66c342e5727664d",
+          "mode": "100755"
+        },
+        {
+          "source": "scripts/verify/shadow-cljs.edn",
+          "path": "scripts/verify/shadow-cljs.edn",
+          "sha256": "c3705a82cab17206be8070b65d5f6125900cd1dedfe448f9868830dbd2be1519",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/verify/verify/core.cljk",
+          "path": "scripts/verify/verify/core.cljk",
+          "sha256": "feb17c39e8d0917bf8be54dbd377ebc22a17815fa11a67526cbe4306f4d580ff",
+          "mode": "100644"
+        }
+      ],
+      "excluded": []
+    }
+  ]
+}

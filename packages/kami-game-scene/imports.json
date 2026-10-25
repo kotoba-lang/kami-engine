@@ -1,0 +1,196 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-game-scene",
+      "commit": "f7f97c55c0d1ab83f8c73fe4cd0c974b6fccba41",
+      "tree": "ad8e4ea10b1f5613a8ff5406330f0dfd2d3a22bf",
+      "url": "https://github.com/kotoba-lang/kami-game-scene.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "2529f247cddaed607f524528c40d361448446c8b840cc042a12bbe781fadd6fa",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "c3e03e2f20430b9369a7c8514b9c4cc95a3a50b00e2999d09fb3d252ac3ec030",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "9d1139883b398b00e3fb9f844947e62c1f4882e1f20c6c6dc404914f7e259357",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "e8541557012a8a032a477363fb9a17c354efe48448d95c3bdc57180faf104d43",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "c6fe035540c7c3b2c345f36718f91ba9b6e2b4a063b2f8ccd87d9670ab08ba4c",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/animations.edn",
+          "path": "resources/game_scene/animations.edn",
+          "sha256": "87ddddb6440a004e93b45a75e9843d631af9e2f05cda0e88799f721a438b9cb3",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/battle_royale_consumables.edn",
+          "path": "resources/game_scene/battle_royale_consumables.edn",
+          "sha256": "df815aad992665cbb8794d737a03de09fcffaae8bbff5ad6ceed181d3d804c84",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/battle_royale_storm.edn",
+          "path": "resources/game_scene/battle_royale_storm.edn",
+          "sha256": "b84a16c93d306d7934ba8f2c3bc80c899b58053306a2b104845d965e84ab0825",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/battle_royale_weapons.edn",
+          "path": "resources/game_scene/battle_royale_weapons.edn",
+          "sha256": "c56ee4ca0ecb5fae571bf6767c8f934b7ea9c6d995908f87b023f7c05630f771",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/brainrot_characters.edn",
+          "path": "resources/game_scene/brainrot_characters.edn",
+          "sha256": "8876a90a71016fb66587fc850258362c8da1d6b4ed538ecdd1922bed5fda6362",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/brainrot_evolution.edn",
+          "path": "resources/game_scene/brainrot_evolution.edn",
+          "sha256": "5f00001333ee80113bc330cb553fe71161b5fcb15440ac36d652d91c9b8e1da7",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/game_catalog.edn",
+          "path": "resources/game_scene/game_catalog.edn",
+          "sha256": "86fdeda45f0bd592ca2c3564c2d254c787fc5458c2b99e08882ce60d00fb3250",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/item_catalog.edn",
+          "path": "resources/game_scene/item_catalog.edn",
+          "sha256": "f6adefdf5e8e1156589983ac99927c43e94ca53786048992f217828df41e6a92",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/pokoa_dex.edn",
+          "path": "resources/game_scene/pokoa_dex.edn",
+          "sha256": "8711851ddadfe4e7368644a43ed80de0fa4a4c9d15b3baf7ad50b00a23911ef4",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/game_scene/pokoa_items.edn",
+          "path": "resources/game_scene/pokoa_items.edn",
+          "sha256": "4f8991810c0232bd9b1aa1893a3d9a25dd82a4dcfdb92aadd3e60d3bff829123",
+          "mode": "100644"
+        },
+        {
+          "source": "src/game_scene.cljk",
+          "path": "src/game_scene.cljk",
+          "sha256": "35dd5f9474e609e57ac79ae059e5417fd03640831ccc02608e3650dcc9c467e6",
+          "mode": "100644"
+        },
+        {
+          "source": "src/game_scene/battle_royale.cljk",
+          "path": "src/game_scene/battle_royale.cljk",
+          "sha256": "4702a85fda990e45f6d4710544138f7e4645c007f64009f9b59307bec8ca5ab8",
+          "mode": "100644"
+        },
+        {
+          "source": "src/game_scene/brainrot.cljk",
+          "path": "src/game_scene/brainrot.cljk",
+          "sha256": "92aeb8ec39852104145d91423baf5181c9da239007d6aa9d2ab85c6677efc0a8",
+          "mode": "100644"
+        },
+        {
+          "source": "src/game_scene/catalog.cljk",
+          "path": "src/game_scene/catalog.cljk",
+          "sha256": "07305d977f6cd8ff448b088307e0b02baaa7c337653cad48784c5ee97faf1851",
+          "mode": "100644"
+        },
+        {
+          "source": "src/game_scene/character.cljk",
+          "path": "src/game_scene/character.cljk",
+          "sha256": "674738904f138469dd06bce9ee3f3b0ee87cdd821302e19f14c2eee77474039d",
+          "mode": "100644"
+        },
+        {
+          "source": "src/game_scene/item_catalog.cljk",
+          "path": "src/game_scene/item_catalog.cljk",
+          "sha256": "8421b47b4199b85f22b8f0f446262bc3ad413b3133dbf65fe1eb88d4b7a067db",
+          "mode": "100644"
+        },
+        {
+          "source": "src/game_scene/pokoa.cljk",
+          "path": "src/game_scene/pokoa.cljk",
+          "sha256": "1ba529a22d688945fe9446c22bc4825156c25218a38caa57a2983693db00452f",
+          "mode": "100644"
+        },
+        {
+          "source": "test/game_scene/battle_royale_test.cljk",
+          "path": "test/game_scene/battle_royale_test.cljk",
+          "sha256": "4f6832e81ec0724cc6983665da375ee9f025ade76911b5690a8001114f020981",
+          "mode": "100644"
+        },
+        {
+          "source": "test/game_scene/brainrot_test.cljk",
+          "path": "test/game_scene/brainrot_test.cljk",
+          "sha256": "272aa4727619ed955f79e68612ac8b2b544a6ff515d22f92c4c3f323d5ff3489",
+          "mode": "100644"
+        },
+        {
+          "source": "test/game_scene/catalog_test.cljk",
+          "path": "test/game_scene/catalog_test.cljk",
+          "sha256": "57cdc9fe7d34f154b0f67635c41e1db35ec83be5818e346f091c3dcc8e30b1a7",
+          "mode": "100644"
+        },
+        {
+          "source": "test/game_scene/character_test.cljk",
+          "path": "test/game_scene/character_test.cljk",
+          "sha256": "74bc62982e33f3ef1204324bbf6efc22df56c275385220f3bb71926737e9b4c6",
+          "mode": "100644"
+        },
+        {
+          "source": "test/game_scene/item_catalog_test.cljk",
+          "path": "test/game_scene/item_catalog_test.cljk",
+          "sha256": "45825d598742cb0c3212bfab664ab5e18bf95409cbe383e347501ee82ce9377b",
+          "mode": "100644"
+        },
+        {
+          "source": "test/game_scene/pokoa_test.cljk",
+          "path": "test/game_scene/pokoa_test.cljk",
+          "sha256": "6ca173c518756684721cbf5722ca746175b0ac95ec1b4997ca11d003c04c7352",
+          "mode": "100644"
+        },
+        {
+          "source": "test/game_scene_test.cljk",
+          "path": "test/game_scene_test.cljk",
+          "sha256": "3a006e3b289a35549f0aff8ef7428850e921f2df95fa4d74f29e4e9a4d1c1197",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

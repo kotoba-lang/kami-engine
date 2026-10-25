@@ -1,0 +1,12 @@
+;; Authoring deps -- datalevin is the scene source of truth (ADR-0036).
+;;   kbb -M author.clj      ;; transacts datoms -> Datalog query -> spits scene.edn
+;;
+;; `src`/`test` below are a second, unrelated artifact: a decoupled, pure
+;; .cljc action-systems layer (camera/weapon/style/boss/stairs) for a
+;; Castlevania-style host (network-isekai / kotoba.kami-host), independent
+;; of the kami-clj-subset logic.clj above and its WASM verify pipeline.
+;;   kbb -M:test            ;; runs the action-systems test suite
+{:paths ["." "src" "test"]
+ :deps  {datalevin/datalevin {:mvn/version "0.9.22"}}
+ :aliases
+ {:test {:main-opts ["-m" "kami-genre-base-systems.platformer.test-runner"]}}}

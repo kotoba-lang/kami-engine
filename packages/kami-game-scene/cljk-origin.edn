@@ -1,0 +1,19 @@
+{:format :kotoba.cljk-origin/v1
+ :renamed-on "2026-09-11"
+ :decision "adr-2609111500-cljk-rename-all-clojure-source (com-junkawasaki/root 90-docs/adr; owner instruction 2026-09-11)"
+ :rule "value = the extension the file had before the rename. A path ending in .clj.cljk or .cljs.cljk kept it in the name because both platform files existed (or the plain target was taken)."
+ :origins
+ {"src/game_scene.cljk" ".cljc"
+  "src/game_scene/battle_royale.cljk" ".cljc"
+  "src/game_scene/brainrot.cljk" ".cljc"
+  "src/game_scene/catalog.cljk" ".cljc"
+  "src/game_scene/character.cljk" ".cljc"
+  "src/game_scene/item_catalog.cljk" ".cljc"
+  "src/game_scene/pokoa.cljk" ".cljc"
+  "test/game_scene/battle_royale_test.cljk" ".cljc"
+  "test/game_scene/brainrot_test.cljk" ".cljc"
+  "test/game_scene/catalog_test.cljk" ".cljc"
+  "test/game_scene/character_test.cljk" ".cljc"
+  "test/game_scene/item_catalog_test.cljk" ".cljc"
+  "test/game_scene/pokoa_test.cljk" ".cljc"
+  "test/game_scene_test.cljk" ".cljc"}}

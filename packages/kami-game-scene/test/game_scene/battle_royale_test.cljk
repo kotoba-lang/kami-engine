@@ -1,0 +1,73 @@
+(ns game-scene.battle-royale-test
+  "Tests for `game-scene.battle-royale`, ported 1:1 from the original
+  `kami-game-scene` Rust crate's `src/battle_royale.rs` `#[cfg(test)]`
+  module AND `tests/battle_royale_parity.rs` (both deleted in
+  kotoba-lang/kami-engine PR #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [game-scene.battle-royale :as br]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'game-scene.battle-royale)))))
+
+;; ── battle_royale.rs #[cfg(test)] ───────────────────────────────────────
+
+;; Rust: shipped_counts
+(deftest shipped-counts
+  (is (= 8 (count (br/shipped-storm-phases))))
+  (is (= 11 (count (br/shipped-consumables))))
+  (is (= 25 (count (br/shipped-weapons)))))
+
+;; Rust: enum_ids_round_trip
+(deftest enum-ids-round-trip
+  (doseq [id ["common" "uncommon" "rare" "epic" "legendary"]]
+    (is (= id (br/rarity-id (br/rarity-from-id id)))))
+  (doseq [id ["small-shield" "large-shield" "mini-hp" "medkit" "chug" "small-fry" "flopper"
+              "shield-fish" "grimace-shake" "gyatt-energy" "ohio-milk"]]
+    (is (= id (br/consumable-type-id (br/consumable-type-from-id id)))))
+  (doseq [id ["assault-rifle" "shotgun" "smg" "sniper-rifle" "pistol" "rocket-launcher" "grenade-launcher"]]
+    (is (= id (br/weapon-type-id (br/weapon-type-from-id id))))))
+
+;; Rust: non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try (br/storm-phases-from-edn "42") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :not-a-map (:game-scene.battle-royale/error err)))))
+
+;; Rust: missing_table_is_an_error
+(deftest missing-table-is-an-error
+  (let [err (try (br/consumables-from-edn "{:x 1}") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :no-table (:game-scene.battle-royale/error err)))))
+
+;; ── tests/battle_royale_parity.rs ───────────────────────────────────────
+
+;; Rust: storm_phases_edn_matches_builtin
+(deftest storm-phases-edn-matches-builtin
+  (let [loaded (br/storm-phases-from-edn br/storm-phases-edn)
+        builtin (br/builtin-storm-phases)]
+    (is (= (count loaded) (count builtin)) "phase count")
+    (is (= 8 (count loaded)) "all 8 phases present")
+    (doseq [[i g w] (map vector (range) loaded builtin)]
+      (is (= g w) (str "phase[" i "]")))
+    (is (= loaded builtin) "full storm-phase parity (ordered)")))
+
+;; Rust: consumables_edn_matches_builtin
+(deftest consumables-edn-matches-builtin
+  (let [loaded (br/consumables-from-edn br/consumables-edn)
+        builtin (br/builtin-consumables)]
+    (is (= (count loaded) (count builtin)) "consumable count")
+    (is (= 11 (count loaded)) "all 11 consumables present")
+    (doseq [[i g w] (map vector (range) loaded builtin)]
+      (is (= g w) (str "consumable[" i "] (" (:name w) ")")))
+    (is (= loaded builtin) "full consumable parity (ordered)")))
+
+;; Rust: weapons_edn_matches_builtin
+(deftest weapons-edn-matches-builtin
+  (let [loaded (br/weapons-from-edn br/weapons-edn)
+        builtin (br/builtin-weapons)]
+    (is (= (count loaded) (count builtin)) "weapon count")
+    (is (= 25 (count loaded)) "all 25 weapons present")
+    (doseq [[i g w] (map vector (range) loaded builtin)]
+      (is (= g w) (str "weapon[" i "] (" (:name w) " " (:rarity w) ")")))
+    (is (= loaded builtin) "full weapon-pool parity (ordered)")))

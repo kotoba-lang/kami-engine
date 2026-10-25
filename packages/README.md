@@ -48,3 +48,12 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-engine-rotor](kami-engine-rotor) | `41ba842` | Reduced-order rotor solver (:rom-rotor) — momentum theory + figure of merit. Thrust → diameter, RPM, shaft power, torque, blade loading. |
 | [kami-engine-multirotor](kami-engine-multirotor) | `97377fa` | The multirotor mass spiral: payload + endurance -> MTOW, or a refusal. Over kami-engine-rotor/-pack/-motor. |
 | [kami-engine-render](kami-engine-render) | `87f0fd6` | engine render (wgpu bootstrap + scene pipelines CLJC IR) — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
+| [kami-engine-script-runtime](kami-engine-script-runtime) | `55aefca` | script runtime (wasmtime/wasmi dual backend host CLJC contracts) — wasmi no-JIT invariant. restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
+| [kami-engine-vehicle-designer](kami-engine-vehicle-designer) | `84da8ae` | Clean-sheet BEV/FCEV vehicle design actor — concept proposer sealed behind a PhysicsGovernor, plus Isaac/CAE sim-verify and datafied BOM→CAM→assembly (langgraph StateGraph). |
+| [kami-engine-web](kami-engine-web) | `1bc9526` | engine web entry — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
+| [kami-flow](kami-flow) | `9e8d356` | KAMI Flow — RTL->PnR->GDSII->Verify/Power/DFT/SI/Yield->STA->DRC/LVS->Signoff orchestration pipeline. Restored from legacy kami-flow crate (deleted #82). ADR-2607010930. |
+| [kami-game-scene](kami-game-scene) | `f7f97c5` | EDN authoring surface for kami-game's ANIMATION-STATE presets, Godot game catalog, brainrot evolution/characters, Sabiotoshi item catalog, battle-royale storm/consumables/weapons, and Pokoa dex/items. Restored from legacy kami-game-scene crate (deleted #82). ADR-2607010930. |
+| [kami-gen-hybrid](kami-gen-hybrid) | `4082aa2` | Imported `kami-gen-hybrid` (no repository description) |
+| [kami-gen-ml3d](kami-gen-ml3d) | `e7388b6` | Imported `kami-gen-ml3d` (no repository description) |
+| [kami-gen-procedural](kami-gen-procedural) | `ec78fba` | Imported `kami-gen-procedural` (no repository description) |
+| [kami-genre-base-systems](kami-genre-base-systems) | `c9abd0e` | Base/foundation gameplay systems, one per PlayStation-Store-style genre category (generic archetypes, kami-clj subset) |

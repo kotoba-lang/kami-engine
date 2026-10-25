@@ -1,0 +1,40 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-engine-script-runtime",
+      "commit": "55aefca081d29153c354f22cc53526b57d151b02",
+      "tree": "61a44e69316b1a3a66706012ea08f70c01c1e054",
+      "url": "https://github.com/kotoba-lang/kami-engine-script-runtime.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "42f0de6f6a8d9de393aa0e01ae6ac37ca3eb818b0e8ab8809f1adef0ae6316b2",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "930a6612359b785151e02d28613576b1500af94ba443c2ec23c0782464f0ec56",
+          "mode": "100644"
+        },
+        {
+          "source": "docs/adr/0001-retire-empty-cljc-scaffold.md",
+          "path": "docs/adr/0001-retire-empty-cljc-scaffold.md",
+          "sha256": "45a0505431e4374fdbf489838a386fd66cd63af297af3a4c522079a369d90d5f",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

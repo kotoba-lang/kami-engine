@@ -1,0 +1,44 @@
+(ns game-scene.character-test
+  "Tests for `game-scene.character`, ported 1:1 from the original
+  `kami-game-scene` Rust crate's `src/character.rs` `#[cfg(test)]` module
+  AND `tests/character_parity.rs` (both deleted in kotoba-lang/kami-engine
+  PR #82), plus a namespace-loads smoke test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [game-scene.character :as character]))
+
+(deftest smoke-test
+  (testing "namespace loads"
+    (is (some? (find-ns 'game-scene.character)))))
+
+;; ── character.rs #[cfg(test)] ───────────────────────────────────────────
+
+;; Rust: shipped_has_seven_characters
+(deftest shipped-has-seven-characters
+  (let [cs (character/characters-from-edn character/brainrot-characters-edn)]
+    (is (= 7 (count cs)))
+    (is (= (count cs) (count (character/builtin-characters))))
+    (is (= "char-skibidi-commander" (:id (first cs))))))
+
+;; Rust: non_map_root_is_an_error
+(deftest non-map-root-is-an-error
+  (let [err (try (character/characters-from-edn "42") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :not-a-map (:game-scene.character/error err)))))
+
+;; Rust: missing_table_is_an_error
+(deftest missing-table-is-an-error
+  (let [err (try (character/characters-from-edn "{:x 1}") nil
+                 (catch #?(:clj Exception :cljs js/Error) e (ex-data e)))]
+    (is (= :no-table (:game-scene.character/error err)))))
+
+;; ── tests/character_parity.rs ───────────────────────────────────────────
+
+;; Rust: characters_edn_matches_builtin
+(deftest characters-edn-matches-builtin
+  (let [loaded (character/characters-from-edn character/brainrot-characters-edn)
+        builtin (character/builtin-characters)]
+    (is (= (count loaded) (count builtin)) "character count")
+    (is (= 7 (count loaded)) "all 7 characters present")
+    (doseq [[g w] (map vector loaded builtin)]
+      (is (= g w) (str (:id w) " — id/name/role/appearance/spawn-points")))
+    (is (= loaded builtin) "full brainrot-characters parity (ordered)")))
