@@ -1,0 +1,20 @@
+{:paths ["src"]
+ ;; Zero-dep, portable .cljc. Shared vehicle-physics primitives — road load,
+ ;; SI constants, aero force, range/energy sensitivity. Purpose: DOMAIN PHYSICS
+ ;; MATH only (no datoms, no solver dispatch). Used by vehicle-design-actor
+ ;; (energy sizing) and aero-clj (range loop), and the CAE seeds.
+ :deps {
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
+        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
+        ;; this repo silently rides whatever a sibling happens to name.
+        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+       io.github.kotoba-lang/physics
+        {:git/url "https://github.com/kotoba-lang/physics.git"
+         :git/sha "3081560a4327319d9916a3c1c53471223462c0c3"}}
+ :aliases
+ {:test {:extra-paths ["test"]}
+}}
