@@ -1,0 +1,1 @@
+{"name":"kami-app-bim-editor","private":true,"scripts":{"build":"amu compile --target wasm32-browser app"},"devDependencies":{"shadow-cljs":"^2.28.20"}}

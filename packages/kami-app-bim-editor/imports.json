@@ -1,0 +1,166 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-app-bim-editor",
+      "commit": "544cb5d7b83c06ca167e4169ea5614d84be7e286",
+      "tree": "7ab6dc2537afadb598009a4901069fa9464855ff",
+      "url": "https://github.com/kotoba-lang/kami-app-bim-editor.git",
+      "files": [
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "5b157867990c6908068bc049e3c4d7c63d229a498c9a2023e660625deb59f44e",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "8553ba39fd94cd53a12347a8510a7f1ac6d9eb960c9ff5c62bac73a922a7f9d7",
+          "mode": "100644"
+        },
+        {
+          "source": "build.cljk",
+          "path": "build.cljk",
+          "sha256": "edfbe4e60bd672a8944cb2dbf223496de639eb078654a34e20b45272438ddff4",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "530f4c7bd443e9f274ab79a4e03555a4469349921109f52296d37c0a2dfd12cc",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "baee050da6ee0ceffcc573fa7645b72a5eeef6571743cbbfd88864c36925ead6",
+          "mode": "100644"
+        },
+        {
+          "source": "kotoba.app.edn",
+          "path": "kotoba.app.edn",
+          "sha256": "98ad164df1a4d7969eb8e1251282743cd1b609426508e470e8121774b31ce9b5",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "0bf98afceaf2b34c99fac0a82b68b8893fe36a3b8252c508c0158da22e1c4ea7",
+          "mode": "100644"
+        },
+        {
+          "source": "package-lock.json",
+          "path": "package-lock.json",
+          "sha256": "33f6d803857a2bae2c3dede1d4c365be4855ed51cf23893507af0f7cda171880",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "5c4901668a44b3b22d45eb0584133df47d304e8eadbc9ee2684ea1222b6ed48a",
+          "mode": "100644"
+        },
+        {
+          "source": "public/index.html",
+          "path": "public/index.html",
+          "sha256": "0e4495336318aa452029a159a414016f3135fba5ae0e41eee942b1fd32f63afe",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/app.js",
+          "path": "public/js/app.js",
+          "sha256": "73285ca841d5a45dca818ffc7fe32263c7e9ab1280fb7acccbebebcba13f07bc",
+          "mode": "100644"
+        },
+        {
+          "source": "public/js/manifest.edn",
+          "path": "public/js/manifest.edn",
+          "sha256": "240101c7bf92e842263b28a92036ea7639d87ecdbc446a08af05426813051e4c",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "dd6059dacb0b5a816d85cc0e24f6eed0b04be0482fe7bbd32e90842c8c18c01e",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/bim_editor/app.cljk",
+          "path": "src/kami/bim_editor/app.cljk",
+          "sha256": "2780d6bd264b6f152d247405ffd22aab3bc26dad08ffbafc60616e6066282cc1",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/bim_editor/family_editor.cljk",
+          "path": "src/kami/bim_editor/family_editor.cljk",
+          "sha256": "04cbb55c819010edd4ad59d0ce9acb2a065646e66a0cc078c29a7ebbddd50bb4",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/bim_editor/integration.cljk",
+          "path": "src/kami/bim_editor/integration.cljk",
+          "sha256": "cf17eeff54c54b3581fc474d8c87d53467892715bcef208b15294a08ea197ce2",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/bim_editor/interaction.cljk",
+          "path": "src/kami/bim_editor/interaction.cljk",
+          "sha256": "67992f7c581064539b90da46d10c641ac1aea2aa58b61be8d868e07b0e76431c",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/bim_editor/project.cljk",
+          "path": "src/kami/bim_editor/project.cljk",
+          "sha256": "691feef1fa2f8817f599862c5e6f88f63b90047cc6203aeba0d9a4f8b91f0585",
+          "mode": "100644"
+        },
+        {
+          "source": "src/kami/bim_editor/ui.cljk",
+          "path": "src/kami/bim_editor/ui.cljk",
+          "sha256": "7a3103abdaab603044d38f5a51870e96b254d585acf594e390553af4275906da",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/bim_editor/family_editor_test.cljk",
+          "path": "test/kami/bim_editor/family_editor_test.cljk",
+          "sha256": "606ee335546d4891e5df6b117ec573b0d3f66f00920367b3a0247a3b43865591",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/bim_editor/integration_test.cljk",
+          "path": "test/kami/bim_editor/integration_test.cljk",
+          "sha256": "b70df385c034b65681fcdf20f8b210da1a304aeca564c5ecbfb29270691b2bbe",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/bim_editor/interaction_test.cljk",
+          "path": "test/kami/bim_editor/interaction_test.cljk",
+          "sha256": "5821a6931b38fda3cb891675f56e2ba2c22f5c6721ae58b10080a1118c2deabf",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/bim_editor/project_test.cljk",
+          "path": "test/kami/bim_editor/project_test.cljk",
+          "sha256": "c96a92c483df6153d535dd214615c643e30deb923ec07ada8bdbaf6a491e31dc",
+          "mode": "100644"
+        },
+        {
+          "source": "test/kami/bim_editor/ui_test.cljk",
+          "path": "test/kami/bim_editor/ui_test.cljk",
+          "sha256": "c1a208b7cea81520b6788dd3d2ae9b20c8fdc18d3178c96da1da3c29e2f42657",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/pages.yml"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+(ns kami.bim-editor.interaction-test
+  (:require [bim :as bim]
+            [kotoba.test :refer [deftest is]]
+            [kami.bim-editor.interaction :as interaction]))
+
+(deftest camera-rays-pick-nearest-elements-and-frame-selection
+  (let [near (bim/wall {:id 10 :start [-1.0 0.0 0.0] :end [1.0 0.0 0.0]
+                        :thickness 0.2 :height 2.0})
+        far (bim/wall {:id 11 :start [-1.0 -3.0 0.0] :end [1.0 -3.0 0.0]
+                       :thickness 0.2 :height 2.0})
+        ray (interaction/camera-ray {:eye [0.0 5.0 1.0] :target [0.0 0.0 1.0]
+                                     :aspect 1.0}
+                                    0.0 0.0)
+        hit (interaction/pick-element [far near] ray)
+        frame (interaction/frame-bounds (:pick/bounds hit))]
+    (is (= [0.0 -1.0 0.0] (:ray/direction ray)))
+    (is (= 10 (:element/id hit)))
+    (is (pos? (:pick/distance hit)))
+    (is (= [0.0 0.0 1.0] (:camera/target frame)))
+    (is (pos? (:camera/distance frame)))
+    (is (nil? (interaction/pick-element
+               [near far]
+               (interaction/camera-ray {:eye [5.0 5.0 1.0] :target [5.0 0.0 1.0]}
+                                       0.0 0.0))))))
+
+(deftest ray-box-handles-inside-and-parallel-rays
+  (let [box {:min [-1.0 -1.0 -1.0] :max [1.0 1.0 1.0]}]
+    (is (= 0.0 (interaction/ray-box-distance
+                {:ray/origin [0.0 0.0 0.0] :ray/direction [1.0 0.0 0.0]} box)))
+    (is (= 2.0 (interaction/ray-box-distance
+                {:ray/origin [0.0 3.0 0.0] :ray/direction [0.0 -1.0 0.0]} box)))
+    (is (nil? (interaction/ray-box-distance
+               {:ray/origin [2.0 3.0 0.0] :ray/direction [0.0 -1.0 0.0]} box)))))
+
+(deftest render-items-highlight-only-the-selected-element
+  (let [wall-a (bim/wall {:id 10 :start [0 0 0] :end [2 0 0]
+                          :thickness 0.2 :height 3.0})
+        wall-b (bim/wall {:id 11 :start [0 2 0] :end [2 2 0]
+                          :thickness 0.2 :height 3.0})
+        items (interaction/element-render-items [wall-a {:id 99 :kind :unknown} wall-b] 11)]
+    (is (= [10 11] (mapv :element/id items)))
+    (is (= [0.55 0.7 0.95] (:color (first items))))
+    (is (= [1.0 0.58 0.12] (:color (second items))))
+    (is (every? #(seq (get-in % [:mesh :indices])) items))))
+
+(deftest ray-plane-drag-produces-world-space-deltas
+  (let [plane {:plane/origin [0.0 0.0 2.0] :plane/normal [0.0 0.0 1.0]}
+        start {:ray/origin [1.0 2.0 10.0] :ray/direction [0.0 0.0 -1.0]}
+        current {:ray/origin [4.0 6.0 10.0] :ray/direction [0.0 0.0 -1.0]}
+        drag (interaction/drag-delta start current plane)]
+    (is (= [1.0 2.0 2.0] (:drag/start drag)))
+    (is (= [4.0 6.0 2.0] (:drag/current drag)))
+    (is (= [3.0 4.0 0.0] (:drag/delta drag)))
+    (is (nil? (interaction/ray-plane-point
+               {:ray/origin [0 0 1] :ray/direction [1 0 0]} plane)))
+    (is (nil? (interaction/ray-plane-point
+               {:ray/origin [0 0 0] :ray/direction [0 0 -1]} plane)))))
+
+(deftest drag-preview-commits-once-and-cancels-exactly
+  (let [original {:elements [{:id 1 :x 0}]}
+        preview {:elements [{:id 1 :x 4}]}
+        state {:project preview :history [{:older true}] :future [{:redo true}]
+               :revision 7 :save-status :clean :last-snap {:snap/kind :grid}}
+        committed (interaction/commit-drag-state state original)
+        cancelled (interaction/cancel-drag-state state original)]
+    (is (= preview (:project committed)))
+    (is (= [{:older true} original] (:history committed)))
+    (is (= [] (:future committed)))
+    (is (= 8 (:revision committed)))
+    (is (= :dirty (:save-status committed)))
+    (is (= original (:project cancelled)))
+    (is (nil? (:last-snap cancelled)))))
+
+(deftest modifier-selection-and-screen-rectangle-are-deterministic
+  (is (= {:selection #{2} :primary 2}
+         (interaction/selection-after-click #{1} 2 :replace)))
+  (is (= {:selection #{1 2} :primary 2}
+         (interaction/selection-after-click #{1} 2 :add)))
+  (is (= {:selection #{1} :primary 1}
+         (interaction/selection-after-click #{1 2} 2 :toggle)))
+  (is (= {:selection #{1 3} :primary 1}
+         (interaction/selection-after-box #{1 2} [2 3] :toggle)))
+  (let [near (bim/wall {:id 10 :start [-1.0 0.0 0.0] :end [1.0 0.0 0.0]
+                        :thickness 0.2 :height 2.0})
+        right (bim/wall {:id 11 :start [3.0 0.0 0.0] :end [5.0 0.0 0.0]
+                         :thickness 0.2 :height 2.0})
+        camera {:eye [0.0 8.0 1.0] :target [0.0 0.0 1.0] :aspect 1.0}]
+    (is (= [10]
+           (interaction/elements-in-screen-rect
+            [near right] camera {:min [-0.3 -0.3] :max [0.3 0.3]} :crossing)))
+    (is (= []
+           (interaction/elements-in-screen-rect
+            [near] camera {:min [-0.05 -0.05] :max [0.05 0.05]} :window)))))

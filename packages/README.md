@@ -17,3 +17,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-app-amenominaka](kami-app-amenominaka) | `ae215e9` | amenominaka (天之御中) — Omniverse Kit-equivalent app shell path reservation, kotoba .cljc |
 | [kami-engine-animation](kami-engine-animation) | `33ac2ab` | Portable animation engine for the Kami family: timelines, tracks and keyframes as immutable EDN, with scalar interpolation and timeline evaluation as the first stable surface. |
 | [kami-app-animator](kami-app-animator) | `bd00b69` | Imported `kami-app-animator` (no repository description) |
+| [kami-app-bim-editor](kami-app-bim-editor) | `544cb5d` | Imported `kami-app-bim-editor` (no repository description) |
