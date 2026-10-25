@@ -68,3 +68,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [douga](douga) | `93639cd` | Pure timeline→ffmpeg render-plan builder + command builders — CLJC craft lib |
 | [cad](cad) | `161b152` | Open-source CAD/CAM workbench as EDN geometry data + portable CLJC model. |
 | [biomech](biomech) | `c85ffb9` | Biomechanics simulation domain layer — 筋肉/骨/皮膚/内臓. Pure Clojure. kotoba-lang capability. |
+| [freeboard](freeboard) | `11510d5` | Apple-Freeform-style infinite-canvas board — clj brain + kami-render(wgpu) + kasane import (ADR-2606280200) |
