@@ -1,0 +1,91 @@
+(ns vehicle-scene-test
+  "Tests for `vehicle-scene` — 1:1 ports of the original `#[test]`s in
+  `kami-vehicle-scene`'s `src/lib.rs` (GROUND CONFIG), plus a
+  self-consistency adaptation of `tests/parity.rs` (the original
+  compared the shipped EDN against a real `kami_vehicle::SurfaceKind`
+  oracle that this duck-typed port does not depend on — see
+  `vehicle-scene`'s namespace docstring), plus a namespace-loads smoke
+  test."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [scene :as scene]
+            [vehicle-scene :as vs]))
+
+;; ---------------------------------------------------------------------
+;; src/lib.rs #[test]s
+;; ---------------------------------------------------------------------
+
+(deftest builtin-table-has-all-eight
+  (let [t (vs/builtin-surface-table)]
+    (is (= 8 (count t)))
+    (doseq [id vs/all-surface-ids]
+      (let [p (vs/get-by-id t id)]
+        (is (= (:name p) (:name (get t id))))))))
+
+(deftest unknown-surface-id-falls-back-to-asphalt-dry
+  (let [t (vs/builtin-surface-table)
+        p (vs/get-by-id t "does_not_exist")]
+    (is (= p (get t "asphalt-dry")))))
+
+(deftest hyphen-keyword-maps-to-underscore-id
+  ;; a keyword VALUE :asphalt-dry -> "asphalt_dry" (underscore) /
+  ;; "asphalt-dry" (hyphen, the duck-typed SurfaceKind-id substitute).
+  (let [m (scene/root-map "{:s :asphalt-dry}")
+        v (scene/mget m "s")]
+    (is (= "asphalt-dry" (vs/surface-kind-from-value v)))
+    (is (= "asphalt_dry" (vs/surface-id-from-kw v)))))
+
+(deftest missing-map-is-an-error
+  (let [err (vs/map-from-edn vs/ground-edn "nope")]
+    (is (= :map-not-found (:error err)))))
+
+(deftest non-map-root-is-an-error
+  (is (= :not-a-map (:error (vs/surface-table-from-edn "42"))))
+  (is (= :not-a-map (:error (vs/map-from-edn "42" "demo-circuit")))))
+
+;; ---------------------------------------------------------------------
+;; tests/parity.rs — adapted (no real kami-vehicle oracle to compare
+;; against; assert shipped-EDN self-consistency instead)
+;; ---------------------------------------------------------------------
+
+(deftest surfaces-edn-self-consistent
+  (let [loaded (:ok (vs/surface-table-from-edn vs/ground-edn))]
+    (is (= 8 (count loaded)) "all 8 surfaces present in EDN")
+    (doseq [id vs/all-surface-ids]
+      (let [p (get loaded id)]
+        (is (some? p) (str id ": present"))
+        (is (number? (:friction-mu p)))
+        (is (number? (:grip-modifier p)))
+        (is (= 3 (count (:tint p))))
+        (is (string? (:name p)))))
+    ;; The shipped-table convenience loader agrees with a direct load.
+    (let [shipped (:ok (vs/shipped-surface-table))]
+      (is (= (get shipped "ice") (get loaded "ice"))))))
+
+(deftest demo-circuit-edn-self-consistent
+  (let [edn (:ok (vs/map-from-edn vs/ground-edn "demo-circuit"))]
+    (is (= "grass" (:default edn)) "default surface")
+    (is (= 9 (count (:zones edn))) "zone count")
+    (doseq [z (:zones edn)]
+      (is (<= (:x-min z) (:x-max z)))
+      (is (<= (:z-min z) (:z-max z)))
+      (is (string? (:surface z))))
+    ;; The convenience loader agrees.
+    (let [shipped (:ok (vs/shipped-demo-circuit))]
+      (is (= (count (:zones shipped)) (count (:zones edn)))))
+    ;; Behavioural spot-check: surface_at() at several probe points.
+    (is (= "asphalt-dry" (vs/surface-at edn 0.0 0.0)) "main asphalt")
+    (is (= "ice" (vs/surface-at edn 0.0 35.0)) "ice patch")
+    (is (= "sand" (vs/surface-at edn 20.0 0.0)) "sand")
+    (is (= "mud" (vs/surface-at edn -20.0 0.0)) "mud")
+    (is (= "grass" (vs/surface-at edn 0.0 200.0)) "off-map -> default grass")))
+
+;; ---------------------------------------------------------------------
+;; Namespace-loads smoke test
+;; ---------------------------------------------------------------------
+
+(deftest namespace-loads
+  (is (fn? vs/build-from-edn))
+  (is (fn? vs/shipped-surface-table))
+  (is (fn? vs/shipped-demo-circuit))
+  (is (string? vs/ground-edn))
+  (is (string? vs/garage-edn)))

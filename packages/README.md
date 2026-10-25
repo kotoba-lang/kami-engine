@@ -63,3 +63,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-solar-helix-scene](kami-solar-helix-scene) | `fcc22d7` | Imported `kami-solar-helix-scene` (no repository description) |
 | [kami-studio](kami-studio) | `5693307` | Imported `kami-studio` (no repository description) |
 | [kami-vehicle](kami-vehicle) | `50d5e29` | BeamNG-grade soft-body vehicle physics: node-beam mass-spring network, Pacejka tire, full powertrain (engine/clutch/gearbox/diff), plastic deformation, JBeam-subset loader. Restored from legacy kami-vehicle crate (deleted #82). ADR-2607010930. |
+| [kami-vehicle-scene](kami-vehicle-scene) | `da9a156` | EDN authoring surface for kami-vehicle ground/garage/powertrain CONFIG (surface grip table, demo-circuit zone map, engine/gearbox/tire presets, 6 garage SedanSpecs). Restored from legacy kami-vehicle-scene crate (kotoba-lang/kami-engine, deleted PR #82). ADR-2607010930. |

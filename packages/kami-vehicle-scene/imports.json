@@ -1,0 +1,106 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-vehicle-scene",
+      "commit": "da9a156e021df92b86fc7f6b522f22349e74d66f",
+      "tree": "ea2f3b12cd3979b64012643c9c477015bda99245",
+      "url": "https://github.com/kotoba-lang/kami-vehicle-scene.git",
+      "files": [
+        {
+          "source": ".clj-kondo/config.edn",
+          "path": ".clj-kondo/config.edn",
+          "sha256": "ea0f8327a6fae75c3c29116959eff33043c9f4a0ae16fca25a8d6a7d557b6217",
+          "mode": "100644"
+        },
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "171aa6ba66ab7164cdccbed69217197417b0fd91bdac8832bb418dc9b31b6adf",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "379ae4fbcda4f49a967250782c53997dd79efceb5b6aabb599e96742ce66a8b3",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "713ad981a998076000a3a8c3b4c493ae69af97286e3fe7f76a9b449213f5d940",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "f725786e2aac9462f21b5aa1a84a3a992a668776c942cb272880e571b62263f7",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "c6fe035540c7c3b2c345f36718f91ba9b6e2b4a063b2f8ccd87d9670ab08ba4c",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/kami_vehicle_scene/garage.edn",
+          "path": "resources/kami_vehicle_scene/garage.edn",
+          "sha256": "e640e230c3067d947d8d11b12d04744a5d4924bc7dd6f79008d4e7cc57d79ed4",
+          "mode": "100644"
+        },
+        {
+          "source": "resources/kami_vehicle_scene/ground.edn",
+          "path": "resources/kami_vehicle_scene/ground.edn",
+          "sha256": "b723eac2f5d6718d791c32ac1613d0bb60169ea7e11059b1ab8385ebfd3e358a",
+          "mode": "100644"
+        },
+        {
+          "source": "src/vehicle_scene.cljk",
+          "path": "src/vehicle_scene.cljk",
+          "sha256": "5128ce5ea296e2f6edff8a4fdbdf9268b8a9196f29069fa81a2e73c39d8b5e0a",
+          "mode": "100644"
+        },
+        {
+          "source": "src/vehicle_scene/garage.cljk",
+          "path": "src/vehicle_scene/garage.cljk",
+          "sha256": "927baac41f1de053d09ba8a86b0d04217a9818d0d373f118c031a4de5228ac5e",
+          "mode": "100644"
+        },
+        {
+          "source": "src/vehicle_scene/integration.cljk",
+          "path": "src/vehicle_scene/integration.cljk",
+          "sha256": "7627252ad6a1a0f2c623d13bde98e9b886870cb95a481da1b8655e148f0c9c39",
+          "mode": "100644"
+        },
+        {
+          "source": "test/vehicle_scene/garage_test.cljk",
+          "path": "test/vehicle_scene/garage_test.cljk",
+          "sha256": "9bf58131eb68a5bd5fdccd1c8c429fedd24b1471886b39ce93d4c6a6b81423ef",
+          "mode": "100644"
+        },
+        {
+          "source": "test/vehicle_scene/integration_test.cljk",
+          "path": "test/vehicle_scene/integration_test.cljk",
+          "sha256": "8d56b0d3730ba793a40bbd93c61122efa882637e545d4e09480358c7c9ea86e2",
+          "mode": "100644"
+        },
+        {
+          "source": "test/vehicle_scene_test.cljk",
+          "path": "test/vehicle_scene_test.cljk",
+          "sha256": "305a9706d3c73c2c2e5024b501bf22fb5bc5d69b676e4a19c33a1401ebfc4529",
+          "mode": "100644"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}
