@@ -16,3 +16,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-vegetation-scene](kami-vegetation-scene) | `d7ba32c` | EDN authoring surface for kami-vegetation TAXONOMIC PROFILE presets (grass/fern/palm/conifer/bush/cactus/moss). Restored from legacy kami-vegetation-scene crate (deleted #82). ADR-2607010930. |
 | [kami-app-amenominaka](kami-app-amenominaka) | `ae215e9` | amenominaka (天之御中) — Omniverse Kit-equivalent app shell path reservation, kotoba .cljc |
 | [kami-engine-animation](kami-engine-animation) | `33ac2ab` | Portable animation engine for the Kami family: timelines, tracks and keyframes as immutable EDN, with scalar interpolation and timeline evaluation as the first stable surface. |
+| [kami-app-animator](kami-app-animator) | `bd00b69` | Imported `kami-app-animator` (no repository description) |
