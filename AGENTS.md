@@ -27,6 +27,8 @@ moved out (ADR-2607102200). The Rust-era guide is in git history
 describe that removed workspace and are historical. All Clojure-family sources
 were renamed to `.cljk` on 2026-09-11 (`cljk-origin.edn`).
 
+> **Update 2026-10-25 (ADR-0049):** this repository is now the monorepo for the `kami-*` family. Standalone `kotoba-lang/kami-*` repositories are imported under `packages/<repo>/` (index: `packages/README.md`); the "moved out / do not restore a nested tree" statements here apply to the top-level pointer directories only, which stay as they are.
+
 ## Layout
 
 | path | contents |

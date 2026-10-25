@@ -1,0 +1,58 @@
+(ns skeleton-scene.vmd-test
+  "Tests for `skeleton-scene.vmd`, ported 1:1 from the original
+  kami-skeleton-scene Rust crate's `src/vmd.rs` `#[cfg(test)] mod
+  tests` (deleted kotoba-lang/kami-engine PR #82). Byte-fixture
+  construction runs on Clojure (JVM `Shift_JIS` charset); this
+  namespace's own tests are exercised via `kbb -M:test`."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [skeleton-scene.vmd :as vmd]))
+
+(defn- sjis-bytes
+  "Encode `s` as Shift-JIS bytes (a vector of unsigned ints), the test-
+  fixture-construction counterpart of `encoding_rs::SHIFT_JIS::encode`."
+  [s]
+  #?(:clj (vec (map #(bit-and 0xff (int %)) (.getBytes ^String s "Shift_JIS")))
+     :cljs (throw (ex-info "sjis-bytes is Clojure-only (test fixture helper)" {}))))
+
+(defn- u32-le-bytes [n] [(bit-and n 0xff) (bit-and (bit-shift-right n 8) 0xff)
+                          (bit-and (bit-shift-right n 16) 0xff) (bit-and (bit-shift-right n 24) 0xff)])
+
+(defn- f32-le-bytes [f]
+  (let [bits #?(:clj (Float/floatToIntBits (float f))
+                :cljs 0)]
+    (u32-le-bytes bits)))
+
+(defn- padded-name [bone-name]
+  (let [sjis (sjis-bytes bone-name)
+        n (min 15 (count sjis))]
+    (vec (concat (take n sjis) (repeat (- 15 n) 0)))))
+
+;; Build a minimal 2-keyframe `.vmd` for `bone-name` (frames 0 and 30).
+(defn- synthetic-vmd [bone-name]
+  (vec
+   (concat
+    (repeat 50 0) ; 30 sig + 20 model name (zeroed)
+    (u32-le-bytes 2) ; 2 bone keyframes
+    (mapcat (fn [i frame]
+              (concat
+               (padded-name bone-name)
+               (u32-le-bytes frame)
+               (f32-le-bytes 0.0) (f32-le-bytes (* i 0.5)) (f32-le-bytes 0.0) ; pos (rise on 2nd key)
+               (f32-le-bytes 0.0) (f32-le-bytes 0.0) (f32-le-bytes 0.0) (f32-le-bytes 1.0) ; quat identity
+               (repeat 64 0))) ; interpolation
+            (range) [0 30]))))
+
+(deftest parses-vmd-bone-track
+  (let [b (synthetic-vmd "センター") ; -> hips
+        c (vmd/vmd-to-clip b 30.0 (fn [n] (when (= n "hips") 0)))]
+    (is (some? c))
+    (is (= 1 (count (:tracks c))) "one bone track")
+    (is (= 0 (:bone-index (first (:tracks c)))))
+    (is (= 2 (count (:keyframes (first (:tracks c))))))
+    (is (< (Math/abs (- (:duration c) 1.0)) 1e-6) "30 frames @ 30fps = 1.0s")
+    (is (< (Math/abs (- (:time (second (:keyframes (first (:tracks c))))) 1.0)) 1e-6))))
+
+(deftest humanoid-name-map
+  (is (= "head" (vmd/mmd-bone-to-humanoid "頭")))
+  (is (= "leftUpperArm" (vmd/mmd-bone-to-humanoid "左腕")))
+  (is (nil? (vmd/mmd-bone-to-humanoid "unknown"))))

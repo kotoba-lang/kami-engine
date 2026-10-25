@@ -1,0 +1,45 @@
+(ns skeleton-scene.clip-test
+  "Tests for `skeleton-scene.clip`, ported 1:1 from the original
+  kami-skeleton-scene Rust crate's `src/clip.rs` `#[cfg(test)] mod
+  tests` (deleted kotoba-lang/kami-engine PR #82)."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [skeleton-scene.clip :as clip]))
+
+(defn- idx [name]
+  (case name
+    "hips" 0
+    "rightUpperArm" 1
+    nil))
+
+(def clip-edn
+  "{:name \"wave\" :duration 2.0 :loop true
+    :tracks [{:bone \"rightUpperArm\" :interp :cubic
+              :keys [{:t 0.0 :rot [0 0 0 1]}
+                     {:t 1.0 :rot [0 0 0.38 0.92]}
+                     {:t 2.0 :rot [0 0 0 1]}]}
+             {:bone \"hips\" :interp :linear
+              :keys [{:t 0.0 :pos [0 0 0]} {:t 2.0 :pos [0 0.05 0]}]}
+             {:bone \"unknownBone\" :keys [{:t 0.0 :pos [9 9 9]}]}]}")
+
+(deftest parses-clip-with-named-bones
+  (let [c (clip/clip-from-edn clip-edn idx)]
+    (is (some? c))
+    (is (= "wave" (:name c)))
+    (is (< (Math/abs (- (:duration c) 2.0)) 1e-6))
+    (is (:looping c))
+    (is (= 2 (count (:tracks c))) "unknown bone track dropped")
+    (let [arm (some #(when (= 1 (:bone-index %)) %) (:tracks c))]
+      (is (= :cubic-spline (:interpolation arm)))
+      (is (= 3 (count (:keyframes arm)))))
+    (let [hips (some #(when (= 0 (:bone-index %)) %) (:tracks c))]
+      (is (= [0.0 0.05 0.0] (:position (nth (:keyframes hips) 1)))))))
+
+(deftest duration-falls-back-to-last-key
+  (let [c (clip/clip-from-edn
+           "{:name \"g\" :tracks [{:bone \"hips\" :keys [{:t 0.0 :pos [0 0 0]} {:t 1.5 :pos [0 1 0]}]}]}"
+           idx)]
+    (is (< (Math/abs (- (:duration c) 1.5)) 1e-6))
+    (is (not (:looping c)))))
+
+(deftest non-map-returns-nil
+  (is (nil? (clip/clip-from-edn "[1 2 3]" idx))))
