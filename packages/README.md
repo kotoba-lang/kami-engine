@@ -62,3 +62,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-sensor-sim](kami-sensor-sim) | `caae678` | Camera / lidar / IMU / contact sensor synth, isaacsim.sensors API-compat target (analytic CPU sensor models: pinhole camera projection+depth, analytic ray-cast lidar VLP-16/toy, body-frame IMU, sphere-vs-primitive contact). Restored from legacy kami-sensor-sim crate (deleted #82). ADR-2607010930. |
 | [kami-solar-helix-scene](kami-solar-helix-scene) | `fcc22d7` | Imported `kami-solar-helix-scene` (no repository description) |
 | [kami-studio](kami-studio) | `5693307` | Imported `kami-studio` (no repository description) |
+| [kami-vehicle](kami-vehicle) | `50d5e29` | BeamNG-grade soft-body vehicle physics: node-beam mass-spring network, Pacejka tire, full powertrain (engine/clutch/gearbox/diff), plastic deformation, JBeam-subset loader. Restored from legacy kami-vehicle crate (deleted #82). ADR-2607010930. |
