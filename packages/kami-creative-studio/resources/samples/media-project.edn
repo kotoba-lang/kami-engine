@@ -1,0 +1,30 @@
+{:media/schema "kami.media-project/v1"
+ :media/id "prism-film"
+ :media/name "KAMI Prism Film"
+ :media/video
+ {:timeline/timebase {:num 30 :den 1 :drop-frame? false}
+  :timeline/tracks
+  [{:track/id :v1 :track/type :video :track/transitions []
+    :track/effect-stack [] :track/enabled? true :track/muted? false :track/locked? false
+    :track/clips
+    [{:clip/id :opening :clip/source-id "opening-frame" :clip/source-in 0
+      :clip/source-out 120 :clip/timeline-start 0 :clip/duration 120 :clip/effect-stack []}]}]
+  :timeline/markers
+  [{:marker/id :title :marker/name "Title" :marker/position 0
+    :marker/duration 30 :marker/color "#80ead0"}]}
+ :media/music
+ {:project/ppq 480 :project/sample-rate 48000
+  :project/tempo-map [{:tempo-point/tick 0 :tempo-point/bpm 120 :tempo-point/time-sig [4 4]}]
+  :project/tracks [{:track/id "music" :track/type :audio :track/name "Music"
+                    :track/mute? false :track/solo? false :track/armed? false
+                    :track/output-bus "master"}]
+  :project/buses [{:bus/id "master" :bus/name "Master" :bus/inputs #{"music"}
+                   :bus/plugin-chain []}]
+  :project/clips [{:clip/id "theme" :clip/track-id "music" :clip/start-tick 0
+                   :clip/length-ticks 3840 :clip/content {:audio/uri "theme-audio"}}]
+  :project/automation []}
+ :media/assets
+ [{:asset/id "opening-frame" :asset/kind :image :asset/path "assets/opening.png"}
+  {:asset/id "theme-audio" :asset/kind :audio :asset/path "assets/theme.wav"}]
+ :media/output {:width 1920 :height 1080 :fps 30 :video-codec :h264 :audio-codec :aac}
+ :media/metadata {:created-by "KAMI Creative Studio"}}

@@ -1,0 +1,108 @@
+(ns kami.creative-studio.core-test
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kami.creative-studio.core :as core]))
+
+(deftest manifest-integrates-kisekae-and-motion
+  (let [m (core/project-manifest
+           {:id "project-1" :name "A" :brief "B" :reference "bafy-ref"
+            :motion-preset :dance :duration 4 :created-at "2026-07-10T00:00:00Z"
+            :edits [{:op/type :part/set :part/kind :hair :part/source "bafy-hair"}]})]
+    (is (= "kami.creative-project/v1" (:schema m)))
+    (is (= "kotoba-lang/kisekae" (get-in m [:character :editor])))
+    (is (= "motion" (get-in m [:stages 2 :modality])))
+    (is (= true (get-in m [:policy :noSilentFallback])))))
+
+(deftest compiles-portable-2d-and-3d-saturation-plans
+  (doseq [dimension ["2d" "3d"]]
+    (let [plan (core/benchmark-plan
+                {:dimension dimension :workload "sprite-or-mesh-density"
+                 :start 100 :step 200 :max 550 :duration-ms 5000 :warmup-frames 90
+                 :budgets {:frameTimeP95Ms 16.7 :memoryMaxMiB 1024}})]
+      (is (= "kami.performance-plan/v1" (:schema plan)))
+      (is (= [100 300 500 550] (mapv :entities (:samples plan)))
+          "the explicit ceiling is always measured even off the step boundary")
+      (is (every? #(= 5000 (:durationMs %)) (:samples plan)))
+      (is (every? #(= 90 (:warmupFrames %)) (:samples plan)))
+      (is (true? (:stopOnFirstViolation plan))))))
+
+(deftest rejects-ambiguous-or-unbounded-benchmark-plans
+  (is (thrown? js/Error
+               (core/benchmark-plan
+                {:dimension "vr" :workload "mesh-density"
+                 :budgets {:frameTimeP95Ms 16.7 :memoryMaxMiB 1024}})))
+  (is (thrown? js/Error
+               (core/benchmark-plan
+                {:dimension "3d" :workload "mesh-density" :max 0
+                 :budgets {:frameTimeP95Ms 16.7 :memoryMaxMiB 1024}})))
+  (is (thrown? js/Error
+               (core/benchmark-plan
+                {:dimension "2d" :workload "sprites" :warmup-frames -1
+                 :budgets {:frameTimeP95Ms 16.7 :memoryMaxMiB 1024}}))))
+
+(deftest embeds-performance-contract-in-project-manifest
+  (let [m (core/project-manifest
+           {:id "project-1" :name "A" :brief "B" :motion-preset :idle
+            :duration 4 :edits [] :created-at "2026-07-15T00:00:00Z"
+            :performance {:dimension "3d" :workload "crowd"
+                          :start 256 :step 256 :max 1024
+                          :budgets {:frameTimeP95Ms 16.7 :memoryMaxMiB 1536}}})]
+    (is (= "3d" (get-in m [:performance :dimension])))
+    (is (= [256 512 768 1024]
+           (mapv :entities (get-in m [:performance :samples]))))))
+
+(deftest extracts-realtime-artifact-contract
+  (testing "direct and artifact-list response shapes"
+    (is (= "x.vrm" (core/artifact-url {:artifactUrl "x.vrm"})))
+    (is (= "x.glb" (core/artifact-url {:artifacts [{:kind "image" :url "x.png"}
+                                                     {:kind "glb" :url "x.glb"}]}))))
+  (is (= 100 (core/progress {:progress 200})))
+  (is (= 0 (core/progress {:progress -2}))))
+
+(deftest composes-independent-trait-catalog
+  (let [catalog {:body [{:id "body-a" :source "cid:body-a"}]
+                 :hair [{:id "hair-a" :source "cid:hair-a"}
+                        {:id "hair-b" :source "cid:hair-b"}]}
+        selection (core/seeded-selection catalog 7)
+        operations (core/selection-operations selection)]
+    (is (= selection (core/seeded-selection catalog 7)))
+    (is (= #{"body" "hair"} (set (map :part/kind operations))))
+    (is (= "hair-a" (get-in (core/select-trait selection
+                                               {:slot :hair :id "hair-a" :source "cid:hair-a"})
+                             [:hair :id])))))
+
+(deftest builds-authorized-kisekae-composition-context
+  (let [base "https://assets.test/base.vrm"
+        donor "https://assets.test/donor.vrm"
+        {:keys [spec caps plan]}
+        (core/composition-context
+         {:body {:id "base" :source base}
+          :hair {:id "hair" :source donor}
+          :face {:id "base-face" :source base}
+          :outfit {:id "base-outfit" :source base}
+          :accessory {:id "none" :source nil}})]
+    (is (= base (get-in spec [:spec/base :vrm/url])))
+    (is (= [:hair] (mapv :part/kind (:spec/parts spec))))
+    (is (every? (comp seq :cap/provenance) caps))
+    (is (= :asset/fetch (get-in plan [:plan/phases 0 :phase])))
+    (is (= :vrm/export (get-in plan [:plan/phases 8 :phase])))))
+
+(deftest creates-capability-carrying-murakumo-compose-request
+  (let [request (core/murakumo-compose-request
+                 {:body {:source "https://assets.test/base.vrm"}
+                  :hair {:source "https://assets.test/hair.vrm"}})]
+    (is (= "vrm-compose" (:function request)))
+    (is (= "kisekae" (:engine request)))
+    (is (= 1 (get-in request [:params :plan :kisekae.plan/version])))
+    (is (every? (comp seq :cap/provenance) (get-in request [:params :caps])))))
+
+(deftest resolves-real-preview-artifacts-without-fallback
+  (let [constraint "https://assets.test/constraint.vrm"
+        seed "https://assets.test/seed.vrm"
+        opts {:constraint-url constraint :seed-url seed}
+        base {:body {:source constraint} :hair {:source constraint}
+              :face {:source constraint} :outfit {:source constraint}}
+        hair (assoc base :hair {:source seed})
+        multi (assoc hair :outfit {:source seed})]
+    (is (= constraint (core/preview-artifact base opts)))
+    (is (= "samples/constraint-seed-hair.vrm" (core/preview-artifact hair opts)))
+    (is (nil? (core/preview-artifact multi opts)) "multi-part requires Murakumo")))

@@ -1,0 +1,67 @@
+(ns kami.creative-studio.media-render-e2e-test
+  (:require [kotoba.io :as io]
+            [clojure.java.shell :as shell]
+            [kotoba.test :refer [deftest is]]
+            [kami.creative-studio.media :as media]))
+
+(defn run-command! [cmd]
+  (let [{:keys [exit err]} (apply shell/sh cmd)]
+    (when-not (zero? exit)
+      (throw (ex-info "external command failed" {:cmd cmd :exit exit :err err})))))
+
+(defn delete-tree! [file]
+  (when (io/exists? file)
+    (doseq [child (reverse (file-seq file))] (io/delete-file child true))))
+
+(deftest real-ffmpeg-video-music-master
+  (let [dir (io/temp-dir
+                      "kami-media-e2e")
+        path #(str (io/absolute-path dir) "/" %)
+        source (path "source.mp4")
+        song (path "song.wav")]
+    (try
+      (run-command! ["ffmpeg" "-y" "-f" "lavfi" "-i" "color=c=blue:s=320x180:r=30:d=2"
+             "-c:v" "libx264" "-pix_fmt" "yuv420p" source])
+      (run-command! ["ffmpeg" "-y" "-f" "lavfi" "-i" "sine=frequency=440:sample_rate=48000:duration=2" song])
+      (let [project
+            (media/project
+             {:id "e2e" :name "Real render"
+              :video {:timeline/timebase {:num 30 :den 1 :drop-frame? false}
+                      :timeline/tracks
+                      [{:track/id :v1 :track/type :video :track/transitions []
+                        :track/effect-stack [] :track/enabled? true :track/muted? false :track/locked? false
+                        :track/clips [{:clip/id :c1 :clip/source-id "source"
+                                       :clip/source-in 0 :clip/source-out 60
+                                       :clip/timeline-start 0 :clip/duration 60 :clip/effect-stack []}]}]
+                      :timeline/markers []}
+              :music {:project/ppq 480 :project/sample-rate 48000
+                      :project/tempo-map [{:tempo-point/tick 0 :tempo-point/bpm 120
+                                           :tempo-point/time-sig [4 4]}]
+                      :project/tracks [{:track/id "music" :track/type :audio :track/name "Music"
+                                        :track/mute? false :track/solo? false :track/armed? false
+                                        :track/output-bus "master"}]
+                      :project/buses [{:bus/id "master" :bus/name "Master"
+                                       :bus/inputs #{"music"} :bus/plugin-chain []}]
+                      :project/clips [{:clip/id "song" :clip/track-id "music"
+                                       :clip/start-tick 0 :clip/length-ticks 1920
+                                       :clip/content {:audio/uri "song"}}]
+                      :project/automation []}
+              :assets [{:asset/id "source" :asset/kind :video :asset/path source}
+                       {:asset/id "song" :asset/kind :audio :asset/path song}]
+              :output {:width 320 :height 180 :fps 30}})
+            plan (media/render-plan project (io/absolute-path dir))]
+        (is (media/valid-project? project))
+        (doseq [segment (:render/segments plan)] (run-command! (:render segment)))
+        (spit (path "segments.txt") (:render/concat-list plan))
+        (run-command! (:render/concat plan))
+        (run-command! (:render/master plan))
+        (let [{:keys [exit out]}
+              (shell/sh "ffprobe" "-v" "error" "-show_entries"
+                        "format=duration:stream=codec_type,width,height"
+                        "-of" "default=noprint_wrappers=1" (:render/output plan))]
+          (is (zero? exit))
+          (is (re-find #"codec_type=video" out))
+          (is (re-find #"codec_type=audio" out))
+          (is (re-find #"width=320" out))
+          (is (<= 1.9 (Double/parseDouble (second (re-find #"duration=([0-9.]+)" out))) 2.1))))
+      (finally (delete-tree! dir)))))

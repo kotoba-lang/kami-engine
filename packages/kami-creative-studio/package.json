@@ -1,0 +1,15 @@
+{
+  "name": "kami-creative-studio",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "release": "rm -rf public && mkdir -p public/js public/vendor && amu compile --target wasm32-browser app && kbb -X:pages build/release && cp -R node_modules/@google/model-viewer/dist public/vendor/model-viewer",
+    "check": "kbb -M:test"
+  },
+  "dependencies": {
+    "@google/model-viewer": "4.3.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "shadow-cljs": "2.28.20"
+  }
+}

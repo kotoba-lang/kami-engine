@@ -33,3 +33,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-character-scene](kami-character-scene) | `9dcf246` | EDN authoring surface for kami-character MetaHuman hair-style presets, FACS face-rig, and default animation blueprint. Restored from legacy kami-character-scene crate (deleted #82). ADR-2607010930. |
 | [kami-eizo-timeline](kami-eizo-timeline) | `226e1c1` | Portable .cljc EDL/timeline data model (track/clip/transition/marker) + SMPTE drop-frame timecode — the missing NLE data model, ADR-2607121400 |
 | [kami-ongaku-project](kami-ongaku-project) | `6dccb9e` | DAW-session data model (track/bus-graph/clip/automation/tempo-map) — L3 SSoT of the ongaku engine stack, ADR-2607121400 |
+| [kami-creative-studio](kami-creative-studio) | `2652dd3` | Imported `kami-creative-studio` (no repository description) |
