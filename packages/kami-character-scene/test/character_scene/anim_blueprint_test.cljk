@@ -1,0 +1,63 @@
+(ns character-scene.anim-blueprint-test
+  "Tests ported 1:1 from the original legacy kami-character-scene Rust
+  crate's `src/anim_blueprint.rs` `#[cfg(test)]` and
+  `tests/anim_blueprint_parity.rs` (deleted in kotoba-lang/kami-engine
+  PR #82). The parity oracle is the REAL
+  `character.anim-blueprint/metahuman-default` (called here, not
+  transcribed)."
+  (:require [character-scene.anim-blueprint :as ab]
+            [character.anim-blueprint :as char-ab]
+            [kotoba.test :refer [deftest is testing]]))
+
+;; --- ported from anim_blueprint.rs `#[cfg(test)]` -----------------------------------------
+
+(deftest shipped-has-two-layers-and-eleven-params
+  (let [[status bp] (ab/shipped-blueprint)]
+    (is (= :ok status))
+    (is (= 2 (count (:layers bp))))
+    (is (= "body" (:name (nth (:layers bp) 0))))
+    (is (= "face" (:name (nth (:layers bp) 1))))
+    (is (= 11 (count (:parameters bp))))
+    (is (contains? (:parameters bp) "jaw_open"))))
+
+(deftest is-prefixed-param-is-bool
+  (let [[status bp] (ab/shipped-blueprint)]
+    (is (= :ok status))
+    (is (= :bool (get-in bp [:parameters "is_moving" :param-type])))
+    (is (= :float (get-in bp [:parameters "speed" :param-type])))))
+
+(deftest non-map-root-is-an-error
+  (let [[status err] (ab/blueprint-from-edn "42")]
+    (is (= :error status))
+    (is (= :not-a-map (:type err)))))
+
+(deftest missing-table-is-an-error
+  (let [[status err] (ab/blueprint-from-edn "{:other 1}")]
+    (is (= :error status))
+    (is (= :no-blueprint (:type err)))))
+
+;; --- ported from tests/anim_blueprint_parity.rs --------------------------------------------
+
+(deftest anim-blueprint-edn-matches-builtin
+  (let [oracle (char-ab/metahuman-default)
+        [status edn] (ab/shipped-blueprint)]
+    (is (= :ok status))
+    (is (= (:parameters oracle) (:parameters edn)) "parameters parity (name/type/value/default)")
+    (is (= (:layers oracle) (:layers edn)) "layers parity (states + transitions)")
+    (is (= (:blend-profiles oracle) (:blend-profiles edn)) "blend-profiles parity")))
+
+(deftest rebuilt-blueprint-transitions-like-builtin
+  (let [[status edn] (ab/shipped-blueprint)
+        _ (is (= :ok status))
+        oracle (char-ab/metahuman-default)
+        drive (fn [bp]
+                (is (= 0 (:active-state (first (:layers bp)))) "starts at idle")
+                (let [bp (char-ab/set-param bp "is_moving" 1.0)]
+                  (loop [bp bp n 40]
+                    (if (zero? n)
+                      bp
+                      (recur (char-ab/update bp 0.016) (dec n))))))
+        edn' (drive edn)
+        oracle' (drive oracle)]
+    (is (= 1 (:active-state (first (:layers edn')))) "transitions to locomotion")
+    (is (= 1 (:active-state (first (:layers oracle')))) "transitions to locomotion")))
