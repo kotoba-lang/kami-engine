@@ -38,3 +38,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-eizo-grade](kami-eizo-grade) | `f960c23` | ASC CDL / monotone curves / .cube LUT / waveform+vectorscope color-grading data model (kami-eizo family, ADR-2607121400) |
 | [kami-engine-vphysics](kami-engine-vphysics) | `7ff753e` | shared vehicle-physics primitives (road load, aero force, range) |
 | [kami-engine-aero](kami-engine-aero) | `fabfd90` | reduced-order aero Cd solver (component build-up) + design range loop |
+| [kami-engine-core](kami-engine-core) | `dcefa5a` | engine core — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
