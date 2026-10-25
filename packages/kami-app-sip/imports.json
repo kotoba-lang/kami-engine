@@ -1,0 +1,281 @@
+{
+  "schema": "kotoba.library-imports.v1",
+  "imports": [
+    {
+      "repo": "kami-app-sip",
+      "commit": "54ae09aac9f6cdc831d560da70db59f5c1d9c286",
+      "tree": "9d8a6ec43dbd3ed852011d301b9bcab52ba5b2a5",
+      "url": "https://github.com/kotoba-lang/kami-app-sip.git",
+      "files": [
+        {
+          "source": ".clj-kondo/config.edn",
+          "path": ".clj-kondo/config.edn",
+          "sha256": "688fc26e276e6a9a56139e6cf577251695893696132e818bcec2a713085428b1",
+          "mode": "100644"
+        },
+        {
+          "source": ".gitignore",
+          "path": ".gitignore",
+          "sha256": "39aa8b19226beb1732085b849ee08277bcaac11fe0f23e69f161f3cd1f9dc67a",
+          "mode": "100644"
+        },
+        {
+          "source": "README.edn",
+          "path": "README.edn",
+          "sha256": "94aa4d919180d0fff1c9319a31b0b4bf28a662bac509b9d4b0e9bd4585415322",
+          "mode": "100644"
+        },
+        {
+          "source": "README.md",
+          "path": "README.md",
+          "sha256": "b422050a5e4f0bac11455a2947cd46e9cee273990fa7754a10e8ae93a6766673",
+          "mode": "100644"
+        },
+        {
+          "source": "cljk-origin.edn",
+          "path": "cljk-origin.edn",
+          "sha256": "7f89b773385cb2a7d27b70b4034a5d85d1c7b7b53c38764abcb8f2a578522f38",
+          "mode": "100644"
+        },
+        {
+          "source": "deps.edn",
+          "path": "deps.edn",
+          "sha256": "ee8155a9a42a37223639b855549ae0c6c5542ad20665cc897bd03b7df1bc6237",
+          "mode": "100644"
+        },
+        {
+          "source": "docs/ARCHITECTURE.md",
+          "path": "docs/ARCHITECTURE.md",
+          "sha256": "be38893fe53c025448548218efee081006ec17c533163ef40d7431344416bd1c",
+          "mode": "100644"
+        },
+        {
+          "source": "docs/p2-shared-index.md",
+          "path": "docs/p2-shared-index.md",
+          "sha256": "63532b8a18b9a1ad1cecdf272717308fa972851d3aa20569cebd87cb5be0b410",
+          "mode": "100644"
+        },
+        {
+          "source": "docs/p3b-data-collection.md",
+          "path": "docs/p3b-data-collection.md",
+          "sha256": "f4f79dad06057d66540edc212c4c841ba4e9546051020e76ee6d679d369a5d77",
+          "mode": "100644"
+        },
+        {
+          "source": "nbb.edn",
+          "path": "nbb.edn",
+          "sha256": "66a77e4ff15f11c36acf609095275a4106be95d10685ad907c2ac2d63b29cea0",
+          "mode": "100644"
+        },
+        {
+          "source": "package.json",
+          "path": "package.json",
+          "sha256": "8631d3c81d9c30f515022c1e53844291481b71bb097dfaac9e4570ca067d07e1",
+          "mode": "100644"
+        },
+        {
+          "source": "public/icon.svg",
+          "path": "public/icon.svg",
+          "sha256": "c46e18865ffa3aa804df857284122ab7af2bc2b2268c0484e6d3607b5636166d",
+          "mode": "100644"
+        },
+        {
+          "source": "public/index.html",
+          "path": "public/index.html",
+          "sha256": "8895e4d997327544133f926b5d4121dd1c8c111911eed93bb6cb6e7a9259cbd9",
+          "mode": "100644"
+        },
+        {
+          "source": "public/manifest.webmanifest",
+          "path": "public/manifest.webmanifest",
+          "sha256": "2e300660922d79ddb6c396f15153d91c8c49e7dae2a1fe1a9ea036b7d4d98881",
+          "mode": "100644"
+        },
+        {
+          "source": "public/researcher.html",
+          "path": "public/researcher.html",
+          "sha256": "b16127ec3edde3931ab186f73b4ae3041cbff0b1d88f645372db4a73e47bf787",
+          "mode": "100644"
+        },
+        {
+          "source": "public/sip.jsonld",
+          "path": "public/sip.jsonld",
+          "sha256": "274ffe716f67a81ca54b07b33879f0ec0a2398b1d8830fa76ddacce3bbc8a61b",
+          "mode": "100644"
+        },
+        {
+          "source": "public/sw.js",
+          "path": "public/sw.js",
+          "sha256": "ca4657f05e4f896254d8a194e074b6e7ba4b0e0a706fd530588e4cedbcaa0c58",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/run-task.cljk",
+          "path": "scripts/run-task.cljk",
+          "sha256": "438421f2f244cf2a0355fdb92ad2e9fa92e05126ff85116e9e219ccd9dbbf737",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/tasks-complex.edn",
+          "path": "scripts/tasks-complex.edn",
+          "sha256": "6dedde00a67dcf6228f2de6ef8d2b426abbe8bef807dc2d5f92b82ab69e99826",
+          "mode": "100644"
+        },
+        {
+          "source": "scripts/tasks.edn",
+          "path": "scripts/tasks.edn",
+          "sha256": "5a386b1f3775c47cf4c5cf38142fc094c75fc30747bfe33799eae2422908ab37",
+          "mode": "100644"
+        },
+        {
+          "source": "shadow-cljs.edn",
+          "path": "shadow-cljs.edn",
+          "sha256": "b92705c5c015b439956602f59d4a538d03feced46ac7a741953b7e92bbc0f81d",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/assets.cljk",
+          "path": "src/sip/assets.cljk",
+          "sha256": "40f850e141bc912ce410cc3ae098af933cb6feeda7349883f5069496a1cc671b",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/bible.cljk",
+          "path": "src/sip/bible.cljk",
+          "sha256": "dd43c63f12cf99c78269484692031fa732a83c5272ee88e425bf6c969e7a79fa",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/kotoba.cljk",
+          "path": "src/sip/kotoba.cljk",
+          "sha256": "8a28bce9ff8de865c5fafde7d8ada11fc2d43888de8d02019f7954cc9637f8f9",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/lore.cljk",
+          "path": "src/sip/lore.cljk",
+          "sha256": "c3b619f308f3e51bb8fa95e5921a3caa81d569a854102a3a59e5fe4ff0ad4563",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/page.cljk",
+          "path": "src/sip/page.cljk",
+          "sha256": "6ac04742bf8f56b7b87907d7c1ac6e95c5daa7ed9e622f12634abd0ff3439d8e",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/preview.cljk",
+          "path": "src/sip/preview.cljk",
+          "sha256": "531f48302d98ebdd868f96915b99ba31ec0728d1066ce77610a43ec6a8b49a08",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/render.cljk",
+          "path": "src/sip/render.cljk",
+          "sha256": "ee2b71e347ed711a766b19216ab59e62af32b942d0b3c4caf7b26d709a8f6e7c",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/research.cljk",
+          "path": "src/sip/research.cljk",
+          "sha256": "1c4630faea14f393dad6472176a91e3e65870bf5dfd5fbb1baebcac72907dd7a",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/researcher.cljk",
+          "path": "src/sip/researcher.cljk",
+          "sha256": "c41d5471067a30ddf53b8667a42260fe8d26bd8406379724c5e58e5a29770709",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/schema.cljk",
+          "path": "src/sip/schema.cljk",
+          "sha256": "8b98c2598466359bfaa169c0d19d59a6eacb8de0bcf2291e004c6d671ee94b22",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/session.cljk",
+          "path": "src/sip/session.cljk",
+          "sha256": "ff132bf11c4160b892ea30dd01c2daee6bc84872092605bddc310adebe09d334",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/store.cljk",
+          "path": "src/sip/store.cljk",
+          "sha256": "80a491af9ead473e857a4a5ff84b6c140dc3e039c172fa571a28a5fe049ff8eb",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/storyboard.cljk",
+          "path": "src/sip/storyboard.cljk",
+          "sha256": "b00a26cd6a935f73d34c0cb3286d5ca5104200e04990f59fbf3ca50020ee0853",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/systems.cljk",
+          "path": "src/sip/systems.cljk",
+          "sha256": "fa0a43d549a0b52783e766304ab6a2e477bb6e8d14a86f49a2b2fc736110327c",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/ui.cljk",
+          "path": "src/sip/ui.cljk",
+          "sha256": "0a943ca7a81c3a5784bf7e2af6d4b8b7bd0deeee2f2382647049460d1a2dc942",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/web.cljk",
+          "path": "src/sip/web.cljk",
+          "sha256": "b9372d4933434a467ddad2314ce6aa6385a9642399a00f0fa6d7f5289d6ad837",
+          "mode": "100644"
+        },
+        {
+          "source": "src/sip/world.cljk",
+          "path": "src/sip/world.cljk",
+          "sha256": "b6ff0e39c73cb394d4953799dd35d6a6302ccc88cd5a38536d720c77fa15d9f5",
+          "mode": "100644"
+        },
+        {
+          "source": "test/sip/render_test.cljk",
+          "path": "test/sip/render_test.cljk",
+          "sha256": "b1e3d0cddc30b30628ced1eaecb018aa255b8b2f1eb513f939a1148397e9f780",
+          "mode": "100644"
+        },
+        {
+          "source": "test/sip/research_test.cljk",
+          "path": "test/sip/research_test.cljk",
+          "sha256": "0c281b15b869b3bbba467e24c672f97e604c90e49d82eaec13ebe60557156791",
+          "mode": "100644"
+        },
+        {
+          "source": "test/sip/session_test.cljk",
+          "path": "test/sip/session_test.cljk",
+          "sha256": "ecd7355aa5f42a911e1ee7f503bb8cc0b21be6a75934f657324eb823963aacb5",
+          "mode": "100644"
+        },
+        {
+          "source": "test/sip/store_test.cljk",
+          "path": "test/sip/store_test.cljk",
+          "sha256": "0b9dcd1c3c27d3493a2995aa50acf9e25d59a337a42221fe72b29fa949b35201",
+          "mode": "100644"
+        },
+        {
+          "source": "wrangler.jsonc",
+          "path": "wrangler.jsonc",
+          "sha256": "127075635a9ee7dbf404e088112d3fb5d391a3ced680c71c98c3e95739d34cac",
+          "mode": "100644"
+        },
+        {
+          "source": "LICENSE",
+          "path": "LICENSE",
+          "sha256": "c95bae1d1ce0235ecccd3560b772ec1efb97f348a79f0fbe0a634f0c2ccefe2c",
+          "mode": "100644",
+          "added": "Apache-2.0 text added by owner decision 2026-10-25; the source repository has no LICENSE file"
+        }
+      ],
+      "excluded": [
+        ".github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

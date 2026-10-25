@@ -26,3 +26,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-app-modeler](kami-app-modeler) | `091b260` | Imported `kami-app-modeler` (no repository description) |
 | [kami-app-sculpt](kami-app-sculpt) | `5f4a69c` | Imported `kami-app-sculpt` (no repository description) |
 | [kami-mangaka-page](kami-mangaka-page) | `555e18a` | kami-mangaka-page domain logic, split out of kami-engine's kami-mangaka-page-clj (ADR-2607010930). |
+| [kami-app-sip](kami-app-sip) | `54ae09a` | kami-app-sip (SIP game) domain logic, split out of kami-engine's kami-app-sip-clj (ADR-2607010930). |

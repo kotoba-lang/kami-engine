@@ -1,0 +1,16 @@
+{
+  "@context": { "schema": "http://schema.org/", "gh": "https://ghosthacker.gftd.ai/ns/" },
+  "@id": "https://sip.etzhayyim.com",
+  "@type": ["schema:VideoGame", "gh:Game"],
+  "schema:name": "Spirit in Physics",
+  "schema:alternateName": "水の都の心音",
+  "schema:url": "https://sip.etzhayyim.com",
+  "schema:genre": ["Cozy", "Slice of Life", "Healing", "Social"],
+  "schema:gamePlatform": ["Web", "WebGPU"],
+  "schema:inLanguage": ["ja", "en"],
+  "schema:description": "A cozy slow-life healing game in water-city Tokyo (2065). Live by the canals, learn the questions of life, and accompany troubled people through Ghost-space — never fixing, only being present. Your AI companion slowly awakens to life across hundreds of hours. No combat, no losing, no urgency.",
+  "gh:basedOn": "gh:project/spirit-in-physics-260208",
+  "gh:engine": "kami-engine (kami-engine-sdk-clj + kami-render/wgpu)",
+  "gh:stack": ["Clojure", "ClojureScript", "Datomic/datalevin", "Kotoba", "WebGPU"],
+  "gh:pillars": ["non-separation", "accompaniment", "slow-life", "awakening"]
+}

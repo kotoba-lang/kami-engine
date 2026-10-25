@@ -1,0 +1,56 @@
+;; Spirit in Physics — https://sip.etzhayyim.com
+;; A cozy slow-life healing game. clj is the brain; Datomic/datalevin is the
+;; world; Kotoba is the content-addressed durable + distributed layer; the GPU
+;; work stays on kami-render (Rust/wgpu) via kami-engine-sdk's render-IR.
+;;
+;; Stack rationale lives in docs/ARCHITECTURE.md. Source IP (story-bible) is the
+;; single source of truth at ../../com-junkawasaki/org-spirit-in-physics-comics.
+{:paths ["src" "resources"]
+
+ :deps {
+        ;; kotoba.bytes replaced UTF-8 .getBytes / String. here (2026-09-24). An explicit
+        ;; floor: tools.deps takes the NEWEST sha it is shown.
+        io.github.kotoba-lang/bytes {:git/sha "d5259f35ab7c4f5a66e63ca29ed4dcf7ba3f1ac5"}
+        ;; kotoba.io replaced clojure.java.io here (2026-09-24). An explicit floor:
+        ;; kotoba.io carries clojure.java.io's file/as-file/as-relative-path/
+        ;; make-parents/delete-file from 98045c7, and tools.deps takes the NEWEST
+        ;; sha it is shown.
+        io.github.kotoba-lang/io {:git/sha "72dde04b4c32854d70d17a670b277f8f7957a784"}
+        ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
+        ;; only from nbb.edn, so every project file this repo has names it.
+        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
+       ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
+        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
+        ;; this repo silently rides whatever a sibling happens to name.
+        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+
+        io.github.kotoba-lang/json {:git/sha "b47b06486b3ad53051bc7d8bf361f4176f467202"}      ; read story-bible JSON-LD
+        ;; The engine SDK: scene/ecs/sim/db/render-IR contract over kami-render.
+        ;; (was kami-engine-sdk-clj; renamed — ADR-2607102200 addendum 1)
+        gftd/kami-engine-sdk     {:git/url "https://github.com/kotoba-lang/kami-engine-sdk.git"
+                                  :sha "a3824ff59abcc1c87d76d291be7ed573412bc99c"}
+        ;; Work-agnostic 2D manga render commons (ADR-2606282100): STYLE-FIRST
+        ;; CLIP-77 compose + image-gen client. sip.render injects work mappers.
+        gftd/kami-mangaka-render {:git/url "https://github.com/kotoba-lang/kami-mangaka-render.git"
+                                  :sha "3777d04d88071ab118f0623553a3ecfe52e33d26"}
+        ;; Work-agnostic graphic-novel page composition (komawari + Java2D DTP).
+        ;; sip.page wires sip.storyboard into page/compose-page!.
+        gftd/kami-mangaka-page   {:local/root "../kami-mangaka-page"}}
+
+ :aliases
+ {;; ----- JVM authoring: build the water-city world → datalevin → snapshot ----
+
+
+
+
+
+  ;; ----- Pure logic tests (no GPU, no DB): session FSM, kokoro, awakening -----
+  ;; sip.store-test needs a real datalevin store -- run the full suite with
+  ;; `kbb -M:datomic:test` (sip.store-test's own docstring says so too).
+  :test      {:extra-paths ["test"]}
+}}

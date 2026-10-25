@@ -1,0 +1,59 @@
+(ns sip.render-test
+  "Prompt composition tests — the two render-verification facts as assertions:
+  STYLE-FIRST ordering and the CLIP word budget. Run with `kbb -M:datomic:test`."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [kotoba.lang.text :as str]
+            [sip.render :as r]))
+
+(def an (r/anchors))
+
+(defn- spec [panel] (r/compose {:anchors an :panel panel}))
+
+(def embodied-panel
+  {:id "02-02b" :area :vol01-water-city :chapter 2 :page 2
+   :layout "2-panel-horizontal" :camera "medium-shot / over Nei's shoulder"
+   :location "Tamakiの小さなアパートのキッチン"
+   :description "Tamakiが振り返り、テーブルにカップを置く。微笑んでいる。"
+   :emotion "温もり、やわらかさ" :characters [:tamaki :nei]})
+
+(def light-panel
+  {:id "01-11" :area :vol01-water-city :chapter 1 :page 11
+   :layout "splash" :camera "medium"
+   :location "事務所の訓練スペース"
+   :description "ポッドが開く。光の像が立ち上がる。半透明、発光する粒子。"
+   :emotion "脆さ、誕生" :characters [:nei]})
+
+(deftest style-first
+  (testing "prompt leads with the style anchor so it survives CLIP truncation"
+    (is (str/starts-with? (:prompt (spec embodied-panel)) "watercolor wash, anime style"))))
+
+(deftest word-budget
+  (testing "every composed prompt stays within the word budget"
+    (let [budget (:word-budget an)]
+      (doseq [p [embodied-panel light-panel]]
+        (let [n (count (str/split (:prompt (spec p)) #"\s+"))]
+          (is (<= n budget) (str (:id p) " has " n " words (budget " budget ")")))))))
+
+(deftest one-character-per-panel
+  (testing "exactly one character is depicted (no two-shot bleed)"
+    (doseq [p [embodied-panel light-panel]]
+      (let [s (spec p)]
+        (is (= 1 (count (filter #{"1girl" "1boy" "2girls"} (:tags s)))))
+        (is (some #{"1girl"} (:tags s)) "single subject")
+        (is (<= (count (:refs s)) 1) "at most one IP-Adapter ref"))))
+  (testing "focal = the dialogue speaker (shot/reverse-shot)"
+    ;; embodied-panel's speaker is Tamaki → Tamaki is shown (not Nei)
+    (is (= :tamaki (r/focal-character embodied-panel)))
+    (let [s (spec embodied-panel)]
+      (is (some #(str/includes? % "lavender shirt") (:tags s)) "Tamaki shown")
+      (is (not-any? #(str/includes? % "grey suit") (:tags s)) "Nei not bled in")))
+  (testing "a Nei-spoken panel shows the android"
+    (let [nei-panel (assoc light-panel :dialogue [{:speaker "nei" :text "……"}])
+          s (spec nei-panel)]
+      (is (some #(str/includes? % "android girl") (:tags s))))))
+
+(deftest negatives
+  (testing "base + focal negatives"
+    (let [s (spec embodied-panel)]
+      (is (some #{"wings"} (:neg s)) "base negative bans wings")
+      (is (some #{"twin tails"} (:neg s)) "tamaki (focal) negative merged in"))))

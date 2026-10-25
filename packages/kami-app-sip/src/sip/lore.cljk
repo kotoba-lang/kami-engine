@@ -1,0 +1,78 @@
+(ns sip.lore
+  "Read the canonical story-bible (single source of truth) so the game's *content*
+  is the novel's content. The bible is now EDN (not JSON-LD) — keys are namespaced
+  keywords. JVM-only authoring helper.
+
+  Source repo: ../../com-junkawasaki/org-spirit-in-physics-comics (override with $SIP_IP_ROOT).
+  Everything degrades gracefully: if a file is missing, a small inline fallback
+  keeps the build runnable."
+  (:require [kotoba.lang.edn :as edn]
+            [kotoba.io :as io]
+            [kotoba.lang.text :as str]))
+
+(def ip-root (or (System/getenv "SIP_IP_ROOT") "../../com-junkawasaki/org-spirit-in-physics-comics"))
+
+(defn- read-edn [rel]
+  (let [f (io/file ip-root rel)]
+    (when (io/exists? f) (edn/read-string (slurp f)))))
+
+(defn- season-kw [s]
+  (let [s (str/lower (str s))]
+    (cond (str/includes? s "spring") :spring
+          (str/includes? s "summer") :summer
+          (str/includes? s "autumn") :autumn
+          (str/includes? s "fall")   :autumn
+          (str/includes? s "winter") :winter
+          :else :spring)))
+
+(defn- id-kw [at-id]
+  (-> (str at-id) (str/replace #"^gh:volume/" "") keyword))
+
+(def ^:private fallback-volumes
+  [{:id :vol01-water-city :title "Vol.1 — Water City" :volume 1 :season :spring
+    :theme "Invitation to the world. Love and daily life." :motifs ["運河" "桜" "光" "種"]}
+   {:id :vol02-life :title "Vol.2 — Life" :volume 2 :season :summer
+    :theme "Life and death. Can information be alive?" :motifs ["図書館" "クラゲ" "花火"]}])
+
+(defn volumes
+  "The 8 learning-areas, drawn from PROJECT.edn → :gh/volumes."
+  []
+  (if-let [proj (read-edn "PROJECT.edn")]
+    (vec
+     (for [v (:gh/volumes proj)]
+       {:id     (id-kw (:id v))
+        :title  (:schema/name v)
+        :volume (long (:gh/position v 0))
+        :season (season-kw (:gh/season v))
+        :theme  (:gh/theme v)
+        :motifs (vec (or (:gh/motifs v) (:gh/featuredThemes v) []))}))
+    fallback-volumes))
+
+(def ^:private fallback-clients ["aiko-kawai" "haruki-tanaka" "yuki-nakamura" "mina-cho"])
+
+(defn clients
+  "Session clients (persona ids), from characters/personas-session-clients.edn
+  when present, else a small fallback set."
+  []
+  (if-let [doc (read-edn "characters/personas-session-clients.edn")]
+    (->> (or (:gh/personas doc) (:graph doc) [])
+         (keep #(or (:id %) (:schema/identifier %)))
+         (map #(-> (str %) (str/replace #"^.*[/:]" "")))
+         (remove str/blank?)
+         vec
+         (#(if (seq %) % fallback-clients)))
+    fallback-clients))
+
+(def ^:private fallback-emotion {:loneliness 0.6 :grief 0.4 :hope 0.2 :turbulence 0.5})
+
+(defn emotion-scores
+  "Emotion ontology scores that shape each Ghost-space landscape."
+  []
+  (or (some-> (read-edn "emotions/emotion-scores.edn")) {}))
+
+(defn emotion-for
+  "Emotion map for `client`. Falls back to a gentle default."
+  [client]
+  (let [scores (emotion-scores)]
+    (or (when (map? scores) (some-> (get scores client) (update-keys keyword)))
+        fallback-emotion)))

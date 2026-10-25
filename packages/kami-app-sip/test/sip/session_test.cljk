@@ -1,0 +1,50 @@
+(ns sip.session-test
+  "Pure tests for the non-combat session FSM — the heart of the game. These run
+  with no GPU and no DB: `kbb -M:test`."
+  (:require [kotoba.test :refer [deftest is testing]]
+            [sip.session :as s]))
+
+(def emotion {:loneliness 0.7 :grief 0.5 :hope 0.2 :turbulence 0.6})
+
+(deftest full-arc-completes
+  (testing "observe → resonate → accompany → name reaches :complete"
+    (let [done (-> (s/begin "aiko-kawai" emotion)
+                   s/observe
+                   (s/resonate 1.0) (s/resonate 1.0) (s/resonate 1.0)
+                   s/to-accompany
+                   (s/accompany :stay) (s/accompany :silence) (s/accompany :ask)
+                   s/to-name
+                   (s/name-core "さびしさ"))]
+      (is (s/complete? done))
+      (is (= "さびしさ" (:named done)))
+      (is (>= (:kokoro done) 0.7) "the client's heart comes to rest"))))
+
+(deftest never-fails
+  (testing "no input ever drops kokoro or grace below their floor"
+    (let [s0 (s/begin "x" emotion)
+          ;; even a perfectly missed rhythm (closeness 0) does no harm
+          s1 (-> s0 s/observe (s/resonate 0.0) (s/resonate 0.0))]
+      (is (>= (:kokoro s1) (:kokoro s0)) "kokoro never decreases")
+      (is (>= (:grace s1) 0.5) "grace holds at/above its neutral floor"))))
+
+(deftest blank-name-is-no-op
+  (testing "naming requires a real name; blank does nothing, no crash"
+    (let [s1 (-> (s/begin "x" emotion) s/observe s/to-name (s/name-core "   "))]
+      (is (not (s/complete? s1))))))
+
+(deftest outcome-has-no-currency
+  (testing "rewards are insight + bond + grace — never gems/score"
+    (let [o (-> (s/begin "x" emotion) s/observe (s/resonate 1.0)
+                s/to-accompany (s/accompany :stay) s/to-name (s/name-core "n")
+                s/outcome)]
+      (is (contains? o :grace))
+      (is (contains? o :insights))
+      (is (contains? o :bond))
+      (is (not (contains? o :gems)))
+      (is (not (contains? o :score))))))
+
+(deftest soft-gates
+  (testing "readiness gates are soft signals, computed from kokoro"
+    (let [s1 (-> (s/begin "x" emotion) s/observe)]
+      (is (boolean? (s/ready-to-accompany? s1)))
+      (is (boolean? (s/ready-to-name? s1))))))

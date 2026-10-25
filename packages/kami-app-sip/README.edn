@@ -1,0 +1,7 @@
+{:repo/id "kotoba-lang/kami-app-sip"
+ :repo/plane :family
+ :repo/family "kami"
+ :repo/role :game-application
+ :repo/canonical-engine "kotoba-lang/kami-engine"
+ :repo/compatibility-surfaces ["https://sip.etzhayyim.com"
+                               "com.etzhayyim.*"]}

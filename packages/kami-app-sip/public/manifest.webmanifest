@@ -1,0 +1,15 @@
+{
+  "name": "Spirit in Physics — 水の都の心音",
+  "short_name": "心音",
+  "description": "水の都・東京2065。のんびり暮らし、学び、誰かに寄り添う、癒しのオンラインゲーム。",
+  "lang": "ja",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f1fb",
+  "theme_color": "#6b5b95",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,27 @@
+;; Originally generated from bb.edn (ADR-2607173000 Wave 3); repaired 2026-08-13
+;; (ADR-2608131600).  kbb --backend sci scripts/run-task.cljk <task> [args…]
+;;
+;; The Wave-3 conversion emitted an EMPTY registry here and deleted bb.edn, so
+;; every entrypoint README.md still documents as `bb <task>` had no runnable
+;; path from 2026-07-17 until today.  The six below were spelled
+;; `(p/shell "clojure …")` / `(apply p/shell "clojure …" *command-line-args*)`;
+;; the converter only recognised the bare symbol `shell`, not the `p/` alias,
+;; so it filed them as complex.  They are conversions, not ports.
+;;
+;; Still NOT restored (they need a port, or a runner feature this file cannot
+;; express — see scripts/tasks-complex.edn for the recovered forms):
+;;   test:pure        — a babashka-hosted (require + clojure.test/run-tests) body
+;;   imagegen:up      — needs (p/shell {:dir …}), which run-task.cljs has no cwd for
+;;   imagegen:health  — captures stdout via (p/sh …) and prints it
+{:world      {:cmd ["kbb" "-M:datomic:build"]
+              :doc "Author the WebGPU world snapshot → public/snapshot.edn"}
+ :load       {:cmd ["kbb" "-M:datomic:render" "load"]
+              :doc "Load anchors + all storyboard panels into the datalevin world"}
+ :compose    {:cmd ["kbb" "-M:datomic:render" "compose"] :pass-args? true
+              :doc "Compose one panel's prompt: run-task.cljs compose <panel-id>"}
+ :render     {:cmd ["kbb" "-M:datomic:render" "render"] :pass-args? true
+              :doc "Render one panel → PNG + provenance datom: render <id> [out.png]"}
+ :render-all {:cmd ["kbb" "-M:datomic:render" "render-all"] :pass-args? true
+              :doc "Batch render panels by id-prefix + record provenance: render-all [prefix]"}
+ :test       {:cmd ["kbb" "-M:datomic:test"]
+              :doc "Full test suite (session + render + store, on the JVM)"}}

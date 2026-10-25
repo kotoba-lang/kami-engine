@@ -1,0 +1,83 @@
+(ns sip.assets
+  "Asset cooking: expand the authoring-time procedural descriptors (`:asset/inline`,
+  e.g. {:prim :plane :size 8}) into the real geometry / params the GPU backend
+  wants. `kami.gpu/ensure-assets!` reads `:asset/data` → {:vertices :indices} for
+  meshes and {:params [..]} for materials; the portable snapshot only carries the
+  abstract `:asset/inline`, so we cook it here, client-side, before the loop.
+
+  Vertex layout matches `kami-clj-host` (the demo cube): interleaved
+  pos3 + normal3 + uv2, stride 8 floats."
+  (:require [kotoba.lang.edn :as edn]
+            [kotoba.lang.text :as str]))
+
+;; --- primitive geometry (unit-ish; per-entity transform/scale does the rest) -
+
+(defn- quad
+  "One quad from 4 [x y z u v] corners + a normal. Returns [verts8… idx…]."
+  [n [a b c d]]
+  (let [[nx ny nz] n
+        v (fn [[x y z u v]] [x y z nx ny nz u v])]
+    {:verts (vec (mapcat v [a b c d]))
+     :idx   [0 1 2 0 2 3]}))
+
+(defn- merge-geo [geos]
+  (loop [gs geos vs [] is [] base 0]
+    (if-let [{:keys [verts idx]} (first gs)]
+      (recur (rest gs)
+             (into vs verts)
+             (into is (map #(+ base %) idx))
+             (+ base (quot (count verts) 8)))
+      {:vertices vs :indices is})))
+
+(defn- plane [s]
+  ;; flat, facing +Y; ±s on X/Z. Canal/water tiles use this (scaled big).
+  (merge-geo [(quad [0 1 0] [[(- s) 0 (- s) 0 0] [s 0 (- s) 1 0]
+                             [s 0 s 1 1] [(- s) 0 s 0 1]])]))
+
+(defn- crossed-billboard [h w]
+  ;; two crossed vertical quads — cheap foliage for the cherry trees.
+  (merge-geo
+   [(quad [0 0 1] [[(- w) 0 0 0 0] [w 0 0 1 0] [w h 0 1 1] [(- w) h 0 0 1]])
+    (quad [1 0 0] [[0 0 (- w) 0 0] [0 0 w 1 0] [0 h w 1 1] [0 h (- w) 0 1]])]))
+
+(defn- cube [s]
+  (let [faces [[[0 0 1]  [[(- s)(- s) s][s (- s) s][s s s][(- s) s s]]]
+               [[0 0 -1] [[s (- s)(- s)][(- s)(- s)(- s)][(- s) s (- s)][s s (- s)]]]
+               [[1 0 0]  [[s (- s) s][s (- s)(- s)][s s (- s)][s s s]]]
+               [[-1 0 0] [[(- s)(- s)(- s)][(- s)(- s) s][(- s) s s][(- s) s (- s)]]]
+               [[0 1 0]  [[(- s) s s][s s s][s s (- s)][(- s) s (- s)]]]
+               [[0 -1 0] [[(- s)(- s)(- s)][s (- s)(- s)][s (- s) s][(- s)(- s) s]]]]
+        uv [[0 0][1 0][1 1][0 1]]]
+    (merge-geo (for [[n corners] faces]
+                 (quad n (map (fn [[x y z] [u v]] [x y z u v]) corners uv))))))
+
+(defn- mesh-geo [{:keys [prim size]}]
+  (case prim
+    :plane   (plane (double (or size 1.0)))
+    :tree    (crossed-billboard 2.2 1.1)
+    :lantern (cube 0.4)
+    (cube 0.5)))
+
+(defn- mat-params [{:keys [albedo emissive]}]
+  (let [rgb (or albedo emissive [0.8 0.8 0.8])]
+    (vec (concat (map double (take 3 rgb)) [1.0]))))
+
+;; --- cook one snapshot ------------------------------------------------------
+
+(defn- parse-inline [s]
+  (when (and s (string? s) (not (str/blank? s)))
+    (try (edn/read-string s) (catch #?(:clj Exception :cljs :default) _ nil))))
+
+(defn cook-asset [{:keys [:asset/kind :asset/inline] :as a}]
+  (let [desc (parse-inline inline)]
+    (assoc a :asset/data
+           (case kind
+             :mesh     (mesh-geo desc)
+             :material {:params (mat-params desc)}
+             {}))))
+
+(defn cook-snapshot
+  "Return `snapshot` with every asset carrying a cooked `:asset/data`, ready for
+  `kami.gpu/ensure-assets!`."
+  [snapshot]
+  (update snapshot :snapshot/assets #(mapv cook-asset %)))
