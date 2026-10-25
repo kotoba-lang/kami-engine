@@ -70,3 +70,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [biomech](biomech) | `c85ffb9` | Biomechanics simulation domain layer — 筋肉/骨/皮膚/内臓. Pure Clojure. kotoba-lang capability. |
 | [freeboard](freeboard) | `11510d5` | Apple-Freeform-style infinite-canvas board — clj brain + kami-render(wgpu) + kasane import (ADR-2606280200) |
 | [swarm-choreo](swarm-choreo) | `fe69e71` | Governed, precomputed multi-agent choreography (drone light shows) over ROS 2 — kotoba-lang |
+| [anime](anime) | `f2eb7a9` | Work-agnostic anime production pipeline vocabulary (cut hierarchy, 12 stages, layer specs) — CLJC craft lib |
