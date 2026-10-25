@@ -46,3 +46,4 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-engine-motor](kami-engine-motor) | `c465afd` | reduced-order traction-motor solver (:rom-motor) |
 | [kami-engine-pack](kami-engine-pack) | `770965c` | Reduced-order lithium pack solver (:rom-pack) — pack-level energy with Peukert rate derating and IR sag. Power+endurance -> pack mass. |
 | [kami-engine-rotor](kami-engine-rotor) | `41ba842` | Reduced-order rotor solver (:rom-rotor) — momentum theory + figure of merit. Thrust → diameter, RPM, shaft power, torque, blade loading. |
+| [kami-engine-multirotor](kami-engine-multirotor) | `97377fa` | The multirotor mass spiral: payload + endurance -> MTOW, or a refusal. Over kami-engine-rotor/-pack/-motor. |

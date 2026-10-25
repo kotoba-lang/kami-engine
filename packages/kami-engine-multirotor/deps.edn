@@ -1,0 +1,21 @@
+{:paths ["src"]
+ ;; The multirotor mass spiral, over the three sizing solvers. Thrust equals
+ ;; weight on a rotorcraft, so mass appears on both sides of the loop and the
+ ;; fixed point is not guaranteed to exist — this library's job is to find it
+ ;; when it does and to REFUSE when it does not.
+ :deps {
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}io.github.kotoba-lang/datom                  {:git/sha "3a45462b3b6da018e24c65d12f8f3d3250a0c38e"}
+        io.github.kotoba-lang/kami-engine-cae-solver {:local/root "../kami-engine-cae-solver"}
+        io.github.kotoba-lang/kami-engine-rotor      {:local/root "../kami-engine-rotor"}
+        io.github.kotoba-lang/kami-engine-pack       {:local/root "../kami-engine-pack"}
+        io.github.kotoba-lang/kami-engine-motor      {:local/root "../kami-engine-motor"}}
+ :aliases
+ {:test {:extra-paths ["test"]}
+  :dev {:override-deps {io.github.kotoba-lang/datom                  {:local/root "../datom"}
+                        io.github.kotoba-lang/kami-engine-cae-solver {:local/root "../kami-engine-cae-solver"}
+                        io.github.kotoba-lang/kami-engine-rotor      {:local/root "../kami-engine-rotor"}
+                        io.github.kotoba-lang/kami-engine-pack       {:local/root "../kami-engine-pack"}
+                        io.github.kotoba-lang/kami-engine-motor      {:local/root "../kami-engine-motor"}}}}}
