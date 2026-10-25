@@ -65,3 +65,9 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-vehicle](kami-vehicle) | `50d5e29` | BeamNG-grade soft-body vehicle physics: node-beam mass-spring network, Pacejka tire, full powertrain (engine/clutch/gearbox/diff), plastic deformation, JBeam-subset loader. Restored from legacy kami-vehicle crate (deleted #82). ADR-2607010930. |
 | [kami-vehicle-scene](kami-vehicle-scene) | `da9a156` | EDN authoring surface for kami-vehicle ground/garage/powertrain CONFIG (surface grip table, demo-circuit zone map, engine/gearbox/tire presets, 6 garage SedanSpecs). Restored from legacy kami-vehicle-scene crate (kotoba-lang/kami-engine, deleted PR #82). ADR-2607010930. |
 | [kami-web](kami-web) | `2c4064b` | Pure-Clojure port of kami-engine's kami-web (WASM entry): matrix math, render-IR schema, PPTX layout, entry catalog |
+| [douga](douga) | `93639cd` | Pure timeline→ffmpeg render-plan builder + command builders — CLJC craft lib |
+| [cad](cad) | `161b152` | Open-source CAD/CAM workbench as EDN geometry data + portable CLJC model. |
+| [biomech](biomech) | `c85ffb9` | Biomechanics simulation domain layer — 筋肉/骨/皮膚/内臓. Pure Clojure. kotoba-lang capability. |
+| [freeboard](freeboard) | `11510d5` | Apple-Freeform-style infinite-canvas board — clj brain + kami-render(wgpu) + kasane import (ADR-2606280200) |
+| [swarm-choreo](swarm-choreo) | `fe69e71` | Governed, precomputed multi-agent choreography (drone light shows) over ROS 2 — kotoba-lang |
+| [anime](anime) | `f2eb7a9` | Work-agnostic anime production pipeline vocabulary (cut hierarchy, 12 stages, layer specs) — CLJC craft lib |

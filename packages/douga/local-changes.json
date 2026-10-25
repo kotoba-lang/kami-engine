@@ -1,0 +1,15 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "5cdfec7a6b44040cf5db09c962f0f46d744d80c84265e57a606af3fa7737bba8",
+      "sha256": "f52ac58fc2b3388bbb96817091a3ef01d5f4e4f6e572b05a5e87baf1228a2b9a",
+      "reason": "Git dependencies on kami-* repositories that are bundled here (kami-eizo-timeline) become local roots so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (dep org.clojure/clojure, alias :test reduced to :extra-paths, alias :lint): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+    },
+    "nbb.edn": {
+      "imported-sha256": "2d0ef36643651b9726b77750725a9b5d0fc3cd009dc452365ae0f9900a8b8b5d",
+      "sha256": "4c406a08c1e7fb0faafb7842206194f0b8601842981060ed5b01c19d7f915a43",
+      "reason": "Git dependencies on kami-* repositories that are bundled here (kami-eizo-timeline) become local roots so the same namespaces are not loaded twice. The other sections are unchanged."
+    }
+  }
+}
