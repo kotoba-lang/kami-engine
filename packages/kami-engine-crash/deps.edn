@@ -1,0 +1,18 @@
+{:paths ["src"]
+ ;; Reduced-order crash/structural solver on the shared, purpose-split libs.
+ ;; Registers :rom-crash on the cae-solver contract; replaces the closed-form
+ ;; structural SF proxy in vehicle-design-actor/simverify with an energy-balance
+ ;; crush model. A high-fidelity kami-cae explicit FEA registers :explicit-fea
+ ;; on the same contract later.
+ :deps {
+        ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
+        ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
+                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}io.github.kotoba-lang/datom                {:git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
+        io.github.kotoba-lang/kami-engine-vphysics   {:local/root "../kami-engine-vphysics"}
+        io.github.kotoba-lang/kami-engine-cae-solver {:local/root "../kami-engine-cae-solver"}}
+ :aliases
+ {:test {:extra-paths ["test"]}
+  :dev {:override-deps {io.github.kotoba-lang/datom                {:local/root "../datom"}
+                        io.github.kotoba-lang/kami-engine-vphysics   {:local/root "../kami-engine-vphysics"}
+                        io.github.kotoba-lang/kami-engine-cae-solver {:local/root "../kami-engine-cae-solver"}}}}}
