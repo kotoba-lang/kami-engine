@@ -2,8 +2,10 @@
  :deps {
         ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
         ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
-        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
-                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}}
+        io.github.kotoba-lang/test
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.test"}}
  :aliases
  {:test {:extra-paths ["test"]}
   ;; Real-browser real-pixel-data proof (test/e2e/, ADR-2607121400): compiles
@@ -13,4 +15,6 @@
   ;; test/e2e/ and the README's "Real-browser real-pixel-data proof" section.
   :e2e {:extra-paths ["test/e2e/src"]
         :extra-deps {io.github.kotoba-lang/org-w3-webcodecs
-                     {:git/sha "b14dc397e248f5aab0f5ad9e7845e2f80b2cf5a3"}}}}}
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/org.w3.webcodecs"}}}}}

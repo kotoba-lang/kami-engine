@@ -29,19 +29,31 @@
         ;; floor: kotoba.lang.coll carries clojure.set's union/intersection/
         ;; difference/map-invert from 0ffd5f6, and tools.deps takes the NEWEST
         ;; sha it is shown.
-        io.github.kotoba-lang/coll {:git/sha "f74e248f0a07e8ae572885f50fab6bdb39dc24be"}
+        io.github.kotoba-lang/coll
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.coll"}
         ;; kotoba.pprint replaced clojure.pprint here (2026-09-24): the same
         ;; bytes (cljs.pprint transcribed). An explicit floor; tools.deps takes the
         ;; NEWEST sha it is shown.
-        io.github.kotoba-lang/pprint {:git/sha "5c9d4aea71d6caac529fffcf361aba0f87ee485e"}
+        io.github.kotoba-lang/pprint
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.pprint"}
         ;; kotoba.lang.edn replaced clojure.edn here (2026-09-23). An explicit floor:
         ;; tools.deps takes the NEWEST sha it is shown, and kbb resolves git deps
         ;; only from nbb.edn, so every project file this repo has names it.
-        io.github.kotoba-lang/edn {:git/sha "79dba32c8892058842c57783f06a2dfe4601aeb0"}
+        io.github.kotoba-lang/edn
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.edn"}
        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
         ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
         ;; this repo silently rides whatever a sibling happens to name.
-        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}}
+        io.github.kotoba-lang/text
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.text"}}
  :aliases
  {:test {:extra-paths ["kami-gameplay/src" "kami-gameplay/test"]
          :extra-deps {io.github.cognitect-labs/test-runner

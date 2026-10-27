@@ -2,12 +2,17 @@
  :deps {
         ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
         ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
-        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
-                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
+        io.github.kotoba-lang/test
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.test"}
         ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
         ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
         ;; this repo silently rides whatever a sibling happens to name.
-        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+        io.github.kotoba-lang/text
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.text"}
        gftd/rtl {:git/url "https://github.com/kotoba-lang/rtl.git" :sha "4c2d6d5340a47cd310028482c6195c59d100de4d"}
         gftd/pnr {:git/url "https://github.com/kotoba-lang/pnr.git" :sha "294a5e26ac54cea653540632f5aa7c2f72ee32c6"}
         gftd/model-checking {:git/url "https://github.com/kotoba-lang/model-checking.git" :sha "7595e47d44caec9600f260261cc8cab4c1a30a7e"}

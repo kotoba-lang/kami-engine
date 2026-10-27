@@ -2,12 +2,20 @@
  :deps {
         ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
         ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
-        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
-                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}io.github.kotoba-lang/kami-autodrive {:git/url "https://github.com/kotoba-lang/kami-autodrive.git"
-                                     :git/sha "30a86d79cfa17a84bdfd3a3ba56fdde91bdf8b5b"}
-        io.github.kotoba-lang/robotics       {:git/url "https://github.com/kotoba-lang/robotics.git"
-                                     :git/sha "1d1f93e3c9ac06ce475ebcfd4df1d908602792d5"}
-        io.github.kotoba-lang/org-ros        {:git/url "https://github.com/kotoba-lang/org-ros.git"
-                                     :git/sha "f8f643a5070ae7fe67d2cdc36a19b79a488a169f"}}
+        io.github.kotoba-lang/test
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.test"}io.github.kotoba-lang/kami-autodrive
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.kamiAutodrive"}
+        io.github.kotoba-lang/robotics
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.robotics"}
+        io.github.kotoba-lang/org-ros
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/org.ros.core"}}
  :aliases
  {:test {:extra-paths ["test"]}}}
