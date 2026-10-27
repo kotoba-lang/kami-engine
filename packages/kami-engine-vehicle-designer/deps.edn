@@ -5,22 +5,32 @@
  :deps {
         ;; kotoba.test (clojure.test-compatible surface), not clojure.test --
         ;; scripts/migrate-clojure-test-to-kotoba-test.cljk. Explicit floor.
-        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/test.git"
-                                    :git/sha "2ab4885f99fd25552d380d0f6b0b54c5a72eb7ae"}
+        io.github.kotoba-lang/test
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.test"}
         ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
         ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
         ;; this repo silently rides whatever a sibling happens to name.
-        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
-       io.github.kotoba-lang/langgraph  {:git/url "https://github.com/kotoba-lang/langgraph.git"
-                                          :git/sha "5b4e5e70837b849b14b6a5800894e3be202ad5fa"}
+        io.github.kotoba-lang/text
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.text"}
+       io.github.kotoba-lang/langgraph
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.langgraph"}
         ;; shared, purpose-split libraries (commonized out of this actor)
-        io.github.kotoba-lang/datom       {:git/url "https://github.com/kotoba-lang/datom.git"
-                                           :git/sha "d27a5833d59d909367956705f2ec931399c891ee"}
+        io.github.kotoba-lang/datom
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.datom"}
         io.github.kotoba-lang/kami-engine-vphysics
         {:local/root "../kami-engine-vphysics"}
         io.github.kotoba-lang/physics
-        {:git/url "https://github.com/kotoba-lang/physics.git"
-         :git/sha "3081560a4327319d9916a3c1c53471223462c0c3"}
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.physics"}
         ;; CAE seeds — computed values injected into the design loop (#2/#3):
         ;;   aero  → Cd (range), crash → structural SF (simverify),
         ;;   echem → FCEV stack efficiency (H2 consumption)
@@ -33,18 +43,24 @@
         ;; (renamed from cnc) = real toolpath/G-code engine, cad =
         ;; kotoba-lang's artifact-registry/maturity-scoring layer (NOT a
         ;; geometry kernel despite the name; see vdesign.cad docstring)
-        io.github.kotoba-lang/org-iso-10303 {:git/url "https://github.com/kotoba-lang/org-iso-10303.git"
-                                             :git/sha "36d50ebe65d07e4ba5714388c8863e7dfa98becc"}
-        io.github.kotoba-lang/org-iso-6983  {:git/url "https://github.com/kotoba-lang/org-iso-6983.git"
-                                             :git/sha "e1998926e70c3707b2dcb751df0f1380dd86c0bc"}
+        io.github.kotoba-lang/org-iso-10303
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/org.iso.std10303"}
+        io.github.kotoba-lang/org-iso-6983
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/org.iso.std6983"}
         io.github.kotoba-lang/cad  {:git/url "https://github.com/kotoba-lang/cad.git"
                                     :git/sha "dd15140fa962d3f7276b26f8cc1fe172a3f30bca"}
         ;; Real time-stepped 2D rigid-body physics (vdesign.simphysics,
         ;; ADR-2607151600) — a genuine, tested impulse-based solver restored
         ;; 1:1 from the deleted kami-physics-2d Rust crate, NOT a new engine
         ;; written for this actor.
-        io.github.kotoba-lang/physics-2d {:git/url "https://github.com/kotoba-lang/physics-2d.git"
-                                          :git/sha "03b6c23c8d9aa36b92a8130fd3e37fc2548b4d26"}}
+        io.github.kotoba-lang/physics-2d
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.physics2d"}}
  :aliases
  {;; offline workspace dev — pin transitive langchain to local checkout
   :dev {:override-deps
