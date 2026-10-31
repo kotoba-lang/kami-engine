@@ -30,7 +30,7 @@
     default))
 (def edn-out? (some #{"--edn"} argv))
 
-(def data-dir "../kami-game-scene/data/")
+(def data-dir "../packages/kami-game-scene/resources/game_scene/")
 (defn- read-data [f] (edn/read-string (.readFileSync fs (str data-dir f) "utf8")))
 
 (def weapons (read-data "battle_royale_weapons.edn"))

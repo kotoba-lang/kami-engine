@@ -74,7 +74,7 @@ These decisions apply to all work in this repository:
 | `kami-render/` | `src/kami/render/*.cljk` (style, character, equipment, capture lifecycle, …) + `src/shaders/*.wgsl`, tests |
 | `kami-physics/` | `kami.physics.runtime` backend router (`rigid-2d`, `vehicle`, `cae`) over `kotoba-lang/physics` |
 | `kami-clj-play/games/`, `kami-clj-play3d/games/` | kami-clj reference games (`logic.cljk`, `scene.edn`, `author.cljk`) |
-| `kami-game-scene/data/`, `kami-live/data/`, `fixtures/` | scene/game catalog EDN, URDF, CSV, YAML, WGSL fixtures for adapter conformance |
+| `packages/kami-game-scene/resources/game_scene/`, `kami-live/data/`, `fixtures/` | scene/game catalog EDN, URDF, CSV, YAML, WGSL fixtures for adapter conformance |
 | `kami-genesis/` | WGSL step shaders for the Genesis/Isaac-compat physics target |
 | `kami-text/` | fonts and the macOS emoji raster helper |
 | `kami-app-sip-clj/`, `kami-mangaka-reader-clj/dist/`, `kami-clj-host/demo/` | built web artifacts and demos |

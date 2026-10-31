@@ -1,7 +1,7 @@
 (ns kami.gameplay.zone
   "The storm — a shrinking safe circle that forces a match to end.
 
-  `kami-game-scene/data/battle_royale_storm.edn` has described eight phases
+  `packages/kami-game-scene/resources/game_scene/battle_royale_storm.edn` has described eight phases
   (wait, shrink, end radius, damage per second) since ADR-0046, and, like the
   weapon table, nothing has been able to run it since its Rust oracle was
   removed. Without it a battle royale has no clock: the shipped royale spawns
