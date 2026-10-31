@@ -57,7 +57,11 @@
                                   :sha "3777d04d88071ab118f0623553a3ecfe52e33d26"}
         ;; Work-agnostic graphic-novel page composition (komawari + Java2D DTP).
         ;; sip.page wires sip.storyboard into page/compose-page!.
-        gftd/kami-mangaka-page   {:local/root "../kami-mangaka-page"}}
+        ;; kami-mangaka-page lives in the kotoba monorepo (JUN-649).
+        gftd/kami-mangaka-page
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "640a1817bd1eeacf7557e70f0e537259859ad150"
+         :deps/root "lib/kotoba.kamiMangakaPage"}}
 
  :aliases
  {;; ----- JVM authoring: build the water-city world → datalevin → snapshot ----

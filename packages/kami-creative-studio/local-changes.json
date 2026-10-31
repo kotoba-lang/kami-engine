@@ -3,8 +3,8 @@
   "files": {
     "deps.edn": {
       "imported-sha256": "b98e36deeb21634537e92107e0ba160729e1d5c987a07e3a08adc71a20268934",
-      "sha256": "4364c63330c6aa8139a968b4714b226ddc7b3aba1da3352eeaf855652731d37e",
-      "reason": "Git dependencies on kami-* repositories become one source each so the same namespaces are not loaded twice: kami-eizo-timeline is the local root under packages/, and kami-ongaku-project is the kotoba monorepo's lib/kotoba.kamiOngakuProject at the same kotoba pin as the other kotoba libraries (its packages/ copy was a duplicate and was removed, JUN-649). The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (dep org.clojure/clojure, alias :cljs, alias :pages, alias :test reduced to :extra-paths, alias :e2e): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+      "sha256": "ed8304969029a550c9dee7f1bc9831302d95827341a0bc023746e21272500ef1",
+      "reason": "Git dependencies on kami-* repositories become one source each so the same namespaces are not loaded twice: kami-eizo-timeline, douga and kami-ongaku-project are the kotoba monorepo's lib/kotoba.kamiEizoTimeline, lib/kotoba.douga and lib/kotoba.kamiOngakuProject, where they now live (JUN-649); douga was the archived standalone repository at an old commit. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (dep org.clojure/clojure, alias :cljs, alias :pages, alias :test reduced to :extra-paths, alias :e2e): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
     }
   }
 }

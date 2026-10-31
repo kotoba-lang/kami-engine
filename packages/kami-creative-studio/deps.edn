@@ -45,15 +45,21 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
          :deps/root "lib/kotoba.kisekae"}
-        io.github.kotoba-lang/kami-eizo-timeline {:local/root "../kami-eizo-timeline"}
+        ;; kami-eizo-timeline and douga live in the kotoba monorepo (JUN-649).
+        io.github.kotoba-lang/kami-eizo-timeline
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "640a1817bd1eeacf7557e70f0e537259859ad150"
+         :deps/root "lib/kotoba.kamiEizoTimeline"}
         ;; kami-ongaku-project lives in the kotoba monorepo (lib/kotoba.kamiOngakuProject);
         ;; the identical copy under packages/ was removed (JUN-649).
         kotoba-lang/kami-ongaku-project
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
          :deps/root "lib/kotoba.kamiOngakuProject"}
-        kotoba-lang/douga {:git/url "https://github.com/kotoba-lang/douga.git"
-                                     :git/sha "b957073d095c5cf96ab7465ad261cbc20eba924d"}}
+        kotoba-lang/douga
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "640a1817bd1eeacf7557e70f0e537259859ad150"
+         :deps/root "lib/kotoba.douga"}}
  :aliases
  {
   :test {:extra-paths ["test"]}}}

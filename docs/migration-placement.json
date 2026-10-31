@@ -136,7 +136,8 @@
   },
   "kami-engine:packages/anime": {
    "to": "kotoba",
-   "reason": "anime production vocabulary; non-game consumers cloud-itonami/animeka, cloud-itonami-jsic-4113"
+   "reason": "anime production vocabulary; non-game consumers cloud-itonami/animeka, cloud-itonami-jsic-4113",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.anime (JUN-649)"
   },
   "kami-engine:packages/biomech": {
    "to": "kotoba",
@@ -149,7 +150,8 @@
   },
   "kami-engine:packages/douga": {
    "to": "kotoba",
-   "reason": "video assembly planning; non-game consumers cloud-itonami/dougaka, mangaka, app-itonami-dougaka"
+   "reason": "video assembly planning; non-game consumers cloud-itonami/dougaka, mangaka, app-itonami-dougaka",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.douga (JUN-649)"
   },
   "kami-engine:packages/freeboard": {
    "to": "kotoba",
@@ -221,15 +223,18 @@
   },
   "kami-engine:packages/kami-eizo-compositor": {
    "to": "kotoba",
-   "reason": "video compositing data model (eizo in the owner's kotoba list)"
+   "reason": "video compositing data model (eizo in the owner's kotoba list)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEizoCompositor (JUN-649)"
   },
   "kami-engine:packages/kami-eizo-grade": {
    "to": "kotoba",
-   "reason": "colour-grading data model (eizo in the owner's kotoba list)"
+   "reason": "colour-grading data model (eizo in the owner's kotoba list)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEizoGrade (JUN-649)"
   },
   "kami-engine:packages/kami-eizo-timeline": {
    "to": "kotoba",
-   "reason": "EDL/timeline data model; used by anime and douga, which go to kotoba"
+   "reason": "EDL/timeline data model; used by anime and douga, which go to kotoba",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEizoTimeline (JUN-649)"
   },
   "kami-engine:packages/kami-engine-aero": {
    "to": "kotoba",
@@ -353,11 +358,13 @@
   },
   "kami-engine:packages/kami-mangaka-page": {
    "to": "kotoba",
-   "reason": "manga page composition; non-game consumer cloud-itonami/mangaka"
+   "reason": "manga page composition; non-game consumer cloud-itonami/mangaka",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiMangakaPage (JUN-649)"
   },
   "kami-engine:packages/kami-mangaka-reader": {
    "to": "kotoba",
-   "reason": "manga reader components (mangaka in the owner's kotoba list)"
+   "reason": "manga reader components (mangaka in the owner's kotoba list)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiMangakaReader (JUN-649)"
   },
   "kami-engine:packages/kami-ongaku-project": {
    "to": "kotoba",
