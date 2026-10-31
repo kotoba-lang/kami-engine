@@ -22,13 +22,13 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1418,
+  "tracked": 1425,
   "class": {
    "a": 244,
    "c": 44,
    "d": 124,
-   "keep": 412,
-   "native": 83,
+   "keep": 415,
+   "native": 87,
    "o": 511
   },
   "port": {
@@ -1019,10 +1019,10 @@
   },
   {
    "unit": "docs",
-   "files": 22,
+   "files": 25,
    "classes": {
     "a": 1,
-    "keep": 21
+    "keep": 24
    },
    "depends-on": [],
    "placement": "kami-engine"
@@ -3989,11 +3989,11 @@
   },
   {
    "unit": "scripts",
-   "files": 89,
+   "files": 93,
    "classes": {
     "a": 1,
     "d": 2,
-    "native": 82,
+    "native": 86,
     "o": 4
    },
    "port": {
@@ -4266,6 +4266,11 @@
    "class": "keep"
   },
   {
+   "path": "docs/evidence/amu-capability-probe-20261101d.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
    "path": "docs/evidence/native-gates-oracle-20261031.json",
    "unit": "docs",
    "class": "keep"
@@ -4296,6 +4301,11 @@
    "class": "keep"
   },
   {
+   "path": "docs/evidence/port-rewrite-rules-20261101d.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
    "path": "docs/evidence/upstream-apis-amu-check-20261031.json",
    "unit": "docs",
    "class": "keep"
@@ -4312,6 +4322,11 @@
   },
   {
    "path": "docs/evidence/upstream-apis-amu-check-20261101b.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
+   "path": "docs/evidence/upstream-apis-amu-check-20261101c.json",
    "unit": "docs",
    "class": "keep"
   },
@@ -16101,6 +16116,26 @@
   },
   {
    "path": "scripts/native/rewrite_rules_corpus/auto-resolved-keyword.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/defmulti-closed.admitted.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/defmulti-open.out-of-scope.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/defmulti-param-names.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/defmulti-param-names.before.kotoba",
    "unit": "scripts",
    "class": "native"
   },
