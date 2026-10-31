@@ -1,0 +1,9 @@
+(ns probe)
+;; expect-value: 12
+
+(defn rect-area [w :i64 h :i64] :i64 (* w h))
+
+(defrecord Impl [area [:fn [[:i64 :i64] :i64]]])
+
+(defn main [] :i64
+  (invoke (:area (->Impl (fn-ref rect-area))) 3 4))

@@ -1,0 +1,7 @@
+(ns probe)
+;; expect-refusal: E2143
+
+(defn main [] :i64
+  (let [a (atom 0)]
+    (and (swap! a inc) true)
+    @a))

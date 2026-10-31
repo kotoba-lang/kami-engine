@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-value: 3
+
+(defn inc2 [x :i64] :i64 (+ x 2))
+
+(defn main [] :i64 (let [f (fn-ref inc2)] (invoke f 1)))

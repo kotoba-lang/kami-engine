@@ -1,0 +1,10 @@
+(ns probe)
+;; expect-value: 12
+
+(defrecord Shape [area [:fn [[:i64 :i64] :i64]]])
+
+(defn rect-area [w :i64 h :i64] :i64 (* w h))
+
+(defn main [] :i64
+  (let [s (->Shape (fn-ref rect-area))]
+    (invoke (:area s) 3 4)))

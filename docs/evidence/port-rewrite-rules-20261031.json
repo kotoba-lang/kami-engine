@@ -1,0 +1,549 @@
+{
+ "schema": "kami.port-rewrite-rules.v1",
+ "issue": "JUN-731",
+ "parent": "JUN-651",
+ "date": "2026-10-31",
+ "amu": {
+  "repo": "kotoba-lang/amu",
+  "rev": "3c9eb7f7f74e0cf636ba75deb88faca5e277ca77",
+  "entry": "bin/amu (macOS arm64)",
+  "bin-amu-sha256": "750159f1956790fbb10c3c7fea8dc1eae5302e23ff6e065fe8337cc9589554fb",
+  "digest-check": "sha256 of bin/amu equals cli.json image.sha256 at the pin"
+ },
+ "rules": "docs/port-rewrite-rules.md",
+ "method": "`amu check` each corpus file; a before/out-of-scope file must be refused with its expect-refusal code, an after/admitted file must check and `amu run` to its expect-value",
+ "cases": [
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-and-write.out-of-scope.kotoba",
+   "case": "atom-and-write",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2143"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2143 swap!/reset! is not admitted inside `and` (atom slice 1 admits them in let, do, if, when, cond and case only) (byte 81)"
+    ]
+   },
+   "sourceSHA256": "7a6d2af422a5456d31d08262cd8461e1d4fb6a0fc6db9a761f30598c802fc0f8",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-doseq.after-reduce.kotoba",
+   "case": "atom-doseq",
+   "role": "after",
+   "expect": {
+    "value": 6
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "e007bea4a2c7421e92a0e60ae17993205ea6b212e601845ac2c037dd600f2caf",
+   "run": {
+    "exit": 0,
+    "output": [
+     "6"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-doseq.before.kotoba",
+   "case": "atom-doseq",
+   "role": "before",
+   "expect": {
+    "refusal": "E2140"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 106)"
+    ]
+   },
+   "sourceSHA256": "57b60e462d50656eeb6da1b0a7fc3e3e814d62344ed60ad37507aa52a03f1415",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-dotimes.after-loop.kotoba",
+   "case": "atom-dotimes",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "f7b1fde83356cc541b68250c35473660f1c4dad2d757c7133408486090809afa",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-dotimes.after-reduce.kotoba",
+   "case": "atom-dotimes",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "bc7ef4c4baff422d8a75daec7923eeb4bec7517d8e3af5e020fb230b016848ad",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-dotimes.before.kotoba",
+   "case": "atom-dotimes",
+   "role": "before",
+   "expect": {
+    "refusal": "E2140"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 102)"
+    ]
+   },
+   "sourceSHA256": "c953da75553a87068793927fc246ea36c54f0af3184e261ea916aae0851fd08d",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-fn-capture.out-of-scope.kotoba",
+   "case": "atom-fn-capture",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2140"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 100)"
+    ]
+   },
+   "sourceSHA256": "d8bf9ca07c65179154360969acff7e18b72a045c1044f957054bb16e0e1046f8",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-global-def.out-of-scope.kotoba",
+   "case": "atom-global-def",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2141"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2141 atom must be the init expression of a let binding (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 45)"
+    ]
+   },
+   "sourceSHA256": "b457985384896a94c70072b2ddedbfa7bab3ff7ff11572eec33f0dc161a15aaa",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-global-defonce.out-of-scope.kotoba",
+   "case": "atom-global-defonce",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2003"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defonce' (byte 38)"
+    ]
+   },
+   "sourceSHA256": "d30f8d7b0f626d147e5c558d568c4019b5a38cb09332e12d54e8658bb063ec15",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-loop.after-loop.kotoba",
+   "case": "atom-loop",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "f7b1fde83356cc541b68250c35473660f1c4dad2d757c7133408486090809afa",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-loop.before.kotoba",
+   "case": "atom-loop",
+   "role": "before",
+   "expect": {
+    "refusal": "E2140"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 127)"
+    ]
+   },
+   "sourceSHA256": "6a549da6b0a9947b92d185a68c6dbaf3785a35fca419ac2807bdb0c892b413d7",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-straight-line.admitted.kotoba",
+   "case": "atom-straight-line",
+   "role": "admitted",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "880b47a9e1b3f5ccf13f97ccda8f9e7cab2999996481b15f49a5af1b86cc146a",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defmulti.after.kotoba",
+   "case": "defmulti",
+   "role": "after",
+   "expect": {
+    "value": 15
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "22644e31acdd8432dc3533225ca0d9b0cf488c1540b716c84366ba281d823a1b",
+   "run": {
+    "exit": 0,
+    "output": [
+     "15"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defmulti.before.kotoba",
+   "case": "defmulti",
+   "role": "before",
+   "expect": {
+    "refusal": "E2003"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defmulti' (byte 87)"
+    ]
+   },
+   "sourceSHA256": "9a9670034e35fc267ed404ddb4f971736078e145892446cd01873df79fd1445b",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defprotocol.after.kotoba",
+   "case": "defprotocol",
+   "role": "after",
+   "expect": {
+    "value": 12
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "b71eb3af1b9cd41510749432b4b6e808cb477663b1a168e4ff9a3b8d330dcb8b",
+   "run": {
+    "exit": 0,
+    "output": [
+     "12"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defprotocol.before.kotoba",
+   "case": "defprotocol",
+   "role": "before",
+   "expect": {
+    "refusal": "E2003"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defprotocol' (byte 38)"
+    ]
+   },
+   "sourceSHA256": "d717b3b959d7b43a9b77df95d54a061be79ae2a8053fc6e196af185d23292069",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-arg.after.kotoba",
+   "case": "fn-ref-arg",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "b5818c81cdceb590958262ecc7fb78405d84ed82af6e6c123e385a22c2bf30aa",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-arg.before.kotoba",
+   "case": "fn-ref-arg",
+   "role": "before",
+   "expect": {
+    "refusal": "E2102"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2102 unknown symbol 'inc2' (byte 127)"
+    ]
+   },
+   "sourceSHA256": "035e02fbf3f5ddf4639819124c954d7c093963d6bd702a89fa71323dde7e9d32",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-hof.admitted.kotoba",
+   "case": "fn-ref-hof",
+   "role": "admitted",
+   "expect": {
+    "value": 7
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "90432f742e5a37ca12f96df32a1bc71b8c3b2cccf12baee404b4a95b301ca3cf",
+   "run": {
+    "exit": 0,
+    "output": [
+     "7"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-let.after.kotoba",
+   "case": "fn-ref-let",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "6bdc925518cd6751073393c12ab3e1f618618ffb4097c111d1f85964791cc336",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-let.before.kotoba",
+   "case": "fn-ref-let",
+   "role": "before",
+   "expect": {
+    "refusal": "E2102"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2102 unknown symbol 'inc2' (byte 99)"
+    ]
+   },
+   "sourceSHA256": "6a5f18dc1db87431a3608c9f445dded210681907d6c481422250863aa403bcde",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/reify.after.kotoba",
+   "case": "reify",
+   "role": "after",
+   "expect": {
+    "value": 12
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "e6449b71ab755741d492ed8b710f37f1f0906cbf854f1d5e8edeafbecf9ddf6a",
+   "run": {
+    "exit": 0,
+    "output": [
+     "12"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/reify.before.kotoba",
+   "case": "reify",
+   "role": "before",
+   "expect": {
+    "refusal": "E2101"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'reify' (byte 67)"
+    ]
+   },
+   "sourceSHA256": "8a302bb420b49d20afccafb46968c3f57229eba15435f1d0937b3b32cf26571f",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-contains.after.kotoba",
+   "case": "set-contains",
+   "role": "after",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "7acf3e8c436c859c18d7917f628b913bf2b7ceb91f5901b337675de2e435d248",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-contains.before.kotoba",
+   "case": "set-contains",
+   "role": "before",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '1': expected :keyword (byte 73)"
+    ]
+   },
+   "sourceSHA256": "2c34790ed3e438f2a3370cafd8b8abe7572c4f18e27df3e6041d238ba452f380",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-count.after.kotoba",
+   "case": "set-count",
+   "role": "after",
+   "expect": {
+    "value": 2
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "ff803ded253db0953017c2326a26afc8904d1a75377fbfe15c601d4862bd14b3",
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-count.before.kotoba",
+   "case": "set-count",
+   "role": "before",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '1': expected :keyword (byte 65)"
+    ]
+   },
+   "sourceSHA256": "da62b7e533ab285e9e9c22e5628a5335f54ab78f683fa2d4b0bdc51916328958",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-keyword.admitted.kotoba",
+   "case": "set-keyword",
+   "role": "admitted",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "fed674ec1b26eb5f9b7f00cafcb63f8a6341a9d629dbefa869459d0ad08882c2",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  }
+ ]
+}

@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-value: 6
+
+(defn main [] :i64
+  (reduce (fn [acc x] (+ acc x)) 0 [1 2 3]))

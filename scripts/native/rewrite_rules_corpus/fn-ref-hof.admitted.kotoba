@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-value: 7
+
+(defn inc2 [x :i64] :i64 (+ x 2))
+
+(defn main [] :i64 (reduce + 0 (map inc2 [1 2])))

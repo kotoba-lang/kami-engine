@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-refusal: E2003
+
+(defprotocol Shape (area [s w h]))
+
+(defn main [] :i64 0)

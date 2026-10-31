@@ -1,0 +1,10 @@
+(ns probe)
+;; expect-refusal: E2003
+
+(defrecord Shape [kind :keyword w :i64 h :i64])
+
+(defmulti area (fn [s] (:kind s)))
+(defmethod area :rect [s] (* (:w s) (:h s)))
+(defmethod area :sq [s] (* (:w s) (:w s)))
+
+(defn main [] :i64 (+ (area (->Shape :rect 3 2)) (area (->Shape :sq 3 3))))
