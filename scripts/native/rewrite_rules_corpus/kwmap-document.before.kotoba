@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-refusal: E2101
+
+(defn- scene [] {:game/id :gftd.games/relaxing :game/title "relaxing" :world {:arena 460 :speed 160}})
+(defn- arena [s k] (get-in s [:world k] 0))
+(defn main [] :i64 (arena (scene) :arena))

@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-value: 25
+
+(def simple-opcode (typed-map-new [:map :keyword :i64] :drop 26 :unreachable 0 :nop 1))
+(defn- op-byte [op :keyword] :i64 (get simple-opcode op -1))
+(defn main [] :i64 (+ (op-byte :drop) (op-byte :missing)))

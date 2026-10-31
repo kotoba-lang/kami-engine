@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-refusal: E2104
+
+(defn- scene [] :document {:world {:arena 460.0}})
+(defn main [] :i64 (document-count (scene)))

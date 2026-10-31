@@ -1,0 +1,12 @@
+(ns probe)
+;; expect-value: 1
+
+(defrecord Whip [state :keyword timer :f64])
+(defrecord Durations [windup :f64 active :f64 recovery :f64])
+(def default-whip-durations (->Durations 0.12 0.18 0.22))
+(defn- step-whip [w [:ref :probe/Whip] attack? :bool dt :f64 durations [:ref :probe/Durations]] [:ref :probe/Whip]
+  (case (:state w)
+    :idle (if attack? (->Whip :windup 0.0) (->Whip :idle 0.0))
+    :windup (let [t (f64-add (:timer w) dt)] (if (f64-lt t (:windup durations)) (assoc w :timer t) (->Whip :active 0.0)))
+    (->Whip :idle 0.0)))
+(defn main [] :i64 (if (= :windup (:state (step-whip (->Whip :idle 0.0) true 0.016 default-whip-durations))) 1 0))

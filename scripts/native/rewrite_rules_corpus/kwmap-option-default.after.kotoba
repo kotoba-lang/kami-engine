@@ -1,0 +1,10 @@
+(ns probe)
+;; expect-value: 50
+
+(defrecord Tween [from [:option :i64] to [:option :i64] duration [:option :i64]])
+(defn- tween-value [o [:ref :probe/Tween] elapsed :i64]
+  (let [from (option-or (:from o) 0) to (option-or (:to o) 100) duration (option-or (:duration o) 300)
+        t (if (< elapsed duration) elapsed duration)]
+    {:v (+ from (quot (* (- to from) t) duration)) :done? (>= t duration)}))
+(defn main [] :i64
+  (:v (tween-value (->Tween (option-none-of [:option :i64]) (option-none-of [:option :i64]) (option-some-of [:option :i64] 200)) 100)))

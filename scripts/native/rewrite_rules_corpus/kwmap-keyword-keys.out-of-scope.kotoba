@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-refusal: E2104
+
+(defn main [] :i64 (count (keys (typed-map-new [:map :keyword :i64] :a 1 :b 2))))

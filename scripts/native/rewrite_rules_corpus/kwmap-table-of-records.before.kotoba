@@ -1,0 +1,8 @@
+(ns probe)
+;; expect-refusal: E2127
+
+(def skills
+  {:fireball {:label "Fireball" :element :fire :audio {:wave "sawtooth" :freq 180 :to 620}}
+   :ice-lance {:label "Ice Lance" :element :ice :audio {:wave "triangle" :freq 880 :to 1320}}})
+(defn- skill-freq [id :keyword] :i64 (:freq (:audio (get skills id))))
+(defn main [] :i64 (skill-freq :ice-lance))

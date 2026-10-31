@@ -1,0 +1,7 @@
+(ns probe)
+;; expect-value: 1
+
+(defrecord Sub [state :keyword timer :i64 kind [:option :keyword]])
+(defn- sub-idle [] [:ref :probe/Sub] (->Sub :idle 0 (option-none-of [:option :keyword])))
+(defn- fire [s [:ref :probe/Sub] k :keyword] [:ref :probe/Sub] (assoc s :kind (option-some-of [:option :keyword] k)))
+(defn main [] :i64 (if (= :bomb (option-or (:kind (fire (sub-idle) :bomb)) :none)) 1 0))

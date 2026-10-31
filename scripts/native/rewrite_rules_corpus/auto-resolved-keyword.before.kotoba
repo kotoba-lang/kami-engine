@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-refusal: E1005
+
+(defn main [] :i64 (if (= ::a :probe/a) 1 0))

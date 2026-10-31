@@ -1,0 +1,9 @@
+(ns probe)
+;; expect-value: 460
+
+(defn- scene [] :document
+  {:game/id :gftd.games/relaxing :game/title "relaxing" :world {:arena 460 :speed 160}})
+(defn- doc-at [d :document k :keyword] :document (option-or (document-get d k) (document-null)))
+(defn- arena [s :document k :keyword] :i64
+  (option-or (document-i64-value (doc-at (doc-at s :world) k)) 0))
+(defn main [] :i64 (arena (scene) :arena))

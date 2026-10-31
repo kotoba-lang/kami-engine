@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-refusal: E2104
+
+(def simple-opcode {:drop 26 :unreachable 0 :nop 1})
+(defn- op-byte [op :keyword] :i64 (if (contains? simple-opcode op) (get simple-opcode op 0) -1))
+(defn main [] :i64 (op-byte :drop))

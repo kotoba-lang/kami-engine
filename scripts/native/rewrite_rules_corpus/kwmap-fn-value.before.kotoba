@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-refusal: E2124
+
+(def handlers {:inc (fn [x] (+ x 1)) :dbl (fn [x] (* x 2))})
+(defn main [] :i64 ((get handlers :dbl) 5))

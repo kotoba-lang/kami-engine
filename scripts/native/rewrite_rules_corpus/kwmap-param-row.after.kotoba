@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-value: 1
+
+(defrecord P [a :i64])
+(defn f [m [:ref :probe/P]] :i64 (:a m))
+(defn main [] :i64 (f (->P 1)))

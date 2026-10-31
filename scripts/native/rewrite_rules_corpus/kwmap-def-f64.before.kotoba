@@ -1,0 +1,10 @@
+(ns probe)
+;; expect-refusal: E2124
+
+(def default-whip-durations {:windup 0.12 :active 0.18 :recovery 0.22})
+(defn- step-whip [{:keys [state timer]} attack? dt durations]
+  (case state
+    :idle (if attack? {:state :windup :timer 0.0} {:state :idle :timer 0.0})
+    :windup (let [t (f64-add timer dt)] (if (f64-lt t (:windup durations)) {:state :windup :timer t} {:state :active :timer 0.0}))
+    {:state :idle :timer 0.0}))
+(defn main [] :i64 (if (= :windup (:state (step-whip {:state :idle :timer 0.0} true 0.016 default-whip-durations))) 1 0))

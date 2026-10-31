@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-value: 1
+
+(defn main [] :i64 (if (= :probe/a :probe/a) 1 0))

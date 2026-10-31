@@ -130,7 +130,10 @@ python3 scripts/upstream_apis.py --kotoba ../kotoba --kotoba-rev REV --amu-check
 ```
 
 Re-run the probe when the Amu pin in `ci.yml` moves, and update `BLOCKERS` in
-`scripts/migration_ledger.py` from its result.
+`scripts/migration_ledger.py` from its result. The keyword map blockers
+(`kwmap/*`, JUN-732) are read by `kwmap_patterns()` rather than a regex; their
+representations and the rewrite corpus cases are the "Keyword maps" section of
+`docs/port-rewrite-rules.md`.
 
 Every ledger unit needs an entry in `docs/migration-placement.json`; the check
 fails on a unit without one. Decide a new unit by the placement rule above and
