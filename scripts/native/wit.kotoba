@@ -1,0 +1,213 @@
+(ns kami.native.wit (:export [main]))
+
+;; Native port of scripts/wit_test.cljk's check mode (JUN-642).
+;; Inputs staged by scripts/native_gates.py:
+;;   (idl)   wit/kami-interface.edn, the one source of the kami:engine interface
+;;   (world) wit/kami-game/world.wit, generated from it
+;;
+;; Both files are reduced to a set of canonical ABI signatures
+;; "iface.fn(s64,s32)s64" (names and lowered types only) and compared.
+;;
+;; main returns 0 when they agree and every host function is documented, else:
+;;   9                         an EDN type has no WIT lowering
+;;   1000000 + 1000*e + w      e signatures only in the EDN, w only in world.wit
+;;   2000000 + n               n host functions without :doc
+;;   3000000 + n               n :doc texts that world.wit does not carry
+;;
+;; Difference from the CLJK oracle: the last check reads the committed
+;; world.wit, where wit_test.cljk reads its own regenerated text. Regenerating
+;; world.wit (`--gen`) stays with the CLJK oracle.
+
+;; ---- text --------------------------------------------------------------------
+
+(defn- squash [s :string] :string
+  ;; collapse every whitespace run to one space and trim both ends
+  (let [n (string-byte-length s)]
+    (loop [i (string-skip-blank s 0) out ""]
+      (if (>= i n)
+        out
+        (let [b (string-find-blank s i)
+              e (if (< b 0) n b)
+              out2 (string-append-range (if (string=? out "") out (string-concat out " ")) s i e)]
+          (recur (string-skip-blank s e) out2))))))
+
+(defn- line-end [s :string i :i64] :i64
+  (let [e (string-find-byte s 10 i)] (if (< e 0) (string-byte-length s) e)))
+
+(defn- strip-comments [s :string] :string
+  (let [n (string-byte-length s)]
+    (loop [i 0 out ""]
+      (let [c (string-index-of-from s "//" i)]
+        (if (< c 0)
+          (string-append-range out s i n)
+          (recur (line-end s c) (string-append-range out s i c)))))))
+
+(defn- comment-text [s :string] :string
+  ;; every line with a leading `//` and one following space or tab removed,
+  ;; as wit_test.cljk flattens its generated text before searching it
+  (let [n (string-byte-length s)]
+    (loop [i 0 out ""]
+      (if (>= i n)
+        out
+        (let [e (line-end s i)
+              j (let [k (string-skip-blank s i)] (if (> k e) e k))
+              j2 (if (= (string-index-of-from s "//" j) j)
+                   (let [k (+ j 2)]
+                     (if (and (< k e) (or (= (string-code-point-at s k) 32) (= (string-code-point-at s k) 9))) (+ k 1) k))
+                   i)]
+          (recur (+ e 1) (string-concat (string-append-range out s j2 e) "\n")))))))
+
+(defn- name-byte? [c :i64] :bool
+  (or (and (>= c 97) (<= c 122)) (and (>= c 65) (<= c 90)) (and (>= c 48) (<= c 57)) (= c 45) (= c 95)))
+
+(defn- blank-byte? [c :i64] :bool
+  (or (= c 32) (= c 9) (= c 10) (= c 13)))
+
+(defn- skip-back-blank [s :string i :i64] :i64
+  (loop [k i] (if (and (>= k 0) (blank-byte? (string-code-point-at s k))) (recur (- k 1)) k)))
+
+(defn- name-start [s :string i :i64] :i64
+  ;; first index of the name ending at i
+  (loop [k i] (if (and (>= k 0) (name-byte? (string-code-point-at s k))) (recur (- k 1)) (+ k 1))))
+
+(defn- name-end [s :string i :i64] :i64
+  (let [n (string-byte-length s)]
+    (loop [k i] (if (and (< k n) (name-byte? (string-code-point-at s k))) (recur (+ k 1)) k))))
+
+(defn- member? [set-text :string item :string] :bool
+  (>= (string-index-of set-text (string-concat (string-concat "\n" item) "\n")) 0))
+
+(defn- add [set-text :string item :string] :string
+  (if (member? set-text item) set-text (string-concat (string-concat set-text item) "\n")))
+
+(defn- missing-from [a :string b :string] :i64
+  ;; members of set a that set b lacks
+  (let [n (string-byte-length a)]
+    (loop [i 1 k 0]
+      (if (>= i n)
+        k
+        (let [e (line-end a i)]
+          (recur (+ e 1) (if (member? b (string-substring a i e)) k (+ k 1))))))))
+
+(defn- signature [iname :string fname :string types :string ret :string] :string
+  (string-concat (string-concat (string-concat (string-concat iname ".") fname)
+                                (string-concat (string-concat "(" types) ")"))
+                 ret))
+
+;; ---- world.wit -> canonical signatures ---------------------------------------
+
+(defn- param-types [s :string from :i64 to :i64] :string
+  ;; "s64,s32" for every `: sNN` between from and to
+  (loop [i from out ""]
+    (let [c (string-find-byte s 58 i)]
+      (if (or (< c 0) (>= c to))
+        out
+        (let [t (string-skip-blank s (+ c 1)) e (name-end s t)
+              ty (string-substring s t e)]
+          (recur e (if (string=? out "") ty (string-concat (string-concat out ",") ty))))))))
+
+(defn- body-signatures [s :string iname :string from :i64 to :i64 acc :string] :string
+  (loop [i from acc acc]
+    (let [f (string-index-of-from s "func" i)]
+      (if (or (< f 0) (>= f to))
+        acc
+        (let [open (string-skip-blank s (+ f 4))
+              colon (skip-back-blank s (- f 1))
+              ne (skip-back-blank s (- colon 1))
+              fname (string-substring s (name-start s ne) (+ ne 1))
+              close (string-find-byte s 41 open)
+              after (string-skip-blank s (+ close 1))
+              arrow (= (string-index-of-from s "->" after) after)
+              rs (if arrow (string-skip-blank s (+ after 2)) after)
+              ret (if arrow (string-substring s rs (name-end s rs)) "")
+              semi (string-skip-blank s (if arrow (name-end s rs) after))
+              ok (and (= (string-code-point-at s open) 40) (= (string-code-point-at s colon) 58)
+                      (< close to) (= (string-code-point-at s semi) 59))]
+          (recur (+ f 4)
+                 (if ok
+                   (add acc (signature iname fname (param-types s (+ open 1) close) ret))
+                   acc)))))))
+
+(defn- wit-signatures [wit :string] :string
+  (let [s (strip-comments wit)]
+    (loop [i 0 acc "\n"]
+      (let [k (string-index-of-from s "interface" i)]
+        (if (< k 0)
+          acc
+          (let [ns (string-skip-blank s (+ k 9))
+                ne (name-end s ns)
+                open (string-skip-blank s ne)
+                close (string-find-byte s 125 open)
+                ok (and (> ns (+ k 9)) (> ne ns) (= (string-code-point-at s open) 123) (> close open)
+                        (or (= k 0) (not (name-byte? (string-code-point-at s (- k 1))))))]
+            (recur (if ok (+ close 1) (+ k 9))
+                   (if ok (body-signatures s (string-substring s ns ne) (+ open 1) close acc) acc))))))))
+
+;; ---- EDN IDL -> canonical signatures -----------------------------------------
+
+(defn- lower [t :string] :string
+  (cond (or (string=? t ":eid") (string=? t ":i64")) "s64"
+        (or (string=? t ":f32") (string=? t ":i32")) "s32"
+        (string=? t ":str") "s32,s32"
+        :else "?"))
+
+(defn- bare [d :document] :string
+  (let [p (printed d)] (string-substring p 1 (string-byte-length p))))
+
+(defn- edn-signature [iname :string fname :string spec :document] :string
+  (let [ps (kget spec :params)
+        n (if (kind-is? ps :vector) (document-count ps) 0)
+        types (loop [i 0 out ""]
+                (if (>= i n)
+                  out
+                  (let [t (lower (printed (at (at ps i) 1)))]
+                    (recur (+ i 1) (if (string=? out "") t (string-concat (string-concat out ",") t))))))
+        r (kget spec :ret)
+        rp (printed r)
+        ret (if (or (kind-is? r :null) (string=? rp ":unit")) ""
+                (if (string=? rp ":str") "?" (lower rp)))]
+    (signature iname fname types ret)))
+
+(defn- interfaces [] :document
+  (blob (kget (entity (idl)) :wit.kami-interface/interfaces)))
+
+(defn- each-func [f :i64] :i64
+  ;; f selects the fold: 0 count unlowerable, 1 undocumented, 2 docs absent from world.wit
+  (let [ifs (interfaces) flat (squash (comment-text (world))) ni (document-count ifs)]
+    (loop [i 0 j 0 k 0]
+      (if (>= i ni)
+        k
+        (let [ie (entry ifs i) funcs (kget (at ie 1) :funcs) nf (document-count funcs)]
+          (if (>= j nf)
+            (recur (+ i 1) 0 k)
+            (let [fe (entry funcs j) spec (at fe 1)
+                  sig (edn-signature (bare (at ie 0)) (bare (at fe 0)) spec)
+                  doc (squash (str-of (kget spec :doc)))
+                  hit (cond (= f 0) (>= (string-index-of sig "?") 0)
+                            (= f 1) (string=? doc "")
+                            :else (and (not (string=? doc "")) (< (string-index-of flat doc) 0)))]
+              (recur i (+ j 1) (if hit (+ k 1) k)))))))))
+
+(defn- edn-signatures [] :string
+  (let [ifs (interfaces) ni (document-count ifs)]
+    (loop [i 0 j 0 acc "\n"]
+      (if (>= i ni)
+        acc
+        (let [ie (entry ifs i) funcs (kget (at ie 1) :funcs) nf (document-count funcs)]
+          (if (>= j nf)
+            (recur (+ i 1) 0 acc)
+            (let [fe (entry funcs j)]
+              (recur i (+ j 1) (add acc (edn-signature (bare (at ie 0)) (bare (at fe 0)) (at fe 1)))))))))))
+
+(defn main [] :i64
+  (let [g (edn-signatures) w (wit-signatures (world))
+        edn-only (missing-from g w) wit-only (missing-from w g)
+        unlowered (each-func 0)]
+    (cond (> unlowered 0) 9
+          (or (> edn-only 0) (> wit-only 0)) (+ 1000000 (* 1000 edn-only) wit-only)
+          (string=? g "\n") 1000000
+          :else (let [undocumented (each-func 1)]
+                  (if (> undocumented 0)
+                    (+ 2000000 undocumented)
+                    (let [dropped (each-func 2)]
+                      (if (> dropped 0) (+ 3000000 dropped) 0)))))))

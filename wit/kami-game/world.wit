@@ -1,7 +1,7 @@
 package kami:engine@1.0.0;
 
 // ---------------------------------------------------------------------------
-// kami:engine/aim ? controller pose and the camera-relative movement basis
+// kami:engine/aim — controller pose and the camera-relative movement basis
 //
 // The controller pose the ECS has never had: get-r* return constants today
 // and
@@ -11,8 +11,8 @@ package kami:engine@1.0.0;
 //
 // move() is the important one. It takes stick input in CAMERA space and
 // resolves it against the entity's own yaw, so forward means away from the
-// camera. Feeding world axes into set-velocity instead ? which is what the
-// shipped royale does ? is what makes a 3D game play like a map cursor.
+// camera. Feeding world axes into set-velocity instead — which is what the
+// shipped royale does — is what makes a 3D game play like a map cursor.
 // ---------------------------------------------------------------------------
 interface aim {
     // Face `target`, applying the scene's configured aim error. Keeps bots and
@@ -45,7 +45,7 @@ interface aim {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/zone ? shrinking safe circle (battle-royale storm) as
+// kami:engine/zone — shrinking safe circle (battle-royale storm) as
 // read-only state
 //
 // Read-only. The circle is a pure function of match time
@@ -76,12 +76,12 @@ interface zone {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/weapon ? weapon state machine over the shared weapon table
+// kami:engine/weapon — weapon state machine over the shared weapon table
 //
 // Backed by the shared 25-row weapon table (battle_royale_weapons.edn).
 // fire() returns the entity hit, or -1 for a miss, a refused trigger pull
 // or a
-// projectile still in flight ? the caller distinguishes those with
+// projectile still in flight — the caller distinguishes those with
 // can-fire and
 // the event stream rather than by guessing from the -1.
 // ---------------------------------------------------------------------------
@@ -106,7 +106,7 @@ interface weapon {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/perception ? what an observer is allowed to know: range,
+// kami:engine/perception — what an observer is allowed to know: range,
 // cone, occlusion, memory
 //
 // A filter, not a behaviour. The shipped bot calls nearest-tagged with a
@@ -132,7 +132,7 @@ interface perception {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/time ? game clock
+// kami:engine/time — game clock
 // ---------------------------------------------------------------------------
 interface time {
     // Milliseconds elapsed this frame.
@@ -144,7 +144,7 @@ interface time {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/physics ? impulse / force application and raycast
+// kami:engine/physics — impulse / force application and raycast
 // ---------------------------------------------------------------------------
 interface physics {
     // Instantaneous change of momentum (f32 bits).
@@ -157,7 +157,7 @@ interface physics {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/render ? draw calls issued from script (the real renderer is
+// kami:engine/render — draw calls issued from script (the real renderer is
 // wgpu)
 // ---------------------------------------------------------------------------
 interface render {
@@ -173,7 +173,7 @@ interface render {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/random ? host-owned seeded PRNG (shared-seed determinism for
+// kami:engine/random — host-owned seeded PRNG (shared-seed determinism for
 // online/replay)
 //
 // The host owns the seed so online co-op stays deterministic
@@ -187,7 +187,7 @@ interface random {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/audio ? fire-and-forget sound triggers + binaural listener
+// kami:engine/audio — fire-and-forget sound triggers + binaural listener
 // pose
 // ---------------------------------------------------------------------------
 interface audio {
@@ -202,7 +202,7 @@ interface audio {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/input ? discrete and analog input queries
+// kami:engine/input — discrete and analog input queries
 // ---------------------------------------------------------------------------
 interface input {
     // Returns 1 if the named key is currently held, 0 otherwise.
@@ -218,8 +218,8 @@ interface input {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/attributes ? named f32 attribute plane per entity (health,
-// team, ammo, facing, ?)
+// kami:engine/attributes — named f32 attribute plane per entity (health,
+// team, ammo, facing, …)
 //
 // The shipped ECS entity is a tag, a position and a velocity. Nothing else
 // can
@@ -227,7 +227,7 @@ interface input {
 // only
 // move point masses around a plane.
 //
-// This is one typed channel for everything else ? health, shield, team,
+// This is one typed channel for everything else — health, shield, team,
 // facing,
 // ammo, stance, AI state. Adding a mechanic costs a row in the attribute
 // registry rather than a new host import. Unregistered names are legal
@@ -248,14 +248,14 @@ interface attributes {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/combat ? one damage pipeline: shields, armour, teams, kill
+// kami:engine/combat — one damage pipeline: shields, armour, teams, kill
 // credit
 //
 // Every health change goes through apply-damage. Once damage can be
 // applied
-// from more than one place, the rules ? team protection, armour, shield
+// from more than one place, the rules — team protection, armour, shield
 // order,
-// kill credit ? start to disagree between the places.
+// kill credit — start to disagree between the places.
 // zone: 0 body, 1 head. Returns the damage actually absorbed, which is
 // what a
 // hit marker and the damage-dealt statistic should both read.
@@ -274,7 +274,7 @@ interface combat {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/match ? GameMode / GameState: entrants, survivors,
+// kami:engine/match — GameMode / GameState: entrants, survivors,
 // placements
 //
 // state: 0 pending, 1 live, 2 ended. place() is 0 until the entity is out.
@@ -294,7 +294,7 @@ interface match {
 }
 
 // ---------------------------------------------------------------------------
-// kami:engine/scene ? ECS entity lifecycle and transform queries
+// kami:engine/scene — ECS entity lifecycle and transform queries
 //
 // All positions/velocities are f32 bit-patterns passed as i32.
 // Entity IDs are i64 (hecs Entity bits). A return of -1 means "not found".
@@ -306,7 +306,7 @@ interface scene {
     despawn: func(entity: s64);
     // Spawn a named entity type; returns a stable entity handle.
     spawn: func(kind-ptr: s32, kind-len: s32) -> s64;
-    // Read translation X ? IEEE-754 f32 bit-pattern as i32.
+    // Read translation X — IEEE-754 f32 bit-pattern as i32.
     get-x: func(entity: s64) -> s32;
     // Write all three translation components atomically.
     set-position: func(entity: s64, x: s32, y: s32, z: s32);
@@ -349,7 +349,7 @@ interface scene {
 }
 
 // ---------------------------------------------------------------------------
-// kami-game world ? what a Clojure game-script component imports/exports
+// kami-game world — what a Clojure game-script component imports/exports
 //
 // Lifecycle:
 //   init()         called once after the WASM module is instantiated.

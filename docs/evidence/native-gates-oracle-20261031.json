@@ -1,0 +1,190 @@
+{
+ "schema": "kami-engine.native-gates-oracle.v1",
+ "date": "2026-10-31",
+ "issue": "JUN-642",
+ "oracle": {
+  "command": "kbb -M scripts/<gate>.cljk",
+  "kbb": "kotoba-lang/kotoba bin/kbb (last change 0732914965630c9dd953f0fcc207be1019623801)",
+  "java": "openjdk version \"21.0.1\" 2023-10-17 LTS",
+  "stdlib": "kotoba-lang/kotoba 4bf68e1a1b205674c70f386d59e430801fae3572 lib/ via :local/root",
+  "note": "Hand-run reference measurement on a developer Mac; never part of CI. The repository deps.edn/nbb.edn could not build a classpath on main (kotoba.test reached through two gitlib roots), so the four stdlib libs were taken from the same kotoba sha through :local/root."
+ },
+ "native": {
+  "amu": "kotoba-lang/amu f7c07dff86d7fb5e89219a0f9ad4a83b2a83c82e seed/bootstrap/aarch64-macos/amu-cli.macho",
+  "amuSHA256": "e4f63a6cd0f8a1ea802aebfdab225dffea1b33ae53ce49dc6fc7237644207aff",
+  "command": "python3 scripts/native_gates.py --amu <amu>",
+  "receiptSourceSHA256": {
+   "adapter-registry": "33626ed440f24a41bca8ef53b013747ca63544ebe81a6070cab802e907fbf675",
+   "adapter-registry--version": "1197d610330734e23c87a9f9dcd18c005a9960efdaf0466bde5780ae0bbb25db",
+   "adapter-registry--rust": "75dbf6b2a0d11fcd449ad84c698cdc520c93e64f2631891aa33dc8a2192012fd",
+   "adapter-registry--contracts": "99bf3c9762a213d35a4e51318b2c9f4c51701d26f41f6cd98cb611b2abfa2d03",
+   "adapter-registry--missing-check": "0c5a6150745e407d13f128fc79fbe7e42345a9a387e2cb8d9e6310848c6cb52d",
+   "adapter-registry--no-adapters": "b392d14e253da132f068aff03d21d5fa1aaaf3c48bcf425438c124aab6312d50",
+   "guest-lint": "e4dc30e17245bbf31f118c22ec813f65cab0a84b1bc8ec6d2db52e8ba158d5d5",
+   "guest-lint--unknown-call": "5b57fb6c7a6a93dde05d4c1588121feb685bc2201d9fd067f2b06016f3c1559e",
+   "guest-lint--bad-arity": "259d1fb767e4746be8d85bb85d655b433ace154d5fb430aa6d6c68d0070283d9",
+   "wit": "cb47c9f933035205707bf2a75c9976597ff9632ab926a767e29b530c6af2b8c7",
+   "wit--param-type": "d5c83cceda15b7b718f07debdb23982ad8f2b17f10f5df47c0dbd99f98151e4f",
+   "wit--missing-func": "c77169b4b42ecc3a1357a219853c333caf961c04128332efa2d61683b7f41096",
+   "wit--undocumented": "e967ab7bfd4234148fa665ed70f723a1dfeeb3dc6e548bd5880c6e5aaa39432f",
+   "wit--unknown-type": "f49857e362cd93a1fa057fc5f081aa2278e10685e14f1215dc4d952580a15a6b",
+   "wit--doc-dropped": "a5e5b7a7b7c142322badde65c23d945607b896631275c39e7cc670e9983d6d02"
+  }
+ },
+ "inputsSHA256": {
+  "docs/adapter-registry.edn": "585dbb641701b7a0b53d222b6c1478073dfc32d260efdfd125ef472dfa511b38",
+  "wit/kami-interface.edn": "18c683be119b70e229fa6662bef7b0b434f802974c6c6dd5c54d88e0a8832a0f",
+  "wit/kami-game/world.wit": "cb6824b918e2c9db76872ae9568d3d72b79cf8eecadd1e0ead4658f42fe00726",
+  "wit/guest-bindings.edn": "33d41fa96eb20a6bd510d76a1dcc1b82fd53971a060f7bf90525a90d0fe35bfa",
+  "kami-clj-play/games/survivors/logic.cljk": "b3809b3bfdb826a66cc412e9c1f03c22642c2af76593e19605ecc163bd1e8289",
+  "kami-clj-play/games/waves/logic.cljk": "e0b9a150059892acc5ceab1b56835fffbf8041c6824d92ee375dfb1eb0886178",
+  "kami-clj-play3d/games/dance/logic.cljk": "6dd684c4201fb19233900eab689496afe70e07319c598b17af9459116f349651",
+  "kami-clj-play3d/games/royale-tps/logic.cljk": "8976d0d9a2b6759f32bc02469b9b3db97d5297cf7ac1109bf9aa3d9c4fb05085",
+  "kami-clj-play3d/games/royale/logic.cljk": "39ac488be81727399c9b1f5d6633b0ce8464815fd292317c77d450c191e3a65c",
+  "kami-clj-play3d/games/rt-audio-demo/logic.cljk": "fc99cf5abde6bea9db74c2264674b958fc584e17033c6ed9d9183afc3ddd1d60"
+ },
+ "results": [
+  {
+   "gate": "adapter-registry",
+   "mutant": null,
+   "oracleExit": 0,
+   "oraclePass": true,
+   "nativeCode": 0,
+   "nativePass": true,
+   "agree": true
+  },
+  {
+   "gate": "adapter-registry",
+   "mutant": "version",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 1,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "adapter-registry",
+   "mutant": "rust",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 2,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "adapter-registry",
+   "mutant": "contracts",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 3,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "adapter-registry",
+   "mutant": "missing-check",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 112,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "adapter-registry",
+   "mutant": "no-adapters",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 202,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "wit",
+   "mutant": null,
+   "oracleExit": 0,
+   "oraclePass": true,
+   "nativeCode": 0,
+   "nativePass": true,
+   "agree": true
+  },
+  {
+   "gate": "wit",
+   "mutant": "param-type",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 1001001,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "wit",
+   "mutant": "missing-func",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 1001000,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "wit",
+   "mutant": "undocumented",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 2000001,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "wit",
+   "mutant": "unknown-type",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 9,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "wit",
+   "mutant": "doc-dropped",
+   "oracleExit": 0,
+   "oraclePass": true,
+   "nativeCode": 3000001,
+   "nativePass": false,
+   "agree": false
+  },
+  {
+   "gate": "guest-lint",
+   "mutant": null,
+   "oracleExit": 0,
+   "oraclePass": true,
+   "nativeCode": 0,
+   "nativePass": true,
+   "agree": true
+  },
+  {
+   "gate": "guest-lint",
+   "mutant": "unknown-call",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 1001001000,
+   "nativePass": false,
+   "agree": true
+  },
+  {
+   "gate": "guest-lint",
+   "mutant": "bad-arity",
+   "oracleExit": 1,
+   "oraclePass": false,
+   "nativeCode": 1000000001,
+   "nativePass": false,
+   "agree": true
+  }
+ ],
+ "differences": [
+  {
+   "gate": "wit",
+   "mutant": "doc-dropped",
+   "reason": "The CLJK gate searches the text it regenerates from the EDN; the native gate searches the committed world.wit, so it also catches a committed file that lost a doc. The committed world.wit had lost every non-ASCII character to \"?\" since #124; this change restores the CLJK --gen output."
+  }
+ ]
+}

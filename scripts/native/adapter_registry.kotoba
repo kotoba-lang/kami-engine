@@ -1,0 +1,42 @@
+(ns kami.native.adapter-registry (:export [main]))
+
+;; Native port of scripts/check_adapter_registry.cljk (JUN-642).
+;; Input staged by scripts/native_gates.py: (registry) = docs/adapter-registry.edn.
+;;
+;; main returns 0 when the registry is well formed, otherwise:
+;;   1           version is not 1
+;;   2           policy :rust-in-default-repo? is not false
+;;   3           contracts is not a non-empty vector
+;;   100 + 10*i + k   contract i is missing required key k (0 :id 1 :authority 2 :check 3 :adapters)
+;;   200 + i     contract i names no adapter (adapters is not a non-empty vector)
+
+(defn- registry-key [e :document k :keyword] :document
+  (blob (kget e k)))
+
+(defn- missing-key [c :document] :i64
+  (cond (not (document-contains c (document-keyword :id))) 0
+        (not (document-contains c (document-keyword :authority))) 1
+        (not (document-contains c (document-keyword :check))) 2
+        (not (document-contains c (document-keyword :adapters))) 3
+        :else -1))
+
+(defn- check-contracts [cs :document] :i64
+  (let [n (document-count cs)]
+    (loop [i 0]
+      (if (>= i n)
+        0
+        (let [c (at cs i) k (missing-key c) a (kget c :adapters)]
+          (cond (>= k 0) (+ 100 (* 10 i) k)
+                (not (and (kind-is? a :vector) (> (document-count a) 0))) (+ 200 i)
+                :else (recur (+ i 1))))))))
+
+(defn main [] :i64
+  (let [e (entity (registry))
+        policy (registry-key e :kami.adapter.registry/policy)
+        rust (kget policy :rust-in-default-repo?)
+        cs (registry-key e :kami.adapter.registry/contracts)]
+    (cond (not (= (i64-of (kget e :kami.adapter.registry/version)) 1)) 1
+          (not (and (kind-is? rust :bool)
+                    (not (option-value-of [:option :bool] (document-bool-value rust) true)))) 2
+          (not (and (kind-is? cs :vector) (> (document-count cs) 0))) 3
+          :else (check-contracts cs))))

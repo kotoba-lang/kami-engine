@@ -2,21 +2,64 @@ name: CI
 on:
   push: { branches: [main] }
   pull_request:
+permissions:
+  contents: read
 jobs:
-  parity:
-    name: WIT single-source + guest lint + no-rust guard
+  native-gates:
+    # The WIT, adapter-registry and guest-lint gates are Kotoba programs
+    # (scripts/native/) run by the pinned Amu macOS CLI (JUN-642). Python only
+    # stages the repository files into each program and reads main's result.
+    # No kbb, nbb, JVM or Node runs here; the CLJK gates in scripts/ are the
+    # hand-run reference oracle.
+    name: Native contract gates (Amu, macOS arm64)
+    runs-on: macos-15
+    steps:
+      # Plain git instead of actions/checkout for this repository: its
+      # post-checkout cleanup runs `git submodule foreach`, which fails on the
+      # kami-engine-sdk gitlink (no .gitmodules entry, see AGENTS.md).
+      - name: Check out this repository
+        run: |
+          git init -q .
+          git fetch -q --depth=1 --no-recurse-submodules "https://github.com/${GITHUB_REPOSITORY}.git" "$GITHUB_SHA"
+          git checkout -q FETCH_HEAD
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: kotoba-lang/amu
+          ref: f7c07dff86d7fb5e89219a0f9ad4a83b2a83c82e
+          path: _native/amu
+          persist-credentials: false
+          sparse-checkout: |
+            bin
+            seed/bootstrap/aarch64-macos
+          sparse-checkout-cone-mode: false
+      - name: Verify the pinned Amu images
+        run: |
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path('_native/amu')
+          meta = json.loads((root / 'seed/bootstrap/aarch64-macos/cli.json').read_text())
+          for part in ('image', 'compiler'):
+              data = (root / meta[part]['path']).read_bytes()
+              assert hashlib.sha256(data).hexdigest() == meta[part]['sha256'], part
+          assert (root / 'bin/amu').resolve() == (root / meta['image']['path']).resolve()
+          PY
+      - name: WIT, adapter registry and guest lint, with negative controls
+        run: |
+          sha=$(python3 -c 'import json; print(json.load(open("_native/amu/seed/bootstrap/aarch64-macos/cli.json"))["image"]["sha256"])')
+          python3 scripts/native_gates.py --amu _native/amu/bin/amu --amu-sha256 "$sha" --output "$RUNNER_TEMP/native-gates"
+  no-rust:
+    name: No Rust runtime files
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      # kbb resolves the kotoba.lang.* stdlib these gates require (from
-      # nbb.edn); plain babashka has no kotoba.lang.edn and no bb.edn here.
-      - uses: kotoba-lang/setup-kbb@9df85c3572851df091ba0f42d31acccb8acd84f1
-      - name: WIT interface — EDN IDL == world.wit, every host fn documented
-        run: kbb -M scripts/wit_test.cljk
-      - name: adapter registry
-        run: kbb -M scripts/check_adapter_registry.cljk
-      - name: kami-clj games stay inside the guest vocabulary
-        run: kbb -M scripts/guest_lint.cljk
+      # Plain git instead of actions/checkout for this repository: its
+      # post-checkout cleanup runs `git submodule foreach`, which fails on the
+      # kami-engine-sdk gitlink (no .gitmodules entry, see AGENTS.md).
+      - name: Check out this repository
+        run: |
+          git init -q .
+          git fetch -q --depth=1 --no-recurse-submodules "https://github.com/${GITHUB_REPOSITORY}.git" "$GITHUB_SHA"
+          git checkout -q FETCH_HEAD
       - name: ensure Rust runtime files stay out
         run: |
           if find . \

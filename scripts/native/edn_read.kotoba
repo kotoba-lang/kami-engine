@@ -1,0 +1,99 @@
+;; Shared helpers for the native gates: reading EDN text into :document
+;; values and looking things up in them. scripts/native_gates.py places this
+;; file's forms after a gate's `ns` form.
+;;
+;; `edn-clean` exists because the native reader (amu document-edn-read,
+;; checked at amu f7c07df) differs from EDN in ways the repository's files
+;; hit: it does not treat a comma as whitespace (`{:x false, :y 2}` reads
+;; `false,` as a symbol, and `[1 2],` traps), nor a newline (`[\n(def x 1)]`
+;; reads three items), nor a `;` comment; text that starts with whitespace does
+;; not read, and runs of spaces between the entries of a large map break
+;; document-get. Every run of whitespace, commas and comments outside a string
+;; literal becomes one space (and leading/trailing runs are dropped) before
+;; reading, which is what an EDN reader ignores anyway.
+
+(defn- byte-or-end [s :string b :i64 from :i64] :i64
+  (let [i (string-find-byte s b from)] (if (< i 0) (string-byte-length s) i)))
+
+(defn- string-close [s :string open :i64] :i64
+  ;; index of the quote closing the string literal opened at `open`
+  (loop [i (+ open 1)]
+    (let [q (byte-or-end s 34 i) b (byte-or-end s 92 i)]
+      (if (< b q) (recur (+ b 2)) q))))
+
+(defn- separator-end [s :string i :i64] :i64
+  ;; end of the run of whitespace, commas and comments starting at i
+  (let [n (string-byte-length s)]
+    (loop [j i]
+      (if (>= j n)
+        n
+        (let [b (string-code-point-at s j)]
+          (cond (or (= b 32) (= b 44) (= b 10) (= b 9) (= b 13)) (recur (+ j 1))
+                (= b 59) (recur (byte-or-end s 10 j))
+                :else j))))))
+
+(defn edn-clean [s :string] :string
+  ;; every separator run outside a string literal becomes one space; leading
+  ;; and trailing runs are dropped
+  (let [n (string-byte-length s)]
+    (loop [i (separator-end s 0) out ""]
+      (if (>= i n)
+        out
+        (let [c (min (min (byte-or-end s 32 i) (byte-or-end s 44 i))
+                     (min (byte-or-end s 10 i) (min (byte-or-end s 9 i) (byte-or-end s 13 i))))
+              q (byte-or-end s 34 i) k (byte-or-end s 59 i)
+              first-stop (min c (min q k))]
+          (cond (>= first-stop n) (string-append-range out s i n)
+                (= first-stop q) (let [e (min (+ (string-close s q) 1) n)]
+                                   (recur e (string-append-range out s i e)))
+                :else (let [e (separator-end s first-stop)
+                            body (string-append-range out s i first-stop)]
+                        (recur e (if (>= e n) body (string-concat body " "))))))))))
+
+(defn edn [s :string] :document
+  (document-edn-read (edn-clean s)))
+
+(defn at [d :document i :i64] :document
+  (option-value-of [:option :document] (document-vector-at d i) (document-null)))
+
+(defn list-item [d :document i :i64] :document
+  (option-value-of [:option :document] (document-list-at d i) (document-null)))
+
+(defn entry [d :document i :i64] :document
+  (option-value-of [:option :document] (document-map-entry-at d i) (document-null)))
+
+(defn kget [d :document k :keyword] :document
+  (option-value-of [:option :document] (document-get d (document-keyword k)) (document-null)))
+
+(defn str-of [d :document] :string
+  (option-value-of [:option :string] (document-string-value d) ""))
+
+(defn printed [d :document] :string
+  ;; a symbol's or keyword's text as EDN prints it (`scene/get-x`, `:f32`).
+  ;; document-symbol-value is not admitted natively, and keyword-name on
+  ;; document-keyword-value faults, so the printed form is the text used.
+  (document-edn-print d))
+
+(defn i64-of [d :document] :i64
+  (option-value-of [:option :i64] (document-i64-value d) -1))
+
+(defn kind-is? [d :document k :keyword] :bool
+  (= (document-kind d) k))
+
+(defn blob [d :document] :document
+  ;; edn-datomize.cljk stores nested collections as pr-str'd strings; read
+  ;; those back, and leave every other value alone.
+  (if (and (kind-is? d :string)
+           (let [s (str-of d)]
+             (or (string=? (string-substring s 0 (min 1 (string-byte-length s))) "{")
+                 (string=? (string-substring s 0 (min 1 (string-byte-length s))) "["))))
+    (edn (str-of d))
+    d))
+
+(defn entity [tx :string] :document
+  ;; the single entity of an edn-datomize tx-data file, or the document itself
+  ;; when the file holds a plain map
+  (let [d (edn tx)]
+    (if (and (kind-is? d :vector) (> (document-count d) 0) (kind-is? (at d 0) :map))
+      (at d 0)
+      d)))
