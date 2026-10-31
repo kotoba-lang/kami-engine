@@ -14,9 +14,14 @@ jobs:
     name: Native contract gates (Amu, macOS arm64)
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
+      # Plain git instead of actions/checkout for this repository: its
+      # post-checkout cleanup runs `git submodule foreach`, which fails on the
+      # kami-engine-sdk gitlink (no .gitmodules entry, see AGENTS.md).
+      - name: Check out this repository
+        run: |
+          git init -q .
+          git fetch -q --depth=1 --no-recurse-submodules "https://github.com/${GITHUB_REPOSITORY}.git" "$GITHUB_SHA"
+          git checkout -q FETCH_HEAD
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: kotoba-lang/amu
@@ -47,9 +52,14 @@ jobs:
     name: No Rust runtime files
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
+      # Plain git instead of actions/checkout for this repository: its
+      # post-checkout cleanup runs `git submodule foreach`, which fails on the
+      # kami-engine-sdk gitlink (no .gitmodules entry, see AGENTS.md).
+      - name: Check out this repository
+        run: |
+          git init -q .
+          git fetch -q --depth=1 --no-recurse-submodules "https://github.com/${GITHUB_REPOSITORY}.git" "$GITHUB_SHA"
+          git checkout -q FETCH_HEAD
       - name: ensure Rust runtime files stay out
         run: |
           if find . \
