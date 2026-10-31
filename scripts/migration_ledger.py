@@ -98,7 +98,7 @@ KEEP_NAMES = {"LICENSE", "NOTICE", ".gitignore", ".nojekyll", "imports.json",
               "local-changes.json", "cljk-origin.edn", "Dockerfile"}
 REMOVE_NAMES = {"deps.edn", "nbb.edn", "package.json", "tasks.edn"}
 NATIVE_PATHS = {"scripts/native_gates.py", "scripts/migration_ledger.py", "scripts/amu_capability_probe.py",
-                "scripts/placement_consumers.py", ".github/workflows/ci.yml"}
+                "scripts/placement_consumers.py", "scripts/upstream_apis.py", ".github/workflows/ci.yml"}
 # CLJK scripts whose job the native gates took over in JUN-642: oracle only.
 GATE_ORACLES = {"scripts/wit_test.cljk", "scripts/check_adapter_registry.cljk", "scripts/guest_lint.cljk"}
 
@@ -199,7 +199,8 @@ def classify(path, mode, code):
     if "hermes" in parts or parts[0] in (".claude", ".github"):
         return {"class": "keep"}
     if parts[:2] == ["docs", "evidence"] or path in ("docs/migration-ledger.json", "docs/migration-ledger.md",
-                                                                   "docs/migration-placement.json"):
+                                                     "docs/migration-placement.json", "docs/upstream-apis.json",
+                                                     "docs/upstream-apis.md"):
         return {"class": "keep"}
     if name in REMOVE_NAMES:
         return {"class": "d", "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"}
