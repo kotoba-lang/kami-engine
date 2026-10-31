@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-refusal: E2111
+
+(defn main [] :i64 (do (doseq [[a b] [[1 2]]] (+ a b)) 0))

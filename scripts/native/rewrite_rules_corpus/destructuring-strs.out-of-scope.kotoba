@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-refusal: E2111
+
+(defn main [] :i64 (let [{:strs [a]} {:a 1}] a))

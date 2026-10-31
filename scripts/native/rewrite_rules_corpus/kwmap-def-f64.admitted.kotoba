@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-value: 1
+
+(def default-whip-durations {:windup 0.12 :active 0.18 :recovery 0.22})
+(defn main [] :i64 (if (f64-lt 0.1 (:windup default-whip-durations)) 1 0))

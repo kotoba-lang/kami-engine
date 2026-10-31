@@ -13,7 +13,7 @@ namespace dependencies and external libraries, and derives the port order
 
 The Amu blockers (class e) are not guessed: BLOCKERS below records what the
 pinned Amu CLI refused when the probe sources in
-docs/evidence/amu-capability-probe-20261101b.json were run against it. The
+docs/evidence/amu-capability-probe-20261101c.json were run against it. The
 atom blockers (JUN-731) and the keyword map blockers (kwmap/*, JUN-732) are
 split by the port they need: the rewrite rules are docs/port-rewrite-rules.md,
 the atom ones measured in docs/evidence/port-rewrite-rules-20261101.json.
@@ -42,16 +42,21 @@ CLASSES = {
     "native": "already native: .kotoba sources and the Amu gate runner and CI definition",
 }
 
-# Measured with the pinned Amu macOS CLI (kotoba-lang/amu c2186d762e20, the
-# one CI uses) on 2026-11-01 (JUN-728). Against the previous pin 3c9eb7f7f74e
-# (amu-capability-probe-20261031b.json) only the keyword-map-literal probes
-# changed: amu PR #1750 admits a keyword-keyed literal as a closed record, so
-# let-map and fn-returns-map now run; the other blockers' probes refuse as
-# before. `detect` is a regex over a CLJK file with its comments and string
-# contents removed; the kwmap/* blockers are read by kwmap_patterns() instead.
-# amu-capability-probe-20261101b.json re-ran every probe at the same pin with the
-# same results, filed under the kwmap/* blockers, and added probes for the
-# blockers they did not cover (JUN-732).
+# Measured with the pinned Amu macOS CLI (kotoba-lang/amu 05668c77134a, the
+# one CI uses) on 2026-11-01 (JUN-729, JUN-734):
+# docs/evidence/amu-capability-probe-20261101c.json. Against the previous pin
+# c2186d762e20 (amu-capability-probe-20261101b.json) six probes changed:
+# amu PR #1751 (JUN-729) makes destructuring reader sugar in let / loop / defn
+# parameters, so let-vector runs; amu PR #1753 (JUN-734) admits def literals
+# holding f64 / bool values or vectors of maps (D5: def-f64-map, def-vec-of-maps
+# run), variadic assoc (D6: assoc-variadic runs), (get m k) -> [:option V] and
+# (:k m d) on a typed map (D10), and refuses a bare record name as a parameter
+# type with E2105 (declared-record-expected, was E2104). keys-or-param is now
+# E2104 (the pattern parameter is unannotated) instead of E2119. Every other
+# probe refuses as before. `detect` is a regex over a CLJK file with its
+# comments and string contents removed; the kwmap/* blockers are read by
+# kwmap_patterns() and destructuring by destructuring_patterns() instead.
+# Earlier: c2186d762e20 (JUN-728, 20261101 / 20261101b), 3c9eb7f7f74e (20261031b).
 BLOCKERS = {
     "multi-module": {
         "refusal": "E6002 required module ... is missing from the explicit source paths",
@@ -64,10 +69,19 @@ BLOCKERS = {
     # kwmap_patterns() over files that contain a keyword map literal; a keyword
     # map that is only a local fixed-shape record, a constant table read by a
     # literal key, or ex-info data is admitted and is no blocker.
+    # JUN-734 (D5, amu 05668c77) admits def literals holding f64 / bool values,
+    # vectors of maps, f64 / bool / keyword vectors and vectors of vectors, so
+    # this blocker shrank from every such def (109 files at c2186d7) to the def
+    # literals that still fail to type: a vector whose literal items differ in
+    # type (maps with different key sets or value types, mixed kinds) or that
+    # holds more than 64 non-integer items. An item that is a symbol, a call or
+    # nil has a type only type flow can tell; it is read as matching anything
+    # (nil fields are kwmap/nil-field).
     "kwmap/def-literal": {
-        "refusal": "E2124 def value must be an integer, string, keyword or vector literal",
-        "what": "a top-level def of a keyword map holding f64 or bool values, or of a vector of maps; port as a "
-                "defrecord built by ->Rec in the def (f64 fields are admitted) or a defn- thunk",
+        "refusal": "E2116 vector literal items must be i64 (at most 64)",
+        "what": "a top-level def of a keyword map (or a vector of them) holding a vector whose items differ in type "
+                "(maps with different keys, mixed kinds) or that holds more than 64 non-integer items; port the items "
+                "as one defrecord with [:option T] fields built by ->Rec, or a typed map",
         "issues": ["JUN-734"],
     },
     "kwmap/table-runtime-key": {
@@ -84,7 +98,8 @@ BLOCKERS = {
         "issues": ["JUN-735"],
     },
     "kwmap/param-row": {
-        "refusal": "E2104 a literal passed to an unannotated parameter; E2119 a {:keys ..} parameter; E2179 [:ref] to another namespace",
+        "refusal": "E2104 a literal passed to an unannotated parameter or an unannotated {:keys ..} parameter; "
+                   "E2105 a bare record name as a parameter type; E2179 [:ref] to another namespace",
         "what": "a map read through a parameter ((:k p), {:keys ..} destructuring) or a literal passed to another "
                 "namespace's fn; port as a defrecord and [:ref :ns/R] parameters (:ns the file's own), built with ->R / map->R",
         "issues": ["JUN-733"],
@@ -105,10 +120,13 @@ BLOCKERS = {
         "issues": ["JUN-733"],
     },
     "kwmap/option-default": {
-        "refusal": "E2104 get with a default / (:k m d) on a record; E2119 :or in a {:keys ..} parameter; E2101 merge",
+        "refusal": "E2104 get with a default on a record, (or (:k m) d), :or in an unannotated {:keys ..} parameter or on a "
+                   "record; E2103 (:k m d) on a record; E2101 merge",
         "what": "an option map with defaults ((get m :k d), (:k m d), (or (:k m) d), :or, (merge {defaults} m)); port as a "
-                "defrecord with [:option T] fields read by option-or, or a typed map read by (get m k d)",
-        "issues": ["JUN-733"],
+                "defrecord with [:option T] fields read by option-or, or a typed map read by (get m k d) / (:k m d) "
+                "(admitted since amu 05668c77, JUN-734 D10); whether a map becomes a record or a typed map is the "
+                "port's decision, so every such use stays counted",
+        "issues": ["JUN-733", "JUN-734"],
     },
     "kwmap/dynamic": {
         "refusal": "E2101 read-string / slurp / spit / pprint / walk; E2104 an f64 inside a :document",
@@ -122,11 +140,9 @@ BLOCKERS = {
                 "or a case on the key",
         "issues": ["JUN-732"],
     },
-    "kwmap/variadic-assoc": {
-        "refusal": "E2103 wrong number of arguments to 'assoc': expected 3",
-        "what": "(assoc m k1 v1 k2 v2 ..); port as nested assoc, one key each",
-        "issues": ["JUN-734"],
-    },
+    # kwmap/variadic-assoc (55 files at c2186d7) is gone: JUN-734 (D6, amu
+    # 05668c77) reads (assoc m k1 v1 k2 v2 ..) as nested assoc on records,
+    # typed maps and documents; only an odd key/value count is E2103.
     "f64-generic-arith": {
         "refusal": "E2104 type mismatch in '*': expected :i64; E2101 for f64->i64",
         "what": "+ - * / < > on f64 values and f64 -> i64 conversion; the named f64-add / f64-mul / f64-lt / f64-sqrt are admitted",
@@ -158,11 +174,17 @@ BLOCKERS = {
         "issues": ["JUN-730", "JUN-731"],
         "detect": r"\((defmulti|defmethod|defprotocol|extend-protocol|extend-type|reify)\b",
     },
+    # JUN-729 (amu 5667e44c) admits destructuring in let / loop and annotated
+    # defn parameters, so the blocker is read by destructuring_patterns() for
+    # what native still refuses rather than for every pattern.
     "destructuring": {
-        "refusal": "E2111 malformed binding vector",
-        "what": "sequential or map destructuring in let / fn / loop bindings",
+        "refusal": "E2104 an unannotated defn pattern parameter, :or on a record, & over a list; E2139 a fn pattern "
+                   "parameter; E2111 :strs / :syms / a non-keyword key, a pattern in doseq; E2127 an absent key; "
+                   "E2101 for; E2103 when-let / if-let",
+        "what": "a pattern in a defn / fn parameter (CLJK parameters are unannotated), in doseq / for / when-let / if-let "
+                "bindings, or a let / loop pattern that is a map pattern or uses &; plain let / loop vector patterns "
+                "(nested, :as, _) are admitted; port as an annotated parameter or a let in the body",
         "issues": ["JUN-729"],
-        "detect": r"\((let|loop|fn|defn-?|when-let|if-let|doseq|for)\b[^\[\]]*\[\s*[\[{]|\(fn\s+\[[^\]]*[\[{]|\(defn-?\s+\S+\s+(\"\"\s+)?\[[^\]]*[\[{]",
     },
     # JUN-731 split the former single atom-escape blocker (46 files at
     # 3c9eb7f) by what a port has to do; a file may carry several of the three.
@@ -463,13 +485,52 @@ SHAPE_TESTS = {"map?", "coll?", "postwalk", "prewalk", "walk/postwalk", "walk/pr
 CORE_NS = ("clojure.", "str/", "string/", "set/", "math/", "Math/", "js/", "edn/", "pp/", "walk/", "w/", "s/", "t/", "test/")
 
 
-def refused_def_value(v):
-    """A def value the native checker refuses (E2124): a vector of maps, or a
-    map holding an f64, a bool, or a vector of floats or forms."""
-    if is_node(v, "vec"):
+def literal_type(x):
+    """The type of a literal item as far as syntax tells (JUN-734 D5); None
+    for a symbol, a call, nil or an empty vector, whose type is type flow."""
+    if isinstance(x, str):
+        if FLOAT.match(x):
+            return "f64"
+        if re.match(r"^-?\d+$", x):
+            return "i64"
+        if x in ("true", "false"):
+            return "bool"
+        if x.startswith('"'):
+            return "string"
+        if is_kw(x):
+            return "keyword"
+        return None
+    if is_kwmap(x):
+        return ("map",) + tuple(sorted((k, literal_type(v)) for k, v in zip(x[1][0::2], x[1][1::2])))
+    if is_node(x, "vec") and x[1]:
+        kinds = {literal_type(y) for y in x[1]} - {None}
+        return ("vec", next(iter(kinds))) if len(kinds) == 1 else None
+    return None
+
+
+def compatible(a, b):
+    """Two literal item types the checker may unify (None matches anything)."""
+    if a is None or b is None:
         return True
-    return contains_node(v, lambda y: (isinstance(y, str) and (FLOAT.match(y) or y in ("true", "false")))
-                         or (is_node(y, "vec") and any(is_node(z) or FLOAT.match(str(z)) for z in y[1])))
+    if isinstance(a, tuple) and isinstance(b, tuple) and a[0] == b[0] == "map":
+        return ([k for k, _ in a[1:]] == [k for k, _ in b[1:]]
+                and all(compatible(u, v) for (_, u), (_, v) in zip(a[1:], b[1:])))
+    return a == b
+
+
+def refused_def_value(v):
+    """A def value the native checker still refuses at amu 05668c77 (E2116): a
+    vector inside it whose literal items differ in type, or that holds more
+    than 64 items that are not integers."""
+    for y, _ in walk(v):
+        if not is_node(y, "vec") or not y[1]:
+            continue
+        if len(y[1]) > 64 and any(literal_type(z) != "i64" for z in y[1]):
+            return True
+        ts = [literal_type(z) for z in y[1]]
+        if any(not compatible(a, b) for i, a in enumerate(ts) for b in ts[i + 1:]):
+            return True
+    return False
 
 
 def fn_params(x):
@@ -514,8 +575,6 @@ def kwmap_patterns(code):
                 found.add("runtime-key")
         if h in RUNTIME_COLL or (h == "into" and a and is_node(a[0], "map") and not a[0][1]):
             found.add("runtime-key")
-        if h == "assoc" and len(a) > 3:
-            found.add("variadic-assoc")
         if h in ("update", "update-in", "merge", "merge-with", "dissoc", "select-keys", "assoc-in", "get-in"):
             found.add("row-op")
         if ((h in ("merge", "merge-with") and a and is_kwmap(a[0]))
@@ -553,12 +612,51 @@ def kwmap_patterns(code):
     return found
 
 
+PATTERN_FNS = ("defn", "defn-", "fn", "defmethod")
+PATTERN_LETS = ("let", "loop")
+PATTERN_OTHER = ("doseq", "for", "when-let", "if-let", "when-some", "if-some", "when-first", "dotimes")
+
+
+def destructuring_patterns(code):
+    """Why a CLJK file's destructuring is still refused at amu 05668c77 (JUN-729).
+
+    Refused: a pattern in a defn / defmethod parameter (CLJK parameters carry no
+    annotation, E2104) or a fn parameter (E2139); a pattern in doseq / for /
+    when-let / if-let .. bindings (E2111 / E2101 / E2103); in let / loop, a map
+    pattern and a & rest. A map pattern is counted whole: an absent key (E2127),
+    :or on a record (E2104) and a :keys name never written as a keyword (E2111)
+    depend on the type and the module, not on the pattern, and :strs / :syms /
+    a non-keyword key (E2111) are map patterns too. & over a vector is admitted
+    and over a list E2104, which is type flow, so every & counts. Admitted and
+    not counted: a let / loop vector pattern without & (nested, :as, _); its nth
+    traps when the vector is short where Clojure binds nil."""
+    found = set()
+    for x, _ in walk(("list", read_forms(code), 0)):
+        h = head(x)
+        if h in PATTERN_FNS:
+            if any(is_node(q, "vec", "map") for pv in fn_params(x) for q in pv[1]):
+                found.add("fn-param" if h == "fn" else "defn-param")
+        elif h in PATTERN_LETS + PATTERN_OTHER and len(x[1]) > 1 and is_node(x[1][1], "vec"):
+            pats = [q for q in x[1][1][1][0::2] if is_node(q, "vec", "map")]
+            if pats and h in PATTERN_OTHER:
+                found.add("binding-form")
+            for p in pats:
+                for y, _ in walk(p):
+                    if is_node(y, "map"):
+                        found.add("map-pattern")
+                    elif is_node(y, "vec") and "&" in y[1]:
+                        found.add("rest")
+    return found
+
+
 def blockers_of(code, reqs):
     found = []
     kwmap = kwmap_patterns(code) if re.search(KWMAP_LITERAL, code) else set()
     for bid, b in BLOCKERS.items():
         if bid.startswith("kwmap/"):
             hit = bid[len("kwmap/"):] in kwmap
+        elif bid == "destructuring":
+            hit = bool(destructuring_patterns(code))
         elif bid == "atom-local-iteration":
             hit = atom_written_in_iteration(code)
         elif bid == "atom-escape":
@@ -748,8 +846,8 @@ def build(kotoba, rev):
         "issue": "JUN-641",
         "inputs": {
             "kotoba-lib": {"repo": "kotoba-lang/kotoba", "rev": rev},
-            "amu-probe": {"repo": "kotoba-lang/amu", "rev": "c2186d762e200205540f4ef9ca2b3ae66c4fc770",
-                          "evidence": "docs/evidence/amu-capability-probe-20261101b.json"},
+            "amu-probe": {"repo": "kotoba-lang/amu", "rev": "05668c77134ae4a5b79db648bbed1d048ef8c830",
+                          "evidence": "docs/evidence/amu-capability-probe-20261101c.json"},
         },
         "classes": CLASSES,
         "counts": {"tracked": len(files), "class": dict(sorted(counts.items())),

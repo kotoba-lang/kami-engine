@@ -1,5 +1,5 @@
 (ns probe)
-;; expect-refusal: E2124
+;; expect-refusal: E2104
 
 (def default-whip-durations {:windup 0.12 :active 0.18 :recovery 0.22})
 (defn- step-whip [{:keys [state timer]} attack? dt durations]

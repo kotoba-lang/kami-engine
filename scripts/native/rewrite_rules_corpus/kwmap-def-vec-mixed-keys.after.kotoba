@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-value: 5
+
+(defrecord Item [a :i64 b [:option :i64]])
+(def items [(->Item 1 (option-none-of [:option :i64])) (->Item 2 (option-some-of [:option :i64] 3))])
+(defn main [] :i64 (+ (:a (nth items 1)) (option-or (:b (nth items 1)) 0)))

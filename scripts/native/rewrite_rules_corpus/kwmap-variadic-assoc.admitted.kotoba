@@ -1,4 +1,4 @@
 (ns probe)
-;; expect-refusal: E2103
+;; expect-value: 4
 
 (defn main [] :i64 (:b (assoc {:a 1 :b 2} :a 3 :b 4)))

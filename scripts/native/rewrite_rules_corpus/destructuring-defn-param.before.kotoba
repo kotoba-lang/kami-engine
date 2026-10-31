@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-refusal: E2104
+
+(defn- prod [[a b]] (* a b))
+(defn main [] :i64 (+ (prod [1 2]) (prod [3 4])))

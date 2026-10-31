@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-value: 14
+
+(defn- prod [[a b] :vector-i64] :i64 (* a b))
+(defn main [] :i64 (+ (prod [1 2]) (prod [3 4])))
