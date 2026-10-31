@@ -1,0 +1,3 @@
+;; kbb reads :deps here, not from deps.edn; the same dependencies (JUN-649).
+{:paths ["src"]
+ :deps {}}

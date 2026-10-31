@@ -1,0 +1,44 @@
+;; kami-engine-sdk — KAMI Engine Clojure SDK (clj + Datomic + WebGPU)
+;; See ARCHITECTURE.md. clj is the brain; kami-render (Rust/wgpu) is the GPU arm.
+;;
+;; Datomic flavor is an open question (ADR-CLJ-02 / §13). The schema and kami.db
+;; API are Datalog-portable; datalevin is the default here as an OSS, embeddable,
+;; blockchain-friendly Datalog store aligned with root/'s "no proprietary Datomic"
+;; platform note. Swap the :datomic alias for Cloud/Peer if desired.
+{:paths ["src" "resources"]
+
+ :deps {
+        io.github.kotoba-lang/io {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.io"}
+        io.github.kotoba-lang/json {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.json"}
+        io.github.kotoba-lang/coll {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.coll"}
+        io.github.kotoba-lang/edn {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.edn"}
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.test"}
+        io.github.kotoba-lang/text {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.text"}
+        ;; kami.fsm, kami.gpu and kami.ipc (JUN-649 split)
+        io.github.kotoba-lang/kotoba.kamiEngineSdk {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "43b9173b6f5866b5eb228a245e7fd451687aa2b9"
+         :deps/root "lib/kotoba.kamiEngineSdk"}} ; snapshot transport (JVM↔browser)
+
+ :aliases
+ {;; ----- JVM authoring / Datomic source of truth -----------------------------
+  ;; alt: com.datomic/peer {:mvn/version "..."}  | com.datomic/client-cloud {:mvn/version "..."}
+
+
+
+
+
+  ;; ----- Contract tests (no GPU): render-IR golden, WGSL emit, IPC packing ---
+  :test     {:extra-paths ["test"]}
+}}

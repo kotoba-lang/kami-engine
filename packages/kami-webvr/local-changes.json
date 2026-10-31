@@ -1,0 +1,15 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "6826966ff5a45f04e9b8401b7a7e2a13bc9a3fa58587e009b3005393523d4e6a",
+      "sha256": "af9c0cd2ed095056817e5ef4d09be9df0d9d232a8d85bf9b53ea1fa6cad5dc7b",
+      "reason": "Moved from the kotoba monorepo lib/kotoba.kamiWebvr at ee9a3f3 (JUN-649): the libraries that stay in kotoba are pinned to that commit, and the ones that moved here in the same wave are local roots under packages/. The other sections are unchanged."
+    },
+    "nbb.edn": {
+      "imported-sha256": "6074756ee422647402697a68dac1828e6ea273ccc449e23eb4169d2030ad4d54",
+      "sha256": "2c43d13f5151030226f12ce73f3867735b440fa31dd92daabc9fd347a07abfae",
+      "reason": "kbb reads :deps from nbb.edn, so it names the same dependencies as deps.edn (JUN-649)."
+    }
+  }
+}
