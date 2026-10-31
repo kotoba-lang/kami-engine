@@ -3,8 +3,8 @@
   "files": {
     "deps.edn": {
       "imported-sha256": "ee8155a9a42a37223639b855549ae0c6c5542ad20665cc897bd03b7df1bc6237",
-      "sha256": "47d6df74922b0909d728d6f8fc13daa4a1f3f1b0a4eef4f78661b22cbbb7199c",
-      "reason": "The dependency on kami-mangaka-page names the kotoba monorepo's lib/kotoba.kamiMangakaPage, where it now lives (JUN-649), so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (dep org.clojure/clojure, alias :datomic, alias :dev, alias :build, alias :render, alias :shadow, alias :test reduced to :extra-paths, alias :lint): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+      "sha256": "bb998aa9ac2b9a3996d815da029e23c3c8815b8d29310cfe3eed7b653a5eb69f",
+      "reason": "The dependency on kami-mangaka-page names the kotoba monorepo's lib/kotoba.kamiMangakaPage, where it now lives (JUN-649), so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (dep org.clojure/clojure, alias :datomic, alias :dev, alias :build, alias :render, alias :shadow, alias :test reduced to :extra-paths, alias :lint): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package. kami-engine-sdk is the local root under packages/: it moved here from the kotoba monorepo (JUN-649), and its standalone repository no longer resolves."
     }
   }
 }

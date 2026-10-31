@@ -88,3 +88,26 @@ Moved with their provenance (`imports.json`) and local changes:
 | kami-gen-procedural | `ec78fba` | kotoba `lib/kotoba.kamiGenProcedural` |
 | kami-web | `2c4064b` | kotoba `lib/kotoba.kamiWeb` |
 | swarm-choreo | `fe69e71` | kotoba `lib/kotoba.swarmChoreo` |
+
+## Moved here from kotoba lib/ (JUN-649)
+
+Game-engine-specific, so placed in this repository (`docs/migration-placement.json`).
+Moved with their provenance (`imports.json`) and local changes. `kami-engine-sdk`
+was split: `kami.fsm`, `kami.gpu` and `kami.ipc` stay in kotoba `lib/kotoba.kamiEngineSdk`,
+which kotoba libraries require.
+
+| package | upstream commit | was |
+|---|---|---|
+| [kami-contracts](kami-contracts) | `43811a8` | kotoba `lib/kotoba.kamiContracts` |
+| [kami-app-fixtures](kami-app-fixtures) | `105f1a5` | kotoba `lib/kotoba.kamiAppFixtures` |
+| [kami-engine-sdk](kami-engine-sdk) | `3f5f61b` | kotoba `lib/kotoba.kamiEngineSdk` |
+| [host](host) | `1da7c94` | kotoba `lib/kotoba.host` |
+| [kami-app-car-sim](kami-app-car-sim) | `957db51` | kotoba `lib/kotoba.kamiAppCarSim` |
+| [kami-app-isekai](kami-app-isekai) | `f556e1f` | kotoba `lib/kotoba.kamiAppIsekai` |
+| [kami-eng-web](kami-eng-web) | `17a53ad` | kotoba `lib/kotoba.kamiEngWeb` |
+| [kami-engine-app-sdk](kami-engine-app-sdk) | `efe8f6c` | kotoba `lib/kotoba.kamiEngineAppSdk` |
+| [kami-engine-guest](kami-engine-guest) | `aa434c6` | kotoba `lib/kotoba.kamiEngineGuest` |
+| [kami-engine-hud-gpu](kami-engine-hud-gpu) | `1607670` | kotoba `lib/kotoba.kamiEngineHudGpu` |
+| [kami-engine-input-map](kami-engine-input-map) | `9841302` | kotoba `lib/kotoba.kamiEngineInputMap` |
+| [kami-isekai-assets](kami-isekai-assets) | `d50bfe0` | kotoba `lib/kotoba.kamiIsekaiAssets` |
+| [kami-webvr](kami-webvr) | `24087fe` | kotoba `lib/kotoba.kamiWebvr` |

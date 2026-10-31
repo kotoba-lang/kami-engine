@@ -1,0 +1,15 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "50a2006cc468a418b9591896b6a69cf3ecd879a8d1e4917f23fda1a57a954483",
+      "sha256": "03a17aebd9fa8839b37667b50d7969d75153527e4f38509e10906625411a5330",
+      "reason": "Moved from the kotoba monorepo lib/kotoba.kamiEngineAppSdk at ee9a3f3 (JUN-649): the libraries that stay in kotoba are pinned to that commit, and the ones that moved here in the same wave are local roots under packages/. The other sections are unchanged."
+    },
+    "nbb.edn": {
+      "imported-sha256": "d004613c9fa288623b90149dd357fadd2ee9efdd55d8e5f8aec89aa01cc3d616",
+      "sha256": "926e5f336b1511c10acb409e2d988df38f99075594160d8470c30f03d97e6fc8",
+      "reason": "kbb reads :deps from nbb.edn, so it names the same dependencies as deps.edn (JUN-649)."
+    }
+  }
+}

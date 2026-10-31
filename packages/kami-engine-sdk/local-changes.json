@@ -1,0 +1,17 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "90f91864b5be734a9703cadb95c1bc9828c4ee59fba5e2a6ae78f155e5cbe813",
+      "sha256": "12d1844b3d727e7baf9a4a98688ce6b484c351ebdca188e48555ffbfdd6a02fe",
+      "reason": "Moved from the kotoba monorepo lib/kotoba.kamiEngineSdk at ee9a3f3 (JUN-649): the libraries that stay in kotoba are pinned to that commit, and the ones that moved here in the same wave are local roots under packages/. The other sections are unchanged. kami.fsm, kami.gpu and kami.ipc stayed in kotoba lib/kotoba.kamiEngineSdk when that library was split, so they are taken from there. lib/kotoba.kamiEngineSdk is pinned to the split commit 43b9173, which holds only those three namespaces."
+    },
+    "nbb.edn": {
+      "imported-sha256": "aa6e0de6c29f8ebaebd3b0bdb39772b83f3ab034e36ec61fe360e8996fd1831f",
+      "sha256": "cfd41fdb309bfbe19e79b7e8ea37772465eb6b721c8e4c6c60d74dbec8b50b90",
+      "reason": "kbb reads :deps from nbb.edn, so it names the same dependencies as deps.edn (JUN-649). kami.fsm, kami.gpu and kami.ipc stayed in kotoba lib/kotoba.kamiEngineSdk when that library was split, so they are taken from there. lib/kotoba.kamiEngineSdk is pinned to the split commit 43b9173, which holds only those three namespaces."
+    }
+  },
+  "split": "kotoba lib/kotoba.kamiEngineSdk was split (JUN-649): src/kami/fsm.cljk, src/kami/gpu.cljk, src/kami/ipc.cljk stay in kotoba because kotoba libraries require them; this side holds the rest, and imports.json lists only the files held here.",
+  "added": {}
+}

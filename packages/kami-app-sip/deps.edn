@@ -49,8 +49,7 @@
          :deps/root "lib/kotoba.json"}      ; read story-bible JSON-LD
         ;; The engine SDK: scene/ecs/sim/db/render-IR contract over kami-render.
         ;; (was kami-engine-sdk-clj; renamed — ADR-2607102200 addendum 1)
-        gftd/kami-engine-sdk     {:git/url "https://github.com/kotoba-lang/kami-engine-sdk.git"
-                                  :sha "a3824ff59abcc1c87d76d291be7ed573412bc99c"}
+        gftd/kami-engine-sdk     {:local/root "../kami-engine-sdk"}
         ;; Work-agnostic 2D manga render commons (ADR-2606282100): STYLE-FIRST
         ;; CLIP-77 compose + image-gen client. sip.render injects work mappers.
         gftd/kami-mangaka-render {:git/url "https://github.com/kotoba-lang/kami-mangaka-render.git"

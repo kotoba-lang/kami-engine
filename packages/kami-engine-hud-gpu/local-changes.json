@@ -1,0 +1,15 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "742b14f5f5bb80d78fc6dd34465612fd30aa7b5bacc5a46a1397ae27f360b65d",
+      "sha256": "66c6aef8529944169eb05afd88b53a296fc2ad5c6e1ef91174ed836914f3a634",
+      "reason": "Moved from the kotoba monorepo lib/kotoba.kamiEngineHudGpu at ee9a3f3 (JUN-649): the libraries that stay in kotoba are pinned to that commit, and the ones that moved here in the same wave are local roots under packages/. The other sections are unchanged."
+    },
+    "nbb.edn": {
+      "imported-sha256": "d004613c9fa288623b90149dd357fadd2ee9efdd55d8e5f8aec89aa01cc3d616",
+      "sha256": "3b79294a6969368ae97cc5cbe607e106ad112a76f1c879e355b9ce84245ff939",
+      "reason": "kbb reads :deps from nbb.edn, so it names the same dependencies as deps.edn (JUN-649)."
+    }
+  }
+}

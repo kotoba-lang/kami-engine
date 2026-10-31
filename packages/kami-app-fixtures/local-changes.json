@@ -1,0 +1,20 @@
+{
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "d9bc632683ef7f4aa843f86848987154bd06b56dd514806131600d7f1350c78a",
+      "sha256": "2bd8a1ed63a1fcde763ae10f2a54562a2e7d8799f942b321b74b7b0407b120d8",
+      "reason": "Moved from the kotoba monorepo lib/kotoba.kamiAppFixtures at ee9a3f3 (JUN-649): the libraries that stay in kotoba are pinned to that commit, and the ones that moved here in the same wave are local roots under packages/. The other sections are unchanged."
+    },
+    "nbb.edn": {
+      "imported-sha256": "15791b057179050ebac6341e3451e19dc26d2e7a748d1314b2ec6c1a1ac09cfb",
+      "sha256": "5f900346fa99877fdd122681b7cffc9fc2e40c4158a7a52a0eaa6cad8bdf8a5f",
+      "reason": "kbb reads :deps from nbb.edn, so it names the same dependencies as deps.edn (JUN-649)."
+    },
+    "resources/kami/app/kami-clj-play/games/survivors/deps.edn": {
+      "imported-sha256": "1b684e98a8690030f503c9dbaf86bcc5e745e511973b252ad81897755ffa028c",
+      "reason": "The git floors/pins on repositories bundled here become local roots in the monorepo deps sync (2026-10-27 refresh); other sections unchanged.",
+      "sha256": "f829de0f7a774b4b7f507b0077be4a01016f3db90b84882b5e3758cc9076ab2e"
+    }
+  },
+  "schema": "kotoba.library-local-changes.v1"
+}

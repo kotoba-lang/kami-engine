@@ -161,6 +161,11 @@
    "reason": "infinite-canvas board (Freeform-like); not a game",
    "done": "moved 2026-10-31 to kotoba lib/kotoba.freeboard (JUN-649)"
   },
+  "kami-engine:packages/host": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.host: kami.host: the browser host for compiled kami games (owner put kami.host in scope); its only other in-lib consumer is kotoba.kamiAppIsekai, which also moves",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.host (JUN-649)"
+  },
   "kami-engine:packages/kami-app": {
    "to": "kami-engine",
    "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
@@ -181,13 +186,28 @@
    "to": "kami-engine",
    "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
   },
+  "kami-engine:packages/kami-app-car-sim": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiAppCarSim: car-sim app domain; consumer is a game (network-awai/network-isekai)",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiAppCarSim (JUN-649)"
+  },
   "kami-engine:packages/kami-app-character-creator": {
    "to": "kami-engine",
    "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
   },
+  "kami-engine:packages/kami-app-fixtures": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiAppFixtures: fixtures for KAMI app crates; also defines kami.app-fixtures, which kotoba.kamiContracts defines too",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiAppFixtures (JUN-649)"
+  },
   "kami-engine:packages/kami-app-hygaccess-plant": {
    "to": "kami-engine",
    "reason": "kami-app-* application; its consumer cloud-itonami/cloud-itonami-hygiene-access uses it as a product visualization, which is a use of the engine, not of a shared library"
+  },
+  "kami-engine:packages/kami-app-isekai": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiAppIsekai: isekai game app",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiAppIsekai (JUN-649)"
   },
   "kami-engine:packages/kami-app-modeler": {
    "to": "kami-engine",
@@ -221,6 +241,11 @@
    "to": "kami-engine",
    "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
   },
+  "kami-engine:packages/kami-contracts": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiContracts: component-boundary authority of the engine; its in-lib consumers (kamiAppFixtures, kamiEngineSdk) move with it",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiContracts (JUN-649)"
+  },
   "kami-engine:packages/kami-creative-studio": {
    "to": "kami-engine",
    "reason": "an application built on the engine, like kami-app-*; owner decision 2026-10-31 (JUN-649)"
@@ -240,6 +265,11 @@
    "reason": "EDL/timeline data model; used by anime and douga, which go to kotoba",
    "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEizoTimeline (JUN-649)"
   },
+  "kami-engine:packages/kami-eng-web": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiEngWeb: engine web entries restored from the legacy kami-engine-web",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiEngWeb (JUN-649)"
+  },
   "kami-engine:packages/kami-engine-aero": {
    "to": "kotoba",
    "reason": "aerodynamic drag solver (CAE)",
@@ -249,6 +279,11 @@
    "to": "kotoba",
    "reason": "animation evaluation (owner's kotoba list); non-game consumer com-junkawasaki/root probes. kami-gameplay keeps depending on it from kami-engine",
    "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineAnimation (JUN-649)"
+  },
+  "kami-engine:packages/kami-engine-app-sdk": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiEngineAppSdk: builder SDK (owner's kami-engine list)",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiEngineAppSdk (JUN-649)"
   },
   "kami-engine:packages/kami-engine-cae-solver": {
    "to": "kotoba",
@@ -272,6 +307,21 @@
   "kami-engine:packages/kami-engine-engine": {
    "to": "kami-engine",
    "reason": "pointer package without code (README points to the successor); what stays or goes is JUN-647"
+  },
+  "kami-engine:packages/kami-engine-guest": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiEngineGuest: kami-clj guest compiler (guest vocabulary); consumers are games (network-isekai, ghosthacker) and kami-genre-base-systems",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiEngineGuest (JUN-649)"
+  },
+  "kami-engine:packages/kami-engine-hud-gpu": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiEngineHudGpu: game HUD",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiEngineHudGpu (JUN-649)"
+  },
+  "kami-engine:packages/kami-engine-input-map": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiEngineInputMap: input binding (owner's kami-engine list)",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiEngineInputMap (JUN-649)"
   },
   "kami-engine:packages/kami-engine-io": {
    "to": "kami-engine",
@@ -309,6 +359,11 @@
   "kami-engine:packages/kami-engine-script-runtime": {
    "to": "kami-engine",
    "reason": "pointer package without code (README points to the successor); what stays or goes is JUN-647"
+  },
+  "kami-engine:packages/kami-engine-sdk": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiEngineSdk: authoring SDK (scenes, ECS, sim) is engine-specific, but kotoba.fsm re-exports kami.fsm and kotoba.webgpu requires kami.gpu, so moving the whole library would make kotoba depend on kami-engine",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiEngineSdk (JUN-649)"
   },
   "kami-engine:packages/kami-engine-vehicle-designer": {
    "to": "kotoba",
@@ -355,6 +410,11 @@
   "kami-engine:packages/kami-input-scene": {
    "to": "kami-engine",
    "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-isekai-assets": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiIsekaiAssets: isekai RPG character and effect templates",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiIsekaiAssets (JUN-649)"
   },
   "kami-engine:packages/kami-mangaka-expression": {
    "to": "kotoba",
@@ -448,6 +508,11 @@
    "reason": "kotoba.web.* (document, render IR, math) is a web rendering library; render IR is in the owner's kotoba list",
    "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiWeb (JUN-649)"
   },
+  "kami-engine:packages/kami-webvr": {
+   "to": "kami-engine",
+   "reason": "moved from kotoba lib/kotoba.kamiWebvr: choice-based scenario (visual-novel) engine from kami-engine-sdk",
+   "done": "moved 2026-10-31 from kotoba lib/kotoba.kamiWebvr (JUN-649)"
+  },
   "kami-engine:packages/swarm-choreo": {
    "to": "kotoba",
    "reason": "drone light-show choreography; not a game",
@@ -463,15 +528,18 @@
   },
   "kotoba:lib/kotoba.host": {
    "to": "kami-engine",
-   "reason": "kami.host: the browser host for compiled kami games (owner put kami.host in scope); its only other in-lib consumer is kotoba.kamiAppIsekai, which also moves"
+   "reason": "kami.host: the browser host for compiled kami games (owner put kami.host in scope); its only other in-lib consumer is kotoba.kamiAppIsekai, which also moves",
+   "done": "moved 2026-10-31 to kami-engine packages/host (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiAppCarSim": {
    "to": "kami-engine",
-   "reason": "car-sim app domain; consumer is a game (network-awai/network-isekai)"
+   "reason": "car-sim app domain; consumer is a game (network-awai/network-isekai)",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-app-car-sim (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiAppFixtures": {
    "to": "kami-engine",
-   "reason": "fixtures for KAMI app crates; also defines kami.app-fixtures, which kotoba.kamiContracts defines too"
+   "reason": "fixtures for KAMI app crates; also defines kami.app-fixtures, which kotoba.kamiContracts defines too",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-app-fixtures (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiAppGiemon": {
    "to": "kotoba",
@@ -483,7 +551,8 @@
   },
   "kotoba:lib/kotoba.kamiAppIsekai": {
    "to": "kami-engine",
-   "reason": "isekai game app"
+   "reason": "isekai game app",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-app-isekai (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiAppQuarryWalk": {
    "to": "kotoba",
@@ -515,15 +584,18 @@
   },
   "kotoba:lib/kotoba.kamiContracts": {
    "to": "kami-engine",
-   "reason": "component-boundary authority of the engine; its in-lib consumers (kamiAppFixtures, kamiEngineSdk) move with it"
+   "reason": "component-boundary authority of the engine; its in-lib consumers (kamiAppFixtures, kamiEngineSdk) move with it",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-contracts (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiEngWeb": {
    "to": "kami-engine",
-   "reason": "engine web entries restored from the legacy kami-engine-web"
+   "reason": "engine web entries restored from the legacy kami-engine-web",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-eng-web (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiEngineAppSdk": {
    "to": "kami-engine",
-   "reason": "builder SDK (owner's kami-engine list)"
+   "reason": "builder SDK (owner's kami-engine list)",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-engine-app-sdk (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiEngineCad": {
    "to": "kotoba",
@@ -535,15 +607,18 @@
   },
   "kotoba:lib/kotoba.kamiEngineGuest": {
    "to": "kami-engine",
-   "reason": "kami-clj guest compiler (guest vocabulary); consumers are games (network-isekai, ghosthacker) and kami-genre-base-systems"
+   "reason": "kami-clj guest compiler (guest vocabulary); consumers are games (network-isekai, ghosthacker) and kami-genre-base-systems",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-engine-guest (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiEngineHudGpu": {
    "to": "kami-engine",
-   "reason": "game HUD"
+   "reason": "game HUD",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-engine-hud-gpu (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiEngineInputMap": {
    "to": "kami-engine",
-   "reason": "input binding (owner's kami-engine list)"
+   "reason": "input binding (owner's kami-engine list)",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-engine-input-map (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiEngineSculpt": {
    "to": "kotoba",
@@ -559,7 +634,8 @@
     ],
     "move-to-kami-engine": "the other namespaces (kami.scene, kami.ecs, kami.sim, kami.db, kami.render, kami.backend.*, ...)",
     "also": "kami.backend.browser is defined both here and in kotoba.host"
-   }
+   },
+   "done": "split 2026-10-31: kami.fsm, kami.gpu and kami.ipc stay in kotoba; the rest is packages/kami-engine-sdk (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiGenSdfAgent": {
    "to": "kotoba",
@@ -567,7 +643,8 @@
   },
   "kotoba:lib/kotoba.kamiIsekaiAssets": {
    "to": "kami-engine",
-   "reason": "isekai RPG character and effect templates"
+   "reason": "isekai RPG character and effect templates",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-isekai-assets (JUN-649)"
   },
   "kotoba:lib/kotoba.kamiMangakaExpression": {
    "to": "kotoba",
@@ -643,7 +720,8 @@
   },
   "kotoba:lib/kotoba.kamiWebvr": {
    "to": "kami-engine",
-   "reason": "choice-based scenario (visual-novel) engine from kami-engine-sdk"
+   "reason": "choice-based scenario (visual-novel) engine from kami-engine-sdk",
+   "done": "moved 2026-10-31 to kami-engine packages/kami-webvr (JUN-649)"
   }
  }
 }

@@ -1,0 +1,20 @@
+{
+  "schema": "kotoba.library-local-changes.v1",
+  "files": {
+    "deps.edn": {
+      "imported-sha256": "3e28cca2f62b0c58f15958e9c78698a6de43ae25fc3714965d2261a7bfa262f5",
+      "sha256": "a7e0ec2a44bb39ced07ffc3d0b9359b1a51cdf34898e5d2e899b7faeea2de9d9",
+      "reason": "Moved from the kotoba monorepo lib/kotoba.kamiAppIsekai at ee9a3f3 (JUN-649): the libraries that stay in kotoba are pinned to that commit, and the ones that moved here in the same wave are local roots under packages/. The other sections are unchanged."
+    },
+    "nbb.edn": {
+      "imported-sha256": "9277710fdb6585c3381fb479a91c8642884caed1acba2cba0cbb9b8f0e4aeb9f",
+      "sha256": "26dbc414e40898eade35f3bf653856344337e968b7ce1e9110001e07c3cea93e",
+      "reason": "kbb reads :deps from nbb.edn, so it names the same dependencies as deps.edn (JUN-649)."
+    },
+    "bb.edn": {
+      "imported-sha256": "f59cc37406bf93155ef548beb4fc404bdd861695c524fdf3a24c3193b122db9d",
+      "sha256": "b2ce68ea61066bce8fa1a11378a7fa6a0dc20bef569be0a115c8e680a4c8b1d5",
+      "reason": "Changed in the kotoba monorepo without a local-change record (last by af1a7179b deps: take error, bytes, coll, edn, io, kotoba-datom, image, pprint, process, text from the kotoba monorepo (bb.edn/shadow-cljs.edn) (#926)); carried over as it was, and recorded here when the package moved (JUN-649)."
+    }
+  }
+}

@@ -1,0 +1,17 @@
+;; kbb reads :deps here, not from deps.edn; the same dependencies (JUN-649).
+{:paths ["src" "resources"]
+ :deps {io.github.kotoba-lang/io {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.io"}
+        io.github.kotoba-lang/pprint {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.pprint"}
+        io.github.kotoba-lang/edn {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.edn"}
+        io.github.kotoba-lang/test {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.test"}
+        io.github.kotoba-lang/text {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
+         :deps/root "lib/kotoba.text"}}}
