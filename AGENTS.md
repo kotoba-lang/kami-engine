@@ -84,7 +84,9 @@ These decisions apply to all work in this repository:
 | `hermes/` | resident-bot profiles for this repo |
 | `scripts/native/`, `scripts/native_gates.py` | the CI gates: Kotoba programs for the WIT, adapter-registry and guest-lint checks, and the Python stager that runs them with Amu |
 | `scripts/` | CLJK reference oracle for those gates (`wit_test.cljk`, `check_adapter_registry.cljk`, `guest_lint.cljk`), task runner (`run-task.cljk` + `scripts/tasks.edn`) |
-| `docs/evidence/` | dated oracle-vs-native measurements |
+| `docs/migration-ledger.json`, `docs/migration-ledger.md` | the migration ledger (JUN-641): every tracked file classified, each unit's namespace dependencies and upstream kotoba libraries, the Amu blockers and the port waves; the `.md` is the reviewable summary |
+| `scripts/migration_ledger.py`, `scripts/amu_capability_probe.py` | generate or check the ledger; probe which CLJK constructs the pinned Amu CLI admits |
+| `docs/evidence/` | dated oracle-vs-native measurements and Amu capability probes |
 | `edn-datomize.cljk`, `schema.edn` | EDN → datom conversion; `schema.edn` is generated |
 | `90-docs/adr/` | repo-local ADRs (0032–0048) |
 
@@ -104,6 +106,19 @@ pass; the codes are listed at the top of each program). Every gate also runs
 mutants of its inputs that must fail. `scripts/native/edn_read.kotoba` works
 around the native EDN reader's handling of commas, newlines, comments and
 whitespace runs; see its header before changing it.
+
+The migration ledger must list exactly the tracked files. After adding,
+removing or renaming a file, regenerate it (it reads kotoba `lib/` to resolve
+upstream namespaces):
+
+```bash
+python3 scripts/migration_ledger.py --check                                         # what CI runs
+python3 scripts/migration_ledger.py --kotoba ../kotoba --kotoba-rev origin/main     # regenerate
+python3 scripts/amu_capability_probe.py ../amu/bin/amu docs/evidence/amu-capability-probe-YYYYMMDD.json
+```
+
+Re-run the probe when the Amu pin in `ci.yml` moves, and update `BLOCKERS` in
+`scripts/migration_ledger.py` from its result.
 
 Reference oracle, run by hand only (see the migration decisions above; record
 the result with a date under `docs/evidence/`). On main the root `deps.edn`
@@ -127,8 +142,11 @@ kbb --backend sci scripts/run-task.cljk wit-check   # run a registered task (als
 task names (`scripts/tasks.edn`) and exits 2.
 
 CI (`.github/workflows/ci.yml`) runs the native gates on a `macos-15` runner
-against a pinned, digest-checked Amu checkout, plus a guard that fails on any
-`Cargo.toml`, `Cargo.lock`, `*.rs`, `rust-toolchain*` or `.cargo/` file.
+against a pinned, digest-checked Amu checkout, a guard that fails on any
+`Cargo.toml`, `Cargo.lock`, `*.rs`, `rust-toolchain*` or `.cargo/` file, and
+the migration ledger check (`migration_ledger.py --check`: the ledger lists
+exactly `git ls-files`; it does not re-derive classes, dependencies or
+blockers).
 
 - Removed from CI (JUN-642): `kotoba-lang/setup-kbb` and the three `kbb -M`
   gate runs. No kbb, nbb, JVM or Node runs in CI.
