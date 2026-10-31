@@ -68,3 +68,14 @@ jobs:
             find . \( -name Cargo.toml -o -name Cargo.lock -o -name '*.rs' -o -name 'rust-toolchain*' -o -path './.cargo/*' \) -print
             exit 1
           fi
+  migration-ledger:
+    name: Migration ledger covers every tracked file
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repository
+        run: |
+          git init -q .
+          git fetch -q --depth=1 --no-recurse-submodules "https://github.com/${GITHUB_REPOSITORY}.git" "$GITHUB_SHA"
+          git checkout -q FETCH_HEAD
+      - name: docs/migration-ledger.json lists exactly git ls-files
+        run: python3 scripts/migration_ledger.py --check
