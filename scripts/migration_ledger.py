@@ -13,7 +13,7 @@ namespace dependencies and external libraries, and derives the port order
 
 The Amu blockers (class e) are not guessed: BLOCKERS below records what the
 pinned Amu CLI refused when the probe sources in
-docs/evidence/amu-capability-probe-20261101c.json were run against it. The
+docs/evidence/amu-capability-probe-20261101d.json were run against it. The
 atom blockers (JUN-731) and the keyword map blockers (kwmap/*, JUN-732) are
 split by the port they need: the rewrite rules are docs/port-rewrite-rules.md,
 the atom ones measured in docs/evidence/port-rewrite-rules-20261101.json.
@@ -42,21 +42,22 @@ CLASSES = {
     "native": "already native: .kotoba sources and the Amu gate runner and CI definition",
 }
 
-# Measured with the pinned Amu macOS CLI (kotoba-lang/amu 05668c77134a, the
-# one CI uses) on 2026-11-01 (JUN-729, JUN-734):
-# docs/evidence/amu-capability-probe-20261101c.json. Against the previous pin
-# c2186d762e20 (amu-capability-probe-20261101b.json) six probes changed:
-# amu PR #1751 (JUN-729) makes destructuring reader sugar in let / loop / defn
-# parameters, so let-vector runs; amu PR #1753 (JUN-734) admits def literals
-# holding f64 / bool values or vectors of maps (D5: def-f64-map, def-vec-of-maps
-# run), variadic assoc (D6: assoc-variadic runs), (get m k) -> [:option V] and
-# (:k m d) on a typed map (D10), and refuses a bare record name as a parameter
-# type with E2105 (declared-record-expected, was E2104). keys-or-param is now
-# E2104 (the pattern parameter is unannotated) instead of E2119. Every other
-# probe refuses as before. `detect` is a regex over a CLJK file with its
-# comments and string contents removed; the kwmap/* blockers are read by
-# kwmap_patterns() and destructuring by destructuring_patterns() instead.
-# Earlier: c2186d762e20 (JUN-728, 20261101 / 20261101b), 3c9eb7f7f74e (20261031b).
+# Measured with the pinned Amu macOS CLI (kotoba-lang/amu 11df09b1f60e, the
+# one CI uses) on 2026-11-01 (JUN-730):
+# docs/evidence/amu-capability-probe-20261101d.json. Against the previous pin
+# 05668c77134a (amu-capability-probe-20261101c.json) one earlier probe changed:
+# amu PR #1754 (JUN-730) expands a closed same-module defmulti and its
+# defmethods to one defn with a static case, so `defmulti` (a defmulti with no
+# defmethod) is E2006 instead of E2003. 42 new probes record the admitted shape
+# (keyword or module-defn dispatch, identical plain parameter vectors, integer /
+# keyword keys) and what still refuses: E2006 / E2001 / E2125 / E2101 / E2104 /
+# E2103 shapes, E2007 / E6010 open multimethods, E2003 protocols, E2181 reify.
+# Every other probe refuses or runs as before. `detect` is a regex over a CLJK
+# file with its comments and string contents removed; the kwmap/* blockers are
+# read by kwmap_patterns(), destructuring by destructuring_patterns() and the
+# dispatch/* blockers by dispatch_patterns() instead.
+# Earlier: 05668c77134a (JUN-729, JUN-734, 20261101c), c2186d762e20 (JUN-728,
+# 20261101 / 20261101b), 3c9eb7f7f74e (20261031b).
 BLOCKERS = {
     "multi-module": {
         "refusal": "E6002 required module ... is missing from the explicit source paths",
@@ -168,11 +169,47 @@ BLOCKERS = {
         "issues": ["JUN-732"],
         "detect": r"(?<![\w:])::[A-Za-z_*!?<>=+\-]",
     },
-    "dispatch-forms": {
-        "refusal": "E2003 unsupported top-level form 'defmulti' / 'defprotocol'; E2101 for reify",
-        "what": "defmulti, defmethod, defprotocol, extend-protocol, extend-type, reify; interim rewrite: rule 4 of docs/port-rewrite-rules.md",
-        "issues": ["JUN-730", "JUN-731"],
-        "detect": r"\((defmulti|defmethod|defprotocol|extend-protocol|extend-type|reify)\b",
+    # JUN-730 (amu 11df09b1, PR #1754) expands a closed same-module defmulti and
+    # its defmethods to one defn with a static case (seed/20-names), so the
+    # former single dispatch-forms blocker (18 files at 05668c7, any
+    # defmulti/defmethod/defprotocol/extend-*/reify) is split by what still
+    # refuses. They are read by dispatch_patterns(); a file whose multimethods
+    # all have the admitted shape carries none of them.
+    "dispatch/multimethod-shape": {
+        "refusal": "E2006 malformed closed dispatch form (fn-literal or other non-name dispatch, defmulti options or "
+                   "attr map, no defmethod, a non-integer/keyword key, differing / pattern / & / multi-arity "
+                   "parameter vectors, empty body, two :default); E2001 a duplicate defmulti or an already-defined "
+                   "name; E2125 a duplicate key; E2101 a dispatch symbol that is not a defn of the module; E2104 / "
+                   "E2103 keyword dispatch over an unannotated or more than one parameter",
+        "what": "a same-module defmulti whose group is not in the admitted shape: dispatch a keyword (one annotated "
+                "parameter) or a defn of this module, integer or keyword keys, identical plain parameter vectors; "
+                "port by rewriting the dispatch fn as a named defn (or a keyword) and giving every method the same "
+                "parameter vector (Dispatch section of docs/port-rewrite-rules.md)",
+        "issues": ["JUN-730"],
+    },
+    "dispatch/open-multimethod": {
+        "refusal": "E2007 a defmethod of a multimethod this module does not declare; E6010 a qualified defmethod "
+                   "name such as t/report; E2003 prefer-method / remove-method / derive",
+        "what": "an open multimethod: a defmethod extending another namespace's multimethod (clojure.test's "
+                "t/report in the run_portable runners, solver/solve) or a hierarchy; no cross-module or runtime "
+                "extension, so the extension point has to become a closed case in the owning module or an explicit "
+                "fn-ref argument",
+        "issues": ["JUN-730", "JUN-651"],
+    },
+    "dispatch/protocol": {
+        "refusal": "E2003 unsupported top-level form 'defprotocol' / 'extend-type' / 'extend-protocol' / "
+                   "'definterface' / 'deftype'; E2128 a defrecord with inline protocol implementations",
+        "what": "defprotocol, extend-type, extend-protocol, definterface, deftype, inline defrecord implementations; "
+                "not admitted at 11df09b (the static protocol expansion is on amu branch claude/jun-730-protocols, "
+                "blocked by the static profile's token cap); interim rewrite: record of fn-ref closures, rule 4 of "
+                "docs/port-rewrite-rules.md",
+        "issues": ["JUN-730"],
+    },
+    "dispatch/reify": {
+        "refusal": "E2181 reify is not admitted (permanent refusal: closed static dispatch; implement the protocol on a record)",
+        "what": "reify; permanent refusal, port as a record of fn-ref closures (rule 4 of docs/port-rewrite-rules.md); "
+                "a reify that closes over locals needs those values as extra record fields",
+        "issues": ["JUN-730"],
     },
     # JUN-729 (amu 5667e44c) admits destructuring in let / loop and annotated
     # defn parameters, so the blocker is read by destructuring_patterns() for
@@ -649,14 +686,136 @@ def destructuring_patterns(code):
     return found
 
 
+DISPATCH_PROTOCOL = ("defprotocol", "extend-type", "extend-protocol", "definterface", "deftype")
+DISPATCH_OPEN = ("prefer-method", "remove-method", "derive", "underive", "make-hierarchy")
+INT = re.compile(r"^-?\d+$")
+
+
+def unpos(x):
+    """A node without its source positions, for comparing forms as written."""
+    return (x[0], [unpos(y) for y in x[1]]) if is_node(x) else x
+
+
+def plain_params(pv):
+    """A defmethod parameter vector the closed expansion admits: plain names,
+    each optionally followed by a type (a keyword or a vector headed by a
+    keyword); no pattern and no &. Returns [(name, typed?)] or None."""
+    out, items = [], pv[1]
+    i = 0
+    while i < len(items):
+        q = items[i]
+        if not is_sym(q) or q == "&" or "/" in q:
+            return None
+        typed = i + 1 < len(items) and (is_kw(items[i + 1]) or (is_node(items[i + 1], "vec") and items[i + 1][1]
+                                                                 and is_kw(items[i + 1][1][0])))
+        out.append((q, typed))
+        i += 2 if typed else 1
+    return out
+
+
+def dispatch_patterns(code):
+    """The dispatch/* blockers (without the prefix) a CLJK file needs at amu
+    11df09b1 (JUN-730).
+
+    seed/20-names expands a closed multimethod: a top-level (defmulti NAME [doc]
+    DISPATCH) and every top-level (defmethod NAME KEY [params] body ..) of the
+    same module become one defn with a static case. Conservative reading of the
+    probes in docs/evidence/amu-capability-probe-20261101d.json:
+
+    - open-multimethod: a defmethod of a name no top-level defmulti of the file
+      declares (E2007; a qualified name such as t/report is E6010), and
+      prefer-method / remove-method / derive / underive / make-hierarchy.
+    - multimethod-shape: a declared multimethod whose group is not the admitted
+      shape. DISPATCH must be a keyword (then exactly one parameter, annotated:
+      an unannotated one is E2104, two are E2103) or a symbol that a top-level
+      defn / defn- of the file defines (clojure.core names such as identity or
+      type are E2101, a fn literal or call is E2006); nothing after DISPATCH and
+      no attr map; at least one defmethod; keys are integers or keywords other
+      than ::auto-resolved ones (strings, nil, class names are E2006), unique
+      (E2125), at most one :default; every parameter vector identical as written
+      (names included: [_ y] next to [x y] is E2006) and plain (no pattern, no &,
+      not multi-arity); a non-empty body; the name defined once (E2001). A
+      defmulti or defmethod that is not a top-level form (inside #? or a do) is
+      counted here too.
+    - protocol: defprotocol / extend-type / extend-protocol / definterface /
+      deftype heads anywhere, and a defrecord with forms after its field vector.
+    - reify: any reify head (E2181, permanent).
+
+    Whether the expanded defn then checks (parameter types, keyword-map use,
+    a throwing method in a public defn being E2130) is left to the other
+    blockers, as for any defn."""
+    forms = read_forms(code)
+    found = set()
+    top = set(id(f) for f in forms)
+    defined = defaultdict(int)
+    defns = set()
+    multis, methods = defaultdict(list), defaultdict(list)
+    for f in forms:
+        h = head(f)
+        if h in ("def", "defn", "defn-", "defonce", "defrecord", "defmulti") and len(f[1]) > 1 and is_sym(f[1][1]):
+            defined[f[1][1]] += 1
+            if h in ("defn", "defn-"):
+                defns.add(f[1][1])
+    for x, _ in walk(("list", forms, 0)):
+        h = head(x)
+        if h in DISPATCH_PROTOCOL:
+            found.add("protocol")
+        elif h == "reify":
+            found.add("reify")
+        elif h in DISPATCH_OPEN:
+            found.add("open-multimethod")
+        elif h == "defrecord" and len(x[1]) > 3:
+            found.add("protocol")
+        elif h in ("defmulti", "defmethod"):
+            name = x[1][1] if len(x[1]) > 1 else None
+            (multis if h == "defmulti" else methods)[name].append((x, id(x) in top))
+    for name, ms in methods.items():
+        if name not in multis:
+            found.add("open-multimethod")
+    for name, ds in multis.items():
+        ms = methods.get(name, [])
+        ok = (len(ds) == 1 and ds[0][1] and is_sym(name) and "/" not in name and defined[name] == 1
+              and ms and all(t for _, t in ms))
+        if ok:
+            rest = ds[0][0][1][2:]
+            if rest and rest[0] == '""':
+                rest = rest[1:]
+            disp = rest[0] if len(rest) == 1 else None
+            ok = isinstance(disp, str) and ((is_kw(disp) and not disp.startswith("::"))
+                                            or (is_sym(disp) and disp in defns and disp != name))
+        if ok:
+            keys, pvs = [], []
+            for m, _ in ms:
+                a = m[1][2:]
+                if len(a) < 3 or not is_node(a[1], "vec"):
+                    ok = False
+                    break
+                keys.append(a[0])
+                pvs.append(a[1])
+            ok = (ok and all(isinstance(k, str) and (INT.match(k) or (is_kw(k) and not k.startswith("::")))
+                             for k in keys)
+                  and len(set(keys)) == len(keys))
+            if ok:
+                shapes = [plain_params(pv) for pv in pvs]
+                ok = all(sh is not None for sh in shapes) and all(unpos(pv) == unpos(pvs[0]) for pv in pvs[1:])
+                if ok and is_kw(disp):
+                    ok = len(shapes[0]) == 1 and shapes[0][0][1]
+        if not ok:
+            found.add("multimethod-shape")
+    return found
+
+
 def blockers_of(code, reqs):
     found = []
     kwmap = kwmap_patterns(code) if re.search(KWMAP_LITERAL, code) else set()
+    dispatch = dispatch_patterns(code)
     for bid, b in BLOCKERS.items():
         if bid.startswith("kwmap/"):
             hit = bid[len("kwmap/"):] in kwmap
         elif bid == "destructuring":
             hit = bool(destructuring_patterns(code))
+        elif bid.startswith("dispatch/"):
+            hit = bid[len("dispatch/"):] in dispatch
         elif bid == "atom-local-iteration":
             hit = atom_written_in_iteration(code)
         elif bid == "atom-escape":
@@ -846,8 +1005,8 @@ def build(kotoba, rev):
         "issue": "JUN-641",
         "inputs": {
             "kotoba-lib": {"repo": "kotoba-lang/kotoba", "rev": rev},
-            "amu-probe": {"repo": "kotoba-lang/amu", "rev": "05668c77134ae4a5b79db648bbed1d048ef8c830",
-                          "evidence": "docs/evidence/amu-capability-probe-20261101c.json"},
+            "amu-probe": {"repo": "kotoba-lang/amu", "rev": "11df09b1f60effadbd521c4031defedb12614139",
+                          "evidence": "docs/evidence/amu-capability-probe-20261101d.json"},
         },
         "classes": CLASSES,
         "counts": {"tracked": len(files), "class": dict(sorted(counts.items())),

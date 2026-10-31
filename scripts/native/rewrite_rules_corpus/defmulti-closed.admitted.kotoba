@@ -1,0 +1,11 @@
+(ns probe)
+;; expect-value: 109
+
+(defn kind [x :i64] :i64 x)
+
+(defmulti render kind)
+(defmethod render 1 [x :i64] :i64 10)
+(defmethod render 2 [x :i64] :i64 20)
+(defmethod render :default [x :i64] :i64 99)
+
+(defn main [] :i64 (+ (render 1) (render 7)))

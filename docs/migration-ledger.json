@@ -4,12 +4,12 @@
  "inputs": {
   "kotoba-lib": {
    "repo": "kotoba-lang/kotoba",
-   "rev": "069bc7d3214293bcd6b0ab183da48b96839a4dc6"
+   "rev": "caf31e541a2ed8af4764e6725548f5104479644f"
   },
   "amu-probe": {
    "repo": "kotoba-lang/amu",
-   "rev": "05668c77134ae4a5b79db648bbed1d048ef8c830",
-   "evidence": "docs/evidence/amu-capability-probe-20261101c.json"
+   "rev": "11df09b1f60effadbd521c4031defedb12614139",
+   "evidence": "docs/evidence/amu-capability-probe-20261101d.json"
   }
  },
  "classes": {
@@ -161,14 +161,38 @@
    ],
    "files": 14
   },
-  "dispatch-forms": {
-   "refusal": "E2003 unsupported top-level form 'defmulti' / 'defprotocol'; E2101 for reify",
-   "what": "defmulti, defmethod, defprotocol, extend-protocol, extend-type, reify; interim rewrite: rule 4 of docs/port-rewrite-rules.md",
+  "dispatch/multimethod-shape": {
+   "refusal": "E2006 malformed closed dispatch form (fn-literal or other non-name dispatch, defmulti options or attr map, no defmethod, a non-integer/keyword key, differing / pattern / & / multi-arity parameter vectors, empty body, two :default); E2001 a duplicate defmulti or an already-defined name; E2125 a duplicate key; E2101 a dispatch symbol that is not a defn of the module; E2104 / E2103 keyword dispatch over an unannotated or more than one parameter",
+   "what": "a same-module defmulti whose group is not in the admitted shape: dispatch a keyword (one annotated parameter) or a defn of this module, integer or keyword keys, identical plain parameter vectors; port by rewriting the dispatch fn as a named defn (or a keyword) and giving every method the same parameter vector (Dispatch section of docs/port-rewrite-rules.md)",
+   "issues": [
+    "JUN-730"
+   ],
+   "files": 5
+  },
+  "dispatch/open-multimethod": {
+   "refusal": "E2007 a defmethod of a multimethod this module does not declare; E6010 a qualified defmethod name such as t/report; E2003 prefer-method / remove-method / derive",
+   "what": "an open multimethod: a defmethod extending another namespace's multimethod (clojure.test's t/report in the run_portable runners, solver/solve) or a hierarchy; no cross-module or runtime extension, so the extension point has to become a closed case in the owning module or an explicit fn-ref argument",
    "issues": [
     "JUN-730",
-    "JUN-731"
+    "JUN-651"
    ],
-   "files": 18
+   "files": 6
+  },
+  "dispatch/protocol": {
+   "refusal": "E2003 unsupported top-level form 'defprotocol' / 'extend-type' / 'extend-protocol' / 'definterface' / 'deftype'; E2128 a defrecord with inline protocol implementations",
+   "what": "defprotocol, extend-type, extend-protocol, definterface, deftype, inline defrecord implementations; not admitted at 11df09b (the static protocol expansion is on amu branch claude/jun-730-protocols, blocked by the static profile's token cap); interim rewrite: record of fn-ref closures, rule 4 of docs/port-rewrite-rules.md",
+   "issues": [
+    "JUN-730"
+   ],
+   "files": 6
+  },
+  "dispatch/reify": {
+   "refusal": "E2181 reify is not admitted (permanent refusal: closed static dispatch; implement the protocol on a record)",
+   "what": "reify; permanent refusal, port as a record of fn-ref closures (rule 4 of docs/port-rewrite-rules.md); a reify that closes over locals needs those values as extra record fields",
+   "issues": [
+    "JUN-730"
+   ],
+   "files": 6
   },
   "destructuring": {
    "refusal": "E2104 an unannotated defn pattern parameter, :or on a record, & over a list; E2139 a fn pattern parameter; E2111 :strs / :syms / a non-keyword key, a pattern in doseq; E2127 an absent key; E2101 for; E2103 when-let / if-let",
@@ -1455,7 +1479,8 @@
     "atom-global": 1,
     "atom-local-iteration": 1,
     "destructuring": 4,
-    "dispatch-forms": 1,
+    "dispatch/multimethod-shape": 1,
+    "dispatch/protocol": 1,
     "f64-generic-arith": 6,
     "fn-literal": 2,
     "host-interop": 5,
@@ -1591,7 +1616,8 @@
     "atom-global": 2,
     "atom-local-iteration": 1,
     "destructuring": 11,
-    "dispatch-forms": 4,
+    "dispatch/protocol": 2,
+    "dispatch/reify": 4,
     "f64-generic-arith": 18,
     "fn-literal": 10,
     "host-interop": 11,
@@ -1862,7 +1888,7 @@
    },
    "blockers": {
     "destructuring": 3,
-    "dispatch-forms": 1,
+    "dispatch/open-multimethod": 1,
     "f64-generic-arith": 11,
     "fn-literal": 1,
     "host-interop": 3,
@@ -2079,7 +2105,7 @@
    },
    "blockers": {
     "destructuring": 7,
-    "dispatch-forms": 1,
+    "dispatch/open-multimethod": 1,
     "f64-generic-arith": 8,
     "fn-literal": 1,
     "host-interop": 3,
@@ -2420,7 +2446,8 @@
     "atom-escape": 2,
     "atom-global": 3,
     "destructuring": 16,
-    "dispatch-forms": 3,
+    "dispatch/protocol": 1,
+    "dispatch/reify": 2,
     "f64-generic-arith": 10,
     "fn-literal": 15,
     "host-interop": 14,
@@ -2928,7 +2955,7 @@
    },
    "blockers": {
     "destructuring": 1,
-    "dispatch-forms": 1,
+    "dispatch/open-multimethod": 1,
     "f64-generic-arith": 6,
     "fn-literal": 2,
     "host-interop": 1,
@@ -2991,7 +3018,7 @@
     "atom-global": 1,
     "atom-local-iteration": 1,
     "destructuring": 15,
-    "dispatch-forms": 1,
+    "dispatch/multimethod-shape": 1,
     "f64-generic-arith": 15,
     "fn-literal": 7,
     "host-interop": 4,
@@ -3115,7 +3142,7 @@
    },
    "blockers": {
     "destructuring": 1,
-    "dispatch-forms": 1,
+    "dispatch/open-multimethod": 1,
     "f64-generic-arith": 2,
     "host-interop": 1,
     "kwmap/option-default": 2,
@@ -3153,7 +3180,7 @@
    },
    "blockers": {
     "destructuring": 1,
-    "dispatch-forms": 1,
+    "dispatch/open-multimethod": 1,
     "f64-generic-arith": 2,
     "host-interop": 1,
     "kwmap/option-default": 2,
@@ -3284,7 +3311,8 @@
     "atom-global": 1,
     "auto-resolved-keyword": 2,
     "destructuring": 23,
-    "dispatch-forms": 2,
+    "dispatch/multimethod-shape": 2,
+    "dispatch/protocol": 2,
     "f64-generic-arith": 20,
     "fn-literal": 19,
     "host-interop": 8,
@@ -3412,7 +3440,7 @@
    },
    "blockers": {
     "destructuring": 22,
-    "dispatch-forms": 1,
+    "dispatch/open-multimethod": 1,
     "f64-generic-arith": 44,
     "host-interop": 20,
     "kwmap/dynamic": 18,
@@ -3517,7 +3545,7 @@
    },
    "blockers": {
     "destructuring": 10,
-    "dispatch-forms": 1,
+    "dispatch/multimethod-shape": 1,
     "f64-generic-arith": 11,
     "fn-literal": 5,
     "kwmap/def-literal": 1,
@@ -6124,6 +6152,7 @@
     "multi-module",
     "kwmap/runtime-key",
     "kwmap/param-row",
+    "dispatch/protocol",
     "destructuring",
     "host-interop"
    ]
@@ -6185,7 +6214,7 @@
     "kwmap/row-op",
     "kwmap/option-default",
     "f64-generic-arith",
-    "dispatch-forms",
+    "dispatch/multimethod-shape",
     "destructuring",
     "host-interop"
    ]
@@ -6365,7 +6394,8 @@
     "kwmap/empty",
     "kwmap/nil-field",
     "fn-literal",
-    "dispatch-forms",
+    "dispatch/protocol",
+    "dispatch/reify",
     "destructuring",
     "atom-local-iteration",
     "atom-global"
@@ -6386,7 +6416,8 @@
     "kwmap/dynamic",
     "f64-generic-arith",
     "regex-literal",
-    "dispatch-forms",
+    "dispatch/protocol",
+    "dispatch/reify",
     "host-interop"
    ]
   },
@@ -6401,7 +6432,7 @@
     "multi-module",
     "kwmap/empty",
     "kwmap/option-default",
-    "dispatch-forms",
+    "dispatch/reify",
     "atom-escape"
    ]
   },
@@ -6588,7 +6619,7 @@
     "kwmap/param-row",
     "kwmap/empty",
     "f64-generic-arith",
-    "dispatch-forms",
+    "dispatch/reify",
     "destructuring",
     "atom-escape"
    ]
@@ -7707,7 +7738,7 @@
    "port": "c",
    "test": true,
    "blockers": [
-    "dispatch-forms",
+    "dispatch/open-multimethod",
     "host-interop"
    ]
   },
@@ -8495,7 +8526,7 @@
     "kwmap/param-row",
     "kwmap/empty",
     "kwmap/option-default",
-    "dispatch-forms"
+    "dispatch/open-multimethod"
    ]
   },
   {
@@ -9659,7 +9690,7 @@
     "kwmap/option-default",
     "f64-generic-arith",
     "fn-literal",
-    "dispatch-forms",
+    "dispatch/protocol",
     "destructuring",
     "host-interop"
    ]
@@ -9782,7 +9813,7 @@
     "kwmap/dynamic",
     "kwmap/fn-value",
     "fn-literal",
-    "dispatch-forms",
+    "dispatch/reify",
     "destructuring",
     "atom-escape",
     "host-interop"
@@ -9818,7 +9849,7 @@
     "kwmap/dynamic",
     "kwmap/fn-value",
     "fn-literal",
-    "dispatch-forms",
+    "dispatch/reify",
     "destructuring",
     "atom-escape",
     "host-interop"
@@ -11327,7 +11358,7 @@
    "port": "c",
    "test": true,
    "blockers": [
-    "dispatch-forms",
+    "dispatch/open-multimethod",
     "host-interop"
    ]
   },
@@ -11536,7 +11567,7 @@
     "kwmap/row-op",
     "kwmap/option-default",
     "f64-generic-arith",
-    "dispatch-forms",
+    "dispatch/multimethod-shape",
     "destructuring",
     "host-interop"
    ]
@@ -12053,7 +12084,7 @@
    "port": "c",
    "test": true,
    "blockers": [
-    "dispatch-forms",
+    "dispatch/open-multimethod",
     "host-interop"
    ]
   },
@@ -12151,7 +12182,7 @@
    "port": "c",
    "test": true,
    "blockers": [
-    "dispatch-forms",
+    "dispatch/open-multimethod",
     "host-interop"
    ]
   },
@@ -12451,6 +12482,7 @@
     "multi-module",
     "kwmap/param-row",
     "kwmap/option-default",
+    "dispatch/protocol",
     "destructuring",
     "host-interop"
    ]
@@ -12502,7 +12534,7 @@
     "kwmap/option-default",
     "kwmap/dynamic",
     "f64-generic-arith",
-    "dispatch-forms",
+    "dispatch/multimethod-shape",
     "destructuring"
    ]
   },
@@ -12652,7 +12684,7 @@
     "kwmap/row-op",
     "kwmap/option-default",
     "f64-generic-arith",
-    "dispatch-forms",
+    "dispatch/multimethod-shape",
     "destructuring"
    ]
   },
@@ -12918,6 +12950,7 @@
     "kwmap/row-op",
     "kwmap/empty",
     "f64-generic-arith",
+    "dispatch/protocol",
     "destructuring",
     "atom-escape"
    ]
@@ -13926,7 +13959,7 @@
    "port": "c",
    "test": true,
    "blockers": [
-    "dispatch-forms",
+    "dispatch/open-multimethod",
     "host-interop"
    ]
   },
@@ -14551,7 +14584,7 @@
     "kwmap/empty",
     "f64-generic-arith",
     "fn-literal",
-    "dispatch-forms",
+    "dispatch/multimethod-shape",
     "destructuring"
    ]
   },

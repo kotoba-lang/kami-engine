@@ -1,0 +1,10 @@
+(ns probe)
+;; expect-value: 22
+
+(defn backend [b :i64 n :i64] :i64 b)
+
+(defmulti emit backend)
+(defmethod emit 1 [b :i64 n :i64] :i64 (* n 2))
+(defmethod emit :default [b :i64 n :i64] :i64 (+ b n))
+
+(defn main [] :i64 (+ (emit 1 5) (emit 7 5)))

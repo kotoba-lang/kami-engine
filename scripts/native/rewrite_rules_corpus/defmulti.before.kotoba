@@ -1,5 +1,6 @@
 (ns probe)
-;; expect-refusal: E2003
+;; expect-refusal: E2006
+;; amu 11df09b1 (JUN-730) admits a closed defmulti, but not a fn-literal dispatch (E2006); E2003 before.
 
 (defrecord Shape [kind :keyword w :i64 h :i64])
 

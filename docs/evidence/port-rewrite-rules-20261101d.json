@@ -1,0 +1,1477 @@
+{
+ "schema": "kami.port-rewrite-rules.v1",
+ "issue": "JUN-731",
+ "parent": "JUN-651",
+ "date": "2026-11-01",
+ "amu": {
+  "repo": "kotoba-lang/amu",
+  "rev": "11df09b1f60effadbd521c4031defedb12614139",
+  "entry": "bin/amu (macOS arm64)",
+  "bin-amu-sha256": "4e766e1fe9f85287d31fc98f9e6749ab47f479a3d8a84e43f59d656039157de0",
+  "digest-check": "sha256 of bin/amu equals cli.json image.sha256 at the pin"
+ },
+ "rules": "docs/port-rewrite-rules.md",
+ "method": "`amu check` each corpus file; a before/out-of-scope file must be refused with its expect-refusal code, an after/admitted file must check and `amu run` to its expect-value",
+ "cases": [
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-and-write.out-of-scope.kotoba",
+   "case": "atom-and-write",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2143"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2143 swap!/reset! is not admitted inside `and` (atom slice 1 admits them in let, do, if, when, cond and case only) (byte 81)"
+    ]
+   },
+   "sourceSHA256": "7a6d2af422a5456d31d08262cd8461e1d4fb6a0fc6db9a761f30598c802fc0f8",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-doseq.after-reduce.kotoba",
+   "case": "atom-doseq",
+   "role": "after",
+   "expect": {
+    "value": 6
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "e007bea4a2c7421e92a0e60ae17993205ea6b212e601845ac2c037dd600f2caf",
+   "run": {
+    "exit": 0,
+    "output": [
+     "6"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-doseq.before.kotoba",
+   "case": "atom-doseq",
+   "role": "before",
+   "expect": {
+    "refusal": "E2140"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 106)"
+    ]
+   },
+   "sourceSHA256": "57b60e462d50656eeb6da1b0a7fc3e3e814d62344ed60ad37507aa52a03f1415",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-dotimes.after-loop.kotoba",
+   "case": "atom-dotimes",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "f7b1fde83356cc541b68250c35473660f1c4dad2d757c7133408486090809afa",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-dotimes.after-reduce.kotoba",
+   "case": "atom-dotimes",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "bc7ef4c4baff422d8a75daec7923eeb4bec7517d8e3af5e020fb230b016848ad",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-dotimes.before.kotoba",
+   "case": "atom-dotimes",
+   "role": "before",
+   "expect": {
+    "refusal": "E2140"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 102)"
+    ]
+   },
+   "sourceSHA256": "c953da75553a87068793927fc246ea36c54f0af3184e261ea916aae0851fd08d",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-fn-capture.out-of-scope.kotoba",
+   "case": "atom-fn-capture",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2140"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 100)"
+    ]
+   },
+   "sourceSHA256": "d8bf9ca07c65179154360969acff7e18b72a045c1044f957054bb16e0e1046f8",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-global-def.out-of-scope.kotoba",
+   "case": "atom-global-def",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2141"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2141 atom must be the init expression of a let binding (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 45)"
+    ]
+   },
+   "sourceSHA256": "b457985384896a94c70072b2ddedbfa7bab3ff7ff11572eec33f0dc161a15aaa",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-global-defonce.out-of-scope.kotoba",
+   "case": "atom-global-defonce",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2003"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defonce' (byte 38)"
+    ]
+   },
+   "sourceSHA256": "d30f8d7b0f626d147e5c558d568c4019b5a38cb09332e12d54e8658bb063ec15",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-loop.after-loop.kotoba",
+   "case": "atom-loop",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "f7b1fde83356cc541b68250c35473660f1c4dad2d757c7133408486090809afa",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-loop.before.kotoba",
+   "case": "atom-loop",
+   "role": "before",
+   "expect": {
+    "refusal": "E2140"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 127)"
+    ]
+   },
+   "sourceSHA256": "6a549da6b0a9947b92d185a68c6dbaf3785a35fca419ac2807bdb0c892b413d7",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/atom-straight-line.admitted.kotoba",
+   "case": "atom-straight-line",
+   "role": "admitted",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "880b47a9e1b3f5ccf13f97ccda8f9e7cab2999996481b15f49a5af1b86cc146a",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/auto-resolved-keyword.after.kotoba",
+   "case": "auto-resolved-keyword",
+   "role": "after",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "83c32135293ff47795d831207c2c35de5aafbbc758ccbcfb3bfeda5134c2c859",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/auto-resolved-keyword.before.kotoba",
+   "case": "auto-resolved-keyword",
+   "role": "before",
+   "expect": {
+    "refusal": "E1005"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E1005 unsupported reader syntax ':' (byte 63)"
+    ]
+   },
+   "sourceSHA256": "c3875bdae0d2d8bb6f4a888546555615812882ab5694f3d1ec1b22e7ffa82d92",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defmulti-closed.admitted.kotoba",
+   "case": "defmulti-closed",
+   "role": "admitted",
+   "expect": {
+    "value": 109
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "0fef175fea2dcec20c0138baf8f5d63f61f6f75a4cfc53f61e3730f361a79add",
+   "run": {
+    "exit": 0,
+    "output": [
+     "109"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defmulti-open.out-of-scope.kotoba",
+   "case": "defmulti-open",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2007"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2007 closed dispatch: 'area' is not declared in this module (no cross-module or runtime extension) (byte 148)"
+    ]
+   },
+   "sourceSHA256": "82e4daaff17ea93eddee57f0a0c3f5f3daaf12a6f7d6485bf345244d4bc72b62",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defmulti-param-names.after.kotoba",
+   "case": "defmulti-param-names",
+   "role": "after",
+   "expect": {
+    "value": 22
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "7ef81dcdca9fb5719ba3571de7258b054f0105bffb5c49f06133778911e266e2",
+   "run": {
+    "exit": 0,
+    "output": [
+     "22"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defmulti-param-names.before.kotoba",
+   "case": "defmulti-param-names",
+   "role": "before",
+   "expect": {
+    "refusal": "E2006"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form '[' (byte 168)"
+    ]
+   },
+   "sourceSHA256": "59c8b88ae10a397299780644d60d347d38f962f73b518b4b01b1039d5e485866",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defmulti.after.kotoba",
+   "case": "defmulti",
+   "role": "after",
+   "expect": {
+    "value": 15
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "163f8056c0114ca8eaeeb65ff6ffc851b7056f5a200d5faf7d0518e109bf9cfe",
+   "run": {
+    "exit": 0,
+    "output": [
+     "15"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defmulti.before.kotoba",
+   "case": "defmulti",
+   "role": "before",
+   "expect": {
+    "refusal": "E2006"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'area' (byte 201)"
+    ]
+   },
+   "sourceSHA256": "1d2b1f48370b499b512f983282c47488bcb46ed9ab5b3ad80f4e6a4a94a6d2e9",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defprotocol.after.kotoba",
+   "case": "defprotocol",
+   "role": "after",
+   "expect": {
+    "value": 12
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "b71eb3af1b9cd41510749432b4b6e808cb477663b1a168e4ff9a3b8d330dcb8b",
+   "run": {
+    "exit": 0,
+    "output": [
+     "12"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/defprotocol.before.kotoba",
+   "case": "defprotocol",
+   "role": "before",
+   "expect": {
+    "refusal": "E2003"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defprotocol' (byte 38)"
+    ]
+   },
+   "sourceSHA256": "d717b3b959d7b43a9b77df95d54a061be79ae2a8053fc6e196af185d23292069",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/destructuring-defn-param.after.kotoba",
+   "case": "destructuring-defn-param",
+   "role": "after",
+   "expect": {
+    "value": 14
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "52ee6359326385fc9798a5fdedcdf157f786953df99d3e36f160a78e31237865",
+   "run": {
+    "exit": 0,
+    "output": [
+     "14"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/destructuring-defn-param.before.kotoba",
+   "case": "destructuring-defn-param",
+   "role": "before",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'a': expected :i64 (byte 51)"
+    ]
+   },
+   "sourceSHA256": "be0073bacf732c9f42a1b2530f649797f05399499eb887188b9bff124e38bc00",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/destructuring-doseq.out-of-scope.kotoba",
+   "case": "destructuring-doseq",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2111"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2111 malformed binding vector in '[' (byte 68)"
+    ]
+   },
+   "sourceSHA256": "03fa22a01a93897c22587c215e03179a369d898a35ad5a7dd0630c6f91dbc6c8",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/destructuring-fn-param.after.kotoba",
+   "case": "destructuring-fn-param",
+   "role": "after",
+   "expect": {
+    "value": 14
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "7ad97563d7b7d4bd945aef48923d997011f48b68113504ba8610eab66f904adf",
+   "run": {
+    "exit": 0,
+    "output": [
+     "14"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/destructuring-fn-param.before.kotoba",
+   "case": "destructuring-fn-param",
+   "role": "before",
+   "expect": {
+    "refusal": "E2139"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2139 a fn literal parameter takes its type from the context, not from an annotation: '[' (byte 73)"
+    ]
+   },
+   "sourceSHA256": "4a5a2d1ac937f4b35032e696327135b22d51474310660efa2ed9465532f11cc4",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/destructuring-let.admitted.kotoba",
+   "case": "destructuring-let",
+   "role": "admitted",
+   "expect": {
+    "value": 44
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "d130210d2a127fe2a3665f2445a3dbe2039f3ee157f23b949478d43ead2984b1",
+   "run": {
+    "exit": 0,
+    "output": [
+     "44"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/destructuring-loop.admitted.kotoba",
+   "case": "destructuring-loop",
+   "role": "admitted",
+   "expect": {
+    "value": 55
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "a87e391bcf8ef6fa5eaff1a91c4d0351405cba5a05a0087da13c3d990c6aceba",
+   "run": {
+    "exit": 0,
+    "output": [
+     "55"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/destructuring-rest-list.out-of-scope.kotoba",
+   "case": "destructuring-rest-list",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '&': expected :vector-i64 (byte 65)"
+    ]
+   },
+   "sourceSHA256": "cc625a4137dd6236e80069fb94d4708e4e8b4b6a26230a3a23890f59f50d70d1",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/destructuring-strs.out-of-scope.kotoba",
+   "case": "destructuring-strs",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2111"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2111 malformed binding vector in ':strs' (byte 63)"
+    ]
+   },
+   "sourceSHA256": "8dcdfc2c24ce5fb9e43c2cacd4a46ed48d2e3303a5932113b09f30eae49d177d",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-literal.after.kotoba",
+   "case": "fn-literal",
+   "role": "after",
+   "expect": {
+    "value": 5
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "ea30fcc118f6a49b9df7fd2f8d1f21bd8687b82eb70f8a475a4da36d43ea309e",
+   "run": {
+    "exit": 0,
+    "output": [
+     "5"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-literal.before.kotoba",
+   "case": "fn-literal",
+   "role": "before",
+   "expect": {
+    "refusal": "E1005"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E1005 unsupported reader syntax '#' (byte 73)"
+    ]
+   },
+   "sourceSHA256": "2285b5350089553db0de7f4e78767953cf84c8c04c0a23b903ec7e76607eaed8",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-arg.after.kotoba",
+   "case": "fn-ref-arg",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "b5818c81cdceb590958262ecc7fb78405d84ed82af6e6c123e385a22c2bf30aa",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-arg.before.kotoba",
+   "case": "fn-ref-arg",
+   "role": "before",
+   "expect": {
+    "refusal": "E2102"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2102 unknown symbol 'inc2' (byte 127)"
+    ]
+   },
+   "sourceSHA256": "035e02fbf3f5ddf4639819124c954d7c093963d6bd702a89fa71323dde7e9d32",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-hof.admitted.kotoba",
+   "case": "fn-ref-hof",
+   "role": "admitted",
+   "expect": {
+    "value": 7
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "90432f742e5a37ca12f96df32a1bc71b8c3b2cccf12baee404b4a95b301ca3cf",
+   "run": {
+    "exit": 0,
+    "output": [
+     "7"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-let.after.kotoba",
+   "case": "fn-ref-let",
+   "role": "after",
+   "expect": {
+    "value": 3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "6bdc925518cd6751073393c12ab3e1f618618ffb4097c111d1f85964791cc336",
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/fn-ref-let.before.kotoba",
+   "case": "fn-ref-let",
+   "role": "before",
+   "expect": {
+    "refusal": "E2102"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2102 unknown symbol 'inc2' (byte 99)"
+    ]
+   },
+   "sourceSHA256": "6a5f18dc1db87431a3608c9f445dded210681907d6c481422250863aa403bcde",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-def-f64.admitted.kotoba",
+   "case": "kwmap-def-f64",
+   "role": "admitted",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "b5c7d7663f5787b7845aeffa8feeb045f2b5642a4054b0ffedb52f745022bc13",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-def-vec-mixed-keys.after.kotoba",
+   "case": "kwmap-def-vec-mixed-keys",
+   "role": "after",
+   "expect": {
+    "value": 5
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "a9656a6c8b91ef81d2c6a23ba65a76d40e9a6551b92fc4464fde16cc54b6bcca",
+   "run": {
+    "exit": 0,
+    "output": [
+     "5"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-def-vec-mixed-keys.before.kotoba",
+   "case": "kwmap-def-vec-mixed-keys",
+   "role": "before",
+   "expect": {
+    "refusal": "E2116"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2116 vector literal items must be i64 (at most 64) (byte 56)"
+    ]
+   },
+   "sourceSHA256": "e960551dcb36a37288543b2c470277d0b5c599c67af8fda5a5445af931ee6e2f",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-document-f64.out-of-scope.kotoba",
+   "case": "kwmap-document-f64",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '460.0': expected :document (byte 79)"
+    ]
+   },
+   "sourceSHA256": "423147cad02a6f1a9f9cffbaa60396e6cda094d4a9f1fa8cbd414650f6644022",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-document.after.kotoba",
+   "case": "kwmap-document",
+   "role": "after",
+   "expect": {
+    "value": 460
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "fae61d38aa4a12578c3f0802251232c4d44279f180a89393d50c5e85a3f55abf",
+   "run": {
+    "exit": 0,
+    "output": [
+     "460"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-document.before.kotoba",
+   "case": "kwmap-document",
+   "role": "before",
+   "expect": {
+    "refusal": "E2101"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'get-in' (byte 160)"
+    ]
+   },
+   "sourceSHA256": "82b12ec3a78d635f01104d7ee4109f2400bb1ca6ec15c8cbfc047b8ae220fb75",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-empty.after.kotoba",
+   "case": "kwmap-empty",
+   "role": "after",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "e1a2a176389c64fce83d086e7fbf34132b40bce54f3ce96c370a76bb366a8801",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-empty.before.kotoba",
+   "case": "kwmap-empty",
+   "role": "before",
+   "expect": {
+    "refusal": "E2133"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2133 cannot infer the error type here: '{' (byte 64)"
+    ]
+   },
+   "sourceSHA256": "814300d24390f3bbe68a91c2b9683a5f8ec498363bea566fe184cbb41bece2bb",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-entity-table.after.kotoba",
+   "case": "kwmap-entity-table",
+   "role": "after",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "f6ae4836f62cb222f3f18e16e2228a0821db1a4b8ef949764dd4002d4a2c38a7",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-entity-table.before.kotoba",
+   "case": "kwmap-entity-table",
+   "role": "before",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in ':next': expected ? (byte 69)"
+    ]
+   },
+   "sourceSHA256": "82db0c483274145934f5e8d8db063b818b604640df4a05b4fbef7fc23a2a6d47",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-ex-info.admitted.kotoba",
+   "case": "kwmap-ex-info",
+   "role": "admitted",
+   "expect": {
+    "value": -3
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "f354586326f97ed532622fa25bc1af49fe7f4d8e6304cbca9b0d9822e3e711d1",
+   "run": {
+    "exit": 0,
+    "output": [
+     "-3"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-fn-value.after.kotoba",
+   "case": "kwmap-fn-value",
+   "role": "after",
+   "expect": {
+    "value": 10
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "3daccd5c85f6daa3c538c46b773e7807063f38e8cbbc64a87b30c71436da681d",
+   "run": {
+    "exit": 0,
+    "output": [
+     "10"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-fn-value.before.kotoba",
+   "case": "kwmap-fn-value",
+   "role": "before",
+   "expect": {
+    "refusal": "E2124"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2124 def value must be an integer, string, keyword or vector literal: 'handlers' (byte 42)"
+    ]
+   },
+   "sourceSHA256": "68a80274b89b7518317f8ae0504056201d9abc8119e5faace607217262d4265e",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-keyword-keys.out-of-scope.kotoba",
+   "case": "kwmap-keyword-keys",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'keys': expected ? (byte 64)"
+    ]
+   },
+   "sourceSHA256": "6d674ba2d07d4081e69a106a55fce4fd0075096342d18765dc4932a5534fe93b",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-merge.after.kotoba",
+   "case": "kwmap-merge",
+   "role": "after",
+   "expect": {
+    "value": 2
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "a4fc0633f5f5f2ccfe02a3758044e9ac7ab96ea4d8567f65b495d502aad12c9e",
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-merge.before.kotoba",
+   "case": "kwmap-merge",
+   "role": "before",
+   "expect": {
+    "refusal": "E2101"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'merge' (byte 61)"
+    ]
+   },
+   "sourceSHA256": "7e81075b5a12616cb76f7c88452b990f23f7ac9e5fac5b1f53649f9982cd103a",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-nil-field.after.kotoba",
+   "case": "kwmap-nil-field",
+   "role": "after",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "35fd76ce560b14201a65cc4e21a1564149106fe0497833c816fa27d30a9f903d",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-nil-field.before.kotoba",
+   "case": "kwmap-nil-field",
+   "role": "before",
+   "expect": {
+    "refusal": "E2102"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2102 unknown symbol 'nil' (byte 85)"
+    ]
+   },
+   "sourceSHA256": "fd458817ad7d7fedf321ca2a33bb258ecf2c1a1966a6be63a493e72d8039180a",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-option-default-typed-map.admitted.kotoba",
+   "case": "kwmap-option-default-typed-map",
+   "role": "admitted",
+   "expect": {
+    "value": 300
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "a899a987fd3f586766ddcc5bbdd14157d5daf03c790ece73a69d74347ce3331f",
+   "run": {
+    "exit": 0,
+    "output": [
+     "300"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-option-default.after.kotoba",
+   "case": "kwmap-option-default",
+   "role": "after",
+   "expect": {
+    "value": 50
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "871c01985523ee1542d8c75b1110089fcda4f26c4c93e44355245c958e8e0953",
+   "run": {
+    "exit": 0,
+    "output": [
+     "50"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-option-default.before.kotoba",
+   "case": "kwmap-option-default",
+   "role": "before",
+   "expect": {
+    "refusal": "E2111"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2111 malformed binding vector in 'from' (byte 246)"
+    ]
+   },
+   "sourceSHA256": "3c559e9bb1b308f2b8c027f9b29c6e8561cc6dde57d17e8cb10f0b5bf8496955",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-param-other-ns.out-of-scope.kotoba",
+   "case": "kwmap-param-other-ns",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2179"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2179 type references an undeclared record schema ':other/P' (byte 77)"
+    ]
+   },
+   "sourceSHA256": "cead835ab0c79f575f58644c7dd35fde7a22452d28b029a8eb337753b2339342",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-param-row.after.kotoba",
+   "case": "kwmap-param-row",
+   "role": "after",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "fabfc5f9d72dbead264ad2ec2711360601447b552c2a3469b7b068610914f4b8",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-param-row.before.kotoba",
+   "case": "kwmap-param-row",
+   "role": "before",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in ':a': expected ? (byte 55)"
+    ]
+   },
+   "sourceSHA256": "39c1692ef481f0fd971b1d0346411fab1002ce7a481dab2035ecd7c10604aa5f",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-state-param.after.kotoba",
+   "case": "kwmap-state-param",
+   "role": "after",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "4b99572027bb3a5e0362ac303d8841fc498cd210d9d381511e3928d18cc0df98",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-state-param.before.kotoba",
+   "case": "kwmap-state-param",
+   "role": "before",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'state': expected ? (byte 135)"
+    ]
+   },
+   "sourceSHA256": "d91b6c6ce562d3f8fbd2f18869fd78943ed2ab5193f8423a7bb00e440ac09131",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-table-of-records.after.kotoba",
+   "case": "kwmap-table-of-records",
+   "role": "after",
+   "expect": {
+    "value": 880
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "01081cf915bbdb6fada3cd5473b7d77548ac6ef12ff84ea624669a2ebf943b2a",
+   "run": {
+    "exit": 0,
+    "output": [
+     "880"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-table-of-records.before.kotoba",
+   "case": "kwmap-table-of-records",
+   "role": "before",
+   "expect": {
+    "refusal": "E2127"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2127 unknown record field 'id' (byte 301)"
+    ]
+   },
+   "sourceSHA256": "3f12a360c747d442ec0ec87f4f131ffa58ed1153e5583ca776ad16352589d455",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-table-runtime-key.after.kotoba",
+   "case": "kwmap-table-runtime-key",
+   "role": "after",
+   "expect": {
+    "value": 25
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "7daa694fee8f2c67a7b05e62a83dcb317c58c04d4f3d0654534745f7eb92733c",
+   "run": {
+    "exit": 0,
+    "output": [
+     "25"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-table-runtime-key.before.kotoba",
+   "case": "kwmap-table-runtime-key",
+   "role": "before",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'contains?': expected ? (byte 129)"
+    ]
+   },
+   "sourceSHA256": "dd13bd3e8c9997e1a28c178aaccbeb2314ba822b5a72bb5b3432dc843986ce6d",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-variadic-assoc-odd.out-of-scope.kotoba",
+   "case": "kwmap-variadic-assoc-odd",
+   "role": "out-of-scope",
+   "expect": {
+    "refusal": "E2103"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2103 wrong number of arguments to 'assoc': expected 3 (byte 61)"
+    ]
+   },
+   "sourceSHA256": "291d369f6b51cdbfd8e60b39b500f4a1e3dc991c5e8f792372b1e07988326937",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/kwmap-variadic-assoc.admitted.kotoba",
+   "case": "kwmap-variadic-assoc",
+   "role": "admitted",
+   "expect": {
+    "value": 4
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "29ea6d9b1c674ad03e73bb40b5d544be6d94a69ae21e565bccca04fe0c5e77e2",
+   "run": {
+    "exit": 0,
+    "output": [
+     "4"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/reify.after.kotoba",
+   "case": "reify",
+   "role": "after",
+   "expect": {
+    "value": 12
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "e6449b71ab755741d492ed8b710f37f1f0906cbf854f1d5e8edeafbecf9ddf6a",
+   "run": {
+    "exit": 0,
+    "output": [
+     "12"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/reify.before.kotoba",
+   "case": "reify",
+   "role": "before",
+   "expect": {
+    "refusal": "E2181"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2181 reify is not admitted (closed static dispatch; implement the protocol on a record): 'reify' (byte 163)"
+    ]
+   },
+   "sourceSHA256": "d3617f66d12cdea954479164a6d1f5492902fbd8d9232cca0934a34340f1002e",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-contains.after.kotoba",
+   "case": "set-contains",
+   "role": "after",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "7acf3e8c436c859c18d7917f628b913bf2b7ceb91f5901b337675de2e435d248",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-contains.before.kotoba",
+   "case": "set-contains",
+   "role": "before",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '1': expected :keyword (byte 73)"
+    ]
+   },
+   "sourceSHA256": "2c34790ed3e438f2a3370cafd8b8abe7572c4f18e27df3e6041d238ba452f380",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-count.after.kotoba",
+   "case": "set-count",
+   "role": "after",
+   "expect": {
+    "value": 2
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "ff803ded253db0953017c2326a26afc8904d1a75377fbfe15c601d4862bd14b3",
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   },
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-count.before.kotoba",
+   "case": "set-count",
+   "role": "before",
+   "expect": {
+    "refusal": "E2104"
+   },
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '1': expected :keyword (byte 65)"
+    ]
+   },
+   "sourceSHA256": "da62b7e533ab285e9e9c22e5628a5335f54ab78f683fa2d4b0bdc51916328958",
+   "ok": true
+  },
+  {
+   "file": "scripts/native/rewrite_rules_corpus/set-keyword.admitted.kotoba",
+   "case": "set-keyword",
+   "role": "admitted",
+   "expect": {
+    "value": 1
+   },
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "sourceSHA256": "fed674ec1b26eb5f9b7f00cafcb63f8a6341a9d629dbefa869459d0ad08882c2",
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   },
+   "ok": true
+  }
+ ]
+}

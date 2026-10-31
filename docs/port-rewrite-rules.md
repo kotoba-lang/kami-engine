@@ -2,9 +2,10 @@
 
 Rewrites to apply when porting a kami CLJK source to canonical `.kotoba`, for
 constructs the pinned Amu CLI refuses **by design** (not as missing features
-that a later Amu slice is expected to admit; rule 4 is the exception, an
-interim until JUN-730). Each rule names the refusal it removes, the authority
-it rests on, a before/after pair and where it stops.
+that a later Amu slice is expected to admit; rule 4's protocol half is the
+exception, an interim until protocols land under JUN-730). Each rule names the
+refusal it removes, the authority it rests on, a before/after pair and where it
+stops.
 
 Every before/after below is a file in `scripts/native/rewrite_rules_corpus/`
 and is measured by the `rewrite-rules` gate of `scripts/native_gates.py`: a
@@ -12,21 +13,20 @@ and is measured by the `rewrite-rules` gate of `scripts/native_gates.py`: a
 (the negative control), each `.after*` file must check and run to its
 `;; expect-value:`. `.admitted` files show forms that need no rewrite and
 `.out-of-scope` files record refusals these rules do not remove. Results at
-the CI pin (amu `05668c7`, `bin/amu` sha256 `13bfdade…4ba11c3`):
-`docs/evidence/port-rewrite-rules-20261101c.json` (73 cases). Against the
-previous pin `c2186d7` (`port-rewrite-rules-20261101b.json`, 60 cases) amu
-PR #1751 (JUN-729: destructuring as reader sugar) and PR #1753 (JUN-734: def
-literals D5, variadic `assoc` D6, typed-map `get` / `(:k m d)` D10) changed
-three `.before` results: `kwmap-variadic-assoc.before` is admitted (now
-`kwmap-variadic-assoc.admitted`); the f64 def in `kwmap-def-f64.before` is
-admitted, so that file is refused only for its destructured unannotated
-parameter (E2104, was E2124) and became `kwmap-state-param`, with the def
-alone as `kwmap-def-f64.admitted`; and `kwmap-option-default.before` is E2111
-instead of E2119. New cases:
-`kwmap-def-vec-mixed-keys` (what D5 still refuses), the admitted
-`kwmap-option-default-typed-map`, the `kwmap-variadic-assoc-odd` refusal and
-the "Destructuring" cases below. Every rule 1-4 case gives the same result as
-at `c2186d7`. `seed/HEADS` line numbers below are at `05668c7`.
+the CI pin (amu `11df09b`, `bin/amu` sha256 `4e766e1f…9157de0`):
+`docs/evidence/port-rewrite-rules-20261101d.json` (77 cases). Against the
+previous pin `05668c7` (`port-rewrite-rules-20261101c.json`, 73 cases) amu
+PR #1754 (JUN-730: closed `defmulti`/`defmethod` expanded to one defn with a
+static `case`; `reify` refused E2181) changed two `.before` results:
+`reify.before` is E2181 instead of E2101, and `defmulti.before` is E2006
+instead of E2003. That `.before` is not admitted: its dispatch is a `fn`
+literal and its parameters are unannotated, so it stays a negative control,
+and `defmulti.after` is now the admitted closed multimethod rather than a
+hand-written `case`. New cases: `defmulti-closed.admitted`, the
+`defmulti-param-names` pair and the `defmulti-open.out-of-scope` refusal
+(rule 4 below). `defprotocol.before` is still E2003. Every other case gives
+the same result as at `05668c7`. `seed/HEADS` line numbers below are at
+`11df09b`.
 
 Authority references are to `kotoba-lang/kotoba-lang` (`lang/`) and
 `kotoba-lang/amu` (`seed/HEADS`).
@@ -37,7 +37,7 @@ Authority references are to `kotoba-lang/kotoba-lang` (`lang/`) and
 - **Authority:** `lang/guest-grammar.edn:527-532` (`:atom-local`, slice 1:
   "reading it inside loop/doseq/dotimes is refused"); `lang/local-state.edn:112-119`
   (`:out-of-scope :writes-under-iteration`: "a future slice may admit it by
-  threading the cell through the loop's own accumulator"); `seed/HEADS:409-410`
+  threading the cell through the loop's own accumulator"); `seed/HEADS:415-416`
   (`HD-ATOM`: the cell may appear only as the first argument of
   swap!/reset!/deref in the binding function).
 - **Status:** permanent refusal for now; port by hand-threading the value.
@@ -74,7 +74,7 @@ as is (`atom-straight-line.admitted`, 1).
 ## Rule 2: a top-level defn passed as a value
 
 - **Removes:** `E2102 unknown symbol 'f'`.
-- **Authority:** `seed/HEADS:379-381` (`HD-FN-REF`: `(fn-ref f)` for a
+- **Authority:** `seed/HEADS:385-387` (`HD-FN-REF`: `(fn-ref f)` for a
   single-clause, non-variadic, non-aborting defn of the file; `HD-INVOKE`).
 - **Rewrite:** where a module defn's name is used as a value (an argument,
   a let init, a record field), write `(fn-ref f)`; call a fn value held in a
@@ -95,8 +95,8 @@ Passing a defn straight to `map`/`filter`/`reduce` is already admitted
 ## Rule 3: a numeric set literal
 
 - **Removes:** `E2104 type mismatch in '1': expected :keyword`.
-- **Authority:** `seed/HEADS:351-352` (`HD-SETLIT`: a set literal is keyword-only;
-  `typed-set-new` builds the others) and `seed/HEADS:314` (`HD-SET-NEW`).
+- **Authority:** `seed/HEADS:357-358` (`HD-SETLIT`: a set literal is keyword-only;
+  `typed-set-new` builds the others) and `seed/HEADS:320` (`HD-SET-NEW`).
 - **Rewrite:** `#{1 2}` → `(typed-set-new [:set :i64] 1 2)`.
 
 ```clojure
@@ -108,45 +108,64 @@ Keyword sets are admitted as literals (`set-keyword.admitted`). **Scope:**
 `typed-set-new` holds at most 32 items (a 33rd traps); a larger constant set
 needs another representation (a sorted vector plus search, or a `case`).
 
-## Rule 4: reify, defprotocol and closed defmulti (interim, until JUN-730)
+## Rule 4: reify, defprotocol and defmulti (JUN-730)
 
-- **Removes:** `E2101 unknown or unsupported form 'reify'`; `E2003 unsupported
-  top-level form 'defprotocol'` / `'defmulti'`.
-- **Authority:** `lang/guest-grammar.edn:498-501` (`:closed-multimethod`, desugars
-  to one module-local defn with static `case` dispatch: admitted by the spec,
-  not yet by the native checker; JUN-730), `seed/HEADS:379` (`fn-ref`), and the
-  record field type `[:fn [[T ..] R]]`.
-- **reify / defprotocol → record of fn-ref closures.** Each protocol method
-  becomes a record field of fn type; each implementation is a defn put in the
-  field with `fn-ref`; a call becomes `(invoke (:method obj) args ..)`.
+Since amu `11df09b` (PR #1754, JUN-730) a closed multimethod is admitted:
+`seed/20-names` (`nm-dp-norm`) expands a top-level `(defmulti NAME [doc]
+DISPATCH)` and every top-level `(defmethod NAME KEY [params] body ..)` of the
+same module, before any name is registered, into
+`(defn NAME [params] (case (DISPATCH p ..) KEY body .. [:default body]))` in
+place of the defmulti (`lang/guest-grammar.edn:498-501`, `:closed-multimethod`;
+`seed/HEADS:274-282`). `reify` is now a **permanent** refusal (E2181,
+`seed/HEADS:611`); `defprotocol`, `extend-type`, `extend-protocol`,
+`definterface` and `deftype` stay E2003 and a defrecord with inline
+implementations E2128 (the protocol expansion is on amu branch
+`claude/jun-730-protocols`, not merged: it does not fit the static profile's
+token cap).
+
+| construct | at `11df09b` | port as | ledger blocker | corpus |
+|---|---|---|---|---|
+| closed defmulti: dispatch a keyword (one annotated parameter) or a defn of the module; integer or keyword keys; identical plain parameter vectors | admitted at `11df09b` (was E2003) | as is | none | `defmulti.after` (15), `defmulti-closed.admitted` (109) |
+| defmulti with a `fn` literal, `#(..)`, call or clojure.core dispatch (`identity`, `type`, `class`) | E2006 (fn / call), E2101 (a core name) | a named defn of the module (or a keyword) as the dispatch | `dispatch/multimethod-shape` | `defmulti.before` (E2006) |
+| defmethods whose parameter vectors differ (`[_ x]` next to `[b x]`), hold a pattern or `&`, or are multi-arity | E2006 | one parameter vector, written the same in every method; destructure in a `let` | `dispatch/multimethod-shape` | `defmulti-param-names` (E2006 -> 22) |
+| keyword dispatch over an unannotated parameter, or over more than one | E2104, E2103 | annotate the one parameter `[s [:ref :ns/R]]`; with more parameters a defn dispatch | `dispatch/multimethod-shape` | |
+| string / nil / class keys, defmulti options (`:default x`, `:hierarchy`) or an attr map, two `:default`s, an empty body | E2006 | integer or keyword keys, the plain form | `dispatch/multimethod-shape` | |
+| duplicate key; duplicate defmulti or a name defined twice | E2125; E2001 | | `dispatch/multimethod-shape` | |
+| a defmethod of a multimethod the module does not declare (another namespace's, e.g. `t/report`, `solver/solve`); `prefer-method`, `remove-method`, `derive` | E2007; E6010 (qualified name); E2003 | a closed `case` in the owning module, or the extension passed as an explicit `fn-ref` | `dispatch/open-multimethod` | `defmulti-open.out-of-scope` (E2007) |
+| `defprotocol` / `extend-type` / `extend-protocol` / `definterface` / `deftype`, inline defrecord implementations | E2003; E2128 | record of fn-ref closures (below) | `dispatch/protocol` | `defprotocol` (E2003 -> 12) |
+| `reify` | **E2181, permanent** (was E2101) | record of fn-ref closures (below) | `dispatch/reify` | `reify` (E2181 -> 12) |
+
+A closed multimethod has no fallback: without a `:default` method a key
+with no method traps (`case`, exit 133 in the probe), where Clojure throws
+`IllegalArgumentException`. The expanded defn is public, so a method that
+`throw`s is E2130 ("unhandled abort at export boundary"), as for any public
+defn that throws (probe `defmethod-throws-public`, `public-defn-throws`).
 
 ```clojure
-;; before (E2101)                          ;; after -> 12
+;; before (E2006)                          ;; after -> 15 (admitted at 11df09b)
+(defmulti area (fn [s] (:kind s)))         (defmulti area :kind)
+(defmethod area :rect [s] (* (:w s) (:h s)))  (defmethod area :rect [s [:ref :probe/Shape]] :i64 (* (:w s) (:h s)))
+(defmethod area :sq [s] (* (:w s) (:w s)))    (defmethod area :sq [s [:ref :probe/Shape]] :i64 (* (:w s) (:w s)))
+```
+
+- **reify / defprotocol → record of fn-ref closures.** Each protocol method
+  becomes a record field of fn type; each implementation is a defn put in the
+  field with `fn-ref`; a call becomes `(invoke (:method obj) args ..)`
+  (`seed/HEADS:385`, `fn-ref`; record field type `[:fn [[T ..] R]]`). For
+  `reify` this is the permanent rewrite, since E2181 will not be lifted.
+
+```clojure
+;; before (E2181)                          ;; after -> 12
 (reify Shape (area [_ w h] (* w h)))       (defn rect-area [w :i64 h :i64] :i64 (* w h))
                                            (defrecord Impl [area [:fn [[:i64 :i64] :i64]]])
                                            (invoke (:area (->Impl (fn-ref rect-area))) 3 4)
 ```
 
-- **Closed defmulti → `case` on a `:kind` field.** The dispatch value becomes
-  a keyword field of a record, the methods become the arms of one `case`, and
-  the parameter is typed `[:ref :<ns>/<Record>]` (the namespace is the file's
-  own `ns`: `:probe/Shape` in the corpus; another namespace is E2179).
-
-```clojure
-;; before (E2003)                          ;; after -> 15
-(defmulti area (fn [s] (:kind s)))         (defn area [s [:ref :probe/Shape]] :i64
-(defmethod area :rect [s] (* (:w s) (:h s)))  (case (:kind s)
-(defmethod area :sq [s] (* (:w s) (:w s)))      :rect (* (:w s) (:h s))
-                                                :sq (* (:w s) (:w s))
-                                                0))
-```
-
-**Scope:** an open multimethod (methods added from other namespaces, hierarchies,
-`prefer-method`), a protocol extended to host types (`extend-type js/...`), or a
-`reify` that closes over locals needs hand work: the record holds only `fn-ref`
-defns, so captured values must become extra record fields passed to the method.
-Once JUN-730 admits closed `defmulti`/`defmethod`, the multimethod half of this
-rule is dropped.
+**Scope:** an open multimethod (methods added from other namespaces,
+hierarchies, `prefer-method`), a protocol extended to host types
+(`extend-type js/...`), or a `reify` that closes over locals needs hand work:
+the record holds only `fn-ref` defns, so captured values must become extra
+record fields passed to the method.
 
 ## Keyword maps (JUN-732)
 
@@ -324,7 +343,7 @@ read back as a document (`kwmap-ex-info.admitted`, -3):
 Since amu `5667e44c` (PR #1751, in the `05668c7` pin) a destructuring pattern
 is reader sugar that `seed/21-check` expands before typing into plain
 temp-bound `nth` / `get` / `vector-drop` bindings (`seed/HEADS:189-197`,
-`HD-LET`; `HD-LOOP`; `seed/HEADS:390-395`, `HD-AMP`). Admitted as written in
+`HD-LET`; `HD-LOOP`; `seed/HEADS:396-401`, `HD-AMP`). Admitted as written in
 `let` and `loop`: vector patterns (nested, `:as`, `_`, `&` over a vector) and
 map patterns (`:keys`, `{x :k}`, `:as`) over a record or keyword map literal
 whose keys are present, `:or` over a typed map (`destructuring-let.admitted`,
@@ -382,5 +401,9 @@ narrowed to the E2116 vectors and `kwmap/variadic-assoc` is removed (JUN-734),
 and `destructuring` is read by `destructuring_patterns()` (JUN-729, above).
 `fn-literal` and `auto-resolved-keyword`
 track the reader shorthands. The detection is a regex/form scan over the CLJK,
-an estimate of the work rather than a proof. `dispatch-forms` links JUN-730
-and this rule set, `destructuring` JUN-729.
+an estimate of the work rather than a proof. At `11df09b` the former
+`dispatch-forms` blocker (18 files, any `defmulti` / `defmethod` /
+`defprotocol` / `extend-*` / `reify` by regex) is split by
+`dispatch_patterns()` into the four `dispatch/*` blockers of rule 4, so a
+closed same-module multimethod in the admitted shape no longer counts;
+`destructuring` links JUN-729.
