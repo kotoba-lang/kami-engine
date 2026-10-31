@@ -1,0 +1,2526 @@
+{
+ "schema": "kami.placement-consumers.v1",
+ "issue": "JUN-649",
+ "kotoba": {
+  "repo": "kotoba-lang/kotoba",
+  "rev": "c2dc09ebe015299f612fe9d4b5e021876e48e176"
+ },
+ "method": "A unit is a kami-engine ledger unit or a kotoba `lib/kotoba.kami*` library\n(plus `lib/kotoba.host`). A consumer is a file whose `(ns ... (:require ...))`\nnames one of the unit's namespaces, found in three places:\n\n- this repository (its CLJK oracle files, from docs/migration-ledger.json);\n- the kotoba monorepo `lib/` at --kotoba-rev (read from git, not the work tree);\n- every other checkout under --forest, as it is on disk. Advisory forks\n  (`*-ghsa-*`), worktree copies, wt/ and workspaces/ are skipped.\n\nConsumer repositories are then labelled: `copy` for an old standalone repo that\nkotoba `lib/` or `packages/` imported (its code is the unit itself or a lib),\n`compat-twin` for kotoba-lang/kotoba-lang `lang/compat` (bulk mechanical\n.kotoba copies), `game` for the game repositories, `kami-engine` and\n`kotoba-lib` for those monorepos, and `other` for the rest (non-game uses).",
+ "skipped-repositories": {
+  "cloud-itonami/cloud-itonami-app-worktrees": 167,
+  "kotoba-lang/aiueos-ghsa-2jcq-p9fx-g4qc": 290,
+  "kotoba-lang/aiueos-ghsa-4gqh-7q9r-fqpf": 290,
+  "kotoba-lang/aiueos-ghsa-cprw-qphh-q5xr": 204,
+  "kotoba-lang/aiueos-ghsa-ff8q-j2vf-r244": 158,
+  "kotoba-lang/aiueos-ghsa-fhrw-h8xq-q37h": 148,
+  "kotoba-lang/aiueos-ghsa-fwfm-x97q-qg47": 202,
+  "kotoba-lang/aiueos-ghsa-ggpq-3qpq-qpjq": 290,
+  "kotoba-lang/aiueos-ghsa-gm6x-5pv7-2jjc": 290,
+  "kotoba-lang/aiueos-ghsa-gpw2-4c9r-pwr4": 134,
+  "kotoba-lang/aiueos-ghsa-hmjq-6vrc-w2mv": 134,
+  "kotoba-lang/kotoba-ghsa-22f4-3j2m-869p": 202,
+  "kotoba-lang/kotoba-ghsa-2fqx-qg9f-m233": 202,
+  "kotoba-lang/kotoba-ghsa-7ggh-p9pp-9c8x": 216,
+  "kotoba-lang/kotoba-ghsa-gq65-qr66-7mf3": 369,
+  "kotoba-lang/kotoba-ghsa-mh2v-96hx-3wpq": 216,
+  "network-awai/cloud-murakumo-distributed-ci-wt": 73
+ },
+ "units": {
+  "kami-engine:(root)": {},
+  "kami-engine:.claude": {},
+  "kami-engine:.github": {},
+  "kami-engine:90-docs": {},
+  "kami-engine:docs": {},
+  "kami-engine:fixtures": {},
+  "kami-engine:hermes": {},
+  "kami-engine:kami-app-sip-clj": {},
+  "kami-engine:kami-clj-host": {},
+  "kami-engine:kami-clj-play": {},
+  "kami-engine:kami-clj-play3d": {},
+  "kami-engine:kami-engine-guest": {},
+  "kami-engine:kami-flow": {},
+  "kami-engine:kami-game-scene": {},
+  "kami-engine:kami-gameplay": {
+   "com-junkawasaki/ghosthacker": {
+    "kind": "game",
+    "files": 3,
+    "sample": [
+     "com-junkawasaki/ghosthacker/games/ghosthacker-prototypes/src/isekai/ghosthacker/world.cljk",
+     "com-junkawasaki/ghosthacker/games/ghosthacker-prototypes/src/isekai/keyboard_garden/world.cljk",
+     "com-junkawasaki/ghosthacker/games/whitehat-frontier/src/whitehat/core.cljk"
+    ]
+   }
+  },
+  "kami-engine:kami-genesis": {},
+  "kami-engine:kami-live": {},
+  "kami-engine:kami-mangaka-expression-clj": {},
+  "kami-engine:kami-mangaka-page-clj": {},
+  "kami-engine:kami-mangaka-reader-clj": {},
+  "kami-engine:kami-mangaka-render-clj": {},
+  "kami-engine:kami-mangaka-text-clj": {},
+  "kami-engine:kami-physics": {},
+  "kami-engine:kami-render": {
+   "network-awai/network-isekai": {
+    "kind": "game",
+    "files": 3,
+    "sample": [
+     "network-awai/network-isekai/src/isekai/character.cljk",
+     "network-awai/network-isekai/src/isekai/shared_presets.cljk",
+     "network-awai/network-isekai/src/isekai/visual_regression.cljk"
+    ]
+   }
+  },
+  "kami-engine:kami-text": {},
+  "kami-engine:kami-ui-sdk": {},
+  "kami-engine:kami-web": {},
+  "kami-engine:kami-web-modelb": {},
+  "kami-engine:packages": {},
+  "kami-engine:packages/anime": {
+   "cloud-itonami/animeka": {
+    "kind": "other",
+    "files": 2,
+    "sample": [
+     "cloud-itonami/animeka/clj/src/animeka/domain.kotoba",
+     "cloud-itonami/animeka/clj/src/animeka/graphs/generation.kotoba"
+    ]
+   },
+   "cloud-itonami/cloud-itonami-jsic-4113": {
+    "kind": "other",
+    "files": 1,
+    "sample": [
+     "cloud-itonami/cloud-itonami-jsic-4113/src/animation_production/governor.cljk"
+    ]
+   },
+   "kotoba-lang/anime": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/anime/src/anime/timeline.cljk",
+     "kotoba-lang/anime/test/anime/production_test.cljk",
+     "kotoba-lang/anime/test/anime/timeline_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/anime"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/anime/timeline.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/biomech": {
+   "kotoba-lang/biomech": {
+    "kind": "copy",
+    "files": 11,
+    "sample": [
+     "kotoba-lang/biomech/src/kotoba/biomech/disc.cljk",
+     "kotoba-lang/biomech/src/kotoba/biomech/fem.cljk",
+     "kotoba-lang/biomech/src/kotoba/biomech/softbody.cljk"
+    ],
+    "copy-of": "kami-engine:packages/biomech"
+   }
+  },
+  "kami-engine:packages/cad": {
+   "kami-engine:packages/kami-engine-vehicle-designer": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-engine-vehicle-designer/src/vdesign/cad.cljk",
+     "packages/kami-engine-vehicle-designer/src/vdesign/process.cljk"
+    ]
+   },
+   "kotoba-lang/cad": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/cad/src/kotoba/cad/app.cljk",
+     "kotoba-lang/cad/src/kotoba/cad/ui.cljk",
+     "kotoba-lang/cad/test/kotoba/cad/core_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/cad"
+   },
+   "kotoba-lang/kami-engine-vehicle-designer": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/cad.cljk",
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/process.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-vehicle-designer"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/kotoba/cad/app.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/kotoba/cad/ui.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/vdesign/cad.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/douga": {
+   "cloud-itonami/app-itonami-dougaka": {
+    "kind": "other",
+    "files": 3,
+    "sample": [
+     "cloud-itonami/app-itonami-dougaka/server/clj/src/dougaka/graphs/render.cljk",
+     "cloud-itonami/app-itonami-dougaka/server/clj/src/dougaka/pipeline.cljk",
+     "cloud-itonami/app-itonami-dougaka/server/clj/test/dougaka/core_test.cljk"
+    ]
+   },
+   "cloud-itonami/cloud-itonami-isco-2654": {
+    "kind": "other",
+    "files": 2,
+    "sample": [
+     "cloud-itonami/cloud-itonami-isco-2654/src/video_production/actor.kotoba",
+     "cloud-itonami/cloud-itonami-isco-2654/src/video_production/governor.kotoba"
+    ]
+   },
+   "cloud-itonami/dougaka": {
+    "kind": "other",
+    "files": 3,
+    "sample": [
+     "cloud-itonami/dougaka/clj/src/dougaka/graphs/render.cljk",
+     "cloud-itonami/dougaka/clj/src/dougaka/pipeline.cljk",
+     "cloud-itonami/dougaka/clj/test/dougaka/core_test.cljk"
+    ]
+   },
+   "cloud-itonami/mangaka": {
+    "kind": "other",
+    "files": 1,
+    "sample": [
+     "cloud-itonami/mangaka/clj/src/mangaka/video.cljk"
+    ]
+   },
+   "kami-engine:packages/anime": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/anime/test/e2e/real_anime_douga_ffmpeg_proof.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-creative-studio": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-creative-studio/src/main/kami/creative_studio/media.cljk"
+    ]
+   },
+   "kotoba-lang/anime": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/anime/test/e2e/real_anime_douga_ffmpeg_proof.cljk"
+    ],
+    "copy-of": "kami-engine:packages/anime"
+   },
+   "kotoba-lang/douga": {
+    "kind": "copy",
+    "files": 8,
+    "sample": [
+     "kotoba-lang/douga/src/douga/eizo_timeline.cljk",
+     "kotoba-lang/douga/test/douga/eizo_timeline_test.cljk",
+     "kotoba-lang/douga/test/douga/ffmpeg_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/douga"
+   },
+   "kotoba-lang/kami-creative-studio": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-creative-studio/src/main/kami/creative_studio/media.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-creative-studio"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/douga/eizo_timeline.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/freeboard": {
+   "kotoba-lang/freeboard": {
+    "kind": "copy",
+    "files": 11,
+    "sample": [
+     "kotoba-lang/freeboard/src/freeboard/collab.cljk",
+     "kotoba-lang/freeboard/src/freeboard/doc.cljk",
+     "kotoba-lang/freeboard/src/freeboard/import.cljk"
+    ],
+    "copy-of": "kami-engine:packages/freeboard"
+   }
+  },
+  "kami-engine:packages/kami-app": {},
+  "kami-engine:packages/kami-app-amenominaka": {
+   "kami-engine:packages/kami-app-hygaccess-plant": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-app-hygaccess-plant/test/render/verify_render.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-amenominaka": {
+    "kind": "copy",
+    "files": 23,
+    "sample": [
+     "kotoba-lang/kami-app-amenominaka/src/kotoba/amenominaka/application.cljk",
+     "kotoba-lang/kami-app-amenominaka/src/kotoba/amenominaka/extensions.cljk",
+     "kotoba-lang/kami-app-amenominaka/src/kotoba/amenominaka/gltf_export.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-amenominaka"
+   },
+   "kotoba-lang/kami-app-hygaccess-plant": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-hygaccess-plant/test/render/verify_render.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-hygaccess-plant"
+   }
+  },
+  "kami-engine:packages/kami-app-animator": {
+   "kotoba-lang/kami-app-animator": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-app-animator/src/kami/animator/app.cljk",
+     "kotoba-lang/kami-app-animator/test/kami/animator/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-animator"
+   }
+  },
+  "kami-engine:packages/kami-app-bim-editor": {
+   "kotoba-lang/kami-app-bim-editor": {
+    "kind": "copy",
+    "files": 6,
+    "sample": [
+     "kotoba-lang/kami-app-bim-editor/src/kami/bim_editor/app.cljk",
+     "kotoba-lang/kami-app-bim-editor/test/kami/bim_editor/family_editor_test.cljk",
+     "kotoba-lang/kami-app-bim-editor/test/kami/bim_editor/integration_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-bim-editor"
+   }
+  },
+  "kami-engine:packages/kami-app-cad": {
+   "kotoba-lang/kami-app-cad": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kami-app-cad/src/kami/cad/app.cljk",
+     "kotoba-lang/kami-app-cad/test/kami/cad/dimensional_sketch_test.cljk",
+     "kotoba-lang/kami-app-cad/test/kami/cad/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-cad"
+   }
+  },
+  "kami-engine:packages/kami-app-character-creator": {
+   "kotoba-lang/kami-app-character-creator": {
+    "kind": "copy",
+    "files": 9,
+    "sample": [
+     "kotoba-lang/kami-app-character-creator/dev/character_creator/app.cljk",
+     "kotoba-lang/kami-app-character-creator/dev/character_creator/pattern_demo.cljk",
+     "kotoba-lang/kami-app-character-creator/dev/character_creator/preview_demo.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-character-creator"
+   }
+  },
+  "kami-engine:packages/kami-app-hygaccess-plant": {
+   "cloud-itonami/cloud-itonami-hygiene-access": {
+    "kind": "other",
+    "files": 3,
+    "sample": [
+     "cloud-itonami/cloud-itonami-hygiene-access/src/hygaccess/mes.kotoba",
+     "cloud-itonami/cloud-itonami-hygiene-access/test/hygaccess/mes_test.kotoba",
+     "cloud-itonami/cloud-itonami-hygiene-access/test/hygaccess/modbus_integration_test.kotoba"
+    ]
+   },
+   "kami-engine:packages/kami-app-amenominaka": {
+    "kind": "kami-engine",
+    "files": 6,
+    "sample": [
+     "packages/kami-app-amenominaka/test/render/verify_m2_render.cljk",
+     "packages/kami-app-amenominaka/test/render/verify_m4_stress.cljk",
+     "packages/kami-app-amenominaka/test/render/verify_m5_ui.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-amenominaka": {
+    "kind": "copy",
+    "files": 6,
+    "sample": [
+     "kotoba-lang/kami-app-amenominaka/test/render/verify_m2_render.cljk",
+     "kotoba-lang/kami-app-amenominaka/test/render/verify_m4_stress.cljk",
+     "kotoba-lang/kami-app-amenominaka/test/render/verify_m5_ui.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-amenominaka"
+   },
+   "kotoba-lang/kami-app-hygaccess-plant": {
+    "kind": "copy",
+    "files": 11,
+    "sample": [
+     "kotoba-lang/kami-app-hygaccess-plant/src/kami_app_hygaccess_plant.cljk",
+     "kotoba-lang/kami-app-hygaccess-plant/src/kami_app_hygaccess_plant/mixing.cljk",
+     "kotoba-lang/kami-app-hygaccess-plant/src/kami_app_hygaccess_plant/render_demo.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-hygaccess-plant"
+   }
+  },
+  "kami-engine:packages/kami-app-modeler": {
+   "kotoba-lang/kami-app-modeler": {
+    "kind": "copy",
+    "files": 8,
+    "sample": [
+     "kotoba-lang/kami-app-modeler/src/kami/modeler/app.cljk",
+     "kotoba-lang/kami-app-modeler/src/kami/modeler/vehicle.cljk",
+     "kotoba-lang/kami-app-modeler/test/kami/modeler/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-modeler"
+   }
+  },
+  "kami-engine:packages/kami-app-sculpt": {
+   "kotoba-lang/kami-app-sculpt": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-app-sculpt/src/kami/sculpt/app.cljk",
+     "kotoba-lang/kami-app-sculpt/test/kami/sculpt/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-sculpt"
+   }
+  },
+  "kami-engine:packages/kami-app-sip": {
+   "kotoba-lang/kami-app-sip": {
+    "kind": "copy",
+    "files": 11,
+    "sample": [
+     "kotoba-lang/kami-app-sip/src/sip/page.cljk",
+     "kotoba-lang/kami-app-sip/src/sip/preview.cljk",
+     "kotoba-lang/kami-app-sip/src/sip/render.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-sip"
+   }
+  },
+  "kami-engine:packages/kami-app-suji": {
+   "kotoba-lang/kami-app-suji": {
+    "kind": "copy",
+    "files": 12,
+    "sample": [
+     "kotoba-lang/kami-app-suji/scripts/gen-page.cljk",
+     "kotoba-lang/kami-app-suji/scripts/nbb_test.cljk",
+     "kotoba-lang/kami-app-suji/scripts/verify-browser.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-suji"
+   }
+  },
+  "kami-engine:packages/kami-atmosphere-scene": {},
+  "kami-engine:packages/kami-autodrive-scene": {},
+  "kami-engine:packages/kami-cam-scene": {},
+  "kami-engine:packages/kami-character-scene": {
+   "kotoba-lang/kami-character-scene": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kami-character-scene/test/character_scene/anim_blueprint_test.cljk",
+     "kotoba-lang/kami-character-scene/test/character_scene/face_rig_test.cljk",
+     "kotoba-lang/kami-character-scene/test/character_scene_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-character-scene"
+   }
+  },
+  "kami-engine:packages/kami-creative-studio": {
+   "kotoba-lang/kami-creative-studio": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-creative-studio/src/main/kami/creative_studio/ui.cljk",
+     "kotoba-lang/kami-creative-studio/test-e2e/kami/creative_studio/media_render_e2e_test.cljk",
+     "kotoba-lang/kami-creative-studio/test/kami/creative_studio/core_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-creative-studio"
+   }
+  },
+  "kami-engine:packages/kami-eizo-compositor": {
+   "kotoba-lang/kami-eizo-compositor": {
+    "kind": "copy",
+    "files": 9,
+    "sample": [
+     "kotoba-lang/kami-eizo-compositor/src/kami/eizo/compositor/nodes.cljk",
+     "kotoba-lang/kami-eizo-compositor/test/e2e/run_e2e.cljk",
+     "kotoba-lang/kami-eizo-compositor/test/e2e/src/kami/eizo/compositor/e2e/composite_proof.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-eizo-compositor"
+   }
+  },
+  "kami-engine:packages/kami-eizo-grade": {
+   "kotoba-lang/kami-eizo-grade": {
+    "kind": "copy",
+    "files": 12,
+    "sample": [
+     "kotoba-lang/kami-eizo-grade/src/kami/eizo/grade.cljk",
+     "kotoba-lang/kami-eizo-grade/src/kami/eizo/grade/cdl.cljk",
+     "kotoba-lang/kami-eizo-grade/src/kami/eizo/grade/curve.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-eizo-grade"
+   }
+  },
+  "kami-engine:packages/kami-eizo-timeline": {
+   "kami-engine:packages/anime": {
+    "kind": "kami-engine",
+    "files": 3,
+    "sample": [
+     "packages/anime/src/anime/timeline.cljk",
+     "packages/anime/test/anime/timeline_test.cljk",
+     "packages/anime/test/e2e/real_anime_douga_ffmpeg_proof.cljk"
+    ]
+   },
+   "kami-engine:packages/douga": {
+    "kind": "kami-engine",
+    "files": 6,
+    "sample": [
+     "packages/douga/src/douga/eizo_timeline.cljk",
+     "packages/douga/test/douga/eizo_timeline_test.cljk",
+     "packages/douga/test/e2e/real_chained_transitions_proof.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-creative-studio": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-creative-studio/src/main/kami/creative_studio/media.cljk"
+    ]
+   },
+   "kotoba-lang/anime": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/anime/src/anime/timeline.cljk",
+     "kotoba-lang/anime/test/anime/timeline_test.cljk",
+     "kotoba-lang/anime/test/e2e/real_anime_douga_ffmpeg_proof.cljk"
+    ],
+    "copy-of": "kami-engine:packages/anime"
+   },
+   "kotoba-lang/douga": {
+    "kind": "copy",
+    "files": 6,
+    "sample": [
+     "kotoba-lang/douga/src/douga/eizo_timeline.cljk",
+     "kotoba-lang/douga/test/douga/eizo_timeline_test.cljk",
+     "kotoba-lang/douga/test/e2e/real_chained_transitions_proof.cljk"
+    ],
+    "copy-of": "kami-engine:packages/douga"
+   },
+   "kotoba-lang/kami-creative-studio": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-creative-studio/src/main/kami/creative_studio/media.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-creative-studio"
+   },
+   "kotoba-lang/kami-eizo-timeline": {
+    "kind": "copy",
+    "files": 5,
+    "sample": [
+     "kotoba-lang/kami-eizo-timeline/src/kami/eizo/timeline.cljk",
+     "kotoba-lang/kami-eizo-timeline/test/e2e/src/kami/eizo/timeline/e2e/entry.cljk",
+     "kotoba-lang/kami-eizo-timeline/test/e2e/src/kami/eizo/timeline/e2e/render_proof.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-eizo-timeline"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/anime/timeline.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/douga/eizo_timeline.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/kami/eizo/timeline.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-engine-aero": {
+   "kami-engine:packages/kami-engine-vehicle-designer": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-engine-vehicle-designer/src/vdesign/design.cljk"
+    ]
+   },
+   "kotoba-lang/kami-engine-aero": {
+    "kind": "copy",
+    "files": 7,
+    "sample": [
+     "kotoba-lang/kami-engine-aero/src/aero/bridge.cljk",
+     "kotoba-lang/kami-engine-aero/src/aero/cli.cljk",
+     "kotoba-lang/kami-engine-aero/src/aero/solver.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-aero"
+   },
+   "kotoba-lang/kami-engine-vehicle-designer": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/design.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-vehicle-designer"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/aero/bridge.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/aero/cli.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/aero/solver.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-engine-animation": {
+   "com-junkawasaki/root": {
+    "kind": "other",
+    "files": 2,
+    "sample": [
+     "com-junkawasaki/root/90-docs/maturity/probes/anim-curves.cljk",
+     "com-junkawasaki/root/90-docs/maturity/probes/rig-skinning.cljk"
+    ]
+   },
+   "kami-engine:kami-gameplay": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "kami-gameplay/src/kami/gameplay/presentation.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-app-animator": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-app-animator/src/kami/animator/app.cljk",
+     "packages/kami-app-animator/test/kami/animator/project_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-animator": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-app-animator/src/kami/animator/app.cljk",
+     "kotoba-lang/kami-app-animator/test/kami/animator/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-animator"
+   },
+   "kotoba-lang/kami-engine-animation": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-animation/test/kami/animation_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-animation"
+   }
+  },
+  "kami-engine:packages/kami-engine-cae-solver": {
+   "cloud-itonami/tsukuru-actor": {
+    "kind": "other",
+    "files": 1,
+    "sample": [
+     "cloud-itonami/tsukuru-actor/src/tsukuru/manufacturability.kotoba"
+    ]
+   },
+   "com-junkawasaki/root": {
+    "kind": "other",
+    "files": 3,
+    "sample": [
+     "com-junkawasaki/root/90-docs/maturity/probes/cae-contact.cljk",
+     "com-junkawasaki/root/90-docs/maturity/probes/cae-fem-static.cljk",
+     "com-junkawasaki/root/90-docs/maturity/probes/cae-verification.cljk"
+    ]
+   },
+   "kami-engine:kami-physics": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "kami-physics/src/kami/physics/runtime.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-app-hygaccess-plant": {
+    "kind": "kami-engine",
+    "files": 4,
+    "sample": [
+     "packages/kami-app-hygaccess-plant/src/kami_app_hygaccess_plant/render_demo.cljk",
+     "packages/kami-app-hygaccess-plant/src/kami_app_hygaccess_plant/solve.cljk",
+     "packages/kami-app-hygaccess-plant/test/kami_app_hygaccess_plant/smoke_test.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-aero": {
+    "kind": "kami-engine",
+    "files": 3,
+    "sample": [
+     "packages/kami-engine-aero/src/aero/lbm.cljk",
+     "packages/kami-engine-aero/src/aero/solver.cljk",
+     "packages/kami-engine-aero/test/aero/lbm_test.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-crash": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-engine-crash/src/crash/solver.cljk",
+     "packages/kami-engine-crash/test/crash/solver_test.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-echem": {
+    "kind": "kami-engine",
+    "files": 8,
+    "sample": [
+     "packages/kami-engine-echem/src/echem/profile.cljk",
+     "packages/kami-engine-echem/src/echem/solver.cljk",
+     "packages/kami-engine-echem/src/echem/stack_thermal.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-motor": {
+    "kind": "kami-engine",
+    "files": 11,
+    "sample": [
+     "packages/kami-engine-motor/src/motor/bldc.cljk",
+     "packages/kami-engine-motor/src/motor/dcbus.cljk",
+     "packages/kami-engine-motor/src/motor/envelope.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-pack": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-engine-pack/src/pack/solver.cljk",
+     "packages/kami-engine-pack/test/pack/solver_test.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-rotor": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-engine-rotor/src/rotor/solver.cljk",
+     "packages/kami-engine-rotor/test/rotor/solver_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-hygaccess-plant": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-app-hygaccess-plant/src/kami_app_hygaccess_plant/render_demo.cljk",
+     "kotoba-lang/kami-app-hygaccess-plant/src/kami_app_hygaccess_plant/solve.cljk",
+     "kotoba-lang/kami-app-hygaccess-plant/test/kami_app_hygaccess_plant/smoke_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-hygaccess-plant"
+   },
+   "kotoba-lang/kami-engine-aero": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kami-engine-aero/src/aero/lbm.cljk",
+     "kotoba-lang/kami-engine-aero/src/aero/solver.cljk",
+     "kotoba-lang/kami-engine-aero/test/aero/lbm_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-aero"
+   },
+   "kotoba-lang/kami-engine-cae-solver": {
+    "kind": "copy",
+    "files": 68,
+    "sample": [
+     "kotoba-lang/kami-engine-cae-solver/scripts/build_pages_report.cljk",
+     "kotoba-lang/kami-engine-cae-solver/scripts/report_maturity.cljk",
+     "kotoba-lang/kami-engine-cae-solver/scripts/run_calculix_contact_evidence.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-cae-solver"
+   },
+   "kotoba-lang/kami-engine-crash": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-crash/src/crash/solver.cljk",
+     "kotoba-lang/kami-engine-crash/test/crash/solver_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-crash"
+   },
+   "kotoba-lang/kami-engine-echem": {
+    "kind": "copy",
+    "files": 8,
+    "sample": [
+     "kotoba-lang/kami-engine-echem/src/echem/profile.cljk",
+     "kotoba-lang/kami-engine-echem/src/echem/solver.cljk",
+     "kotoba-lang/kami-engine-echem/src/echem/stack_thermal.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-echem"
+   },
+   "kotoba-lang/kami-engine-motor": {
+    "kind": "copy",
+    "files": 11,
+    "sample": [
+     "kotoba-lang/kami-engine-motor/src/motor/bldc.cljk",
+     "kotoba-lang/kami-engine-motor/src/motor/dcbus.cljk",
+     "kotoba-lang/kami-engine-motor/src/motor/envelope.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-motor"
+   },
+   "kotoba-lang/kami-engine-pack": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-pack/src/pack/solver.cljk",
+     "kotoba-lang/kami-engine-pack/test/pack/solver_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-pack"
+   },
+   "kotoba-lang/kami-engine-rotor": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-rotor/src/rotor/solver.cljk",
+     "kotoba-lang/kami-engine-rotor/test/rotor/solver_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-rotor"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 5,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/aero/lbm.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/aero/solver.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/crash/solver.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-engine-core": {},
+  "kami-engine:packages/kami-engine-crash": {
+   "kami-engine:packages/kami-engine-vehicle-designer": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-engine-vehicle-designer/src/vdesign/simphysics.cljk",
+     "packages/kami-engine-vehicle-designer/src/vdesign/simverify.cljk"
+    ]
+   },
+   "kotoba-lang/kami-engine-crash": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-crash/test/crash/solver_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-crash"
+   },
+   "kotoba-lang/kami-engine-vehicle-designer": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/simphysics.cljk",
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/simverify.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-vehicle-designer"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/vdesign/simphysics.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/vdesign/simverify.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-engine-echem": {
+   "kami-engine:packages/kami-engine-vehicle-designer": {
+    "kind": "kami-engine",
+    "files": 3,
+    "sample": [
+     "packages/kami-engine-vehicle-designer/src/vdesign/design.cljk",
+     "packages/kami-engine-vehicle-designer/src/vdesign/hydrogen.cljk",
+     "packages/kami-engine-vehicle-designer/test/vdesign/hydrogen_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-engine-echem": {
+    "kind": "copy",
+    "files": 6,
+    "sample": [
+     "kotoba-lang/kami-engine-echem/src/echem/profile.cljk",
+     "kotoba-lang/kami-engine-echem/src/echem/system.cljk",
+     "kotoba-lang/kami-engine-echem/test/echem/profile_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-echem"
+   },
+   "kotoba-lang/kami-engine-vehicle-designer": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/design.cljk",
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/hydrogen.cljk",
+     "kotoba-lang/kami-engine-vehicle-designer/test/vdesign/hydrogen_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-vehicle-designer"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/vdesign/design.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-engine-engine": {},
+  "kami-engine:packages/kami-engine-io": {},
+  "kami-engine:packages/kami-engine-modeling": {
+   "com-junkawasaki/root": {
+    "kind": "other",
+    "files": 14,
+    "sample": [
+     "com-junkawasaki/root/90-docs/maturity/probes/assembly-mates.cljk",
+     "com-junkawasaki/root/90-docs/maturity/probes/bom.cljk",
+     "com-junkawasaki/root/90-docs/maturity/probes/dcc-subdivision.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-app-modeler": {
+    "kind": "kami-engine",
+    "files": 3,
+    "sample": [
+     "packages/kami-app-modeler/src/kami/modeler/app.cljk",
+     "packages/kami-app-modeler/src/kami/modeler/vehicle.cljk",
+     "packages/kami-app-modeler/test/kami/modeler/project_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-modeler": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kami-app-modeler/src/kami/modeler/app.cljk",
+     "kotoba-lang/kami-app-modeler/src/kami/modeler/vehicle.cljk",
+     "kotoba-lang/kami-app-modeler/test/kami/modeler/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-modeler"
+   },
+   "kotoba-lang/kami-engine-modeling": {
+    "kind": "copy",
+    "files": 23,
+    "sample": [
+     "kotoba-lang/kami-engine-modeling/src/kami/modeling.cljk",
+     "kotoba-lang/kami-engine-modeling/src/kami/modeling/assembly.cljk",
+     "kotoba-lang/kami-engine-modeling/src/kami/modeling/brep.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-modeling"
+   }
+  },
+  "kami-engine:packages/kami-engine-motor": {
+   "kami-engine:packages/kami-engine-multirotor": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-engine-multirotor/src/multirotor/closure.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-vehicle-designer": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-engine-vehicle-designer/src/vdesign/design.cljk"
+    ]
+   },
+   "kotoba-lang/kami-engine-motor": {
+    "kind": "copy",
+    "files": 7,
+    "sample": [
+     "kotoba-lang/kami-engine-motor/src/motor/envelope.cljk",
+     "kotoba-lang/kami-engine-motor/test/motor/bldc_test.cljk",
+     "kotoba-lang/kami-engine-motor/test/motor/dcbus_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-motor"
+   },
+   "kotoba-lang/kami-engine-multirotor": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-multirotor/src/multirotor/closure.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-multirotor"
+   },
+   "kotoba-lang/kami-engine-vehicle-designer": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/design.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-vehicle-designer"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/vdesign/design.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-engine-multirotor": {
+   "kotoba-lang/kami-engine-multirotor": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-multirotor/test/multirotor/closure_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-multirotor"
+   }
+  },
+  "kami-engine:packages/kami-engine-pack": {
+   "kami-engine:packages/kami-engine-multirotor": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-engine-multirotor/src/multirotor/closure.cljk",
+     "packages/kami-engine-multirotor/test/multirotor/closure_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-engine-multirotor": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-multirotor/src/multirotor/closure.cljk",
+     "kotoba-lang/kami-engine-multirotor/test/multirotor/closure_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-multirotor"
+   },
+   "kotoba-lang/kami-engine-pack": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-pack/test/pack/solver_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-pack"
+   }
+  },
+  "kami-engine:packages/kami-engine-render": {},
+  "kami-engine:packages/kami-engine-rotor": {
+   "kami-engine:packages/kami-engine-multirotor": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-engine-multirotor/src/multirotor/closure.cljk",
+     "packages/kami-engine-multirotor/test/multirotor/closure_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-engine-multirotor": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-multirotor/src/multirotor/closure.cljk",
+     "kotoba-lang/kami-engine-multirotor/test/multirotor/closure_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-multirotor"
+   },
+   "kotoba-lang/kami-engine-rotor": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-rotor/src/rotor/solver.cljk",
+     "kotoba-lang/kami-engine-rotor/test/rotor/solver_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-rotor"
+   }
+  },
+  "kami-engine:packages/kami-engine-script-runtime": {},
+  "kami-engine:packages/kami-engine-vehicle-designer": {
+   "cloud-itonami/cloud-itonami-isic-2910": {
+    "kind": "other",
+    "files": 3,
+    "sample": [
+     "cloud-itonami/cloud-itonami-isic-2910/src/automotive/physics_probe.cljk",
+     "cloud-itonami/cloud-itonami-isic-2910/src/automotive/robotics.cljk",
+     "cloud-itonami/cloud-itonami-isic-2910/test/automotive/physics_probe_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-engine-vehicle-designer": {
+    "kind": "copy",
+    "files": 37,
+    "sample": [
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/cartridge.cljk",
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/cartridge_fcev.cljk",
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/cartridge_volume.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-vehicle-designer"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 16,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/vdesign/cartridge.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/vdesign/cartridge_fcev.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/vdesign/cartridge_volume.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-engine-vphysics": {
+   "kami-engine:kami-physics": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "kami-physics/src/kami/physics/runtime.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-aero": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-engine-aero/src/aero/bridge.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-crash": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-engine-crash/src/crash/solver.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-engine-vehicle-designer": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-engine-vehicle-designer/src/vdesign/powertrain.cljk",
+     "packages/kami-engine-vehicle-designer/test/vdesign/vehicle_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-engine-aero": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-aero/src/aero/bridge.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-aero"
+   },
+   "kotoba-lang/kami-engine-crash": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-crash/src/crash/solver.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-crash"
+   },
+   "kotoba-lang/kami-engine-vehicle-designer": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-vehicle-designer/src/vdesign/powertrain.cljk",
+     "kotoba-lang/kami-engine-vehicle-designer/test/vdesign/vehicle_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-vehicle-designer"
+   },
+   "kotoba-lang/kami-engine-vphysics": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kami-engine-vphysics/src/vphysics/backend.cljk",
+     "kotoba-lang/kami-engine-vphysics/test/vphysics/backend_test.cljk",
+     "kotoba-lang/kami-engine-vphysics/test/vphysics/core_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-engine-vphysics"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/aero/bridge.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/crash/solver.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/vdesign/powertrain.kotoba"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-engine-web": {},
+  "kami-engine:packages/kami-flow": {
+   "kotoba-lang/kami-flow": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-flow/test/flow/choked_test.cljk",
+     "kotoba-lang/kami-flow/test/flow/pump_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-flow"
+   }
+  },
+  "kami-engine:packages/kami-game-scene": {
+   "kotoba-lang/kami-game-scene": {
+    "kind": "copy",
+    "files": 6,
+    "sample": [
+     "kotoba-lang/kami-game-scene/test/game_scene/battle_royale_test.cljk",
+     "kotoba-lang/kami-game-scene/test/game_scene/brainrot_test.cljk",
+     "kotoba-lang/kami-game-scene/test/game_scene/catalog_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-game-scene"
+   }
+  },
+  "kami-engine:packages/kami-gen-hybrid": {
+   "kotoba-lang/kami-gen-hybrid": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-gen-hybrid/src/kami/gen/hybrid.cljk",
+     "kotoba-lang/kami-gen-hybrid/test/kami/gen/hybrid_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-gen-hybrid"
+   }
+  },
+  "kami-engine:packages/kami-gen-ml3d": {
+   "kotoba-lang/kami-gen-ml3d": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-gen-ml3d/src/kami/gen/ml3d.cljk",
+     "kotoba-lang/kami-gen-ml3d/test/kami/gen/ml3d_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-gen-ml3d"
+   }
+  },
+  "kami-engine:packages/kami-gen-procedural": {
+   "kotoba-lang/kami-gen-procedural": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-gen-procedural/test/kami/gen/procedural_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-gen-procedural"
+   }
+  },
+  "kami-engine:packages/kami-genre-base-systems": {
+   "kotoba-lang/kami-genre-base-systems": {
+    "kind": "copy",
+    "files": 5,
+    "sample": [
+     "kotoba-lang/kami-genre-base-systems/games/platformer/test/kami_genre_base_systems/platformer/boss_test.cljk",
+     "kotoba-lang/kami-genre-base-systems/games/platformer/test/kami_genre_base_systems/platformer/camera_test.cljk",
+     "kotoba-lang/kami-genre-base-systems/games/platformer/test/kami_genre_base_systems/platformer/style_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-genre-base-systems"
+   },
+   "network-awai/network-isekai": {
+    "kind": "game",
+    "files": 2,
+    "sample": [
+     "network-awai/network-isekai/src/isekai/castlevania.cljk",
+     "network-awai/network-isekai/test/castlevania_test.cljk"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-input-scene": {},
+  "kami-engine:packages/kami-mangaka-expression": {
+   "cloud-itonami/app-itonami-genko": {
+    "kind": "other",
+    "files": 1,
+    "sample": [
+     "cloud-itonami/app-itonami-genko/test/kami/mangaka/genko_test.cljk"
+    ]
+   },
+   "cloud-itonami/mangaka": {
+    "kind": "other",
+    "files": 2,
+    "sample": [
+     "cloud-itonami/mangaka/clj/dev/compose_arc00.cljk",
+     "cloud-itonami/mangaka/clj/src/mangaka/graphs/analyze_expression.cljk"
+    ]
+   },
+   "kotoba-lang/kami-mangaka-expression": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-mangaka-expression/test/kami/mangaka/expression_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-mangaka-expression"
+   },
+   "kotoba:lib/kotoba.kamiMangakaExpression": {
+    "kind": "kotoba-lib",
+    "files": 1,
+    "sample": [
+     "lib/kotoba.kamiMangakaExpression/test/kami/mangaka/expression_test.cljk"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-mangaka-page": {
+   "cloud-itonami/mangaka": {
+    "kind": "other",
+    "files": 3,
+    "sample": [
+     "cloud-itonami/mangaka/clj/dev/compose_arc00.cljk",
+     "cloud-itonami/mangaka/clj/src/mangaka/graphs/generate_page.cljk",
+     "cloud-itonami/mangaka/clj/src/mangaka/layout/komawari.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-app-sip": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-app-sip/src/sip/page.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-sip": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-sip/src/sip/page.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-sip"
+   },
+   "kotoba-lang/kami-mangaka-page": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-mangaka-page/test/kami/mangaka/komawari_test.cljk",
+     "kotoba-lang/kami-mangaka-page/test/kami/mangaka/page_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-mangaka-page"
+   }
+  },
+  "kami-engine:packages/kami-mangaka-reader": {
+   "kotoba-lang/kami-mangaka-reader": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kami-mangaka-reader/src/kami/mangaka/reader/app.cljk",
+     "kotoba-lang/kami-mangaka-reader/src/kami/mangaka/reader/ssr.cljk",
+     "kotoba-lang/kami-mangaka-reader/test/kami/mangaka/reader/ssr_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-mangaka-reader"
+   }
+  },
+  "kami-engine:packages/kami-ongaku-project": {
+   "kami-engine:packages/kami-creative-studio": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-creative-studio/src/main/kami/creative_studio/media.cljk"
+    ]
+   },
+   "kotoba-lang/kami-creative-studio": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-creative-studio/src/main/kami/creative_studio/media.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-creative-studio"
+   },
+   "kotoba-lang/kami-ongaku-project": {
+    "kind": "copy",
+    "files": 5,
+    "sample": [
+     "kotoba-lang/kami-ongaku-project/test/e2e/run_e2e.cljk",
+     "kotoba-lang/kami-ongaku-project/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "kotoba-lang/kami-ongaku-project/test/e2e/src/kami/ongaku/project/e2e/main_driver.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-ongaku-project"
+   },
+   "kotoba:lib/kotoba.kamiOngakuProject": {
+    "kind": "kotoba-lib",
+    "files": 5,
+    "sample": [
+     "lib/kotoba.kamiOngakuProject/test/e2e/run_e2e.cljk",
+     "lib/kotoba.kamiOngakuProject/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "lib/kotoba.kamiOngakuProject/test/e2e/src/kami/ongaku/project/e2e/main_driver.cljk"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-postfx-scene": {},
+  "kami-engine:packages/kami-scene-contracts": {
+   "kotoba-lang/kami-scene-contracts": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-scene-contracts/src/kami/scene/authority_manifest.cljk",
+     "kotoba-lang/kami-scene-contracts/src/kami/scene/fixture_sync.cljk",
+     "kotoba-lang/kami-scene-contracts/src/kami/scene/mirror_check.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-scene-contracts"
+   },
+   "kotoba:lib/kotoba.kamiSceneContracts": {
+    "kind": "kotoba-lib",
+    "files": 4,
+    "sample": [
+     "lib/kotoba.kamiSceneContracts/src/kami/scene/authority_manifest.cljk",
+     "lib/kotoba.kamiSceneContracts/src/kami/scene/fixture_sync.cljk",
+     "lib/kotoba.kamiSceneContracts/src/kami/scene/mirror_check.cljk"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-sensor-sim": {
+   "kotoba-lang/kami-sensor-sim": {
+    "kind": "copy",
+    "files": 9,
+    "sample": [
+     "kotoba-lang/kami-sensor-sim/src/sensor_sim.cljk",
+     "kotoba-lang/kami-sensor-sim/src/sensor_sim/camera.cljk",
+     "kotoba-lang/kami-sensor-sim/src/sensor_sim/contact.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-sensor-sim"
+   },
+   "kotoba:lib/kotoba.kamiSensorSim": {
+    "kind": "kotoba-lib",
+    "files": 9,
+    "sample": [
+     "lib/kotoba.kamiSensorSim/src/sensor_sim.cljk",
+     "lib/kotoba.kamiSensorSim/src/sensor_sim/camera.cljk",
+     "lib/kotoba.kamiSensorSim/src/sensor_sim/contact.cljk"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-skeleton-scene": {
+   "kotoba-lang/kami-skeleton-scene": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-skeleton-scene/src/skeleton_scene.cljk",
+     "kotoba-lang/kami-skeleton-scene/test/skeleton_scene/clip_test.cljk",
+     "kotoba-lang/kami-skeleton-scene/test/skeleton_scene/pmx_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-skeleton-scene"
+   }
+  },
+  "kami-engine:packages/kami-solar-helix-scene": {},
+  "kami-engine:packages/kami-studio": {
+   "kotoba-lang/kami-studio": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-studio/test/kami/studio/staleness_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-studio"
+   },
+   "kotoba:lib/kotoba.kamiStudio": {
+    "kind": "kotoba-lib",
+    "files": 1,
+    "sample": [
+     "lib/kotoba.kamiStudio/test/kami/studio/staleness_test.cljk"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-terrain-scene": {
+   "kotoba-lang/kami-terrain-scene": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-terrain-scene/test/terrain_scene/waves_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-terrain-scene"
+   }
+  },
+  "kami-engine:packages/kami-vegetation-scene": {},
+  "kami-engine:packages/kami-vehicle": {
+   "kami-engine:packages/biomech": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/biomech/src/kotoba/biomech/softbody.cljk",
+     "packages/biomech/test/kotoba/biomech/softbody_test.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-vehicle-scene": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-vehicle-scene/src/vehicle_scene/integration.cljk"
+    ]
+   },
+   "kotoba-lang/biomech": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/biomech/src/kotoba/biomech/softbody.cljk",
+     "kotoba-lang/biomech/test/kotoba/biomech/softbody_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/biomech"
+   },
+   "kotoba-lang/kami-cad-import": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-cad-import/test/cad_import/jbeam_loadback_test.cljk",
+     "kotoba-lang/kami-cad-import/test/cad_import/jbeam_physics_smoke_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiCadImport"
+   },
+   "kotoba-lang/kami-vehicle": {
+    "kind": "copy",
+    "files": 30,
+    "sample": [
+     "kotoba-lang/kami-vehicle/src/vehicle.cljk",
+     "kotoba-lang/kami-vehicle/src/vehicle/backend.cljk",
+     "kotoba-lang/kami-vehicle/src/vehicle/builder.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-vehicle"
+   },
+   "kotoba-lang/kami-vehicle-scene": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-vehicle-scene/src/vehicle_scene/integration.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-vehicle-scene"
+   },
+   "kotoba:lib/kotoba.kamiCadImport": {
+    "kind": "kotoba-lib",
+    "files": 2,
+    "sample": [
+     "lib/kotoba.kamiCadImport/test/cad_import/jbeam_loadback_test.cljk",
+     "lib/kotoba.kamiCadImport/test/cad_import/jbeam_physics_smoke_test.cljk"
+    ]
+   },
+   "network-awai/network-isekai": {
+    "kind": "game",
+    "files": 1,
+    "sample": [
+     "network-awai/network-isekai/src/isekai/drive_physics.cljk"
+    ]
+   }
+  },
+  "kami-engine:packages/kami-vehicle-scene": {
+   "kotoba-lang/kami-vehicle-scene": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-vehicle-scene/src/vehicle_scene.cljk",
+     "kotoba-lang/kami-vehicle-scene/src/vehicle_scene/integration.cljk",
+     "kotoba-lang/kami-vehicle-scene/test/vehicle_scene/garage_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-vehicle-scene"
+   }
+  },
+  "kami-engine:packages/kami-web": {
+   "kotoba-lang/kami-web": {
+    "kind": "copy",
+    "files": 7,
+    "sample": [
+     "kotoba-lang/kami-web/src/kotoba/web.cljk",
+     "kotoba-lang/kami-web/src/kotoba/web/render_ir.cljk",
+     "kotoba-lang/kami-web/test/kotoba/web/document_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-web"
+   }
+  },
+  "kami-engine:packages/swarm-choreo": {
+   "kotoba-lang/swarm-choreo": {
+    "kind": "copy",
+    "files": 6,
+    "sample": [
+     "kotoba-lang/swarm-choreo/src/kotoba/swarm_choreo/validate.cljk",
+     "kotoba-lang/swarm-choreo/test/kotoba/swarm_choreo/gate_test.cljk",
+     "kotoba-lang/swarm-choreo/test/kotoba/swarm_choreo/physics_check_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/swarm-choreo"
+   }
+  },
+  "kami-engine:scripts": {},
+  "kami-engine:wit": {},
+  "kotoba:lib/kotoba.host": {
+   "kami-engine:packages/kami-app-sip": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-app-sip/src/sip/web.cljk"
+    ]
+   },
+   "kotoba-lang/host": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/host/src/kotoba/host.cljk",
+     "kotoba-lang/host/test/host_test.cljk",
+     "kotoba-lang/host/test/kami/host_rigid_body_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.host"
+   },
+   "kotoba-lang/kami-app-isekai": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-isekai/dev/slime_hunt/game.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppIsekai"
+   },
+   "kotoba-lang/kami-app-sip": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-sip/src/sip/web.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-sip"
+   },
+   "kotoba-lang/kami-engine-sdk": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-sdk/examples/hello_scene.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngineSdk"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/kotoba/host.kotoba"
+    ]
+   },
+   "network-awai/network-isekai": {
+    "kind": "game",
+    "files": 29,
+    "sample": [
+     "network-awai/network-isekai/scripts/isekai/ashen_kingdom_probe.cljk",
+     "network-awai/network-isekai/scripts/isekai/building_site_touch_probe.cljk",
+     "network-awai/network-isekai/scripts/isekai/card_dominion_probe.cljk"
+    ]
+   }
+  },
+  "kotoba:lib/kotoba.kamiAppCarSim": {
+   "kotoba-lang/kami-app-car-sim": {
+    "kind": "copy",
+    "files": 8,
+    "sample": [
+     "kotoba-lang/kami-app-car-sim/src/kotoba/car_sim.cljk",
+     "kotoba-lang/kami-app-car-sim/src/kotoba/car_sim/scene.cljk",
+     "kotoba-lang/kami-app-car-sim/test/kotoba/car_sim/color_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppCarSim"
+   },
+   "network-awai/network-isekai": {
+    "kind": "game",
+    "files": 1,
+    "sample": [
+     "network-awai/network-isekai/src/isekai/three_game.cljk"
+    ]
+   }
+  },
+  "kotoba:lib/kotoba.kamiAppFixtures": {
+   "kotoba-lang/kami-app-fixtures": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-app-fixtures/test/kami/app_fixtures_test.cljk",
+     "kotoba-lang/kami-app-fixtures/test/kami/provider/contract_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppFixtures"
+   },
+   "kotoba-lang/kami-contracts": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-contracts/test/kami/app_fixtures_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiContracts"
+   }
+  },
+  "kotoba:lib/kotoba.kamiAppGiemon": {
+   "kotoba-lang/kami-app-giemon": {
+    "kind": "copy",
+    "files": 13,
+    "sample": [
+     "kotoba-lang/kami-app-giemon/src/kami_app_giemon.cljk",
+     "kotoba-lang/kami-app-giemon/src/kami_app_giemon/armcrawler.cljk",
+     "kotoba-lang/kami-app-giemon/src/kami_app_giemon/caterpillar.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppGiemon"
+   }
+  },
+  "kotoba:lib/kotoba.kamiAppGiemonFactory": {
+   "kotoba-lang/kami-app-giemon-factory": {
+    "kind": "copy",
+    "files": 8,
+    "sample": [
+     "kotoba-lang/kami-app-giemon-factory/src/kami_app_giemon_factory.cljk",
+     "kotoba-lang/kami-app-giemon-factory/test/kami_app_giemon_factory/clashes_test.cljk",
+     "kotoba-lang/kami-app-giemon-factory/test/kami_app_giemon_factory/construction_order_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppGiemonFactory"
+   }
+  },
+  "kotoba:lib/kotoba.kamiAppIsekai": {
+   "kotoba-lang/kami-app-isekai": {
+    "kind": "copy",
+    "files": 5,
+    "sample": [
+     "kotoba-lang/kami-app-isekai/render-test/render_pixel_test.cljk",
+     "kotoba-lang/kami-app-isekai/scripts/gen_scene.cljk",
+     "kotoba-lang/kami-app-isekai/scripts/playtest_coscientist.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppIsekai"
+   }
+  },
+  "kotoba:lib/kotoba.kamiAppQuarryWalk": {},
+  "kotoba:lib/kotoba.kamiAppSarutahikoFactory": {
+   "kotoba-lang/kami-app-sarutahiko-factory": {
+    "kind": "copy",
+    "files": 6,
+    "sample": [
+     "kotoba-lang/kami-app-sarutahiko-factory/test/kotoba/sarutahiko_factory/clashes_test.cljk",
+     "kotoba-lang/kami-app-sarutahiko-factory/test/kotoba/sarutahiko_factory/construction_order_test.cljk",
+     "kotoba-lang/kami-app-sarutahiko-factory/test/kotoba/sarutahiko_factory/factory_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppSarutahikoFactory"
+   }
+  },
+  "kotoba:lib/kotoba.kamiAppShibuya": {
+   "kotoba-lang/kami-app-shibuya": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-shibuya/test/kotoba/shibuya_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppShibuya"
+   }
+  },
+  "kotoba:lib/kotoba.kamiAppTatekata": {
+   "kotoba-lang/kami-app-tatekata": {
+    "kind": "copy",
+    "files": 5,
+    "sample": [
+     "kotoba-lang/kami-app-tatekata/src/kotoba/tatekata/weld_field.cljk",
+     "kotoba-lang/kami-app-tatekata/test/kotoba/tatekata/deposit_field_test.cljk",
+     "kotoba-lang/kami-app-tatekata/test/kotoba/tatekata/process_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppTatekata"
+   }
+  },
+  "kotoba:lib/kotoba.kamiArticulated": {},
+  "kotoba:lib/kotoba.kamiAutodrive": {
+   "kami-engine:packages/swarm-choreo": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/swarm-choreo/src/kotoba/swarm_choreo/physics_check.cljk",
+     "packages/swarm-choreo/src/kotoba/swarm_choreo/validate.cljk"
+    ]
+   },
+   "kotoba-lang/kami-autodrive": {
+    "kind": "copy",
+    "files": 37,
+    "sample": [
+     "kotoba-lang/kami-autodrive/src/autodrive.cljk",
+     "kotoba-lang/kami-autodrive/src/autodrive/autopilot.cljk",
+     "kotoba-lang/kami-autodrive/src/autodrive/control.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAutodrive"
+   },
+   "kotoba-lang/swarm-choreo": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/swarm-choreo/src/kotoba/swarm_choreo/physics_check.cljk",
+     "kotoba-lang/swarm-choreo/src/kotoba/swarm_choreo/validate.cljk"
+    ],
+    "copy-of": "kami-engine:packages/swarm-choreo"
+   }
+  },
+  "kotoba:lib/kotoba.kamiCadImport": {
+   "kotoba-lang/kami-cad-import": {
+    "kind": "copy",
+    "files": 24,
+    "sample": [
+     "kotoba-lang/kami-cad-import/src/cad_import.cljk",
+     "kotoba-lang/kami-cad-import/src/cad_import/demos.cljk",
+     "kotoba-lang/kami-cad-import/src/cad_import/demos/roadster.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiCadImport"
+   }
+  },
+  "kotoba:lib/kotoba.kamiContracts": {
+   "cloud-itonami/mangaka": {
+    "kind": "other",
+    "files": 3,
+    "sample": [
+     "cloud-itonami/mangaka/clj/src/mangaka/kami.cljk",
+     "cloud-itonami/mangaka/clj/test/mangaka/kami_test.clj.cljk",
+     "cloud-itonami/mangaka/clj/test/mangaka/kami_test.cljc.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-app-sip": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-app-sip/src/sip/schema.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-fixtures": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-fixtures/test/kami/app_fixtures_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppFixtures"
+   },
+   "kotoba-lang/kami-app-sip": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-sip/src/sip/schema.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-sip"
+   },
+   "kotoba-lang/kami-contracts": {
+    "kind": "copy",
+    "files": 9,
+    "sample": [
+     "kotoba-lang/kami-contracts/src/kami/component.cljk",
+     "kotoba-lang/kami-contracts/src/kami/contracts/gpu.cljk",
+     "kotoba-lang/kami-contracts/src/kami/contracts/wit_cli.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiContracts"
+   },
+   "kotoba-lang/kami-engine-sdk": {
+    "kind": "copy",
+    "files": 7,
+    "sample": [
+     "kotoba-lang/kami-engine-sdk/dev/gen_demo.cljk",
+     "kotoba-lang/kami-engine-sdk/dev/gen_fixture.cljk",
+     "kotoba-lang/kami-engine-sdk/dev/roundtrip.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngineSdk"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/kami/db.kotoba"
+    ]
+   },
+   "kotoba:lib/kotoba.kamiAppFixtures": {
+    "kind": "kotoba-lib",
+    "files": 1,
+    "sample": [
+     "lib/kotoba.kamiAppFixtures/test/kami/app_fixtures_test.cljk"
+    ]
+   },
+   "kotoba:lib/kotoba.kamiEngineSdk": {
+    "kind": "kotoba-lib",
+    "files": 3,
+    "sample": [
+     "lib/kotoba.kamiEngineSdk/src/kami/db.cljk",
+     "lib/kotoba.kamiEngineSdk/test/kami/contract_test.cljk",
+     "lib/kotoba.kamiEngineSdk/test/kami/runtime_test.cljk"
+    ]
+   }
+  },
+  "kotoba:lib/kotoba.kamiEngWeb": {
+   "kotoba-lang/kami-eng-web": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-eng-web/src/eng_web.cljk",
+     "kotoba-lang/kami-eng-web/test/eng_web_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngWeb"
+   }
+  },
+  "kotoba:lib/kotoba.kamiEngineAppSdk": {
+   "kami-engine:packages/kami-app-character-creator": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-app-character-creator/dev/character_creator/app.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-character-creator": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-character-creator/dev/character_creator/app.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-character-creator"
+   },
+   "kotoba-lang/kami-engine-app-sdk": {
+    "kind": "copy",
+    "files": 10,
+    "sample": [
+     "kotoba-lang/kami-engine-app-sdk/dev/widgets_demo.cljk",
+     "kotoba-lang/kami-engine-app-sdk/src/kami_ui_sdk/widgets.cljk",
+     "kotoba-lang/kami-engine-app-sdk/test/kami_ui_sdk/effect_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngineAppSdk"
+   }
+  },
+  "kotoba:lib/kotoba.kamiEngineCad": {
+   "com-junkawasaki/root": {
+    "kind": "other",
+    "files": 1,
+    "sample": [
+     "com-junkawasaki/root/90-docs/maturity/probes/sketch-constraints.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-app-cad": {
+    "kind": "kami-engine",
+    "files": 4,
+    "sample": [
+     "packages/kami-app-cad/src/kami/cad/app.cljk",
+     "packages/kami-app-cad/src/kami/cad/dimensional_sketch.cljk",
+     "packages/kami-app-cad/test/kami/cad/dimensional_sketch_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-cad": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-app-cad/src/kami/cad/app.cljk",
+     "kotoba-lang/kami-app-cad/src/kami/cad/dimensional_sketch.cljk",
+     "kotoba-lang/kami-app-cad/test/kami/cad/dimensional_sketch_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-cad"
+   },
+   "kotoba-lang/kami-engine-cad": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-engine-cad/test/kami/cad_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngineCad"
+   }
+  },
+  "kotoba:lib/kotoba.kamiEngineCfd": {
+   "com-junkawasaki/root": {
+    "kind": "other",
+    "files": 2,
+    "sample": [
+     "com-junkawasaki/root/90-docs/maturity/probes/cae-cfd.cljk",
+     "com-junkawasaki/root/scripts/mk1_cfd.cljk"
+    ]
+   },
+   "kotoba-lang/kami-engine-cfd": {
+    "kind": "copy",
+    "files": 5,
+    "sample": [
+     "kotoba-lang/kami-engine-cfd/src/kami_cfd/duct.cljk",
+     "kotoba-lang/kami-engine-cfd/src/kami_cfd/runner.cljk",
+     "kotoba-lang/kami-engine-cfd/test/kami_cfd/duct_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngineCfd"
+   }
+  },
+  "kotoba:lib/kotoba.kamiEngineGuest": {
+   "com-junkawasaki/ghosthacker": {
+    "kind": "game",
+    "files": 1,
+    "sample": [
+     "com-junkawasaki/ghosthacker/games/ghosthacker-prototypes/src/isekai/roblox/ir.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-genre-base-systems": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-genre-base-systems/scripts/verify/verify/core.cljk"
+    ]
+   },
+   "kotoba-lang/engine": {
+    "kind": "copy",
+    "files": 10,
+    "sample": [
+     "kotoba-lang/engine/src/kotoba/engine_clj.cljk",
+     "kotoba-lang/engine/src/kotoba/engine_clj/ast.cljk",
+     "kotoba-lang/engine/src/kotoba/engine_clj/codegen.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngineGuest"
+   },
+   "kotoba-lang/kami-app-isekai": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-isekai/dev/slime_hunt/game.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppIsekai"
+   },
+   "kotoba-lang/kami-engine-guest": {
+    "kind": "copy",
+    "files": 10,
+    "sample": [
+     "kotoba-lang/kami-engine-guest/src/kotoba/engine_clj.cljk",
+     "kotoba-lang/kami-engine-guest/src/kotoba/engine_clj/ast.cljk",
+     "kotoba-lang/kami-engine-guest/src/kotoba/engine_clj/codegen.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngineGuest"
+   },
+   "kotoba-lang/kami-genre-base-systems": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-genre-base-systems/scripts/verify/verify/core.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-genre-base-systems"
+   },
+   "network-awai/network-isekai": {
+    "kind": "game",
+    "files": 27,
+    "sample": [
+     "network-awai/network-isekai/scripts/isekai/ashen_kingdom_probe.cljk",
+     "network-awai/network-isekai/scripts/isekai/building_site_touch_probe.cljk",
+     "network-awai/network-isekai/scripts/isekai/card_dominion_probe.cljk"
+    ]
+   }
+  },
+  "kotoba:lib/kotoba.kamiEngineHudGpu": {},
+  "kotoba:lib/kotoba.kamiEngineInputMap": {},
+  "kotoba:lib/kotoba.kamiEngineSculpt": {
+   "com-junkawasaki/root": {
+    "kind": "other",
+    "files": 3,
+    "sample": [
+     "com-junkawasaki/root/90-docs/maturity/probes/sculpt-brushes.cljk",
+     "com-junkawasaki/root/90-docs/maturity/probes/sculpt-remesh.cljk",
+     "com-junkawasaki/root/90-docs/maturity/probes/sculpt-texture-paint.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-app-sculpt": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-app-sculpt/src/kami/sculpt/app.cljk",
+     "packages/kami-app-sculpt/test/kami/sculpt/project_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-sculpt": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-app-sculpt/src/kami/sculpt/app.cljk",
+     "kotoba-lang/kami-app-sculpt/test/kami/sculpt/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-sculpt"
+   },
+   "kotoba-lang/kami-engine-sculpt": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-engine-sculpt/test/kami/paint_test.cljk",
+     "kotoba-lang/kami-engine-sculpt/test/kami/sculpt_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngineSculpt"
+   }
+  },
+  "kotoba:lib/kotoba.kamiEngineSdk": {
+   "cloud-itonami/mangaka": {
+    "kind": "other",
+    "files": 3,
+    "sample": [
+     "cloud-itonami/mangaka/clj/src/mangaka/kami.cljk",
+     "cloud-itonami/mangaka/clj/test/mangaka/kami_test.clj.cljk",
+     "cloud-itonami/mangaka/clj/test/mangaka/kami_test.cljc.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-app-sip": {
+    "kind": "kami-engine",
+    "files": 4,
+    "sample": [
+     "packages/kami-app-sip/src/sip/schema.cljk",
+     "packages/kami-app-sip/src/sip/systems.cljk",
+     "packages/kami-app-sip/src/sip/web.cljk"
+    ]
+   },
+   "kotoba-lang/fsm": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/fsm/src/kotoba/fsm.cljk",
+     "kotoba-lang/fsm/src/kotoba/fsm.kotoba",
+     "kotoba-lang/fsm/test/kami/fsm_oracle_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.fsm"
+   },
+   "kotoba-lang/host": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/host/src/kami/backend/browser.cljk",
+     "kotoba-lang/host/test/host_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.host"
+   },
+   "kotoba-lang/kami-app-sip": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-app-sip/src/sip/schema.cljk",
+     "kotoba-lang/kami-app-sip/src/sip/systems.cljk",
+     "kotoba-lang/kami-app-sip/src/sip/web.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-sip"
+   },
+   "kotoba-lang/kami-contracts": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-contracts/src/kami/component.cljk",
+     "kotoba-lang/kami-contracts/test/kami/component_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiContracts"
+   },
+   "kotoba-lang/kami-engine-sdk": {
+    "kind": "copy",
+    "files": 28,
+    "sample": [
+     "kotoba-lang/kami-engine-sdk/dev/gen_demo.cljk",
+     "kotoba-lang/kami-engine-sdk/dev/gen_fixture.cljk",
+     "kotoba-lang/kami-engine-sdk/dev/roundtrip.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiEngineSdk"
+   },
+   "kotoba-lang/kotoba-lang": {
+    "kind": "compat-twin",
+    "files": 14,
+    "sample": [
+     "kotoba-lang/kotoba-lang/lang/compat/kami/backend/browser.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/kami/binaural.kotoba",
+     "kotoba-lang/kotoba-lang/lang/compat/kami/db.kotoba"
+    ]
+   },
+   "kotoba-lang/webgpu": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/webgpu/scripts/gen_compute_golden.cljk",
+     "kotoba-lang/webgpu/test/gpu_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.webgpu"
+   },
+   "kotoba:lib/kotoba.fsm": {
+    "kind": "kotoba-lib",
+    "files": 3,
+    "sample": [
+     "lib/kotoba.fsm/src/kotoba/fsm.cljk",
+     "lib/kotoba.fsm/src/kotoba/fsm.kotoba",
+     "lib/kotoba.fsm/test/kami/fsm_oracle_test.cljk"
+    ]
+   },
+   "kotoba:lib/kotoba.host": {
+    "kind": "kotoba-lib",
+    "files": 2,
+    "sample": [
+     "lib/kotoba.host/src/kami/backend/browser.cljk",
+     "lib/kotoba.host/test/host_test.cljk"
+    ]
+   },
+   "kotoba:lib/kotoba.kamiContracts": {
+    "kind": "kotoba-lib",
+    "files": 2,
+    "sample": [
+     "lib/kotoba.kamiContracts/src/kami/component.cljk",
+     "lib/kotoba.kamiContracts/test/kami/component_test.cljk"
+    ]
+   },
+   "kotoba:lib/kotoba.webgpu": {
+    "kind": "kotoba-lib",
+    "files": 1,
+    "sample": [
+     "lib/kotoba.webgpu/test/gpu_test.cljk"
+    ]
+   },
+   "network-awai/network-isekai": {
+    "kind": "game",
+    "files": 3,
+    "sample": [
+     "network-awai/network-isekai/src/isekai/authoritative_transport.cljk",
+     "network-awai/network-isekai/src/isekai/benchmark_catalog.cljk",
+     "network-awai/network-isekai/test/isekai/authoritative_transport_test.cljk"
+    ]
+   }
+  },
+  "kotoba:lib/kotoba.kamiGenSdfAgent": {
+   "kotoba-lang/kami-gen-sdf-agent": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kami-gen-sdf-agent/src/kami/gen/sdf_agent.cljk",
+     "kotoba-lang/kami-gen-sdf-agent/src/kami/gen/sdf_agent/critique.cljk",
+     "kotoba-lang/kami-gen-sdf-agent/test/kami/gen/sdf_agent_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiGenSdfAgent"
+   }
+  },
+  "kotoba:lib/kotoba.kamiIsekaiAssets": {
+   "kotoba-lang/kami-app-isekai": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-isekai/scripts/gen_scene.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiAppIsekai"
+   },
+   "kotoba-lang/kami-isekai-assets": {
+    "kind": "copy",
+    "files": 10,
+    "sample": [
+     "kotoba-lang/kami-isekai-assets/src/kami/isekai/catalog.cljk",
+     "kotoba-lang/kami-isekai-assets/src/kami/isekai/chargen.cljk",
+     "kotoba-lang/kami-isekai-assets/src/kami/isekai/equipment.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiIsekaiAssets"
+   }
+  },
+  "kotoba:lib/kotoba.kamiMangakaExpression": {
+   "cloud-itonami/app-itonami-genko": {
+    "kind": "other",
+    "files": 1,
+    "sample": [
+     "cloud-itonami/app-itonami-genko/test/kami/mangaka/genko_test.cljk"
+    ]
+   },
+   "cloud-itonami/mangaka": {
+    "kind": "other",
+    "files": 2,
+    "sample": [
+     "cloud-itonami/mangaka/clj/dev/compose_arc00.cljk",
+     "cloud-itonami/mangaka/clj/src/mangaka/graphs/analyze_expression.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-mangaka-expression": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-mangaka-expression/test/kami/mangaka/expression_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-mangaka-expression": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-mangaka-expression/test/kami/mangaka/expression_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-mangaka-expression"
+   }
+  },
+  "kotoba:lib/kotoba.kamiMangakaQa": {
+   "cloud-itonami/mangaka": {
+    "kind": "other",
+    "files": 4,
+    "sample": [
+     "cloud-itonami/mangaka/clj/src/mangaka/graphs/jump_benchmark_qa.cljk",
+     "cloud-itonami/mangaka/clj/src/mangaka/graphs/recover_storyboard.cljk",
+     "cloud-itonami/mangaka/clj/src/mangaka/graphs/review_page.cljk"
+    ]
+   },
+   "kotoba-lang/kami-mangaka-qa": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-mangaka-qa/src/kami/mangaka/qa/score.cljk",
+     "kotoba-lang/kami-mangaka-qa/test/kami/mangaka/qa_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiMangakaQa"
+   }
+  },
+  "kotoba:lib/kotoba.kamiMangakaRender": {
+   "cloud-itonami/tsumugu": {
+    "kind": "other",
+    "files": 5,
+    "sample": [
+     "cloud-itonami/tsumugu/src/tsumugu/coscientist.kotoba",
+     "cloud-itonami/tsumugu/src/tsumugu/render.kotoba",
+     "cloud-itonami/tsumugu/src/tsumugu/sim.kotoba"
+    ]
+   },
+   "kami-engine:packages/kami-app-sip": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-app-sip/src/sip/render.cljk"
+    ]
+   },
+   "kotoba-lang/kami-app-sip": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-app-sip/src/sip/render.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-app-sip"
+   },
+   "kotoba-lang/kami-mangaka-render": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-mangaka-render/test/kami/mangaka/render_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiMangakaRender"
+   }
+  },
+  "kotoba:lib/kotoba.kamiMangakaScene": {
+   "kotoba-lang/kami-mangaka-scene": {
+    "kind": "copy",
+    "files": 9,
+    "sample": [
+     "kotoba-lang/kami-mangaka-scene/src/mangaka_scene.cljk",
+     "kotoba-lang/kami-mangaka-scene/src/mangaka_scene/lexicon.cljk",
+     "kotoba-lang/kami-mangaka-scene/src/mangaka_scene/scene.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiMangakaScene"
+   }
+  },
+  "kotoba:lib/kotoba.kamiMangakaSceneAuthor": {
+   "kotoba-lang/kami-mangaka-scene-author": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-mangaka-scene-author/test/kami/mangaka/scene_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiMangakaSceneAuthor"
+   }
+  },
+  "kotoba:lib/kotoba.kamiMangakaText": {
+   "kami-engine:packages/kami-mangaka-page": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-mangaka-page/src/kami/mangaka/page.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-mangaka-reader": {
+    "kind": "kami-engine",
+    "files": 3,
+    "sample": [
+     "packages/kami-mangaka-reader/src/kami/mangaka/reader/ssr.cljk",
+     "packages/kami-mangaka-reader/src/kami/mangaka/reader/views.cljk",
+     "packages/kami-mangaka-reader/test/kami/mangaka/reader/ssr_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-mangaka-page": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-mangaka-page/src/kami/mangaka/page.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-mangaka-page"
+   },
+   "kotoba-lang/kami-mangaka-reader": {
+    "kind": "copy",
+    "files": 3,
+    "sample": [
+     "kotoba-lang/kami-mangaka-reader/src/kami/mangaka/reader/ssr.cljk",
+     "kotoba-lang/kami-mangaka-reader/src/kami/mangaka/reader/views.cljk",
+     "kotoba-lang/kami-mangaka-reader/test/kami/mangaka/reader/ssr_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-mangaka-reader"
+   },
+   "kotoba-lang/kami-mangaka-text": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-mangaka-text/test/kami/mangaka/text_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiMangakaText"
+   }
+  },
+  "kotoba:lib/kotoba.kamiNvCompat": {
+   "kotoba-lang/kami-nv-compat": {
+    "kind": "copy",
+    "files": 90,
+    "sample": [
+     "kotoba-lang/kami-nv-compat/src/kotoba/lang/kami_nv_compat/actions/task_space_actions.cljk",
+     "kotoba-lang/kami-nv-compat/src/kotoba/lang/kami_nv_compat/alpamayo.cljk",
+     "kotoba-lang/kami-nv-compat/src/kotoba/lang/kami_nv_compat/alpasim.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiNvCompat"
+   },
+   "kotoba-lang/render": {
+    "kind": "other",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/render/test/kotoba/render/probe_mesh_test.cljk"
+    ]
+   }
+  },
+  "kotoba:lib/kotoba.kamiOngakuNotation": {
+   "kami-engine:packages/kami-ongaku-project": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-ongaku-project/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "packages/kami-ongaku-project/test/kami/ongaku/project_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-ongaku-notation": {
+    "kind": "copy",
+    "files": 12,
+    "sample": [
+     "kotoba-lang/kami-ongaku-notation/src/kami/ongaku/notation.cljk",
+     "kotoba-lang/kami-ongaku-notation/src/kami/ongaku/notation/duration.cljk",
+     "kotoba-lang/kami-ongaku-notation/src/kami/ongaku/notation/musicxml.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiOngakuNotation"
+   },
+   "kotoba-lang/kami-ongaku-project": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-ongaku-project/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "kotoba-lang/kami-ongaku-project/test/kami/ongaku/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-ongaku-project"
+   },
+   "kotoba:lib/kotoba.kamiOngakuProject": {
+    "kind": "kotoba-lib",
+    "files": 2,
+    "sample": [
+     "lib/kotoba.kamiOngakuProject/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "lib/kotoba.kamiOngakuProject/test/kami/ongaku/project_test.cljk"
+    ]
+   }
+  },
+  "kotoba:lib/kotoba.kamiOngakuPluginHost": {
+   "kotoba-lang/kami-ongaku-plugin-host": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-ongaku-plugin-host/src/kami/ongaku/plugin_host.cljk",
+     "kotoba-lang/kami-ongaku-plugin-host/test/e2e/run_e2e.cljk",
+     "kotoba-lang/kami-ongaku-plugin-host/test/e2e/src/kami/ongaku/plugin_host/e2e/pdc_dsp.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiOngakuPluginHost"
+   }
+  },
+  "kotoba:lib/kotoba.kamiOngakuProject": {
+   "kami-engine:packages/kami-creative-studio": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-creative-studio/src/main/kami/creative_studio/media.cljk"
+    ]
+   },
+   "kami-engine:packages/kami-ongaku-project": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-ongaku-project/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "packages/kami-ongaku-project/test/kami/ongaku/project_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-creative-studio": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-creative-studio/src/main/kami/creative_studio/media.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-creative-studio"
+   },
+   "kotoba-lang/kami-ongaku-project": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-ongaku-project/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "kotoba-lang/kami-ongaku-project/test/kami/ongaku/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-ongaku-project"
+   }
+  },
+  "kotoba:lib/kotoba.kamiOngakuSampler": {
+   "kotoba-lang/kami-ongaku-sampler": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-ongaku-sampler/test/e2e/src/kami/ongaku/sampler/e2e/fixture.cljk",
+     "kotoba-lang/kami-ongaku-sampler/test/kami/ongaku/sampler_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiOngakuSampler"
+   }
+  },
+  "kotoba:lib/kotoba.kamiOngakuSequencer": {
+   "kami-engine:packages/kami-ongaku-project": {
+    "kind": "kami-engine",
+    "files": 2,
+    "sample": [
+     "packages/kami-ongaku-project/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "packages/kami-ongaku-project/test/kami/ongaku/project_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-ongaku-project": {
+    "kind": "copy",
+    "files": 2,
+    "sample": [
+     "kotoba-lang/kami-ongaku-project/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "kotoba-lang/kami-ongaku-project/test/kami/ongaku/project_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-ongaku-project"
+   },
+   "kotoba-lang/kami-ongaku-sequencer": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-ongaku-sequencer/src/kami/ongaku/sequencer/smf.cljk",
+     "kotoba-lang/kami-ongaku-sequencer/test/e2e/src/kami/ongaku/sequencer/e2e/fixture.cljk",
+     "kotoba-lang/kami-ongaku-sequencer/test/kami/ongaku/sequencer/smf_test.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiOngakuSequencer"
+   },
+   "kotoba:lib/kotoba.kamiOngakuProject": {
+    "kind": "kotoba-lib",
+    "files": 2,
+    "sample": [
+     "lib/kotoba.kamiOngakuProject/test/e2e/src/kami/ongaku/project/e2e/fixture.cljk",
+     "lib/kotoba.kamiOngakuProject/test/kami/ongaku/project_test.cljk"
+    ]
+   }
+  },
+  "kotoba:lib/kotoba.kamiSceneContracts": {
+   "kami-engine:packages/kami-scene-contracts": {
+    "kind": "kami-engine",
+    "files": 4,
+    "sample": [
+     "packages/kami-scene-contracts/src/kami/scene/authority_manifest.cljk",
+     "packages/kami-scene-contracts/src/kami/scene/fixture_sync.cljk",
+     "packages/kami-scene-contracts/src/kami/scene/mirror_check.cljk"
+    ]
+   },
+   "kotoba-lang/kami-scene-contracts": {
+    "kind": "copy",
+    "files": 4,
+    "sample": [
+     "kotoba-lang/kami-scene-contracts/src/kami/scene/authority_manifest.cljk",
+     "kotoba-lang/kami-scene-contracts/src/kami/scene/fixture_sync.cljk",
+     "kotoba-lang/kami-scene-contracts/src/kami/scene/mirror_check.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-scene-contracts"
+   }
+  },
+  "kotoba:lib/kotoba.kamiSensorSim": {
+   "kami-engine:packages/kami-sensor-sim": {
+    "kind": "kami-engine",
+    "files": 9,
+    "sample": [
+     "packages/kami-sensor-sim/src/sensor_sim.cljk",
+     "packages/kami-sensor-sim/src/sensor_sim/camera.cljk",
+     "packages/kami-sensor-sim/src/sensor_sim/contact.cljk"
+    ]
+   },
+   "kotoba-lang/kami-sensor-sim": {
+    "kind": "copy",
+    "files": 9,
+    "sample": [
+     "kotoba-lang/kami-sensor-sim/src/sensor_sim.cljk",
+     "kotoba-lang/kami-sensor-sim/src/sensor_sim/camera.cljk",
+     "kotoba-lang/kami-sensor-sim/src/sensor_sim/contact.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-sensor-sim"
+   }
+  },
+  "kotoba:lib/kotoba.kamiStudio": {
+   "kami-engine:packages/kami-studio": {
+    "kind": "kami-engine",
+    "files": 1,
+    "sample": [
+     "packages/kami-studio/test/kami/studio/staleness_test.cljk"
+    ]
+   },
+   "kotoba-lang/kami-studio": {
+    "kind": "copy",
+    "files": 1,
+    "sample": [
+     "kotoba-lang/kami-studio/test/kami/studio/staleness_test.cljk"
+    ],
+    "copy-of": "kami-engine:packages/kami-studio"
+   }
+  },
+  "kotoba:lib/kotoba.kamiUsdNative": {},
+  "kotoba:lib/kotoba.kamiWebvr": {
+   "kotoba-lang/kami-webvr": {
+    "kind": "copy",
+    "files": 5,
+    "sample": [
+     "kotoba-lang/kami-webvr/cljs-test/kami/webvr/cine_bridge_test.cljk",
+     "kotoba-lang/kami-webvr/cljs-test/kami/webvr/engine_test.cljk",
+     "kotoba-lang/kami-webvr/src/kami/webvr/engine.cljk"
+    ],
+    "copy-of": "kotoba:lib/kotoba.kamiWebvr"
+   }
+  }
+ }
+}

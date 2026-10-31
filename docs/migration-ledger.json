@@ -4,7 +4,7 @@
  "inputs": {
   "kotoba-lib": {
    "repo": "kotoba-lang/kotoba",
-   "rev": "4528a70b00171d74cf9e50bc557e51857332ac51"
+   "rev": "c2dc09ebe015299f612fe9d4b5e021876e48e176"
   },
   "amu-probe": {
    "repo": "kotoba-lang/amu",
@@ -22,13 +22,13 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1780,
+  "tracked": 1783,
   "class": {
    "a": 282,
    "c": 64,
    "d": 178,
-   "keep": 513,
-   "native": 8,
+   "keep": 515,
+   "native": 9,
    "o": 735
   },
   "port": {
@@ -856,6 +856,66 @@
    ]
   }
  ],
+ "placement": {
+  "source": "docs/migration-placement.json",
+  "status": "proposed 2026-10-31; `owner` entries need an owner decision, the rest apply the rule and stand unless the owner overrides them",
+  "counts": {
+   "kami-engine": {
+    "kami-engine": 61,
+    "kotoba": 34,
+    "owner": 1
+   },
+   "kotoba": {
+    "kami-engine": 14,
+    "kotoba": 27,
+    "split": 1
+   }
+  },
+  "kotoba-lib": {
+   "kotoba:lib/kotoba.host": "kami-engine",
+   "kotoba:lib/kotoba.kamiAppCarSim": "kami-engine",
+   "kotoba:lib/kotoba.kamiAppFixtures": "kami-engine",
+   "kotoba:lib/kotoba.kamiAppGiemon": "kotoba",
+   "kotoba:lib/kotoba.kamiAppGiemonFactory": "kotoba",
+   "kotoba:lib/kotoba.kamiAppIsekai": "kami-engine",
+   "kotoba:lib/kotoba.kamiAppQuarryWalk": "kotoba",
+   "kotoba:lib/kotoba.kamiAppSarutahikoFactory": "kotoba",
+   "kotoba:lib/kotoba.kamiAppShibuya": "kotoba",
+   "kotoba:lib/kotoba.kamiAppTatekata": "kotoba",
+   "kotoba:lib/kotoba.kamiArticulated": "kotoba",
+   "kotoba:lib/kotoba.kamiAutodrive": "kotoba",
+   "kotoba:lib/kotoba.kamiCadImport": "kotoba",
+   "kotoba:lib/kotoba.kamiContracts": "kami-engine",
+   "kotoba:lib/kotoba.kamiEngWeb": "kami-engine",
+   "kotoba:lib/kotoba.kamiEngineAppSdk": "kami-engine",
+   "kotoba:lib/kotoba.kamiEngineCad": "kotoba",
+   "kotoba:lib/kotoba.kamiEngineCfd": "kotoba",
+   "kotoba:lib/kotoba.kamiEngineGuest": "kami-engine",
+   "kotoba:lib/kotoba.kamiEngineHudGpu": "kami-engine",
+   "kotoba:lib/kotoba.kamiEngineInputMap": "kami-engine",
+   "kotoba:lib/kotoba.kamiEngineSculpt": "kotoba",
+   "kotoba:lib/kotoba.kamiEngineSdk": "split",
+   "kotoba:lib/kotoba.kamiGenSdfAgent": "kotoba",
+   "kotoba:lib/kotoba.kamiIsekaiAssets": "kami-engine",
+   "kotoba:lib/kotoba.kamiMangakaExpression": "kotoba",
+   "kotoba:lib/kotoba.kamiMangakaQa": "kotoba",
+   "kotoba:lib/kotoba.kamiMangakaRender": "kotoba",
+   "kotoba:lib/kotoba.kamiMangakaScene": "kotoba",
+   "kotoba:lib/kotoba.kamiMangakaSceneAuthor": "kotoba",
+   "kotoba:lib/kotoba.kamiMangakaText": "kotoba",
+   "kotoba:lib/kotoba.kamiNvCompat": "kotoba",
+   "kotoba:lib/kotoba.kamiOngakuNotation": "kotoba",
+   "kotoba:lib/kotoba.kamiOngakuPluginHost": "kotoba",
+   "kotoba:lib/kotoba.kamiOngakuProject": "kotoba",
+   "kotoba:lib/kotoba.kamiOngakuSampler": "kotoba",
+   "kotoba:lib/kotoba.kamiOngakuSequencer": "kotoba",
+   "kotoba:lib/kotoba.kamiSceneContracts": "kami-engine",
+   "kotoba:lib/kotoba.kamiSensorSim": "kotoba",
+   "kotoba:lib/kotoba.kamiStudio": "kami-engine",
+   "kotoba:lib/kotoba.kamiUsdNative": "kotoba",
+   "kotoba:lib/kotoba.kamiWebvr": "kami-engine"
+  }
+ },
  "units": [
   {
    "unit": "(root)",
@@ -876,7 +936,8 @@
     "keyword-map-literal": 1,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": ".claude",
@@ -884,7 +945,8 @@
    "classes": {
     "keep": 2
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": ".github",
@@ -892,7 +954,8 @@
    "classes": {
     "native": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "90-docs",
@@ -900,16 +963,18 @@
    "classes": {
     "keep": 21
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "docs",
-   "files": 5,
+   "files": 7,
    "classes": {
     "a": 1,
-    "keep": 4
+    "keep": 6
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "fixtures",
@@ -926,7 +991,8 @@
    "blockers": {
     "f64-generic-arith": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "hermes",
@@ -934,7 +1000,8 @@
    "classes": {
     "keep": 6
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-app-sip-clj",
@@ -943,7 +1010,8 @@
     "a": 2,
     "c": 5
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-clj-host",
@@ -952,7 +1020,8 @@
     "c": 2,
     "keep": 2
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-clj-play",
@@ -973,7 +1042,8 @@
     "host-interop": 1,
     "keyword-map-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-clj-play3d",
@@ -993,7 +1063,8 @@
     "host-interop": 1,
     "keyword-map-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-engine-guest",
@@ -1001,7 +1072,8 @@
    "classes": {
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-flow",
@@ -1012,7 +1084,8 @@
     "d": 1,
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kotoba"
   },
   {
    "unit": "kami-game-scene",
@@ -1021,7 +1094,8 @@
     "a": 10,
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-gameplay",
@@ -1095,7 +1169,8 @@
     "keyword-map-literal": 28,
     "multi-module": 28
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-genesis",
@@ -1104,7 +1179,8 @@
     "a": 3,
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kotoba"
   },
   {
    "unit": "kami-live",
@@ -1113,7 +1189,8 @@
     "a": 1,
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-mangaka-expression-clj",
@@ -1121,7 +1198,8 @@
    "classes": {
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-mangaka-page-clj",
@@ -1129,7 +1207,8 @@
    "classes": {
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-mangaka-reader-clj",
@@ -1137,7 +1216,8 @@
    "classes": {
     "d": 2
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-mangaka-render-clj",
@@ -1145,7 +1225,8 @@
    "classes": {
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-mangaka-text-clj",
@@ -1153,7 +1234,8 @@
    "classes": {
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-physics",
@@ -1190,7 +1272,8 @@
     "keyword-map-literal": 2,
     "multi-module": 2
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-render",
@@ -1249,7 +1332,8 @@
     "multi-module": 23,
     "regex-literal": 3
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-text",
@@ -1257,7 +1341,8 @@
    "classes": {
     "a": 3
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-ui-sdk",
@@ -1265,7 +1350,8 @@
    "classes": {
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-web",
@@ -1273,7 +1359,8 @@
    "classes": {
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "kami-web-modelb",
@@ -1282,7 +1369,8 @@
     "c": 2,
     "d": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "packages",
@@ -1290,7 +1378,8 @@
    "classes": {
     "keep": 1
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/anime",
@@ -1332,7 +1421,8 @@
     "multi-module": 5,
     "regex-literal": 1
    },
-   "wave": 2
+   "wave": 2,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/biomech",
@@ -1401,7 +1491,8 @@
     "multi-module": 13,
     "regex-literal": 2
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/cad",
@@ -1464,7 +1555,8 @@
     "multi-module": 7,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/douga",
@@ -1512,7 +1604,8 @@
     "multi-module": 9,
     "regex-literal": 3
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/freeboard",
@@ -1569,7 +1662,8 @@
     "keyword-map-literal": 14,
     "multi-module": 14
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-app",
@@ -1577,7 +1671,8 @@
    "classes": {
     "keep": 6
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-amenominaka",
@@ -1678,7 +1773,8 @@
     "multi-module": 27,
     "regex-literal": 4
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-animator",
@@ -1731,7 +1827,8 @@
     "keyword-map-literal": 4,
     "multi-module": 3
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-bim-editor",
@@ -1811,7 +1908,8 @@
     "multi-module": 9,
     "regex-literal": 5
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-cad",
@@ -1867,7 +1965,8 @@
     "keyword-map-literal": 6,
     "multi-module": 5
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-character-creator",
@@ -1950,7 +2049,8 @@
     "keyword-map-literal": 14,
     "multi-module": 15
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-hygaccess-plant",
@@ -2011,7 +2111,8 @@
     "keyword-map-literal": 14,
     "multi-module": 11
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-modeler",
@@ -2076,7 +2177,8 @@
     "multi-module": 9,
     "regex-literal": 1
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-sculpt",
@@ -2128,7 +2230,8 @@
     "multi-module": 3,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-sip",
@@ -2221,7 +2324,8 @@
     "multi-module": 21,
     "regex-literal": 4
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-app-suji",
@@ -2314,7 +2418,8 @@
     "multi-module": 13,
     "regex-literal": 3
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-atmosphere-scene",
@@ -2344,7 +2449,8 @@
     "keyword-map-literal": 1,
     "multi-module": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-autodrive-scene",
@@ -2377,7 +2483,8 @@
     "keyword-map-literal": 1,
     "multi-module": 2
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-cam-scene",
@@ -2410,7 +2517,8 @@
     "keyword-map-literal": 2,
     "multi-module": 2
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-character-scene",
@@ -2451,7 +2559,8 @@
     "keyword-map-literal": 3,
     "multi-module": 4
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-creative-studio",
@@ -2531,7 +2640,8 @@
     "multi-module": 7,
     "regex-literal": 2
    },
-   "wave": 2
+   "wave": 2,
+   "placement": "owner"
   },
   {
    "unit": "packages/kami-eizo-compositor",
@@ -2581,7 +2691,8 @@
     "keyword-map-literal": 9,
     "multi-module": 9
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-eizo-grade",
@@ -2634,7 +2745,8 @@
     "multi-module": 12,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-eizo-timeline",
@@ -2678,7 +2790,8 @@
     "keyword-map-literal": 5,
     "multi-module": 5
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-aero",
@@ -2736,7 +2849,8 @@
     "keyword-map-literal": 10,
     "multi-module": 11
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-animation",
@@ -2766,7 +2880,8 @@
     "keyword-map-literal": 2,
     "multi-module": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-cae-solver",
@@ -2918,7 +3033,8 @@
     "multi-module": 67,
     "regex-literal": 28
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-core",
@@ -2926,7 +3042,8 @@
    "classes": {
     "keep": 6
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-engine-crash",
@@ -2962,7 +3079,8 @@
     "keyword-map-literal": 2,
     "multi-module": 2
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-echem",
@@ -3008,7 +3126,8 @@
     "multi-module": 8,
     "regex-literal": 1
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-engine",
@@ -3016,7 +3135,8 @@
    "classes": {
     "keep": 6
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-engine-io",
@@ -3024,7 +3144,8 @@
    "classes": {
     "keep": 6
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-engine-modeling",
@@ -3108,7 +3229,8 @@
     "multi-module": 25,
     "regex-literal": 11
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-motor",
@@ -3152,7 +3274,8 @@
     "keyword-map-literal": 11,
     "multi-module": 11
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-multirotor",
@@ -3185,7 +3308,8 @@
     "keyword-map-literal": 2,
     "multi-module": 2
    },
-   "wave": 2
+   "wave": 2,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-pack",
@@ -3220,7 +3344,8 @@
     "keyword-map-literal": 2,
     "multi-module": 2
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-render",
@@ -3228,7 +3353,8 @@
    "classes": {
     "keep": 6
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-engine-rotor",
@@ -3265,7 +3391,8 @@
     "multi-module": 2,
     "regex-literal": 1
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-script-runtime",
@@ -3273,7 +3400,8 @@
    "classes": {
     "keep": 6
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-engine-vehicle-designer",
@@ -3380,7 +3508,8 @@
     "multi-module": 45,
     "regex-literal": 7
    },
-   "wave": 2
+   "wave": 2,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-vphysics",
@@ -3419,7 +3548,8 @@
     "keyword-map-literal": 4,
     "multi-module": 4
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-engine-web",
@@ -3427,7 +3557,8 @@
    "classes": {
     "keep": 6
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-flow",
@@ -3491,7 +3622,8 @@
     "multi-module": 4,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-game-scene",
@@ -3543,7 +3675,8 @@
     "keyword-map-literal": 7,
     "multi-module": 14
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-gen-hybrid",
@@ -3607,7 +3740,8 @@
     "multi-module": 5,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-gen-ml3d",
@@ -3673,7 +3807,8 @@
     "multi-module": 4,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-gen-procedural",
@@ -3720,7 +3855,8 @@
     "multi-module": 2,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-genre-base-systems",
@@ -3769,7 +3905,8 @@
     "keyword-map-literal": 27,
     "multi-module": 5
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-input-scene",
@@ -3798,7 +3935,8 @@
     "keyword-map-literal": 1,
     "multi-module": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-mangaka-expression",
@@ -3840,7 +3978,8 @@
     "multi-module": 2,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-mangaka-page",
@@ -3887,7 +4026,8 @@
     "multi-module": 3,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-mangaka-reader",
@@ -3934,7 +4074,8 @@
     "keyword-map-literal": 4,
     "multi-module": 4
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-ongaku-project",
@@ -3991,7 +4132,8 @@
     "multi-module": 6,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-postfx-scene",
@@ -4021,7 +4163,8 @@
     "keyword-map-literal": 1,
     "multi-module": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-scene-contracts",
@@ -4067,7 +4210,8 @@
     "keyword-map-literal": 4,
     "multi-module": 5
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-sensor-sim",
@@ -4105,7 +4249,8 @@
     "keyword-map-literal": 5,
     "multi-module": 10
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-skeleton-scene",
@@ -4147,7 +4292,8 @@
     "keyword-map-literal": 4,
     "multi-module": 6
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-solar-helix-scene",
@@ -4177,7 +4323,8 @@
     "keyword-map-literal": 2,
     "multi-module": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-studio",
@@ -4220,7 +4367,8 @@
     "multi-module": 2,
     "regex-literal": 1
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-terrain-scene",
@@ -4252,7 +4400,8 @@
     "keyword-map-literal": 2,
     "multi-module": 2
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-vegetation-scene",
@@ -4285,7 +4434,8 @@
     "keyword-map-literal": 1,
     "multi-module": 2
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-vehicle",
@@ -4352,7 +4502,8 @@
     "keyword-map-literal": 25,
     "multi-module": 30
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-vehicle-scene",
@@ -4394,7 +4545,8 @@
     "keyword-map-literal": 4,
     "multi-module": 6
    },
-   "wave": 1
+   "wave": 1,
+   "placement": "kami-engine"
   },
   {
    "unit": "packages/kami-web",
@@ -4438,7 +4590,8 @@
     "keyword-map-literal": 6,
     "multi-module": 8
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "packages/swarm-choreo",
@@ -4489,22 +4642,24 @@
     "keyword-map-literal": 10,
     "multi-module": 9
    },
-   "wave": 0
+   "wave": 0,
+   "placement": "kotoba"
   },
   {
    "unit": "scripts",
-   "files": 16,
+   "files": 17,
    "classes": {
     "a": 1,
     "d": 4,
-    "native": 7,
+    "native": 8,
     "o": 4
    },
    "port": {
     "d": 1,
     "native": 3
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   },
   {
    "unit": "wit",
@@ -4512,7 +4667,8 @@
    "classes": {
     "a": 5
    },
-   "depends-on": []
+   "depends-on": [],
+   "placement": "kami-engine"
   }
  ],
  "files": [
@@ -4753,12 +4909,22 @@
    "class": "keep"
   },
   {
+   "path": "docs/evidence/placement-consumers-20261031.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
    "path": "docs/migration-ledger.json",
    "unit": "docs",
    "class": "keep"
   },
   {
    "path": "docs/migration-ledger.md",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
+   "path": "docs/migration-placement.json",
    "unit": "docs",
    "class": "keep"
   },
@@ -19778,6 +19944,11 @@
   },
   {
    "path": "scripts/native_gates.py",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/placement_consumers.py",
    "unit": "scripts",
    "class": "native"
   },
