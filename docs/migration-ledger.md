@@ -32,7 +32,7 @@ over each `b`/`c` file, so a count is an estimate of the work, not a proof.
 
 | blocker | files | refusal | issues |
 |---|---:|---|---|
-| multi-module | 346 | E6002 required module ... is missing from the explicit source paths | AWAI-50, JUN-384 |
+| multi-module | 358 | E6002 required module ... is missing from the explicit source paths | AWAI-50, JUN-384 |
 | keyword-map-literal | 391 | E2105 unsupported type ':a' | JUN-651 |
 | f64-generic-arith | 333 | E2104 type mismatch in '*': expected :i64; E2101 for f64->i64 | KOTOBA-161 |
 | regex-literal | 42 | E1005 unsupported reader syntax '#' | AWAI-47 |
@@ -48,9 +48,9 @@ is in wave n when the longest chain of in-repo units it depends on is n long. A
 unit also waits for its upstream kotoba libraries (Phase 3, JUN-643) and for the
 blockers above, which the waves do not model.
 
-- **wave 0** (40): `(root)`, `fixtures`, `kami-clj-play`, `kami-clj-play3d`, `kami-gameplay`, `kami-physics`, `kami-render`, `packages/host`, `packages/kami-app-amenominaka`, `packages/kami-app-animator`, `packages/kami-app-bim-editor`, `packages/kami-app-cad`, `packages/kami-app-car-sim`, `packages/kami-app-fixtures`, `packages/kami-app-modeler`, `packages/kami-app-sculpt`, `packages/kami-app-suji`, `packages/kami-atmosphere-scene`, `packages/kami-autodrive-scene`, `packages/kami-cam-scene`, `packages/kami-character-scene`, `packages/kami-contracts`, `packages/kami-creative-studio`, `packages/kami-eng-web`, `packages/kami-engine-app-sdk`, `packages/kami-engine-guest`, `packages/kami-engine-hud-gpu`, `packages/kami-engine-input-map`, `packages/kami-game-scene`, `packages/kami-input-scene`, `packages/kami-isekai-assets`, `packages/kami-postfx-scene`, `packages/kami-scene-contracts`, `packages/kami-skeleton-scene`, `packages/kami-solar-helix-scene`, `packages/kami-studio`, `packages/kami-terrain-scene`, `packages/kami-vegetation-scene`, `packages/kami-vehicle-scene`, `packages/kami-webvr`
-- **wave 1** (5): `packages/kami-app-character-creator`, `packages/kami-app-hygaccess-plant`, `packages/kami-app-isekai`, `packages/kami-engine-sdk`, `packages/kami-genre-base-systems`
-- **wave 2** (1): `packages/kami-app-sip`
+- **wave 0** (39): `(root)`, `fixtures`, `kami-clj-play`, `kami-clj-play3d`, `kami-gameplay`, `kami-physics`, `kami-render`, `packages/host`, `packages/kami-app-animator`, `packages/kami-app-bim-editor`, `packages/kami-app-cad`, `packages/kami-app-car-sim`, `packages/kami-app-fixtures`, `packages/kami-app-modeler`, `packages/kami-app-sculpt`, `packages/kami-app-suji`, `packages/kami-atmosphere-scene`, `packages/kami-autodrive-scene`, `packages/kami-cam-scene`, `packages/kami-character-scene`, `packages/kami-contracts`, `packages/kami-creative-studio`, `packages/kami-eng-web`, `packages/kami-engine-app-sdk`, `packages/kami-engine-guest`, `packages/kami-engine-hud-gpu`, `packages/kami-engine-input-map`, `packages/kami-game-scene`, `packages/kami-input-scene`, `packages/kami-isekai-assets`, `packages/kami-postfx-scene`, `packages/kami-scene-contracts`, `packages/kami-skeleton-scene`, `packages/kami-solar-helix-scene`, `packages/kami-studio`, `packages/kami-terrain-scene`, `packages/kami-vegetation-scene`, `packages/kami-vehicle-scene`, `packages/kami-webvr`
+- **wave 1** (5): `packages/kami-app-amenominaka`, `packages/kami-app-character-creator`, `packages/kami-app-isekai`, `packages/kami-engine-sdk`, `packages/kami-genre-base-systems`
+- **wave 2** (2): `packages/kami-app-hygaccess-plant`, `packages/kami-app-sip`
 
 ## Placement (JUN-649)
 
@@ -221,10 +221,11 @@ standalone copy nor a mechanical compat twin (`docs/evidence/placement-consumers
 |---|---:|---:|---:|
 | kotoba/lib/kotoba.test | 37 | 1 | 0 |
 | kotoba/lib/kotoba.text | 26 | 1 | 1 |
-| unresolved | 23 | 36 | - |
+| unresolved | 23 | 38 | - |
+| kotoba/lib/kotoba.scene | 12 | 1 | 0 |
 | kotoba/lib/kotoba.edn | 10 | 1 | 0 |
 | kotoba/lib/kotoba.webgpu | 9 | 4 | 0 |
-| kotoba/lib/kotoba.io | 8 | 1 | 1 |
+| kotoba/lib/kotoba.io | 8 | 1 | 0 |
 | kotoba/lib/kotoba.css | 7 | 1 | 0 |
 | kotoba/lib/kotoba.html | 7 | 1 | 0 |
 | kotoba/lib/kotoba.bytes | 6 | 1 | 0 |
@@ -232,23 +233,25 @@ standalone copy nor a mechanical compat twin (`docs/evidence/placement-consumers
 | kotoba/lib/kotoba.physics | 4 | 3 | 0 |
 | kotoba/lib/kotoba.domGpu | 3 | 1 | 0 |
 | kotoba/lib/kotoba.json | 3 | 2 | 1 |
-| kotoba/lib/kotoba.character | 2 | 6 | 0 |
+| kotoba/lib/kotoba.atmosphere | 2 | 1 | 0 |
+| kotoba/lib/kotoba.bim | 2 | 8 | 0 |
+| kotoba/lib/kotoba.character | 2 | 7 | 0 |
 | kotoba/lib/kotoba.gpu | 2 | 1 | 0 |
 | kotoba/lib/kotoba.kamiEngineAnimation | 2 | 1 | 0 |
 | kotoba/lib/kotoba.kamiEngineCaeSolver | 2 | 2 | 0 |
-| kotoba/lib/kotoba.physics2d | 2 | 1 | 0 |
+| kotoba/lib/kotoba.physics2d | 2 | 2 | 0 |
 | kotoba/lib/kotoba.playwright | 2 | 1 | 0 |
 | kotoba/lib/kotoba.process | 2 | 1 | 1 |
 | kotoba/lib/kotoba.scene2d | 2 | 1 | 0 |
 | kotoba/lib/kotoba.spriteGpu | 2 | 1 | 0 |
-| kotoba/lib/org.vrmC.vrm | 2 | 11 | 0 |
+| kotoba/lib/org.vrmC.vrm | 2 | 12 | 0 |
 | kotoba/lib/kotoba.appkit | 1 | 1 | 0 |
-| kotoba/lib/kotoba.bim | 1 | 7 | 0 |
 | kotoba/lib/kotoba.canvaskit | 1 | 1 | 0 |
 | kotoba/lib/kotoba.douga | 1 | 1 | 0 |
 | kotoba/lib/kotoba.fsm | 1 | 1 | 1 |
 | kotoba/lib/kotoba.game | 1 | 5 | 0 |
 | kotoba/lib/kotoba.image | 1 | 1 | 0 |
+| kotoba/lib/kotoba.input | 1 | 1 | 0 |
 | kotoba/lib/kotoba.jpGoDigitalDesignSystem | 1 | 4 | 0 |
 | kotoba/lib/kotoba.kamiEizoTimeline | 1 | 2 | 0 |
 | kotoba/lib/kotoba.kamiEngineCad | 1 | 1 | 0 |
@@ -265,16 +268,19 @@ standalone copy nor a mechanical compat twin (`docs/evidence/placement-consumers
 | kotoba/lib/kotoba.kotobaUi | 1 | 1 | 0 |
 | kotoba/lib/kotoba.langchain | 1 | 2 | 0 |
 | kotoba/lib/kotoba.nagare | 1 | 6 | 0 |
+| kotoba/lib/kotoba.postfx | 1 | 1 | 1 |
 | kotoba/lib/kotoba.pprint | 1 | 1 | 0 |
 | kotoba/lib/kotoba.qaGovernor | 1 | 3 | 0 |
 | kotoba/lib/kotoba.route | 1 | 1 | 0 |
-| kotoba/lib/kotoba.skeleton | 1 | 1 | 0 |
+| kotoba/lib/kotoba.skeleton | 1 | 2 | 0 |
+| kotoba/lib/kotoba.terrain | 1 | 1 | 0 |
 | kotoba/lib/kotoba.vegetation | 1 | 1 | 0 |
 | kotoba/lib/kotoba.webgl | 1 | 1 | 0 |
 | kotoba/lib/org.iso.pdf | 1 | 1 | 0 |
 | kotoba/lib/org.iso.std16739 | 1 | 1 | 0 |
 | kotoba/lib/org.iso.std6983 | 1 | 1 | 0 |
+| kotoba/lib/org.khronos.gltf | 1 | 1 | 0 |
 | kotoba/lib/org.materialx.core | 1 | 1 | 0 |
 | kotoba/lib/org.openusd.usd | 1 | 1 | 0 |
 
-`unresolved` namespaces are neither defined here nor found in kotoba `lib/`: `cheshire.core`, `cljs.core.async`, `cljs.core.async.macros`, `cljs.pprint`, `cljs.reader`, `cljs.test`, `clojure.edn`, `clojure.java.io`, `clojure.java.shell`, `clojure.pprint`, `clojure.test`, `datalevin.core`, `goog.object`, `hiccup2.core`, `jsonista.core`, `kotoba.lang.capability-values`, `kotoba.render.character`, `kotoba.render.foreground-density`, `kotoba.render.mesh`, `org.httpkit.client`, `promesa.core`, `reagent.dom`, `reagent.dom.client`, `shadow.css`, `shadow.css.build`, `suji.methods.attachment`, `suji.methods.girdle`, `suji.methods.load`, `suji.methods.math`, `suji.methods.muscle`, `suji.methods.pose`, `suji.methods.posture`, `suji.methods.recruit`, `suji.methods.segment`, `suji.methods.spine`, `suji.methods.strain`
+`unresolved` namespaces are neither defined here nor found in kotoba `lib/`: `cheshire.core`, `cljs.core.async`, `cljs.core.async.macros`, `cljs.pprint`, `cljs.reader`, `cljs.test`, `clojure.edn`, `clojure.java.io`, `clojure.java.shell`, `clojure.pprint`, `clojure.test`, `datalevin.core`, `goog.object`, `hiccup2.core`, `jsonista.core`, `kotoba.lang.capability-values`, `kotoba.render.character`, `kotoba.render.foreground-density`, `kotoba.render.mesh`, `macros`, `org.httpkit.client`, `physics_2d`, `promesa.core`, `reagent.dom`, `reagent.dom.client`, `shadow.css`, `shadow.css.build`, `suji.methods.attachment`, `suji.methods.girdle`, `suji.methods.load`, `suji.methods.math`, `suji.methods.muscle`, `suji.methods.pose`, `suji.methods.posture`, `suji.methods.recruit`, `suji.methods.segment`, `suji.methods.spine`, `suji.methods.strain`

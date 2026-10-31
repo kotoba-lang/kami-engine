@@ -46,7 +46,7 @@
     "AWAI-50",
     "JUN-384"
    ],
-   "files": 346
+   "files": 358
   },
   "keyword-map-literal": {
    "refusal": "E2105 unsupported type ':a'",
@@ -118,7 +118,6 @@
     "kami-physics",
     "kami-render",
     "packages/host",
-    "packages/kami-app-amenominaka",
     "packages/kami-app-animator",
     "packages/kami-app-bim-editor",
     "packages/kami-app-cad",
@@ -155,8 +154,8 @@
   {
    "wave": 1,
    "units": [
+    "packages/kami-app-amenominaka",
     "packages/kami-app-character-creator",
-    "packages/kami-app-hygaccess-plant",
     "packages/kami-app-isekai",
     "packages/kami-engine-sdk",
     "packages/kami-genre-base-systems"
@@ -165,6 +164,7 @@
   {
    "wave": 2,
    "units": [
+    "packages/kami-app-hygaccess-plant",
     "packages/kami-app-sip"
    ]
   }
@@ -180,9 +180,18 @@
    "kotoba-ported": []
   },
   {
-   "lib": "kotoba/lib/kotoba.bim",
-   "units": 1,
+   "lib": "kotoba/lib/kotoba.atmosphere",
+   "units": 2,
    "namespaces": [
+    "atmosphere"
+   ],
+   "kotoba-ported": []
+  },
+  {
+   "lib": "kotoba/lib/kotoba.bim",
+   "units": 2,
+   "namespaces": [
+    "bim",
     "bim.cloud",
     "bim.drawing",
     "bim.editor",
@@ -213,6 +222,7 @@
    "lib": "kotoba/lib/kotoba.character",
    "units": 2,
    "namespaces": [
+    "character",
     "character.anim-blueprint",
     "character.blendshape",
     "character.body",
@@ -309,14 +319,20 @@
    "kotoba-ported": []
   },
   {
+   "lib": "kotoba/lib/kotoba.input",
+   "units": 1,
+   "namespaces": [
+    "input"
+   ],
+   "kotoba-ported": []
+  },
+  {
    "lib": "kotoba/lib/kotoba.io",
    "units": 8,
    "namespaces": [
     "kotoba.io"
    ],
-   "kotoba-ported": [
-    "kotoba.io"
-   ]
+   "kotoba-ported": []
   },
   {
    "lib": "kotoba/lib/kotoba.jpGoDigitalDesignSystem",
@@ -501,6 +517,7 @@
    "lib": "kotoba/lib/kotoba.physics2d",
    "units": 2,
    "namespaces": [
+    "physics-2d",
     "physics-2d.backend"
    ],
    "kotoba-ported": []
@@ -512,6 +529,16 @@
     "kami.playwright"
    ],
    "kotoba-ported": []
+  },
+  {
+   "lib": "kotoba/lib/kotoba.postfx",
+   "units": 1,
+   "namespaces": [
+    "postfx"
+   ],
+   "kotoba-ported": [
+    "postfx"
+   ]
   },
   {
    "lib": "kotoba/lib/kotoba.pprint",
@@ -550,6 +577,14 @@
    "kotoba-ported": []
   },
   {
+   "lib": "kotoba/lib/kotoba.scene",
+   "units": 12,
+   "namespaces": [
+    "scene"
+   ],
+   "kotoba-ported": []
+  },
+  {
    "lib": "kotoba/lib/kotoba.scene2d",
    "units": 2,
    "namespaces": [
@@ -561,6 +596,7 @@
    "lib": "kotoba/lib/kotoba.skeleton",
    "units": 1,
    "namespaces": [
+    "skeleton",
     "skeleton.math"
    ],
    "kotoba-ported": []
@@ -570,6 +606,14 @@
    "units": 2,
    "namespaces": [
     "kami.sprite-gpu"
+   ],
+   "kotoba-ported": []
+  },
+  {
+   "lib": "kotoba/lib/kotoba.terrain",
+   "units": 1,
+   "namespaces": [
+    "terrain"
    ],
    "kotoba-ported": []
   },
@@ -643,6 +687,14 @@
    "kotoba-ported": []
   },
   {
+   "lib": "kotoba/lib/org.khronos.gltf",
+   "units": 1,
+   "namespaces": [
+    "gltf"
+   ],
+   "kotoba-ported": []
+  },
+  {
    "lib": "kotoba/lib/org.materialx.core",
    "units": 1,
    "namespaces": [
@@ -662,6 +714,7 @@
    "lib": "kotoba/lib/org.vrmC.vrm",
    "units": 2,
    "namespaces": [
+    "vrm",
     "vrm.compose",
     "vrm.convert",
     "vrm.export",
@@ -699,7 +752,9 @@
     "kotoba.render.character",
     "kotoba.render.foreground-density",
     "kotoba.render.mesh",
+    "macros",
     "org.httpkit.client",
+    "physics_2d",
     "promesa.core",
     "reagent.dom",
     "reagent.dom.client",
@@ -1098,7 +1153,8 @@
      "physics-2d.backend"
     ],
     "unresolved": [
-     "clojure.test"
+     "clojure.test",
+     "physics_2d"
     ]
    },
    "blockers": {
@@ -1248,6 +1304,7 @@
      "kotoba.physics.contract"
     ],
     "kotoba/lib/kotoba.physics2d": [
+     "physics-2d",
      "physics-2d.backend"
     ],
     "kotoba/lib/kotoba.test": [
@@ -1330,10 +1387,21 @@
     "verify-m8-fly-camera",
     "verify-m9-timeline"
    ],
-   "depends-on": [],
+   "depends-on": [
+    "packages/kami-atmosphere-scene",
+    "packages/kami-postfx-scene",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene"
+   ],
    "external": {
     "kotoba/lib/kotoba.appkit": [
      "appkit.core"
+    ],
+    "kotoba/lib/kotoba.atmosphere": [
+     "atmosphere"
+    ],
+    "kotoba/lib/kotoba.bim": [
+     "bim"
     ],
     "kotoba/lib/kotoba.css": [
      "css.core"
@@ -1360,6 +1428,9 @@
      "kami.webgpu",
      "kami.webgpu.ir"
     ],
+    "kotoba/lib/org.khronos.gltf": [
+     "gltf"
+    ],
     "kotoba/lib/org.materialx.core": [
      "materialx.core"
     ],
@@ -1378,10 +1449,10 @@
     "f64-generic-arith": 18,
     "host-interop": 11,
     "keyword-map-literal": 30,
-    "multi-module": 27,
+    "multi-module": 28,
     "regex-literal": 4
    },
-   "wave": 0,
+   "wave": 1,
    "placement": "kami-engine"
   },
   {
@@ -1469,6 +1540,7 @@
    "depends-on": [],
    "external": {
     "kotoba/lib/kotoba.bim": [
+     "bim",
      "bim.cloud",
      "bim.drawing",
      "bim.editor",
@@ -1514,7 +1586,7 @@
     "f64-generic-arith": 10,
     "host-interop": 1,
     "keyword-map-literal": 10,
-    "multi-module": 9,
+    "multi-module": 10,
     "regex-literal": 5
    },
    "wave": 0,
@@ -1661,6 +1733,7 @@
    ],
    "external": {
     "kotoba/lib/kotoba.character": [
+     "character",
      "character.blendshape",
      "character.body",
      "character.material",
@@ -1679,6 +1752,7 @@
      "kami.webgpu.mesh"
     ],
     "kotoba/lib/org.vrmC.vrm": [
+     "vrm",
      "vrm.compose",
      "vrm.convert",
      "vrm.export",
@@ -1813,7 +1887,7 @@
     "keyword-map-literal": 14,
     "multi-module": 11
    },
-   "wave": 1,
+   "wave": 2,
    "placement": "kami-engine"
   },
   {
@@ -2107,7 +2181,8 @@
      "cljs.core.async",
      "cljs.core.async.macros",
      "cljs.reader",
-     "datalevin.core"
+     "datalevin.core",
+     "macros"
     ]
    },
    "blockers": {
@@ -2235,6 +2310,12 @@
    ],
    "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.atmosphere": [
+     "atmosphere"
+    ],
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ]
@@ -2243,7 +2324,7 @@
     "destructuring": 1,
     "f64-generic-arith": 1,
     "keyword-map-literal": 1,
-    "multi-module": 1
+    "multi-module": 2
    },
    "wave": 0,
    "placement": "kami-engine"
@@ -2266,6 +2347,9 @@
    ],
    "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ],
@@ -2300,6 +2384,9 @@
    ],
    "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ],
@@ -2342,6 +2429,9 @@
      "character.anim-blueprint",
      "character.control-rig"
     ],
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ],
@@ -2353,7 +2443,7 @@
     "destructuring": 6,
     "f64-generic-arith": 3,
     "keyword-map-literal": 3,
-    "multi-module": 4
+    "multi-module": 6
    },
    "wave": 0,
    "placement": "kami-engine"
@@ -2928,6 +3018,9 @@
      "game.pokoa",
      "game.sabiotoshi"
     ],
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ],
@@ -3009,6 +3102,12 @@
    ],
    "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.input": [
+     "input"
+    ],
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ]
@@ -3016,7 +3115,7 @@
    "blockers": {
     "destructuring": 1,
     "keyword-map-literal": 1,
-    "multi-module": 1
+    "multi-module": 2
    },
    "wave": 0,
    "placement": "kami-engine"
@@ -3098,6 +3197,12 @@
    ],
    "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.postfx": [
+     "postfx"
+    ],
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ]
@@ -3106,7 +3211,7 @@
     "destructuring": 2,
     "f64-generic-arith": 1,
     "keyword-map-literal": 1,
-    "multi-module": 1
+    "multi-module": 2
    },
    "wave": 0,
    "placement": "kami-engine"
@@ -3183,7 +3288,11 @@
    ],
    "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.skeleton": [
+     "skeleton",
      "skeleton.math"
     ],
     "kotoba/lib/kotoba.test": [
@@ -3196,7 +3305,7 @@
     "f64-generic-arith": 8,
     "host-interop": 4,
     "keyword-map-literal": 4,
-    "multi-module": 6
+    "multi-module": 8
    },
    "wave": 0,
    "placement": "kami-engine"
@@ -3219,6 +3328,9 @@
    ],
    "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ]
@@ -3227,7 +3339,7 @@
     "destructuring": 2,
     "f64-generic-arith": 2,
     "keyword-map-literal": 2,
-    "multi-module": 1
+    "multi-module": 2
    },
    "wave": 0,
    "placement": "kami-engine"
@@ -3296,6 +3408,12 @@
    ],
    "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
+    "kotoba/lib/kotoba.terrain": [
+     "terrain"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ]
@@ -3304,7 +3422,7 @@
     "destructuring": 2,
     "f64-generic-arith": 2,
     "keyword-map-literal": 2,
-    "multi-module": 2
+    "multi-module": 4
    },
    "wave": 0,
    "placement": "kami-engine"
@@ -3327,6 +3445,9 @@
    ],
    "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.scene": [
+     "scene"
+    ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
     ],
@@ -3370,6 +3491,9 @@
     ],
     "kotoba/lib/kotoba.physics": [
      "kotoba.physics.vehicle"
+    ],
+    "kotoba/lib/kotoba.scene": [
+     "scene"
     ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
@@ -5681,6 +5805,7 @@
    "port": "b",
    "ns": "kotoba.amenominaka.scene",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "destructuring"
    ]
@@ -6253,6 +6378,7 @@
    "port": "b",
    "ns": "kami.bim-editor.interaction",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring"
@@ -9074,6 +9200,7 @@
    "port": "b",
    "ns": "atmosphere-scene",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "destructuring"
    ]
@@ -9309,6 +9436,7 @@
    "port": "b",
    "ns": "character-scene",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring"
@@ -9335,6 +9463,7 @@
    "port": "b",
    "ns": "character-scene.face-rig",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "destructuring"
    ]
@@ -12870,6 +12999,7 @@
    "port": "b",
    "ns": "input-scene",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "destructuring"
    ]
@@ -13227,6 +13357,7 @@
    "port": "b",
    "ns": "postfx-scene",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring"
@@ -13578,6 +13709,7 @@
    "port": "b",
    "ns": "skeleton-scene.clip",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "f64-generic-arith",
     "atom-escape"
@@ -13607,6 +13739,7 @@
    "port": "c",
    "ns": "skeleton-scene.vmd",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
@@ -13724,6 +13857,7 @@
    "port": "b",
    "ns": "solar-helix-scene",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring"
@@ -13899,6 +14033,7 @@
    "port": "b",
    "ns": "terrain-scene",
    "blockers": [
+    "multi-module",
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring"
@@ -13912,6 +14047,7 @@
    "port": "b",
    "ns": "terrain-scene.waves",
    "blockers": [
+    "multi-module",
     "keyword-map-literal"
    ]
   },
