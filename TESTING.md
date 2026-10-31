@@ -1,5 +1,7 @@
 # Testing the CLJ/EDN game stack
 
+> **Out of date (2026-10-31).** The Rust workspace this page describes was removed (ADR-0048), and so were `scripts/test-wasm.sh` and `scripts/test-script-backends.sh`, which ran `cargo` (JUN-648). The `cargo` commands below no longer work; the current gates are in `.github/workflows/ci.yml`. Rewriting this page is tracked in JUN-647.
+
 How the kami-clj game layer (ADR-0035/0036/0037/0038) is tested, and how to run the
 gates. See `AGENTS.md` → "CLJ/EDN Game Layer" for the architecture.
 

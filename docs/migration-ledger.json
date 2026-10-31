@@ -22,11 +22,11 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1331,
+  "tracked": 1329,
   "class": {
    "a": 244,
    "c": 44,
-   "d": 126,
+   "d": 124,
    "keep": 397,
    "native": 9,
    "o": 511
@@ -3435,10 +3435,10 @@
   },
   {
    "unit": "scripts",
-   "files": 17,
+   "files": 15,
    "classes": {
     "a": 1,
-    "d": 4,
+    "d": 2,
     "native": 8,
     "o": 4
    },
@@ -14374,18 +14374,6 @@
   },
   {
    "path": "scripts/test-bb-pipeline.sh",
-   "unit": "scripts",
-   "class": "d",
-   "note": "shell runner outside the native gate"
-  },
-  {
-   "path": "scripts/test-script-backends.sh",
-   "unit": "scripts",
-   "class": "d",
-   "note": "shell runner outside the native gate"
-  },
-  {
-   "path": "scripts/test-wasm.sh",
    "unit": "scripts",
    "class": "d",
    "note": "shell runner outside the native gate"
