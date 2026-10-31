@@ -1,0 +1,7 @@
+(ns probe)
+;; expect-refusal: E2007
+;; a defmethod of a multimethod this module does not declare: no cross-module or runtime extension.
+
+(defmethod area :rect [s] 1)
+
+(defn main [] :i64 0)

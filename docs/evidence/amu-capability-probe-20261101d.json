@@ -1,0 +1,1665 @@
+{
+ "schema": "kami.amu-capability-probe.v1",
+ "issue": "JUN-641",
+ "date": "2026-11-01",
+ "amu": {
+  "repo": "kotoba-lang/amu",
+  "rev": "11df09b1f60effadbd521c4031defedb12614139",
+  "entry": "bin/amu (macOS arm64)",
+  "bin-amu-sha256": "4e766e1fe9f85287d31fc98f9e6749ab47f479a3d8a84e43f59d656039157de0",
+  "amu-cli-macho-sha256": "4e766e1fe9f85287d31fc98f9e6749ab47f479a3d8a84e43f59d656039157de0"
+ },
+ "method": "each source is a single canonical .kotoba file; `amu check` then, when it passes, `amu run` (main prints its i64)",
+ "probes": [
+  {
+   "blocker": "multi-module",
+   "name": "require",
+   "source": "(ns probe (:require [kotoba.lang.coll :as c]))\n\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E6002 required module kotoba.lang.coll is missing from the explicit source paths (byte 21)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "let-map",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [m {:a 1}] (:a m)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "fn-returns-map",
+   "source": "(ns probe)\n\n(defn mk [] {:a 1 :b 2})\n(defn main [] :i64 (:a (mk)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defrecord-admitted",
+   "source": "(ns probe)\n\n(defrecord P [x :i64 y :i64])\n(defn main [] :i64 (:y (->P 1 2)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "assoc-present-key-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:a (assoc {:a 1 :b 2} :a 5)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "5"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/row-op",
+   "name": "assoc-new-key",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:b (assoc {:a 1} :b 2)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2127 unknown record field ':b' (byte 49)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/runtime-key",
+   "name": "absent-key",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:z {:a 1}))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2127 unknown record field ':z' (byte 32)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/row-op",
+   "name": "dissoc",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:b (dissoc {:a 1 :b 2} :a)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'dissoc': expected ? (byte 36)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/row-op",
+   "name": "merge",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:b (merge {:a 1} {:b 2})))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'merge' (byte 36)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/row-op",
+   "name": "update",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:a (update {:a 1} :a inc)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'update' (byte 36)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/option-default",
+   "name": "get-default",
+   "source": "(ns probe)\n\n(defn main [] :i64 (get {:a 1} :a 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'get': expected ? (byte 32)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/runtime-key",
+   "name": "contains-key",
+   "source": "(ns probe)\n\n(defn main [] :i64 (if (contains? {:a 1} :a) 1 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'contains?': expected ? (byte 36)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/dynamic",
+   "name": "mixed-keys",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [m {:a 1 \"b\" 2}] 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2105 unsupported type '\"b\"' (byte 45)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/empty",
+   "name": "empty-map",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [m {}] 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2133 cannot infer the error type here: '{' (byte 39)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/nil-field",
+   "name": "nil-value",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [m {:a nil :b 1}] (:b m)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2102 unknown symbol 'nil' (byte 43)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/fn-value",
+   "name": "fn-value",
+   "source": "(ns probe)\n\n(defn main [] :i64 ((:f {:f (fn [x] x)}) 1))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2128 malformed or conflicting record schema ':f' (byte 37)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/param-row",
+   "name": "unannotated-param",
+   "source": "(ns probe)\n\n(defn f [m] :i64 (:a m))\n(defn main [] :i64 (f {:a 1}))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in ':a': expected ? (byte 30)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/param-row",
+   "name": "declared-record-expected",
+   "source": "(ns probe)\n\n(defrecord P [a :i64])\n(defn f [p P] :i64 (:a p))\n(defn main [] :i64 (f {:a 1}))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2105 unsupported type 'P' (byte 46)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/nil-field",
+   "name": "if-different-keys",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [m (if true {:a 1} {:a 1 :b 2})] (:a m)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'if': expected ? (byte 40)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/param-row",
+   "name": "map-over-records",
+   "source": "(ns probe)\n\n(defn main [] :i64 (reduce + 0 (map :a [{:a 1} {:a 2}])))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'map': expected :vector-i64 (byte 44)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "def-f64-map",
+   "source": "(ns probe)\n\n(def x {:a 1.5 :n 1})\n(defn main [] :i64 (:n x))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "def-vec-of-maps",
+   "source": "(ns probe)\n\n(def x [{:a 1} {:a 2}])\n(defn main [] :i64 (:a (nth x 1)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "def-ctor-f64-admitted",
+   "source": "(ns probe)\n\n(defrecord D [a :f64])\n(def x (->D 0.5))\n(defn main [] :i64 (if (f64-lt 0.1 (:a x)) 1 0))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/table-runtime-key",
+   "name": "table-runtime-key",
+   "source": "(ns probe)\n\n(def t {:a 1 :b 2})\n(defn f [k :keyword] :i64 (get t k))\n(defn main [] :i64 (f :b))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2127 unknown record field 'k' (byte 65)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "typed-map-runtime-key-admitted",
+   "source": "(ns probe)\n\n(def t (typed-map-new [:map :keyword :i64] :a 1 :b 2))\n(defn f [k :keyword] :i64 (get t k -1))\n(defn main [] :i64 (f :b))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/runtime-key",
+   "name": "keys-of-keyword-typed-map",
+   "source": "(ns probe)\n\n(defn main [] :i64 (count (keys (typed-map-new [:map :keyword :i64] :a 1 :b 2))))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'keys': expected ? (byte 39)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/option-default",
+   "name": "keys-or-param",
+   "source": "(ns probe)\n\n(defn f [{:keys [a] :or {a 1}}] (+ a 1))\n(defn main [] :i64 (f {:a 2}))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'a': expected :i64 (byte 29)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/dynamic",
+   "name": "read-string",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:a (read-string \"{:a 1}\")))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'read-string' (byte 36)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "assoc-variadic",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:b (assoc {:a 1 :b 2} :a 3 :b 4)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "4"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "ex-info-data-admitted",
+   "source": "(ns probe)\n\n(defn- f [i :i64] :i64 (if (< i 0) (throw (ex-info \"neg\" {:index i})) i))\n(defn main [] :i64 (try (f -1) (catch e 0)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "0"
+    ]
+   }
+  },
+  {
+   "blocker": "fn-literal",
+   "name": "hash-fn",
+   "source": "(ns probe)\n\n(defn main [] :i64 (reduce + 0 (map #(+ % 1) [1 2])))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E1005 unsupported reader syntax '#' (byte 48)"
+    ]
+   }
+  },
+  {
+   "blocker": "auto-resolved-keyword",
+   "name": "double-colon",
+   "source": "(ns probe)\n\n(defn main [] :i64 (if (= ::a :probe/a) 1 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E1005 unsupported reader syntax ':' (byte 38)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "qualified-keyword-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (if (= :probe/a :probe/a) 1 0))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "f64-record-field-admitted",
+   "source": "(ns probe)\n\n(defrecord V [x :f64])\n(defn main [] :i64 (if (f64-lt 1.0 (:x (->V 1.5))) 1 0))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": "f64-generic-arith",
+   "name": "infix-mul",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [x (* 1.5 2.0)] 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '*': expected :i64 (byte 40)"
+    ]
+   }
+  },
+  {
+   "blocker": "f64-generic-arith",
+   "name": "infix-lt",
+   "source": "(ns probe)\n\n(defn main [] :i64 (if (< 1.5 2.0) 1 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '<': expected :i64 (byte 36)"
+    ]
+   }
+  },
+  {
+   "blocker": "f64-generic-arith",
+   "name": "named-ops-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [x (f64-sqrt (f64-mul 1.5 2.0))] (if (f64-lt 1.5 x) 1 0)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": "f64-generic-arith",
+   "name": "f64-to-i64",
+   "source": "(ns probe)\n\n(defn main [] :i64 (f64-to-i64-checked 3.0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'f64-to-i64-checked' (byte 32)"
+    ]
+   }
+  },
+  {
+   "blocker": "regex-literal",
+   "name": "re-find",
+   "source": "(ns probe)\n\n(defn main [] :i64 (if (re-find #\"a\" \"a\") 1 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E1005 unsupported reader syntax '#' (byte 44)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmulti",
+   "source": "(ns probe)\n\n(defmulti area :k)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'area' (byte 22)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/protocol",
+   "name": "defprotocol",
+   "source": "(ns probe)\n\n(defprotocol Shape (area [s]))\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defprotocol' (byte 13)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmulti-keyword-dispatch-admitted",
+   "source": "(ns probe)\n\n(defrecord Shape [kind :keyword w :i64 h :i64])\n(defmulti area :kind)\n(defmethod area :rect [s [:ref :probe/Shape]] :i64 (* (:w s) (:h s)))\n(defmethod area :sq [s [:ref :probe/Shape]] :i64 (* (:w s) (:w s)))\n(defn main [] :i64 (+ (area (->Shape :rect 3 2)) (area (->Shape :sq 3 3))))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "15"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmulti-defn-dispatch-default-admitted",
+   "source": "(ns probe)\n\n(defn kind [x :i64] :i64 x)\n(defmulti render kind)\n(defmethod render 1 [x :i64] :i64 10)\n(defmethod render 2 [x :i64] :i64 20)\n(defmethod render :default [x :i64] :i64 99)\n(defn main [] :i64 (+ (render 1) (render 7)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "109"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmulti-two-params-admitted",
+   "source": "(ns probe)\n\n(defn d [a :i64 b :i64] :i64 a)\n(defmulti f d)\n(defmethod f 1 [a :i64 b :i64] :i64 (+ a b))\n(defmethod f 2 [a :i64 b :i64] :i64 (* a b))\n(defn main [] :i64 (+ (f 1 5) (f 2 5)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "16"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmulti-qualified-keyword-key-admitted",
+   "source": "(ns probe)\n\n(defn k [x :i64] :keyword :a/b)\n(defmulti f k)\n(defmethod f :a/b [x :i64] :i64 1)\n(defmethod f :default [x :i64] :i64 0)\n(defn main [] :i64 (f 1))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmethod-before-defmulti-admitted",
+   "source": "(ns probe)\n\n(defn kind [x :i64] :i64 x)\n(defmethod render 1 [x :i64] :i64 10)\n(defmulti render kind)\n(defmethod render :default [x :i64] :i64 0)\n(defn main [] :i64 (render 1))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "10"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmethod-several-body-forms-admitted",
+   "source": "(ns probe)\n\n(defn kind [x :i64] :i64 x)\n(defmulti render kind)\n(defmethod render 1 [x :i64] :i64 (let [y 1] y) 5)\n(defmethod render :default [x :i64] :i64 0)\n(defn main [] :i64 (render 1))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "5"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmethod-unannotated-param-admitted",
+   "source": "(ns probe)\n\n(defn k [x :i64] :i64 x)\n(defmulti f k)\n(defmethod f 1 [x] (+ x 1))\n(defmethod f :default [x] 0)\n(defn main [] :i64 (f 1))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmulti-two-in-module-admitted",
+   "source": "(ns probe)\n\n(defn k [x :i64] :i64 x)\n(defmulti f k)\n(defmulti g k)\n(defmethod f 1 [x :i64] :i64 1)\n(defmethod g 1 [x :i64] :i64 2)\n(defmethod f :default [x :i64] :i64 0)\n(defmethod g :default [x :i64] :i64 0)\n(defn main [] :i64 (+ (f 1) (g 1)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmulti-no-default-traps",
+   "source": "(ns probe)\n\n(defn kind [x :i64] :i64 x)\n(defmulti render kind)\n(defmethod render 1 [x :i64] :i64 10)\n(defn main [] :i64 (render 5))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 133,
+    "output": []
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defmethod-throws-public",
+   "source": "(ns probe)\n\n(defn kind [x :i64] :i64 x)\n(defmulti render kind)\n(defmethod render 1 [x :i64] :i64 (throw (ex-info \"no\" {:x x})))\n(defmethod render :default [x :i64] :i64 0)\n(defn main [] :i64 (try (render 1) (catch e 7)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2130 unhandled abort at export boundary; catch it with try: render (byte 50)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "public-defn-throws",
+   "source": "(ns probe)\n\n(defn f [i :i64] :i64 (if (< i 0) (throw (ex-info \"neg\" {:index i})) i))\n(defn main [] :i64 (try (f -1) (catch e 0)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2130 unhandled abort at export boundary; catch it with try: f (byte 18)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmulti-fn-dispatch",
+   "source": "(ns probe)\n\n(defrecord Shape [kind :keyword w :i64 h :i64])\n(defmulti area (fn [s] (:kind s)))\n(defmethod area :rect [s] (* (:w s) (:h s)))\n(defn main [] :i64 (area (->Shape :rect 3 2)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'area' (byte 70)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmulti-builtin-dispatch",
+   "source": "(ns probe)\n\n(defmulti f identity)\n(defmethod f 1 [x :i64] :i64 1)\n(defmethod f :default [x :i64] :i64 0)\n(defn main [] :i64 (f 1))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'identity' (byte 24)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmulti-keyword-dispatch-unannotated",
+   "source": "(ns probe)\n\n(defrecord Shape [kind :keyword w :i64 h :i64])\n(defmulti area :kind)\n(defmethod area :rect [s] (* (:w s) (:h s)))\n(defmethod area :sq [s] (* (:w s) (:w s)))\n(defn main [] :i64 (+ (area (->Shape :rect 3 2)) (area (->Shape :sq 3 3))))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in ':kind': expected ? (byte 75)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmulti-keyword-dispatch-two-params",
+   "source": "(ns probe)\n\n(defrecord Shape [kind :keyword w :i64])\n(defmulti area :kind)\n(defmethod area :rect [s [:ref :probe/Shape] n :i64] :i64 (* n (:w s)))\n(defmethod area :default [s [:ref :probe/Shape] n :i64] :i64 0)\n(defn main [] :i64 (area (->Shape :rect 3) 2))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2103 wrong number of arguments to ':kind': expected 1 (byte 68)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmulti-options",
+   "source": "(ns probe)\n\n(defmulti f :k :default :x)\n(defmethod f :a [x] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'f' (byte 22)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmulti-attr-map",
+   "source": "(ns probe)\n\n(defmulti f {:arglists (quote ([x]))} :k)\n(defmethod f :a [x] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'f' (byte 22)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-param-names-differ",
+   "source": "(ns probe)\n\n(defn k [x :i64 y :i64] :i64 x)\n(defmulti f k)\n(defmethod f 1 [_ y :i64] :i64 y)\n(defmethod f 2 [x :i64 y :i64] :i64 y)\n(defn main [] :i64 (f 1 2))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form '[' (byte 108)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-pattern-param",
+   "source": "(ns probe)\n\n(defmulti f :k)\n(defmethod f :a [{:keys [k]}] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form '[' (byte 44)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-rest-param",
+   "source": "(ns probe)\n\n(defn k [x :i64] :i64 x)\n(defmulti f k)\n(defmethod f 1 [x & r] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form '[' (byte 67)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-string-key",
+   "source": "(ns probe)\n\n(defmulti f :k)\n(defmethod f \"a\" [x] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form '\"a\"' (byte 41)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-nil-key",
+   "source": "(ns probe)\n\n(defn k [x :i64] :i64 x)\n(defmulti f k)\n(defmethod f nil [x :i64] :i64 1)\n(defn main [] :i64 (f 1))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'nil' (byte 65)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-class-key",
+   "source": "(ns probe)\n\n(defmulti f class)\n(defmethod f String [x] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'String' (byte 44)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-multi-arity",
+   "source": "(ns probe)\n\n(defn k [x :i64] :i64 x)\n(defmulti f k)\n(defmethod f 1 ([x :i64] :i64 1))\n(defn main [] :i64 (f 1))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'f' (byte 63)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-empty-body",
+   "source": "(ns probe)\n\n(defn k [x :i64] :i64 x)\n(defmulti f k)\n(defmethod f 1 [x :i64])\n(defn main [] :i64 (f 1))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'f' (byte 63)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-two-defaults",
+   "source": "(ns probe)\n\n(defn k [x :i64] :i64 x)\n(defmulti f k)\n(defmethod f :default [x :i64] :i64 1)\n(defmethod f :default [x :i64] :i64 2)\n(defn main [] :i64 (f 1))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form ':default' (byte 104)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-duplicate-key",
+   "source": "(ns probe)\n\n(defn kind [x :i64] :i64 x)\n(defmulti render kind)\n(defmethod render 1 [x :i64] :i64 1)\n(defmethod render 1 [x :i64] :i64 2)\n(defn main [] :i64 (render 1))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2125 case constants must be unique: '1' (byte 118)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmethod-not-top-level",
+   "source": "(ns probe)\n\n(defn kind [x :i64] :i64 x)\n(defmulti render kind)\n(defn main [] :i64 (do (defmethod render 1 [x :i64] :i64 10) 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2006 malformed closed dispatch form 'render' (byte 50)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmulti-duplicate",
+   "source": "(ns probe)\n\n(defmulti f :k)\n(defmulti f :k)\n(defmethod f :a [x] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2001 duplicate definition 'f' (byte 38)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/multimethod-shape",
+   "name": "defmulti-name-defined",
+   "source": "(ns probe)\n\n(defn f [x :i64] :i64 x)\n(defmulti f :k)\n(defmethod f :a [x] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2001 duplicate definition 'f' (byte 47)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/open-multimethod",
+   "name": "defmethod-undeclared",
+   "source": "(ns probe)\n\n(defmethod area :rect [s] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2007 closed dispatch: 'area' is not declared in this module (no cross-module or runtime extension) (byte 23)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/open-multimethod",
+   "name": "defmethod-qualified",
+   "source": "(ns probe)\n\n(defmethod t/report :fail [m] 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E6010 named operation t/report is not a registered capability (byte 23)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/open-multimethod",
+   "name": "prefer-method",
+   "source": "(ns probe)\n\n(defn kind [x :i64] :i64 x)\n(defmulti render kind)\n(defmethod render 1 [x :i64] :i64 10)\n(prefer-method render 1 2)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'prefer-method' (byte 102)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/open-multimethod",
+   "name": "remove-method",
+   "source": "(ns probe)\n\n(defn kind [x :i64] :i64 x)\n(defmulti render kind)\n(defmethod render 1 [x :i64] :i64 10)\n(remove-method render 1)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'remove-method' (byte 102)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/open-multimethod",
+   "name": "derive",
+   "source": "(ns probe)\n\n(derive :a :b)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'derive' (byte 13)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/protocol",
+   "name": "extend-type",
+   "source": "(ns probe)\n\n(defrecord R [a :i64])\n(extend-type R Shape (area [s] 1))\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'extend-type' (byte 36)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/protocol",
+   "name": "extend-protocol",
+   "source": "(ns probe)\n\n(extend-protocol Shape R (area [s] 1))\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'extend-protocol' (byte 13)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/protocol",
+   "name": "definterface",
+   "source": "(ns probe)\n\n(definterface I (f []))\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'definterface' (byte 13)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/protocol",
+   "name": "deftype",
+   "source": "(ns probe)\n\n(deftype T [a] Shape (area [s] 1))\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'deftype' (byte 13)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/protocol",
+   "name": "defrecord-inline-impl",
+   "source": "(ns probe)\n\n(defrecord R [a :i64] Shape (area [s] 1))\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2128 malformed or conflicting record schema '(' (byte 12)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/reify",
+   "name": "reify",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [s (reify Shape (area [_ w h] (* w h)))] 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2181 reify is not admitted (closed static dispatch; implement the protocol on a record): 'reify' (byte 40)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch/reify",
+   "name": "reify-def",
+   "source": "(ns probe)\n\n(def s (reify Shape (area [_] 1)))\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2181 reify is not admitted (closed static dispatch; implement the protocol on a record): 'reify' (byte 20)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "let-vector",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [[a b] [1 2]] (+ a b)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "fn-param-pattern",
+   "source": "(ns probe)\n\n(defn main [] :i64 (reduce (fn [acc [a b]] (+ acc (* a b))) 0 [[1 2] [3 4]]))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2139 a fn literal parameter takes its type from the context, not from an annotation: '[' (byte 48)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "defn-param-pattern-unannotated",
+   "source": "(ns probe)\n\n(defn f [[a b]] (+ a b))\n(defn main [] :i64 (f [1 2]))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'a': expected :i64 (byte 22)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "defn-keys-param-unannotated",
+   "source": "(ns probe)\n\n(defn f [{:keys [a]}] :i64 a)\n(defn main [] :i64 (f {:a 3}))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'a': expected ? (byte 29)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defn-param-pattern-annotated-admitted",
+   "source": "(ns probe)\n\n(defn f [[a b] :vector-i64] :i64 (+ a b))\n(defn main [] :i64 (f [1 2]))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "keys-strs",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [{:strs [a]} {:a 1}] a))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2111 malformed binding vector in ':strs' (byte 38)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "keys-syms",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [{:syms [a]} {:a 1}] a))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2111 malformed binding vector in ':syms' (byte 38)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "string-key",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [{a \"a\"} {:a 1}] a))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2111 malformed binding vector in '\"a\"' (byte 40)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "rest-over-list",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [[a & r] (list 1 2 3)] a))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '&': expected :vector-i64 (byte 40)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "keys-or-record",
+   "source": "(ns probe)\n\n(defrecord P [a :i64])\n(defn main [] :i64 (let [{:keys [a] :or {a 5}} (->P 1)] (+ a (:a (->P 0)))))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'a': expected ? (byte 68)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "keys-absent-key",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [{:keys [a b]} {:a 1}] (+ a (:b {:b 1}))))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2127 unknown record field ':b' (byte 65)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "keys-unspelled-keyword",
+   "source": "(ns probe)\n\n(defrecord P [a :i64 b :i64])\n(defn main [] :i64 (let [{:keys [a b]} (->P 1 2)] (+ a b)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2111 malformed binding vector in 'a' (byte 75)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "doseq-pattern",
+   "source": "(ns probe)\n\n(defn main [] :i64 (do (doseq [[a b] [[1 2]]] (+ a b)) 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2111 malformed binding vector in '[' (byte 43)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "for-pattern",
+   "source": "(ns probe)\n\n(defn main [] :i64 (count (for [[a b] [[1 2]]] (+ a b))))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'for' (byte 39)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "when-let-pattern",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [r (when-let [[a b] [1 2]] (+ a b))] 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2103 wrong number of arguments to 'when-let': expected 2 (byte 40)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "let-rest-as-nested-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [[x y & more :as all] [1 2 3 4] [[p q] r] [[7 8] [9]]] (+ x y (count more) (count all) p q (nth r 0))))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "33"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "let-keys-literal-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [{:keys [a] b :b :as m} {:a 1 :b 2}] (+ a b (:a m))))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "4"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "let-keys-record-admitted",
+   "source": "(ns probe)\n\n(defrecord P [a :i64 b :i64])\n(defn main [] :i64 (let [{:keys [a b]} (->P 1 2)] (+ a (+ b (:a (->P 0 0))) (:b (->P 0 0)))))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "keys-or-typed-map-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [{:keys [a] :or {a 5}} (typed-map-new [:map :keyword :i64] :b 1)] (+ a (count [:a]))))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "6"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "loop-pattern-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (loop [[a b] [0 1] n 0] (if (< n 10) (recur [b (+ a b)] (+ n 1)) a)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "55"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "let-vector-short-traps",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [[a b c] [1 2]] a))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 132,
+    "output": []
+   }
+  },
+  {
+   "blocker": null,
+   "name": "def-bool-map-admitted",
+   "source": "(ns probe)\n\n(def x {:a true :n 1})\n(defn main [] :i64 (if (:a x) (:n x) 0))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "def-vec-f64-admitted",
+   "source": "(ns probe)\n\n(def x [0.5 1.5])\n(defn main [] :i64 (count x))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "def-vec-of-vectors-admitted",
+   "source": "(ns probe)\n\n(def x [[1 2] [3 4]])\n(defn main [] :i64 (nth (nth x 1) 0))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "def-map-of-vec-maps-admitted",
+   "source": "(ns probe)\n\n(def x {:items [{:a 1} {:a 2}] :n 2})\n(defn main [] :i64 (:a (nth (:items x) 1)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/def-literal",
+   "name": "def-vec-maps-different-keys",
+   "source": "(ns probe)\n\n(def x [{:a 1} {:a 2 :b 3}])\n(defn main [] :i64 (count x))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2116 vector literal items must be i64 (at most 64) (byte 27)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/def-literal",
+   "name": "def-vec-mixed-kinds",
+   "source": "(ns probe)\n\n(def x [1 \"b\"])\n(defn main [] :i64 (count x))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2116 vector literal items must be i64 (at most 64) (byte 22)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/def-literal",
+   "name": "def-vec-over-64-maps",
+   "source": "(ns probe)\n\n(def x [{:a 0} {:a 1} {:a 2} {:a 3} {:a 4} {:a 5} {:a 6} {:a 7} {:a 8} {:a 9} {:a 10} {:a 11} {:a 12} {:a 13} {:a 14} {:a 15} {:a 16} {:a 17} {:a 18} {:a 19} {:a 20} {:a 21} {:a 22} {:a 23} {:a 24} {:a 25} {:a 26} {:a 27} {:a 28} {:a 29} {:a 30} {:a 31} {:a 32} {:a 33} {:a 34} {:a 35} {:a 36} {:a 37} {:a 38} {:a 39} {:a 40} {:a 41} {:a 42} {:a 43} {:a 44} {:a 45} {:a 46} {:a 47} {:a 48} {:a 49} {:a 50} {:a 51} {:a 52} {:a 53} {:a 54} {:a 55} {:a 56} {:a 57} {:a 58} {:a 59} {:a 60} {:a 61} {:a 62} {:a 63} {:a 64}])\n(defn main [] :i64 (count x))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2116 vector literal items must be i64 (at most 64) (byte 19)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "assoc-variadic-typed-map-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (get (assoc (typed-map-new [:map :keyword :i64] :a 1) :b 2 :c 3) :c 0))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "3"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "assoc-variadic-odd",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:b (assoc {:a 1 :b 2} :a 3 :b)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2103 wrong number of arguments to 'assoc': expected 3 (byte 36)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/option-default",
+   "name": "kw-default-record",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:a {:a 1} 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2103 wrong number of arguments to ':a': expected 1 (byte 32)"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/option-default",
+   "name": "or-default",
+   "source": "(ns probe)\n\n(defn main [] :i64 (or (:a {:a 1}) 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in 'or': expected :bool (byte 32)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "kw-default-typed-map-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (:b (typed-map-new [:map :keyword :i64] :a 1) 9))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "9"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "get-typed-map-option-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (option-or (get (typed-map-new [:map :keyword :i64] :a 1) :a) 0))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "get-typed-map-default-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (get (typed-map-new [:map :keyword :i64] :a 1) :z 4))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "4"
+    ]
+   }
+  },
+  {
+   "blocker": "kwmap/param-row",
+   "name": "record-name-param",
+   "source": "(ns probe)\n\n(defrecord P [a :i64])\n(defn f [p P] :i64 (:a p))\n(defn main [] :i64 (f (->P 1)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2105 unsupported type 'P' (byte 46)"
+    ]
+   }
+  },
+  {
+   "blocker": "atom-escape",
+   "name": "swap-in-loop",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [a (atom 0)] (dotimes [i 3] (swap! a + i)) @a))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 71)"
+    ]
+   }
+  },
+  {
+   "blocker": "atom-escape",
+   "name": "straight-line-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [a (atom 0)] (swap! a inc) @a))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": "host-interop",
+   "name": "js-global",
+   "source": "(ns probe)\n\n(defn main [] :i64 (js/Date.now))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E6010 named operation js/Date.now is not a registered capability (byte 32)"
+    ]
+   }
+  },
+  {
+   "blocker": "host-interop",
+   "name": "import-declaration",
+   "source": "(ns probe)\n\n(defimport now \"env\" \"now\" [] :i64)\n(defn main [] :i64 (now))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defimport' (byte 13)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "set-literal-numbers",
+   "source": "(ns probe)\n\n(defn main [] :i64 (if (contains? #{1 2} 1) 1 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '1': expected :keyword (byte 48)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defn-as-value",
+   "source": "(ns probe)\n\n(defn ap [f x :i64] :i64 (f x))\n(defn inc1 [x :i64] :i64 (+ x 1))\n(defn main [] :i64 (ap inc1 1))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2102 unknown symbol 'inc1' (byte 101)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "fn-literal-and-hof-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (reduce + 0 (map (fn [x] (+ x 1)) [1 2 3])))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "9"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "strings-and-vectors-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (+ (count [\"a\" \"b\"]) (count [[1 2] [3]]) (string-byte-length (str \"a\" \"b\"))))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "6"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "mixed-vector-literal",
+   "source": "(ns probe)\n\n(defn main [] :i64 (count [\"a\" [1 2]]))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2116 vector literal items must be i64 (at most 64) (byte 43)"
+    ]
+   }
+  }
+ ]
+}

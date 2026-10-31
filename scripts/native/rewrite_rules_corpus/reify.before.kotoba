@@ -1,5 +1,6 @@
 (ns probe)
-;; expect-refusal: E2101
+;; expect-refusal: E2181
+;; amu 11df09b1 (JUN-730): reify is a permanent refusal (closed static dispatch); E2101 before.
 
 (defn main [] :i64
   (let [s (reify Shape (area [_ w h] (* w h)))]
