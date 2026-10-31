@@ -1,0 +1,614 @@
+{
+ "schema": "kami.migration-placement.v1",
+ "issue": "JUN-649",
+ "rule": "Owner decision 2026-10-31 (JUN-640): game-engine-specific parts stay in kotoba-lang/kami-engine; parts used, or expected to be used, outside a game engine (3D processing, physics, CAE, robotics, media production) go to kotoba-lang/kotoba lib/. Dependencies point from kami-engine to kotoba lib/, never back.",
+ "status": "proposed 2026-10-31; `owner` entries need an owner decision, the rest apply the rule and stand unless the owner overrides them",
+ "values": {
+  "kami-engine": "stays in or moves to kotoba-lang/kami-engine",
+  "kotoba": "stays in or moves to kotoba-lang/kotoba lib/",
+  "split": "the library is divided; `split` says which namespaces go where",
+  "owner": "the rule does not decide it; waiting for the owner"
+ },
+ "evidence": "docs/evidence/placement-consumers-20261031.json",
+ "units": {
+  "kami-engine:(root)": {
+   "to": "kami-engine",
+   "reason": "repository infrastructure: WIT and guest vocabulary, gates, ledger, ADRs, bot profiles"
+  },
+  "kami-engine:.claude": {
+   "to": "kami-engine",
+   "reason": "repository infrastructure: WIT and guest vocabulary, gates, ledger, ADRs, bot profiles"
+  },
+  "kami-engine:.github": {
+   "to": "kami-engine",
+   "reason": "repository infrastructure: WIT and guest vocabulary, gates, ledger, ADRs, bot profiles"
+  },
+  "kami-engine:90-docs": {
+   "to": "kami-engine",
+   "reason": "repository infrastructure: WIT and guest vocabulary, gates, ledger, ADRs, bot profiles"
+  },
+  "kami-engine:docs": {
+   "to": "kami-engine",
+   "reason": "repository infrastructure: WIT and guest vocabulary, gates, ledger, ADRs, bot profiles"
+  },
+  "kami-engine:fixtures": {
+   "to": "kami-engine",
+   "reason": "adapter conformance fixtures for the engine contracts"
+  },
+  "kami-engine:hermes": {
+   "to": "kami-engine",
+   "reason": "repository infrastructure: WIT and guest vocabulary, gates, ledger, ADRs, bot profiles"
+  },
+  "kami-engine:kami-app-sip-clj": {
+   "to": "kami-engine",
+   "reason": "built web artifacts and demos of the engine; removal is JUN-647"
+  },
+  "kami-engine:kami-clj-host": {
+   "to": "kami-engine",
+   "reason": "built web artifacts and demos of the engine; removal is JUN-647"
+  },
+  "kami-engine:kami-clj-play": {
+   "to": "kami-engine",
+   "reason": "kami-clj reference games"
+  },
+  "kami-engine:kami-clj-play3d": {
+   "to": "kami-engine",
+   "reason": "kami-clj reference games"
+  },
+  "kami-engine:kami-engine-guest": {
+   "to": "kami-engine",
+   "reason": "pointer README or built dist/ only; what stays or goes is JUN-647"
+  },
+  "kami-engine:kami-flow": {
+   "to": "kotoba",
+   "reason": "graph-ingest assets (semiconductor coverage data) of KAMI Flow; moves with packages/kami-flow"
+  },
+  "kami-engine:kami-game-scene": {
+   "to": "kami-engine",
+   "reason": "game catalog data",
+   "duplicate": {
+    "of": "kami-engine:packages/kami-game-scene",
+    "same": "all 10 EDN files are byte-identical to packages/kami-game-scene/resources/game_scene/",
+    "keep": "kami-engine:packages/kami-game-scene",
+    "consumers-to-fix": "kami-gameplay reads ../kami-game-scene/data/ (bin/simulate.cljk, test/kami/gameplay/data_test.cljk), kami-clj-play3d/games/royale-tps/scene.edn comment"
+   }
+  },
+  "kami-engine:kami-gameplay": {
+   "to": "kami-engine",
+   "reason": "game rules; the one outside consumer is a game (com-junkawasaki/ghosthacker)"
+  },
+  "kami-engine:kami-genesis": {
+   "to": "kotoba",
+   "reason": "WGSL step shaders for the Genesis/Isaac-compatible physics target: robotics simulation, which is not a game; belongs beside kotoba.kamiNvCompat"
+  },
+  "kami-engine:kami-live": {
+   "to": "kami-engine",
+   "reason": "game audio data"
+  },
+  "kami-engine:kami-mangaka-expression-clj": {
+   "to": "kami-engine",
+   "reason": "pointer README or built dist/ only; what stays or goes is JUN-647"
+  },
+  "kami-engine:kami-mangaka-page-clj": {
+   "to": "kami-engine",
+   "reason": "pointer README or built dist/ only; what stays or goes is JUN-647"
+  },
+  "kami-engine:kami-mangaka-reader-clj": {
+   "to": "kami-engine",
+   "reason": "pointer README or built dist/ only; what stays or goes is JUN-647"
+  },
+  "kami-engine:kami-mangaka-render-clj": {
+   "to": "kami-engine",
+   "reason": "pointer README or built dist/ only; what stays or goes is JUN-647"
+  },
+  "kami-engine:kami-mangaka-text-clj": {
+   "to": "kami-engine",
+   "reason": "pointer README or built dist/ only; what stays or goes is JUN-647"
+  },
+  "kami-engine:kami-physics": {
+   "to": "kami-engine",
+   "reason": "game entry of the physics router; the backends it routes to (vphysics, cae-solver, kotoba.physics) are placed in kotoba"
+  },
+  "kami-engine:kami-render": {
+   "to": "kami-engine",
+   "reason": "render-style, character and equipment contracts for games; consumer is a game (network-awai/network-isekai). The WebGPU executor it consumes is already kotoba.webgpu"
+  },
+  "kami-engine:kami-text": {
+   "to": "kami-engine",
+   "reason": "fonts and emoji raster used by engine text rendering"
+  },
+  "kami-engine:kami-ui-sdk": {
+   "to": "kami-engine",
+   "reason": "pointer README or built dist/ only; what stays or goes is JUN-647"
+  },
+  "kami-engine:kami-web": {
+   "to": "kami-engine",
+   "reason": "pointer README or built dist/ only; what stays or goes is JUN-647"
+  },
+  "kami-engine:kami-web-modelb": {
+   "to": "kami-engine",
+   "reason": "built web artifacts and demos of the engine; removal is JUN-647"
+  },
+  "kami-engine:packages": {
+   "to": "kami-engine",
+   "reason": "repository infrastructure: WIT and guest vocabulary, gates, ledger, ADRs, bot profiles"
+  },
+  "kami-engine:packages/anime": {
+   "to": "kotoba",
+   "reason": "anime production vocabulary; non-game consumers cloud-itonami/animeka, cloud-itonami-jsic-4113"
+  },
+  "kami-engine:packages/biomech": {
+   "to": "kotoba",
+   "reason": "biomechanics simulation; not a game"
+  },
+  "kami-engine:packages/cad": {
+   "to": "kotoba",
+   "reason": "CAD/CAM; consumers include kami-engine-vehicle-designer, which goes to kotoba"
+  },
+  "kami-engine:packages/douga": {
+   "to": "kotoba",
+   "reason": "video assembly planning; non-game consumers cloud-itonami/dougaka, mangaka, app-itonami-dougaka"
+  },
+  "kami-engine:packages/freeboard": {
+   "to": "kotoba",
+   "reason": "infinite-canvas board (Freeform-like); not a game"
+  },
+  "kami-engine:packages/kami-app": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-app-amenominaka": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-app-animator": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-app-bim-editor": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-app-cad": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-app-character-creator": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-app-hygaccess-plant": {
+   "to": "kami-engine",
+   "reason": "kami-app-* application; its consumer cloud-itonami/cloud-itonami-hygiene-access uses it as a product visualization, which is a use of the engine, not of a shared library"
+  },
+  "kami-engine:packages/kami-app-modeler": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-app-sculpt": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-app-sip": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-app-suji": {
+   "to": "kami-engine",
+   "reason": "kami-app-*: applications built on the engine (owner's initial split); the domain libraries they use are placed in kotoba"
+  },
+  "kami-engine:packages/kami-atmosphere-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-autodrive-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-cam-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-character-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-creative-studio": {
+   "to": "owner",
+   "reason": "an integrated video-and-music composer application built from douga, eizo and ongaku. Not a game, but an application rather than a library; kotoba lib/ holds libraries, so the rule does not decide it"
+  },
+  "kami-engine:packages/kami-eizo-compositor": {
+   "to": "kotoba",
+   "reason": "video compositing data model (eizo in the owner's kotoba list)"
+  },
+  "kami-engine:packages/kami-eizo-grade": {
+   "to": "kotoba",
+   "reason": "colour-grading data model (eizo in the owner's kotoba list)"
+  },
+  "kami-engine:packages/kami-eizo-timeline": {
+   "to": "kotoba",
+   "reason": "EDL/timeline data model; used by anime and douga, which go to kotoba"
+  },
+  "kami-engine:packages/kami-engine-aero": {
+   "to": "kotoba",
+   "reason": "aerodynamic drag solver (CAE)"
+  },
+  "kami-engine:packages/kami-engine-animation": {
+   "to": "kotoba",
+   "reason": "animation evaluation (owner's kotoba list); non-game consumer com-junkawasaki/root probes. kami-gameplay keeps depending on it from kami-engine"
+  },
+  "kami-engine:packages/kami-engine-cae-solver": {
+   "to": "kotoba",
+   "reason": "CAE solver contract; non-game consumers cloud-itonami/tsukuru-actor, com-junkawasaki/root probes"
+  },
+  "kami-engine:packages/kami-engine-core": {
+   "to": "kami-engine",
+   "reason": "pointer package without code (README points to the successor); what stays or goes is JUN-647"
+  },
+  "kami-engine:packages/kami-engine-crash": {
+   "to": "kotoba",
+   "reason": "crash solver (CAE)"
+  },
+  "kami-engine:packages/kami-engine-echem": {
+   "to": "kotoba",
+   "reason": "fuel-cell solver (CAE)"
+  },
+  "kami-engine:packages/kami-engine-engine": {
+   "to": "kami-engine",
+   "reason": "pointer package without code (README points to the successor); what stays or goes is JUN-647"
+  },
+  "kami-engine:packages/kami-engine-io": {
+   "to": "kami-engine",
+   "reason": "pointer package without code (README points to the successor); what stays or goes is JUN-647"
+  },
+  "kami-engine:packages/kami-engine-modeling": {
+   "to": "kotoba",
+   "reason": "polygon editing engine; non-game consumer com-junkawasaki/root maturity probes"
+  },
+  "kami-engine:packages/kami-engine-motor": {
+   "to": "kotoba",
+   "reason": "traction-motor solver (CAE)"
+  },
+  "kami-engine:packages/kami-engine-multirotor": {
+   "to": "kotoba",
+   "reason": "multirotor sizing (CAE)"
+  },
+  "kami-engine:packages/kami-engine-pack": {
+   "to": "kotoba",
+   "reason": "battery-pack solver (CAE)"
+  },
+  "kami-engine:packages/kami-engine-render": {
+   "to": "kami-engine",
+   "reason": "pointer package without code (README points to the successor); what stays or goes is JUN-647"
+  },
+  "kami-engine:packages/kami-engine-rotor": {
+   "to": "kotoba",
+   "reason": "rotor solver (CAE)"
+  },
+  "kami-engine:packages/kami-engine-script-runtime": {
+   "to": "kami-engine",
+   "reason": "pointer package without code (README points to the successor); what stays or goes is JUN-647"
+  },
+  "kami-engine:packages/kami-engine-vehicle-designer": {
+   "to": "kotoba",
+   "reason": "vehicle design actor; non-game consumer cloud-itonami/cloud-itonami-isic-2910"
+  },
+  "kami-engine:packages/kami-engine-vphysics": {
+   "to": "kotoba",
+   "reason": "vehicle-physics primitives shared by the CAE solvers"
+  },
+  "kami-engine:packages/kami-engine-web": {
+   "to": "kami-engine",
+   "reason": "pointer package without code (README points to the successor); what stays or goes is JUN-647"
+  },
+  "kami-engine:packages/kami-flow": {
+   "to": "kotoba",
+   "reason": "KAMI Flow is a semiconductor design pipeline (RTL to GDSII, over kotoba.rtl / pnr / dft / power / yield); not a game"
+  },
+  "kami-engine:packages/kami-game-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-gen-hybrid": {
+   "to": "kotoba",
+   "reason": "3D character generation; avatars (VRM) are used outside games"
+  },
+  "kami-engine:packages/kami-gen-ml3d": {
+   "to": "kotoba",
+   "reason": "photo/text to 3D generation; not game-specific"
+  },
+  "kami-engine:packages/kami-gen-procedural": {
+   "to": "kotoba",
+   "reason": "procedural character pipeline; not game-specific"
+  },
+  "kami-engine:packages/kami-genre-base-systems": {
+   "to": "kami-engine",
+   "reason": "per-genre gameplay systems; consumer is a game (network-awai/network-isekai)"
+  },
+  "kami-engine:packages/kami-input-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-mangaka-expression": {
+   "to": "kotoba",
+   "reason": "manga expression patterns; non-game consumers cloud-itonami/mangaka, app-itonami-genko",
+   "duplicate": {
+    "of": "kotoba:lib/kotoba.kamiMangakaExpression",
+    "same": "same upstream import commit 96fc3ce; 13 files identical, only deps.edn, nbb.edn, local-changes.json differ",
+    "keep": "kotoba:lib/kotoba.kamiMangakaExpression"
+   }
+  },
+  "kami-engine:packages/kami-mangaka-page": {
+   "to": "kotoba",
+   "reason": "manga page composition; non-game consumer cloud-itonami/mangaka"
+  },
+  "kami-engine:packages/kami-mangaka-reader": {
+   "to": "kotoba",
+   "reason": "manga reader components (mangaka in the owner's kotoba list)"
+  },
+  "kami-engine:packages/kami-ongaku-project": {
+   "to": "kotoba",
+   "reason": "DAW session data model (ongaku in the owner's kotoba list)",
+   "duplicate": {
+    "of": "kotoba:lib/kotoba.kamiOngakuProject",
+    "same": "same upstream import commit 6dccb9e; 17 files identical, only deps.edn, local-changes.json differ",
+    "keep": "kotoba:lib/kotoba.kamiOngakuProject"
+   }
+  },
+  "kami-engine:packages/kami-postfx-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-scene-contracts": {
+   "to": "kami-engine",
+   "reason": "scene-domain contract authority of the engine",
+   "duplicate": {
+    "of": "kotoba:lib/kotoba.kamiSceneContracts",
+    "same": "same upstream import commit 87918d6; 41 files identical, only deps.edn, nbb.edn, local-changes.json differ",
+    "keep": "kami-engine:packages/kami-scene-contracts"
+   }
+  },
+  "kami-engine:packages/kami-sensor-sim": {
+   "to": "kotoba",
+   "reason": "robotics sensor synthesis (Isaac-compatible)",
+   "duplicate": {
+    "of": "kotoba:lib/kotoba.kamiSensorSim",
+    "same": "same upstream import commit caae678; 17 files identical, only deps.edn, nbb.edn, local-changes.json differ",
+    "keep": "kotoba:lib/kotoba.kamiSensorSim"
+   }
+  },
+  "kami-engine:packages/kami-skeleton-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-solar-helix-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-studio": {
+   "to": "kami-engine",
+   "reason": "hub page of the Kami Studio apps",
+   "duplicate": {
+    "of": "kotoba:lib/kotoba.kamiStudio",
+    "same": "same upstream import commit 5693307; 10 files identical, only deps.edn, nbb.edn, local-changes.json differ",
+    "keep": "kami-engine:packages/kami-studio"
+   }
+  },
+  "kami-engine:packages/kami-terrain-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-vegetation-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-vehicle": {
+   "to": "kotoba",
+   "reason": "soft-body vehicle physics; consumers include kotoba.kamiCadImport and biomech, both in kotoba, so leaving it here would make kotoba depend on kami-engine"
+  },
+  "kami-engine:packages/kami-vehicle-scene": {
+   "to": "kami-engine",
+   "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
+  },
+  "kami-engine:packages/kami-web": {
+   "to": "kotoba",
+   "reason": "kotoba.web.* (document, render IR, math) is a web rendering library; render IR is in the owner's kotoba list"
+  },
+  "kami-engine:packages/swarm-choreo": {
+   "to": "kotoba",
+   "reason": "drone light-show choreography; not a game"
+  },
+  "kami-engine:scripts": {
+   "to": "kami-engine",
+   "reason": "repository infrastructure: WIT and guest vocabulary, gates, ledger, ADRs, bot profiles"
+  },
+  "kami-engine:wit": {
+   "to": "kami-engine",
+   "reason": "repository infrastructure: WIT and guest vocabulary, gates, ledger, ADRs, bot profiles"
+  },
+  "kotoba:lib/kotoba.host": {
+   "to": "kami-engine",
+   "reason": "kami.host: the browser host for compiled kami games (owner put kami.host in scope); its only other in-lib consumer is kotoba.kamiAppIsekai, which also moves"
+  },
+  "kotoba:lib/kotoba.kamiAppCarSim": {
+   "to": "kami-engine",
+   "reason": "car-sim app domain; consumer is a game (network-awai/network-isekai)"
+  },
+  "kotoba:lib/kotoba.kamiAppFixtures": {
+   "to": "kami-engine",
+   "reason": "fixtures for KAMI app crates; also defines kami.app-fixtures, which kotoba.kamiContracts defines too"
+  },
+  "kotoba:lib/kotoba.kamiAppGiemon": {
+   "to": "kotoba",
+   "reason": "Giemon robotics; not a game"
+  },
+  "kotoba:lib/kotoba.kamiAppGiemonFactory": {
+   "to": "kotoba",
+   "reason": "robot factory safety decision; not a game"
+  },
+  "kotoba:lib/kotoba.kamiAppIsekai": {
+   "to": "kami-engine",
+   "reason": "isekai game app"
+  },
+  "kotoba:lib/kotoba.kamiAppQuarryWalk": {
+   "to": "kotoba",
+   "reason": "quarry safety configuration; not a game"
+  },
+  "kotoba:lib/kotoba.kamiAppSarutahikoFactory": {
+   "to": "kotoba",
+   "reason": "truck assembly plant; not a game"
+  },
+  "kotoba:lib/kotoba.kamiAppShibuya": {
+   "to": "kotoba",
+   "reason": "street digital twin; not a game"
+  },
+  "kotoba:lib/kotoba.kamiAppTatekata": {
+   "to": "kotoba",
+   "reason": "construction material-process and robot operations; not a game"
+  },
+  "kotoba:lib/kotoba.kamiArticulated": {
+   "to": "kotoba",
+   "reason": "articulated transforms (3D processing)"
+  },
+  "kotoba:lib/kotoba.kamiAutodrive": {
+   "to": "kotoba",
+   "reason": "vehicle autonomy (GNC); consumer swarm-choreo goes to kotoba"
+  },
+  "kotoba:lib/kotoba.kamiCadImport": {
+   "to": "kotoba",
+   "reason": "CAD import"
+  },
+  "kotoba:lib/kotoba.kamiContracts": {
+   "to": "kami-engine",
+   "reason": "component-boundary authority of the engine; its in-lib consumers (kamiAppFixtures, kamiEngineSdk) move with it"
+  },
+  "kotoba:lib/kotoba.kamiEngWeb": {
+   "to": "kami-engine",
+   "reason": "engine web entries restored from the legacy kami-engine-web"
+  },
+  "kotoba:lib/kotoba.kamiEngineAppSdk": {
+   "to": "kami-engine",
+   "reason": "builder SDK (owner's kami-engine list)"
+  },
+  "kotoba:lib/kotoba.kamiEngineCad": {
+   "to": "kotoba",
+   "reason": "CAD geometry; non-game consumer com-junkawasaki/root probes"
+  },
+  "kotoba:lib/kotoba.kamiEngineCfd": {
+   "to": "kotoba",
+   "reason": "CFD (CAE); non-game consumer com-junkawasaki/root"
+  },
+  "kotoba:lib/kotoba.kamiEngineGuest": {
+   "to": "kami-engine",
+   "reason": "kami-clj guest compiler (guest vocabulary); consumers are games (network-isekai, ghosthacker) and kami-genre-base-systems"
+  },
+  "kotoba:lib/kotoba.kamiEngineHudGpu": {
+   "to": "kami-engine",
+   "reason": "game HUD"
+  },
+  "kotoba:lib/kotoba.kamiEngineInputMap": {
+   "to": "kami-engine",
+   "reason": "input binding (owner's kami-engine list)"
+  },
+  "kotoba:lib/kotoba.kamiEngineSculpt": {
+   "to": "kotoba",
+   "reason": "SDF sculpting; non-game consumer com-junkawasaki/root probes"
+  },
+  "kotoba:lib/kotoba.kamiEngineSdk": {
+   "to": "split",
+   "reason": "authoring SDK (scenes, ECS, sim) is engine-specific, but kotoba.fsm re-exports kami.fsm and kotoba.webgpu requires kami.gpu, so moving the whole library would make kotoba depend on kami-engine",
+   "split": {
+    "stay-in-kotoba": [
+     "kami.fsm",
+     "kami.gpu"
+    ],
+    "move-to-kami-engine": "the other namespaces (kami.scene, kami.ecs, kami.sim, kami.db, kami.render, kami.backend.*, ...)",
+    "also": "kami.backend.browser is defined both here and in kotoba.host"
+   }
+  },
+  "kotoba:lib/kotoba.kamiGenSdfAgent": {
+   "to": "kotoba",
+   "reason": "SDF/CSG mesh authoring (3D processing)"
+  },
+  "kotoba:lib/kotoba.kamiIsekaiAssets": {
+   "to": "kami-engine",
+   "reason": "isekai RPG character and effect templates"
+  },
+  "kotoba:lib/kotoba.kamiMangakaExpression": {
+   "to": "kotoba",
+   "reason": "manga (owner's kotoba list); the kami-engine duplicate is removed"
+  },
+  "kotoba:lib/kotoba.kamiMangakaQa": {
+   "to": "kotoba",
+   "reason": "manga QA; non-game consumer cloud-itonami/mangaka"
+  },
+  "kotoba:lib/kotoba.kamiMangakaRender": {
+   "to": "kotoba",
+   "reason": "manga panel rendering; non-game consumer cloud-itonami/tsumugu"
+  },
+  "kotoba:lib/kotoba.kamiMangakaScene": {
+   "to": "kotoba",
+   "reason": "manga 3D scene"
+  },
+  "kotoba:lib/kotoba.kamiMangakaSceneAuthor": {
+   "to": "kotoba",
+   "reason": "manga scene authoring"
+  },
+  "kotoba:lib/kotoba.kamiMangakaText": {
+   "to": "kotoba",
+   "reason": "manga text layer"
+  },
+  "kotoba:lib/kotoba.kamiNvCompat": {
+   "to": "kotoba",
+   "reason": "Omniverse/Isaac compatibility (robotics, rendering); consumer kotoba-lang/render"
+  },
+  "kotoba:lib/kotoba.kamiOngakuNotation": {
+   "to": "kotoba",
+   "reason": "music notation (ongaku)"
+  },
+  "kotoba:lib/kotoba.kamiOngakuPluginHost": {
+   "to": "kotoba",
+   "reason": "audio plugin hosting (ongaku)"
+  },
+  "kotoba:lib/kotoba.kamiOngakuProject": {
+   "to": "kotoba",
+   "reason": "DAW session (ongaku); the kami-engine duplicate is removed"
+  },
+  "kotoba:lib/kotoba.kamiOngakuSampler": {
+   "to": "kotoba",
+   "reason": "sampler (ongaku)"
+  },
+  "kotoba:lib/kotoba.kamiOngakuSequencer": {
+   "to": "kotoba",
+   "reason": "sequencer (ongaku)"
+  },
+  "kotoba:lib/kotoba.kamiSceneContracts": {
+   "to": "kami-engine",
+   "reason": "duplicate of packages/kami-scene-contracts; the kami-engine copy is kept and this one is removed",
+   "duplicate": {
+    "of": "kami-engine:packages/kami-scene-contracts",
+    "keep": "kami-engine:packages/kami-scene-contracts"
+   }
+  },
+  "kotoba:lib/kotoba.kamiSensorSim": {
+   "to": "kotoba",
+   "reason": "robotics sensors; the kami-engine duplicate is removed"
+  },
+  "kotoba:lib/kotoba.kamiStudio": {
+   "to": "kami-engine",
+   "reason": "duplicate of packages/kami-studio; the kami-engine copy is kept and this one is removed",
+   "duplicate": {
+    "of": "kami-engine:packages/kami-studio",
+    "keep": "kami-engine:packages/kami-studio"
+   }
+  },
+  "kotoba:lib/kotoba.kamiUsdNative": {
+   "to": "kotoba",
+   "reason": "USD (3D processing)"
+  },
+  "kotoba:lib/kotoba.kamiWebvr": {
+   "to": "kami-engine",
+   "reason": "choice-based scenario (visual-novel) engine from kami-engine-sdk"
+  }
+ }
+}

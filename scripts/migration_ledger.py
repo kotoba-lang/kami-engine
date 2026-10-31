@@ -26,6 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 LEDGER = ROOT / "docs" / "migration-ledger.json"
+PLACEMENT = ROOT / "docs" / "migration-placement.json"  # JUN-649, hand-written decisions
 SCHEMA = "kami.migration-ledger.v1"
 
 CLASSES = {
@@ -97,7 +98,7 @@ KEEP_NAMES = {"LICENSE", "NOTICE", ".gitignore", ".nojekyll", "imports.json",
               "local-changes.json", "cljk-origin.edn", "Dockerfile"}
 REMOVE_NAMES = {"deps.edn", "nbb.edn", "package.json", "tasks.edn"}
 NATIVE_PATHS = {"scripts/native_gates.py", "scripts/migration_ledger.py", "scripts/amu_capability_probe.py",
-                ".github/workflows/ci.yml"}
+                "scripts/placement_consumers.py", ".github/workflows/ci.yml"}
 # CLJK scripts whose job the native gates took over in JUN-642: oracle only.
 GATE_ORACLES = {"scripts/wit_test.cljk", "scripts/check_adapter_registry.cljk", "scripts/guest_lint.cljk"}
 
@@ -197,7 +198,8 @@ def classify(path, mode, code):
         return {"class": "native"}
     if "hermes" in parts or parts[0] in (".claude", ".github"):
         return {"class": "keep"}
-    if parts[:2] == ["docs", "evidence"] or path in ("docs/migration-ledger.json", "docs/migration-ledger.md"):
+    if parts[:2] == ["docs", "evidence"] or path in ("docs/migration-ledger.json", "docs/migration-ledger.md",
+                                                                   "docs/migration-placement.json"):
         return {"class": "keep"}
     if name in REMOVE_NAMES:
         return {"class": "d", "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"}
@@ -405,6 +407,17 @@ def build(kotoba, rev):
     blockers = {k: {kk: vv for kk, vv in v.items() if kk != "detect"} | {"files": blocker_files[k]}
                 for k, v in BLOCKERS.items()}
 
+    placement = json.loads(PLACEMENT.read_text(encoding="utf-8"))
+    decided = placement["units"]
+    for e in units:
+        key = "kami-engine:" + e["unit"]
+        if key not in decided:
+            raise SystemExit(f"{key} has no entry in {PLACEMENT.relative_to(ROOT)}; decide its placement (JUN-649)")
+        e["placement"] = decided[key]["to"]
+    place_counts = defaultdict(lambda: defaultdict(int))
+    for key, d in decided.items():
+        place_counts[key.split(":")[0]][d["to"]] += 1
+
     return {
         "schema": SCHEMA,
         "issue": "JUN-641",
@@ -420,6 +433,9 @@ def build(kotoba, rev):
         "waves": [{"wave": w, "units": sorted(wave_list[w])} for w in sorted(wave_list)],
         "cycles": cycles,
         "upstream": upstream,
+        "placement": {"source": str(PLACEMENT.relative_to(ROOT)), "status": placement["status"],
+                      "counts": {k: dict(sorted(v.items())) for k, v in sorted(place_counts.items())},
+                      "kotoba-lib": {k: d["to"] for k, d in sorted(decided.items()) if k.startswith("kotoba:")}},
         "units": units,
         "files": files,
     }
@@ -461,6 +477,7 @@ def summary(ledger):
         out.append(f"- **wave {w['wave']}** ({len(w['units'])}): " + ", ".join(f"`{u}`" for u in w["units"]))
     if ledger["cycles"]:
         out += ["", "Cycles (ported together): " + "; ".join(", ".join(g) for g in ledger["cycles"])]
+    out += placement_summary()
     out += ["", "## Upstream kotoba libraries", "",
             "`ported` counts the namespaces that already have a `.kotoba` source in kotoba `lib/`.", "",
             "| library | units | namespaces | ported |", "|---|---:|---:|---:|"]
@@ -471,6 +488,26 @@ def summary(ledger):
             + ", ".join(f"`{n}`" for n in next((u["namespaces"] for u in ledger["upstream"]
                                                  if u["lib"] == "unresolved"), [])), ""]
     return "\n".join(out)
+
+
+def placement_summary():
+    placement = json.loads(PLACEMENT.read_text(encoding="utf-8"))
+    evidence_path = ROOT / placement["evidence"]
+    consumers = json.loads(evidence_path.read_text())["units"] if evidence_path.exists() else {}
+    out = ["", "## Placement (JUN-649)", "",
+           f"From `{PLACEMENT.relative_to(ROOT)}` ({placement['status']}). Rule: {placement['rule']}", "",
+           "`outside` lists the consumers that are neither this repository, kotoba `lib/`, an old",
+           f"standalone copy nor a mechanical compat twin (`{placement['evidence']}`).", "",
+           "| unit | to | reason | outside |", "|---|---|---|---|"]
+    for key, d in placement["units"].items():
+        reason = d["reason"]
+        if "duplicate" in d:
+            reason += f" (duplicate of `{d['duplicate']['of']}`; keep `{d['duplicate']['keep']}`)"
+        if "split" in d:
+            reason += f" (stays in kotoba: {', '.join(d['split']['stay-in-kotoba'])})"
+        outside = sorted(r for r, row in consumers.get(key, {}).items() if row["kind"] in ("game", "other"))
+        out.append(f"| `{key}` | {d['to']} | {reason.replace('|', '/')} | {', '.join(outside)} |")
+    return out
 
 
 def write(ledger):
@@ -493,7 +530,16 @@ def check():
         print("in ledger but not tracked:", p)
     if dup:
         print("duplicate paths:", dup)
-    print(f"ledger {len(listed)} files, git ls-files {len(actual)}: {'ok' if ok else 'MISMATCH'}")
+    decided = json.loads(PLACEMENT.read_text(encoding="utf-8"))["units"]
+    undecided = [u["unit"] for u in ledger["units"] if "kami-engine:" + u["unit"] not in decided]
+    bad = [k for k, d in decided.items() if d["to"] not in ("kami-engine", "kotoba", "split", "owner")]
+    for u in undecided:
+        print("no placement:", u)
+    for k in bad:
+        print("unknown placement value:", k)
+    ok = ok and not undecided and not bad
+    print(f"ledger {len(listed)} files, git ls-files {len(actual)}, "
+          f"{len(ledger['units'])} units placed: {'ok' if ok else 'MISMATCH'}")
     if not ok:
         print("regenerate: python3 scripts/migration_ledger.py --kotoba PATH --kotoba-rev REV")
     return 0 if ok else 1

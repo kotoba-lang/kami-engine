@@ -85,7 +85,8 @@ These decisions apply to all work in this repository:
 | `scripts/native/`, `scripts/native_gates.py` | the CI gates: Kotoba programs for the WIT, adapter-registry and guest-lint checks, and the Python stager that runs them with Amu |
 | `scripts/` | CLJK reference oracle for those gates (`wit_test.cljk`, `check_adapter_registry.cljk`, `guest_lint.cljk`), task runner (`run-task.cljk` + `scripts/tasks.edn`) |
 | `docs/migration-ledger.json`, `docs/migration-ledger.md` | the migration ledger (JUN-641): every tracked file classified, each unit's namespace dependencies and upstream kotoba libraries, the Amu blockers and the port waves; the `.md` is the reviewable summary |
-| `scripts/migration_ledger.py`, `scripts/amu_capability_probe.py` | generate or check the ledger; probe which CLJK constructs the pinned Amu CLI admits |
+| `docs/migration-placement.json` | where each unit goes (JUN-649): this repository or kotoba `lib/`, with the reason, duplicates and splits; hand-written, merged into the ledger |
+| `scripts/migration_ledger.py`, `scripts/amu_capability_probe.py`, `scripts/placement_consumers.py` | generate or check the ledger; probe which CLJK constructs the pinned Amu CLI admits; survey who requires each unit across the local checkouts |
 | `docs/evidence/` | dated oracle-vs-native measurements and Amu capability probes |
 | `edn-datomize.cljk`, `schema.edn` | EDN → datom conversion; `schema.edn` is generated |
 | `90-docs/adr/` | repo-local ADRs (0032–0048) |
@@ -119,6 +120,14 @@ python3 scripts/amu_capability_probe.py ../amu/bin/amu docs/evidence/amu-capabil
 
 Re-run the probe when the Amu pin in `ci.yml` moves, and update `BLOCKERS` in
 `scripts/migration_ledger.py` from its result.
+
+Every ledger unit needs an entry in `docs/migration-placement.json`; the check
+fails on a unit without one. Decide a new unit by the placement rule above and
+record the reason. To refresh the consumer evidence the reasons cite:
+
+```bash
+python3 scripts/placement_consumers.py --forest ~/github --output docs/evidence/placement-consumers-YYYYMMDD.json
+```
 
 Reference oracle, run by hand only (see the migration decisions above; record
 the result with a date under `docs/evidence/`). On main the root `deps.edn`
