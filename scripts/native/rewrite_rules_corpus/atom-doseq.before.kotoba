@@ -1,0 +1,7 @@
+(ns probe)
+;; expect-refusal: E2140
+
+(defn main [] :i64
+  (let [a (atom 0)]
+    (doseq [x [1 2 3]] (swap! a + x))
+    @a))

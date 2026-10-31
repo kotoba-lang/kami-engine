@@ -9,11 +9,20 @@ reads main's i64 result. The verdict is computed by the Kotoba program; 0 is a
 pass. Every gate also runs negative controls: each mutant changes one input and
 must make its gate fail with the expected code.
 
+The rewrite-rules gate (JUN-731) runs scripts/native/rewrite_rules_corpus/:
+each `<case>.before.kotoba` must be refused by `amu check` with the code on its
+`;; expect-refusal:` line (the negative control), each `<case>.after*.kotoba`
+must check and run to its `;; expect-value:`, `.admitted` cases show a form that
+needs no rewrite and `.out-of-scope` cases a refusal the rules do not remove.
+docs/port-rewrite-rules.md describes the rules.
+
     python3 scripts/native_gates.py --amu path/to/amu [--gate NAME] [--no-mutants]
+        [--rewrite-evidence docs/evidence/port-rewrite-rules-YYYYMMDD.json]
 """
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -21,6 +30,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 NATIVE = ROOT / 'scripts' / 'native'
+CORPUS = NATIVE / 'rewrite_rules_corpus'
 GAME_ROOTS = ['kami-clj-play3d/games', 'kami-clj-play/games']
 
 
@@ -135,11 +145,63 @@ def run(amu, out, label, source):
     return int(result.stdout.strip()), None
 
 
+def corpus_cases():
+    """(name, case, role, expect) for every corpus file; role is before/after/admitted/out-of-scope."""
+    rows = []
+    for f in sorted(CORPUS.glob('*.kotoba')):
+        case, role = f.name[:-len('.kotoba')].split('.', 1)
+        role = 'after' if role.startswith('after') else role
+        assert role in ('before', 'after', 'admitted', 'out-of-scope'), f.name
+        text = f.read_text()
+        m = re.search(r'^;; expect-(refusal|value): (\S+)$', text, re.M)
+        assert m, f'{f.name}: no expect line'
+        want = ('refusal', m.group(2)) if m.group(1) == 'refusal' else ('value', int(m.group(2)))
+        assert (want[0] == 'refusal') == (role in ('before', 'out-of-scope')), f.name
+        rows.append((f.name, case, role, want))
+    befores = {c for _, c, r, _ in rows if r == 'before'}
+    afters = {c for _, c, r, _ in rows if r == 'after'}
+    assert befores == afters, f'unpaired cases: {sorted(befores ^ afters)}'
+    return rows
+
+
+def rewrite_rules(amu):
+    """Run the corpus; returns (receipt rows, failures)."""
+    rows, failures = [], []
+    for name, case, role, (kind, want) in corpus_cases():
+        path = CORPUS / name
+        check = subprocess.run([str(amu), 'check', str(path)], capture_output=True, text=True, timeout=600)
+        out = (check.stdout + check.stderr).strip().splitlines()[-1:]
+        row = dict(file=f'scripts/native/rewrite_rules_corpus/{name}', case=case, role=role,
+                   expect={kind: want}, check={'exit': check.returncode, 'output': out},
+                   sourceSHA256=sha(path.read_bytes()))
+        if kind == 'refusal':
+            got = re.search(r'\b(E\d{4})\b', out[0]).group(1) if check.returncode and out and re.search(r'\bE\d{4}\b', out[0]) else None
+            ok = got == want
+            detail = f'refused {got}' if got else 'NOT refused'
+        else:
+            got = None
+            if check.returncode == 0:
+                run_ = subprocess.run([str(amu), 'run', str(path)], capture_output=True, text=True, timeout=600)
+                row['run'] = {'exit': run_.returncode, 'output': (run_.stdout + run_.stderr).strip().splitlines()[-1:]}
+                if run_.returncode == 0:
+                    got = int(run_.stdout.strip())
+            ok = got == want
+            detail = f'ran {got}' if got is not None else f'check/run failed: {out}'
+        row['ok'] = ok
+        rows.append(row)
+        label = 'negative control ' if role == 'before' else ''
+        print(f'  {"✓" if ok else "✗"} {label}{name}: {detail} (want {want})')
+        if not ok:
+            failures.append(f'rewrite-rules--{name}')
+    return rows, failures
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--amu', type=Path, required=True)
     p.add_argument('--amu-sha256')
-    p.add_argument('--gate', choices=sorted(GATES), action='append')
+    p.add_argument('--gate', choices=sorted(GATES) + ['rewrite-rules'], action='append')
+    p.add_argument('--rewrite-evidence', type=Path)
     p.add_argument('--no-mutants', action='store_true')
     p.add_argument('--output', type=Path)
     a = p.parse_args()
@@ -149,7 +211,16 @@ def main():
     out = a.output or Path(tempfile.mkdtemp(prefix='kami-native-gates-'))
     out.mkdir(parents=True, exist_ok=True)
     failures, receipt = [], []
-    for name in a.gate or sorted(GATES):
+    selected = a.gate or sorted(GATES) + ['rewrite-rules']
+    for name in selected:
+        if name == 'rewrite-rules':
+            rows, bad = rewrite_rules(amu)
+            print(f'{"✗" if bad else "✓"} rewrite-rules: {len(rows) - len(bad)}/{len(rows)} corpus cases as expected')
+            receipt += [dict(gate=name, kind='corpus', **r) for r in rows]
+            failures += bad
+            if a.rewrite_evidence:
+                write_evidence(a.rewrite_evidence, amu, rows)
+            continue
         gate = GATES[name]
         source, names = build_source(gate, {})
         code, err = run(amu, out, name, source)
@@ -178,6 +249,23 @@ def main():
     if failures:
         print('FAILED:', ', '.join(failures))
         sys.exit(1)
+
+
+def write_evidence(path, amu, rows):
+    ci = (ROOT / '.github/workflows/ci.yml').read_text()
+    pin = re.search(r'repository:\s*kotoba-lang/amu\s*\n\s*ref:\s*([0-9a-f]{40})', ci).group(1)
+    d = re.search(r'(\d{4})(\d{2})(\d{2})', path.name)
+    doc = dict(schema='kami.port-rewrite-rules.v1', issue='JUN-731', parent='JUN-651',
+               date='-'.join(d.groups()) if d else None,
+               amu={'repo': 'kotoba-lang/amu', 'rev': pin, 'entry': 'bin/amu (macOS arm64)',
+                    'bin-amu-sha256': sha(amu.read_bytes()),
+                    'digest-check': 'sha256 of bin/amu equals cli.json image.sha256 at the pin'},
+               rules='docs/port-rewrite-rules.md',
+               method='`amu check` each corpus file; a before/out-of-scope file must be refused with its expect-refusal code, '
+                      'an after/admitted file must check and `amu run` to its expect-value',
+               cases=rows)
+    path.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + '\n')
+    print(f'evidence: {path}')
 
 
 if __name__ == '__main__':

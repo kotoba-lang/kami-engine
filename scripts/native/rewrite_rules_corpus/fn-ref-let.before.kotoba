@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-refusal: E2102
+
+(defn inc2 [x :i64] :i64 (+ x 2))
+
+(defn main [] :i64 (let [f inc2] (f 1)))

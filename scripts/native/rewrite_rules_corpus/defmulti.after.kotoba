@@ -1,0 +1,12 @@
+(ns probe)
+;; expect-value: 15
+
+(defrecord Shape [kind :keyword w :i64 h :i64])
+
+(defn area [s [:ref :probe/Shape]] :i64
+  (case (:kind s)
+    :rect (* (:w s) (:h s))
+    :sq (* (:w s) (:w s))
+    0))
+
+(defn main [] :i64 (+ (area (->Shape :rect 3 2)) (area (->Shape :sq 3 3))))

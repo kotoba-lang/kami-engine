@@ -22,13 +22,13 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1335,
+  "tracked": 1365,
   "class": {
    "a": 244,
    "c": 44,
    "d": 124,
-   "keep": 402,
-   "native": 10,
+   "keep": 404,
+   "native": 38,
    "o": 511
   },
   "port": {
@@ -52,7 +52,7 @@
    "refusal": "E2105 unsupported type ':a'",
    "what": "a keyword map literal such as {:a 1}; defrecord is admitted",
    "issues": [
-    "JUN-651"
+    "JUN-728"
    ],
    "files": 391
   },
@@ -73,10 +73,11 @@
    "files": 42
   },
   "dispatch-forms": {
-   "refusal": "E2003 unsupported top-level form 'defmulti' / 'defprotocol'",
-   "what": "defmulti, defmethod, defprotocol, extend-protocol, extend-type, reify",
+   "refusal": "E2003 unsupported top-level form 'defmulti' / 'defprotocol'; E2101 for reify",
+   "what": "defmulti, defmethod, defprotocol, extend-protocol, extend-type, reify; interim rewrite: rule 4 of docs/port-rewrite-rules.md",
    "issues": [
-    "JUN-651"
+    "JUN-730",
+    "JUN-731"
    ],
    "files": 18
   },
@@ -84,17 +85,33 @@
    "refusal": "E2111 malformed binding vector",
    "what": "sequential or map destructuring in let / fn / loop bindings",
    "issues": [
-    "JUN-651"
+    "JUN-729"
    ],
    "files": 275
   },
-  "atom-escape": {
-   "refusal": "E2140 atom escapes its let scope (straight-line swap!/reset!/deref only)",
-   "what": "an atom stored, returned, defined at top level or mutated inside a loop or closure",
+  "atom-local-iteration": {
+   "refusal": "E2140 atom escapes its let scope (a write inside loop/doseq/dotimes)",
+   "what": "a let-bound atom written by swap!/reset! inside loop, doseq or dotimes; rewritable by rule 1 of docs/port-rewrite-rules.md (loop accumulator or reduce)",
+   "issues": [
+    "JUN-731"
+   ],
+   "files": 6
+  },
+  "atom-global": {
+   "refusal": "E2141 atom must be the init of a let binding (def); E2003 unsupported top-level form 'defonce'",
+   "what": "a top-level def/defonce atom: state that outlives one call, out of scope for local state (state ability / :state kit)",
    "issues": [
     "JUN-651"
    ],
-   "files": 46
+   "files": 19
+  },
+  "atom-escape": {
+   "refusal": "E2140 atom escapes its let scope (straight-line swap!/reset!/deref only)",
+   "what": "swap!/reset! in a file with neither of the two atom blockers above: an atom passed in, returned, stored or captured by a closure; hand work",
+   "issues": [
+    "JUN-651"
+   ],
+   "files": 23
   },
   "host-interop": {
    "refusal": "E6010 named operation js/... is not a registered capability; E2003 for an import declaration",
@@ -885,10 +902,10 @@
   },
   {
    "unit": "docs",
-   "files": 12,
+   "files": 14,
    "classes": {
     "a": 1,
-    "keep": 11
+    "keep": 13
    },
    "depends-on": [],
    "placement": "kami-engine"
@@ -1318,7 +1335,9 @@
     ]
    },
    "blockers": {
-    "atom-escape": 5,
+    "atom-escape": 3,
+    "atom-global": 1,
+    "atom-local-iteration": 1,
     "destructuring": 4,
     "dispatch-forms": 1,
     "f64-generic-arith": 6,
@@ -1443,7 +1462,9 @@
     ]
    },
    "blockers": {
-    "atom-escape": 8,
+    "atom-escape": 6,
+    "atom-global": 2,
+    "atom-local-iteration": 1,
     "destructuring": 11,
     "dispatch-forms": 4,
     "f64-generic-arith": 18,
@@ -1500,7 +1521,7 @@
     ]
    },
    "blockers": {
-    "atom-escape": 1,
+    "atom-global": 1,
     "destructuring": 2,
     "f64-generic-arith": 2,
     "host-interop": 1,
@@ -1581,7 +1602,7 @@
     ]
    },
    "blockers": {
-    "atom-escape": 1,
+    "atom-global": 1,
     "destructuring": 5,
     "f64-generic-arith": 10,
     "host-interop": 1,
@@ -1639,7 +1660,7 @@
     ]
    },
    "blockers": {
-    "atom-escape": 1,
+    "atom-global": 1,
     "destructuring": 3,
     "f64-generic-arith": 6,
     "host-interop": 1,
@@ -1770,7 +1791,7 @@
     ]
    },
    "blockers": {
-    "atom-escape": 1,
+    "atom-global": 1,
     "destructuring": 12,
     "f64-generic-arith": 13,
     "host-interop": 6,
@@ -2045,7 +2066,9 @@
     ]
    },
    "blockers": {
-    "atom-escape": 2,
+    "atom-escape": 1,
+    "atom-global": 1,
+    "atom-local-iteration": 1,
     "destructuring": 3,
     "f64-generic-arith": 7,
     "host-interop": 6,
@@ -2098,7 +2121,7 @@
     ]
    },
    "blockers": {
-    "atom-escape": 1,
+    "atom-global": 1,
     "destructuring": 2,
     "f64-generic-arith": 4,
     "host-interop": 1,
@@ -2186,7 +2209,8 @@
     ]
    },
    "blockers": {
-    "atom-escape": 5,
+    "atom-escape": 2,
+    "atom-global": 3,
     "destructuring": 16,
     "dispatch-forms": 3,
     "f64-generic-arith": 10,
@@ -2281,7 +2305,9 @@
     ]
    },
    "blockers": {
-    "atom-escape": 4,
+    "atom-escape": 1,
+    "atom-global": 2,
+    "atom-local-iteration": 1,
     "destructuring": 10,
     "f64-generic-arith": 10,
     "host-interop": 3,
@@ -2590,7 +2616,7 @@
     ]
    },
    "blockers": {
-    "atom-escape": 1,
+    "atom-global": 1,
     "destructuring": 5,
     "f64-generic-arith": 6,
     "host-interop": 4,
@@ -2691,7 +2717,8 @@
     ]
    },
    "blockers": {
-    "atom-escape": 2,
+    "atom-global": 1,
+    "atom-local-iteration": 1,
     "destructuring": 16,
     "dispatch-forms": 1,
     "f64-generic-arith": 15,
@@ -2763,7 +2790,9 @@
     ]
    },
    "blockers": {
-    "atom-escape": 4,
+    "atom-escape": 1,
+    "atom-global": 2,
+    "atom-local-iteration": 1,
     "destructuring": 8,
     "f64-generic-arith": 7,
     "host-interop": 5,
@@ -2960,7 +2989,8 @@
     ]
    },
    "blockers": {
-    "atom-escape": 5,
+    "atom-escape": 4,
+    "atom-global": 1,
     "destructuring": 22,
     "dispatch-forms": 2,
     "f64-generic-arith": 20,
@@ -3559,11 +3589,11 @@
   },
   {
    "unit": "scripts",
-   "files": 16,
+   "files": 44,
    "classes": {
     "a": 1,
     "d": 2,
-    "native": 9,
+    "native": 37,
     "o": 4
    },
    "port": {
@@ -3831,6 +3861,11 @@
    "class": "keep"
   },
   {
+   "path": "docs/evidence/port-rewrite-rules-20261031.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
    "path": "docs/evidence/upstream-apis-amu-check-20261031.json",
    "unit": "docs",
    "class": "keep"
@@ -3852,6 +3887,11 @@
   },
   {
    "path": "docs/migration-placement.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
+   "path": "docs/port-rewrite-rules.md",
    "unit": "docs",
    "class": "keep"
   },
@@ -5457,7 +5497,7 @@
    "blockers": [
     "keyword-map-literal",
     "f64-generic-arith",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -5487,7 +5527,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-local-iteration",
     "host-interop"
    ]
   },
@@ -5691,7 +5731,8 @@
     "keyword-map-literal",
     "dispatch-forms",
     "destructuring",
-    "atom-escape"
+    "atom-local-iteration",
+    "atom-global"
    ]
   },
   {
@@ -5846,7 +5887,7 @@
     "f64-generic-arith",
     "regex-literal",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -6206,7 +6247,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -6346,7 +6387,7 @@
     "f64-generic-arith",
     "regex-literal",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -6607,7 +6648,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -6947,7 +6988,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -8100,7 +8141,8 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-local-iteration",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -8347,7 +8389,7 @@
     "f64-generic-arith",
     "regex-literal",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -8641,7 +8683,7 @@
     "multi-module",
     "keyword-map-literal",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -8715,7 +8757,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape"
+    "atom-global"
    ]
   },
   {
@@ -8730,7 +8772,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -9011,7 +9053,7 @@
    "blockers": [
     "multi-module",
     "f64-generic-arith",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -9027,7 +9069,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -9122,7 +9164,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape"
+    "atom-local-iteration"
    ]
   },
   {
@@ -9958,7 +10000,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -10219,7 +10261,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -10345,7 +10387,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-local-iteration",
     "host-interop"
    ]
   },
@@ -10617,7 +10659,7 @@
     "multi-module",
     "keyword-map-literal",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -10633,7 +10675,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape"
+    "atom-local-iteration"
    ]
   },
   {
@@ -10741,7 +10783,7 @@
     "f64-generic-arith",
     "regex-literal",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -11429,7 +11471,7 @@
     "keyword-map-literal",
     "f64-generic-arith",
     "destructuring",
-    "atom-escape",
+    "atom-global",
     "host-interop"
    ]
   },
@@ -14497,6 +14539,146 @@
   },
   {
    "path": "scripts/native/guest_lint.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-and-write.out-of-scope.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-doseq.after-reduce.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-doseq.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-dotimes.after-loop.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-dotimes.after-reduce.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-dotimes.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-fn-capture.out-of-scope.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-global-def.out-of-scope.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-global-defonce.out-of-scope.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-loop.after-loop.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-loop.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/atom-straight-line.admitted.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/defmulti.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/defmulti.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/defprotocol.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/defprotocol.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/fn-ref-arg.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/fn-ref-arg.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/fn-ref-hof.admitted.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/fn-ref-let.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/fn-ref-let.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/reify.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/reify.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/set-contains.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/set-contains.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/set-count.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/set-count.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/set-keyword.admitted.kotoba",
    "unit": "scripts",
    "class": "native"
   },

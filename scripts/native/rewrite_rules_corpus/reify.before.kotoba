@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-refusal: E2101
+
+(defn main [] :i64
+  (let [s (reify Shape (area [_ w h] (* w h)))]
+    0))

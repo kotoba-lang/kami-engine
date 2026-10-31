@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-value: 3
+
+(defn main [] :i64
+  (loop [i 0 a 0]
+    (if (< i 3) (recur (+ i 1) (+ a i)) a)))

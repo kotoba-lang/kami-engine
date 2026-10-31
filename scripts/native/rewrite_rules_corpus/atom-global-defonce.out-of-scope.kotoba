@@ -1,0 +1,7 @@
+(ns probe)
+;; expect-refusal: E2003
+
+(defonce a (atom 0))
+
+(defn main [] :i64
+  (do (swap! a inc) @a))

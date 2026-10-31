@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-value: 1
+
+(defn main [] :i64 (if (contains? (typed-set-new [:set :i64] 1 2) 1) 1 0))

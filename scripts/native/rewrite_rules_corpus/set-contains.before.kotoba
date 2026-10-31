@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-refusal: E2104
+
+(defn main [] :i64 (if (contains? #{1 2} 1) 1 0))

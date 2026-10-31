@@ -13,7 +13,10 @@ namespace dependencies and external libraries, and derives the port order
 
 The Amu blockers (class e) are not guessed: BLOCKERS below records what the
 pinned Amu CLI refused when the probe sources in
-docs/evidence/amu-capability-probe-20261031b.json were run against it.
+docs/evidence/amu-capability-probe-20261031b.json were run against it. The
+atom blockers are split by the port they need (JUN-731): the rewrite rules and
+their measured corpus are docs/port-rewrite-rules.md and
+docs/evidence/port-rewrite-rules-20261031.json.
 """
 
 import argparse
@@ -52,7 +55,7 @@ BLOCKERS = {
     "keyword-map-literal": {
         "refusal": "E2105 unsupported type ':a'",
         "what": "a keyword map literal such as {:a 1}; defrecord is admitted",
-        "issues": ["JUN-651"],
+        "issues": ["JUN-728"],
         "detect": r"\{\s*:",
     },
     "f64-generic-arith": {
@@ -67,22 +70,35 @@ BLOCKERS = {
         "issues": ["AWAI-47"],
     },
     "dispatch-forms": {
-        "refusal": "E2003 unsupported top-level form 'defmulti' / 'defprotocol'",
-        "what": "defmulti, defmethod, defprotocol, extend-protocol, extend-type, reify",
-        "issues": ["JUN-651"],
+        "refusal": "E2003 unsupported top-level form 'defmulti' / 'defprotocol'; E2101 for reify",
+        "what": "defmulti, defmethod, defprotocol, extend-protocol, extend-type, reify; interim rewrite: rule 4 of docs/port-rewrite-rules.md",
+        "issues": ["JUN-730", "JUN-731"],
         "detect": r"\((defmulti|defmethod|defprotocol|extend-protocol|extend-type|reify)\b",
     },
     "destructuring": {
         "refusal": "E2111 malformed binding vector",
         "what": "sequential or map destructuring in let / fn / loop bindings",
-        "issues": ["JUN-651"],
+        "issues": ["JUN-729"],
         "detect": r"\((let|loop|fn|defn-?|when-let|if-let|doseq|for)\b[^\[\]]*\[\s*[\[{]|\(fn\s+\[[^\]]*[\[{]|\(defn-?\s+\S+\s+(\"\"\s+)?\[[^\]]*[\[{]",
+    },
+    # JUN-731 split the former single atom-escape blocker (46 files at
+    # 3c9eb7f) by what a port has to do; a file may carry several of the three.
+    "atom-local-iteration": {
+        "refusal": "E2140 atom escapes its let scope (a write inside loop/doseq/dotimes)",
+        "what": "a let-bound atom written by swap!/reset! inside loop, doseq or dotimes; rewritable by rule 1 of docs/port-rewrite-rules.md (loop accumulator or reduce)",
+        "issues": ["JUN-731"],
+    },
+    "atom-global": {
+        "refusal": "E2141 atom must be the init of a let binding (def); E2003 unsupported top-level form 'defonce'",
+        "what": "a top-level def/defonce atom: state that outlives one call, out of scope for local state (state ability / :state kit)",
+        "issues": ["JUN-651"],
+        "detect": r"\(def\s+(?:\^\S+\s+)?\S+\s+\((?:\w+/)?atom\b|\(defonce\b",
     },
     "atom-escape": {
         "refusal": "E2140 atom escapes its let scope (straight-line swap!/reset!/deref only)",
-        "what": "an atom stored, returned, defined at top level or mutated inside a loop or closure",
+        "what": "swap!/reset! in a file with neither of the two atom blockers above: an atom passed in, returned, stored or captured by a closure; hand work",
         "issues": ["JUN-651"],
-        "detect": r"\(def\s+\S+\s+\(atom\b|\(defonce\b|\(swap!|\(reset!",
+        "detect": r"\(swap!|\(reset!",
     },
     "host-interop": {
         "refusal": "E6010 named operation js/... is not a registered capability; E2003 for an import declaration",
@@ -251,10 +267,32 @@ def host_code(code):
     return PLATFORM.sub("", code)
 
 
+ITERATION = re.compile(r"\((loop|doseq|dotimes)(?=[\s)])")
+LOCAL_ATOM = re.compile(r"[\[\s](" + SYM + r")\s+\((?:\w+/)?atom\b")
+
+
+def atom_written_in_iteration(code):
+    """A let-bound atom name that swap!/reset! writes inside loop/doseq/dotimes.
+
+    Names bound by def/defonce are excluded, so a global written in a loop
+    counts as atom-global only."""
+    names = {m.group(1) for m in LOCAL_ATOM.finditer(code)
+             if not re.search(r"\((?:def|defonce)\s+(?:\^\S+\s+)?$", code[:m.start(1)])}
+    if not names:
+        return False
+    write = re.compile(r"\((?:swap!|reset!)\s+(" + "|".join(re.escape(n) for n in sorted(names)) + r")(?=[\s)])")
+    return any(write.search(form_at(code, m.start())) for m in ITERATION.finditer(code))
+
+
 def blockers_of(code, reqs):
     found = []
     for bid, b in BLOCKERS.items():
-        if bid == "multi-module":
+        if bid == "atom-local-iteration":
+            hit = atom_written_in_iteration(code)
+        elif bid == "atom-escape":
+            hit = (re.search(b["detect"], code) is not None
+                   and not {"atom-local-iteration", "atom-global"} & set(found))
+        elif bid == "multi-module":
             hit = bool(reqs)
         elif bid == "regex-literal":
             hit = '"REGEX"' in code

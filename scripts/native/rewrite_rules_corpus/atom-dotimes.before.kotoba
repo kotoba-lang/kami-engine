@@ -1,0 +1,7 @@
+(ns probe)
+;; expect-refusal: E2140
+
+(defn main [] :i64
+  (let [a (atom 0)]
+    (dotimes [i 3] (swap! a + i))
+    @a))

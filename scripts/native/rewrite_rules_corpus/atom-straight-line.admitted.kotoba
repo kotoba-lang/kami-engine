@@ -1,0 +1,7 @@
+(ns probe)
+;; expect-value: 1
+
+(defn main [] :i64
+  (let [a (atom 0)]
+    (when true (swap! a inc))
+    @a))
