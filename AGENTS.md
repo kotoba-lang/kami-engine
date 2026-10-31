@@ -29,6 +29,37 @@ were renamed to `.cljk` on 2026-09-11 (`cljk-origin.edn`).
 
 > **Update 2026-10-25 (ADR-0049):** this repository is now the monorepo for the `kami-*` family. Standalone `kotoba-lang/kami-*` repositories are imported under `packages/<repo>/` (index: `packages/README.md`); the "moved out / do not restore a nested tree" statements here apply to the top-level pointer directories only, which stay as they are.
 
+## Kotoba / Amu selfhost migration (owner decisions, 2026-10-31)
+
+The kami family is moving to canonical `.kotoba` built, checked and tested by
+Amu selfhost only (Linear project P-JUN-38, decisions recorded in JUN-640).
+These decisions apply to all work in this repository:
+
+- **Placement.** This repository is the game-engine monorepo: gameplay rules,
+  scene/game contracts, the `kami:engine` WIT and guest vocabulary, the builder
+  SDK, `kami-app-*` apps and the engine's host integration. Parts that are
+  useful outside a game engine — 3D processing (geometry, meshes, transforms,
+  render IR / WebGPU) and physics (rigid body, vehicle, CAE/CFD solvers) — go
+  to the `kotoba-lang/kotoba` monorepo `lib/`. The test is whether anything
+  other than the game engine uses it, or is expected to. Dependencies point
+  from this repository to `kotoba` `lib/`, never back. Placement of each
+  package is tracked in JUN-649.
+- **CLJK stays as a reference oracle.** Existing `.cljk` sources are kept, not
+  deleted, when their `.kotoba` port lands. The oracle is run by hand on a
+  developer machine to produce reference values (KIR, Definition CIDs, golden
+  vectors); record the command, tool versions, inputs and outputs with a date.
+  It never goes into CI, gates, builds or a fallback path. A mismatch between
+  the oracle and the native result is reported, not reconciled.
+- **Rust is pruned.** Rust is not kept even as an oracle. Do not add Rust here
+  or move Rust into an adapter repo; remaining kami Rust repos
+  (`kami-engine-host-rs`, `kami-apps`) are handled in JUN-648.
+- **`kami.host` is in scope.** The browser host in `kotoba-lang/host` is part
+  of this migration (Amu browser Wasm, JUN-645) and is placed by the same rule.
+- **Old repositories are archived after their move.** A standalone
+  `kotoba-lang/kami-*` repository is archived once its default-branch tip is
+  in its destination and it has no later commits or open PRs. Repositories
+  are archived, never deleted.
+
 ## Layout
 
 | path | contents |
