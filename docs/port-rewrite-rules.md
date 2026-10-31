@@ -16,13 +16,13 @@ the CI pin (amu `05668c7`, `bin/amu` sha256 `13bfdade…4ba11c3`):
 `docs/evidence/port-rewrite-rules-20261101c.json` (73 cases). Against the
 previous pin `c2186d7` (`port-rewrite-rules-20261101b.json`, 60 cases) amu
 PR #1751 (JUN-729: destructuring as reader sugar) and PR #1753 (JUN-734: def
-literals D5, variadic `assoc` D6, typed-map `get` / `(:k m d)` D10) admitted
-two `.before` forms and changed the code of one:
-`kwmap-def-f64.before` and `kwmap-variadic-assoc.before` are now admitted
-(the def literal became `kwmap-def-f64.admitted`, the variadic assoc
-`kwmap-variadic-assoc.admitted`; the pair's remaining refusal, a destructured
-unannotated parameter, is `kwmap-state-param`), and
-`kwmap-option-default.before` is E2111 instead of E2119. New cases:
+literals D5, variadic `assoc` D6, typed-map `get` / `(:k m d)` D10) changed
+three `.before` results: `kwmap-variadic-assoc.before` is admitted (now
+`kwmap-variadic-assoc.admitted`); the f64 def in `kwmap-def-f64.before` is
+admitted, so that file is refused only for its destructured unannotated
+parameter (E2104, was E2124) and became `kwmap-state-param`, with the def
+alone as `kwmap-def-f64.admitted`; and `kwmap-option-default.before` is E2111
+instead of E2119. New cases:
 `kwmap-def-vec-mixed-keys` (what D5 still refuses), the admitted
 `kwmap-option-default-typed-map`, the `kwmap-variadic-assoc-odd` refusal and
 the "Destructuring" cases below. Every rule 1-4 case gives the same result as
