@@ -32,7 +32,6 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-cam-scene](kami-cam-scene) | `c40307f` | EDN authoring surface for kami-cam (kotoba-lang/cnc) STOCK MATERIAL presets — tolerant EDN accessors from kotoba-lang/scene, parity-tested against kotoba.cam.stock/material-presets. Restored from legacy kami-cam-scene crate (deleted #82). ADR-2607010930. |
 | [kami-character-scene](kami-character-scene) | `9dcf246` | EDN authoring surface for kami-character MetaHuman hair-style presets, FACS face-rig, and default animation blueprint. Restored from legacy kami-character-scene crate (deleted #82). ADR-2607010930. |
 | [kami-eizo-timeline](kami-eizo-timeline) | `226e1c1` | Portable .cljc EDL/timeline data model (track/clip/transition/marker) + SMPTE drop-frame timecode — the missing NLE data model, ADR-2607121400 |
-| [kami-ongaku-project](kami-ongaku-project) | `6dccb9e` | DAW-session data model (track/bus-graph/clip/automation/tempo-map) — L3 SSoT of the ongaku engine stack, ADR-2607121400 |
 | [kami-creative-studio](kami-creative-studio) | `2652dd3` | Imported `kami-creative-studio` (no repository description) |
 | [kami-eizo-compositor](kami-eizo-compositor) | `2e4382d` | VFX compositing node data model (chroma-key/roto/tracking/blend) — kotoba-lang eizo domain, ADR-2607121400 |
 | [kami-eizo-grade](kami-eizo-grade) | `f960c23` | ASC CDL / monotone curves / .cube LUT / waveform+vectorscope color-grading data model (kami-eizo family, ADR-2607121400) |
@@ -57,9 +56,7 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-gen-ml3d](kami-gen-ml3d) | `e7388b6` | Imported `kami-gen-ml3d` (no repository description) |
 | [kami-gen-procedural](kami-gen-procedural) | `ec78fba` | Imported `kami-gen-procedural` (no repository description) |
 | [kami-genre-base-systems](kami-genre-base-systems) | `c9abd0e` | Base/foundation gameplay systems, one per PlayStation-Store-style genre category (generic archetypes, kami-clj subset) |
-| [kami-mangaka-expression](kami-mangaka-expression) | `96fc3ce` | kami.mangaka.expression + patterns EDN (ADR-2607102200 addendum 12) |
 | [kami-mangaka-reader](kami-mangaka-reader) | `01823ab` | kami-mangaka-reader domain logic (ClojureScript/shadow-cljs), split out of kami-engine's kami-mangaka-reader-clj (ADR-2607010930). |
-| [kami-sensor-sim](kami-sensor-sim) | `caae678` | Camera / lidar / IMU / contact sensor synth, isaacsim.sensors API-compat target (analytic CPU sensor models: pinhole camera projection+depth, analytic ray-cast lidar VLP-16/toy, body-frame IMU, sphere-vs-primitive contact). Restored from legacy kami-sensor-sim crate (deleted #82). ADR-2607010930. |
 | [kami-solar-helix-scene](kami-solar-helix-scene) | `fcc22d7` | Imported `kami-solar-helix-scene` (no repository description) |
 | [kami-studio](kami-studio) | `5693307` | Imported `kami-studio` (no repository description) |
 | [kami-vehicle](kami-vehicle) | `50d5e29` | BeamNG-grade soft-body vehicle physics: node-beam mass-spring network, Pacejka tire, full powertrain (engine/clutch/gearbox/diff), plastic deformation, JBeam-subset loader. Restored from legacy kami-vehicle crate (deleted #82). ADR-2607010930. |
@@ -71,3 +68,15 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [freeboard](freeboard) | `11510d5` | Apple-Freeform-style infinite-canvas board — clj brain + kami-render(wgpu) + kasane import (ADR-2606280200) |
 | [swarm-choreo](swarm-choreo) | `fe69e71` | Governed, precomputed multi-agent choreography (drone light shows) over ROS 2 — kotoba-lang |
 | [anime](anime) | `f2eb7a9` | Work-agnostic anime production pipeline vocabulary (cut hierarchy, 12 stages, layer specs) — CLJC craft lib |
+
+## Removed duplicates (JUN-649)
+
+These packages were imported here and into the kotoba monorepo from the same
+upstream commit, and their code was identical. The placement rule puts them in
+kotoba `lib/` (`docs/migration-placement.json`), so the copies here were removed:
+
+| package | upstream commit | source of truth |
+|---|---|---|
+| kami-ongaku-project | `6dccb9e` | kotoba `lib/kotoba.kamiOngakuProject` |
+| kami-mangaka-expression | `96fc3ce` | kotoba `lib/kotoba.kamiMangakaExpression` |
+| kami-sensor-sim | `caae678` | kotoba `lib/kotoba.kamiSensorSim` |

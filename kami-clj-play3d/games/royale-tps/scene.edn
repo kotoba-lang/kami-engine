@@ -48,7 +48,7 @@
  :zone
  {:start-radius 900.0
   :center [0.0 0.0 0.0]
-  ;; phases come from kami-game-scene/data/battle_royale_storm.edn; naming the
+  ;; phases come from packages/kami-game-scene/resources/game_scene/battle_royale_storm.edn; naming the
   ;; file rather than copying it keeps one schedule in the workspace
   :phases :battle-royale/storm-phases}
 

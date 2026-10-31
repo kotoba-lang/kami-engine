@@ -46,7 +46,12 @@
          :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
          :deps/root "lib/kotoba.kisekae"}
         io.github.kotoba-lang/kami-eizo-timeline {:local/root "../kami-eizo-timeline"}
-        kotoba-lang/kami-ongaku-project {:local/root "../kami-ongaku-project"}
+        ;; kami-ongaku-project lives in the kotoba monorepo (lib/kotoba.kamiOngakuProject);
+        ;; the identical copy under packages/ was removed (JUN-649).
+        kotoba-lang/kami-ongaku-project
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
+         :deps/root "lib/kotoba.kamiOngakuProject"}
         kotoba-lang/douga {:git/url "https://github.com/kotoba-lang/douga.git"
                                      :git/sha "b957073d095c5cf96ab7465ad261cbc20eba924d"}}
  :aliases

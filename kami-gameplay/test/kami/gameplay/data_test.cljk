@@ -25,12 +25,12 @@
 (def data-dirs
   "Where the shared tables might be, depending on where the suite was started.
 
-  `../kami-game-scene/data/` when run from `kami-gameplay/`, and
-  `kami-game-scene/data/` when run from the repository root — which is where
+  `../packages/kami-game-scene/resources/game_scene/` when run from `kami-gameplay/`, and
+  `packages/kami-game-scene/resources/game_scene/` when run from the repository root — which is where
   the workspace's `:jvm-test` fleet gate runs everything. A suite that only
   worked from one of the two would pass locally and report an unreadable table
   in CI, and an unreadable table must not look like a table that was checked."
-  ["../kami-game-scene/data/" "kami-game-scene/data/"])
+  ["../packages/kami-game-scene/resources/game_scene/" "packages/kami-game-scene/resources/game_scene/"])
 
 (defn- slurp-edn [path]
   (try

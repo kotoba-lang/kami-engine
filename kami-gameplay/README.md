@@ -26,7 +26,7 @@ walk every bot at the player from anywhere on the map, and hand shooting to the
 host. There is no aim, no ammo, no reload, no damage, no storm and no state in
 which anyone has won.
 
-Meanwhile three EDN tables in `kami-game-scene/data/` describe 25 weapons, an
+Meanwhile three EDN tables in `packages/kami-game-scene/resources/game_scene/` describe 25 weapons, an
 eight-phase storm and eleven consumables, each with a header saying a Rust
 function "stays the builtin fallback AND the parity oracle". That Rust left with
 the workspace. The tables have had no runtime and no oracle since.

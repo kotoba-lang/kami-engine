@@ -1,7 +1,7 @@
 (ns kami.gameplay.weapon
   "Weapons as data, and the firing state machine that reads them.
 
-  `kami-game-scene/data/battle_royale_weapons.edn` has held a 25-entry weapon
+  `packages/kami-game-scene/resources/game_scene/battle_royale_weapons.edn` has held a 25-entry weapon
   table — damage, headshot multiplier, fire rate, magazine, reload time, spread,
   falloff, range, projectile speed — since ADR-0046. Nothing has been able to
   execute it since the Rust `weapon_pool()` that was its parity oracle left the

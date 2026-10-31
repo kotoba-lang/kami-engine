@@ -2,7 +2,7 @@
  "schema": "kami.migration-placement.v1",
  "issue": "JUN-649",
  "rule": "Owner decision 2026-10-31 (JUN-640): game-engine-specific parts stay in kotoba-lang/kami-engine; parts used, or expected to be used, outside a game engine (3D processing, physics, CAE, robotics, media production) go to kotoba-lang/kotoba lib/. Dependencies point from kami-engine to kotoba lib/, never back.",
- "status": "proposed 2026-10-31; `owner` entries need an owner decision, the rest apply the rule and stand unless the owner overrides them",
+ "status": "proposed 2026-10-31; entries apply the rule and stand unless the owner overrides them; kami-creative-studio decided by the owner 2026-10-31",
  "values": {
   "kami-engine": "stays in or moves to kotoba-lang/kami-engine",
   "kotoba": "stays in or moves to kotoba-lang/kotoba lib/",
@@ -71,7 +71,8 @@
     "same": "all 10 EDN files are byte-identical to packages/kami-game-scene/resources/game_scene/",
     "keep": "kami-engine:packages/kami-game-scene",
     "consumers-to-fix": "kami-gameplay reads ../kami-game-scene/data/ (bin/simulate.cljk, test/kami/gameplay/data_test.cljk), kami-clj-play3d/games/royale-tps/scene.edn comment"
-   }
+   },
+   "done": "removed 2026-10-31 (JUN-649): identical to the copy that is kept"
   },
   "kami-engine:kami-gameplay": {
    "to": "kami-engine",
@@ -214,8 +215,8 @@
    "reason": "*-scene: EDN authoring surface that binds a kotoba library into kami scenes (scene contract)"
   },
   "kami-engine:packages/kami-creative-studio": {
-   "to": "owner",
-   "reason": "an integrated video-and-music composer application built from douga, eizo and ongaku. Not a game, but an application rather than a library; kotoba lib/ holds libraries, so the rule does not decide it"
+   "to": "kami-engine",
+   "reason": "an application built on the engine, like kami-app-*; owner decision 2026-10-31 (JUN-649)"
   },
   "kami-engine:packages/kami-eizo-compositor": {
    "to": "kotoba",
@@ -336,7 +337,8 @@
     "of": "kotoba:lib/kotoba.kamiMangakaExpression",
     "same": "same upstream import commit 96fc3ce; 13 files identical, only deps.edn, nbb.edn, local-changes.json differ",
     "keep": "kotoba:lib/kotoba.kamiMangakaExpression"
-   }
+   },
+   "done": "removed 2026-10-31 (JUN-649): identical to the copy that is kept"
   },
   "kami-engine:packages/kami-mangaka-page": {
    "to": "kotoba",
@@ -353,7 +355,8 @@
     "of": "kotoba:lib/kotoba.kamiOngakuProject",
     "same": "same upstream import commit 6dccb9e; 17 files identical, only deps.edn, local-changes.json differ",
     "keep": "kotoba:lib/kotoba.kamiOngakuProject"
-   }
+   },
+   "done": "removed 2026-10-31 (JUN-649): identical to the copy that is kept"
   },
   "kami-engine:packages/kami-postfx-scene": {
    "to": "kami-engine",
@@ -375,7 +378,8 @@
     "of": "kotoba:lib/kotoba.kamiSensorSim",
     "same": "same upstream import commit caae678; 17 files identical, only deps.edn, nbb.edn, local-changes.json differ",
     "keep": "kotoba:lib/kotoba.kamiSensorSim"
-   }
+   },
+   "done": "removed 2026-10-31 (JUN-649): identical to the copy that is kept"
   },
   "kami-engine:packages/kami-skeleton-scene": {
    "to": "kami-engine",

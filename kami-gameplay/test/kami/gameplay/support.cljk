@@ -2,7 +2,7 @@
   "Fixtures shared by the suite.
 
   The weapon and storm rows here are copied verbatim from
-  `kami-game-scene/data/battle_royale_*.edn`. `kami.gameplay.data-test` asserts
+  `packages/kami-game-scene/resources/game_scene/battle_royale_*.edn`. `kami.gameplay.data-test` asserts
   that they still match the shipped files, so a fixture that drifts from the
   data it stands for fails loudly instead of quietly testing something else."
   (:require [kami.gameplay.attributes :as attr]
