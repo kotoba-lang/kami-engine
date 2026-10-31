@@ -13,10 +13,10 @@ namespace dependencies and external libraries, and derives the port order
 
 The Amu blockers (class e) are not guessed: BLOCKERS below records what the
 pinned Amu CLI refused when the probe sources in
-docs/evidence/amu-capability-probe-20261031b.json were run against it. The
+docs/evidence/amu-capability-probe-20261101.json were run against it. The
 atom blockers are split by the port they need (JUN-731): the rewrite rules and
 their measured corpus are docs/port-rewrite-rules.md and
-docs/evidence/port-rewrite-rules-20261031.json.
+docs/evidence/port-rewrite-rules-20261101.json.
 """
 
 import argparse
@@ -42,10 +42,13 @@ CLASSES = {
     "native": "already native: .kotoba sources and the Amu gate runner and CI definition",
 }
 
-# Measured with the pinned Amu macOS CLI (kotoba-lang/amu 3c9eb7f7f74e, the
-# one CI uses) on 2026-10-31 (JUN-726). Every probe gave the same refusal as at
-# the previous pin f7c07dff86d7 (amu-capability-probe-20261031.json). `detect`
-# is a regex over a CLJK file with its comments and string contents removed.
+# Measured with the pinned Amu macOS CLI (kotoba-lang/amu c2186d762e20, the
+# one CI uses) on 2026-11-01 (JUN-728). Against the previous pin 3c9eb7f7f74e
+# (amu-capability-probe-20261031b.json) only the keyword-map-literal probes
+# changed: amu PR #1750 admits a keyword-keyed literal as a closed record, so
+# let-map and fn-returns-map now run; the other blockers' probes refuse as
+# before. `detect` is a regex over a CLJK file with its comments and string
+# contents removed.
 BLOCKERS = {
     "multi-module": {
         "refusal": "E6002 required module ... is missing from the explicit source paths",
@@ -53,9 +56,23 @@ BLOCKERS = {
         "issues": ["AWAI-50", "JUN-384"],
     },
     "keyword-map-literal": {
-        "refusal": "E2105 unsupported type ':a'",
-        "what": "a keyword map literal such as {:a 1}; defrecord is admitted",
+        "refusal": "E2127 assoc of an absent key / lookup of an absent key; E2104 a literal passed to an unannotated "
+                   "parameter or where a declared record is expected, get with a default, contains?, dissoc, if arms with "
+                   "different keys, map over a vector of literals; E2101 merge / update; E2105 mixed key kinds; "
+                   "E2133 {}; E2128 a fn value; E2102 nil",
+        "what": "a keyword map literal such as {:a 1}. Since amu c2186d7 (PR #1750) it is a closed record: (:k m), get "
+                "and assoc of a present key, nesting, loop/recur, an unannotated defn result and :f64 values are admitted; "
+                "the record cannot gain or lose keys and cannot cross an unannotated parameter. Still flagged on any "
+                "keyword literal, because whether a file stays inside the admitted subset depends on how the map flows "
+                "between functions, which a regex cannot decide (see the JUN-728 note below)",
         "issues": ["JUN-728"],
+        # JUN-728: kept as every keyword literal. A narrower detect would have to
+        # prove that no literal reaches a refused use (an unannotated parameter,
+        # get with a default, contains?, dissoc/merge/update, an absent key, {} or
+        # nil): that is type flow, not syntax. A pattern scan for the refused uses
+        # left 9 of the 391 files at kami e42d222, and those still pass maps
+        # between functions, look them up by a runtime keyword (palette tables),
+        # destructure them or build ex-info data, so dropping them would under-count.
         "detect": r"\{\s*:",
     },
     "f64-generic-arith": {
@@ -476,8 +493,8 @@ def build(kotoba, rev):
         "issue": "JUN-641",
         "inputs": {
             "kotoba-lib": {"repo": "kotoba-lang/kotoba", "rev": rev},
-            "amu-probe": {"repo": "kotoba-lang/amu", "rev": "3c9eb7f7f74e0cf636ba75deb88faca5e277ca77",
-                          "evidence": "docs/evidence/amu-capability-probe-20261031b.json"},
+            "amu-probe": {"repo": "kotoba-lang/amu", "rev": "c2186d762e200205540f4ef9ca2b3ae66c4fc770",
+                          "evidence": "docs/evidence/amu-capability-probe-20261101.json"},
         },
         "classes": CLASSES,
         "counts": {"tracked": len(files), "class": dict(sorted(counts.items())),
