@@ -1,0 +1,152 @@
+(ns kami.native.guest-lint (:export [main]))
+
+;; Native port of scripts/guest_lint.cljk (JUN-642): every kami-clj game stays
+;; inside the declared guest vocabulary.
+;; Inputs staged by scripts/native_gates.py:
+;;   (idl)            wit/kami-interface.edn (host function arities)
+;;   (bindings)       wit/guest-bindings.edn
+;;   (game-count)     number of games found (every kami-clj-play*/games/*/logic.cljk)
+;;   (game-source i)  the i-th game's logic.cljk, in path order
+;;
+;; A call is every list whose head is a symbol. It is allowed when its symbol is
+;; a core form, a guest binding, an iteration form, a name the file defines, or
+;; starts with `.`; a call to a guest binding must pass the host function's
+;; parameter count.
+;;
+;; main returns 0 when every game is clean, otherwise:
+;;   3                                   no game found (refuses to report a pass)
+;;   1000000000 + 1000000*g + 1000*u + a  game g has u unknown names and a arity mismatches
+
+;; ---- tree walking --------------------------------------------------------------
+
+(defn- child [d :document i :i64] :document
+  (let [k (document-kind d)]
+    (cond (= k :list) (list-item d i)
+          (= k :vector) (at d i)
+          (= k :map) (entry d i)
+          :else (document-null))))
+
+(defn- branch? [d :document] :bool
+  (let [k (document-kind d)] (or (= k :list) (= k :vector) (= k :set) (= k :map))))
+
+(defn- member? [set-text :string item :string] :bool
+  (>= (string-index-of set-text (string-concat (string-concat "\n" item) "\n")) 0))
+
+(defn- size [set-text :string] :i64
+  ;; members of a "\nA\nB\n" set
+  (loop [i 0 k -1]
+    (let [j (string-find-byte set-text 10 i)] (if (< j 0) k (recur (+ j 1) (+ k 1))))))
+
+(defn- add [set-text :string item :string] :string
+  (if (member? set-text item) set-text (string-concat (string-concat set-text item) "\n")))
+
+(defn- calls [d :document acc :string] :string
+  ;; "\nsym argc\n..." for every list with a symbol head, distinct. A set
+  ;; literal is recorded as the name `#set`, which no vocabulary allows: the
+  ;; native reader cannot index into a set (document-set-at is not admitted),
+  ;; so a game with one fails instead of going unchecked.
+  (cond
+    (kind-is? d :set) (add acc "#set 0")
+    (not (branch? d)) acc
+    :else
+    (let [n (document-count d)
+          head (child d 0)
+          acc2 (if (and (kind-is? d :list) (> n 0) (kind-is? head :symbol))
+                 (add acc (string-concat (string-concat (printed head) " ") (string-from-i64 (- n 1))))
+                 acc)
+          start (if (and (kind-is? d :list) (> n 0) (kind-is? head :symbol)) 1 0)]
+      (loop [i start acc acc2]
+        (if (>= i n) acc (recur (+ i 1) (calls (child d i) acc)))))))
+
+(defn- defines [d :document acc :string] :string
+  ;; names the file introduces: def/defn/defsystem/defatom names, defn/defsystem
+  ;; parameter symbols, and every bound name of a let vector
+  (if (or (not (branch? d)) (kind-is? d :set))
+    acc
+    (let [n (document-count d)
+          h (if (> n 0) (printed (child d 0)) "")
+          a (child d 1)
+          b (child d 2)
+          is-list (kind-is? d :list)
+          acc1 (if (and is-list (kind-is? a :symbol)
+                        (or (string=? h "def") (string=? h "defn") (string=? h "defsystem") (string=? h "defatom")))
+                 (add acc (printed a)) acc)
+          acc2 (if (and is-list (kind-is? b :vector) (or (string=? h "defn") (string=? h "defsystem")))
+                 (loop [i 0 acc acc1]
+                   (if (>= i (document-count b)) acc
+                       (recur (+ i 1) (if (kind-is? (at b i) :symbol) (add acc (printed (at b i))) acc))))
+                 acc1)
+          acc3 (if (and is-list (kind-is? a :vector) (string=? h "let"))
+                 (loop [i 0 acc acc2]
+                   (if (>= i (document-count a)) acc (recur (+ i 2) (add acc (printed (at a i))))))
+                 acc2)]
+      (loop [i 0 acc acc3]
+        (if (>= i n) acc (recur (+ i 1) (defines (child d i) acc)))))))
+
+;; ---- host arity ------------------------------------------------------------------
+
+(defn- bare [d :document] :string
+  (let [p (printed d)] (string-substring p 1 (string-byte-length p))))
+
+(defn- host-arity [ifs :document host :string] :i64
+  ;; parameter count of host function "iface/fn", or -1 when the IDL has none
+  (let [ni (document-count ifs)]
+    (loop [i 0 j 0]
+      (if (>= i ni)
+        -1
+        (let [ie (entry ifs i) funcs (kget (at ie 1) :funcs) nf (document-count funcs)]
+          (if (>= j nf)
+            (recur (+ i 1) 0)
+            (let [fe (entry funcs j)]
+              (if (string=? host (string-concat (string-concat (bare (at ie 0)) "/") (bare (at fe 0))))
+                (document-count (kget (at fe 1) :params))
+                (recur i (+ j 1))))))))))
+
+;; ---- one game --------------------------------------------------------------------
+
+(defn- line-end [s :string i :i64] :i64
+  (let [e (string-find-byte s 10 i)] (if (< e 0) (string-byte-length s) e)))
+
+(defn- lint [src :string guest :document ifs :document] :i64
+  ;; 1000*unknown + bad-arity for one game
+  (let [forms (edn (string-concat (string-concat "[" src) "\n]"))
+        seen (calls forms "\n")
+        local (defines forms "\n")
+        core (kget guest :core-forms)
+        binds (kget guest :bindings)
+        iter (kget guest :iteration)
+        n (string-byte-length seen)]
+    (loop [i 1 unknown "\n" bad "\n"]
+      (if (>= i n)
+        (+ (* 1000 (size unknown)) (size bad))
+        (let [e (line-end seen i)
+              pair (string-substring seen i e)
+              sp (string-index-of pair " ")
+              name (string-substring pair 0 sp)
+              argc (string-substring pair (+ sp 1) (string-byte-length pair))
+              sym (document-edn-read name)
+              bound (and (kind-is? binds :map) (document-contains binds sym))
+              known (or (and (kind-is? core :set) (document-set-contains? core sym))
+                        bound
+                        (and (kind-is? iter :set) (document-set-contains? iter sym))
+                        (and (kind-is? iter :map) (document-contains iter sym))
+                        (member? local name)
+                        (string=? (string-substring name 0 (min 1 (string-byte-length name))) "."))
+              host (if bound (printed (option-value-of [:option :document] (document-get binds sym) (document-null))) "")
+              want (if bound (host-arity ifs host) -1)
+              wrong (and bound (>= want 0) (not (string=? argc (string-from-i64 want))))]
+          (recur (+ e 1)
+                 (if known unknown (add unknown name))
+                 (if wrong (add bad pair) bad)))))))
+
+(defn main [] :i64
+  (let [guest (edn (bindings))
+        ifs (blob (kget (entity (idl)) :wit.kami-interface/interfaces))
+        n (game-count)]
+    (if (= n 0)
+      3
+      (loop [g 0]
+        (if (>= g n)
+          0
+          (let [r (lint (game-source g) guest ifs)]
+            (if (> r 0) (+ 1000000000 (* 1000000 g) r) (recur (+ g 1)))))))))

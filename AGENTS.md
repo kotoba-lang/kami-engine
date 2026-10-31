@@ -82,11 +82,33 @@ These decisions apply to all work in this repository:
 | `kami-web/`, `kami-ui-sdk/`, `kami-engine-guest/`, `kami-mangaka-*-clj/` | pointer READMEs only — the code moved to its own repo; do not restore a nested tree. Exception: `kami-mangaka-reader-clj/` has no README and keeps only its built `dist/` (`reader.js`, `manifest.edn`) |
 | `kami-engine-sdk` | gitlink (no `.gitmodules`); the SDK is a separate repo |
 | `hermes/` | resident-bot profiles for this repo |
-| `scripts/` | gates (`wit_test.cljk`, `check_adapter_registry.cljk`, `guest_lint.cljk`), task runner (`run-task.cljk` + `scripts/tasks.edn`) |
+| `scripts/native/`, `scripts/native_gates.py` | the CI gates: Kotoba programs for the WIT, adapter-registry and guest-lint checks, and the Python stager that runs them with Amu |
+| `scripts/` | CLJK reference oracle for those gates (`wit_test.cljk`, `check_adapter_registry.cljk`, `guest_lint.cljk`), task runner (`run-task.cljk` + `scripts/tasks.edn`) |
+| `docs/evidence/` | dated oracle-vs-native measurements |
 | `edn-datomize.cljk`, `schema.edn` | EDN → datom conversion; `schema.edn` is generated |
 | `90-docs/adr/` | repo-local ADRs (0032–0048) |
 
 ## Verify
+
+The gates CI runs (Apple Silicon, with an Amu checkout at the commit pinned in
+`.github/workflows/ci.yml`):
+
+```bash
+python3 scripts/native_gates.py --amu ../amu/bin/amu             # all three gates + negative controls
+python3 scripts/native_gates.py --amu ../amu/bin/amu --gate wit  # one gate
+```
+
+Each gate is a Kotoba program in `scripts/native/`; `native_gates.py` embeds the
+files it reads, runs it with `amu run`, and decodes main's i64 result (0 is a
+pass; the codes are listed at the top of each program). Every gate also runs
+mutants of its inputs that must fail. `scripts/native/edn_read.kotoba` works
+around the native EDN reader's handling of commas, newlines, comments and
+whitespace runs; see its header before changing it.
+
+Reference oracle, run by hand only (see the migration decisions above; record
+the result with a date under `docs/evidence/`). On main the root `deps.edn`
+does not build a classpath (`kotoba.test` is reached through two gitlib roots),
+so `docs/evidence/native-gates-oracle-20261031.json` records how it was run:
 
 ```bash
 kbb -M scripts/wit_test.cljk               # EDN IDL == world.wit, every host fn documented
@@ -104,10 +126,22 @@ kbb --backend sci scripts/run-task.cljk wit-check   # run a registered task (als
 `kbb --backend sci scripts/run-task.cljk` with no task prints the registered
 task names (`scripts/tasks.edn`) and exits 2.
 
-CI (`.github/workflows/ci.yml`) installs kbb with `kotoba-lang/setup-kbb` and
-runs the WIT, adapter-registry and guest-lint gates, plus a guard that fails on
-any `Cargo.toml`, `Cargo.lock`, `*.rs`, `rust-toolchain*` or `.cargo/` file.
-CI does not run the gameplay/render/physics suites.
+CI (`.github/workflows/ci.yml`) runs the native gates on a `macos-15` runner
+against a pinned, digest-checked Amu checkout, plus a guard that fails on any
+`Cargo.toml`, `Cargo.lock`, `*.rs`, `rust-toolchain*` or `.cargo/` file.
+
+- Removed from CI (JUN-642): `kotoba-lang/setup-kbb` and the three `kbb -M`
+  gate runs. No kbb, nbb, JVM or Node runs in CI.
+- Native gate: present, with negative controls for every gate.
+- No longer covered by CI: regenerating `world.wit` (`wit_test.cljk --gen`
+  stays with the oracle); the CLJK gates' exact behaviour on inputs the
+  mutants do not exercise. The gameplay/render/physics suites were never in CI
+  and still are not.
+- The WIT gate searches the committed `world.wit` for every `:doc`, where the
+  CLJK gate searched its own regenerated text, so it also fails when the
+  committed file loses documentation.
+- GitHub Actions is disabled for this repository (checked 2026-10-31; the last
+  run was 2026-07-22), so none of this runs until it is turned back on.
 
 `scripts/test-*.sh` drive the removed Rust crates and do not run.
 
@@ -133,7 +167,9 @@ CI does not run the gameplay/render/physics suites.
 
 - `wit/kami-interface.edn` is the only source of the host interface. Change
   the EDN (including the `:doc` prose), then regenerate `world.wit`. Never
-  hand-edit `world.wit` alone.
+  hand-edit `world.wit` alone. Write the regenerated file as UTF-8: the
+  committed file once lost every `—` and `…` to `?`, which the native WIT gate
+  now rejects.
 - Guest code has integer-only arithmetic and no math library (no sin, cos,
   sqrt, or float compare; `min`, `max` and `clamp` exist but only on
   integers). A host function must not expect the guest to compute a float. Add it in the `move-toward`/`spawn-ring` shape and
