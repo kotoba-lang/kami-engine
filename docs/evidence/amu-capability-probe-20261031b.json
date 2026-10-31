@@ -1,0 +1,276 @@
+{
+ "schema": "kami.amu-capability-probe.v1",
+ "issue": "JUN-641",
+ "date": "2026-10-31",
+ "amu": {
+  "repo": "kotoba-lang/amu",
+  "rev": "3c9eb7f7f74e0cf636ba75deb88faca5e277ca77",
+  "entry": "bin/amu (macOS arm64)",
+  "bin-amu-sha256": "750159f1956790fbb10c3c7fea8dc1eae5302e23ff6e065fe8337cc9589554fb",
+  "amu-cli-macho-sha256": "750159f1956790fbb10c3c7fea8dc1eae5302e23ff6e065fe8337cc9589554fb"
+ },
+ "method": "each source is a single canonical .kotoba file; `amu check` then, when it passes, `amu run` (main prints its i64)",
+ "probes": [
+  {
+   "blocker": "multi-module",
+   "name": "require",
+   "source": "(ns probe (:require [kotoba.lang.coll :as c]))\n\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E6002 required module kotoba.lang.coll is missing from the explicit source paths (byte 21)"
+    ]
+   }
+  },
+  {
+   "blocker": "keyword-map-literal",
+   "name": "let-map",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [m {:a 1}] (:a m)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2105 unsupported type ':a' (byte 40)"
+    ]
+   }
+  },
+  {
+   "blocker": "keyword-map-literal",
+   "name": "fn-returns-map",
+   "source": "(ns probe)\n\n(defn mk [] {:a 1 :b 2})\n(defn main [] :i64 (:a (mk)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2105 unsupported type ':a' (byte 25)"
+    ]
+   }
+  },
+  {
+   "blocker": "keyword-map-literal",
+   "name": "defrecord-admitted",
+   "source": "(ns probe)\n\n(defrecord P [x :i64 y :i64])\n(defn main [] :i64 (:y (->P 1 2)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "2"
+    ]
+   }
+  },
+  {
+   "blocker": "f64-generic-arith",
+   "name": "infix-mul",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [x (* 1.5 2.0)] 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '*': expected :i64 (byte 40)"
+    ]
+   }
+  },
+  {
+   "blocker": "f64-generic-arith",
+   "name": "infix-lt",
+   "source": "(ns probe)\n\n(defn main [] :i64 (if (< 1.5 2.0) 1 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '<': expected :i64 (byte 36)"
+    ]
+   }
+  },
+  {
+   "blocker": "f64-generic-arith",
+   "name": "named-ops-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [x (f64-sqrt (f64-mul 1.5 2.0))] (if (f64-lt 1.5 x) 1 0)))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": "f64-generic-arith",
+   "name": "f64-to-i64",
+   "source": "(ns probe)\n\n(defn main [] :i64 (f64-to-i64-checked 3.0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2101 unknown or unsupported form 'f64-to-i64-checked' (byte 32)"
+    ]
+   }
+  },
+  {
+   "blocker": "regex-literal",
+   "name": "re-find",
+   "source": "(ns probe)\n\n(defn main [] :i64 (if (re-find #\"a\" \"a\") 1 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E1005 unsupported reader syntax '#' (byte 44)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch-forms",
+   "name": "defmulti",
+   "source": "(ns probe)\n\n(defmulti area :k)\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defmulti' (byte 13)"
+    ]
+   }
+  },
+  {
+   "blocker": "dispatch-forms",
+   "name": "defprotocol",
+   "source": "(ns probe)\n\n(defprotocol Shape (area [s]))\n(defn main [] :i64 0)\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defprotocol' (byte 13)"
+    ]
+   }
+  },
+  {
+   "blocker": "destructuring",
+   "name": "let-vector",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [[a b] [1 2]] (+ a b)))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2111 malformed binding vector in '[' (byte 37)"
+    ]
+   }
+  },
+  {
+   "blocker": "atom-escape",
+   "name": "swap-in-loop",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [a (atom 0)] (dotimes [i 3] (swap! a + i)) @a))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2140 atom `a` escapes its let scope (atom slice 1 admits swap!/reset!/deref in straight-line code of the binding function only) (byte 71)"
+    ]
+   }
+  },
+  {
+   "blocker": "atom-escape",
+   "name": "straight-line-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (let [a (atom 0)] (swap! a inc) @a))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "1"
+    ]
+   }
+  },
+  {
+   "blocker": "host-interop",
+   "name": "js-global",
+   "source": "(ns probe)\n\n(defn main [] :i64 (js/Date.now))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E6010 named operation js/Date.now is not a registered capability (byte 32)"
+    ]
+   }
+  },
+  {
+   "blocker": "host-interop",
+   "name": "import-declaration",
+   "source": "(ns probe)\n\n(defimport now \"env\" \"now\" [] :i64)\n(defn main [] :i64 (now))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2003 unsupported top-level form 'defimport' (byte 13)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "set-literal-numbers",
+   "source": "(ns probe)\n\n(defn main [] :i64 (if (contains? #{1 2} 1) 1 0))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2104 type mismatch in '1': expected :keyword (byte 48)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "defn-as-value",
+   "source": "(ns probe)\n\n(defn ap [f x :i64] :i64 (f x))\n(defn inc1 [x :i64] :i64 (+ x 1))\n(defn main [] :i64 (ap inc1 1))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2102 unknown symbol 'inc1' (byte 101)"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "fn-literal-and-hof-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (reduce + 0 (map (fn [x] (+ x 1)) [1 2 3])))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "9"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "strings-and-vectors-admitted",
+   "source": "(ns probe)\n\n(defn main [] :i64 (+ (count [\"a\" \"b\"]) (count [[1 2] [3]]) (string-byte-length (str \"a\" \"b\"))))\n",
+   "check": {
+    "exit": 0,
+    "output": [
+     "ok"
+    ]
+   },
+   "run": {
+    "exit": 0,
+    "output": [
+     "6"
+    ]
+   }
+  },
+  {
+   "blocker": null,
+   "name": "mixed-vector-literal",
+   "source": "(ns probe)\n\n(defn main [] :i64 (count [\"a\" [1 2]]))\n",
+   "check": {
+    "exit": 1,
+    "output": [
+     "seed: E2116 vector literal items must be i64 (at most 64) (byte 43)"
+    ]
+   }
+  }
+ ]
+}

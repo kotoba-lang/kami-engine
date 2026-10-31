@@ -4,12 +4,12 @@
  "inputs": {
   "kotoba-lib": {
    "repo": "kotoba-lang/kotoba",
-   "rev": "43b9173b6f5866b5eb228a245e7fd451687aa2b9"
+   "rev": "455b84fbc812ab05ab5dae1cdae117d44a1da264"
   },
   "amu-probe": {
    "repo": "kotoba-lang/amu",
-   "rev": "f7c07dff86d7fb5e89219a0f9ad4a83b2a83c82e",
-   "evidence": "docs/evidence/amu-capability-probe-20261031.json"
+   "rev": "3c9eb7f7f74e0cf636ba75deb88faca5e277ca77",
+   "evidence": "docs/evidence/amu-capability-probe-20261031b.json"
   }
  },
  "classes": {
@@ -22,12 +22,12 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1333,
+  "tracked": 1334,
   "class": {
    "a": 244,
    "c": 44,
    "d": 124,
-   "keep": 400,
+   "keep": 401,
    "native": 10,
    "o": 511
   },
@@ -885,10 +885,10 @@
   },
   {
    "unit": "docs",
-   "files": 10,
+   "files": 11,
    "classes": {
     "a": 1,
-    "keep": 9
+    "keep": 10
    },
    "depends-on": [],
    "placement": "kami-engine"
@@ -3812,6 +3812,11 @@
   },
   {
    "path": "docs/evidence/amu-capability-probe-20261031.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
+   "path": "docs/evidence/amu-capability-probe-20261031b.json",
    "unit": "docs",
    "class": "keep"
   },

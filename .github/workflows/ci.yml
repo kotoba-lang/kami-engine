@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: kotoba-lang/amu
-          ref: f7c07dff86d7fb5e89219a0f9ad4a83b2a83c82e
+          ref: 3c9eb7f7f74e0cf636ba75deb88faca5e277ca77
           path: _native/amu
           persist-credentials: false
           sparse-checkout: |

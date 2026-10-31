@@ -2,56 +2,14 @@
 ;; values and looking things up in them. scripts/native_gates.py places this
 ;; file's forms after a gate's `ns` form.
 ;;
-;; `edn-clean` exists because the native reader (amu document-edn-read,
-;; checked at amu f7c07df) differs from EDN in ways the repository's files
-;; hit: it does not treat a comma as whitespace (`{:x false, :y 2}` reads
-;; `false,` as a symbol, and `[1 2],` traps), nor a newline (`[\n(def x 1)]`
-;; reads three items), nor a `;` comment; text that starts with whitespace does
-;; not read, and runs of spaces between the entries of a large map break
-;; document-get. Every run of whitespace, commas and comments outside a string
-;; literal becomes one space (and leading/trailing runs are dropped) before
-;; reading, which is what an EDN reader ignores anyway.
-
-(defn- byte-or-end [s :string b :i64 from :i64] :i64
-  (let [i (string-find-byte s b from)] (if (< i 0) (string-byte-length s) i)))
-
-(defn- string-close [s :string open :i64] :i64
-  ;; index of the quote closing the string literal opened at `open`
-  (loop [i (+ open 1)]
-    (let [q (byte-or-end s 34 i) b (byte-or-end s 92 i)]
-      (if (< b q) (recur (+ b 2)) q))))
-
-(defn- separator-end [s :string i :i64] :i64
-  ;; end of the run of whitespace, commas and comments starting at i
-  (let [n (string-byte-length s)]
-    (loop [j i]
-      (if (>= j n)
-        n
-        (let [b (string-code-point-at s j)]
-          (cond (or (= b 32) (= b 44) (= b 10) (= b 9) (= b 13)) (recur (+ j 1))
-                (= b 59) (recur (byte-or-end s 10 j))
-                :else j))))))
-
-(defn edn-clean [s :string] :string
-  ;; every separator run outside a string literal becomes one space; leading
-  ;; and trailing runs are dropped
-  (let [n (string-byte-length s)]
-    (loop [i (separator-end s 0) out ""]
-      (if (>= i n)
-        out
-        (let [c (min (min (byte-or-end s 32 i) (byte-or-end s 44 i))
-                     (min (byte-or-end s 10 i) (min (byte-or-end s 9 i) (byte-or-end s 13 i))))
-              q (byte-or-end s 34 i) k (byte-or-end s 59 i)
-              first-stop (min c (min q k))]
-          (cond (>= first-stop n) (string-append-range out s i n)
-                (= first-stop q) (let [e (min (+ (string-close s q) 1) n)]
-                                   (recur e (string-append-range out s i e)))
-                :else (let [e (separator-end s first-stop)
-                            body (string-append-range out s i first-stop)]
-                        (recur e (if (>= e n) body (string-concat body " "))))))))))
+;; Repository files are read with the native reader as they are. Before amu
+;; 3c9eb7f (PR #1744, JUN-650) document-edn-read was the identity, and this file
+;; carried `edn-clean`, which rewrote every run of whitespace, commas and `;`
+;; comments outside a string literal to one space first. document-edn-read now
+;; canonicalizes those delimiters itself, so the workaround was removed (JUN-726).
 
 (defn edn [s :string] :document
-  (document-edn-read (edn-clean s)))
+  (document-edn-read s))
 
 (defn at [d :document i :i64] :document
   (option-value-of [:option :document] (document-vector-at d i) (document-null)))
