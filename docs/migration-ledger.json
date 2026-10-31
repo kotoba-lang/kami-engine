@@ -22,12 +22,12 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1417,
+  "tracked": 1418,
   "class": {
    "a": 244,
    "c": 44,
    "d": 124,
-   "keep": 411,
+   "keep": 412,
    "native": 83,
    "o": 511
   },
@@ -995,10 +995,10 @@
   },
   {
    "unit": "docs",
-   "files": 21,
+   "files": 22,
    "classes": {
     "a": 1,
-    "keep": 20
+    "keep": 21
    },
    "depends-on": [],
    "placement": "kami-engine"
@@ -4279,6 +4279,11 @@
   },
   {
    "path": "docs/evidence/upstream-apis-amu-check-20261101.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
+   "path": "docs/evidence/upstream-apis-amu-check-20261101b.json",
    "unit": "docs",
    "class": "keep"
   },

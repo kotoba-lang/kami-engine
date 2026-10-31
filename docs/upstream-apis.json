@@ -4,20 +4,20 @@
  "inputs": {
   "kami-engine": {
    "repo": "kotoba-lang/kami-engine",
-   "rev": "f0c3bab51917a5f3495d7831ed1f8a1d12feb64c"
+   "rev": "b6ae455f82a1eb1fbc3d37a18fafefa397323c09"
   },
   "kotoba-lib": {
    "repo": "kotoba-lang/kotoba",
-   "rev": "3ad286f520505db7cb82c04f76d73b621bc17700"
+   "rev": "069bc7d3214293bcd6b0ab183da48b96839a4dc6"
   },
   "ledger": {
    "path": "docs/migration-ledger.json",
-   "kotoba-lib-rev": "3ad286f520505db7cb82c04f76d73b621bc17700"
+   "kotoba-lib-rev": "069bc7d3214293bcd6b0ab183da48b96839a4dc6"
   },
   "amu-check": {
-   "evidence": "docs/evidence/upstream-apis-amu-check-20261101.json",
-   "amu-rev": "c2186d762e200205540f4ef9ca2b3ae66c4fc770",
-   "bin-amu-sha256": "91aa38ebe406a3720a9547db7ec294f539f527fcd5342b3933cd1a593d60ea40"
+   "evidence": "docs/evidence/upstream-apis-amu-check-20261101b.json",
+   "amu-rev": "05668c77134ae4a5b79db648bbed1d048ef8c830",
+   "bin-amu-sha256": "13bfdadefa7a3f64faad795b25f00993592d27233bae5235b6182ccf04ba11c3"
   }
  },
  "method": "Var references are found syntactically: the ns form's libspecs give each required namespace its alias and :refer list, and `alias/var` or `full.ns/var` tokens in the rest of the file (comments and string contents removed) are the vars used. A :refer list counts as used as written; `:refer :all` is resolved against the names the library defines. Macros, dynamic `require` calls and host-specific reader branches are not distinguished.",
@@ -2134,7 +2134,7 @@
     "checked": 2,
     "pass": 0,
     "refusals": [
-     "E2124",
+     "E2105",
      "E6002"
     ]
    }
@@ -3557,7 +3557,7 @@
       {
        "lib": "kotoba.fsm",
        "path": "lib/kotoba.fsm/src/kami/fsm.kotoba",
-       "amu-check": "E2124"
+       "amu-check": "E2105"
       }
      ],
      "defined-in-libs": [
