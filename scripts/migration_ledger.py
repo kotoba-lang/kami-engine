@@ -163,6 +163,7 @@ def form_at(src, start):
 
 
 SYM = r"[A-Za-z][\w.\-]*"
+REFER_KEYS = (":refer", ":exclude", ":rename", ":only", ":refer-macros")
 
 
 def ns_info(code):
@@ -173,16 +174,21 @@ def ns_info(code):
     reqs = set()
     for r in re.finditer(r"\(:require\b", form):
         body = form_at(form, r.start())[len("(:require"):-1]
-        depth = 0
+        # opened: the token before each open bracket. A symbol is a required
+        # namespace at the top of :require or as the head of a libspec, but not
+        # inside a :refer/:exclude/:rename/:only list, where single-segment
+        # names (scene, bim, input) would otherwise read as namespaces.
+        opened = []
         tok = re.compile(r"[\[\](){}]|#\?@?|" + SYM + r"|:[\w.\-/]+|\S")
         prev = None
         for t in tok.findall(body):
             if t in "([{":
-                depth += 1
+                opened.append(prev)
             elif t in ")]}":
-                depth -= 1
-            elif re.fullmatch(SYM, t) and "." in t:
-                if depth == 0 or prev in ("[", "("):
+                if opened:
+                    opened.pop()
+            elif re.fullmatch(SYM, t):
+                if not opened or (prev in ("[", "(") and opened[-1] not in REFER_KEYS):
                     reqs.add(t)
             prev = t
     return m.group(1), sorted(reqs)
@@ -261,18 +267,25 @@ def blockers_of(code, reqs):
 
 
 def kotoba_namespaces(kotoba, rev):
-    """namespace -> {lib, kotoba?} from the kotoba monorepo's lib/ at rev."""
+    """namespace -> {lib, kotoba?} from the kotoba monorepo's lib/ at rev.
+
+    A namespace defined by several libraries resolves to the first in path
+    order, and kotoba? says whether that library has a .kotoba for it: a
+    .kotoba in another library (kotoba.io is in both lib/kotoba.io and
+    lib/kotoba.kotobaIo) does not port the one kami depends on."""
     names = subprocess.run(["git", "-C", str(kotoba), "ls-tree", "-r", "--name-only", rev, "lib"],
                            check=True, capture_output=True, text=True).stdout.split("\n")
-    table = {}
+    table, ported = {}, set()
     for p in names:
         m = re.match(r"lib/([^/]+)/src/(.+)\.(cljk|cljc|cljs|clj|kotoba)$", p)
         if not m:
             continue
         ns = m.group(2).replace("/", ".").replace("_", "-")
-        e = table.setdefault(ns, {"lib": m.group(1), "kotoba": False})
+        table.setdefault(ns, {"lib": m.group(1), "kotoba": False})
         if m.group(3) == "kotoba":
-            e["kotoba"] = True
+            ported.add((ns, m.group(1)))
+    for ns, e in table.items():
+        e["kotoba"] = (ns, e["lib"]) in ported
     return table
 
 
