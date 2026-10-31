@@ -1,0 +1,8803 @@
+{
+ "schema": "kami.upstream-apis.v1",
+ "issue": "JUN-643",
+ "inputs": {
+  "kami-engine": {
+   "repo": "kotoba-lang/kami-engine",
+   "rev": "cc6e15ca455c8c6318e22da2dd2028015fe78a86"
+  },
+  "kotoba-lib": {
+   "repo": "kotoba-lang/kotoba",
+   "rev": "0dd4355673e1f5c0fdb07c8718eea8e422a9cb0a"
+  },
+  "ledger": {
+   "path": "docs/migration-ledger.json",
+   "kotoba-lib-rev": "43b9173b6f5866b5eb228a245e7fd451687aa2b9"
+  },
+  "amu-check": {
+   "evidence": "docs/evidence/upstream-apis-amu-check-20261031.json",
+   "amu-rev": "f7c07dff86d7fb5e89219a0f9ad4a83b2a83c82e",
+   "bin-amu-sha256": "e4f63a6cd0f8a1ea802aebfdab225dffea1b33ae53ce49dc6fc7237644207aff"
+  }
+ },
+ "method": "Var references are found syntactically: the ns form's libspecs give each required namespace its alias and :refer list, and `alias/var` or `full.ns/var` tokens in the rest of the file (comments and string contents removed) are the vars used. A :refer list counts as used as written; `:refer :all` is resolved against the names the library defines. Macros, dynamic `require` calls and host-specific reader branches are not distinguished.",
+ "counts": {
+  "libs": 119,
+  "direct": 62,
+  "transitive": 57,
+  "namespaces": 114,
+  "vars": 588
+ },
+ "port-order": [
+  {
+   "level": 0,
+   "libs": [
+    "kotoba.error",
+    "kotoba.kamiOngakuSequencer",
+    "kotoba.pprint",
+    "kotoba.set",
+    "kotoba.spec",
+    "kotoba.test",
+    "kotoba.text",
+    "kotoba.walk"
+   ]
+  },
+  {
+   "level": 1,
+   "libs": [
+    "gov.nist.aes",
+    "kotoba.atmosphere",
+    "kotoba.byoubu",
+    "kotoba.bytes",
+    "kotoba.canvaskit",
+    "kotoba.coll",
+    "kotoba.dance",
+    "kotoba.dxf",
+    "kotoba.expr",
+    "kotoba.html",
+    "kotoba.input",
+    "kotoba.kamiEngineAnimation",
+    "kotoba.kamiEngineCad",
+    "kotoba.kamiEngineSculpt",
+    "kotoba.kamiMangakaText",
+    "kotoba.kamiOngakuNotation",
+    "kotoba.level",
+    "kotoba.nagare",
+    "kotoba.num",
+    "kotoba.pipelines",
+    "kotoba.skeleton",
+    "kotoba.sprite2d",
+    "kotoba.xml",
+    "org.ietf.asn1",
+    "org.ietf.x25519",
+    "org.ietf.x448",
+    "org.khronos.glb",
+    "org.openusd.usd",
+    "org.w3.webgpu"
+   ]
+  },
+  {
+   "level": 2,
+   "libs": [
+    "kotoba.character",
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.kamiOngakuProject",
+    "kotoba.kotobaHir",
+    "kotoba.netsync",
+    "org.ietf.deflate",
+    "org.khronos.gltf",
+    "org.materialx.core",
+    "org.vrmC.vrm"
+   ]
+  },
+  {
+   "level": 3,
+   "libs": [
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.designQuality",
+    "kotoba.domGpu",
+    "kotoba.game",
+    "kotoba.htmldom",
+    "kotoba.json",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiMangakaPage",
+    "kotoba.kisekae",
+    "kotoba.machine",
+    "kotoba.physics",
+    "kotoba.process",
+    "kotoba.scene",
+    "kotoba.wgsl",
+    "org.ietf.cbor",
+    "org.iso.pdf",
+    "org.iso.std10303",
+    "org.iso.std6983",
+    "org.w3.png",
+    "org.w3.svg"
+   ]
+  },
+  {
+   "level": 4,
+   "libs": [
+    "gov.nist.sha2",
+    "kotoba.byoubuUi",
+    "kotoba.cartpoleMath",
+    "kotoba.image",
+    "kotoba.ioMultiformats",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiMangakaRender",
+    "kotoba.kamiVehicle",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.langchain",
+    "kotoba.osaho",
+    "kotoba.physics2d",
+    "kotoba.playwright",
+    "kotoba.postfx",
+    "kotoba.renderShaders",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.sky",
+    "kotoba.spriteGpu",
+    "kotoba.terrain",
+    "kotoba.traversal",
+    "kotoba.vegetation",
+    "org.ietf.ed25519"
+   ]
+  },
+  {
+   "level": 5,
+   "libs": [
+    "gov.nist.ecc",
+    "kotoba.fsm",
+    "kotoba.gpu",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.langgraph",
+    "kotoba.scene2d",
+    "kotoba.shitsuke",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.x509",
+    "org.w3.webcodecs"
+   ]
+  },
+  {
+   "level": 6,
+   "libs": [
+    "kotoba.i18n",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.liquidGlassUi",
+    "kotoba.qaGovernor",
+    "kotoba.route",
+    "kotoba.webgl",
+    "org.ietf.hpke"
+   ]
+  },
+  {
+   "level": 7,
+   "libs": [
+    "kotoba.douga",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaUi",
+    "kotoba.webgpu",
+    "org.ietf.tls"
+   ]
+  },
+  {
+   "level": 8,
+   "libs": [
+    "kotoba.appkit",
+    "kotoba.http"
+   ]
+  },
+  {
+   "level": 9,
+   "libs": [
+    "kotoba.kotobaIssue",
+    "org.iso.std16739"
+   ]
+  },
+  {
+   "level": 10,
+   "libs": [
+    "kotoba.bim"
+   ]
+  }
+ ],
+ "cycles": [
+  [
+   "kotoba.spec",
+   "kotoba.test",
+   "kotoba.text"
+  ],
+  [
+   "gov.nist.sha2",
+   "kotoba.ioMultiformats",
+   "kotoba.kotobaCoreContracts",
+   "kotoba.osaho",
+   "kotoba.security",
+   "org.ietf.ed25519"
+  ],
+  [
+   "kotoba.cssom",
+   "kotoba.domGpu",
+   "kotoba.htmldom"
+  ]
+ ],
+ "libs": [
+  {
+   "lib": "gov.nist.aes",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.http",
+    "kotoba.kotobaIssue",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "AWAI-61",
+     "file": "lib/gov.nist.aes/README.md",
+     "line": 128,
+     "text": "## Native port and gate (JUN-352, AWAI-61)"
+    },
+    {
+     "key": "JUN-352",
+     "file": "lib/gov.nist.aes/README.md",
+     "line": 128,
+     "text": "## Native port and gate (JUN-352, AWAI-61)"
+    },
+    {
+     "key": "AWAI-61",
+     "file": "lib/gov.nist.aes/kotoba/aes/core.kotoba",
+     "line": 1,
+     "text": ";; aes.core -- the AES block cipher (FIPS 197) in native .kotoba (JUN-352, AWAI-61)."
+    },
+    {
+     "key": "JUN-352",
+     "file": "lib/gov.nist.aes/kotoba/aes/core.kotoba",
+     "line": 1,
+     "text": ";; aes.core -- the AES block cipher (FIPS 197) in native .kotoba (JUN-352, AWAI-61)."
+    },
+    {
+     "key": "AWAI-61",
+     "file": "lib/gov.nist.aes/kotoba/aes/gcm.kotoba",
+     "line": 1,
+     "text": ";; aes.gcm -- AES-GCM (NIST SP 800-38D) in native .kotoba (JUN-352, AWAI-61)."
+    },
+    {
+     "key": "JUN-352",
+     "file": "lib/gov.nist.aes/kotoba/aes/gcm.kotoba",
+     "line": 1,
+     "text": ";; aes.gcm -- AES-GCM (NIST SP 800-38D) in native .kotoba (JUN-352, AWAI-61)."
+    },
+    {
+     "key": "JUN-352",
+     "file": "lib/gov.nist.aes/kotoba/aes/native_gate.kotoba",
+     "line": 1,
+     "text": ";; aes.native-gate -- AES (FIPS 197) and AES-GCM (SP 800-38D) known answers (JUN-352,"
+    },
+    {
+     "key": "AWAI-61",
+     "file": "lib/gov.nist.aes/kotoba/aes/native_gate.kotoba",
+     "line": 2,
+     "text": ";; AWAI-61). Generated by tools/gen_gate.py from Project Wycheproof (test/aes/"
+    },
+    {
+     "key": "AWAI-61",
+     "file": "lib/gov.nist.aes/local-changes.json",
+     "line": 17,
+     "text": "\"reason\": \"JUN-352 / AWAI-61: AES and AES-GCM (all key sizes) in native .kotoba with a known-answer gate of 61 Wycheproof cases and FIPS 197 Appendix C, an inde"
+    },
+    {
+     "key": "JUN-352",
+     "file": "lib/gov.nist.aes/local-changes.json",
+     "line": 17,
+     "text": "\"reason\": \"JUN-352 / AWAI-61: AES and AES-GCM (all key sizes) in native .kotoba with a known-answer gate of 61 Wycheproof cases and FIPS 197 Appendix C, an inde"
+    }
+   ]
+  },
+  {
+   "lib": "gov.nist.ecc",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.http",
+    "kotoba.kotobaIssue",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 6,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "gov.nist.sha2",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "gov.nist.sha2",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.osaho",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.io",
+    "kotoba.osaho",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "JUN-287",
+     "file": "lib/gov.nist.sha2/docs/evidence/sha2-core-native-gate-20261023.edn",
+     "line": 3,
+     "text": ":linear \"JUN-287\""
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.appkit",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "require-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "appkit.core",
+     "vars": [
+      "panel"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.appkit/src/appkit/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.kotobaUi",
+    "kotoba.process",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 8,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "deps-outside-lib": [
+    "../kotoba-ui"
+   ]
+  },
+  {
+   "lib": "kotoba.atmosphere",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "require-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-atmosphere-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 4,
+   "namespaces": [
+    {
+     "ns": "atmosphere",
+     "vars": [
+      "day-night-to-uniform",
+      "default-weather",
+      "weather-clear",
+      "weather-overcast"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka",
+      "packages/kami-atmosphere-scene"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.atmosphere/src/atmosphere.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-atmosphere-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.bim",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "require-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 18,
+    "kotoba": 0
+   },
+   "vars-used": 138,
+   "namespaces": [
+    {
+     "ns": "bim",
+     "vars": [
+      "add-element",
+      "add-opening-to-slab",
+      "add-opening-to-wall",
+      "add-space",
+      "add-storey",
+      "align-element",
+      "axis-sweep-geometry",
+      "brep-geometry",
+      "building",
+      "curtain-wall",
+      "delete-element",
+      "delete-space",
+      "detect-clashes",
+      "door",
+      "duplicate-element",
+      "element",
+      "element-mesh",
+      "enclosed-wall-boundaries",
+      "find-building",
+      "find-storey",
+      "gable-roof",
+      "join-walls",
+      "linear-array",
+      "material-layer",
+      "merge-meshes",
+      "mesh-ref-geometry",
+      "mirror-element",
+      "no-geometry",
+      "offset-wall",
+      "path-railing",
+      "project",
+      "radial-array",
+      "rectangle-profile",
+      "rectangular-opening",
+      "rehost-wall-element",
+      "remove-opening-from-wall",
+      "room-space",
+      "rotate-element-z",
+      "set-slab-layers",
+      "set-slab-vertex-elevations",
+      "set-wall-layers",
+      "site",
+      "slab",
+      "slab-opening",
+      "storey",
+      "straight-stair",
+      "translate-element",
+      "trim-extend-walls",
+      "update-element",
+      "update-space",
+      "wall",
+      "window"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka",
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 13,
+     "cljk": "lib/kotoba.bim/src/bim.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "bim.cloud",
+     "vars": [
+      "checksum",
+      "get-opencde-document",
+      "list-opencde-topics",
+      "opencde-store",
+      "publish-bcf-topics",
+      "publish-model-version",
+      "register-opencde-project"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.bim/src/bim/cloud.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "bim.drawing",
+     "vars": [
+      "documented-floor-plan",
+      "documented-floor-plan-svg",
+      "drawing-sheet-svg",
+      "orthographic-view",
+      "orthographic-view-svg",
+      "schedule-table",
+      "sheet-sizes-mm"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.bim/src/bim/drawing.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "bim.editor",
+     "vars": [
+      "model-snap-candidates",
+      "snap-translation"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.bim/src/bim/editor.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "bim.integration",
+     "vars": [
+      "add-view-annotation",
+      "analyze-2d-truss",
+      "analyze-3d-frame-combination",
+      "analyze-closed-authored-mep-system",
+      "analyze-mep-system",
+      "analyze-structural-combination",
+      "annotation-family-definition",
+      "change-event",
+      "cloud-itonami-payload",
+      "cloud-itonami-sync-payload",
+      "collaboration-workspace",
+      "commit-design-revision",
+      "connect-mep-elements",
+      "drawing-sheet",
+      "drawing-view",
+      "export-ifc",
+      "family-catalog",
+      "family-definition",
+      "federated-design",
+      "generate-drawing-set",
+      "generate-structural-model",
+      "grade-mep-route",
+      "import-ifc-spf",
+      "instantiate-family",
+      "instantiate-family-type",
+      "layout-sheet-viewports",
+      "mep-connector",
+      "mep-equipment",
+      "mep-system",
+      "merge-events",
+      "print-setting",
+      "reassociate-view-annotations",
+      "rectangular-duct-pressure-loss",
+      "remove-view-annotation",
+      "route-mep",
+      "size-and-balance-mep-network",
+      "size-rectangular-duct",
+      "structural-analysis-member",
+      "structural-area-load-case",
+      "structural-load-case",
+      "structural-load-combination",
+      "structural-member",
+      "structural-model",
+      "structural-node",
+      "structural-result-overlay",
+      "structural-seismic-load-case",
+      "structural-wind-load-case",
+      "tag-elements-with-family",
+      "title-block",
+      "update-view-annotation",
+      "validate-mep-system",
+      "validate-structural-model",
+      "view-range"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.bim/src/bim/integration.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "bim.interchange",
+     "vars": [
+      "drawing-set-pdf",
+      "floor-plan-dxf"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.bim/src/bim/interchange.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "bim.mep",
+     "vars": [
+      "analyze-electrical-distribution",
+      "analyze-electrical-feeder",
+      "analyze-panel",
+      "electrical-circuit",
+      "network-assembly",
+      "rectangular-route-assembly",
+      "route-assembly",
+      "select-circuit-conductor",
+      "select-protective-device"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.bim/src/bim/mep.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "bim.spatial",
+     "vars": [
+      "build-index",
+      "element-bounds",
+      "query-report",
+      "stream-delta",
+      "stream-plan",
+      "stream-session"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.bim/src/bim/spatial.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.dxf",
+    "kotoba.edn",
+    "kotoba.kotobaIssue",
+    "kotoba.test",
+    "kotoba.text",
+    "org.iso.pdf",
+    "org.iso.std10303",
+    "org.iso.std16739",
+    "org.w3.svg"
+   ],
+   "port-level": 10,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.byoubu",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.appkit",
+    "kotoba.byoubuUi",
+    "kotoba.kotobaUi"
+   ],
+   "src": {
+    "cljk": 7,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "deps-outside-lib": [
+    "../atmosphere",
+    "../postfx",
+    "../sky",
+    "../terrain"
+   ]
+  },
+  {
+   "lib": "kotoba.byoubuUi",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.appkit",
+    "kotoba.kotobaUi"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.byoubu",
+    "kotoba.css",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "deps-outside-lib": [
+    "../byoubu",
+    "../css"
+   ]
+  },
+  {
+   "lib": "kotoba.bytes",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-isekai",
+    "packages/kami-app-sip",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-guest",
+    "packages/kami-scene-contracts"
+   ],
+   "require-units": [
+    "packages/kami-app-isekai",
+    "packages/kami-app-sip",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-guest",
+    "packages/kami-scene-contracts"
+   ],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.byoubuUi",
+    "kotoba.cartpoleMath",
+    "kotoba.character",
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.designQuality",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.edn",
+    "kotoba.fsm",
+    "kotoba.game",
+    "kotoba.gpu",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.image",
+    "kotoba.io",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.json",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiMangakaPage",
+    "kotoba.kamiMangakaRender",
+    "kotoba.kamiVehicle",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.liquidGlassUi",
+    "kotoba.machine",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.playwright",
+    "kotoba.postfx",
+    "kotoba.process",
+    "kotoba.qaGovernor",
+    "kotoba.renderShaders",
+    "kotoba.route",
+    "kotoba.scene",
+    "kotoba.scene2d",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.shitsuke",
+    "kotoba.sky",
+    "kotoba.spriteGpu",
+    "kotoba.terrain",
+    "kotoba.traversal",
+    "kotoba.vegetation",
+    "kotoba.webgl",
+    "kotoba.webgpu",
+    "kotoba.wgsl",
+    "org.ietf.cbor",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.deflate",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.pdf",
+    "org.iso.std10303",
+    "org.iso.std16739",
+    "org.iso.std6983",
+    "org.w3.png",
+    "org.w3.svg",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 4,
+   "namespaces": [
+    {
+     "ns": "kotoba.bytes",
+     "vars": [
+      "base64-decode-bytes",
+      "base64-encode",
+      "utf8-bytes",
+      "utf8-string"
+     ],
+     "units": [
+      "packages/kami-app-isekai",
+      "packages/kami-app-sip",
+      "packages/kami-contracts",
+      "packages/kami-creative-studio",
+      "packages/kami-engine-guest",
+      "packages/kami-scene-contracts"
+     ],
+     "files": 8,
+     "cljk": "lib/kotoba.bytes/src/kotoba/bytes.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "(root)",
+    "kami-clj-play",
+    "kami-gameplay",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-atmosphere-scene",
+    "packages/kami-autodrive-scene",
+    "packages/kami-cam-scene",
+    "packages/kami-character-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-guest",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-input-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-postfx-scene",
+    "packages/kami-scene-contracts",
+    "packages/kami-skeleton-scene",
+    "packages/kami-solar-helix-scene",
+    "packages/kami-studio",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1,
+    2
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.canvaskit",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-engine-app-sdk"
+   ],
+   "require-units": [
+    "packages/kami-engine-app-sdk"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 4,
+    "kotoba": 0
+   },
+   "vars-used": 2,
+   "namespaces": [
+    {
+     "ns": "canvaskit.scroll-view",
+     "vars": [
+      "convert-point-to-view",
+      "scroll-view"
+     ],
+     "units": [
+      "packages/kami-engine-app-sdk"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.canvaskit/src/canvaskit/scroll_view.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-engine-app-sdk"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.cartpoleMath",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 1
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.io",
+    "kotoba.process",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E2105"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.character",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-character-creator"
+   ],
+   "require-units": [
+    "packages/kami-app-character-creator",
+    "packages/kami-character-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 18,
+    "kotoba": 0
+   },
+   "vars-used": 13,
+   "namespaces": [
+    {
+     "ns": "character",
+     "vars": [
+      "generate-character"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.character/src/character.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "character.anim-blueprint",
+     "vars": [
+      "metahuman-default",
+      "set-param",
+      "update"
+     ],
+     "units": [
+      "packages/kami-character-scene"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.character/src/character/anim_blueprint.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "character.blendshape",
+     "vars": [
+      "arkit-names"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 3,
+     "cljk": "lib/kotoba.character/src/character/blendshape.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "character.body",
+     "vars": [
+      "bone-world-positions",
+      "generate-humanoid-skeleton"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 5,
+     "cljk": "lib/kotoba.character/src/character/body.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "character.control-rig",
+     "vars": [
+      "evaluate",
+      "metahuman-face-rig",
+      "set-control"
+     ],
+     "units": [
+      "packages/kami-character-scene"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.character/src/character/control_rig.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "character.material",
+     "vars": [
+      "for-part"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.character/src/character/material.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "character.params",
+     "vars": [
+      "default-character-def",
+      "hair-presets"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.character/src/character/params.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.spec",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "packages/kami-app-character-creator",
+    "packages/kami-character-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.coll",
+   "transitive": false,
+   "manifest-units": [
+    "(root)",
+    "packages/kami-app-suji",
+    "packages/kami-contracts",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk"
+   ],
+   "require-units": [
+    "packages/kami-app-suji",
+    "packages/kami-contracts",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk"
+   ],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.byoubuUi",
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.game",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiVehicle",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaHir",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.liquidGlassUi",
+    "kotoba.netsync",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.playwright",
+    "kotoba.qaGovernor",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 33,
+    "kotoba": 1
+   },
+   "vars-used": 4,
+   "namespaces": [
+    {
+     "ns": "kotoba.lang.coll",
+     "vars": [
+      "difference",
+      "intersection",
+      "subset?",
+      "union"
+     ],
+     "units": [
+      "packages/kami-app-suji",
+      "packages/kami-contracts",
+      "packages/kami-engine-input-map",
+      "packages/kami-engine-sdk"
+     ],
+     "files": 10,
+     "cljk": "lib/kotoba.coll/src/kotoba/lang/coll.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.error",
+    "kotoba.set",
+    "kotoba.test",
+    "kotoba.walk"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "(root)",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-studio",
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E2104"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.css",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-studio"
+   ],
+   "require-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-studio"
+   ],
+   "required-by-libs": [
+    "kotoba.appkit",
+    "kotoba.byoubuUi",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.route"
+   ],
+   "src": {
+    "cljk": 5,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "css.core",
+     "vars": [
+      "css"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka",
+      "packages/kami-app-animator",
+      "packages/kami-app-bim-editor",
+      "packages/kami-app-cad",
+      "packages/kami-app-modeler",
+      "packages/kami-app-sculpt",
+      "packages/kami-studio"
+     ],
+     "files": 7,
+     "cljk": "lib/kotoba.css/src/css/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.error",
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.cssom",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.domGpu",
+    "kotoba.htmldom"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.domGpu",
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.dance",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.designQuality",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.appkit",
+    "kotoba.kotobaUi"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.domGpu",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "required-by-libs": [
+    "kotoba.cssom",
+    "kotoba.htmldom"
+   ],
+   "src": {
+    "cljk": 17,
+    "kotoba": 2
+   },
+   "vars-used": 2,
+   "namespaces": [
+    {
+     "ns": "reagent.core",
+     "vars": [
+      "after-render",
+      "atom"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka",
+      "packages/kami-app-suji",
+      "packages/kami-creative-studio"
+     ],
+     "files": 3,
+     "cljk": "lib/kotoba.domGpu/src/reagent/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": [
+      "after-render"
+     ]
+    }
+   ],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.cssom",
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.htmldom",
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "JUN-93",
+     "file": "lib/kotoba.domGpu/AGENTS.md",
+     "line": 1,
+     "text": "# Native DOM component (JUN-93)"
+    },
+    {
+     "key": "JUN-290",
+     "file": "lib/kotoba.domGpu/AGENTS.md",
+     "line": 4,
+     "text": "under JUN-290. Do not restore JVM/nbb or a hosted/C-loader fallback."
+    }
+   ],
+   "amu-check": {
+    "files": 2,
+    "checked": 2,
+    "pass": 0,
+    "refusals": [
+     "E2104",
+     "E6002"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.douga",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-creative-studio"
+   ],
+   "require-units": [
+    "packages/kami-creative-studio"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 6,
+   "namespaces": [
+    {
+     "ns": "douga.ffmpeg",
+     "vars": [
+      "bgm-mix-cmd",
+      "concat-list-text",
+      "concat-segments-cmd",
+      "scene-segment-cmd",
+      "silent-audio-cmd",
+      "video-segment-cmd"
+     ],
+     "units": [
+      "packages/kami-creative-studio"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.douga/src/douga/ffmpeg.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 7,
+   "blocks-units": [
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.douga/local-changes.json",
+     "line": 7,
+     "text": "\"reason\": \"Moved from kotoba-lang/kami-engine packages/ (JUN-649). The kotoba git floors and pins, and the kami packages that are bundled in this monorepo, beco"
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.dxf",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.edn",
+   "transitive": false,
+   "manifest-units": [
+    "(root)",
+    "kami-gameplay",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-isekai",
+    "packages/kami-app-sip",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-sdk"
+   ],
+   "require-units": [
+    "kami-gameplay",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-isekai",
+    "packages/kami-app-sip",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-sdk"
+   ],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.cssom",
+    "kotoba.designQuality",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.game",
+    "kotoba.gpu",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.image",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.json",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiMangakaPage",
+    "kotoba.kamiMangakaRender",
+    "kotoba.kamiVehicle",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.liquidGlassUi",
+    "kotoba.machine",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.playwright",
+    "kotoba.qaGovernor",
+    "kotoba.renderShaders",
+    "kotoba.route",
+    "kotoba.scene",
+    "kotoba.scene2d",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.shitsuke",
+    "kotoba.sky",
+    "kotoba.spriteGpu",
+    "kotoba.traversal",
+    "kotoba.vegetation",
+    "kotoba.webgl",
+    "kotoba.webgpu",
+    "kotoba.wgsl",
+    "org.ietf.cbor",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std10303",
+    "org.iso.std16739",
+    "org.iso.std6983",
+    "org.w3.png",
+    "org.w3.svg",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 41,
+    "kotoba": 2
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "kotoba.lang.edn",
+     "vars": [
+      "read-string"
+     ],
+     "units": [
+      "kami-gameplay",
+      "packages/kami-app-amenominaka",
+      "packages/kami-app-bim-editor",
+      "packages/kami-app-character-creator",
+      "packages/kami-app-fixtures",
+      "packages/kami-app-isekai",
+      "packages/kami-app-sip",
+      "packages/kami-contracts",
+      "packages/kami-creative-studio",
+      "packages/kami-engine-sdk"
+     ],
+     "files": 24,
+     "cljk": "lib/kotoba.edn/src/kotoba/lang/edn.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "(root)",
+    "kami-gameplay",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-atmosphere-scene",
+    "packages/kami-autodrive-scene",
+    "packages/kami-cam-scene",
+    "packages/kami-character-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-input-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-postfx-scene",
+    "packages/kami-skeleton-scene",
+    "packages/kami-solar-helix-scene",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1,
+    2
+   ],
+   "tracking": [
+    {
+     "key": "JUN-203",
+     "file": "lib/kotoba.edn/local-changes.json",
+     "line": 232,
+     "text": "\"reason\": \"JUN-203: reviewed native branch integration, current compiler/API compatibility and regression coverage; preserve the imported default snapshot in th"
+    }
+   ],
+   "amu-check": {
+    "files": 2,
+    "checked": 2,
+    "pass": 0,
+    "refusals": [
+     "E2104",
+     "E6002"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.error",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.byoubuUi",
+    "kotoba.coll",
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.game",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiVehicle",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaHir",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.liquidGlassUi",
+    "kotoba.netsync",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.playwright",
+    "kotoba.postfx",
+    "kotoba.qaGovernor",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.openusd.usd",
+    "org.w3.svg",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [],
+   "port-level": 0,
+   "blocks-units": [
+    "(root)",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-postfx-scene",
+    "packages/kami-studio",
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.expr",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt"
+   ],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.renderShaders",
+    "kotoba.scene2d",
+    "kotoba.shaders",
+    "kotoba.sky",
+    "kotoba.spriteGpu",
+    "kotoba.webgl",
+    "kotoba.webgpu",
+    "kotoba.wgsl"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-isekai-assets"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.fsm",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 2
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.io",
+    "kotoba.osaho",
+    "kotoba.pprint",
+    "kotoba.test"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [],
+   "amu-check": {
+    "files": 2,
+    "checked": 2,
+    "pass": 0,
+    "refusals": [
+     "E2124",
+     "E6002"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.game",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-game-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 40,
+    "kotoba": 0
+   },
+   "vars-used": 41,
+   "namespaces": [
+    {
+     "ns": "game.animation",
+     "vars": [
+      "bobbing",
+      "emote-celebrate",
+      "emote-dance",
+      "emote-rage",
+      "emote-sad",
+      "emote-taunt",
+      "emote-wave",
+      "glitch",
+      "grimace-wobble",
+      "head-bob",
+      "item-pickup",
+      "new-state",
+      "nintendo-bounce",
+      "ohio-glitch",
+      "pop-in",
+      "pop-spawn",
+      "pulse-glow",
+      "sigma-idle",
+      "skibidi-idle",
+      "spinning",
+      "squash-stretch",
+      "with-clip",
+      "wobble"
+     ],
+     "units": [
+      "packages/kami-game-scene"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.game/src/game/animation.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "game.battle-royale",
+     "vars": [
+      "consumable-pool",
+      "default-storm-phases",
+      "weapon-pool"
+     ],
+     "units": [
+      "packages/kami-game-scene"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.game/src/game/battle_royale.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "game.island-gen",
+     "vars": [
+      "brainrot-characters",
+      "brainrot-evolution",
+      "brainrot-evolution-chains",
+      "character-appearance",
+      "character-def",
+      "evo-stage",
+      "game-def",
+      "genres",
+      "godot-game-catalog"
+     ],
+     "units": [
+      "packages/kami-game-scene"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.game/src/game/island_gen.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "game.pokoa",
+     "vars": [
+      "pokoa-dex",
+      "pokoa-items"
+     ],
+     "units": [
+      "packages/kami-game-scene"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.game/src/game/pokoa.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "game.sabiotoshi",
+     "vars": [
+      "default-item-catalog",
+      "disassembly-step",
+      "rust-zone",
+      "v3"
+     ],
+     "units": [
+      "packages/kami-game-scene"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.game/src/game/sabiotoshi.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-game-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.gpu",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgl",
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.machine",
+    "kotoba.test",
+    "kotoba.traversal"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.html",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-studio"
+   ],
+   "require-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-studio"
+   ],
+   "required-by-libs": [
+    "kotoba.appkit",
+    "kotoba.i18n",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.route",
+    "kotoba.shitsuke"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "html.core",
+     "vars": [
+      "html5"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka",
+      "packages/kami-app-animator",
+      "packages/kami-app-bim-editor",
+      "packages/kami-app-cad",
+      "packages/kami-app-modeler",
+      "packages/kami-app-sculpt",
+      "packages/kami-studio"
+     ],
+     "files": 7,
+     "cljk": "lib/kotoba.html/src/html/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.htmldom",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.cssom",
+    "kotoba.domGpu"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.cssom",
+    "kotoba.domGpu",
+    "kotoba.edn",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.http",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.kotobaIssue",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 19,
+    "kotoba": 1
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.error",
+    "kotoba.json",
+    "kotoba.test",
+    "kotoba.text",
+    "org.ietf.tls"
+   ],
+   "port-level": 8,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "JUN-267",
+     "file": "lib/kotoba.http/docs/family-monorepo.md",
+     "line": 24,
+     "text": "[JUN-267](https://linear.app/kotobalabs/issue/JUN-267)."
+    }
+   ],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E2104"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.i18n",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.kamiEngineCaeSolver"
+   ],
+   "src": {
+    "cljk": 7,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.shitsuke",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 6,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-hygaccess-plant"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [],
+   "deps-outside-lib": [
+    "../shitsuke"
+   ]
+  },
+  {
+   "lib": "kotoba.image",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-isekai"
+   ],
+   "require-units": [
+    "packages/kami-app-isekai"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 4,
+   "namespaces": [
+    {
+     "ns": "kotoba.image",
+     "vars": [
+      "get-rgb",
+      "height",
+      "read-image",
+      "width"
+     ],
+     "units": [
+      "packages/kami-app-isekai"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.image/src/kotoba/image.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.io",
+    "kotoba.test",
+    "org.ietf.deflate",
+    "org.w3.png"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-isekai"
+   ],
+   "blocks-waves": [
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.input",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-input-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 5,
+   "namespaces": [
+    {
+     "ns": "input",
+     "vars": [
+      "actions",
+      "default-fps-map",
+      "default-graph-map",
+      "input-map",
+      "resolve-action"
+     ],
+     "units": [
+      "packages/kami-input-scene"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.input/src/input.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-input-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.io",
+   "transitive": false,
+   "manifest-units": [
+    "kami-clj-play",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-sdk",
+    "packages/kami-scene-contracts",
+    "packages/kami-studio"
+   ],
+   "require-units": [
+    "packages/kami-app-fixtures",
+    "packages/kami-app-isekai",
+    "packages/kami-app-sip",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-sdk",
+    "packages/kami-scene-contracts",
+    "packages/kami-studio"
+   ],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.byoubuUi",
+    "kotoba.cartpoleMath",
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.gpu",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.image",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiMangakaPage",
+    "kotoba.kamiMangakaRender",
+    "kotoba.kamiVehicle",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.liquidGlassUi",
+    "kotoba.machine",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.postfx",
+    "kotoba.process",
+    "kotoba.qaGovernor",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.terrain",
+    "kotoba.traversal",
+    "kotoba.vegetation",
+    "kotoba.webgl",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.pdf",
+    "org.iso.std10303",
+    "org.iso.std16739",
+    "org.iso.std6983",
+    "org.w3.png",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 14,
+    "kotoba": 0
+   },
+   "vars-used": 14,
+   "namespaces": [
+    {
+     "ns": "kotoba.io",
+     "vars": [
+      "absolute-path",
+      "delete-file",
+      "directory?",
+      "exists?",
+      "file",
+      "file?",
+      "input-stream",
+      "length",
+      "list-names",
+      "make-parents",
+      "output-stream",
+      "path",
+      "resource",
+      "temp-dir"
+     ],
+     "units": [
+      "packages/kami-app-fixtures",
+      "packages/kami-app-isekai",
+      "packages/kami-app-sip",
+      "packages/kami-contracts",
+      "packages/kami-creative-studio",
+      "packages/kami-engine-sdk",
+      "packages/kami-scene-contracts",
+      "packages/kami-studio"
+     ],
+     "files": 22,
+     "cljk": "lib/kotoba.io/src/kotoba/io.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": [],
+     "kotoba-in-other-libs": [
+      {
+       "lib": "kotoba.kotobaIo",
+       "path": "lib/kotoba.kotobaIo/src/kotoba/io.kotoba",
+       "amu-check": "pass"
+      }
+     ],
+     "defined-in-libs": [
+      "kotoba.io",
+      "kotoba.kotobaIo"
+     ]
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.test"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "kami-clj-play",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-cam-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-sdk",
+    "packages/kami-postfx-scene",
+    "packages/kami-scene-contracts",
+    "packages/kami-studio",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1,
+    2
+   ],
+   "tracking": [
+    {
+     "key": "JUN-203",
+     "file": "lib/kotoba.io/local-changes.json",
+     "line": 95,
+     "text": "\"reason\": \"JUN-203: reviewed native branch integration, current compiler/API compatibility and regression coverage; preserve the imported default snapshot in th"
+    },
+    {
+     "key": "JUN-232",
+     "file": "lib/kotoba.io/local-changes.json",
+     "line": 120,
+     "text": "\"reason\": \"JUN-203: reviewed native branch integration, current compiler/API compatibility and regression coverage; preserve the imported default snapshot in th"
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.ioMultiformats",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.osaho",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 3
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "gov.nist.sha2",
+    "kotoba.bytes",
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [],
+   "amu-check": {
+    "files": 3,
+    "checked": 3,
+    "pass": 2,
+    "refusals": [
+     "E6002"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.jpGoDigitalDesignSystem",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-suji"
+   ],
+   "require-units": [
+    "packages/kami-app-suji"
+   ],
+   "required-by-libs": [
+    "kotoba.route"
+   ],
+   "src": {
+    "cljk": 9,
+    "kotoba": 0
+   },
+   "vars-used": 10,
+   "namespaces": [
+    {
+     "ns": "jp-go-dds.core",
+     "vars": [
+      "button",
+      "card",
+      "container",
+      "heading",
+      "section",
+      "table"
+     ],
+     "units": [
+      "packages/kami-app-suji"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.jpGoDigitalDesignSystem/src/jp_go_dds/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "jp-go-dds.dark",
+     "vars": [
+      "resolve-dark"
+     ],
+     "units": [
+      "packages/kami-app-suji"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.jpGoDigitalDesignSystem/src/jp_go_dds/dark.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "jp-go-dds.page",
+     "vars": [
+      "->page"
+     ],
+     "units": [
+      "packages/kami-app-suji"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.jpGoDigitalDesignSystem/src/jp_go_dds/page.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "jp-go-dds.tokens",
+     "vars": [
+      "a11y-css",
+      "bridge-css"
+     ],
+     "units": [
+      "packages/kami-app-suji"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.jpGoDigitalDesignSystem/src/jp_go_dds/tokens.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.css",
+    "kotoba.html",
+    "kotoba.osaho",
+    "kotoba.text"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.json",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-sip",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-sdk"
+   ],
+   "require-units": [
+    "packages/kami-app-sip",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-sdk"
+   ],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.http",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiMangakaRender",
+    "kotoba.kotobaIssue",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.playwright",
+    "kotoba.qaGovernor",
+    "kotoba.vegetation",
+    "kotoba.webgpu",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 27,
+    "kotoba": 1
+   },
+   "vars-used": 3,
+   "namespaces": [
+    {
+     "ns": "json.data-json",
+     "vars": [
+      "read-str",
+      "write-str"
+     ],
+     "units": [
+      "packages/kami-app-sip"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.json/src/json/data_json.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kotoba.json",
+     "vars": [
+      "write-str"
+     ],
+     "units": [
+      "packages/kami-creative-studio",
+      "packages/kami-engine-sdk"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.json/src/kotoba/json.cljk",
+     "kotoba": "lib/kotoba.json/src/kotoba/json.kotoba",
+     "vars-not-defined-in-cljk": [],
+     "kotoba-missing-vars": [
+      "write-str"
+     ],
+     "kotoba-export-list": true,
+     "amu-check": "E6002"
+    }
+   ],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-sdk",
+    "packages/kami-isekai-assets",
+    "packages/kami-vegetation-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1,
+    2
+   ],
+   "tracking": [
+    {
+     "key": "JUN-203",
+     "file": "lib/kotoba.json/local-changes.json",
+     "line": 4,
+     "text": "\"reason\": \"JUN-203 native canonical facade; forward the qualified native library implementation while leaving the existing host alias unchanged.\","
+    }
+   ],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E6002"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.kamiEizoTimeline",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-creative-studio"
+   ],
+   "require-units": [
+    "packages/kami-creative-studio"
+   ],
+   "required-by-libs": [
+    "kotoba.douga"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 3,
+   "namespaces": [
+    {
+     "ns": "kami.eizo.timeline",
+     "vars": [
+      "timeline-duration",
+      "validate-timeline"
+     ],
+     "units": [
+      "packages/kami-creative-studio"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kamiEizoTimeline/src/kami/eizo/timeline.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kami.eizo.timeline.timecode",
+     "vars": [
+      "format-timecode"
+     ],
+     "units": [
+      "packages/kami-creative-studio"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kamiEizoTimeline/src/kami/eizo/timeline/timecode.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test",
+    "org.w3.webcodecs"
+   ],
+   "port-level": 6,
+   "blocks-units": [
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.kamiEizoTimeline/local-changes.json",
+     "line": 7,
+     "text": "\"reason\": \"Moved from kotoba-lang/kami-engine packages/ (JUN-649). The kotoba git floors and pins, and the kami packages that are bundled in this monorepo, beco"
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.kamiEngineAnimation",
+   "transitive": false,
+   "manifest-units": [
+    "(root)",
+    "kami-gameplay",
+    "packages/kami-app-animator"
+   ],
+   "require-units": [
+    "kami-gameplay",
+    "packages/kami-app-animator"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 17,
+   "namespaces": [
+    {
+     "ns": "kami.animation",
+     "vars": [
+      "add-keyframe",
+      "apply-pose-constraints",
+      "auto-tangents",
+      "bone-skinning-matrices",
+      "bone-track-target",
+      "bone-world-matrices",
+      "delete-keyframe",
+      "evaluate",
+      "evaluate-skeleton-pose",
+      "keyframe",
+      "move-keyframe",
+      "pose-constraint",
+      "sample",
+      "solve-two-bone-ik",
+      "timeline",
+      "track",
+      "update-keyframe"
+     ],
+     "units": [
+      "kami-gameplay",
+      "packages/kami-app-animator"
+     ],
+     "files": 3,
+     "cljk": "lib/kotoba.kamiEngineAnimation/src/kami/animation.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "(root)",
+    "kami-gameplay",
+    "packages/kami-app-animator"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.kamiEngineAnimation/local-changes.json",
+     "line": 7,
+     "text": "\"reason\": \"Moved from kotoba-lang/kami-engine packages/ (JUN-649). The kotoba git floors and pins, and the kami packages that are bundled in this monorepo, beco"
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.kamiEngineCad",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-cad"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 29,
+   "namespaces": [
+    {
+     "ns": "kami.cad",
+     "vars": [
+      "boolean-difference",
+      "boolean-intersect",
+      "boolean-union",
+      "bounds",
+      "curve",
+      "curve-length",
+      "distance-constraint",
+      "extrude-polygon",
+      "feature",
+      "feature-model",
+      "fillet-sketch",
+      "horizontal",
+      "loft",
+      "loft-mesh",
+      "move-control-point",
+      "recompute-feature-model",
+      "set-weight",
+      "sketch",
+      "sketch-line",
+      "sketch-loop->polygon",
+      "sketch-point",
+      "snap-point",
+      "solid-mesh",
+      "solid-volume",
+      "solve-sketch",
+      "suppress-feature",
+      "tessellate",
+      "trim-curve",
+      "vertical"
+     ],
+     "units": [
+      "packages/kami-app-cad"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.kamiEngineCad/src/kami/cad.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-cad"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "placement": "kotoba"
+  },
+  {
+   "lib": "kotoba.kamiEngineCaeSolver",
+   "transitive": false,
+   "manifest-units": [
+    "kami-physics",
+    "packages/kami-app-hygaccess-plant"
+   ],
+   "require-units": [
+    "kami-physics",
+    "packages/kami-app-hygaccess-plant"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 37,
+    "kotoba": 0
+   },
+   "vars-used": 4,
+   "namespaces": [
+    {
+     "ns": "cae.backend",
+     "vars": [
+      "backend",
+      "backend-id"
+     ],
+     "units": [
+      "kami-physics"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kamiEngineCaeSolver/src/cae/backend.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "cae.solver",
+     "vars": [
+      "backends",
+      "solve"
+     ],
+     "units": [
+      "packages/kami-app-hygaccess-plant"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.kamiEngineCaeSolver/src/cae/solver.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.i18n",
+    "kotoba.io",
+    "kotoba.json",
+    "kotoba.physics",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 7,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-hygaccess-plant"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.kamiEngineCaeSolver/local-changes.json",
+     "line": 7,
+     "text": "\"reason\": \"Moved from kotoba-lang/kami-engine packages/ (JUN-649). The kotoba git floors and pins, and the kami packages that are bundled in this monorepo, beco"
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.kamiEngineModeling",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-modeler"
+   ],
+   "require-units": [
+    "packages/kami-app-modeler"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 13,
+    "kotoba": 0
+   },
+   "vars-used": 45,
+   "namespaces": [
+    {
+     "ns": "kami.modeling",
+     "vars": [
+      "add-modifier",
+      "add-object",
+      "bevel-face",
+      "boolean-mesh",
+      "bridge-faces",
+      "cube",
+      "delete-face",
+      "delete-object",
+      "duplicate-object",
+      "evaluated-object-mesh",
+      "extrude-face",
+      "face-normal",
+      "find-object",
+      "flip-faces",
+      "inset-face",
+      "knife-face",
+      "loop-cut-face",
+      "mesh",
+      "mesh-edges",
+      "modifier",
+      "move-modifier",
+      "object",
+      "orient-outward",
+      "pick-element",
+      "planar-unwrap",
+      "remove-modifier",
+      "reparent-object",
+      "scale-faces",
+      "scene",
+      "scene-mesh",
+      "scene-renderables",
+      "selected-vertex-indices",
+      "set-object-locked",
+      "set-object-material",
+      "set-object-transform",
+      "set-object-visible",
+      "signed-volume",
+      "snap-vertices",
+      "transform-point-world",
+      "transform-uvs",
+      "translate-edges",
+      "translate-faces",
+      "translate-vertices",
+      "update-object",
+      "valid-mesh?"
+     ],
+     "units": [
+      "packages/kami-app-modeler"
+     ],
+     "files": 3,
+     "cljk": "lib/kotoba.kamiEngineModeling/src/kami/modeling.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.num",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-modeler"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.kamiEngineModeling/local-changes.json",
+     "line": 7,
+     "text": "\"reason\": \"Moved from kotoba-lang/kami-engine packages/ (JUN-649). The kotoba git floors and pins, and the kami packages that are bundled in this monorepo, beco"
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.kamiEngineSculpt",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-sculpt"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 19,
+   "namespaces": [
+    {
+     "ns": "kami.sculpt",
+     "vars": [
+      "add-layer",
+      "apply-layer-stroke",
+      "bake-layer",
+      "brush",
+      "clear-mask",
+      "delete-layer",
+      "duplicate-layer",
+      "evaluate-document",
+      "fill-holes-document",
+      "filter-mask",
+      "invert-mask",
+      "move-layer",
+      "remesh-document",
+      "repair-document",
+      "sculpt-document",
+      "sphere-mesh",
+      "subdivide-document",
+      "topology-diagnostics",
+      "update-layer"
+     ],
+     "units": [
+      "packages/kami-app-sculpt"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.kamiEngineSculpt/src/kami/sculpt.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-sculpt"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "placement": "kotoba"
+  },
+  {
+   "lib": "kotoba.kamiEngineSdk",
+   "transitive": false,
+   "manifest-units": [
+    "packages/host",
+    "packages/kami-engine-sdk"
+   ],
+   "require-units": [
+    "packages/host",
+    "packages/kami-engine-sdk"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 9,
+   "namespaces": [
+    {
+     "ns": "kami.fsm",
+     "vars": [
+      "advance",
+      "advance-seq",
+      "fsm",
+      "reachable-states"
+     ],
+     "units": [
+      "packages/kami-engine-sdk"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kamiEngineSdk/src/kami/fsm.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": [],
+     "kotoba-in-other-libs": [
+      {
+       "lib": "kotoba.fsm",
+       "path": "lib/kotoba.fsm/src/kami/fsm.kotoba",
+       "amu-check": "E2124"
+      }
+     ],
+     "defined-in-libs": [
+      "kotoba.fsm",
+      "kotoba.kamiEngineSdk"
+     ]
+    },
+    {
+     "ns": "kami.gpu",
+     "vars": [
+      "IGpuBackend",
+      "ensure-assets!",
+      "submit!"
+     ],
+     "units": [
+      "packages/host",
+      "packages/kami-engine-sdk"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.kamiEngineSdk/src/kami/gpu.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": [],
+     "defined-in-libs": [
+      "kotoba.gpu",
+      "kotoba.kamiEngineSdk"
+     ]
+    },
+    {
+     "ns": "kami.ipc",
+     "vars": [
+      "byte-len",
+      "pack"
+     ],
+     "units": [
+      "packages/kami-engine-sdk"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.kamiEngineSdk/src/kami/ipc.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.json",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/host",
+    "packages/kami-engine-sdk"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.kamiEngineSdk/local-changes.json",
+     "line": 15,
+     "text": "\"split\": \"Split (JUN-649): only src/kami/fsm.cljk, src/kami/gpu.cljk, src/kami/ipc.cljk stay here, because kotoba libraries require them; the rest of the librar"
+    }
+   ],
+   "placement": "split"
+  },
+  {
+   "lib": "kotoba.kamiEngineVphysics",
+   "transitive": false,
+   "manifest-units": [
+    "kami-physics"
+   ],
+   "require-units": [
+    "kami-physics"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 2,
+   "namespaces": [
+    {
+     "ns": "vphysics.backend",
+     "vars": [
+      "backend",
+      "backend-id"
+     ],
+     "units": [
+      "kami-physics"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kamiEngineVphysics/src/vphysics/backend.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.physics",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "kami-physics"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.kamiEngineVphysics/local-changes.json",
+     "line": 7,
+     "text": "\"reason\": \"Moved from kotoba-lang/kami-engine packages/ (JUN-649). The kotoba git floors and pins, and the kami packages that are bundled in this monorepo, beco"
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.kamiMangakaPage",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-sip"
+   ],
+   "require-units": [
+    "packages/kami-app-sip"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "kami.mangaka.page",
+     "vars": [
+      "compose-page!"
+     ],
+     "units": [
+      "packages/kami-app-sip"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kamiMangakaPage/src/kami/mangaka/page.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.kamiMangakaText",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-sip"
+   ],
+   "blocks-waves": [
+    2
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.kamiMangakaPage/local-changes.json",
+     "line": 7,
+     "text": "\"reason\": \"Moved from kotoba-lang/kami-engine packages/ (JUN-649). The kotoba git floors and pins, and the kami packages that are bundled in this monorepo, beco"
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.kamiMangakaRender",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-sip"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 4,
+   "namespaces": [
+    {
+     "ns": "kami.mangaka.render",
+     "vars": [
+      "aspect->dims",
+      "compose",
+      "read-anchors",
+      "render!"
+     ],
+     "units": [
+      "packages/kami-app-sip"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kamiMangakaRender/src/kami/mangaka/render.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.json",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-sip"
+   ],
+   "blocks-waves": [
+    2
+   ],
+   "tracking": [],
+   "placement": "kotoba"
+  },
+  {
+   "lib": "kotoba.kamiMangakaText",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.kamiMangakaPage"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-sip"
+   ],
+   "blocks-waves": [
+    2
+   ],
+   "tracking": [],
+   "placement": "kotoba"
+  },
+  {
+   "lib": "kotoba.kamiOngakuNotation",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.kamiOngakuProject"
+   ],
+   "src": {
+    "cljk": 7,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "placement": "kotoba"
+  },
+  {
+   "lib": "kotoba.kamiOngakuProject",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-creative-studio"
+   ],
+   "require-units": [
+    "packages/kami-creative-studio"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "kami.ongaku.project",
+     "vars": [
+      "validate-project"
+     ],
+     "units": [
+      "packages/kami-creative-studio"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kamiOngakuProject/src/kami/ongaku/project.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.kamiOngakuNotation",
+    "kotoba.kamiOngakuSequencer",
+    "kotoba.text"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "placement": "kotoba"
+  },
+  {
+   "lib": "kotoba.kamiOngakuSequencer",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.kamiOngakuProject"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [],
+   "port-level": 0,
+   "blocks-units": [
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "placement": "kotoba"
+  },
+  {
+   "lib": "kotoba.kamiVehicle",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-vehicle-scene"
+   ],
+   "require-units": [
+    "packages/kami-vehicle-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 19,
+    "kotoba": 0
+   },
+   "vars-used": 2,
+   "namespaces": [
+    {
+     "ns": "vehicle.backend",
+     "vars": [
+      "document-with-structure",
+      "instantiate-document"
+     ],
+     "units": [
+      "packages/kami-vehicle-scene"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kamiVehicle/src/vehicle/backend.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.physics",
+    "kotoba.test"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.kamiVehicle/local-changes.json",
+     "line": 7,
+     "text": "\"reason\": \"Moved from kotoba-lang/kami-engine packages/ (JUN-649). The kotoba git floors and pins, and the kami packages that are bundled in this monorepo, beco"
+    },
+    {
+     "key": "JUN-716",
+     "file": "lib/kotoba.kamiVehicle/local-changes.json",
+     "line": 17,
+     "text": "\"reason\": \"Renamed from test/vehicle_test.cljk (ns vehicle-test) to test/vehicle/root_test.cljk (ns vehicle.root-test) (JUN-716): kotoba.physics also defines a "
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.kisekae",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-creative-studio"
+   ],
+   "require-units": [
+    "packages/kami-creative-studio"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 6,
+    "kotoba": 0
+   },
+   "vars-used": 6,
+   "namespaces": [
+    {
+     "ns": "kisekae.build",
+     "vars": [
+      "build-document",
+      "export-bytes"
+     ],
+     "units": [
+      "packages/kami-creative-studio"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kisekae/src/kisekae/build.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kisekae.compositor",
+     "vars": [
+      "authorized-plan!"
+     ],
+     "units": [
+      "packages/kami-creative-studio"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kisekae/src/kisekae/compositor.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kisekae.edit",
+     "vars": [
+      "apply-op"
+     ],
+     "units": [
+      "packages/kami-creative-studio"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.kisekae/src/kisekae/edit.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kisekae.spec",
+     "vars": [
+      "new-spec",
+      "part-urls"
+     ],
+     "units": [
+      "packages/kami-creative-studio"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.kisekae/src/kisekae/spec.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.text",
+    "org.vrmC.vrm"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.kotobaCoreContracts",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.osaho",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 7,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.ioMultiformats",
+    "kotoba.test",
+    "kotoba.text",
+    "org.ietf.cbor",
+    "org.ietf.ed25519"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "JUN-267",
+     "file": "lib/kotoba.kotobaCoreContracts/docs/adr/0002-capability-source-monorepo.md",
+     "line": 4,
+     "text": "remain separate. Tracking: [JUN-267](https://linear.app/kotobalabs/issue/JUN-267)."
+    },
+    {
+     "key": "JUN-267",
+     "file": "lib/kotoba.kotobaCoreContracts/maintenance/capability-consolidation/2026-10-22/receipt.json",
+     "line": 4,
+     "text": "\"tracking\": \"https://linear.app/kotobalabs/issue/JUN-267\","
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.kotobaHir",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.osaho",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 1
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.test"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E2104"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.kotobaIssue",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-bim-editor"
+   ],
+   "required-by-libs": [
+    "kotoba.bim"
+   ],
+   "src": {
+    "cljk": 7,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "kotoba.issue.bcf",
+     "vars": [
+      "topic"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kotobaIssue/src/kotoba/issue/bcf.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.http",
+    "kotoba.json",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 9,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.kotobaUi",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "required-by-libs": [
+    "kotoba.appkit"
+   ],
+   "src": {
+    "cljk": 5,
+    "kotoba": 0
+   },
+   "vars-used": 2,
+   "namespaces": [
+    {
+     "ns": "kotoba-ui.core",
+     "vars": [
+      "class-name",
+      "nav-bar"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.kotobaUi/src/kotoba_ui/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.byoubuUi",
+    "kotoba.css",
+    "kotoba.designQuality",
+    "kotoba.liquidGlassUi",
+    "kotoba.shitsuke",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 7,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "deps-outside-lib": [
+    "../byoubu",
+    "../byoubu-ui",
+    "../css",
+    "../design-quality",
+    "../liquid-glass-ui",
+    "../shitsuke"
+   ]
+  },
+  {
+   "lib": "kotoba.langchain",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-isekai"
+   ],
+   "required-by-libs": [
+    "kotoba.langgraph",
+    "kotoba.qaGovernor"
+   ],
+   "src": {
+    "cljk": 16,
+    "kotoba": 0
+   },
+   "vars-used": 7,
+   "namespaces": [
+    {
+     "ns": "langchain.jvm",
+     "vars": [
+      "complete-json",
+      "json-read",
+      "json-write",
+      "jvm-http-fn",
+      "vision-json"
+     ],
+     "units": [
+      "packages/kami-app-isekai"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.langchain/src/langchain/jvm.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "langchain.model",
+     "vars": [
+      "anthropic-model",
+      "default-model"
+     ],
+     "units": [
+      "packages/kami-app-isekai"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.langchain/src/langchain/model.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.json",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-isekai"
+   ],
+   "blocks-waves": [
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.langgraph",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.qaGovernor"
+   ],
+   "src": {
+    "cljk": 7,
+    "kotoba": 1
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.io",
+    "kotoba.json",
+    "kotoba.langchain",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "packages/kami-app-isekai"
+   ],
+   "blocks-waves": [
+    1
+   ],
+   "tracking": [],
+   "deps-outside-lib": [
+    "../langchain"
+   ],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E6023"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.level",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.liquidGlassUi",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.appkit",
+    "kotoba.kotobaUi"
+   ],
+   "src": {
+    "cljk": 4,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.css",
+    "kotoba.shitsuke",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 6,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "deps-outside-lib": [
+    "../css",
+    "../shitsuke"
+   ]
+  },
+  {
+   "lib": "kotoba.machine",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.gpu",
+    "kotoba.traversal",
+    "kotoba.webgl",
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.nagare",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-hygaccess-plant"
+   ],
+   "require-units": [
+    "packages/kami-app-hygaccess-plant"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 8,
+    "kotoba": 0
+   },
+   "vars-used": 8,
+   "namespaces": [
+    {
+     "ns": "nagare.diagnostics",
+     "vars": [
+      "max-courant"
+     ],
+     "units": [
+      "packages/kami-app-hygaccess-plant"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.nagare/src/nagare/diagnostics.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "nagare.field",
+     "vars": [
+      "vol-scalar",
+      "vol-vector",
+      "with-values"
+     ],
+     "units": [
+      "packages/kami-app-hygaccess-plant"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.nagare/src/nagare/field.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "nagare.fvm",
+     "vars": [
+      "convection-diffusion"
+     ],
+     "units": [
+      "packages/kami-app-hygaccess-plant"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.nagare/src/nagare/fvm.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "nagare.linsolve",
+     "vars": [
+      "bicgstab"
+     ],
+     "units": [
+      "packages/kami-app-hygaccess-plant"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.nagare/src/nagare/linsolve.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "nagare.mesh",
+     "vars": [
+      "block-mesh"
+     ],
+     "units": [
+      "packages/kami-app-hygaccess-plant"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.nagare/src/nagare/mesh.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "nagare.solver",
+     "vars": [
+      "advance"
+     ],
+     "units": [
+      "packages/kami-app-hygaccess-plant"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.nagare/src/nagare/solver.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-hygaccess-plant"
+   ],
+   "blocks-waves": [
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.netsync",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 5,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.test"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.num",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.kamiEngineModeling"
+   ],
+   "src": {
+    "cljk": 16,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-modeler"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.osaho",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 18,
+    "kotoba": 2
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "gov.nist.sha2",
+    "kotoba.bytes",
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.io",
+    "kotoba.ioMultiformats",
+    "kotoba.kotobaHir",
+    "kotoba.security",
+    "kotoba.test",
+    "kotoba.text",
+    "org.ietf.cbor"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "JUN-202",
+     "file": "lib/kotoba.osaho/src/kotoba/kir/gas.cljk",
+     "line": 35,
+     "text": ";; -- Kotoba reading (W3: JUN-202 selfbuild scan refused this module E2139"
+    },
+    {
+     "key": "AWAI-77",
+     "file": "lib/kotoba.osaho/src/kotoba/kir/gas.cljk",
+     "line": 56,
+     "text": ";; Linear AWAI-77."
+    }
+   ],
+   "amu-check": {
+    "files": 2,
+    "checked": 2,
+    "pass": 0,
+    "refusals": [
+     "E6002"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.physics",
+   "transitive": false,
+   "manifest-units": [
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-modeler",
+    "packages/kami-vehicle-scene"
+   ],
+   "require-units": [
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-modeler",
+    "packages/kami-vehicle-scene"
+   ],
+   "required-by-libs": [
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiVehicle",
+    "kotoba.physics2d",
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 6,
+    "kotoba": 0
+   },
+   "vars-used": 10,
+   "namespaces": [
+    {
+     "ns": "kotoba.physics",
+     "vars": [
+      "default-layers",
+      "separate"
+     ],
+     "units": [
+      "packages/host"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.physics/src/kotoba/physics.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kotoba.physics.contract",
+     "vars": [
+      "make-case",
+      "make-scene",
+      "qualified?",
+      "require-backend!",
+      "solve",
+      "step"
+     ],
+     "units": [
+      "kami-physics",
+      "packages/host"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.physics/src/kotoba/physics/contract.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kotoba.physics.vehicle",
+     "vars": [
+      "document",
+      "document?"
+     ],
+     "units": [
+      "packages/kami-app-modeler",
+      "packages/kami-vehicle-scene"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.physics/src/kotoba/physics/vehicle.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.physics2d",
+   "transitive": false,
+   "manifest-units": [
+    "kami-physics",
+    "packages/host"
+   ],
+   "require-units": [
+    "kami-physics",
+    "packages/host"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 3,
+   "namespaces": [
+    {
+     "ns": "physics-2d",
+     "vars": [
+      "make-circle-collider"
+     ],
+     "units": [
+      "packages/host"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.physics2d/src/physics_2d.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "physics-2d.backend",
+     "vars": [
+      "backend",
+      "backend-id"
+     ],
+     "units": [
+      "kami-physics",
+      "packages/host"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.physics2d/src/physics_2d/backend.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.physics",
+    "kotoba.test"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "kami-physics",
+    "packages/host"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.pipelines",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.playwright",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-isekai",
+    "packages/kami-isekai-assets"
+   ],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 4,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "kami.playwright",
+     "vars": [
+      "eval-page"
+     ],
+     "units": [
+      "packages/kami-app-isekai",
+      "packages/kami-isekai-assets"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.playwright/src/kami/playwright.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.json",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-isekai-assets"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.postfx",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-postfx-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 1,
+    "kotoba": 1
+   },
+   "vars-used": 19,
+   "namespaces": [
+    {
+     "ns": "postfx",
+     "vars": [
+      "aces-tonemap",
+      "add",
+      "baminiku-character",
+      "bloom",
+      "chromatic-aberration",
+      "color-grade",
+      "crt",
+      "depth-of-field",
+      "film-grain",
+      "final-fantasy",
+      "god-rays",
+      "new-pipeline",
+      "nintendo",
+      "outline",
+      "pixelate",
+      "retro",
+      "ssao",
+      "ssr",
+      "vignette"
+     ],
+     "units": [
+      "packages/kami-postfx-scene"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.postfx/src/postfx.cljk",
+     "kotoba": "lib/kotoba.postfx/src/postfx.kotoba",
+     "vars-not-defined-in-cljk": [],
+     "kotoba-missing-vars": [],
+     "kotoba-export-list": true,
+     "amu-check": "E2104"
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.error",
+    "kotoba.process",
+    "kotoba.test"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-postfx-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E2104"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.pprint",
+   "transitive": false,
+   "manifest-units": [
+    "(root)",
+    "kami-clj-play",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-isekai"
+   ],
+   "require-units": [
+    "packages/kami-app-isekai"
+   ],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.osaho",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "kotoba.pprint",
+     "vars": [
+      "pprint"
+     ],
+     "units": [
+      "packages/kami-app-isekai"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.pprint/src/kotoba/pprint.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [],
+   "port-level": 0,
+   "blocks-units": [
+    "(root)",
+    "kami-clj-play",
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.process",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-isekai",
+    "packages/kami-app-suji"
+   ],
+   "require-units": [
+    "packages/kami-app-isekai",
+    "packages/kami-app-suji"
+   ],
+   "required-by-libs": [
+    "kotoba.appkit",
+    "kotoba.cartpoleMath",
+    "kotoba.postfx",
+    "kotoba.qaGovernor",
+    "kotoba.terrain",
+    "kotoba.vegetation",
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 14,
+    "kotoba": 1
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "kotoba.process",
+     "vars": [
+      "sh"
+     ],
+     "units": [
+      "packages/kami-app-isekai",
+      "packages/kami-app-suji"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.process/src/kotoba/process.cljk",
+     "kotoba": "lib/kotoba.process/src/kotoba/process.kotoba",
+     "vars-not-defined-in-cljk": [],
+     "kotoba-missing-vars": [
+      "sh"
+     ],
+     "kotoba-export-list": true,
+     "amu-check": "E6002"
+    }
+   ],
+   "deps": [
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-postfx-scene",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "JUN-203",
+     "file": "lib/kotoba.process/local-changes.json",
+     "line": 4,
+     "text": "\"reason\": \"JUN-203 native canonical facade; forward the qualified native library implementation while leaving the existing host alias unchanged.\","
+    }
+   ],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E6002"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.qaGovernor",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-isekai"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 11,
+    "kotoba": 0
+   },
+   "vars-used": 6,
+   "namespaces": [
+    {
+     "ns": "qa-governor.governor",
+     "vars": [
+      "evaluate-proposal"
+     ],
+     "units": [
+      "packages/kami-app-isekai"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.qaGovernor/src/qa_governor/governor.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "qa-governor.ledger",
+     "vars": [
+      "empty-ledger",
+      "record"
+     ],
+     "units": [
+      "packages/kami-app-isekai"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.qaGovernor/src/qa_governor/ledger.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "qa-governor.rubric",
+     "vars": [
+      "extend-rubric",
+      "grade",
+      "weighted-score"
+     ],
+     "units": [
+      "packages/kami-app-isekai"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.qaGovernor/src/qa_governor/rubric.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.io",
+    "kotoba.langgraph",
+    "kotoba.process",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 6,
+   "blocks-units": [
+    "packages/kami-app-isekai"
+   ],
+   "blocks-waves": [
+    1
+   ],
+   "tracking": [],
+   "deps-outside-lib": [
+    "../langchain"
+   ]
+  },
+  {
+   "lib": "kotoba.renderShaders",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text",
+    "kotoba.wgsl"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.route",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-suji"
+   ],
+   "require-units": [
+    "packages/kami-app-suji"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 3,
+   "namespaces": [
+    {
+     "ns": "route.core",
+     "vars": [
+      "fragment->view",
+      "nav",
+      "validate!"
+     ],
+     "units": [
+      "packages/kami-app-suji"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.route/src/route/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 6,
+   "blocks-units": [
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.scene",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-atmosphere-scene",
+    "packages/kami-autodrive-scene",
+    "packages/kami-cam-scene",
+    "packages/kami-character-scene",
+    "packages/kami-game-scene",
+    "packages/kami-input-scene",
+    "packages/kami-postfx-scene",
+    "packages/kami-skeleton-scene",
+    "packages/kami-solar-helix-scene",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 5,
+   "namespaces": [
+    {
+     "ns": "scene",
+     "vars": [
+      "kw-key",
+      "mget",
+      "num",
+      "root-map",
+      "vec3"
+     ],
+     "units": [
+      "packages/kami-atmosphere-scene",
+      "packages/kami-autodrive-scene",
+      "packages/kami-cam-scene",
+      "packages/kami-character-scene",
+      "packages/kami-game-scene",
+      "packages/kami-input-scene",
+      "packages/kami-postfx-scene",
+      "packages/kami-skeleton-scene",
+      "packages/kami-solar-helix-scene",
+      "packages/kami-terrain-scene",
+      "packages/kami-vegetation-scene",
+      "packages/kami-vehicle-scene"
+     ],
+     "files": 26,
+     "cljk": "lib/kotoba.scene/src/scene.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.test"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-atmosphere-scene",
+    "packages/kami-autodrive-scene",
+    "packages/kami-cam-scene",
+    "packages/kami-character-scene",
+    "packages/kami-game-scene",
+    "packages/kami-input-scene",
+    "packages/kami-postfx-scene",
+    "packages/kami-skeleton-scene",
+    "packages/kami-solar-helix-scene",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.scene2d",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-isekai",
+    "packages/kami-isekai-assets"
+   ],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "kami.scene2d",
+     "vars": [
+      "frame-quads"
+     ],
+     "units": [
+      "packages/kami-app-isekai",
+      "packages/kami-isekai-assets"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.scene2d/src/kami/scene2d.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.sprite2d",
+    "kotoba.spriteGpu",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-isekai-assets"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.security",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.osaho",
+    "kotoba.route",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 52,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.io",
+    "kotoba.ioMultiformats",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.pprint",
+    "kotoba.test",
+    "kotoba.text",
+    "org.ietf.cbor",
+    "org.ietf.ed25519"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "JUN-202",
+     "file": "lib/kotoba.security/src/kotoba/security/hardware.cljk",
+     "line": 5,
+     "text": ";; -- Kotoba reading (W3: JUN-202 selfbuild scan refused this module E2119"
+    },
+    {
+     "key": "AWAI-77",
+     "file": "lib/kotoba.security/src/kotoba/security/hardware.cljk",
+     "line": 24,
+     "text": ";; selfbuild scan (seed OK) is recorded on Linear AWAI-77."
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.set",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.byoubuUi",
+    "kotoba.coll",
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.game",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiVehicle",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaHir",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.liquidGlassUi",
+    "kotoba.netsync",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.playwright",
+    "kotoba.qaGovernor",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 13,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [],
+   "port-level": 0,
+   "blocks-units": [
+    "(root)",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-studio",
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.shaders",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.test",
+    "kotoba.text",
+    "kotoba.wgsl"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.shitsuke",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.appkit",
+    "kotoba.i18n",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi"
+   ],
+   "src": {
+    "cljk": 11,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.html",
+    "kotoba.io",
+    "kotoba.osaho",
+    "kotoba.pprint",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-hygaccess-plant"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [],
+   "deps-outside-lib": [
+    "../html"
+   ]
+  },
+  {
+   "lib": "kotoba.skeleton",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-skeleton-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 14,
+   "namespaces": [
+    {
+     "ns": "skeleton",
+     "vars": [
+      "animation-clip",
+      "bone",
+      "bone-track",
+      "default-humanoid-constraints",
+      "evaluate",
+      "interpolation-by-name",
+      "joint-constraint",
+      "keyframe",
+      "skeleton"
+     ],
+     "units": [
+      "packages/kami-skeleton-scene"
+     ],
+     "files": 6,
+     "cljk": "lib/kotoba.skeleton/src/skeleton.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "skeleton.math",
+     "vars": [
+      "mat4-mul",
+      "quat-identity",
+      "vec3-",
+      "vec3-one",
+      "vec3-scale"
+     ],
+     "units": [
+      "packages/kami-skeleton-scene"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.skeleton/src/skeleton/math.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-skeleton-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.sky",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text",
+    "kotoba.wgsl"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.spec",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.aes",
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.atmosphere",
+    "kotoba.bim",
+    "kotoba.byoubu",
+    "kotoba.byoubuUi",
+    "kotoba.bytes",
+    "kotoba.canvaskit",
+    "kotoba.cartpoleMath",
+    "kotoba.character",
+    "kotoba.coll",
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.dance",
+    "kotoba.designQuality",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.dxf",
+    "kotoba.edn",
+    "kotoba.expr",
+    "kotoba.fsm",
+    "kotoba.game",
+    "kotoba.gpu",
+    "kotoba.html",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.image",
+    "kotoba.input",
+    "kotoba.io",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.json",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineAnimation",
+    "kotoba.kamiEngineCad",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSculpt",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiMangakaPage",
+    "kotoba.kamiMangakaRender",
+    "kotoba.kamiMangakaText",
+    "kotoba.kamiOngakuNotation",
+    "kotoba.kamiOngakuProject",
+    "kotoba.kamiVehicle",
+    "kotoba.kisekae",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaHir",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.level",
+    "kotoba.liquidGlassUi",
+    "kotoba.machine",
+    "kotoba.nagare",
+    "kotoba.netsync",
+    "kotoba.num",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.pipelines",
+    "kotoba.playwright",
+    "kotoba.postfx",
+    "kotoba.process",
+    "kotoba.qaGovernor",
+    "kotoba.renderShaders",
+    "kotoba.route",
+    "kotoba.scene",
+    "kotoba.scene2d",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.shitsuke",
+    "kotoba.skeleton",
+    "kotoba.sky",
+    "kotoba.sprite2d",
+    "kotoba.spriteGpu",
+    "kotoba.terrain",
+    "kotoba.test",
+    "kotoba.text",
+    "kotoba.traversal",
+    "kotoba.vegetation",
+    "kotoba.webgl",
+    "kotoba.webgpu",
+    "kotoba.wgsl",
+    "kotoba.xml",
+    "org.ietf.asn1",
+    "org.ietf.cbor",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.deflate",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x25519",
+    "org.ietf.x448",
+    "org.ietf.x509",
+    "org.iso.pdf",
+    "org.iso.std10303",
+    "org.iso.std16739",
+    "org.iso.std6983",
+    "org.khronos.glb",
+    "org.khronos.gltf",
+    "org.materialx.core",
+    "org.openusd.usd",
+    "org.vrmC.vrm",
+    "org.w3.png",
+    "org.w3.svg",
+    "org.w3.webcodecs",
+    "org.w3.webgpu"
+   ],
+   "src": {
+    "cljk": 10,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 0,
+   "blocks-units": [
+    "(root)",
+    "kami-clj-play",
+    "kami-gameplay",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-car-sim",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-atmosphere-scene",
+    "packages/kami-autodrive-scene",
+    "packages/kami-cam-scene",
+    "packages/kami-character-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-eng-web",
+    "packages/kami-engine-app-sdk",
+    "packages/kami-engine-guest",
+    "packages/kami-engine-hud-gpu",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-input-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-postfx-scene",
+    "packages/kami-scene-contracts",
+    "packages/kami-skeleton-scene",
+    "packages/kami-solar-helix-scene",
+    "packages/kami-studio",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene",
+    "packages/kami-webvr"
+   ],
+   "blocks-waves": [
+    0,
+    1,
+    2
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.sprite2d",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.scene2d",
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 7,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-isekai-assets"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.spriteGpu",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-isekai",
+    "packages/kami-isekai-assets"
+   ],
+   "required-by-libs": [
+    "kotoba.scene2d",
+    "kotoba.webgl",
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "kami.sprite-gpu",
+     "vars": [
+      "pack-instances"
+     ],
+     "units": [
+      "packages/kami-app-isekai",
+      "packages/kami-isekai-assets"
+     ],
+     "files": 2,
+     "cljk": "lib/kotoba.spriteGpu/src/kami/sprite_gpu.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test",
+    "kotoba.wgsl"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-isekai-assets"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.terrain",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-terrain-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 7,
+    "kotoba": 1
+   },
+   "vars-used": 6,
+   "namespaces": [
+    {
+     "ns": "terrain",
+     "vars": [
+      "biome-heightmap-config",
+      "biome-palette",
+      "biome-splat-thresholds",
+      "biome-values",
+      "default-heightmap-config",
+      "default-waves"
+     ],
+     "units": [
+      "packages/kami-terrain-scene"
+     ],
+     "files": 3,
+     "cljk": "lib/kotoba.terrain/src/terrain.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.process",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-terrain-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E2104"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.test",
+   "transitive": false,
+   "manifest-units": [
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-car-sim",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-atmosphere-scene",
+    "packages/kami-autodrive-scene",
+    "packages/kami-cam-scene",
+    "packages/kami-character-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-eng-web",
+    "packages/kami-engine-app-sdk",
+    "packages/kami-engine-guest",
+    "packages/kami-engine-hud-gpu",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-input-scene",
+    "packages/kami-postfx-scene",
+    "packages/kami-scene-contracts",
+    "packages/kami-skeleton-scene",
+    "packages/kami-solar-helix-scene",
+    "packages/kami-studio",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene",
+    "packages/kami-webvr"
+   ],
+   "require-units": [
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-car-sim",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-atmosphere-scene",
+    "packages/kami-autodrive-scene",
+    "packages/kami-cam-scene",
+    "packages/kami-character-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-eng-web",
+    "packages/kami-engine-app-sdk",
+    "packages/kami-engine-guest",
+    "packages/kami-engine-hud-gpu",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-input-scene",
+    "packages/kami-postfx-scene",
+    "packages/kami-scene-contracts",
+    "packages/kami-skeleton-scene",
+    "packages/kami-solar-helix-scene",
+    "packages/kami-studio",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene",
+    "packages/kami-webvr"
+   ],
+   "required-by-libs": [
+    "gov.nist.aes",
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.atmosphere",
+    "kotoba.bim",
+    "kotoba.byoubu",
+    "kotoba.byoubuUi",
+    "kotoba.bytes",
+    "kotoba.canvaskit",
+    "kotoba.cartpoleMath",
+    "kotoba.character",
+    "kotoba.coll",
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.dance",
+    "kotoba.designQuality",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.dxf",
+    "kotoba.edn",
+    "kotoba.expr",
+    "kotoba.fsm",
+    "kotoba.game",
+    "kotoba.gpu",
+    "kotoba.html",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.image",
+    "kotoba.input",
+    "kotoba.io",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.json",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineAnimation",
+    "kotoba.kamiEngineCad",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSculpt",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiMangakaPage",
+    "kotoba.kamiMangakaRender",
+    "kotoba.kamiMangakaText",
+    "kotoba.kamiOngakuNotation",
+    "kotoba.kamiOngakuProject",
+    "kotoba.kamiVehicle",
+    "kotoba.kisekae",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaHir",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.level",
+    "kotoba.liquidGlassUi",
+    "kotoba.machine",
+    "kotoba.nagare",
+    "kotoba.netsync",
+    "kotoba.num",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.pipelines",
+    "kotoba.playwright",
+    "kotoba.postfx",
+    "kotoba.process",
+    "kotoba.qaGovernor",
+    "kotoba.renderShaders",
+    "kotoba.route",
+    "kotoba.scene",
+    "kotoba.scene2d",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.shitsuke",
+    "kotoba.skeleton",
+    "kotoba.sky",
+    "kotoba.spec",
+    "kotoba.sprite2d",
+    "kotoba.spriteGpu",
+    "kotoba.terrain",
+    "kotoba.text",
+    "kotoba.traversal",
+    "kotoba.vegetation",
+    "kotoba.webgl",
+    "kotoba.webgpu",
+    "kotoba.wgsl",
+    "kotoba.xml",
+    "org.ietf.asn1",
+    "org.ietf.cbor",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.deflate",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x25519",
+    "org.ietf.x448",
+    "org.ietf.x509",
+    "org.iso.pdf",
+    "org.iso.std10303",
+    "org.iso.std16739",
+    "org.iso.std6983",
+    "org.khronos.glb",
+    "org.khronos.gltf",
+    "org.materialx.core",
+    "org.openusd.usd",
+    "org.vrmC.vrm",
+    "org.w3.png",
+    "org.w3.svg",
+    "org.w3.webcodecs",
+    "org.w3.webgpu"
+   ],
+   "src": {
+    "cljk": 42,
+    "kotoba": 0
+   },
+   "vars-used": 4,
+   "namespaces": [
+    {
+     "ns": "kotoba.test",
+     "vars": [
+      "deftest",
+      "is",
+      "run-tests",
+      "testing"
+     ],
+     "units": [
+      "packages/host",
+      "packages/kami-app-amenominaka",
+      "packages/kami-app-animator",
+      "packages/kami-app-bim-editor",
+      "packages/kami-app-cad",
+      "packages/kami-app-car-sim",
+      "packages/kami-app-character-creator",
+      "packages/kami-app-fixtures",
+      "packages/kami-app-hygaccess-plant",
+      "packages/kami-app-isekai",
+      "packages/kami-app-modeler",
+      "packages/kami-app-sculpt",
+      "packages/kami-app-sip",
+      "packages/kami-app-suji",
+      "packages/kami-atmosphere-scene",
+      "packages/kami-autodrive-scene",
+      "packages/kami-cam-scene",
+      "packages/kami-character-scene",
+      "packages/kami-contracts",
+      "packages/kami-creative-studio",
+      "packages/kami-eng-web",
+      "packages/kami-engine-app-sdk",
+      "packages/kami-engine-guest",
+      "packages/kami-engine-hud-gpu",
+      "packages/kami-engine-input-map",
+      "packages/kami-engine-sdk",
+      "packages/kami-game-scene",
+      "packages/kami-input-scene",
+      "packages/kami-postfx-scene",
+      "packages/kami-scene-contracts",
+      "packages/kami-skeleton-scene",
+      "packages/kami-solar-helix-scene",
+      "packages/kami-studio",
+      "packages/kami-terrain-scene",
+      "packages/kami-vegetation-scene",
+      "packages/kami-vehicle-scene",
+      "packages/kami-webvr"
+     ],
+     "files": 120,
+     "cljk": "lib/kotoba.test/src/kotoba/test.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.spec",
+    "kotoba.text"
+   ],
+   "port-level": 0,
+   "blocks-units": [
+    "(root)",
+    "kami-clj-play",
+    "kami-gameplay",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-car-sim",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-atmosphere-scene",
+    "packages/kami-autodrive-scene",
+    "packages/kami-cam-scene",
+    "packages/kami-character-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-eng-web",
+    "packages/kami-engine-app-sdk",
+    "packages/kami-engine-guest",
+    "packages/kami-engine-hud-gpu",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-input-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-postfx-scene",
+    "packages/kami-scene-contracts",
+    "packages/kami-skeleton-scene",
+    "packages/kami-solar-helix-scene",
+    "packages/kami-studio",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene",
+    "packages/kami-webvr"
+   ],
+   "blocks-waves": [
+    0,
+    1,
+    2
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.text",
+   "transitive": false,
+   "manifest-units": [
+    "(root)",
+    "kami-gameplay",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-car-sim",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-isekai",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-autodrive-scene",
+    "packages/kami-character-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-eng-web",
+    "packages/kami-engine-app-sdk",
+    "packages/kami-engine-guest",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-scene-contracts",
+    "packages/kami-studio",
+    "packages/kami-vehicle-scene",
+    "packages/kami-webvr"
+   ],
+   "require-units": [
+    "kami-gameplay",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-car-sim",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-isekai",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-autodrive-scene",
+    "packages/kami-character-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-eng-web",
+    "packages/kami-engine-app-sdk",
+    "packages/kami-engine-guest",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-scene-contracts",
+    "packages/kami-studio",
+    "packages/kami-vehicle-scene",
+    "packages/kami-webvr"
+   ],
+   "required-by-libs": [
+    "gov.nist.aes",
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.atmosphere",
+    "kotoba.bim",
+    "kotoba.byoubu",
+    "kotoba.byoubuUi",
+    "kotoba.bytes",
+    "kotoba.canvaskit",
+    "kotoba.cartpoleMath",
+    "kotoba.character",
+    "kotoba.coll",
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.dance",
+    "kotoba.designQuality",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.dxf",
+    "kotoba.edn",
+    "kotoba.expr",
+    "kotoba.fsm",
+    "kotoba.game",
+    "kotoba.gpu",
+    "kotoba.html",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.image",
+    "kotoba.input",
+    "kotoba.io",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.json",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineAnimation",
+    "kotoba.kamiEngineCad",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSculpt",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiMangakaPage",
+    "kotoba.kamiMangakaRender",
+    "kotoba.kamiMangakaText",
+    "kotoba.kamiOngakuNotation",
+    "kotoba.kamiOngakuProject",
+    "kotoba.kamiVehicle",
+    "kotoba.kisekae",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaHir",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.level",
+    "kotoba.liquidGlassUi",
+    "kotoba.machine",
+    "kotoba.nagare",
+    "kotoba.netsync",
+    "kotoba.num",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.pipelines",
+    "kotoba.playwright",
+    "kotoba.postfx",
+    "kotoba.process",
+    "kotoba.qaGovernor",
+    "kotoba.renderShaders",
+    "kotoba.route",
+    "kotoba.scene",
+    "kotoba.scene2d",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.shitsuke",
+    "kotoba.skeleton",
+    "kotoba.sky",
+    "kotoba.spec",
+    "kotoba.sprite2d",
+    "kotoba.spriteGpu",
+    "kotoba.terrain",
+    "kotoba.test",
+    "kotoba.traversal",
+    "kotoba.vegetation",
+    "kotoba.webgl",
+    "kotoba.webgpu",
+    "kotoba.wgsl",
+    "kotoba.xml",
+    "org.ietf.asn1",
+    "org.ietf.cbor",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.deflate",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x25519",
+    "org.ietf.x448",
+    "org.ietf.x509",
+    "org.iso.pdf",
+    "org.iso.std10303",
+    "org.iso.std16739",
+    "org.iso.std6983",
+    "org.khronos.glb",
+    "org.khronos.gltf",
+    "org.materialx.core",
+    "org.openusd.usd",
+    "org.vrmC.vrm",
+    "org.w3.png",
+    "org.w3.svg",
+    "org.w3.webcodecs",
+    "org.w3.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 4
+   },
+   "vars-used": 13,
+   "namespaces": [
+    {
+     "ns": "kotoba.lang.text",
+     "vars": [
+      "blank?",
+      "capitalize",
+      "ends-with?",
+      "includes?",
+      "index-of",
+      "join",
+      "lower",
+      "replace",
+      "split",
+      "split-lines",
+      "starts-with?",
+      "trim",
+      "upper"
+     ],
+     "units": [
+      "kami-gameplay",
+      "packages/host",
+      "packages/kami-app-amenominaka",
+      "packages/kami-app-animator",
+      "packages/kami-app-bim-editor",
+      "packages/kami-app-cad",
+      "packages/kami-app-car-sim",
+      "packages/kami-app-character-creator",
+      "packages/kami-app-fixtures",
+      "packages/kami-app-isekai",
+      "packages/kami-app-sip",
+      "packages/kami-app-suji",
+      "packages/kami-autodrive-scene",
+      "packages/kami-character-scene",
+      "packages/kami-contracts",
+      "packages/kami-creative-studio",
+      "packages/kami-eng-web",
+      "packages/kami-engine-app-sdk",
+      "packages/kami-engine-guest",
+      "packages/kami-engine-sdk",
+      "packages/kami-game-scene",
+      "packages/kami-isekai-assets",
+      "packages/kami-scene-contracts",
+      "packages/kami-studio",
+      "packages/kami-vehicle-scene",
+      "packages/kami-webvr"
+     ],
+     "files": 67,
+     "cljk": "lib/kotoba.text/src/kotoba/lang/text.cljk",
+     "kotoba": "lib/kotoba.text/src/kotoba/lang/text.kotoba",
+     "vars-not-defined-in-cljk": [],
+     "kotoba-missing-vars": [
+      "capitalize",
+      "lower",
+      "replace",
+      "split",
+      "split-lines",
+      "upper"
+     ],
+     "kotoba-export-list": true,
+     "amu-check": "E2104"
+    }
+   ],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 0,
+   "blocks-units": [
+    "(root)",
+    "kami-clj-play",
+    "kami-gameplay",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-car-sim",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-fixtures",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-sip",
+    "packages/kami-app-suji",
+    "packages/kami-atmosphere-scene",
+    "packages/kami-autodrive-scene",
+    "packages/kami-cam-scene",
+    "packages/kami-character-scene",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-eng-web",
+    "packages/kami-engine-app-sdk",
+    "packages/kami-engine-guest",
+    "packages/kami-engine-hud-gpu",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-input-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-postfx-scene",
+    "packages/kami-scene-contracts",
+    "packages/kami-skeleton-scene",
+    "packages/kami-solar-helix-scene",
+    "packages/kami-studio",
+    "packages/kami-terrain-scene",
+    "packages/kami-vegetation-scene",
+    "packages/kami-vehicle-scene",
+    "packages/kami-webvr"
+   ],
+   "blocks-waves": [
+    0,
+    1,
+    2
+   ],
+   "tracking": [
+    {
+     "key": "JUN-203",
+     "file": "lib/kotoba.text/local-changes.json",
+     "line": 32,
+     "text": "\"reason\": \"Retain kotoba.text alias identity and behavior/source-path adaptations. Assert that canonical kotoba.string preserves every legacy text export, inclu"
+    },
+    {
+     "key": "JUN-232",
+     "file": "lib/kotoba.text/local-changes.json",
+     "line": 42,
+     "text": "\"reason\": \"JUN-203: reviewed native branch integration, current compiler/API compatibility and regression coverage; preserve the imported default snapshot in th"
+    },
+    {
+     "key": "JUN-93",
+     "file": "lib/kotoba.text/local-changes.json",
+     "line": 47,
+     "text": "\"reason\": \"JUN-203: reviewed native branch integration, current compiler/API compatibility and regression coverage; preserve the imported default snapshot in th"
+    }
+   ],
+   "amu-check": {
+    "files": 4,
+    "checked": 4,
+    "pass": 0,
+    "refusals": [
+     "E2101",
+     "E2104",
+     "E6002"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.traversal",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.gpu",
+    "kotoba.webgl",
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.machine",
+    "kotoba.test"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.vegetation",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-vegetation-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 8,
+    "kotoba": 1
+   },
+   "vars-used": 7,
+   "namespaces": [
+    {
+     "ns": "vegetation.taxonomy",
+     "vars": [
+      "bush",
+      "cactus",
+      "conifer",
+      "fern",
+      "grass",
+      "moss",
+      "palm"
+     ],
+     "units": [
+      "packages/kami-vegetation-scene"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.vegetation/src/vegetation/taxonomy.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.json",
+    "kotoba.process",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "packages/kami-vegetation-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [],
+   "amu-check": {
+    "files": 1,
+    "checked": 1,
+    "pass": 0,
+    "refusals": [
+     "E2104"
+    ]
+   }
+  },
+  {
+   "lib": "kotoba.walk",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.byoubuUi",
+    "kotoba.coll",
+    "kotoba.css",
+    "kotoba.cssom",
+    "kotoba.domGpu",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.game",
+    "kotoba.htmldom",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kamiEngineModeling",
+    "kotoba.kamiEngineSdk",
+    "kotoba.kamiEngineVphysics",
+    "kotoba.kamiVehicle",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaHir",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.langchain",
+    "kotoba.langgraph",
+    "kotoba.liquidGlassUi",
+    "kotoba.netsync",
+    "kotoba.osaho",
+    "kotoba.physics",
+    "kotoba.physics2d",
+    "kotoba.playwright",
+    "kotoba.qaGovernor",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shaders",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 13,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [],
+   "port-level": 0,
+   "blocks-units": [
+    "(root)",
+    "kami-physics",
+    "packages/host",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-contracts",
+    "packages/kami-creative-studio",
+    "packages/kami-engine-input-map",
+    "packages/kami-engine-sdk",
+    "packages/kami-game-scene",
+    "packages/kami-isekai-assets",
+    "packages/kami-studio",
+    "packages/kami-vehicle-scene"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.webgl",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-suji"
+   ],
+   "require-units": [
+    "packages/kami-app-isekai"
+   ],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 4,
+    "kotoba": 0
+   },
+   "vars-used": 2,
+   "namespaces": [
+    {
+     "ns": "kami.webgl",
+     "vars": [
+      "scene-renderer",
+      "webgl2-context"
+     ],
+     "units": [
+      "packages/kami-app-isekai"
+     ],
+     "files": 1,
+     "cljk": "lib/kotoba.webgl/src/kami/webgl.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.gpu",
+    "kotoba.spriteGpu",
+    "kotoba.test"
+   ],
+   "port-level": 6,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.webgpu",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "require-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 7,
+    "kotoba": 0
+   },
+   "vars-used": 23,
+   "namespaces": [
+    {
+     "ns": "kami.webgpu",
+     "vars": [
+      "draw!",
+      "init!",
+      "inst-buffer-capacity"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka",
+      "packages/kami-app-hygaccess-plant",
+      "packages/kami-app-modeler"
+     ],
+     "files": 5,
+     "cljk": "lib/kotoba.webgpu/src/kami/webgpu.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kami.webgpu.geometry",
+     "vars": [
+      "cylinder",
+      "long-bone",
+      "sphere",
+      "tri-count",
+      "vertebral-body"
+     ],
+     "units": [
+      "packages/kami-app-suji"
+     ],
+     "files": 3,
+     "cljk": "lib/kotoba.webgpu/src/kami/webgpu/geometry.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kami.webgpu.ir",
+     "vars": [
+      "instance",
+      "render-ir",
+      "rig->camera",
+      "sky",
+      "valid?"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka",
+      "packages/kami-app-modeler"
+     ],
+     "files": 4,
+     "cljk": "lib/kotoba.webgpu/src/kami/webgpu/ir.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "kami.webgpu.mesh",
+     "vars": [
+      "draw!",
+      "init!",
+      "init-canvas!",
+      "render-frame!",
+      "render-scene!",
+      "render-skinned-frame!",
+      "sync-canvas-size!",
+      "upload-mesh!",
+      "upload-texture!",
+      "view-projection"
+     ],
+     "units": [
+      "packages/kami-app-animator",
+      "packages/kami-app-bim-editor",
+      "packages/kami-app-cad",
+      "packages/kami-app-character-creator",
+      "packages/kami-app-modeler",
+      "packages/kami-app-sculpt",
+      "packages/kami-app-suji"
+     ],
+     "files": 9,
+     "cljk": "lib/kotoba.webgpu/src/kami/webgpu/mesh.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.cartpoleMath",
+    "kotoba.coll",
+    "kotoba.dance",
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.expr",
+    "kotoba.fsm",
+    "kotoba.gpu",
+    "kotoba.io",
+    "kotoba.level",
+    "kotoba.netsync",
+    "kotoba.physics",
+    "kotoba.pipelines",
+    "kotoba.playwright",
+    "kotoba.pprint",
+    "kotoba.renderShaders",
+    "kotoba.scene2d",
+    "kotoba.shaders",
+    "kotoba.sky",
+    "kotoba.sprite2d",
+    "kotoba.spriteGpu",
+    "kotoba.test",
+    "kotoba.text",
+    "kotoba.webgl",
+    "kotoba.wgsl",
+    "org.w3.webgpu"
+   ],
+   "port-level": 7,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "JUN-649",
+     "file": "lib/kotoba.webgpu/local-changes.json",
+     "line": 5,
+     "text": "\"reason\": \"JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :gen-compute-golden): the official CD/CI path is Amu "
+    }
+   ]
+  },
+  {
+   "lib": "kotoba.wgsl",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.renderShaders",
+    "kotoba.scene2d",
+    "kotoba.shaders",
+    "kotoba.sky",
+    "kotoba.spriteGpu",
+    "kotoba.webgl",
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.expr",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-isekai",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-isekai-assets"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "kotoba.xml",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "org.materialx.core"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.ietf.asn1",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.http",
+    "kotoba.kotobaIssue",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.ietf.cbor",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.osaho",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 5
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [],
+   "amu-check": {
+    "files": 5,
+    "checked": 5,
+    "pass": 0,
+    "refusals": [
+     "E2104",
+     "E6002"
+    ]
+   }
+  },
+  {
+   "lib": "org.ietf.chacha20Poly1305",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.http",
+    "kotoba.kotobaIssue",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 5,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.io",
+    "kotoba.osaho",
+    "kotoba.test"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": [
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.chacha20Poly1305/README.md",
+     "line": 96,
+     "text": "## Native port and gate (AWAI-117)"
+    },
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.chacha20Poly1305/kotoba/chacha20/aead.kotoba",
+     "line": 2,
+     "text": ";; (AWAI-117). Bytes are :vector-i64 of 0..255."
+    },
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.chacha20Poly1305/kotoba/chacha20/core.kotoba",
+     "line": 1,
+     "text": ";; chacha20.core -- RFC 8439 ChaCha20 (sections 2.1-2.4) in native .kotoba (AWAI-117)."
+    },
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.chacha20Poly1305/kotoba/chacha20/native_gate.kotoba",
+     "line": 2,
+     "text": ";; AEAD (AWAI-117). Generated by tools/gen_gate.py from tools/reference.py; every value"
+    },
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.chacha20Poly1305/kotoba/chacha20/poly1305.kotoba",
+     "line": 1,
+     "text": ";; chacha20.poly1305 -- RFC 8439 Poly1305 (section 2.5) in native .kotoba (AWAI-117)."
+    },
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.chacha20Poly1305/local-changes.json",
+     "line": 16,
+     "text": "\"reason\": \"AWAI-117: RFC 8439 ChaCha20, Poly1305, AEAD and XChaCha20-Poly1305 in native .kotoba with a known-answer gate generated from an independent Python re"
+    },
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.chacha20Poly1305/test/wycheproof/README.md",
+     "line": 1,
+     "text": "# Wycheproof vectors (vendored, AWAI-117)"
+    }
+   ]
+  },
+  {
+   "lib": "org.ietf.deflate",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.image",
+    "org.iso.pdf",
+    "org.w3.png"
+   ],
+   "src": {
+    "cljk": 10,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.test"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-isekai"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.ietf.ed25519",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.osaho",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 4,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "gov.nist.sha2",
+    "kotoba.bytes",
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.test",
+    "kotoba.text",
+    "org.ietf.x25519"
+   ],
+   "port-level": 4,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "JUN-290",
+     "file": "lib/org.ietf.ed25519/AGENTS.md",
+     "line": 9,
+     "text": "not part of CI/CD (Linear JUN-290)."
+    },
+    {
+     "key": "JUN-326",
+     "file": "lib/org.ietf.ed25519/README.md",
+     "line": 96,
+     "text": "and verify, with no JVM, no Node.js and no host crypto. Linear JUN-326 is the"
+    },
+    {
+     "key": "AWAI-96",
+     "file": "lib/org.ietf.ed25519/README.md",
+     "line": 256,
+     "text": "## Native authority key profile (AWAI-96)"
+    },
+    {
+     "key": "JUN-326",
+     "file": "lib/org.ietf.ed25519/docs/evidence/selfhost-gate-20261023.edn",
+     "line": 2,
+     "text": ";; selfhost gate receipt (Linear JUN-326; com-junkawasaki/root ADR-2610222140)."
+    },
+    {
+     "key": "JUN-287",
+     "file": "lib/org.ietf.ed25519/docs/evidence/selfhost-memory-20261023.edn",
+     "line": 3,
+     "text": ":linear [\"JUN-345\" \"JUN-287\"]"
+    },
+    {
+     "key": "JUN-345",
+     "file": "lib/org.ietf.ed25519/docs/evidence/selfhost-memory-20261023.edn",
+     "line": 3,
+     "text": ":linear [\"JUN-345\" \"JUN-287\"]"
+    },
+    {
+     "key": "JUN-326",
+     "file": "lib/org.ietf.ed25519/kotoba/ed25519/selfhost.kotoba",
+     "line": 3,
+     "text": ";; from a seed, sign and verify with no host crypto (Linear JUN-326;"
+    },
+    {
+     "key": "AWAI-96",
+     "file": "lib/org.ietf.ed25519/local-changes.json",
+     "line": 17,
+     "text": "\"reason\": \"AWAI-96: canonical nonidentity prime-order public-key validation for native C0 authority; reuse existing point arithmetic, preserve legacy verify? an"
+    }
+   ]
+  },
+  {
+   "lib": "org.ietf.hpke",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.http",
+    "kotoba.kotobaIssue",
+    "org.ietf.tls",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "gov.nist.aes",
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.test",
+    "kotoba.text",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.x25519",
+    "org.ietf.x448"
+   ],
+   "port-level": 6,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.ietf.tls",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.http",
+    "kotoba.kotobaIssue",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 16,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.osaho",
+    "kotoba.test",
+    "kotoba.text",
+    "org.ietf.asn1",
+    "org.ietf.hpke",
+    "org.ietf.x509"
+   ],
+   "port-level": 7,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.ietf.x25519",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "gov.nist.ecc",
+    "gov.nist.sha2",
+    "kotoba.appkit",
+    "kotoba.bim",
+    "kotoba.douga",
+    "kotoba.fsm",
+    "kotoba.http",
+    "kotoba.i18n",
+    "kotoba.ioMultiformats",
+    "kotoba.jpGoDigitalDesignSystem",
+    "kotoba.kamiEizoTimeline",
+    "kotoba.kamiEngineCaeSolver",
+    "kotoba.kotobaCoreContracts",
+    "kotoba.kotobaIssue",
+    "kotoba.kotobaUi",
+    "kotoba.liquidGlassUi",
+    "kotoba.osaho",
+    "kotoba.route",
+    "kotoba.security",
+    "kotoba.shitsuke",
+    "kotoba.webgpu",
+    "org.ietf.chacha20Poly1305",
+    "org.ietf.ed25519",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.ietf.x509",
+    "org.iso.std16739",
+    "org.w3.webcodecs"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "kami-physics",
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": [
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.x25519/README.md",
+     "line": 89,
+     "text": "## Native gate (AWAI-117)"
+    },
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.x25519/kotoba/x25519/native_gate.kotoba",
+     "line": 1,
+     "text": ";; x25519.native-gate -- RFC 7748 known answers for the native X25519 (AWAI-117)."
+    },
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.x25519/local-changes.json",
+     "line": 17,
+     "text": "\"reason\": \"AWAI-117: native X25519 known-answer gate (RFC 7748 sections 5.2 and 6.1, low-order points), generated from an independent Python reference, with thr"
+    },
+    {
+     "key": "AWAI-117",
+     "file": "lib/org.ietf.x25519/test/wycheproof/README.md",
+     "line": 1,
+     "text": "# Wycheproof vectors (vendored, AWAI-117)"
+    }
+   ]
+  },
+  {
+   "lib": "org.ietf.x448",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.http",
+    "kotoba.kotobaIssue",
+    "org.ietf.hpke",
+    "org.ietf.tls",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.ietf.x509",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "kotoba.http",
+    "kotoba.kotobaIssue",
+    "org.ietf.tls",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.osaho",
+    "kotoba.test",
+    "kotoba.text",
+    "org.ietf.asn1"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.iso.pdf",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-bim-editor"
+   ],
+   "required-by-libs": [
+    "kotoba.bim"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 3,
+   "namespaces": [
+    {
+     "ns": "pdf.core",
+     "vars": [
+      "page-text",
+      "pages",
+      "parse"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 1,
+     "cljk": "lib/org.iso.pdf/src/pdf/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text",
+    "org.ietf.deflate"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.iso.std10303",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim",
+    "org.iso.std16739"
+   ],
+   "src": {
+    "cljk": 13,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.iso.std16739",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-bim-editor"
+   ],
+   "require-units": [
+    "packages/kami-app-bim-editor"
+   ],
+   "required-by-libs": [
+    "kotoba.bim"
+   ],
+   "src": {
+    "cljk": 5,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "ifc.core",
+     "vars": [
+      "write-spf"
+     ],
+     "units": [
+      "packages/kami-app-bim-editor"
+     ],
+     "files": 2,
+     "cljk": "lib/org.iso.std16739/src/ifc/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.bytes",
+    "kotoba.coll",
+    "kotoba.edn",
+    "kotoba.http",
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text",
+    "org.iso.std10303"
+   ],
+   "port-level": 9,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.iso.std6983",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-cam-scene"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 7,
+    "kotoba": 0
+   },
+   "vars-used": 6,
+   "namespaces": [
+    {
+     "ns": "kotoba.cam.stock",
+     "vars": [
+      "abs-plastic",
+      "aluminum-6061",
+      "material",
+      "steel-1045",
+      "titanium-ti6al4v",
+      "wood-oak"
+     ],
+     "units": [
+      "packages/kami-cam-scene"
+     ],
+     "files": 2,
+     "cljk": "lib/org.iso.std6983/src/kotoba/cam/stock.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-cam-scene"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.khronos.glb",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.kisekae",
+    "org.khronos.gltf",
+    "org.vrmC.vrm"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-character-creator",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.khronos.gltf",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "require-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 6,
+   "namespaces": [
+    {
+     "ns": "gltf",
+     "vars": [
+      "export-glb-scene",
+      "export-glb-scene-byte-seq",
+      "glb-magic",
+      "le-bytes->u32",
+      "parse-gltf",
+      "u32->le-bytes"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka"
+     ],
+     "files": 3,
+     "cljk": "lib/org.khronos.gltf/src/gltf.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text",
+    "org.khronos.glb"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.materialx.core",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 2,
+   "namespaces": [
+    {
+     "ns": "materialx.core",
+     "vars": [
+      "materialx",
+      "value"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka"
+     ],
+     "files": 1,
+     "cljk": "lib/org.materialx.core/src/materialx/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text",
+    "kotoba.xml"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.openusd.usd",
+   "transitive": false,
+   "manifest-units": [],
+   "require-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "required-by-libs": [],
+   "src": {
+    "cljk": 3,
+    "kotoba": 0
+   },
+   "vars-used": 1,
+   "namespaces": [
+    {
+     "ns": "usd.core",
+     "vars": [
+      "usda"
+     ],
+     "units": [
+      "packages/kami-app-amenominaka"
+     ],
+     "files": 1,
+     "cljk": "lib/org.openusd.usd/src/usd/core.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.error",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.vrmC.vrm",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-character-creator"
+   ],
+   "require-units": [
+    "packages/kami-app-character-creator",
+    "packages/kami-creative-studio"
+   ],
+   "required-by-libs": [
+    "kotoba.kisekae"
+   ],
+   "src": {
+    "cljk": 17,
+    "kotoba": 0
+   },
+   "vars-used": 35,
+   "namespaces": [
+    {
+     "ns": "vrm",
+     "vars": [
+      "parse-vrm"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 1,
+     "cljk": "lib/org.vrmC.vrm/src/vrm.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.compose",
+     "vars": [
+      "compose"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 1,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/compose.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.convert",
+     "vars": [
+      "read-accessor-f32",
+      "read-base-color-texture"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 1,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/convert.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.export",
+     "vars": [
+      "export-glb"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 2,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/export.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.expression",
+     "vars": [
+      "new-manager",
+      "resolve-expression"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 1,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/expression.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.glb",
+     "vars": [
+      "parse-glb",
+      "string->byte-seq",
+      "u32->le-bytes"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 3,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/glb.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.gltf-types",
+     "vars": [
+      "asset",
+      "buffer-target-array-buffer",
+      "buffer-target-element-array-buffer",
+      "component-type-float",
+      "component-type-unsigned-int",
+      "component-type-unsigned-short",
+      "gltf-document"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 2,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/gltf_types.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.math",
+     "vars": [
+      "mat4-from-scale-rotation-translation",
+      "mat4-identity",
+      "mat4-mul",
+      "vec3-one",
+      "vec3-zero"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 1,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/math.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.parse",
+     "vars": [
+      "parse-vrm"
+     ],
+     "units": [
+      "packages/kami-app-character-creator",
+      "packages/kami-creative-studio"
+     ],
+     "files": 2,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/parse.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.part",
+     "vars": [
+      "decompose"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 1,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/part.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.spring",
+     "vars": [
+      "new-simulator",
+      "step"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 1,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/spring.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    },
+    {
+     "ns": "vrm.vrm-types",
+     "vars": [
+      "expression-preset->str",
+      "expression-preset-table",
+      "morph-target-bind",
+      "str->human-bone-name",
+      "vrm-document",
+      "vrm-expression",
+      "vrm-human-bone",
+      "vrm-humanoid",
+      "vrm-meta"
+     ],
+     "units": [
+      "packages/kami-app-character-creator"
+     ],
+     "files": 3,
+     "cljk": "lib/org.vrmC.vrm/src/vrm/vrm_types.cljk",
+     "kotoba": null,
+     "vars-not-defined-in-cljk": []
+    }
+   ],
+   "deps": [
+    "kotoba.test",
+    "kotoba.text",
+    "org.khronos.glb"
+   ],
+   "port-level": 2,
+   "blocks-units": [
+    "packages/kami-app-character-creator",
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.w3.png",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.image"
+   ],
+   "src": {
+    "cljk": 5,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.io",
+    "kotoba.test",
+    "org.ietf.deflate"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-isekai"
+   ],
+   "blocks-waves": [
+    1
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.w3.svg",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.bim"
+   ],
+   "src": {
+    "cljk": 4,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.edn",
+    "kotoba.error",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 3,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-bim-editor"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.w3.webcodecs",
+   "transitive": true,
+   "manifest-units": [],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.douga",
+    "kotoba.kamiEizoTimeline"
+   ],
+   "src": {
+    "cljk": 2,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.io",
+    "kotoba.osaho",
+    "kotoba.test",
+    "kotoba.text"
+   ],
+   "port-level": 5,
+   "blocks-units": [
+    "packages/kami-creative-studio"
+   ],
+   "blocks-waves": [
+    0
+   ],
+   "tracking": []
+  },
+  {
+   "lib": "org.w3.webgpu",
+   "transitive": false,
+   "manifest-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt"
+   ],
+   "require-units": [],
+   "required-by-libs": [
+    "kotoba.webgpu"
+   ],
+   "src": {
+    "cljk": 1,
+    "kotoba": 0
+   },
+   "vars-used": 0,
+   "namespaces": [],
+   "deps": [
+    "kotoba.text"
+   ],
+   "port-level": 1,
+   "blocks-units": [
+    "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
+    "packages/kami-app-bim-editor",
+    "packages/kami-app-cad",
+    "packages/kami-app-character-creator",
+    "packages/kami-app-hygaccess-plant",
+    "packages/kami-app-modeler",
+    "packages/kami-app-sculpt",
+    "packages/kami-app-suji"
+   ],
+   "blocks-waves": [
+    0,
+    1
+   ],
+   "tracking": []
+  }
+ ],
+ "unresolved-namespaces": {
+  "cheshire.core": [
+   "packages/kami-app-isekai",
+   "packages/kami-isekai-assets"
+  ],
+  "cljs.core.async": [
+   "packages/host",
+   "packages/kami-app-sip",
+   "packages/kami-engine-sdk"
+  ],
+  "cljs.core.async.macros": [
+   "packages/kami-app-sip"
+  ],
+  "cljs.pprint": [
+   "packages/kami-creative-studio"
+  ],
+  "cljs.reader": [
+   "packages/kami-app-amenominaka",
+   "packages/kami-app-animator",
+   "packages/kami-app-bim-editor",
+   "packages/kami-app-cad",
+   "packages/kami-app-character-creator",
+   "packages/kami-app-isekai",
+   "packages/kami-app-modeler",
+   "packages/kami-app-sculpt",
+   "packages/kami-app-sip",
+   "packages/kami-genre-base-systems"
+  ],
+  "cljs.test": [
+   "kami-gameplay",
+   "packages/kami-app-suji",
+   "packages/kami-webvr"
+  ],
+  "clojure.edn": [
+   "packages/kami-engine-guest",
+   "packages/kami-scene-contracts"
+  ],
+  "clojure.java.io": [
+   "packages/kami-app-fixtures",
+   "packages/kami-app-suji",
+   "packages/kami-contracts",
+   "packages/kami-creative-studio",
+   "packages/kami-scene-contracts"
+  ],
+  "clojure.java.shell": [
+   "packages/kami-creative-studio"
+  ],
+  "clojure.pprint": [
+   "packages/kami-app-isekai"
+  ],
+  "clojure.test": [
+   "kami-gameplay",
+   "kami-physics",
+   "kami-render",
+   "packages/kami-genre-base-systems",
+   "packages/kami-isekai-assets"
+  ],
+  "datalevin.core": [
+   "packages/kami-app-sip",
+   "packages/kami-engine-sdk"
+  ],
+  "goog.object": [
+   "packages/kami-app-modeler"
+  ],
+  "hiccup2.core": [
+   "packages/kami-creative-studio"
+  ],
+  "jsonista.core": [
+   "packages/kami-app-isekai"
+  ],
+  "kotoba.lang.capability-values": [
+   "packages/kami-creative-studio"
+  ],
+  "kotoba.render.character": [
+   "kami-render"
+  ],
+  "kotoba.render.foreground-density": [
+   "kami-render"
+  ],
+  "kotoba.render.mesh": [
+   "kami-render"
+  ],
+  "org.httpkit.client": [
+   "packages/kami-app-isekai"
+  ],
+  "physics_2d": [
+   "kami-physics"
+  ],
+  "promesa.core": [
+   "packages/kami-app-modeler",
+   "packages/kami-app-suji"
+  ],
+  "reagent.dom": [
+   "packages/kami-creative-studio"
+  ],
+  "reagent.dom.client": [
+   "packages/kami-app-amenominaka",
+   "packages/kami-app-suji"
+  ],
+  "shadow.css": [
+   "packages/kami-creative-studio"
+  ],
+  "shadow.css.build": [
+   "packages/kami-creative-studio"
+  ],
+  "suji.methods.attachment": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.girdle": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.load": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.math": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.muscle": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.pose": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.posture": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.recruit": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.segment": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.spine": [
+   "packages/kami-app-suji"
+  ],
+  "suji.methods.strain": [
+   "packages/kami-app-suji"
+  ]
+ }
+}

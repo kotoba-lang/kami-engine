@@ -22,13 +22,13 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1329,
+  "tracked": 1333,
   "class": {
    "a": 244,
    "c": 44,
    "d": 124,
-   "keep": 397,
-   "native": 9,
+   "keep": 400,
+   "native": 10,
    "o": 511
   },
   "port": {
@@ -830,10 +830,10 @@
   },
   {
    "unit": "docs",
-   "files": 7,
+   "files": 10,
    "classes": {
     "a": 1,
-    "keep": 6
+    "keep": 9
    },
    "depends-on": [],
    "placement": "kami-engine"
@@ -3435,11 +3435,11 @@
   },
   {
    "unit": "scripts",
-   "files": 15,
+   "files": 16,
    "classes": {
     "a": 1,
     "d": 2,
-    "native": 8,
+    "native": 9,
     "o": 4
    },
    "port": {
@@ -3702,6 +3702,11 @@
    "class": "keep"
   },
   {
+   "path": "docs/evidence/upstream-apis-amu-check-20261031.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
    "path": "docs/migration-ledger.json",
    "unit": "docs",
    "class": "keep"
@@ -3713,6 +3718,16 @@
   },
   {
    "path": "docs/migration-placement.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
+   "path": "docs/upstream-apis.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
+   "path": "docs/upstream-apis.md",
    "unit": "docs",
    "class": "keep"
   },
@@ -14377,6 +14392,11 @@
    "unit": "scripts",
    "class": "d",
    "note": "shell runner outside the native gate"
+  },
+  {
+   "path": "scripts/upstream_apis.py",
+   "unit": "scripts",
+   "class": "native"
   },
   {
    "path": "scripts/wit_test.cljk",

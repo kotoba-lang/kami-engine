@@ -1,0 +1,366 @@
+{
+ "schema": "kami.upstream-apis-amu-check.v1",
+ "issue": "JUN-643",
+ "date": "2026-10-31",
+ "inputs": {
+  "kotoba-lib": {
+   "repo": "kotoba-lang/kotoba",
+   "rev": "0dd4355673e1f5c0fdb07c8718eea8e422a9cb0a"
+  },
+  "kami-engine": {
+   "repo": "kotoba-lang/kami-engine",
+   "rev": "cc6e15ca455c8c6318e22da2dd2028015fe78a86"
+  }
+ },
+ "amu": {
+  "repo": "kotoba-lang/amu",
+  "rev": "f7c07dff86d7fb5e89219a0f9ad4a83b2a83c82e",
+  "pinned-in": ".github/workflows/ci.yml",
+  "entry": "bin/amu (macOS arm64)",
+  "bin-amu-sha256": "e4f63a6cd0f8a1ea802aebfdab225dffea1b33ae53ce49dc6fc7237644207aff",
+  "compiler-sha256": "c527540c20686e02e2211a500a1edd24fe999a4caf6a9576e19e1bb13acde23f",
+  "cli-json": {
+   "image": "e4f63a6cd0f8a1ea802aebfdab225dffea1b33ae53ce49dc6fc7237644207aff",
+   "compiler": "c527540c20686e02e2211a500a1edd24fe999a4caf6a9576e19e1bb13acde23f"
+  }
+ },
+ "method": "each src .kotoba file of every library in docs/upstream-apis.json (and each .kotoba twin of a kami-used namespace found in another library) is written from the kotoba revision's git object to a temporary directory at its lib/ path and checked on its own: `amu check <file>`. The CLI compiles one self-contained file, so a file that requires another module is refused with E6002 rather than checked.",
+ "command": "amu check lib/<id>/src/<path>.kotoba",
+ "checks": [
+  {
+   "lib": "kotoba.cartpoleMath",
+   "path": "lib/kotoba.cartpoleMath/src/kotoba/cartpole_math.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2105"
+   ],
+   "output": [
+    "seed: E2105 unsupported type ':vector-f64' (byte 413)"
+   ]
+  },
+  {
+   "lib": "kotoba.coll",
+   "path": "lib/kotoba.coll/src/kotoba/lang/bounded_coll.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'empty-string-set': expected :i64 (byte 545)"
+   ]
+  },
+  {
+   "lib": "kotoba.domGpu",
+   "path": "lib/kotoba.domGpu/src/kotoba/wasm/dom.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module kotoba.wasm.dom-core is missing from the explicit source paths (byte 439)"
+   ]
+  },
+  {
+   "lib": "kotoba.domGpu",
+   "path": "lib/kotoba.domGpu/src/kotoba/wasm/dom_core.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'empty-document': expected :i64 (byte 484)"
+   ]
+  },
+  {
+   "lib": "kotoba.edn",
+   "path": "lib/kotoba.edn/src/kotoba/edn.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module kotoba.lang.edn is missing from the explicit source paths (byte 169)"
+   ]
+  },
+  {
+   "lib": "kotoba.edn",
+   "path": "lib/kotoba.edn/src/kotoba/lang/canonical_document.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'encode-canonical': expected :i64 (byte 530)"
+   ]
+  },
+  {
+   "lib": "kotoba.fsm",
+   "path": "lib/kotoba.fsm/src/kami/fsm.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2124"
+   ],
+   "output": [
+    "seed: E2124 def value must be an integer, string, keyword or vector literal: 'player-state-type' (byte 85)"
+   ]
+  },
+  {
+   "lib": "kotoba.fsm",
+   "path": "lib/kotoba.fsm/src/kotoba/fsm.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module kami.fsm is missing from the explicit source paths (byte 28)"
+   ]
+  },
+  {
+   "lib": "kotoba.http",
+   "path": "lib/kotoba.http/src/kotoba/lang/exact_router.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'empty-routes': expected :i64 (byte 378)"
+   ]
+  },
+  {
+   "lib": "kotoba.ioMultiformats",
+   "path": "lib/kotoba.ioMultiformats/src/multiformats/cid.kotoba",
+   "exit": 0,
+   "codes": [],
+   "output": [
+    "ok"
+   ]
+  },
+  {
+   "lib": "kotoba.ioMultiformats",
+   "path": "lib/kotoba.ioMultiformats/src/multiformats/cid_hash.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module multiformats.cid is missing from the explicit source paths (byte 804)"
+   ]
+  },
+  {
+   "lib": "kotoba.ioMultiformats",
+   "path": "lib/kotoba.ioMultiformats/src/multiformats/sha256.kotoba",
+   "exit": 0,
+   "codes": [],
+   "output": [
+    "ok"
+   ]
+  },
+  {
+   "lib": "kotoba.json",
+   "path": "lib/kotoba.json/src/kotoba/json.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module json.core is missing from the explicit source paths (byte 134)"
+   ]
+  },
+  {
+   "lib": "kotoba.kotobaHir",
+   "path": "lib/kotoba.kotobaHir/src/kotoba/hir.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'module-problem': expected :i64 (byte 16801)"
+   ]
+  },
+  {
+   "lib": "kotoba.kotobaIo",
+   "path": "lib/kotoba.kotobaIo/src/kotoba/io.kotoba",
+   "exit": 0,
+   "codes": [],
+   "output": [
+    "ok"
+   ]
+  },
+  {
+   "lib": "kotoba.langgraph",
+   "path": "lib/kotoba.langgraph/src/langgraph/core.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6023"
+   ],
+   "output": [
+    "seed: E6023 namespace templates are not admitted in R5: :params (byte 3458)"
+   ]
+  },
+  {
+   "lib": "kotoba.osaho",
+   "path": "lib/kotoba.osaho/src/kotoba/kir/alpha_normalization.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module kotoba.form is missing from the explicit source paths (byte 381)"
+   ]
+  },
+  {
+   "lib": "kotoba.osaho",
+   "path": "lib/kotoba.osaho/src/kotoba/kir/definition_identity.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module kotoba.form is missing from the explicit source paths (byte 513)"
+   ]
+  },
+  {
+   "lib": "kotoba.postfx",
+   "path": "lib/kotoba.postfx/src/postfx.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'effect-types': expected :i64 (byte 523)"
+   ]
+  },
+  {
+   "lib": "kotoba.process",
+   "path": "lib/kotoba.process/src/kotoba/process.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module kotoba.lang.process is missing from the explicit source paths (byte 138)"
+   ]
+  },
+  {
+   "lib": "kotoba.terrain",
+   "path": "lib/kotoba.terrain/src/terrain_golden.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'lattice-hash': expected :i64 (byte 251)"
+   ]
+  },
+  {
+   "lib": "kotoba.text",
+   "path": "lib/kotoba.text/src/kotoba/lang/bounded_regex.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'regex-contains': expected :i64 (byte 26121)"
+   ]
+  },
+  {
+   "lib": "kotoba.text",
+   "path": "lib/kotoba.text/src/kotoba/lang/bounded_text.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2101"
+   ],
+   "output": [
+    "seed: E2101 unknown or unsupported form 'string-split-count' (byte 10849)"
+   ]
+  },
+  {
+   "lib": "kotoba.text",
+   "path": "lib/kotoba.text/src/kotoba/lang/text.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'join': expected :i64 (byte 2466)"
+   ]
+  },
+  {
+   "lib": "kotoba.text",
+   "path": "lib/kotoba.text/src/kotoba/text.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module kotoba.lang.text is missing from the explicit source paths (byte 202)"
+   ]
+  },
+  {
+   "lib": "kotoba.vegetation",
+   "path": "lib/kotoba.vegetation/src/vegetation_golden.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'rng-next-f64': expected :i64 (byte 363)"
+   ]
+  },
+  {
+   "lib": "org.ietf.cbor",
+   "path": "lib/org.ietf.cbor/src/cbor/codec.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module cbor.fragment is missing from the explicit source paths (byte 250)"
+   ]
+  },
+  {
+   "lib": "org.ietf.cbor",
+   "path": "lib/org.ietf.cbor/src/cbor/core.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module cbor.fragment is missing from the explicit source paths (byte 507)"
+   ]
+  },
+  {
+   "lib": "org.ietf.cbor",
+   "path": "lib/org.ietf.cbor/src/cbor/form.kotoba",
+   "exit": 1,
+   "codes": [
+    "E6002"
+   ],
+   "output": [
+    "seed: E6002 required module kotoba.form is missing from the explicit source paths (byte 159)"
+   ]
+  },
+  {
+   "lib": "org.ietf.cbor",
+   "path": "lib/org.ietf.cbor/src/cbor/fragment.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'encode-f64': expected :i64 (byte 10241)"
+   ]
+  },
+  {
+   "lib": "org.ietf.cbor",
+   "path": "lib/org.ietf.cbor/src/cbor/value.kotoba",
+   "exit": 1,
+   "codes": [
+    "E2104"
+   ],
+   "output": [
+    "seed: E2104 type mismatch in 'make': expected :i64 (byte 507)"
+   ]
+  }
+ ]
+}
