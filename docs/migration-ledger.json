@@ -4,12 +4,12 @@
  "inputs": {
   "kotoba-lib": {
    "repo": "kotoba-lang/kotoba",
-   "rev": "455b84fbc812ab05ab5dae1cdae117d44a1da264"
+   "rev": "3ad286f520505db7cb82c04f76d73b621bc17700"
   },
   "amu-probe": {
    "repo": "kotoba-lang/amu",
-   "rev": "3c9eb7f7f74e0cf636ba75deb88faca5e277ca77",
-   "evidence": "docs/evidence/amu-capability-probe-20261031b.json"
+   "rev": "c2186d762e200205540f4ef9ca2b3ae66c4fc770",
+   "evidence": "docs/evidence/amu-capability-probe-20261101.json"
   }
  },
  "classes": {
@@ -22,12 +22,12 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1365,
+  "tracked": 1367,
   "class": {
    "a": 244,
    "c": 44,
    "d": 124,
-   "keep": 404,
+   "keep": 406,
    "native": 38,
    "o": 511
   },
@@ -49,8 +49,8 @@
    "files": 358
   },
   "keyword-map-literal": {
-   "refusal": "E2105 unsupported type ':a'",
-   "what": "a keyword map literal such as {:a 1}; defrecord is admitted",
+   "refusal": "E2127 assoc of an absent key / lookup of an absent key; E2104 a literal passed to an unannotated parameter or where a declared record is expected, get with a default, contains?, dissoc, if arms with different keys, map over a vector of literals; E2101 merge / update; E2105 mixed key kinds; E2133 {}; E2128 a fn value; E2102 nil",
+   "what": "a keyword map literal such as {:a 1}. Since amu c2186d7 (PR #1750) it is a closed record: (:k m), get and assoc of a present key, nesting, loop/recur, an unannotated defn result and :f64 values are admitted; the record cannot gain or lose keys and cannot cross an unannotated parameter. Still flagged on any keyword literal, because whether a file stays inside the admitted subset depends on how the map flows between functions, which a regex cannot decide (see the JUN-728 note below)",
    "issues": [
     "JUN-728"
    ],
@@ -902,10 +902,10 @@
   },
   {
    "unit": "docs",
-   "files": 14,
+   "files": 16,
    "classes": {
     "a": 1,
-    "keep": 13
+    "keep": 15
    },
    "depends-on": [],
    "placement": "kami-engine"
@@ -3851,6 +3851,11 @@
    "class": "keep"
   },
   {
+   "path": "docs/evidence/amu-capability-probe-20261101.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
    "path": "docs/evidence/native-gates-oracle-20261031.json",
    "unit": "docs",
    "class": "keep"
@@ -3862,6 +3867,11 @@
   },
   {
    "path": "docs/evidence/port-rewrite-rules-20261031.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
+   "path": "docs/evidence/port-rewrite-rules-20261101.json",
    "unit": "docs",
    "class": "keep"
   },

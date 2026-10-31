@@ -12,8 +12,12 @@ and is measured by the `rewrite-rules` gate of `scripts/native_gates.py`: a
 (the negative control), each `.after*` file must check and run to its
 `;; expect-value:`. `.admitted` files show forms that need no rewrite and
 `.out-of-scope` files record refusals these rules do not remove. Results at
-the CI pin (amu `3c9eb7f`, `bin/amu` sha256 `750159f1…54fb`):
-`docs/evidence/port-rewrite-rules-20261031.json`.
+the CI pin (amu `c2186d7`, `bin/amu` sha256 `91aa38eb…0ea40`):
+`docs/evidence/port-rewrite-rules-20261101.json`. Every case gave the same
+result as at the previous pin `3c9eb7f`
+(`docs/evidence/port-rewrite-rules-20261031.json`): amu PR #1750 (JUN-728:
+keyword map literals as closed records, `:f64` record fields) changed no
+refusal the corpus covers. `seed/HEADS` line numbers below are at `c2186d7`.
 
 Authority references are to `kotoba-lang/kotoba-lang` (`lang/`) and
 `kotoba-lang/amu` (`seed/HEADS`).
@@ -24,7 +28,7 @@ Authority references are to `kotoba-lang/kotoba-lang` (`lang/`) and
 - **Authority:** `lang/guest-grammar.edn:527-532` (`:atom-local`, slice 1:
   "reading it inside loop/doseq/dotimes is refused"); `lang/local-state.edn:112-119`
   (`:out-of-scope :writes-under-iteration`: "a future slice may admit it by
-  threading the cell through the loop's own accumulator"); `seed/HEADS:372-373`
+  threading the cell through the loop's own accumulator"); `seed/HEADS:383-384`
   (`HD-ATOM`: the cell may appear only as the first argument of
   swap!/reset!/deref in the binding function).
 - **Status:** permanent refusal for now; port by hand-threading the value.
@@ -61,7 +65,7 @@ as is (`atom-straight-line.admitted`, 1).
 ## Rule 2: a top-level defn passed as a value
 
 - **Removes:** `E2102 unknown symbol 'f'`.
-- **Authority:** `seed/HEADS:346-348` (`HD-FN-REF`: `(fn-ref f)` for a
+- **Authority:** `seed/HEADS:357-359` (`HD-FN-REF`: `(fn-ref f)` for a
   single-clause, non-variadic, non-aborting defn of the file; `HD-INVOKE`).
 - **Rewrite:** where a module defn's name is used as a value (an argument,
   a let init, a record field), write `(fn-ref f)`; call a fn value held in a
@@ -82,8 +86,8 @@ Passing a defn straight to `map`/`filter`/`reduce` is already admitted
 ## Rule 3: a numeric set literal
 
 - **Removes:** `E2104 type mismatch in '1': expected :keyword`.
-- **Authority:** `seed/HEADS:328-329` (`HD-SETLIT`: a set literal is keyword-only;
-  `typed-set-new` builds the others) and `seed/HEADS:291` (`HD-SET-NEW`).
+- **Authority:** `seed/HEADS:329-330` (`HD-SETLIT`: a set literal is keyword-only;
+  `typed-set-new` builds the others) and `seed/HEADS:292` (`HD-SET-NEW`).
 - **Rewrite:** `#{1 2}` → `(typed-set-new [:set :i64] 1 2)`.
 
 ```clojure
@@ -101,7 +105,7 @@ needs another representation (a sorted vector plus search, or a `case`).
   top-level form 'defprotocol'` / `'defmulti'`.
 - **Authority:** `lang/guest-grammar.edn:498-501` (`:closed-multimethod`, desugars
   to one module-local defn with static `case` dispatch: admitted by the spec,
-  not yet by the native checker; JUN-730), `seed/HEADS:346` (`fn-ref`), and the
+  not yet by the native checker; JUN-730), `seed/HEADS:357` (`fn-ref`), and the
   record field type `[:fn [[T ..] R]]`.
 - **reify / defprotocol → record of fn-ref closures.** Each protocol method
   becomes a record field of fn type; each implementation is a defn put in the
