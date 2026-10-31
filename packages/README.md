@@ -20,7 +20,6 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-app-bim-editor](kami-app-bim-editor) | `544cb5d` | Imported `kami-app-bim-editor` (no repository description) |
 | [kami-app-cad](kami-app-cad) | `db874d8` | Browser NURBS/CAD authoring workspace: loft sections, a dimension-constrained sketch, extruded solids with limited Boolean ops, feature history and EDN projects. Geometry comes from kami-engine-cad, rendering from kotoba-lang/webgpu; requires WebGPU. |
 | [kami-app-character-creator](kami-app-character-creator) | `8e776d9` | EDN-native VRM character creator (ADR-2607031200) — Phase 1: CharacterDoc -> real .vrm export, built on kotoba-lang/{vrm,character} |
-| [kami-engine-cae-solver](kami-engine-cae-solver) | `92dcd10` | CAE solver contract — solve multimethod dispatch (:rom ↔ :lbm) |
 | [kami-app-hygaccess-plant](kami-app-hygaccess-plant) | `a7451e7` | Mixing-tank CFD simulation (nagare + kami-engine-cae-solver) for the sodium-hypochlorite dilution step of cloud-itonami-hygiene-access's water-purification-drops |
 | [kami-engine-modeling](kami-engine-modeling) | `c514bc8` | Imported `kami-engine-modeling` (no repository description) |
 | [kami-app-modeler](kami-app-modeler) | `091b260` | Imported `kami-app-modeler` (no repository description) |
@@ -35,20 +34,11 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-creative-studio](kami-creative-studio) | `2652dd3` | Imported `kami-creative-studio` (no repository description) |
 | [kami-eizo-compositor](kami-eizo-compositor) | `2e4382d` | VFX compositing node data model (chroma-key/roto/tracking/blend) — kotoba-lang eizo domain, ADR-2607121400 |
 | [kami-eizo-grade](kami-eizo-grade) | `f960c23` | ASC CDL / monotone curves / .cube LUT / waveform+vectorscope color-grading data model (kami-eizo family, ADR-2607121400) |
-| [kami-engine-vphysics](kami-engine-vphysics) | `7ff753e` | shared vehicle-physics primitives (road load, aero force, range) |
-| [kami-engine-aero](kami-engine-aero) | `fabfd90` | reduced-order aero Cd solver (component build-up) + design range loop |
 | [kami-engine-core](kami-engine-core) | `dcefa5a` | engine core — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
-| [kami-engine-crash](kami-engine-crash) | `849a2be` | reduced-order frontal-crash solver (:rom-crash) |
-| [kami-engine-echem](kami-engine-echem) | `8b7b449` | reduced-order PEM fuel-cell solver (:rom-fc) |
 | [kami-engine-engine](kami-engine-engine) | `66fd75a` | umbrella (World+Clock+Net) — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
 | [kami-engine-io](kami-engine-io) | `87868b4` | engine I/O — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
-| [kami-engine-motor](kami-engine-motor) | `c465afd` | reduced-order traction-motor solver (:rom-motor) |
-| [kami-engine-pack](kami-engine-pack) | `770965c` | Reduced-order lithium pack solver (:rom-pack) — pack-level energy with Peukert rate derating and IR sag. Power+endurance -> pack mass. |
-| [kami-engine-rotor](kami-engine-rotor) | `41ba842` | Reduced-order rotor solver (:rom-rotor) — momentum theory + figure of merit. Thrust → diameter, RPM, shaft power, torque, blade loading. |
-| [kami-engine-multirotor](kami-engine-multirotor) | `97377fa` | The multirotor mass spiral: payload + endurance -> MTOW, or a refusal. Over kami-engine-rotor/-pack/-motor. |
 | [kami-engine-render](kami-engine-render) | `87f0fd6` | engine render (wgpu bootstrap + scene pipelines CLJC IR) — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
 | [kami-engine-script-runtime](kami-engine-script-runtime) | `55aefca` | script runtime (wasmtime/wasmi dual backend host CLJC contracts) — wasmi no-JIT invariant. restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
-| [kami-engine-vehicle-designer](kami-engine-vehicle-designer) | `84da8ae` | Clean-sheet BEV/FCEV vehicle design actor — concept proposer sealed behind a PhysicsGovernor, plus Isaac/CAE sim-verify and datafied BOM→CAM→assembly (langgraph StateGraph). |
 | [kami-engine-web](kami-engine-web) | `1bc9526` | engine web entry — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
 | [kami-flow](kami-flow) | `9e8d356` | KAMI Flow — RTL->PnR->GDSII->Verify/Power/DFT/SI/Yield->STA->DRC/LVS->Signoff orchestration pipeline. Restored from legacy kami-flow crate (deleted #82). ADR-2607010930. |
 | [kami-game-scene](kami-game-scene) | `f7f97c5` | EDN authoring surface for kami-game's ANIMATION-STATE presets, Godot game catalog, brainrot evolution/characters, Sabiotoshi item catalog, battle-royale storm/consumables/weapons, and Pokoa dex/items. Restored from legacy kami-game-scene crate (deleted #82). ADR-2607010930. |
@@ -63,7 +53,6 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-vehicle-scene](kami-vehicle-scene) | `da9a156` | EDN authoring surface for kami-vehicle ground/garage/powertrain CONFIG (surface grip table, demo-circuit zone map, engine/gearbox/tire presets, 6 garage SedanSpecs). Restored from legacy kami-vehicle-scene crate (kotoba-lang/kami-engine, deleted PR #82). ADR-2607010930. |
 | [kami-web](kami-web) | `2c4064b` | Pure-Clojure port of kami-engine's kami-web (WASM entry): matrix math, render-IR schema, PPTX layout, entry catalog |
 | [douga](douga) | `93639cd` | Pure timeline→ffmpeg render-plan builder + command builders — CLJC craft lib |
-| [cad](cad) | `161b152` | Open-source CAD/CAM workbench as EDN geometry data + portable CLJC model. |
 | [biomech](biomech) | `c85ffb9` | Biomechanics simulation domain layer — 筋肉/骨/皮膚/内臓. Pure Clojure. kotoba-lang capability. |
 | [freeboard](freeboard) | `11510d5` | Apple-Freeform-style infinite-canvas board — clj brain + kami-render(wgpu) + kasane import (ADR-2606280200) |
 | [swarm-choreo](swarm-choreo) | `fe69e71` | Governed, precomputed multi-agent choreography (drone light shows) over ROS 2 — kotoba-lang |
@@ -80,3 +69,22 @@ kotoba `lib/` (`docs/migration-placement.json`), so the copies here were removed
 | kami-ongaku-project | `6dccb9e` | kotoba `lib/kotoba.kamiOngakuProject` |
 | kami-mangaka-expression | `96fc3ce` | kotoba `lib/kotoba.kamiMangakaExpression` |
 | kami-sensor-sim | `caae678` | kotoba `lib/kotoba.kamiSensorSim` |
+
+## Moved to kotoba lib/ (JUN-649)
+
+Used outside a game engine, so placed in the kotoba monorepo (`docs/migration-placement.json`).
+Moved with their provenance (`imports.json`) and local changes:
+
+| package | upstream commit | now |
+|---|---|---|
+| cad | `161b152` | kotoba `lib/kotoba.cad` |
+| kami-engine-cae-solver | `92dcd10` | kotoba `lib/kotoba.kamiEngineCaeSolver` |
+| kami-engine-vphysics | `7ff753e` | kotoba `lib/kotoba.kamiEngineVphysics` |
+| kami-engine-aero | `fabfd90` | kotoba `lib/kotoba.kamiEngineAero` |
+| kami-engine-crash | `849a2be` | kotoba `lib/kotoba.kamiEngineCrash` |
+| kami-engine-echem | `8b7b449` | kotoba `lib/kotoba.kamiEngineEchem` |
+| kami-engine-motor | `c465afd` | kotoba `lib/kotoba.kamiEngineMotor` |
+| kami-engine-pack | `770965c` | kotoba `lib/kotoba.kamiEnginePack` |
+| kami-engine-rotor | `41ba842` | kotoba `lib/kotoba.kamiEngineRotor` |
+| kami-engine-multirotor | `97377fa` | kotoba `lib/kotoba.kamiEngineMultirotor` |
+| kami-engine-vehicle-designer | `84da8ae` | kotoba `lib/kotoba.kamiEngineVehicleDesigner` |

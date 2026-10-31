@@ -17,7 +17,10 @@
         {:git/url "https://github.com/kotoba-lang/kotoba.git"
          :git/sha "4bf68e1a1b205674c70f386d59e430801fae3572"
          :deps/root "lib/kotoba.nagare"}
+        ;; cae-solver lives in the kotoba monorepo (lib/kotoba.kamiEngineCaeSolver, JUN-649).
         io.github.kotoba-lang/kami-engine-cae-solver
-        {:local/root "../kami-engine-cae-solver"}}
+        {:git/url "https://github.com/kotoba-lang/kotoba.git"
+         :git/sha "1253cd8ba563fdc43a8023f0f735ca69ff4d6476"
+         :deps/root "lib/kotoba.kamiEngineCaeSolver"}}
  :aliases
  {:test {:extra-paths ["test"]}}}

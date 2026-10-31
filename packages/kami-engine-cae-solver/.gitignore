@@ -1,7 +1,0 @@
-.cache/
-.cpcache/
-.clj-kondo/.cache/
-.lsp/
-.DS_Store
-dist/
-.nbb/
