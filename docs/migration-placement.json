@@ -144,7 +144,8 @@
   },
   "kami-engine:packages/cad": {
    "to": "kotoba",
-   "reason": "CAD/CAM; consumers include kami-engine-vehicle-designer, which goes to kotoba"
+   "reason": "CAD/CAM; consumers include kami-engine-vehicle-designer, which goes to kotoba",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.cad (JUN-649)"
   },
   "kami-engine:packages/douga": {
    "to": "kotoba",
@@ -232,7 +233,8 @@
   },
   "kami-engine:packages/kami-engine-aero": {
    "to": "kotoba",
-   "reason": "aerodynamic drag solver (CAE)"
+   "reason": "aerodynamic drag solver (CAE)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineAero (JUN-649)"
   },
   "kami-engine:packages/kami-engine-animation": {
    "to": "kotoba",
@@ -240,7 +242,8 @@
   },
   "kami-engine:packages/kami-engine-cae-solver": {
    "to": "kotoba",
-   "reason": "CAE solver contract; non-game consumers cloud-itonami/tsukuru-actor, com-junkawasaki/root probes"
+   "reason": "CAE solver contract; non-game consumers cloud-itonami/tsukuru-actor, com-junkawasaki/root probes",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineCaeSolver (JUN-649)"
   },
   "kami-engine:packages/kami-engine-core": {
    "to": "kami-engine",
@@ -248,11 +251,13 @@
   },
   "kami-engine:packages/kami-engine-crash": {
    "to": "kotoba",
-   "reason": "crash solver (CAE)"
+   "reason": "crash solver (CAE)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineCrash (JUN-649)"
   },
   "kami-engine:packages/kami-engine-echem": {
    "to": "kotoba",
-   "reason": "fuel-cell solver (CAE)"
+   "reason": "fuel-cell solver (CAE)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineEchem (JUN-649)"
   },
   "kami-engine:packages/kami-engine-engine": {
    "to": "kami-engine",
@@ -268,15 +273,18 @@
   },
   "kami-engine:packages/kami-engine-motor": {
    "to": "kotoba",
-   "reason": "traction-motor solver (CAE)"
+   "reason": "traction-motor solver (CAE)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineMotor (JUN-649)"
   },
   "kami-engine:packages/kami-engine-multirotor": {
    "to": "kotoba",
-   "reason": "multirotor sizing (CAE)"
+   "reason": "multirotor sizing (CAE)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineMultirotor (JUN-649)"
   },
   "kami-engine:packages/kami-engine-pack": {
    "to": "kotoba",
-   "reason": "battery-pack solver (CAE)"
+   "reason": "battery-pack solver (CAE)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEnginePack (JUN-649)"
   },
   "kami-engine:packages/kami-engine-render": {
    "to": "kami-engine",
@@ -284,7 +292,8 @@
   },
   "kami-engine:packages/kami-engine-rotor": {
    "to": "kotoba",
-   "reason": "rotor solver (CAE)"
+   "reason": "rotor solver (CAE)",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineRotor (JUN-649)"
   },
   "kami-engine:packages/kami-engine-script-runtime": {
    "to": "kami-engine",
@@ -292,11 +301,13 @@
   },
   "kami-engine:packages/kami-engine-vehicle-designer": {
    "to": "kotoba",
-   "reason": "vehicle design actor; non-game consumer cloud-itonami/cloud-itonami-isic-2910"
+   "reason": "vehicle design actor; non-game consumer cloud-itonami/cloud-itonami-isic-2910",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineVehicleDesigner (JUN-649)"
   },
   "kami-engine:packages/kami-engine-vphysics": {
    "to": "kotoba",
-   "reason": "vehicle-physics primitives shared by the CAE solvers"
+   "reason": "vehicle-physics primitives shared by the CAE solvers",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineVphysics (JUN-649)"
   },
   "kami-engine:packages/kami-engine-web": {
    "to": "kami-engine",

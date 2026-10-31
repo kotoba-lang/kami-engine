@@ -3,8 +3,8 @@
   "files": {
     "deps.edn": {
       "imported-sha256": "5ab02da212a0d114783ae31253127b618fb222eb58f05bd361e595dc312d1aa2",
-      "sha256": "614b057fdbf440fa5938d61b8d43bcb76f76a47848e74ff9d3d86e833408b62e",
-      "reason": "Git dependencies on kami-* repositories that are bundled here (kami-engine-cae-solver) become local roots so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :lint, alias :cljs): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+      "sha256": "6ba73c3d88656bc378d86e1958119773e5342d94f752d6b47cb4f886db197a40",
+      "reason": "The git dependency on kami-engine-cae-solver points at the kotoba monorepo's lib/kotoba.kamiEngineCaeSolver, where that package now lives (JUN-649), so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :lint, alias :cljs): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
     }
   }
 }
