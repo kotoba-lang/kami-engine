@@ -104,9 +104,10 @@ python3 scripts/native_gates.py --amu ../amu/bin/amu --gate wit  # one gate
 Each gate is a Kotoba program in `scripts/native/`; `native_gates.py` embeds the
 files it reads, runs it with `amu run`, and decodes main's i64 result (0 is a
 pass; the codes are listed at the top of each program). Every gate also runs
-mutants of its inputs that must fail. `scripts/native/edn_read.kotoba` works
-around the native EDN reader's handling of commas, newlines, comments and
-whitespace runs; see its header before changing it.
+mutants of its inputs that must fail. `scripts/native/edn_read.kotoba` reads
+repository files with the native `document-edn-read` as they are: since amu
+3c9eb7f (JUN-650) it treats commas, newlines, `;` comments and whitespace runs
+as EDN does, so the earlier `edn-clean` workaround is gone (JUN-726).
 
 The migration ledger must list exactly the tracked files. After adding,
 removing or renaming a file, regenerate it (it reads kotoba `lib/` to resolve

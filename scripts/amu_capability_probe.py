@@ -7,11 +7,16 @@ Each probe is one canonical .kotoba file. `blocker` names the entry of
 BLOCKERS in scripts/migration_ledger.py that the probe measures (None for
 probes that only record a rewrite rule or an admitted form). Re-run this when
 the Amu pin in .github/workflows/ci.yml moves, and update BLOCKERS and the
-evidence date with it.
+evidence path in scripts/migration_ledger.py with it. The recorded amu revision
+is the pin in ci.yml and the date comes from the YYYYMMDD in the output name.
 """
-import hashlib, json, subprocess, sys, tempfile
+import hashlib, json, re, subprocess, sys, tempfile
 from pathlib import Path
 amu = sys.argv[1]; out = sys.argv[2]
+CI = (Path(__file__).resolve().parent.parent / ".github/workflows/ci.yml").read_text()
+PIN = re.search(r"repository:\s*kotoba-lang/amu\s*\n\s*ref:\s*([0-9a-f]{40})", CI).group(1)
+_d = re.search(r"(\d{4})(\d{2})(\d{2})", Path(out).name)
+DATE = "-".join(_d.groups()) if _d else None
 P = [
  ("multi-module", "require", "(ns probe (:require [kotoba.lang.coll :as c]))\n\n(defn main [] :i64 0)\n"),
  ("keyword-map-literal", "let-map", "(defn main [] :i64 (let [m {:a 1}] (:a m)))"),
@@ -48,8 +53,8 @@ with tempfile.TemporaryDirectory() as d:
             row["run"] = {"exit": run.returncode, "output": (run.stdout + run.stderr).strip().splitlines()[-1:]}
         rows.append(row)
 cli = Path(amu).parent.parent / "seed/bootstrap/aarch64-macos/amu-cli.macho"
-doc = {"schema": "kami.amu-capability-probe.v1", "issue": "JUN-641", "date": "2026-10-31",
-       "amu": {"repo": "kotoba-lang/amu", "rev": "f7c07dff86d7fb5e89219a0f9ad4a83b2a83c82e",
+doc = {"schema": "kami.amu-capability-probe.v1", "issue": "JUN-641", "date": DATE,
+       "amu": {"repo": "kotoba-lang/amu", "rev": PIN,
                "entry": "bin/amu (macOS arm64)",
                "bin-amu-sha256": hashlib.sha256(Path(amu).read_bytes()).hexdigest(),
                "amu-cli-macho-sha256": hashlib.sha256(cli.read_bytes()).hexdigest()},

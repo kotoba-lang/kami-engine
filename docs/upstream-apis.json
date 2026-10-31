@@ -4,20 +4,20 @@
  "inputs": {
   "kami-engine": {
    "repo": "kotoba-lang/kami-engine",
-   "rev": "cc6e15ca455c8c6318e22da2dd2028015fe78a86"
+   "rev": "6c3fac87473dc05e7b0b20d3d05255e1949157bf"
   },
   "kotoba-lib": {
    "repo": "kotoba-lang/kotoba",
-   "rev": "0dd4355673e1f5c0fdb07c8718eea8e422a9cb0a"
+   "rev": "455b84fbc812ab05ab5dae1cdae117d44a1da264"
   },
   "ledger": {
    "path": "docs/migration-ledger.json",
-   "kotoba-lib-rev": "43b9173b6f5866b5eb228a245e7fd451687aa2b9"
+   "kotoba-lib-rev": "455b84fbc812ab05ab5dae1cdae117d44a1da264"
   },
   "amu-check": {
-   "evidence": "docs/evidence/upstream-apis-amu-check-20261031.json",
-   "amu-rev": "f7c07dff86d7fb5e89219a0f9ad4a83b2a83c82e",
-   "bin-amu-sha256": "e4f63a6cd0f8a1ea802aebfdab225dffea1b33ae53ce49dc6fc7237644207aff"
+   "evidence": "docs/evidence/upstream-apis-amu-check-20261031b.json",
+   "amu-rev": "3c9eb7f7f74e0cf636ba75deb88faca5e277ca77",
+   "bin-amu-sha256": "750159f1956790fbb10c3c7fea8dc1eae5302e23ff6e065fe8337cc9589554fb"
   }
  },
  "method": "Var references are found syntactically: the ns form's libspecs give each required namespace its alias and :refer list, and `alias/var` or `full.ns/var` tokens in the rest of the file (comments and string contents removed) are the vars used. A :refer list counts as used as written; `:refer :all` is resolved against the names the library defines. Macros, dynamic `require` calls and host-specific reader branches are not distinguished.",
@@ -254,7 +254,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": [
     {
@@ -349,7 +350,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -416,7 +418,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [
     {
@@ -468,7 +471,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": [],
    "deps-outside-lib": [
@@ -519,7 +522,8 @@
     "packages/kami-atmosphere-scene"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -795,7 +799,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -824,7 +829,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": [],
    "deps-outside-lib": [
@@ -860,7 +865,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": [],
    "deps-outside-lib": [
@@ -1119,7 +1124,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [],
    "amu-check": {
@@ -1386,7 +1392,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [],
    "amu-check": {
@@ -1472,7 +1479,8 @@
     "packages/kami-studio"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -1506,7 +1514,8 @@
     "packages/kami-creative-studio"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -1542,7 +1551,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -1571,7 +1581,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": []
   },
@@ -1630,7 +1640,8 @@
     "packages/kami-creative-studio"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": [
     {
@@ -1737,7 +1748,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -2019,7 +2031,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -2071,7 +2084,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -2111,7 +2125,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [],
    "amu-check": {
@@ -2290,7 +2305,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -2371,7 +2387,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -2404,7 +2421,8 @@
     "packages/kami-creative-studio"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -2438,7 +2456,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": [
     {
@@ -2485,7 +2504,7 @@
    ],
    "blocks-waves": [
     0,
-    1
+    2
    ],
    "tracking": [],
    "deps-outside-lib": [
@@ -2841,7 +2860,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [],
    "amu-check": {
@@ -3330,7 +3350,7 @@
    ],
    "blocks-waves": [
     0,
-    1
+    2
    ],
    "tracking": [
     {
@@ -4094,7 +4114,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [
     {
@@ -4172,7 +4193,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [],
    "amu-check": {
@@ -4227,7 +4249,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -4276,7 +4299,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": [],
    "deps-outside-lib": [
@@ -4430,7 +4453,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -4460,7 +4484,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": [],
    "deps-outside-lib": [
@@ -4506,7 +4530,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -4616,7 +4641,7 @@
     "packages/kami-app-hygaccess-plant"
    ],
    "blocks-waves": [
-    1
+    2
    ],
    "tracking": []
   },
@@ -4652,7 +4677,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -4753,7 +4779,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [
     {
@@ -4879,7 +4906,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -4976,7 +5004,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -5034,7 +5063,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -5193,7 +5223,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -5266,7 +5297,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [
     {
@@ -5394,7 +5426,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -5576,7 +5609,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -5650,7 +5684,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [
     {
@@ -5755,7 +5790,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -5793,7 +5829,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -5834,7 +5871,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [],
    "deps-outside-lib": [
@@ -5939,7 +5977,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -6158,7 +6197,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -6216,7 +6256,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -6820,9 +6861,6 @@
      "kotoba-missing-vars": [
       "capitalize",
       "lower",
-      "replace",
-      "split",
-      "split-lines",
       "upper"
      ],
      "kotoba-export-list": true,
@@ -6896,18 +6934,53 @@
      "text": "\"reason\": \"JUN-203: reviewed native branch integration, current compiler/API compatibility and regression coverage; preserve the imported default snapshot in th"
     },
     {
+     "key": "JUN-718",
+     "file": "lib/kotoba.text/local-changes.json",
+     "line": 47,
+     "text": "\"reason\": \"JUN-203: reviewed native branch integration, current compiler/API compatibility and regression coverage; preserve the imported default snapshot in th"
+    },
+    {
      "key": "JUN-93",
      "file": "lib/kotoba.text/local-changes.json",
      "line": 47,
      "text": "\"reason\": \"JUN-203: reviewed native branch integration, current compiler/API compatibility and regression coverage; preserve the imported default snapshot in th"
+    },
+    {
+     "key": "JUN-718",
+     "file": "lib/kotoba.text/migration/native-text-jun718-20261031.edn",
+     "line": 1,
+     "text": ";; JUN-718 (kami upstream port 1/4): kotoba.lang.text gains the literal-string"
+    },
+    {
+     "key": "JUN-93",
+     "file": "lib/kotoba.text/migration/native-text-jun718-20261031.edn",
+     "line": 32,
+     "text": "The repo contract (AGENTS.md JUN-93: typed string-list join,"
+    },
+    {
+     "key": "JUN-718",
+     "file": "lib/kotoba.text/src/kotoba/lang/bounded_text.kotoba",
+     "line": 263,
+     "text": ";; sep (the text.cljk oracle's answer). JUN-718: counted with this"
+    },
+    {
+     "key": "JUN-718",
+     "file": "lib/kotoba.text/src/kotoba/lang/text.kotoba",
+     "line": 105,
+     "text": ";; JUN-718: the literal-string half of text.cljk's split / split-lines /"
+    },
+    {
+     "key": "JUN-718",
+     "file": "lib/kotoba.text/test/native/text.kotoba",
+     "line": 5,
+     "text": ";; JUN-718: list equality for the split goldens (count, then each part)."
     }
    ],
    "amu-check": {
     "files": 4,
     "checked": 4,
-    "pass": 0,
+    "pass": 1,
     "refusals": [
-     "E2101",
      "E2104",
      "E6002"
     ]
@@ -6948,7 +7021,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -7098,7 +7172,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -7155,7 +7230,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -7313,7 +7389,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [
     {
@@ -7366,7 +7443,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   },
@@ -7393,7 +7471,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": []
   },
@@ -7426,7 +7504,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -7492,7 +7571,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [],
    "amu-check": {
@@ -7536,7 +7616,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": [
     {
@@ -7681,7 +7762,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [
     {
@@ -7768,7 +7850,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -7806,7 +7889,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -7870,7 +7954,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": [
     {
@@ -7928,7 +8013,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -7964,7 +8050,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -8012,7 +8099,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -8043,7 +8131,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -8095,7 +8184,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -8224,7 +8314,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": []
   },
@@ -8267,7 +8357,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": []
   },
@@ -8309,7 +8399,7 @@
     "packages/kami-app-amenominaka"
    ],
    "blocks-waves": [
-    0
+    1
    ],
    "tracking": []
   },
@@ -8584,7 +8674,8 @@
     "packages/kami-app-bim-editor"
    ],
    "blocks-waves": [
-    0
+    0,
+    1
    ],
    "tracking": []
   },
@@ -8656,7 +8747,8 @@
    ],
    "blocks-waves": [
     0,
-    1
+    1,
+    2
    ],
    "tracking": []
   }

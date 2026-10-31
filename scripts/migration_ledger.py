@@ -13,7 +13,7 @@ namespace dependencies and external libraries, and derives the port order
 
 The Amu blockers (class e) are not guessed: BLOCKERS below records what the
 pinned Amu CLI refused when the probe sources in
-docs/evidence/amu-capability-probe-20261031.json were run against it.
+docs/evidence/amu-capability-probe-20261031b.json were run against it.
 """
 
 import argparse
@@ -39,9 +39,10 @@ CLASSES = {
     "native": "already native: .kotoba sources and the Amu gate runner and CI definition",
 }
 
-# Measured with the pinned Amu macOS CLI (kotoba-lang/amu f7c07dff86d7, the
-# one CI uses) on 2026-10-31. `detect` is a regex over a CLJK file with its
-# comments and string contents removed.
+# Measured with the pinned Amu macOS CLI (kotoba-lang/amu 3c9eb7f7f74e, the
+# one CI uses) on 2026-10-31 (JUN-726). Every probe gave the same refusal as at
+# the previous pin f7c07dff86d7 (amu-capability-probe-20261031.json). `detect`
+# is a regex over a CLJK file with its comments and string contents removed.
 BLOCKERS = {
     "multi-module": {
         "refusal": "E6002 required module ... is missing from the explicit source paths",
@@ -437,8 +438,8 @@ def build(kotoba, rev):
         "issue": "JUN-641",
         "inputs": {
             "kotoba-lib": {"repo": "kotoba-lang/kotoba", "rev": rev},
-            "amu-probe": {"repo": "kotoba-lang/amu", "rev": "f7c07dff86d7fb5e89219a0f9ad4a83b2a83c82e",
-                          "evidence": "docs/evidence/amu-capability-probe-20261031.json"},
+            "amu-probe": {"repo": "kotoba-lang/amu", "rev": "3c9eb7f7f74e0cf636ba75deb88faca5e277ca77",
+                          "evidence": "docs/evidence/amu-capability-probe-20261031b.json"},
         },
         "classes": CLASSES,
         "counts": {"tracked": len(files), "class": dict(sorted(counts.items())),

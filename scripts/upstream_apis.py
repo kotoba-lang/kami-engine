@@ -558,7 +558,7 @@ def amu_check(kotoba, kotoba_rev, kami_rev, amu, date):
     doc = {
         "schema": EVIDENCE_SCHEMA,
         "issue": "JUN-643",
-        "date": f"{date[:4]}-{date[4:6]}-{date[6:]}",
+        "date": f"{date[:4]}-{date[4:6]}-{date[6:8]}",
         "inputs": {"kotoba-lib": {"repo": "kotoba-lang/kotoba", "rev": kt.rev},
                    "kami-engine": {"repo": "kotoba-lang/kami-engine", "rev": km.rev}},
         "amu": {"repo": "kotoba-lang/amu", "rev": amu_pin(km), "pinned-in": ".github/workflows/ci.yml",
@@ -650,10 +650,11 @@ def main():
     ap.add_argument("--kotoba-rev", required=True, help="the kotoba revision to read lib/ from")
     ap.add_argument("--kami-rev", default="HEAD", help="the kami-engine revision to read (default HEAD)")
     ap.add_argument("--amu-check", metavar="AMU", help="run `amu check` with this pinned CLI and write evidence")
-    ap.add_argument("--date", help="YYYYMMDD for the evidence file name (with --amu-check)")
+    ap.add_argument("--date", help="YYYYMMDD for the evidence file name (with --amu-check); a trailing "
+                    "letter (YYYYMMDDb) keeps an earlier same-day evidence file")
     a = ap.parse_args()
     if a.amu_check:
-        if not a.date or not re.fullmatch(r"\d{8}", a.date):
+        if not a.date or not re.fullmatch(r"\d{8}[a-z]?", a.date):
             ap.error("--amu-check needs --date YYYYMMDD")
         amu_check(a.kotoba, a.kotoba_rev, a.kami_rev, a.amu_check, a.date)
         return 0
