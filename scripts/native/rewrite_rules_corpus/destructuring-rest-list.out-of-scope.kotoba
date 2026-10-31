@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-refusal: E2104
+
+(defn main [] :i64 (let [[a & r] (list 1 2 3)] a))

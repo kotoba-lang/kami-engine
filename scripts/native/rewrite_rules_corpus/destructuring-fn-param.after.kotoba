@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-value: 14
+
+(defn main [] :i64 (reduce (fn [acc p] (let [[a b] p] (+ acc (* a b)))) 0 [[1 2] [3 4]]))

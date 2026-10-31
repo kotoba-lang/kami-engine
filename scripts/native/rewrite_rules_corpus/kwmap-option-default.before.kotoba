@@ -1,5 +1,7 @@
 (ns probe)
-;; expect-refusal: E2119
+;; expect-refusal: E2111
+;; amu 05668c77: E2111, the :keys names are written as keywords nowhere else in the module; with them
+;; written it is E2104 (an unannotated pattern parameter, or :or on a record).
 
 (defn- tween-value [{:keys [from to duration] :or {from 0 to 100 duration 300}} elapsed]
   (let [t (min elapsed duration)] {:v (+ from (quot (* (- to from) t) duration)) :done? (>= t duration)}))

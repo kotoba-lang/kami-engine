@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-value: 55
+
+(defn main [] :i64 (loop [[a b] [0 1] n 0] (if (< n 10) (recur [b (+ a b)] (+ n 1)) a)))

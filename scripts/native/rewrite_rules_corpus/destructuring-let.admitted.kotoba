@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-value: 44
+
+(defn main [] :i64
+  (let [[x y & more :as all] [1 2 3 4] {:keys [w] h :h} {:w 5 :h 6} [[p q] r] [[7 8] [9]]]
+    (+ x y (count more) (count all) w h p q (nth r 0))))

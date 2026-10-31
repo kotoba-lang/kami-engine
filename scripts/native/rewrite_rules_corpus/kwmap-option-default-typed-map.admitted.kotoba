@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-value: 300
+
+(def opts (typed-map-new [:map :keyword :i64] :duration 200))
+(defn main [] :i64 (+ (get opts :from 0) (:to opts 100) (option-or (get opts :duration) 300)))

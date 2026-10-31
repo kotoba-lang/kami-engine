@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-refusal: E2139
+
+(defn main [] :i64 (reduce (fn [acc [a b]] (+ acc (* a b))) 0 [[1 2] [3 4]]))

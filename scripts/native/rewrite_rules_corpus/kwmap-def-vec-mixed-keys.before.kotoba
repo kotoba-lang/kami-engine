@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-refusal: E2116
+
+(def items [{:a 1} {:a 2 :b 3}])
+(defn main [] :i64 (+ (:a (nth items 1)) (count items)))

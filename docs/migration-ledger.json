@@ -4,12 +4,12 @@
  "inputs": {
   "kotoba-lib": {
    "repo": "kotoba-lang/kotoba",
-   "rev": "f03105d219ed818bb427b694d6d33414b7cb6a5e"
+   "rev": "069bc7d3214293bcd6b0ab183da48b96839a4dc6"
   },
   "amu-probe": {
    "repo": "kotoba-lang/amu",
-   "rev": "c2186d762e200205540f4ef9ca2b3ae66c4fc770",
-   "evidence": "docs/evidence/amu-capability-probe-20261101b.json"
+   "rev": "05668c77134ae4a5b79db648bbed1d048ef8c830",
+   "evidence": "docs/evidence/amu-capability-probe-20261101c.json"
   }
  },
  "classes": {
@@ -22,13 +22,13 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1402,
+  "tracked": 1417,
   "class": {
    "a": 244,
    "c": 44,
    "d": 124,
-   "keep": 409,
-   "native": 70,
+   "keep": 411,
+   "native": 83,
    "o": 511
   },
   "port": {
@@ -49,12 +49,12 @@
    "files": 358
   },
   "kwmap/def-literal": {
-   "refusal": "E2124 def value must be an integer, string, keyword or vector literal",
-   "what": "a top-level def of a keyword map holding f64 or bool values, or of a vector of maps; port as a defrecord built by ->Rec in the def (f64 fields are admitted) or a defn- thunk",
+   "refusal": "E2116 vector literal items must be i64 (at most 64)",
+   "what": "a top-level def of a keyword map (or a vector of them) holding a vector whose items differ in type (maps with different keys, mixed kinds) or that holds more than 64 non-integer items; port the items as one defrecord with [:option T] fields built by ->Rec, or a typed map",
    "issues": [
     "JUN-734"
    ],
-   "files": 109
+   "files": 17
   },
   "kwmap/table-runtime-key": {
    "refusal": "E2127 lookup of an absent key; E2104 contains? / get with a default on a record",
@@ -73,7 +73,7 @@
    "files": 182
   },
   "kwmap/param-row": {
-   "refusal": "E2104 a literal passed to an unannotated parameter; E2119 a {:keys ..} parameter; E2179 [:ref] to another namespace",
+   "refusal": "E2104 a literal passed to an unannotated parameter or an unannotated {:keys ..} parameter; E2105 a bare record name as a parameter type; E2179 [:ref] to another namespace",
    "what": "a map read through a parameter ((:k p), {:keys ..} destructuring) or a literal passed to another namespace's fn; port as a defrecord and [:ref :ns/R] parameters (:ns the file's own), built with ->R / map->R",
    "issues": [
     "JUN-733"
@@ -105,10 +105,11 @@
    "files": 46
   },
   "kwmap/option-default": {
-   "refusal": "E2104 get with a default / (:k m d) on a record; E2119 :or in a {:keys ..} parameter; E2101 merge",
-   "what": "an option map with defaults ((get m :k d), (:k m d), (or (:k m) d), :or, (merge {defaults} m)); port as a defrecord with [:option T] fields read by option-or, or a typed map read by (get m k d)",
+   "refusal": "E2104 get with a default on a record, (or (:k m) d), :or in an unannotated {:keys ..} parameter or on a record; E2103 (:k m d) on a record; E2101 merge",
+   "what": "an option map with defaults ((get m :k d), (:k m d), (or (:k m) d), :or, (merge {defaults} m)); port as a defrecord with [:option T] fields read by option-or, or a typed map read by (get m k d) / (:k m d) (admitted since amu 05668c77, JUN-734 D10); whether a map becomes a record or a typed map is the port's decision, so every such use stays counted",
    "issues": [
-    "JUN-733"
+    "JUN-733",
+    "JUN-734"
    ],
    "files": 195
   },
@@ -127,14 +128,6 @@
     "JUN-732"
    ],
    "files": 27
-  },
-  "kwmap/variadic-assoc": {
-   "refusal": "E2103 wrong number of arguments to 'assoc': expected 3",
-   "what": "(assoc m k1 v1 k2 v2 ..); port as nested assoc, one key each",
-   "issues": [
-    "JUN-734"
-   ],
-   "files": 55
   },
   "f64-generic-arith": {
    "refusal": "E2104 type mismatch in '*': expected :i64; E2101 for f64->i64",
@@ -178,12 +171,12 @@
    "files": 18
   },
   "destructuring": {
-   "refusal": "E2111 malformed binding vector",
-   "what": "sequential or map destructuring in let / fn / loop bindings",
+   "refusal": "E2104 an unannotated defn pattern parameter, :or on a record, & over a list; E2139 a fn pattern parameter; E2111 :strs / :syms / a non-keyword key, a pattern in doseq; E2127 an absent key; E2101 for; E2103 when-let / if-let",
+   "what": "a pattern in a defn / fn parameter (CLJK parameters are unannotated), in doseq / for / when-let / if-let bindings, or a let / loop pattern that is a map pattern or uses &; plain let / loop vector patterns (nested, :as, _) are admitted; port as an annotated parameter or a let in the body",
    "issues": [
     "JUN-729"
    ],
-   "files": 275
+   "files": 273
   },
   "atom-local-iteration": {
    "refusal": "E2140 atom escapes its let scope (a write inside loop/doseq/dotimes)",
@@ -1002,10 +995,10 @@
   },
   {
    "unit": "docs",
-   "files": 19,
+   "files": 21,
    "classes": {
     "a": 1,
-    "keep": 18
+    "keep": 20
    },
    "depends-on": [],
    "placement": "kami-engine"
@@ -1074,7 +1067,6 @@
     "destructuring": 1,
     "f64-generic-arith": 3,
     "host-interop": 1,
-    "kwmap/def-literal": 1,
     "kwmap/dynamic": 1,
     "kwmap/runtime-key": 1
    },
@@ -1179,11 +1171,11 @@
     ]
    },
    "blockers": {
-    "destructuring": 25,
+    "destructuring": 22,
     "f64-generic-arith": 32,
     "fn-literal": 14,
     "host-interop": 1,
-    "kwmap/def-literal": 9,
+    "kwmap/def-literal": 1,
     "kwmap/dynamic": 4,
     "kwmap/empty": 11,
     "kwmap/fn-value": 1,
@@ -1193,7 +1185,6 @@
     "kwmap/row-op": 19,
     "kwmap/runtime-key": 9,
     "kwmap/table-runtime-key": 1,
-    "kwmap/variadic-assoc": 9,
     "multi-module": 28
    },
    "wave": 0,
@@ -1348,11 +1339,11 @@
     ]
    },
    "blockers": {
-    "destructuring": 20,
+    "destructuring": 23,
     "f64-generic-arith": 25,
     "fn-literal": 20,
     "host-interop": 2,
-    "kwmap/def-literal": 16,
+    "kwmap/def-literal": 1,
     "kwmap/dynamic": 6,
     "kwmap/empty": 18,
     "kwmap/nil-field": 1,
@@ -1361,7 +1352,6 @@
     "kwmap/row-op": 24,
     "kwmap/runtime-key": 21,
     "kwmap/table-runtime-key": 9,
-    "kwmap/variadic-assoc": 7,
     "multi-module": 23,
     "regex-literal": 3
    },
@@ -1469,7 +1459,6 @@
     "f64-generic-arith": 6,
     "fn-literal": 2,
     "host-interop": 5,
-    "kwmap/def-literal": 3,
     "kwmap/dynamic": 2,
     "kwmap/empty": 3,
     "kwmap/fn-value": 1,
@@ -1479,7 +1468,6 @@
     "kwmap/row-op": 4,
     "kwmap/runtime-key": 5,
     "kwmap/table-runtime-key": 1,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 6,
     "regex-literal": 1
    },
@@ -1615,7 +1603,6 @@
     "kwmap/param-row": 15,
     "kwmap/row-op": 13,
     "kwmap/runtime-key": 7,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 28,
     "regex-literal": 4
    },
@@ -1672,7 +1659,6 @@
     "f64-generic-arith": 2,
     "fn-literal": 1,
     "host-interop": 1,
-    "kwmap/def-literal": 2,
     "kwmap/dynamic": 2,
     "kwmap/empty": 2,
     "kwmap/nil-field": 2,
@@ -1680,7 +1666,6 @@
     "kwmap/param-row": 3,
     "kwmap/row-op": 3,
     "kwmap/runtime-key": 1,
-    "kwmap/variadic-assoc": 2,
     "multi-module": 3
    },
    "wave": 0,
@@ -1770,7 +1755,6 @@
     "kwmap/param-row": 9,
     "kwmap/row-op": 9,
     "kwmap/runtime-key": 5,
-    "kwmap/variadic-assoc": 6,
     "multi-module": 10,
     "regex-literal": 5
    },
@@ -1825,11 +1809,10 @@
    },
    "blockers": {
     "atom-global": 1,
-    "destructuring": 3,
+    "destructuring": 4,
     "f64-generic-arith": 6,
     "fn-literal": 3,
     "host-interop": 1,
-    "kwmap/def-literal": 1,
     "kwmap/dynamic": 2,
     "kwmap/empty": 1,
     "kwmap/nil-field": 2,
@@ -1837,7 +1820,6 @@
     "kwmap/param-row": 5,
     "kwmap/row-op": 4,
     "kwmap/runtime-key": 1,
-    "kwmap/variadic-assoc": 2,
     "multi-module": 5
    },
    "wave": 0,
@@ -1879,19 +1861,17 @@
     ]
    },
    "blockers": {
-    "destructuring": 2,
+    "destructuring": 3,
     "dispatch-forms": 1,
     "f64-generic-arith": 11,
     "fn-literal": 1,
     "host-interop": 3,
-    "kwmap/def-literal": 3,
     "kwmap/dynamic": 2,
     "kwmap/empty": 2,
     "kwmap/option-default": 6,
     "kwmap/param-row": 6,
     "kwmap/runtime-key": 2,
     "kwmap/table-runtime-key": 2,
-    "kwmap/variadic-assoc": 2,
     "multi-module": 11,
     "regex-literal": 1
    },
@@ -1977,7 +1957,7 @@
     "f64-generic-arith": 13,
     "fn-literal": 9,
     "host-interop": 6,
-    "kwmap/def-literal": 3,
+    "kwmap/def-literal": 1,
     "kwmap/dynamic": 4,
     "kwmap/empty": 4,
     "kwmap/fn-value": 2,
@@ -1987,7 +1967,6 @@
     "kwmap/row-op": 8,
     "kwmap/runtime-key": 7,
     "kwmap/table-runtime-key": 2,
-    "kwmap/variadic-assoc": 3,
     "multi-module": 15
    },
    "wave": 1,
@@ -2034,13 +2013,12 @@
     "f64-generic-arith": 7,
     "fn-literal": 4,
     "host-interop": 5,
-    "kwmap/def-literal": 2,
+    "kwmap/def-literal": 1,
     "kwmap/dynamic": 4,
     "kwmap/option-default": 2,
     "kwmap/param-row": 2,
     "kwmap/row-op": 3,
     "kwmap/runtime-key": 4,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 4
    },
    "wave": 0,
@@ -2100,12 +2078,11 @@
     ]
    },
    "blockers": {
-    "destructuring": 6,
+    "destructuring": 7,
     "dispatch-forms": 1,
     "f64-generic-arith": 8,
     "fn-literal": 1,
     "host-interop": 3,
-    "kwmap/def-literal": 1,
     "kwmap/dynamic": 1,
     "kwmap/empty": 3,
     "kwmap/fn-value": 1,
@@ -2114,7 +2091,6 @@
     "kwmap/param-row": 9,
     "kwmap/row-op": 3,
     "kwmap/runtime-key": 1,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 11
    },
    "wave": 2,
@@ -2214,7 +2190,6 @@
     "f64-generic-arith": 9,
     "fn-literal": 5,
     "host-interop": 2,
-    "kwmap/def-literal": 3,
     "kwmap/dynamic": 4,
     "kwmap/empty": 1,
     "kwmap/fn-value": 1,
@@ -2224,7 +2199,6 @@
     "kwmap/row-op": 3,
     "kwmap/runtime-key": 2,
     "kwmap/table-runtime-key": 2,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 6
    },
    "wave": 1,
@@ -2294,7 +2268,6 @@
     "f64-generic-arith": 7,
     "fn-literal": 6,
     "host-interop": 6,
-    "kwmap/def-literal": 1,
     "kwmap/dynamic": 2,
     "kwmap/empty": 4,
     "kwmap/nil-field": 2,
@@ -2302,7 +2275,6 @@
     "kwmap/param-row": 5,
     "kwmap/row-op": 5,
     "kwmap/runtime-key": 2,
-    "kwmap/variadic-assoc": 2,
     "multi-module": 9,
     "regex-literal": 1
    },
@@ -2362,7 +2334,6 @@
     "kwmap/param-row": 3,
     "kwmap/row-op": 2,
     "kwmap/runtime-key": 1,
-    "kwmap/variadic-assoc": 2,
     "multi-module": 3,
     "regex-literal": 1
    },
@@ -2453,7 +2424,7 @@
     "f64-generic-arith": 10,
     "fn-literal": 15,
     "host-interop": 14,
-    "kwmap/def-literal": 8,
+    "kwmap/def-literal": 3,
     "kwmap/dynamic": 10,
     "kwmap/empty": 7,
     "kwmap/fn-value": 4,
@@ -2462,7 +2433,6 @@
     "kwmap/row-op": 5,
     "kwmap/runtime-key": 7,
     "kwmap/table-runtime-key": 3,
-    "kwmap/variadic-assoc": 2,
     "multi-module": 21,
     "regex-literal": 4
    },
@@ -2560,7 +2530,7 @@
     "f64-generic-arith": 10,
     "fn-literal": 9,
     "host-interop": 3,
-    "kwmap/def-literal": 3,
+    "kwmap/def-literal": 1,
     "kwmap/dynamic": 8,
     "kwmap/empty": 6,
     "kwmap/fn-value": 1,
@@ -2570,7 +2540,6 @@
     "kwmap/row-op": 7,
     "kwmap/runtime-key": 9,
     "kwmap/table-runtime-key": 2,
-    "kwmap/variadic-assoc": 2,
     "multi-module": 13,
     "regex-literal": 3
    },
@@ -2649,7 +2618,6 @@
    "blockers": {
     "destructuring": 1,
     "f64-generic-arith": 2,
-    "kwmap/def-literal": 1,
     "kwmap/dynamic": 1,
     "kwmap/empty": 1,
     "kwmap/nil-field": 1,
@@ -2741,9 +2709,8 @@
     ]
    },
    "blockers": {
-    "destructuring": 6,
+    "destructuring": 3,
     "f64-generic-arith": 3,
-    "kwmap/def-literal": 1,
     "kwmap/dynamic": 3,
     "kwmap/empty": 3,
     "kwmap/nil-field": 1,
@@ -2816,7 +2783,7 @@
     "f64-generic-arith": 4,
     "fn-literal": 8,
     "host-interop": 2,
-    "kwmap/def-literal": 4,
+    "kwmap/def-literal": 2,
     "kwmap/dynamic": 13,
     "kwmap/empty": 4,
     "kwmap/option-default": 5,
@@ -2907,11 +2874,10 @@
    },
    "blockers": {
     "atom-global": 1,
-    "destructuring": 5,
+    "destructuring": 6,
     "f64-generic-arith": 6,
     "fn-literal": 7,
     "host-interop": 4,
-    "kwmap/def-literal": 1,
     "kwmap/dynamic": 3,
     "kwmap/empty": 4,
     "kwmap/fn-value": 1,
@@ -2921,7 +2887,6 @@
     "kwmap/row-op": 5,
     "kwmap/runtime-key": 3,
     "kwmap/table-runtime-key": 1,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 7,
     "regex-literal": 2
    },
@@ -3025,12 +2990,11 @@
    "blockers": {
     "atom-global": 1,
     "atom-local-iteration": 1,
-    "destructuring": 16,
+    "destructuring": 15,
     "dispatch-forms": 1,
     "f64-generic-arith": 15,
     "fn-literal": 7,
     "host-interop": 4,
-    "kwmap/def-literal": 2,
     "kwmap/dynamic": 1,
     "kwmap/empty": 7,
     "kwmap/fn-value": 3,
@@ -3039,7 +3003,6 @@
     "kwmap/row-op": 7,
     "kwmap/runtime-key": 6,
     "kwmap/table-runtime-key": 3,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 12,
     "regex-literal": 3
    },
@@ -3110,7 +3073,7 @@
     "atom-global": 2,
     "atom-local-iteration": 1,
     "auto-resolved-keyword": 3,
-    "destructuring": 8,
+    "destructuring": 6,
     "f64-generic-arith": 7,
     "fn-literal": 7,
     "host-interop": 5,
@@ -3158,7 +3121,6 @@
     "kwmap/option-default": 2,
     "kwmap/param-row": 2,
     "kwmap/row-op": 1,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 1
    },
    "wave": 0,
@@ -3321,12 +3283,12 @@
     "atom-escape": 4,
     "atom-global": 1,
     "auto-resolved-keyword": 2,
-    "destructuring": 22,
+    "destructuring": 23,
     "dispatch-forms": 2,
     "f64-generic-arith": 20,
     "fn-literal": 19,
     "host-interop": 8,
-    "kwmap/def-literal": 11,
+    "kwmap/def-literal": 4,
     "kwmap/dynamic": 16,
     "kwmap/empty": 17,
     "kwmap/fn-value": 3,
@@ -3336,7 +3298,6 @@
     "kwmap/row-op": 21,
     "kwmap/runtime-key": 22,
     "kwmap/table-runtime-key": 4,
-    "kwmap/variadic-assoc": 4,
     "multi-module": 30,
     "regex-literal": 4
    },
@@ -3400,7 +3361,7 @@
     ]
    },
    "blockers": {
-    "destructuring": 9,
+    "destructuring": 8,
     "f64-generic-arith": 1,
     "fn-literal": 2,
     "kwmap/dynamic": 7,
@@ -3450,18 +3411,16 @@
     ]
    },
    "blockers": {
-    "destructuring": 21,
+    "destructuring": 22,
     "dispatch-forms": 1,
     "f64-generic-arith": 44,
     "host-interop": 20,
-    "kwmap/def-literal": 23,
     "kwmap/dynamic": 18,
     "kwmap/fn-value": 1,
     "kwmap/nil-field": 2,
     "kwmap/option-default": 5,
     "kwmap/param-row": 6,
     "kwmap/runtime-key": 18,
-    "kwmap/variadic-assoc": 2,
     "multi-module": 5
    },
    "wave": 1,
@@ -3557,11 +3516,11 @@
     ]
    },
    "blockers": {
-    "destructuring": 9,
+    "destructuring": 10,
     "dispatch-forms": 1,
     "f64-generic-arith": 11,
     "fn-literal": 5,
-    "kwmap/def-literal": 6,
+    "kwmap/def-literal": 1,
     "kwmap/dynamic": 5,
     "kwmap/empty": 5,
     "kwmap/fn-value": 1,
@@ -3665,7 +3624,6 @@
     "kwmap/param-row": 3,
     "kwmap/row-op": 1,
     "kwmap/runtime-key": 2,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 5
    },
    "wave": 0,
@@ -3710,7 +3668,7 @@
    "blockers": {
     "atom-escape": 2,
     "auto-resolved-keyword": 2,
-    "destructuring": 5,
+    "destructuring": 3,
     "f64-generic-arith": 8,
     "fn-literal": 6,
     "host-interop": 4,
@@ -3800,7 +3758,6 @@
    "blockers": {
     "destructuring": 3,
     "host-interop": 1,
-    "kwmap/def-literal": 1,
     "kwmap/dynamic": 1,
     "kwmap/option-default": 1,
     "kwmap/param-row": 1,
@@ -3988,7 +3945,7 @@
     "f64-generic-arith": 2,
     "fn-literal": 4,
     "host-interop": 4,
-    "kwmap/def-literal": 2,
+    "kwmap/def-literal": 1,
     "kwmap/dynamic": 1,
     "kwmap/empty": 3,
     "kwmap/fn-value": 4,
@@ -3996,7 +3953,6 @@
     "kwmap/param-row": 6,
     "kwmap/row-op": 4,
     "kwmap/runtime-key": 2,
-    "kwmap/variadic-assoc": 1,
     "multi-module": 6,
     "regex-literal": 3
    },
@@ -4005,11 +3961,11 @@
   },
   {
    "unit": "scripts",
-   "files": 76,
+   "files": 89,
    "classes": {
     "a": 1,
     "d": 2,
-    "native": 69,
+    "native": 82,
     "o": 4
    },
    "port": {
@@ -4277,6 +4233,11 @@
    "class": "keep"
   },
   {
+   "path": "docs/evidence/amu-capability-probe-20261101c.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
    "path": "docs/evidence/native-gates-oracle-20261031.json",
    "unit": "docs",
    "class": "keep"
@@ -4298,6 +4259,11 @@
   },
   {
    "path": "docs/evidence/port-rewrite-rules-20261101b.json",
+   "unit": "docs",
+   "class": "keep"
+  },
+  {
+   "path": "docs/evidence/port-rewrite-rules-20261101c.json",
    "unit": "docs",
    "class": "keep"
   },
@@ -4616,7 +4582,6 @@
    "kotoba": "kami-clj-play/games/survivors/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -4832,7 +4797,6 @@
    "ns": "kami.gameplay.ai",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
@@ -4851,11 +4815,9 @@
    "ns": "kami.gameplay.aim",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -4868,7 +4830,6 @@
    "port": "b",
    "ns": "kami.gameplay.attributes",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/row-op",
     "kwmap/option-default",
@@ -4888,7 +4849,6 @@
     "multi-module",
     "kwmap/param-row",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -4921,7 +4881,6 @@
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -4952,7 +4911,6 @@
     "kwmap/row-op",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -4984,7 +4942,6 @@
    "ns": "kami.gameplay.perception",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
@@ -5007,7 +4964,6 @@
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -5021,8 +4977,7 @@
    "port": "b",
    "ns": "kami.gameplay.rng",
    "blockers": [
-    "f64-generic-arith",
-    "destructuring"
+    "f64-generic-arith"
    ]
   },
   {
@@ -5077,12 +5032,10 @@
    "ns": "kami.gameplay.world3d",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -5097,7 +5050,6 @@
    "ns": "kami.gameplay.zone",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
@@ -5122,7 +5074,6 @@
     "kwmap/empty",
     "kwmap/nil-field",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -5169,7 +5120,6 @@
     "multi-module",
     "kwmap/param-row",
     "kwmap/empty",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -5219,8 +5169,7 @@
    "blockers": [
     "multi-module",
     "kwmap/option-default",
-    "f64-generic-arith",
-    "destructuring"
+    "f64-generic-arith"
    ]
   },
   {
@@ -5262,11 +5211,9 @@
    "ns": "kami.gameplay.presentation-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/row-op",
     "kwmap/option-default",
-    "fn-literal",
-    "destructuring"
+    "fn-literal"
    ]
   },
   {
@@ -5326,11 +5273,9 @@
    "ns": "kami.gameplay.world3d-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal"
    ]
@@ -5473,7 +5418,6 @@
    "port": "b",
    "ns": "kami.render.arm-ik",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/option-default",
@@ -5491,14 +5435,12 @@
    "ns": "kami.render.capture-lifecycle",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/nil-field",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -5512,13 +5454,11 @@
    "port": "b",
    "ns": "kami.render.character-camera",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -5533,14 +5473,14 @@
    "ns": "kami.render.character-material",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/empty",
     "kwmap/option-default",
     "f64-generic-arith",
-    "fn-literal"
+    "fn-literal",
+    "destructuring"
    ]
   },
   {
@@ -5552,7 +5492,6 @@
    "ns": "kami.render.character-preset",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -5572,14 +5511,12 @@
    "ns": "kami.render.environment-composition",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -5594,14 +5531,12 @@
    "ns": "kami.render.equipment-kit",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring",
@@ -5617,14 +5552,12 @@
    "ns": "kami.render.fitted-equipment-mesh",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -5639,7 +5572,6 @@
    "ns": "kami.render.operator-body-mesh",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -5660,7 +5592,6 @@
    "ns": "kami.render.operator-face-mesh",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -5681,14 +5612,12 @@
    "ns": "kami.render.operator-fit",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -5723,7 +5652,6 @@
    "ns": "kami.render.weapon-mesh",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -5847,7 +5775,6 @@
    "ns": "kami.render.capture-lifecycle-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
@@ -5865,7 +5792,6 @@
    "ns": "kami.render.character-camera-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
@@ -5919,14 +5845,13 @@
    "ns": "kami.render.environment-composition-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "regex-literal",
     "fn-literal",
+    "destructuring",
     "host-interop"
    ]
   },
@@ -6003,7 +5928,8 @@
     "kwmap/option-default",
     "kwmap/dynamic",
     "f64-generic-arith",
-    "fn-literal"
+    "fn-literal",
+    "destructuring"
    ]
   },
   {
@@ -6175,7 +6101,6 @@
    "port": "c",
    "ns": "kami.audio",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/option-default",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -6214,7 +6139,6 @@
     "kwmap/nil-field",
     "kwmap/option-default",
     "kwmap/fn-value",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring",
@@ -6230,7 +6154,6 @@
    "port": "c",
    "ns": "kami.input",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
@@ -6315,7 +6238,6 @@
    "ns": "kami.input-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/nil-field",
@@ -6460,7 +6382,6 @@
     "f64-generic-arith",
     "regex-literal",
     "dispatch-forms",
-    "destructuring",
     "host-interop"
    ]
   },
@@ -6622,7 +6543,6 @@
     "kwmap/option-default",
     "kwmap/dynamic",
     "kwmap/fn-value",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "regex-literal",
     "fn-literal",
@@ -6664,6 +6584,7 @@
     "kwmap/empty",
     "f64-generic-arith",
     "dispatch-forms",
+    "destructuring",
     "atom-escape"
    ]
   },
@@ -7011,14 +6932,12 @@
    "ns": "kami.animator.app",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/nil-field",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring",
@@ -7034,13 +6953,11 @@
    "port": "b",
    "ns": "kami.animator.project",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/nil-field",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "destructuring"
    ]
   },
@@ -7173,7 +7090,6 @@
     "kwmap/nil-field",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "regex-literal",
     "fn-literal",
@@ -7198,7 +7114,6 @@
     "kwmap/nil-field",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "regex-literal",
     "destructuring"
@@ -7241,7 +7156,6 @@
     "kwmap/empty",
     "kwmap/nil-field",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -7260,7 +7174,6 @@
     "kwmap/empty",
     "kwmap/nil-field",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -7310,7 +7223,6 @@
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "regex-literal"
    ]
@@ -7345,7 +7257,6 @@
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/nil-field",
-    "kwmap/variadic-assoc",
     "f64-generic-arith"
    ]
   },
@@ -7481,7 +7392,6 @@
     "kwmap/nil-field",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring",
@@ -7498,7 +7408,6 @@
    "ns": "kami.cad.dimensional-sketch",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "f64-generic-arith",
@@ -7519,7 +7428,6 @@
     "kwmap/nil-field",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -7549,7 +7457,8 @@
    "blockers": [
     "multi-module",
     "kwmap/param-row",
-    "f64-generic-arith"
+    "f64-generic-arith",
+    "destructuring"
    ]
   },
   {
@@ -7645,7 +7554,6 @@
    "blockers": [
     "kwmap/param-row",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -7659,12 +7567,10 @@
    "ns": "kotoba.car-sim.garage",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith"
    ]
   },
@@ -7677,7 +7583,6 @@
    "ns": "kotoba.car-sim.ground",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -7696,11 +7601,11 @@
    "ns": "kotoba.car-sim.scene",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/empty",
     "kwmap/option-default",
-    "f64-generic-arith"
+    "f64-generic-arith",
+    "destructuring"
    ]
   },
   {
@@ -7960,12 +7865,10 @@
    "ns": "character-creator.accessories",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/fn-value",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -7980,7 +7883,6 @@
    "ns": "character-creator.doc",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
@@ -8018,7 +7920,6 @@
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring",
     "host-interop"
@@ -8162,7 +8063,6 @@
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
-    "kwmap/variadic-assoc",
     "fn-literal",
     "host-interop"
    ]
@@ -8242,7 +8142,6 @@
    "kotoba": "packages/kami-app-fixtures/resources/kami/app/kami-clj-play/games/survivors/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -8437,7 +8336,6 @@
    "blockers": [
     "multi-module",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "fn-literal",
     "host-interop"
    ]
@@ -8535,7 +8433,6 @@
     "kwmap/empty",
     "kwmap/nil-field",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -8548,7 +8445,6 @@
    "port": "b",
    "ns": "kami-app-hygaccess-plant.process",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/param-row",
     "f64-generic-arith",
     "destructuring"
@@ -8638,7 +8534,8 @@
    "ns": "kami-app-hygaccess-plant.process-test",
    "blockers": [
     "multi-module",
-    "f64-generic-arith"
+    "f64-generic-arith",
+    "destructuring"
    ]
   },
   {
@@ -8858,7 +8755,6 @@
    "ns": "render-pixel-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -8939,7 +8835,6 @@
    "ns": "kami-app-isekai.playtest.tuning",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -8966,7 +8861,6 @@
     "kwmap/row-op",
     "kwmap/nil-field",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring",
@@ -8981,7 +8875,6 @@
    "port": "b",
    "ns": "kami-app-isekai.voxel-world",
    "blockers": [
-    "kwmap/def-literal",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -9113,7 +9006,6 @@
     "kwmap/nil-field",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "auto-resolved-keyword",
@@ -9131,14 +9023,12 @@
    "port": "b",
    "ns": "kami.modeler.project",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/nil-field",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -9382,7 +9272,6 @@
     "kwmap/nil-field",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "regex-literal",
     "fn-literal",
@@ -9402,7 +9291,6 @@
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -9601,12 +9489,10 @@
    "ns": "sip.kotoba",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring",
@@ -9622,7 +9508,6 @@
    "ns": "sip.lore",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/empty",
     "kwmap/option-default",
@@ -9748,12 +9633,10 @@
    "ns": "sip.session",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -9820,7 +9703,6 @@
    "ns": "sip.ui",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/param-row",
     "kwmap/empty",
@@ -9911,7 +9793,6 @@
    "ns": "sip.session-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/option-default",
     "f64-generic-arith"
    ]
@@ -10081,7 +9962,6 @@
    "ns": "kami.app-suji.coverage",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -10116,7 +9996,6 @@
    "ns": "kami.app-suji.scene",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/empty",
@@ -10166,7 +10045,6 @@
     "kwmap/empty",
     "kwmap/nil-field",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "auto-resolved-keyword",
     "destructuring",
@@ -10186,7 +10064,6 @@
     "multi-module",
     "kwmap/runtime-key",
     "kwmap/param-row",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring"
@@ -10458,7 +10335,6 @@
    "ns": "autodrive-scene",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -10628,7 +10504,6 @@
    "ns": "character-scene",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/empty",
     "kwmap/dynamic",
@@ -10679,8 +10554,7 @@
    "ns": "character-scene.anim-blueprint-test",
    "blockers": [
     "multi-module",
-    "f64-generic-arith",
-    "destructuring"
+    "f64-generic-arith"
    ]
   },
   {
@@ -10693,8 +10567,7 @@
    "ns": "character-scene.face-rig-test",
    "blockers": [
     "multi-module",
-    "f64-generic-arith",
-    "destructuring"
+    "f64-generic-arith"
    ]
   },
   {
@@ -10706,8 +10579,7 @@
    "test": true,
    "ns": "character-scene-test",
    "blockers": [
-    "multi-module",
-    "destructuring"
+    "multi-module"
    ]
   },
   {
@@ -10886,7 +10758,6 @@
    "port": "b",
    "ns": "kami.contracts.rt",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -11034,7 +10905,6 @@
    "ns": "kami.contracts-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/empty",
@@ -11194,7 +11064,6 @@
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "regex-literal",
     "fn-literal",
@@ -11210,7 +11079,6 @@
    "ns": "kami.creative-studio.ui",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -11260,7 +11128,8 @@
     "kwmap/nil-field",
     "kwmap/option-default",
     "f64-generic-arith",
-    "fn-literal"
+    "fn-literal",
+    "destructuring"
    ]
   },
   {
@@ -11587,7 +11456,6 @@
    "port": "b",
    "ns": "kami-ui-sdk.rtc",
    "blockers": [
-    "kwmap/def-literal",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -11600,7 +11468,6 @@
    "port": "b",
    "ns": "kami-ui-sdk.sound",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -11625,7 +11492,6 @@
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -11752,8 +11618,7 @@
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/option-default",
-    "f64-generic-arith",
-    "destructuring"
+    "f64-generic-arith"
    ]
   },
   {
@@ -12021,7 +11886,6 @@
     "multi-module",
     "f64-generic-arith",
     "fn-literal",
-    "destructuring",
     "host-interop"
    ]
   },
@@ -12085,7 +11949,6 @@
     "f64-generic-arith",
     "regex-literal",
     "fn-literal",
-    "destructuring",
     "atom-global",
     "host-interop"
    ]
@@ -12173,7 +12036,6 @@
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -12489,7 +12351,6 @@
    "ns": "hello-scene",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "f64-generic-arith",
     "destructuring"
@@ -12673,7 +12534,6 @@
     "kwmap/empty",
     "kwmap/nil-field",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "fn-literal"
    ]
   },
@@ -12703,7 +12563,6 @@
     "kwmap/empty",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "fn-literal",
     "destructuring",
     "host-interop"
@@ -12731,7 +12590,6 @@
    "ns": "kami.postfx",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "f64-generic-arith"
    ]
   },
@@ -12764,7 +12622,6 @@
    "ns": "kami.render.authority",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/row-op",
     "kwmap/empty",
@@ -12784,7 +12641,6 @@
    "ns": "kami.rt",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/param-row",
@@ -12919,7 +12775,6 @@
     "kwmap/row-op",
     "kwmap/empty",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "fn-literal",
     "destructuring"
    ]
@@ -12949,11 +12804,9 @@
    "ns": "kami.benchmark-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "fn-literal",
     "destructuring",
@@ -12994,7 +12847,8 @@
     "kwmap/fn-value",
     "f64-generic-arith",
     "regex-literal",
-    "fn-literal"
+    "fn-literal",
+    "destructuring"
    ]
   },
   {
@@ -13108,7 +12962,6 @@
    "ns": "kami.sim-lod-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/option-default"
    ]
@@ -13123,7 +12976,6 @@
    "ns": "kami.world-partition-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/option-default",
@@ -13344,8 +13196,7 @@
     "kwmap/runtime-key",
     "kwmap/param-row",
     "kwmap/option-default",
-    "kwmap/dynamic",
-    "destructuring"
+    "kwmap/dynamic"
    ]
   },
   {
@@ -13577,7 +13428,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/fighting/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -13618,7 +13468,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/free-to-play/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -13659,7 +13508,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/horror/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -13700,7 +13548,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/indie/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -13741,7 +13588,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/kids-family/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -13782,7 +13628,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/local-multiplayer/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -13823,7 +13668,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/modern-remake/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -13864,7 +13708,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/open-world/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -13905,7 +13748,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/platformer/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -13957,7 +13799,6 @@
    "blockers": [
     "kwmap/param-row",
     "kwmap/nil-field",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -13970,7 +13811,6 @@
    "port": "b",
    "ns": "kami-genre-base-systems.platformer.stairs",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/fn-value"
    ]
   },
@@ -13984,7 +13824,6 @@
    "blockers": [
     "kwmap/param-row",
     "kwmap/option-default",
-    "kwmap/variadic-assoc",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -13997,10 +13836,10 @@
    "port": "b",
    "ns": "kami-genre-base-systems.platformer.weapon",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/nil-field",
-    "f64-generic-arith"
+    "f64-generic-arith",
+    "destructuring"
    ]
   },
   {
@@ -14013,7 +13852,6 @@
    "ns": "kami-genre-base-systems.platformer.boss-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/option-default",
     "f64-generic-arith"
    ]
@@ -14028,7 +13866,6 @@
    "ns": "kami-genre-base-systems.platformer.camera-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/option-default",
     "f64-generic-arith"
@@ -14071,7 +13908,6 @@
    "ns": "kami-genre-base-systems.platformer.weapon-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/option-default",
     "f64-generic-arith"
@@ -14101,7 +13937,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/post-apocalyptic/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -14142,7 +13977,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/puzzle/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -14183,7 +14017,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/relaxing/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -14224,7 +14057,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/rhythm/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -14265,7 +14097,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/single-player/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -14306,7 +14137,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/sports/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -14347,7 +14177,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/stealth/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -14388,7 +14217,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/strategy/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -14429,7 +14257,6 @@
    "kotoba": "packages/kami-genre-base-systems/games/superhero/author.kotoba",
    "port": "b",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/runtime-key",
     "kwmap/dynamic",
     "f64-generic-arith",
@@ -14699,7 +14526,6 @@
    "port": "b",
    "ns": "kami.isekai.classes",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/nil-field",
@@ -14720,7 +14546,8 @@
     "kwmap/empty",
     "f64-generic-arith",
     "fn-literal",
-    "dispatch-forms"
+    "dispatch-forms",
+    "destructuring"
    ]
   },
   {
@@ -14748,7 +14575,6 @@
    "port": "b",
    "ns": "kami.isekai.palette",
    "blockers": [
-    "kwmap/def-literal",
     "f64-generic-arith",
     "destructuring"
    ]
@@ -14790,7 +14616,6 @@
    "port": "b",
    "ns": "kami.isekai.races",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "kwmap/runtime-key",
     "kwmap/dynamic",
@@ -14818,7 +14643,6 @@
    "port": "b",
    "ns": "kami.isekai.skills",
    "blockers": [
-    "kwmap/def-literal",
     "kwmap/table-runtime-key",
     "f64-generic-arith"
    ]
@@ -14863,7 +14687,6 @@
    "ns": "kami.isekai.tensei",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "f64-generic-arith"
    ]
   },
@@ -15205,7 +15028,6 @@
     "kwmap/empty",
     "kwmap/option-default",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "fn-literal",
     "destructuring",
     "host-interop"
@@ -15319,8 +15141,7 @@
     "kwmap/dynamic",
     "f64-generic-arith",
     "fn-literal",
-    "auto-resolved-keyword",
-    "destructuring"
+    "auto-resolved-keyword"
    ]
   },
   {
@@ -15435,8 +15256,7 @@
     "multi-module",
     "f64-generic-arith",
     "fn-literal",
-    "auto-resolved-keyword",
-    "destructuring"
+    "auto-resolved-keyword"
    ]
   },
   {
@@ -15582,7 +15402,6 @@
    "ns": "kami.studio.ui",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/option-default",
     "destructuring"
@@ -16005,7 +15824,6 @@
    "ns": "kami.webvr.engine-test",
    "blockers": [
     "multi-module",
-    "kwmap/def-literal",
     "kwmap/param-row",
     "kwmap/option-default",
     "kwmap/fn-value",
@@ -16098,7 +15916,6 @@
     "kwmap/param-row",
     "kwmap/row-op",
     "kwmap/dynamic",
-    "kwmap/variadic-assoc",
     "fn-literal",
     "host-interop"
    ]
@@ -16270,6 +16087,51 @@
    "class": "native"
   },
   {
+   "path": "scripts/native/rewrite_rules_corpus/destructuring-defn-param.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/destructuring-defn-param.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/destructuring-doseq.out-of-scope.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/destructuring-fn-param.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/destructuring-fn-param.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/destructuring-let.admitted.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/destructuring-loop.admitted.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/destructuring-rest-list.out-of-scope.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/destructuring-strs.out-of-scope.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
    "path": "scripts/native/rewrite_rules_corpus/fn-literal.after.kotoba",
    "unit": "scripts",
    "class": "native"
@@ -16305,12 +16167,17 @@
    "class": "native"
   },
   {
-   "path": "scripts/native/rewrite_rules_corpus/kwmap-def-f64.after.kotoba",
+   "path": "scripts/native/rewrite_rules_corpus/kwmap-def-f64.admitted.kotoba",
    "unit": "scripts",
    "class": "native"
   },
   {
-   "path": "scripts/native/rewrite_rules_corpus/kwmap-def-f64.before.kotoba",
+   "path": "scripts/native/rewrite_rules_corpus/kwmap-def-vec-mixed-keys.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/kwmap-def-vec-mixed-keys.before.kotoba",
    "unit": "scripts",
    "class": "native"
   },
@@ -16390,6 +16257,11 @@
    "class": "native"
   },
   {
+   "path": "scripts/native/rewrite_rules_corpus/kwmap-option-default-typed-map.admitted.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
    "path": "scripts/native/rewrite_rules_corpus/kwmap-option-default.after.kotoba",
    "unit": "scripts",
    "class": "native"
@@ -16415,6 +16287,16 @@
    "class": "native"
   },
   {
+   "path": "scripts/native/rewrite_rules_corpus/kwmap-state-param.after.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
+   "path": "scripts/native/rewrite_rules_corpus/kwmap-state-param.before.kotoba",
+   "unit": "scripts",
+   "class": "native"
+  },
+  {
    "path": "scripts/native/rewrite_rules_corpus/kwmap-table-of-records.after.kotoba",
    "unit": "scripts",
    "class": "native"
@@ -16435,12 +16317,12 @@
    "class": "native"
   },
   {
-   "path": "scripts/native/rewrite_rules_corpus/kwmap-variadic-assoc.after.kotoba",
+   "path": "scripts/native/rewrite_rules_corpus/kwmap-variadic-assoc-odd.out-of-scope.kotoba",
    "unit": "scripts",
    "class": "native"
   },
   {
-   "path": "scripts/native/rewrite_rules_corpus/kwmap-variadic-assoc.before.kotoba",
+   "path": "scripts/native/rewrite_rules_corpus/kwmap-variadic-assoc.admitted.kotoba",
    "unit": "scripts",
    "class": "native"
   },

@@ -12,14 +12,21 @@ and is measured by the `rewrite-rules` gate of `scripts/native_gates.py`: a
 (the negative control), each `.after*` file must check and run to its
 `;; expect-value:`. `.admitted` files show forms that need no rewrite and
 `.out-of-scope` files record refusals these rules do not remove. Results at
-the CI pin (amu `c2186d7`, `bin/amu` sha256 `91aa38eb…0ea40`):
-`docs/evidence/port-rewrite-rules-20261101b.json` (60 cases; the 28 cases of
-rules 1-4 as in `port-rewrite-rules-20261101.json`, plus the keyword map and
-reader cases of JUN-732). Every rule 1-4 case gave the same
-result as at the previous pin `3c9eb7f`
-(`docs/evidence/port-rewrite-rules-20261031.json`): amu PR #1750 (JUN-728:
-keyword map literals as closed records, `:f64` record fields) changed no
-refusal the corpus covers. `seed/HEADS` line numbers below are at `c2186d7`.
+the CI pin (amu `05668c7`, `bin/amu` sha256 `13bfdade…4ba11c3`):
+`docs/evidence/port-rewrite-rules-20261101c.json` (73 cases). Against the
+previous pin `c2186d7` (`port-rewrite-rules-20261101b.json`, 60 cases) amu
+PR #1751 (JUN-729: destructuring as reader sugar) and PR #1753 (JUN-734: def
+literals D5, variadic `assoc` D6, typed-map `get` / `(:k m d)` D10) admitted
+two `.before` forms and changed the code of one:
+`kwmap-def-f64.before` and `kwmap-variadic-assoc.before` are now admitted
+(the def literal became `kwmap-def-f64.admitted`, the variadic assoc
+`kwmap-variadic-assoc.admitted`; the pair's remaining refusal, a destructured
+unannotated parameter, is `kwmap-state-param`), and
+`kwmap-option-default.before` is E2111 instead of E2119. New cases:
+`kwmap-def-vec-mixed-keys` (what D5 still refuses), the admitted
+`kwmap-option-default-typed-map`, the `kwmap-variadic-assoc-odd` refusal and
+the "Destructuring" cases below. Every rule 1-4 case gives the same result as
+at `c2186d7`. `seed/HEADS` line numbers below are at `05668c7`.
 
 Authority references are to `kotoba-lang/kotoba-lang` (`lang/`) and
 `kotoba-lang/amu` (`seed/HEADS`).
@@ -30,7 +37,7 @@ Authority references are to `kotoba-lang/kotoba-lang` (`lang/`) and
 - **Authority:** `lang/guest-grammar.edn:527-532` (`:atom-local`, slice 1:
   "reading it inside loop/doseq/dotimes is refused"); `lang/local-state.edn:112-119`
   (`:out-of-scope :writes-under-iteration`: "a future slice may admit it by
-  threading the cell through the loop's own accumulator"); `seed/HEADS:383-384`
+  threading the cell through the loop's own accumulator"); `seed/HEADS:409-410`
   (`HD-ATOM`: the cell may appear only as the first argument of
   swap!/reset!/deref in the binding function).
 - **Status:** permanent refusal for now; port by hand-threading the value.
@@ -67,7 +74,7 @@ as is (`atom-straight-line.admitted`, 1).
 ## Rule 2: a top-level defn passed as a value
 
 - **Removes:** `E2102 unknown symbol 'f'`.
-- **Authority:** `seed/HEADS:357-359` (`HD-FN-REF`: `(fn-ref f)` for a
+- **Authority:** `seed/HEADS:379-381` (`HD-FN-REF`: `(fn-ref f)` for a
   single-clause, non-variadic, non-aborting defn of the file; `HD-INVOKE`).
 - **Rewrite:** where a module defn's name is used as a value (an argument,
   a let init, a record field), write `(fn-ref f)`; call a fn value held in a
@@ -88,8 +95,8 @@ Passing a defn straight to `map`/`filter`/`reduce` is already admitted
 ## Rule 3: a numeric set literal
 
 - **Removes:** `E2104 type mismatch in '1': expected :keyword`.
-- **Authority:** `seed/HEADS:329-330` (`HD-SETLIT`: a set literal is keyword-only;
-  `typed-set-new` builds the others) and `seed/HEADS:292` (`HD-SET-NEW`).
+- **Authority:** `seed/HEADS:351-352` (`HD-SETLIT`: a set literal is keyword-only;
+  `typed-set-new` builds the others) and `seed/HEADS:314` (`HD-SET-NEW`).
 - **Rewrite:** `#{1 2}` → `(typed-set-new [:set :i64] 1 2)`.
 
 ```clojure
@@ -107,7 +114,7 @@ needs another representation (a sorted vector plus search, or a `case`).
   top-level form 'defprotocol'` / `'defmulti'`.
 - **Authority:** `lang/guest-grammar.edn:498-501` (`:closed-multimethod`, desugars
   to one module-local defn with static `case` dispatch: admitted by the spec,
-  not yet by the native checker; JUN-730), `seed/HEADS:357` (`fn-ref`), and the
+  not yet by the native checker; JUN-730), `seed/HEADS:379` (`fn-ref`), and the
   record field type `[:fn [[T ..] R]]`.
 - **reify / defprotocol → record of fn-ref closures.** Each protocol method
   becomes a record field of fn type; each implementation is a defn put in the
@@ -156,22 +163,23 @@ where the representation is not yet complete. The corpus cases are
 | pattern | refusal | port as | blocker | follow-up |
 |---|---|---|---|---|
 | constant table read by a literal key | admitted | the literal (a closed record) | none | |
-| constant table holding f64 / bool values, or a vector of maps | E2124 | `(def t (->Rec ..))` (f64 fields admitted) or a `defn-` thunk | `kwmap/def-literal` | JUN-734 (D5) |
+| constant table holding f64 / bool values, or a vector of maps | admitted at `05668c7` (JUN-734 D5; was E2124) | the literal | none | |
+| constant vector whose items differ in type (maps with different keys or value types, `[1 "b"]`, `[0 0.5]`) or holding more than 64 non-integer items | E2116 | one defrecord with `[:option T]` fields built by `->Rec`, or a typed map | `kwmap/def-literal` | JUN-734 |
 | table looked up or iterated by a runtime key | E2127, E2104 (`contains?`) | `(typed-map-new [:map :keyword V])`, V a scalar, `[:ref R]` or `[:fn ..]` | `kwmap/table-runtime-key` | JUN-735 |
 | local fixed-shape record | admitted | as is | none | |
 | accumulator in reduce/loop | admitted when the keys are fixed | a record loop slot; a typed map when keys vary | `kwmap/runtime-key` when keyed at run time | |
-| option map with defaults (`:or`, `(get m :k d)`, `(:k m d)`, `merge` of defaults) | E2119, E2104 | defrecord with `[:option T]` fields + `option-or`, or a typed map + `(get m k d)` | `kwmap/option-default` | JUN-733 (D2) |
+| option map with defaults (`:or`, `(get m :k d)`, `(:k m d)`, `merge` of defaults) | on a record: E2104 (`get` default, `or`, `:or`), E2103 (`(:k m d)`), E2111 (`:keys` name written nowhere else); on a typed map `(get m :k d)` and `(:k m d)` are admitted at `05668c7` (JUN-734 D10) | defrecord with `[:option T]` fields + `option-or`, or a typed map + `(get m k d)` / `(:k m d)` | `kwmap/option-default` | JUN-733 (D2) |
 | `ex-info` data | admitted (it becomes `:document`) | as is; read back with `document-get` | none | |
 | runtime-keyed map, entity table | E2127, E2104 | `[:map :i64\|:keyword [:ref R]]` | `kwmap/runtime-key` | JUN-735 (D7 keyword-key iteration, D8 31-entry cap) |
 | EDN I/O, shape tested at run time | E2101 | `:document` and the document ops | `kwmap/dynamic` | JUN-735 (D9: no f64 in a document) |
-| map crossing a fn or module boundary | E2104, E2119, E2179 | defrecord and `[:ref :ns/R]` parameters, built with `->R` / `map->R`; `:ns` is the file's own namespace | `kwmap/param-row` | JUN-733 (D1, D2) |
+| map crossing a fn or module boundary | E2104, E2105 (a bare record name as the type, since `05668c7`), E2179 | defrecord and `[:ref :ns/R]` parameters, built with `->R` / `map->R`; `:ns` is the file's own namespace | `kwmap/param-row` | JUN-733 (D1, D2) |
 | nil field | E2102 | an `[:option T]` field | `kwmap/nil-field` | JUN-733 (D4) |
 | `{}` | E2133 | `(typed-map-new [:map K V])` or a full record | `kwmap/empty` | JUN-733 (D3) |
 | `merge` / `dissoc` / `select-keys` / `update` / `*-in` | E2101, E2104 | nested `assoc` on a declared record | `kwmap/row-op` | JUN-733 (D3) |
 | fn values in a map | E2124 (def), E2128 | `[:map :keyword [:fn ..]]` with `fn-ref` / `invoke`, or `case` on the key | `kwmap/fn-value` | JUN-732 |
 | `contains?` | E2104 | a typed map | `kwmap/runtime-key` (non-literal key) | |
 | `#js`, `clj->js`, hiccup attrs | host | a host adapter outside the guest | `host-interop` | |
-| variadic `assoc` | E2103 | nested `assoc`, one key each | `kwmap/variadic-assoc` | JUN-734 (D6) |
+| variadic `assoc` | admitted at `05668c7` (JUN-734 D6; was E2103); an odd key/value count stays E2103 | as is | none (the `kwmap/variadic-assoc` blocker is removed) | |
 
 Each before/after below is a corpus case (`kwmap-<case>.before` /
 `.after`), measured at the pin. Records use the file's own namespace, here
@@ -206,8 +214,11 @@ E2104, after 25):
     s (:freq (:audio s))))
 ```
 
-**f64 constant table and a state map passed between fns**
-(`kwmap-def-f64`, before E2124, after 1):
+**A state map passed between fns** (`kwmap-state-param`, before E2104 for the
+unannotated `{:keys ..}` parameter, after 1). Until `05668c7` this was
+`kwmap-def-f64` and its before was refused E2124 at the def; the f64 def is now
+admitted as written (`kwmap-def-f64.admitted`, 1), so only the parameter needs
+the rewrite:
 
 ```clojure
 ;; before
@@ -221,7 +232,10 @@ E2104, after 25):
   (case (:state w) ..))
 ```
 
-**Option map with defaults** (`kwmap-option-default`, before E2119, after 50):
+**Option map with defaults** (`kwmap-option-default`, before E2111 at
+`05668c7`, E2119 at `c2186d7`, after 50). On a typed map the default needs no
+rewrite: `(get opts :from 0)` and `(:to opts 100)` are admitted
+(`kwmap-option-default-typed-map.admitted`, 300):
 
 ```clojure
 ;; before
@@ -292,7 +306,10 @@ defrecord and a `[:ref :probe/P]` parameter (`kwmap-param-row`); a `[:ref]` to
 another namespace is E2179 (`kwmap-param-other-ns.out-of-scope`); `merge`
 (E2101) becomes `assoc` on the declared keys (`kwmap-merge`); `{}` (E2133)
 becomes `(typed-map-new [:map :keyword :i64])` (`kwmap-empty`); variadic
-`assoc` (E2103) becomes one `assoc` per key (`kwmap-variadic-assoc`); `keys` of
+`assoc` is admitted as written since `05668c7` (`kwmap-variadic-assoc.admitted`;
+an odd count is `kwmap-variadic-assoc-odd.out-of-scope`, E2103); a def vector of
+maps with different keys (E2116) becomes a vector of one record with
+`[:option T]` fields (`kwmap-def-vec-mixed-keys`, after 5); `keys` of
 a keyword-keyed typed map is still refused (E2104,
 `kwmap-keyword-keys.out-of-scope`; JUN-735 D7). `ex-info` data is admitted and
 read back as a document (`kwmap-ex-info.admitted`, -3):
@@ -301,6 +318,35 @@ read back as a document (`kwmap-ex-info.admitted`, -3):
 (defn- weapon-at [i :i64] :i64 (if (< i 0) (throw (ex-info "weapon index out of range" {:index i :kind :weapon})) i))
 (try (weapon-at -3) (catch e (option-or (document-i64-value (option-or (document-get (ex-data e) :index) (document-null))) 0)))
 ```
+
+## Destructuring (JUN-729)
+
+Since amu `5667e44c` (PR #1751, in the `05668c7` pin) a destructuring pattern
+is reader sugar that `seed/21-check` expands before typing into plain
+temp-bound `nth` / `get` / `vector-drop` bindings (`seed/HEADS:189-197`,
+`HD-LET`; `HD-LOOP`; `seed/HEADS:390-395`, `HD-AMP`). Admitted as written in
+`let` and `loop`: vector patterns (nested, `:as`, `_`, `&` over a vector) and
+map patterns (`:keys`, `{x :k}`, `:as`) over a record or keyword map literal
+whose keys are present, `:or` over a typed map (`destructuring-let.admitted`,
+44; `destructuring-loop.admitted`, 55). `nth` traps on a short vector where
+Clojure binds nil.
+
+| construct | refusal | port as | corpus |
+|---|---|---|---|
+| pattern in a defn parameter without a type | E2104 | annotate it: `[[a b] :vector-i64]`, `[{:keys [..]} [:ref :ns/R]]` | `destructuring-defn-param` (after 14) |
+| pattern in a `fn` parameter | E2139 | a plain parameter and a `let` pattern in the body | `destructuring-fn-param` (after 14) |
+| pattern in `doseq` / `for` / `when-let` / `if-let` | E2111, E2101 (`for`), E2103 | bind a name, destructure in a `let` | `destructuring-doseq.out-of-scope` |
+| `:strs` / `:syms`, a string or other non-keyword key | E2111 | keyword keys | `destructuring-strs.out-of-scope` |
+| `&` over a list | E2104 | a vector | `destructuring-rest-list.out-of-scope` |
+| `:or` on a record, an absent key (nil lookup) | E2104, E2127 | `[:option T]` fields, or a typed map with `:or` | (`kwmap-option-default`) |
+| a `:keys` name never written as a keyword in the module | E2111 | | |
+
+The ledger's `destructuring` blocker counts a file when it has a pattern in a
+defn / fn parameter (no CLJK parameter is annotated), in doseq / for /
+when-let / if-let bindings, or a `let` / `loop` map pattern or `&` (whether
+the value is a record with every key, a typed map, a vector or a list is type
+flow, so these count whole); a file whose only patterns are `let` / `loop`
+vector patterns without `&` is no longer counted.
 
 ## Reader shorthands (JUN-732)
 
@@ -331,7 +377,10 @@ hand work). It splits the former `keyword-map-literal` blocker (JUN-732) into
 the `kwmap/*` blockers of the table above, read by `kwmap_patterns()` (a small
 reader over the CLJK with comments and strings removed) in files that hold a
 keyword map literal; local records, constant tables read by a literal key and
-`ex-info` data are no longer blockers. `fn-literal` and `auto-resolved-keyword`
+`ex-info` data are no longer blockers; at `05668c7` `kwmap/def-literal` is
+narrowed to the E2116 vectors and `kwmap/variadic-assoc` is removed (JUN-734),
+and `destructuring` is read by `destructuring_patterns()` (JUN-729, above).
+`fn-literal` and `auto-resolved-keyword`
 track the reader shorthands. The detection is a regex/form scan over the CLJK,
 an estimate of the work rather than a proof. `dispatch-forms` links JUN-730
 and this rule set, `destructuring` JUN-729.
