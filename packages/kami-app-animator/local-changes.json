@@ -3,8 +3,8 @@
   "files": {
     "deps.edn": {
       "imported-sha256": "2f29341cfd41fcf917045fdb005a4eb2c8e535975405910ba80f355c48f36b30",
-      "sha256": "fb6d8f9401d434d40f342166239da805703096d69602e1bf42660f435c81a082",
-      "reason": "Git dependencies on kami-* repositories that are bundled here (kami-engine-animation) become local roots so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :cljs): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+      "sha256": "7a714d6ae98ef801504f4df158d23cffcc7d57c4c67d9079b90bac10129c20ed",
+      "reason": "The dependency on kami-engine-animation names the kotoba monorepo's lib/kotoba.kamiEngineAnimation, where it now lives (JUN-649), so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :cljs): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
     }
   }
 }

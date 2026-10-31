@@ -4,7 +4,7 @@
  "inputs": {
   "kotoba-lib": {
    "repo": "kotoba-lang/kotoba",
-   "rev": "640a1817bd1eeacf7557e70f0e537259859ad150"
+   "rev": "ee9a3f386fc046f5ff2fb3f1526df5ef5bc2ada9"
   },
   "amu-probe": {
    "repo": "kotoba-lang/amu",
@@ -22,19 +22,19 @@
   "native": "already native: .kotoba sources and the Amu gate runner and CI definition"
  },
  "counts": {
-  "tracked": 1260,
+  "tracked": 997,
   "class": {
-   "a": 224,
-   "c": 55,
-   "d": 122,
-   "keep": 378,
+   "a": 212,
+   "c": 41,
+   "d": 96,
+   "keep": 302,
    "native": 9,
-   "o": 472
+   "o": 337
   },
   "port": {
-   "b": 415,
-   "c": 41,
-   "d": 13,
+   "b": 285,
+   "c": 38,
+   "d": 11,
    "native": 3
   }
  },
@@ -46,7 +46,7 @@
     "AWAI-50",
     "JUN-384"
    ],
-   "files": 345
+   "files": 230
   },
   "keyword-map-literal": {
    "refusal": "E2105 unsupported type ':a'",
@@ -54,7 +54,7 @@
    "issues": [
     "JUN-651"
    ],
-   "files": 360
+   "files": 251
   },
   "f64-generic-arith": {
    "refusal": "E2104 type mismatch in '*': expected :i64; E2101 for f64->i64",
@@ -62,7 +62,7 @@
    "issues": [
     "KOTOBA-161"
    ],
-   "files": 347
+   "files": 231
   },
   "regex-literal": {
    "refusal": "E1005 unsupported reader syntax '#'",
@@ -70,7 +70,7 @@
    "issues": [
     "AWAI-47"
    ],
-   "files": 42
+   "files": 25
   },
   "dispatch-forms": {
    "refusal": "E2003 unsupported top-level form 'defmulti' / 'defprotocol'",
@@ -78,7 +78,7 @@
    "issues": [
     "JUN-651"
    ],
-   "files": 10
+   "files": 9
   },
   "destructuring": {
    "refusal": "E2111 malformed binding vector",
@@ -86,7 +86,7 @@
    "issues": [
     "JUN-651"
    ],
-   "files": 259
+   "files": 185
   },
   "atom-escape": {
    "refusal": "E2140 atom escapes its let scope (straight-line swap!/reset!/deref only)",
@@ -94,7 +94,7 @@
    "issues": [
     "JUN-651"
    ],
-   "files": 39
+   "files": 27
   },
   "host-interop": {
    "refusal": "E6010 named operation js/... is not a registered capability; E2003 for an import declaration",
@@ -103,7 +103,7 @@
     "AWAI-25",
     "JUN-353"
    ],
-   "files": 104
+   "files": 85
   }
  },
  "waves": [
@@ -114,13 +114,15 @@
     "fixtures",
     "kami-clj-play",
     "kami-clj-play3d",
+    "kami-gameplay",
     "kami-physics",
     "kami-render",
-    "packages/freeboard",
     "packages/kami-app-amenominaka",
+    "packages/kami-app-animator",
     "packages/kami-app-bim-editor",
     "packages/kami-app-cad",
     "packages/kami-app-character-creator",
+    "packages/kami-app-modeler",
     "packages/kami-app-sculpt",
     "packages/kami-app-sip",
     "packages/kami-app-suji",
@@ -129,13 +131,7 @@
     "packages/kami-cam-scene",
     "packages/kami-character-scene",
     "packages/kami-creative-studio",
-    "packages/kami-engine-animation",
-    "packages/kami-engine-modeling",
-    "packages/kami-flow",
     "packages/kami-game-scene",
-    "packages/kami-gen-hybrid",
-    "packages/kami-gen-ml3d",
-    "packages/kami-gen-procedural",
     "packages/kami-genre-base-systems",
     "packages/kami-input-scene",
     "packages/kami-postfx-scene",
@@ -145,20 +141,13 @@
     "packages/kami-studio",
     "packages/kami-terrain-scene",
     "packages/kami-vegetation-scene",
-    "packages/kami-vehicle",
-    "packages/kami-web",
-    "packages/swarm-choreo"
+    "packages/kami-vehicle-scene"
    ]
   },
   {
    "wave": 1,
    "units": [
-    "kami-gameplay",
-    "packages/biomech",
-    "packages/kami-app-animator",
-    "packages/kami-app-hygaccess-plant",
-    "packages/kami-app-modeler",
-    "packages/kami-vehicle-scene"
+    "packages/kami-app-hygaccess-plant"
    ]
   }
  ],
@@ -188,54 +177,30 @@
   },
   {
    "lib": "kotoba/lib/kotoba.bytes",
-   "units": 5,
+   "units": 3,
    "namespaces": [
     "kotoba.bytes"
    ],
    "kotoba-ported": []
   },
   {
-   "lib": "kotoba/lib/kotoba.canvaskit",
-   "units": 1,
-   "namespaces": [
-    "canvaskit.hit-test",
-    "canvaskit.scroll-view",
-    "canvaskit.viewport"
-   ],
-   "kotoba-ported": []
-  },
-  {
    "lib": "kotoba/lib/kotoba.character",
-   "units": 4,
+   "units": 2,
    "namespaces": [
     "character.anim-blueprint",
-    "character.bin",
     "character.blendshape",
     "character.body",
     "character.control-rig",
     "character.material",
-    "character.math",
-    "character.params",
-    "character.space"
+    "character.params"
    ],
    "kotoba-ported": []
   },
   {
    "lib": "kotoba/lib/kotoba.coll",
-   "units": 4,
-   "namespaces": [
-    "kotoba.lang.coll"
-   ],
-   "kotoba-ported": []
-  },
-  {
-   "lib": "kotoba/lib/kotoba.comfyui",
    "units": 1,
    "namespaces": [
-    "comfyui.exec",
-    "comfyui.node",
-    "comfyui.std",
-    "comfyui.workflow"
+    "kotoba.lang.coll"
    ],
    "kotoba-ported": []
   },
@@ -244,15 +209,6 @@
    "units": 7,
    "namespaces": [
     "css.core"
-   ],
-   "kotoba-ported": []
-  },
-  {
-   "lib": "kotoba/lib/kotoba.dft",
-   "units": 1,
-   "namespaces": [
-    "dft.atpg",
-    "dft.scan"
    ],
    "kotoba-ported": []
   },
@@ -274,27 +230,9 @@
   },
   {
    "lib": "kotoba/lib/kotoba.edn",
-   "units": 9,
+   "units": 6,
    "namespaces": [
     "kotoba.lang.edn"
-   ],
-   "kotoba-ported": []
-  },
-  {
-   "lib": "kotoba/lib/kotoba.error",
-   "units": 2,
-   "namespaces": [
-    "kotoba.lang.error"
-   ],
-   "kotoba-ported": []
-  },
-  {
-   "lib": "kotoba/lib/kotoba.fea",
-   "units": 1,
-   "namespaces": [
-    "kotoba.fea.boundary",
-    "kotoba.fea.mesh",
-    "kotoba.fea.solver"
    ],
    "kotoba-ported": []
   },
@@ -327,16 +265,8 @@
    "kotoba-ported": []
   },
   {
-   "lib": "kotoba/lib/kotoba.image",
-   "units": 1,
-   "namespaces": [
-    "kotoba.image"
-   ],
-   "kotoba-ported": []
-  },
-  {
    "lib": "kotoba/lib/kotoba.io",
-   "units": 8,
+   "units": 4,
    "namespaces": [
     "kotoba.io"
    ],
@@ -367,19 +297,6 @@
    ]
   },
   {
-   "lib": "kotoba/lib/kotoba.kamiAutodrive",
-   "units": 1,
-   "namespaces": [
-    "autodrive.autopilot",
-    "autodrive.classes",
-    "autodrive.dynamics",
-    "autodrive.geom",
-    "autodrive.plant",
-    "autodrive.types"
-   ],
-   "kotoba-ported": []
-  },
-  {
    "lib": "kotoba/lib/kotoba.kamiContracts",
    "units": 1,
    "namespaces": [
@@ -393,6 +310,14 @@
    "namespaces": [
     "kami.eizo.timeline",
     "kami.eizo.timeline.timecode"
+   ],
+   "kotoba-ported": []
+  },
+  {
+   "lib": "kotoba/lib/kotoba.kamiEngineAnimation",
+   "units": 2,
+   "namespaces": [
+    "kami.animation"
    ],
    "kotoba-ported": []
   },
@@ -429,6 +354,14 @@
     "kotoba.engine-clj.ast",
     "kotoba.engine-clj.codegen",
     "kotoba.engine-clj.wasm-bytes"
+   ],
+   "kotoba-ported": []
+  },
+  {
+   "lib": "kotoba/lib/kotoba.kamiEngineModeling",
+   "units": 1,
+   "namespaces": [
+    "kami.modeling"
    ],
    "kotoba-ported": []
   },
@@ -483,6 +416,14 @@
    "kotoba-ported": []
   },
   {
+   "lib": "kotoba/lib/kotoba.kamiVehicle",
+   "units": 1,
+   "namespaces": [
+    "vehicle.backend"
+   ],
+   "kotoba-ported": []
+  },
+  {
    "lib": "kotoba/lib/kotoba.kisekae",
    "units": 1,
    "namespaces": [
@@ -510,14 +451,6 @@
    "kotoba-ported": []
   },
   {
-   "lib": "kotoba/lib/kotoba.modelChecking",
-   "units": 1,
-   "namespaces": [
-    "model-checking.equivalence"
-   ],
-   "kotoba-ported": []
-  },
-  {
    "lib": "kotoba/lib/kotoba.nagare",
    "units": 1,
    "namespaces": [
@@ -531,19 +464,8 @@
    "kotoba-ported": []
   },
   {
-   "lib": "kotoba/lib/kotoba.num",
-   "units": 1,
-   "namespaces": [
-    "num.array",
-    "num.cpu",
-    "num.protocol",
-    "num.sparse"
-   ],
-   "kotoba-ported": []
-  },
-  {
    "lib": "kotoba/lib/kotoba.physics",
-   "units": 4,
+   "units": 3,
    "namespaces": [
     "kotoba.physics.contract",
     "kotoba.physics.vehicle"
@@ -559,24 +481,6 @@
    "kotoba-ported": []
   },
   {
-   "lib": "kotoba/lib/kotoba.pnr",
-   "units": 1,
-   "namespaces": [
-    "pnr.floorplan",
-    "pnr.gdsii"
-   ],
-   "kotoba-ported": []
-  },
-  {
-   "lib": "kotoba/lib/kotoba.power",
-   "units": 1,
-   "namespaces": [
-    "power.estimation",
-    "power.ir-drop"
-   ],
-   "kotoba-ported": []
-  },
-  {
    "lib": "kotoba/lib/kotoba.process",
    "units": 1,
    "namespaces": [
@@ -587,14 +491,6 @@
    ]
   },
   {
-   "lib": "kotoba/lib/kotoba.robotics",
-   "units": 1,
-   "namespaces": [
-    "kotoba.robotics"
-   ],
-   "kotoba-ported": []
-  },
-  {
    "lib": "kotoba/lib/kotoba.route",
    "units": 1,
    "namespaces": [
@@ -603,25 +499,8 @@
    "kotoba-ported": []
   },
   {
-   "lib": "kotoba/lib/kotoba.rtl",
-   "units": 1,
-   "namespaces": [
-    "rtl.hdl"
-   ],
-   "kotoba-ported": []
-  },
-  {
-   "lib": "kotoba/lib/kotoba.signalIntegrity",
-   "units": 1,
-   "namespaces": [
-    "signal-integrity.eye-diagram",
-    "signal-integrity.transmission-line"
-   ],
-   "kotoba-ported": []
-  },
-  {
    "lib": "kotoba/lib/kotoba.skeleton",
-   "units": 2,
+   "units": 1,
    "namespaces": [
     "skeleton.math"
    ],
@@ -629,7 +508,7 @@
   },
   {
    "lib": "kotoba/lib/kotoba.test",
-   "units": 36,
+   "units": 25,
    "namespaces": [
     "kotoba.test"
    ],
@@ -637,7 +516,7 @@
   },
   {
    "lib": "kotoba/lib/kotoba.text",
-   "units": 20,
+   "units": 15,
    "namespaces": [
     "kotoba.lang.text"
    ],
@@ -661,15 +540,6 @@
     "kami.webgpu.geometry",
     "kami.webgpu.ir",
     "kami.webgpu.mesh"
-   ],
-   "kotoba-ported": []
-  },
-  {
-   "lib": "kotoba/lib/kotoba.yield",
-   "units": 1,
-   "namespaces": [
-    "yield.corner",
-    "yield.monte-carlo"
    ],
    "kotoba-ported": []
   },
@@ -714,16 +584,8 @@
    "kotoba-ported": []
   },
   {
-   "lib": "kotoba/lib/org.ros.core",
-   "units": 1,
-   "namespaces": [
-    "kotoba.ros.rosbridge"
-   ],
-   "kotoba-ported": []
-  },
-  {
    "lib": "kotoba/lib/org.vrmC.vrm",
-   "units": 5,
+   "units": 2,
    "namespaces": [
     "vrm.compose",
     "vrm.convert",
@@ -731,8 +593,6 @@
     "vrm.expression",
     "vrm.glb",
     "vrm.gltf-types",
-    "vrm.humanoid",
-    "vrm.json",
     "vrm.math",
     "vrm.parse",
     "vrm.part",
@@ -743,7 +603,7 @@
   },
   {
    "lib": "unresolved",
-   "units": 18,
+   "units": 15,
    "namespaces": [
     "cljs.core.async",
     "cljs.core.async.macros",
@@ -754,10 +614,6 @@
     "clojure.java.io",
     "clojure.java.shell",
     "clojure.test",
-    "cloud-murakumo.executor",
-    "cloud-murakumo.gen",
-    "cloud-murakumo.spec",
-    "cloud-murakumo.worker",
     "datalevin.core",
     "goog.object",
     "hiccup2.core",
@@ -765,8 +621,6 @@
     "kotoba.render.character",
     "kotoba.render.foreground-density",
     "kotoba.render.mesh",
-    "malli.core",
-    "num.solver",
     "promesa.core",
     "reagent.dom",
     "reagent.dom.client",
@@ -1005,18 +859,6 @@
    "placement": "kami-engine"
   },
   {
-   "unit": "kami-flow",
-   "files": 7,
-   "classes": {
-    "a": 4,
-    "c": 1,
-    "d": 1,
-    "keep": 1
-   },
-   "depends-on": [],
-   "placement": "kotoba"
-  },
-  {
    "unit": "kami-gameplay",
    "files": 41,
    "classes": {
@@ -1066,12 +908,13 @@
     "run-tests",
     "simulate"
    ],
-   "depends-on": [
-    "packages/kami-engine-animation"
-   ],
+   "depends-on": [],
    "external": {
     "kotoba/lib/kotoba.edn": [
      "kotoba.lang.edn"
+    ],
+    "kotoba/lib/kotoba.kamiEngineAnimation": [
+     "kami.animation"
     ],
     "kotoba/lib/kotoba.text": [
      "kotoba.lang.text"
@@ -1088,18 +931,8 @@
     "keyword-map-literal": 28,
     "multi-module": 28
    },
-   "wave": 1,
+   "wave": 0,
    "placement": "kami-engine"
-  },
-  {
-   "unit": "kami-genesis",
-   "files": 4,
-   "classes": {
-    "a": 3,
-    "keep": 1
-   },
-   "depends-on": [],
-   "placement": "kotoba"
   },
   {
    "unit": "kami-live",
@@ -1304,134 +1137,6 @@
    "placement": "kami-engine"
   },
   {
-   "unit": "packages/biomech",
-   "files": 26,
-   "classes": {
-    "a": 1,
-    "d": 2,
-    "keep": 6,
-    "o": 17
-   },
-   "port": {
-    "b": 17
-   },
-   "namespaces": [
-    "kotoba.biomech",
-    "kotoba.biomech.disc",
-    "kotoba.biomech.disc-test",
-    "kotoba.biomech.fem",
-    "kotoba.biomech.fem-test",
-    "kotoba.biomech.hemodynamics",
-    "kotoba.biomech.hemodynamics-test",
-    "kotoba.biomech.muscle",
-    "kotoba.biomech.muscle-test",
-    "kotoba.biomech.osteo",
-    "kotoba.biomech.osteo-test",
-    "kotoba.biomech.softbody",
-    "kotoba.biomech.softbody-test",
-    "kotoba.biomech.tissue",
-    "kotoba.biomech.tissue-loader",
-    "kotoba.biomech.tissue-loader-test",
-    "kotoba.biomech.tissue-test"
-   ],
-   "depends-on": [
-    "packages/kami-vehicle"
-   ],
-   "external": {
-    "kotoba/lib/kotoba.coll": [
-     "kotoba.lang.coll"
-    ],
-    "kotoba/lib/kotoba.edn": [
-     "kotoba.lang.edn"
-    ],
-    "kotoba/lib/kotoba.error": [
-     "kotoba.lang.error"
-    ],
-    "kotoba/lib/kotoba.fea": [
-     "kotoba.fea.boundary",
-     "kotoba.fea.mesh",
-     "kotoba.fea.solver"
-    ],
-    "kotoba/lib/kotoba.io": [
-     "kotoba.io"
-    ],
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ],
-    "kotoba/lib/kotoba.text": [
-     "kotoba.lang.text"
-    ]
-   },
-   "blockers": {
-    "atom-escape": 1,
-    "destructuring": 4,
-    "f64-generic-arith": 15,
-    "keyword-map-literal": 7,
-    "multi-module": 13,
-    "regex-literal": 2
-   },
-   "wave": 1,
-   "placement": "kotoba"
-  },
-  {
-   "unit": "packages/freeboard",
-   "files": 28,
-   "classes": {
-    "a": 1,
-    "c": 1,
-    "d": 5,
-    "keep": 6,
-    "o": 15
-   },
-   "port": {
-    "b": 14,
-    "d": 1
-   },
-   "namespaces": [
-    "freeboard.board",
-    "freeboard.board-test",
-    "freeboard.collab",
-    "freeboard.collab-test",
-    "freeboard.doc",
-    "freeboard.import",
-    "freeboard.interop-test",
-    "freeboard.ops-test",
-    "freeboard.render",
-    "freeboard.render-ir",
-    "freeboard.scene",
-    "freeboard.scene-test",
-    "freeboard.schema",
-    "freeboard.snapshot"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.canvaskit": [
-     "canvaskit.hit-test",
-     "canvaskit.scroll-view",
-     "canvaskit.viewport"
-    ],
-    "kotoba/lib/kotoba.edn": [
-     "kotoba.lang.edn"
-    ],
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ],
-    "unresolved": [
-     "cljs.reader",
-     "malli.core"
-    ]
-   },
-   "blockers": {
-    "atom-escape": 1,
-    "destructuring": 7,
-    "f64-generic-arith": 10,
-    "keyword-map-literal": 14,
-    "multi-module": 14
-   },
-   "wave": 0,
-   "placement": "kotoba"
-  },
-  {
    "unit": "packages/kami-app",
    "files": 6,
    "classes": {
@@ -1562,15 +1267,16 @@
     "kami.animator.project-test",
     "kami.animator.ui"
    ],
-   "depends-on": [
-    "packages/kami-engine-animation"
-   ],
+   "depends-on": [],
    "external": {
     "kotoba/lib/kotoba.css": [
      "css.core"
     ],
     "kotoba/lib/kotoba.html": [
      "html.core"
+    ],
+    "kotoba/lib/kotoba.kamiEngineAnimation": [
+     "kami.animation"
     ],
     "kotoba/lib/kotoba.test": [
      "kotoba.test"
@@ -1593,7 +1299,7 @@
     "keyword-map-literal": 4,
     "multi-module": 3
    },
-   "wave": 1,
+   "wave": 0,
    "placement": "kami-engine"
   },
   {
@@ -1909,15 +1615,16 @@
     "kami.modeler.verify-webgl2",
     "kami.modeler.verify-webgpu"
    ],
-   "depends-on": [
-    "packages/kami-engine-modeling"
-   ],
+   "depends-on": [],
    "external": {
     "kotoba/lib/kotoba.css": [
      "css.core"
     ],
     "kotoba/lib/kotoba.html": [
      "html.core"
+    ],
+    "kotoba/lib/kotoba.kamiEngineModeling": [
+     "kami.modeling"
     ],
     "kotoba/lib/kotoba.physics": [
      "kotoba.physics.vehicle"
@@ -1945,7 +1652,7 @@
     "multi-module": 9,
     "regex-literal": 1
    },
-   "wave": 1,
+   "wave": 0,
    "placement": "kami-engine"
   },
   {
@@ -2419,37 +2126,6 @@
    "placement": "kami-engine"
   },
   {
-   "unit": "packages/kami-engine-animation",
-   "files": 14,
-   "classes": {
-    "d": 2,
-    "keep": 10,
-    "o": 2
-   },
-   "port": {
-    "b": 2
-   },
-   "namespaces": [
-    "kami.animation",
-    "kami.animation-test"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ]
-   },
-   "blockers": {
-    "atom-escape": 1,
-    "destructuring": 1,
-    "f64-generic-arith": 2,
-    "keyword-map-literal": 2,
-    "multi-module": 1
-   },
-   "wave": 0,
-   "placement": "kotoba"
-  },
-  {
    "unit": "packages/kami-engine-core",
    "files": 6,
    "classes": {
@@ -2477,91 +2153,6 @@
    "placement": "kami-engine"
   },
   {
-   "unit": "packages/kami-engine-modeling",
-   "files": 40,
-   "classes": {
-    "a": 2,
-    "d": 2,
-    "keep": 9,
-    "o": 27
-   },
-   "port": {
-    "b": 25,
-    "c": 2
-   },
-   "namespaces": [
-    "kami.modeling",
-    "kami.modeling-assembly-test",
-    "kami.modeling-brep-test",
-    "kami.modeling-cae-test",
-    "kami.modeling-collaboration-test",
-    "kami.modeling-crypto-test",
-    "kami.modeling-document-test",
-    "kami.modeling-drawing-test",
-    "kami.modeling-feature-graph-test",
-    "kami.modeling-large-scene-test",
-    "kami.modeling-nurbs-test",
-    "kami.modeling-sheet-metal-test",
-    "kami.modeling-step-test",
-    "kami.modeling-test",
-    "kami.modeling.assembly",
-    "kami.modeling.brep",
-    "kami.modeling.cae",
-    "kami.modeling.collaboration",
-    "kami.modeling.csg",
-    "kami.modeling.document",
-    "kami.modeling.drawing",
-    "kami.modeling.feature-graph",
-    "kami.modeling.large-scene",
-    "kami.modeling.nurbs",
-    "kami.modeling.sheet-metal",
-    "kami.modeling.step"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.bytes": [
-     "kotoba.bytes"
-    ],
-    "kotoba/lib/kotoba.coll": [
-     "kotoba.lang.coll"
-    ],
-    "kotoba/lib/kotoba.edn": [
-     "kotoba.lang.edn"
-    ],
-    "kotoba/lib/kotoba.io": [
-     "kotoba.io"
-    ],
-    "kotoba/lib/kotoba.num": [
-     "num.array",
-     "num.cpu",
-     "num.protocol",
-     "num.sparse"
-    ],
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ],
-    "kotoba/lib/kotoba.text": [
-     "kotoba.lang.text"
-    ],
-    "unresolved": [
-     "cljs.reader",
-     "num.solver"
-    ]
-   },
-   "blockers": {
-    "atom-escape": 6,
-    "destructuring": 19,
-    "dispatch-forms": 1,
-    "f64-generic-arith": 23,
-    "host-interop": 6,
-    "keyword-map-literal": 27,
-    "multi-module": 25,
-    "regex-literal": 11
-   },
-   "wave": 0,
-   "placement": "kotoba"
-  },
-  {
    "unit": "packages/kami-engine-render",
    "files": 6,
    "classes": {
@@ -2587,71 +2178,6 @@
    },
    "depends-on": [],
    "placement": "kami-engine"
-  },
-  {
-   "unit": "packages/kami-flow",
-   "files": 14,
-   "classes": {
-    "d": 2,
-    "keep": 6,
-    "o": 6
-   },
-   "port": {
-    "b": 6
-   },
-   "namespaces": [
-    "flow",
-    "flow-test",
-    "flow.choked",
-    "flow.choked-test",
-    "flow.pump",
-    "flow.pump-test"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.dft": [
-     "dft.atpg",
-     "dft.scan"
-    ],
-    "kotoba/lib/kotoba.modelChecking": [
-     "model-checking.equivalence"
-    ],
-    "kotoba/lib/kotoba.pnr": [
-     "pnr.floorplan",
-     "pnr.gdsii"
-    ],
-    "kotoba/lib/kotoba.power": [
-     "power.estimation",
-     "power.ir-drop"
-    ],
-    "kotoba/lib/kotoba.rtl": [
-     "rtl.hdl"
-    ],
-    "kotoba/lib/kotoba.signalIntegrity": [
-     "signal-integrity.eye-diagram",
-     "signal-integrity.transmission-line"
-    ],
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ],
-    "kotoba/lib/kotoba.text": [
-     "kotoba.lang.text"
-    ],
-    "kotoba/lib/kotoba.yield": [
-     "yield.corner",
-     "yield.monte-carlo"
-    ]
-   },
-   "blockers": {
-    "destructuring": 6,
-    "f64-generic-arith": 6,
-    "host-interop": 1,
-    "keyword-map-literal": 6,
-    "multi-module": 4,
-    "regex-literal": 1
-   },
-   "wave": 0,
-   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-game-scene",
@@ -2705,186 +2231,6 @@
    },
    "wave": 0,
    "placement": "kami-engine"
-  },
-  {
-   "unit": "packages/kami-gen-hybrid",
-   "files": 14,
-   "classes": {
-    "d": 2,
-    "keep": 6,
-    "o": 6
-   },
-   "port": {
-    "b": 6
-   },
-   "namespaces": [
-    "kami.gen.hybrid",
-    "kami.gen.hybrid-test",
-    "kami.gen.hybrid.nodes",
-    "kami.gen.hybrid.texture",
-    "kami.gen.hybrid.vrm-export",
-    "kami.gen.hybrid.workflow"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.bytes": [
-     "kotoba.bytes"
-    ],
-    "kotoba/lib/kotoba.character": [
-     "character.bin",
-     "character.body",
-     "character.material",
-     "character.params",
-     "character.space"
-    ],
-    "kotoba/lib/kotoba.comfyui": [
-     "comfyui.exec",
-     "comfyui.node",
-     "comfyui.std",
-     "comfyui.workflow"
-    ],
-    "kotoba/lib/kotoba.image": [
-     "kotoba.image"
-    ],
-    "kotoba/lib/kotoba.io": [
-     "kotoba.io"
-    ],
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ],
-    "kotoba/lib/org.vrmC.vrm": [
-     "vrm.export",
-     "vrm.glb",
-     "vrm.gltf-types",
-     "vrm.json",
-     "vrm.vrm-types"
-    ]
-   },
-   "blockers": {
-    "destructuring": 6,
-    "f64-generic-arith": 5,
-    "host-interop": 5,
-    "keyword-map-literal": 6,
-    "multi-module": 5,
-    "regex-literal": 1
-   },
-   "wave": 0,
-   "placement": "kotoba"
-  },
-  {
-   "unit": "packages/kami-gen-ml3d",
-   "files": 13,
-   "classes": {
-    "d": 2,
-    "keep": 6,
-    "o": 5
-   },
-   "port": {
-    "b": 4,
-    "d": 1
-   },
-   "namespaces": [
-    "kami-heuristic-vrm-postprocess",
-    "kami.gen.ml3d",
-    "kami.gen.ml3d-test",
-    "kami.gen.ml3d.fixture",
-    "kami.gen.ml3d.rig"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.coll": [
-     "kotoba.lang.coll"
-    ],
-    "kotoba/lib/kotoba.error": [
-     "kotoba.lang.error"
-    ],
-    "kotoba/lib/kotoba.io": [
-     "kotoba.io"
-    ],
-    "kotoba/lib/kotoba.skeleton": [
-     "skeleton.math"
-    ],
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ],
-    "kotoba/lib/kotoba.text": [
-     "kotoba.lang.text"
-    ],
-    "kotoba/lib/org.vrmC.vrm": [
-     "vrm.convert",
-     "vrm.export",
-     "vrm.glb",
-     "vrm.gltf-types",
-     "vrm.json",
-     "vrm.parse",
-     "vrm.vrm-types"
-    ],
-    "unresolved": [
-     "cloud-murakumo.executor",
-     "cloud-murakumo.gen",
-     "cloud-murakumo.spec",
-     "cloud-murakumo.worker"
-    ]
-   },
-   "blockers": {
-    "atom-escape": 1,
-    "destructuring": 4,
-    "f64-generic-arith": 3,
-    "host-interop": 4,
-    "keyword-map-literal": 4,
-    "multi-module": 4,
-    "regex-literal": 1
-   },
-   "wave": 0,
-   "placement": "kotoba"
-  },
-  {
-   "unit": "packages/kami-gen-procedural",
-   "files": 10,
-   "classes": {
-    "d": 2,
-    "keep": 6,
-    "o": 2
-   },
-   "port": {
-    "b": 2
-   },
-   "namespaces": [
-    "kami.gen.procedural",
-    "kami.gen.procedural-test"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.character": [
-     "character.bin",
-     "character.body",
-     "character.material",
-     "character.math",
-     "character.params"
-    ],
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ],
-    "kotoba/lib/org.vrmC.vrm": [
-     "vrm.export",
-     "vrm.glb",
-     "vrm.gltf-types",
-     "vrm.humanoid",
-     "vrm.json",
-     "vrm.parse",
-     "vrm.vrm-types"
-    ]
-   },
-   "blockers": {
-    "destructuring": 2,
-    "f64-generic-arith": 2,
-    "host-interop": 2,
-    "keyword-map-literal": 2,
-    "multi-module": 2,
-    "regex-literal": 1
-   },
-   "wave": 0,
-   "placement": "kotoba"
   },
   {
    "unit": "packages/kami-genre-base-systems",
@@ -3230,74 +2576,6 @@
    "placement": "kami-engine"
   },
   {
-   "unit": "packages/kami-vehicle",
-   "files": 43,
-   "classes": {
-    "d": 2,
-    "keep": 6,
-    "o": 35
-   },
-   "port": {
-    "b": 35
-   },
-   "namespaces": [
-    "vehicle",
-    "vehicle-test",
-    "vehicle.backend",
-    "vehicle.backend-test",
-    "vehicle.beam",
-    "vehicle.beam-test",
-    "vehicle.builder",
-    "vehicle.builder-test",
-    "vehicle.controls",
-    "vehicle.ground",
-    "vehicle.ground-test",
-    "vehicle.implicit",
-    "vehicle.implicit-test",
-    "vehicle.integrator",
-    "vehicle.integrator-test",
-    "vehicle.jbeam",
-    "vehicle.jbeam-test",
-    "vehicle.models.garage",
-    "vehicle.models.garage-test",
-    "vehicle.models.sedan",
-    "vehicle.models.sedan-test",
-    "vehicle.node",
-    "vehicle.node-test",
-    "vehicle.powertrain",
-    "vehicle.powertrain-test",
-    "vehicle.rigid-chassis",
-    "vehicle.rigid-chassis-test",
-    "vehicle.softbody",
-    "vehicle.softbody-test",
-    "vehicle.triangle",
-    "vehicle.vec3",
-    "vehicle.vehicle",
-    "vehicle.vehicle-test",
-    "vehicle.wheel",
-    "vehicle.wheel-test"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.physics": [
-     "kotoba.physics.contract",
-     "kotoba.physics.vehicle"
-    ],
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ]
-   },
-   "blockers": {
-    "atom-escape": 2,
-    "destructuring": 14,
-    "f64-generic-arith": 33,
-    "keyword-map-literal": 25,
-    "multi-module": 30
-   },
-   "wave": 0,
-   "placement": "kotoba"
-  },
-  {
    "unit": "packages/kami-vehicle-scene",
    "files": 17,
    "classes": {
@@ -3317,10 +2595,11 @@
     "vehicle-scene.integration",
     "vehicle-scene.integration-test"
    ],
-   "depends-on": [
-    "packages/kami-vehicle"
-   ],
+   "depends-on": [],
    "external": {
+    "kotoba/lib/kotoba.kamiVehicle": [
+     "vehicle.backend"
+    ],
     "kotoba/lib/kotoba.physics": [
      "kotoba.physics.vehicle"
     ],
@@ -3337,105 +2616,8 @@
     "keyword-map-literal": 4,
     "multi-module": 6
    },
-   "wave": 1,
+   "wave": 0,
    "placement": "kami-engine"
-  },
-  {
-   "unit": "packages/kami-web",
-   "files": 31,
-   "classes": {
-    "a": 1,
-    "c": 12,
-    "d": 2,
-    "keep": 6,
-    "o": 10
-   },
-   "port": {
-    "b": 9,
-    "c": 1
-   },
-   "namespaces": [
-    "kotoba.web",
-    "kotoba.web-test",
-    "kotoba.web.document",
-    "kotoba.web.document-test",
-    "kotoba.web.entries",
-    "kotoba.web.entries-test",
-    "kotoba.web.math",
-    "kotoba.web.math-test",
-    "kotoba.web.render-ir",
-    "kotoba.web.render-ir-test"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ],
-    "kotoba/lib/kotoba.text": [
-     "kotoba.lang.text"
-    ]
-   },
-   "blockers": {
-    "destructuring": 6,
-    "f64-generic-arith": 8,
-    "host-interop": 1,
-    "keyword-map-literal": 6,
-    "multi-module": 8
-   },
-   "wave": 0,
-   "placement": "kotoba"
-  },
-  {
-   "unit": "packages/swarm-choreo",
-   "files": 19,
-   "classes": {
-    "d": 2,
-    "keep": 7,
-    "o": 10
-   },
-   "port": {
-    "b": 10
-   },
-   "namespaces": [
-    "kotoba.swarm-choreo.gate",
-    "kotoba.swarm-choreo.gate-test",
-    "kotoba.swarm-choreo.physics-check",
-    "kotoba.swarm-choreo.physics-check-test",
-    "kotoba.swarm-choreo.ros",
-    "kotoba.swarm-choreo.ros-test",
-    "kotoba.swarm-choreo.show",
-    "kotoba.swarm-choreo.show-test",
-    "kotoba.swarm-choreo.validate",
-    "kotoba.swarm-choreo.validate-test"
-   ],
-   "depends-on": [],
-   "external": {
-    "kotoba/lib/kotoba.kamiAutodrive": [
-     "autodrive.autopilot",
-     "autodrive.classes",
-     "autodrive.dynamics",
-     "autodrive.geom",
-     "autodrive.plant",
-     "autodrive.types"
-    ],
-    "kotoba/lib/kotoba.robotics": [
-     "kotoba.robotics"
-    ],
-    "kotoba/lib/kotoba.test": [
-     "kotoba.test"
-    ],
-    "kotoba/lib/org.ros.core": [
-     "kotoba.ros.rosbridge"
-    ]
-   },
-   "blockers": {
-    "destructuring": 5,
-    "f64-generic-arith": 9,
-    "keyword-map-literal": 10,
-    "multi-module": 9
-   },
-   "wave": 0,
-   "placement": "kotoba"
   },
   {
    "unit": "scripts",
@@ -4143,42 +3325,6 @@
    "note": "gitlink without a .gitmodules entry; decided in JUN-647"
   },
   {
-   "path": "kami-flow/graph/README.md",
-   "unit": "kami-flow",
-   "class": "keep"
-  },
-  {
-   "path": "kami-flow/graph/data/entries_semiconductor.json",
-   "unit": "kami-flow",
-   "class": "a"
-  },
-  {
-   "path": "kami-flow/graph/data/runs.json",
-   "unit": "kami-flow",
-   "class": "a"
-  },
-  {
-   "path": "kami-flow/graph/neo4j_bulk_ingest.cypher",
-   "unit": "kami-flow",
-   "class": "a"
-  },
-  {
-   "path": "kami-flow/graph/neo4j_domain_coverage.cypher",
-   "unit": "kami-flow",
-   "class": "a"
-  },
-  {
-   "path": "kami-flow/graph/run_ingest.sh",
-   "unit": "kami-flow",
-   "class": "d",
-   "note": "shell runner outside the native gate"
-  },
-  {
-   "path": "kami-flow/graph/run_ingest_graph_worker.mjs",
-   "unit": "kami-flow",
-   "class": "c"
-  },
-  {
    "path": "kami-gameplay/README.md",
    "unit": "kami-gameplay",
    "class": "keep"
@@ -4685,26 +3831,6 @@
     "f64-generic-arith",
     "destructuring"
    ]
-  },
-  {
-   "path": "kami-genesis/README.md",
-   "unit": "kami-genesis",
-   "class": "keep"
-  },
-  {
-   "path": "kami-genesis/src/wgsl/cartpole_step.wgsl",
-   "unit": "kami-genesis",
-   "class": "a"
-  },
-  {
-   "path": "kami-genesis/src/wgsl/double_pendulum_step.wgsl",
-   "unit": "kami-genesis",
-   "class": "a"
-  },
-  {
-   "path": "kami-genesis/src/wgsl/planar_chain_step.wgsl",
-   "unit": "kami-genesis",
-   "class": "a"
   },
   {
    "path": "kami-live/README.md",
@@ -5310,539 +4436,6 @@
    "path": "packages/README.md",
    "unit": "packages",
    "class": "keep"
-  },
-  {
-   "path": "packages/biomech/.gitignore",
-   "unit": "packages/biomech",
-   "class": "keep"
-  },
-  {
-   "path": "packages/biomech/LICENSE",
-   "unit": "packages/biomech",
-   "class": "keep"
-  },
-  {
-   "path": "packages/biomech/README.md",
-   "unit": "packages/biomech",
-   "class": "keep"
-  },
-  {
-   "path": "packages/biomech/cljk-origin.edn",
-   "unit": "packages/biomech",
-   "class": "keep"
-  },
-  {
-   "path": "packages/biomech/deps.edn",
-   "unit": "packages/biomech",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/biomech/imports.json",
-   "unit": "packages/biomech",
-   "class": "keep"
-  },
-  {
-   "path": "packages/biomech/local-changes.json",
-   "unit": "packages/biomech",
-   "class": "keep"
-  },
-  {
-   "path": "packages/biomech/nbb.edn",
-   "unit": "packages/biomech",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/biomech/resources/kami/biomech/tissues.edn",
-   "unit": "packages/biomech",
-   "class": "a"
-  },
-  {
-   "path": "packages/biomech/src/kotoba/biomech.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/src/kotoba/biomech.kotoba",
-   "port": "b",
-   "ns": "kotoba.biomech",
-   "blockers": [
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/biomech/src/kotoba/biomech/disc.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/src/kotoba/biomech/disc.kotoba",
-   "port": "b",
-   "ns": "kotoba.biomech.disc",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/biomech/src/kotoba/biomech/fem.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/src/kotoba/biomech/fem.kotoba",
-   "port": "b",
-   "ns": "kotoba.biomech.fem",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/biomech/src/kotoba/biomech/hemodynamics.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/src/kotoba/biomech/hemodynamics.kotoba",
-   "port": "b",
-   "ns": "kotoba.biomech.hemodynamics"
-  },
-  {
-   "path": "packages/biomech/src/kotoba/biomech/muscle.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/src/kotoba/biomech/muscle.kotoba",
-   "port": "b",
-   "ns": "kotoba.biomech.muscle",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/biomech/src/kotoba/biomech/osteo.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/src/kotoba/biomech/osteo.kotoba",
-   "port": "b",
-   "ns": "kotoba.biomech.osteo",
-   "blockers": [
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/biomech/src/kotoba/biomech/softbody.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/src/kotoba/biomech/softbody.kotoba",
-   "port": "b",
-   "ns": "kotoba.biomech.softbody",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/biomech/src/kotoba/biomech/tissue.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/src/kotoba/biomech/tissue.kotoba",
-   "port": "b",
-   "ns": "kotoba.biomech.tissue",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/biomech/src/kotoba/biomech/tissue_loader.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/src/kotoba/biomech/tissue_loader.kotoba",
-   "port": "b",
-   "ns": "kotoba.biomech.tissue-loader",
-   "blockers": [
-    "multi-module"
-   ]
-  },
-  {
-   "path": "packages/biomech/test/kotoba/biomech/disc_test.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/test/kotoba/biomech/disc_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.biomech.disc-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/biomech/test/kotoba/biomech/fem_test.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/test/kotoba/biomech/fem_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.biomech.fem-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/biomech/test/kotoba/biomech/hemodynamics_test.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/test/kotoba/biomech/hemodynamics_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.biomech.hemodynamics-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/biomech/test/kotoba/biomech/muscle_test.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/test/kotoba/biomech/muscle_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.biomech.muscle-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/biomech/test/kotoba/biomech/osteo_test.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/test/kotoba/biomech/osteo_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.biomech.osteo-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/biomech/test/kotoba/biomech/softbody_test.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/test/kotoba/biomech/softbody_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.biomech.softbody-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/biomech/test/kotoba/biomech/tissue_loader_test.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/test/kotoba/biomech/tissue_loader_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.biomech.tissue-loader-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith",
-    "regex-literal",
-    "atom-escape"
-   ]
-  },
-  {
-   "path": "packages/biomech/test/kotoba/biomech/tissue_test.cljk",
-   "unit": "packages/biomech",
-   "class": "o",
-   "kotoba": "packages/biomech/test/kotoba/biomech/tissue_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.biomech.tissue-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/freeboard/.gitignore",
-   "unit": "packages/freeboard",
-   "class": "keep"
-  },
-  {
-   "path": "packages/freeboard/LICENSE",
-   "unit": "packages/freeboard",
-   "class": "keep"
-  },
-  {
-   "path": "packages/freeboard/README.md",
-   "unit": "packages/freeboard",
-   "class": "keep"
-  },
-  {
-   "path": "packages/freeboard/cljk-origin.edn",
-   "unit": "packages/freeboard",
-   "class": "keep"
-  },
-  {
-   "path": "packages/freeboard/deps.edn",
-   "unit": "packages/freeboard",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/freeboard/imports.json",
-   "unit": "packages/freeboard",
-   "class": "keep"
-  },
-  {
-   "path": "packages/freeboard/local-changes.json",
-   "unit": "packages/freeboard",
-   "class": "keep"
-  },
-  {
-   "path": "packages/freeboard/nbb.edn",
-   "unit": "packages/freeboard",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/freeboard/package.json",
-   "unit": "packages/freeboard",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/freeboard/public/index.html",
-   "unit": "packages/freeboard",
-   "class": "c"
-  },
-  {
-   "path": "packages/freeboard/scripts/build.sh",
-   "unit": "packages/freeboard",
-   "class": "d",
-   "note": "shell runner outside the native gate"
-  },
-  {
-   "path": "packages/freeboard/scripts/run-task.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "port": "d",
-   "note": "kbb runner or tooling"
-  },
-  {
-   "path": "packages/freeboard/scripts/tasks-complex.edn",
-   "unit": "packages/freeboard",
-   "class": "a"
-  },
-  {
-   "path": "packages/freeboard/scripts/tasks.edn",
-   "unit": "packages/freeboard",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/freeboard/src/freeboard/board.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/src/freeboard/board.kotoba",
-   "port": "b",
-   "ns": "freeboard.board",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/freeboard/src/freeboard/collab.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/src/freeboard/collab.kotoba",
-   "port": "b",
-   "ns": "freeboard.collab",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/freeboard/src/freeboard/doc.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/src/freeboard/doc.kotoba",
-   "port": "b",
-   "ns": "freeboard.doc",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal"
-   ]
-  },
-  {
-   "path": "packages/freeboard/src/freeboard/import.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/src/freeboard/import.kotoba",
-   "port": "b",
-   "ns": "freeboard.import",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/freeboard/src/freeboard/render.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/src/freeboard/render.kotoba",
-   "port": "b",
-   "ns": "freeboard.render",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/freeboard/src/freeboard/render_ir.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/src/freeboard/render_ir.kotoba",
-   "port": "b",
-   "ns": "freeboard.render-ir",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/freeboard/src/freeboard/scene.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/src/freeboard/scene.kotoba",
-   "port": "b",
-   "ns": "freeboard.scene",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/freeboard/src/freeboard/schema.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/src/freeboard/schema.kotoba",
-   "port": "b",
-   "ns": "freeboard.schema",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal"
-   ]
-  },
-  {
-   "path": "packages/freeboard/src/freeboard/snapshot.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/src/freeboard/snapshot.kotoba",
-   "port": "b",
-   "ns": "freeboard.snapshot",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/freeboard/test/freeboard/board_test.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/test/freeboard/board_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "freeboard.board-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/freeboard/test/freeboard/collab_test.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/test/freeboard/collab_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "freeboard.collab-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "atom-escape"
-   ]
-  },
-  {
-   "path": "packages/freeboard/test/freeboard/interop_test.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/test/freeboard/interop_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "freeboard.interop-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/freeboard/test/freeboard/ops_test.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/test/freeboard/ops_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "freeboard.ops-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/freeboard/test/freeboard/scene_test.cljk",
-   "unit": "packages/freeboard",
-   "class": "o",
-   "kotoba": "packages/freeboard/test/freeboard/scene_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "freeboard.scene-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
   },
   {
    "path": "packages/kami-app-amenominaka/.gitignore",
@@ -9253,96 +7846,6 @@
    ]
   },
   {
-   "path": "packages/kami-engine-animation/.gitignore",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/LICENSE",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/README.md",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/cljk-origin.edn",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/deps.edn",
-   "unit": "packages/kami-engine-animation",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-engine-animation/hermes/README.md",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/hermes/profiles/anim-app-maint/SOUL.md",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/hermes/profiles/anim-app-maint/config.yaml",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/hermes/profiles/anim-app-maint/profile.yaml",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/imports.json",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/local-changes.json",
-   "unit": "packages/kami-engine-animation",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-animation/nbb.edn",
-   "unit": "packages/kami-engine-animation",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-engine-animation/src/kami/animation.cljk",
-   "unit": "packages/kami-engine-animation",
-   "class": "o",
-   "kotoba": "packages/kami-engine-animation/src/kami/animation.kotoba",
-   "port": "b",
-   "ns": "kami.animation",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "atom-escape"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-animation/test/kami/animation_test.cljk",
-   "unit": "packages/kami-engine-animation",
-   "class": "o",
-   "kotoba": "packages/kami-engine-animation/test/kami/animation_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.animation-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
    "path": "packages/kami-engine-core/.gitignore",
    "unit": "packages/kami-engine-core",
    "class": "keep"
@@ -9433,475 +7936,6 @@
    "class": "keep"
   },
   {
-   "path": "packages/kami-engine-modeling/.gitignore",
-   "unit": "packages/kami-engine-modeling",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-modeling/LICENSE",
-   "unit": "packages/kami-engine-modeling",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-modeling/README.md",
-   "unit": "packages/kami-engine-modeling",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-modeling/cljk-origin.edn",
-   "unit": "packages/kami-engine-modeling",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-modeling/deps.edn",
-   "unit": "packages/kami-engine-modeling",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-engine-modeling/imports.json",
-   "unit": "packages/kami-engine-modeling",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-modeling/local-changes.json",
-   "unit": "packages/kami-engine-modeling",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-modeling/nbb.edn",
-   "unit": "packages/kami-engine-modeling",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling.kotoba",
-   "port": "b",
-   "ns": "kami.modeling",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring",
-    "atom-escape"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/assembly.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/assembly.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.assembly",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/brep.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/brep.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.brep",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/cae.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/cae.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.cae",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring",
-    "atom-escape"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/collaboration.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/collaboration.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.collaboration",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/csg.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/csg.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.csg",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/document.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/document.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.document",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/drawing.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/drawing.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.drawing",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring",
-    "atom-escape",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/feature_graph.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/feature_graph.kotoba",
-   "port": "c",
-   "ns": "kami.modeling.feature-graph",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "destructuring",
-    "atom-escape",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/large_scene.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/large_scene.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.large-scene",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/nurbs.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/nurbs.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.nurbs",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/sheet_metal.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/sheet_metal.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.sheet-metal",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/src/kami/modeling/step.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/src/kami/modeling/step.kotoba",
-   "port": "b",
-   "ns": "kami.modeling.step",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring",
-    "atom-escape"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/fixtures/calculix/README.md",
-   "unit": "packages/kami-engine-modeling",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/fixtures/calculix/uniaxial-bar-8.frd",
-   "unit": "packages/kami-engine-modeling",
-   "class": "keep",
-   "note": "unclassified extension"
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/fixtures/calculix/uniaxial-bar-8.inp",
-   "unit": "packages/kami-engine-modeling",
-   "class": "a"
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/fixtures/nist/README.md",
-   "unit": "packages/kami-engine-modeling",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/fixtures/nist/nist_ftc_11_asme1_rb.stp",
-   "unit": "packages/kami-engine-modeling",
-   "class": "a"
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_assembly_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_assembly_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-assembly-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_brep_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_brep_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-brep-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_cae_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_cae_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-cae-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_collaboration_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_collaboration_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-collaboration-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_crypto_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_crypto_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-crypto-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_document_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_document_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-document-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_drawing_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_drawing_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-drawing-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_feature_graph_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_feature_graph_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-feature-graph-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "destructuring",
-    "atom-escape"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_large_scene_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_large_scene_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-large-scene-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_nurbs_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_nurbs_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-nurbs-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_sheet_metal_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_sheet_metal_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-sheet-metal-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_step_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_step_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-step-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/kami/modeling_test.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/kami/modeling_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.modeling-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-engine-modeling/test/run_portable.cljk",
-   "unit": "packages/kami-engine-modeling",
-   "class": "o",
-   "kotoba": "packages/kami-engine-modeling/test/run_portable.kotoba",
-   "port": "c",
-   "test": true,
-   "blockers": [
-    "keyword-map-literal",
-    "dispatch-forms",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
    "path": "packages/kami-engine-render/.gitignore",
    "unit": "packages/kami-engine-render",
    "class": "keep"
@@ -9990,135 +8024,6 @@
    "path": "packages/kami-engine-web/local-changes.json",
    "unit": "packages/kami-engine-web",
    "class": "keep"
-  },
-  {
-   "path": "packages/kami-flow/.gitignore",
-   "unit": "packages/kami-flow",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-flow/LICENSE",
-   "unit": "packages/kami-flow",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-flow/README.md",
-   "unit": "packages/kami-flow",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-flow/cljk-origin.edn",
-   "unit": "packages/kami-flow",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-flow/deps.edn",
-   "unit": "packages/kami-flow",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-flow/imports.json",
-   "unit": "packages/kami-flow",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-flow/local-changes.json",
-   "unit": "packages/kami-flow",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-flow/nbb.edn",
-   "unit": "packages/kami-flow",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-flow/src/flow.cljk",
-   "unit": "packages/kami-flow",
-   "class": "o",
-   "kotoba": "packages/kami-flow/src/flow.kotoba",
-   "port": "b",
-   "ns": "flow",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-flow/src/flow/choked.cljk",
-   "unit": "packages/kami-flow",
-   "class": "o",
-   "kotoba": "packages/kami-flow/src/flow/choked.kotoba",
-   "port": "b",
-   "ns": "flow.choked",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-flow/src/flow/pump.cljk",
-   "unit": "packages/kami-flow",
-   "class": "o",
-   "kotoba": "packages/kami-flow/src/flow/pump.kotoba",
-   "port": "b",
-   "ns": "flow.pump",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-flow/test/flow/choked_test.cljk",
-   "unit": "packages/kami-flow",
-   "class": "o",
-   "kotoba": "packages/kami-flow/test/flow/choked_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "flow.choked-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-flow/test/flow/pump_test.cljk",
-   "unit": "packages/kami-flow",
-   "class": "o",
-   "kotoba": "packages/kami-flow/test/flow/pump_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "flow.pump-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-flow/test/flow_test.cljk",
-   "unit": "packages/kami-flow",
-   "class": "o",
-   "kotoba": "packages/kami-flow/test/flow_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "flow-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
   },
   {
    "path": "packages/kami-game-scene/.gitignore",
@@ -10388,323 +8293,6 @@
    "blockers": [
     "multi-module",
     "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-hybrid/.gitignore",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-hybrid/LICENSE",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-hybrid/README.md",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-hybrid/cljk-origin.edn",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-hybrid/deps.edn",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-gen-hybrid/imports.json",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-hybrid/local-changes.json",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-hybrid/nbb.edn",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-gen-hybrid/src/kami/gen/hybrid.cljk",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "o",
-   "kotoba": "packages/kami-gen-hybrid/src/kami/gen/hybrid.kotoba",
-   "port": "b",
-   "ns": "kami.gen.hybrid",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-hybrid/src/kami/gen/hybrid/nodes.cljk",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "o",
-   "kotoba": "packages/kami-gen-hybrid/src/kami/gen/hybrid/nodes.kotoba",
-   "port": "b",
-   "ns": "kami.gen.hybrid.nodes",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-hybrid/src/kami/gen/hybrid/texture.cljk",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "o",
-   "kotoba": "packages/kami-gen-hybrid/src/kami/gen/hybrid/texture.kotoba",
-   "port": "b",
-   "ns": "kami.gen.hybrid.texture",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-hybrid/src/kami/gen/hybrid/vrm_export.cljk",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "o",
-   "kotoba": "packages/kami-gen-hybrid/src/kami/gen/hybrid/vrm_export.kotoba",
-   "port": "b",
-   "ns": "kami.gen.hybrid.vrm-export",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-hybrid/src/kami/gen/hybrid/workflow.cljk",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "o",
-   "kotoba": "packages/kami-gen-hybrid/src/kami/gen/hybrid/workflow.kotoba",
-   "port": "b",
-   "ns": "kami.gen.hybrid.workflow",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-hybrid/test/kami/gen/hybrid_test.cljk",
-   "unit": "packages/kami-gen-hybrid",
-   "class": "o",
-   "kotoba": "packages/kami-gen-hybrid/test/kami/gen/hybrid_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.gen.hybrid-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-ml3d/.gitignore",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-ml3d/LICENSE",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-ml3d/README.md",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-ml3d/cljk-origin.edn",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-ml3d/deps.edn",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-gen-ml3d/imports.json",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-ml3d/local-changes.json",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-ml3d/nbb.edn",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-gen-ml3d/scripts/kami-heuristic-vrm-postprocess.cljk",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "o",
-   "port": "d",
-   "note": "kbb runner or tooling",
-   "ns": "kami-heuristic-vrm-postprocess"
-  },
-  {
-   "path": "packages/kami-gen-ml3d/src/kami/gen/ml3d.cljk",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "o",
-   "kotoba": "packages/kami-gen-ml3d/src/kami/gen/ml3d.kotoba",
-   "port": "b",
-   "ns": "kami.gen.ml3d",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "destructuring",
-    "atom-escape",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-ml3d/src/kami/gen/ml3d/fixture.cljk",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "o",
-   "kotoba": "packages/kami-gen-ml3d/src/kami/gen/ml3d/fixture.kotoba",
-   "port": "b",
-   "ns": "kami.gen.ml3d.fixture",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-ml3d/src/kami/gen/ml3d/rig.cljk",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "o",
-   "kotoba": "packages/kami-gen-ml3d/src/kami/gen/ml3d/rig.kotoba",
-   "port": "b",
-   "ns": "kami.gen.ml3d.rig",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-ml3d/test/kami/gen/ml3d_test.cljk",
-   "unit": "packages/kami-gen-ml3d",
-   "class": "o",
-   "kotoba": "packages/kami-gen-ml3d/test/kami/gen/ml3d_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.gen.ml3d-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-procedural/.gitignore",
-   "unit": "packages/kami-gen-procedural",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-procedural/LICENSE",
-   "unit": "packages/kami-gen-procedural",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-procedural/README.md",
-   "unit": "packages/kami-gen-procedural",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-procedural/cljk-origin.edn",
-   "unit": "packages/kami-gen-procedural",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-procedural/deps.edn",
-   "unit": "packages/kami-gen-procedural",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-gen-procedural/imports.json",
-   "unit": "packages/kami-gen-procedural",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-procedural/local-changes.json",
-   "unit": "packages/kami-gen-procedural",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-gen-procedural/nbb.edn",
-   "unit": "packages/kami-gen-procedural",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-gen-procedural/src/kami/gen/procedural.cljk",
-   "unit": "packages/kami-gen-procedural",
-   "class": "o",
-   "kotoba": "packages/kami-gen-procedural/src/kami/gen/procedural.kotoba",
-   "port": "b",
-   "ns": "kami.gen.procedural",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-gen-procedural/test/kami/gen/procedural_test.cljk",
-   "unit": "packages/kami-gen-procedural",
-   "class": "o",
-   "kotoba": "packages/kami-gen-procedural/test/kami/gen/procedural_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kami.gen.procedural-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "regex-literal",
-    "destructuring",
-    "host-interop"
    ]
   },
   {
@@ -12760,944 +10348,6 @@
    "ns": "vehicle-scene-test",
    "blockers": [
     "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/.gitignore",
-   "unit": "packages/kami-vehicle",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-vehicle/LICENSE",
-   "unit": "packages/kami-vehicle",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-vehicle/README.md",
-   "unit": "packages/kami-vehicle",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-vehicle/cljk-origin.edn",
-   "unit": "packages/kami-vehicle",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-vehicle/deps.edn",
-   "unit": "packages/kami-vehicle",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-vehicle/imports.json",
-   "unit": "packages/kami-vehicle",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-vehicle/local-changes.json",
-   "unit": "packages/kami-vehicle",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-vehicle/nbb.edn",
-   "unit": "packages/kami-vehicle",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle.kotoba",
-   "port": "b",
-   "ns": "vehicle",
-   "blockers": [
-    "multi-module"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/backend.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/backend.kotoba",
-   "port": "b",
-   "ns": "vehicle.backend",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/beam.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/beam.kotoba",
-   "port": "b",
-   "ns": "vehicle.beam",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/builder.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/builder.kotoba",
-   "port": "b",
-   "ns": "vehicle.builder",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/controls.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/controls.kotoba",
-   "port": "b",
-   "ns": "vehicle.controls",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/ground.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/ground.kotoba",
-   "port": "b",
-   "ns": "vehicle.ground",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/implicit.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/implicit.kotoba",
-   "port": "b",
-   "ns": "vehicle.implicit",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/integrator.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/integrator.kotoba",
-   "port": "b",
-   "ns": "vehicle.integrator",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/jbeam.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/jbeam.kotoba",
-   "port": "b",
-   "ns": "vehicle.jbeam",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/models/garage.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/models/garage.kotoba",
-   "port": "b",
-   "ns": "vehicle.models.garage",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/models/sedan.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/models/sedan.kotoba",
-   "port": "b",
-   "ns": "vehicle.models.sedan",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "atom-escape"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/node.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/node.kotoba",
-   "port": "b",
-   "ns": "vehicle.node",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/powertrain.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/powertrain.kotoba",
-   "port": "b",
-   "ns": "vehicle.powertrain",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/rigid_chassis.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/rigid_chassis.kotoba",
-   "port": "b",
-   "ns": "vehicle.rigid-chassis",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/softbody.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/softbody.kotoba",
-   "port": "b",
-   "ns": "vehicle.softbody",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/triangle.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/triangle.kotoba",
-   "port": "b",
-   "ns": "vehicle.triangle",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/vec3.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/vec3.kotoba",
-   "port": "b",
-   "ns": "vehicle.vec3",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/vehicle.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/vehicle.kotoba",
-   "port": "b",
-   "ns": "vehicle.vehicle",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring",
-    "atom-escape"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/src/vehicle/wheel.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/src/vehicle/wheel.kotoba",
-   "port": "b",
-   "ns": "vehicle.wheel",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/backend_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/backend_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.backend-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/beam_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/beam_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.beam-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/builder_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/builder_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.builder-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/ground_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/ground_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.ground-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/implicit_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/implicit_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.implicit-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/integrator_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/integrator_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.integrator-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/jbeam_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/jbeam_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.jbeam-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/models/garage_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/models/garage_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.models.garage-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/models/sedan_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/models/sedan_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.models.sedan-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/node_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/node_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.node-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/powertrain_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/powertrain_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.powertrain-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/rigid_chassis_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/rigid_chassis_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.rigid-chassis-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/softbody_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/softbody_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.softbody-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/vehicle_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/vehicle_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.vehicle-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle/wheel_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle/wheel_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle.wheel-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-vehicle/test/vehicle_test.cljk",
-   "unit": "packages/kami-vehicle",
-   "class": "o",
-   "kotoba": "packages/kami-vehicle/test/vehicle_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "vehicle-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-web/.gitignore",
-   "unit": "packages/kami-web",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-web/LICENSE",
-   "unit": "packages/kami-web",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-web/README.md",
-   "unit": "packages/kami-web",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-web/cljk-origin.edn",
-   "unit": "packages/kami-web",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-web/demos/clj-demo.html",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/clj-demo.wasm",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/graph.html",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/haisen.json",
-   "unit": "packages/kami-web",
-   "class": "a"
-  },
-  {
-   "path": "packages/kami-web/demos/index.html",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/kami-map/test.html",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/play.html",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/vendor/kami-ui-sdk/kami-effect.js",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/vendor/kami-ui-sdk/kami-engine-audio.js",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/vendor/kami-ui-sdk/kami-motion.js",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/vendor/kami-ui-sdk/kami-rtc.js",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/vendor/kami-ui-sdk/kami-sound.js",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/demos/vendor/kami-ui-sdk/kami-ui.js",
-   "unit": "packages/kami-web",
-   "class": "c"
-  },
-  {
-   "path": "packages/kami-web/deps.edn",
-   "unit": "packages/kami-web",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-web/imports.json",
-   "unit": "packages/kami-web",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-web/local-changes.json",
-   "unit": "packages/kami-web",
-   "class": "keep"
-  },
-  {
-   "path": "packages/kami-web/nbb.edn",
-   "unit": "packages/kami-web",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/kami-web/src/kotoba/web.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/src/kotoba/web.kotoba",
-   "port": "b",
-   "ns": "kotoba.web",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal"
-   ]
-  },
-  {
-   "path": "packages/kami-web/src/kotoba/web/document.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/src/kotoba/web/document.kotoba",
-   "port": "b",
-   "ns": "kotoba.web.document",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-web/src/kotoba/web/entries.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/src/kotoba/web/entries.kotoba",
-   "port": "b",
-   "ns": "kotoba.web.entries",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-web/src/kotoba/web/math.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/src/kotoba/web/math.kotoba",
-   "port": "c",
-   "ns": "kotoba.web.math",
-   "blockers": [
-    "f64-generic-arith",
-    "destructuring",
-    "host-interop"
-   ]
-  },
-  {
-   "path": "packages/kami-web/src/kotoba/web/render_ir.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/src/kotoba/web/render_ir.kotoba",
-   "port": "b",
-   "ns": "kotoba.web.render-ir",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-web/test/kotoba/web/document_test.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/test/kotoba/web/document_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.web.document-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-web/test/kotoba/web/entries_test.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/test/kotoba/web/entries_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.web.entries-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-web/test/kotoba/web/math_test.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/test/kotoba/web/math_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.web.math-test",
-   "blockers": [
-    "multi-module",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/kami-web/test/kotoba/web/render_ir_test.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/test/kotoba/web/render_ir_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.web.render-ir-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/kami-web/test/kotoba/web_test.cljk",
-   "unit": "packages/kami-web",
-   "class": "o",
-   "kotoba": "packages/kami-web/test/kotoba/web_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.web-test",
-   "blockers": [
-    "multi-module"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/.gitignore",
-   "unit": "packages/swarm-choreo",
-   "class": "keep"
-  },
-  {
-   "path": "packages/swarm-choreo/LICENSE",
-   "unit": "packages/swarm-choreo",
-   "class": "keep"
-  },
-  {
-   "path": "packages/swarm-choreo/NOTICE",
-   "unit": "packages/swarm-choreo",
-   "class": "keep"
-  },
-  {
-   "path": "packages/swarm-choreo/README.md",
-   "unit": "packages/swarm-choreo",
-   "class": "keep"
-  },
-  {
-   "path": "packages/swarm-choreo/cljk-origin.edn",
-   "unit": "packages/swarm-choreo",
-   "class": "keep"
-  },
-  {
-   "path": "packages/swarm-choreo/deps.edn",
-   "unit": "packages/swarm-choreo",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/swarm-choreo/imports.json",
-   "unit": "packages/swarm-choreo",
-   "class": "keep"
-  },
-  {
-   "path": "packages/swarm-choreo/local-changes.json",
-   "unit": "packages/swarm-choreo",
-   "class": "keep"
-  },
-  {
-   "path": "packages/swarm-choreo/nbb.edn",
-   "unit": "packages/swarm-choreo",
-   "class": "d",
-   "note": "kbb/nbb manifest; JUN-647 decides what the hand-run oracle keeps"
-  },
-  {
-   "path": "packages/swarm-choreo/src/kotoba/swarm_choreo/gate.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/src/kotoba/swarm_choreo/gate.kotoba",
-   "port": "b",
-   "ns": "kotoba.swarm-choreo.gate",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/src/kotoba/swarm_choreo/physics_check.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/src/kotoba/swarm_choreo/physics_check.kotoba",
-   "port": "b",
-   "ns": "kotoba.swarm-choreo.physics-check",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/src/kotoba/swarm_choreo/ros.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/src/kotoba/swarm_choreo/ros.kotoba",
-   "port": "b",
-   "ns": "kotoba.swarm-choreo.ros",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/src/kotoba/swarm_choreo/show.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/src/kotoba/swarm_choreo/show.kotoba",
-   "port": "b",
-   "ns": "kotoba.swarm-choreo.show",
-   "blockers": [
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/src/kotoba/swarm_choreo/validate.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/src/kotoba/swarm_choreo/validate.kotoba",
-   "port": "b",
-   "ns": "kotoba.swarm-choreo.validate",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith",
-    "destructuring"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/test/kotoba/swarm_choreo/gate_test.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/test/kotoba/swarm_choreo/gate_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.swarm-choreo.gate-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/test/kotoba/swarm_choreo/physics_check_test.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/test/kotoba/swarm_choreo/physics_check_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.swarm-choreo.physics-check-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/test/kotoba/swarm_choreo/ros_test.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/test/kotoba/swarm_choreo/ros_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.swarm-choreo.ros-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/test/kotoba/swarm_choreo/show_test.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/test/kotoba/swarm_choreo/show_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.swarm-choreo.show-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
-    "f64-generic-arith"
-   ]
-  },
-  {
-   "path": "packages/swarm-choreo/test/kotoba/swarm_choreo/validate_test.cljk",
-   "unit": "packages/swarm-choreo",
-   "class": "o",
-   "kotoba": "packages/swarm-choreo/test/kotoba/swarm_choreo/validate_test.kotoba",
-   "port": "b",
-   "test": true,
-   "ns": "kotoba.swarm-choreo.validate-test",
-   "blockers": [
-    "multi-module",
-    "keyword-map-literal",
     "f64-generic-arith"
    ]
   },

@@ -15,13 +15,11 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-terrain-scene](kami-terrain-scene) | `1087f93` | EDN authoring surface for kami-terrain biome presets (heightmap/splat/palette) and default Gerstner ocean waves. Referenced by name (resolve_biome) from kami-app-isekai/kami-app-quarry-walk. Restored from legacy kami-terrain-scene crate (deleted #82). ADR-2607010930. |
 | [kami-vegetation-scene](kami-vegetation-scene) | `d7ba32c` | EDN authoring surface for kami-vegetation TAXONOMIC PROFILE presets (grass/fern/palm/conifer/bush/cactus/moss). Restored from legacy kami-vegetation-scene crate (deleted #82). ADR-2607010930. |
 | [kami-app-amenominaka](kami-app-amenominaka) | `ae215e9` | amenominaka (天之御中) — Omniverse Kit-equivalent app shell path reservation, kotoba .cljc |
-| [kami-engine-animation](kami-engine-animation) | `33ac2ab` | Portable animation engine for the Kami family: timelines, tracks and keyframes as immutable EDN, with scalar interpolation and timeline evaluation as the first stable surface. |
 | [kami-app-animator](kami-app-animator) | `bd00b69` | Imported `kami-app-animator` (no repository description) |
 | [kami-app-bim-editor](kami-app-bim-editor) | `544cb5d` | Imported `kami-app-bim-editor` (no repository description) |
 | [kami-app-cad](kami-app-cad) | `db874d8` | Browser NURBS/CAD authoring workspace: loft sections, a dimension-constrained sketch, extruded solids with limited Boolean ops, feature history and EDN projects. Geometry comes from kami-engine-cad, rendering from kotoba-lang/webgpu; requires WebGPU. |
 | [kami-app-character-creator](kami-app-character-creator) | `8e776d9` | EDN-native VRM character creator (ADR-2607031200) — Phase 1: CharacterDoc -> real .vrm export, built on kotoba-lang/{vrm,character} |
 | [kami-app-hygaccess-plant](kami-app-hygaccess-plant) | `a7451e7` | Mixing-tank CFD simulation (nagare + kami-engine-cae-solver) for the sodium-hypochlorite dilution step of cloud-itonami-hygiene-access's water-purification-drops |
-| [kami-engine-modeling](kami-engine-modeling) | `c514bc8` | Imported `kami-engine-modeling` (no repository description) |
 | [kami-app-modeler](kami-app-modeler) | `091b260` | Imported `kami-app-modeler` (no repository description) |
 | [kami-app-sculpt](kami-app-sculpt) | `5f4a69c` | Imported `kami-app-sculpt` (no repository description) |
 | [kami-app-sip](kami-app-sip) | `54ae09a` | kami-app-sip (SIP game) domain logic, split out of kami-engine's kami-app-sip-clj (ADR-2607010930). |
@@ -36,20 +34,11 @@ the deviations listed in `local-changes.json`. The old repositories are not arch
 | [kami-engine-render](kami-engine-render) | `87f0fd6` | engine render (wgpu bootstrap + scene pipelines CLJC IR) — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
 | [kami-engine-script-runtime](kami-engine-script-runtime) | `55aefca` | script runtime (wasmtime/wasmi dual backend host CLJC contracts) — wasmi no-JIT invariant. restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
 | [kami-engine-web](kami-engine-web) | `1bc9526` | engine web entry — restored from legacy kami-engine Rust crate (deleted #259) as zero-dep portable CLJC. Part of the clj-wgsl migration (ADR-2607010930). |
-| [kami-flow](kami-flow) | `9e8d356` | KAMI Flow — RTL->PnR->GDSII->Verify/Power/DFT/SI/Yield->STA->DRC/LVS->Signoff orchestration pipeline. Restored from legacy kami-flow crate (deleted #82). ADR-2607010930. |
 | [kami-game-scene](kami-game-scene) | `f7f97c5` | EDN authoring surface for kami-game's ANIMATION-STATE presets, Godot game catalog, brainrot evolution/characters, Sabiotoshi item catalog, battle-royale storm/consumables/weapons, and Pokoa dex/items. Restored from legacy kami-game-scene crate (deleted #82). ADR-2607010930. |
-| [kami-gen-hybrid](kami-gen-hybrid) | `4082aa2` | Imported `kami-gen-hybrid` (no repository description) |
-| [kami-gen-ml3d](kami-gen-ml3d) | `e7388b6` | Imported `kami-gen-ml3d` (no repository description) |
-| [kami-gen-procedural](kami-gen-procedural) | `ec78fba` | Imported `kami-gen-procedural` (no repository description) |
 | [kami-genre-base-systems](kami-genre-base-systems) | `c9abd0e` | Base/foundation gameplay systems, one per PlayStation-Store-style genre category (generic archetypes, kami-clj subset) |
 | [kami-solar-helix-scene](kami-solar-helix-scene) | `fcc22d7` | Imported `kami-solar-helix-scene` (no repository description) |
 | [kami-studio](kami-studio) | `5693307` | Imported `kami-studio` (no repository description) |
-| [kami-vehicle](kami-vehicle) | `50d5e29` | BeamNG-grade soft-body vehicle physics: node-beam mass-spring network, Pacejka tire, full powertrain (engine/clutch/gearbox/diff), plastic deformation, JBeam-subset loader. Restored from legacy kami-vehicle crate (deleted #82). ADR-2607010930. |
 | [kami-vehicle-scene](kami-vehicle-scene) | `da9a156` | EDN authoring surface for kami-vehicle ground/garage/powertrain CONFIG (surface grip table, demo-circuit zone map, engine/gearbox/tire presets, 6 garage SedanSpecs). Restored from legacy kami-vehicle-scene crate (kotoba-lang/kami-engine, deleted PR #82). ADR-2607010930. |
-| [kami-web](kami-web) | `2c4064b` | Pure-Clojure port of kami-engine's kami-web (WASM entry): matrix math, render-IR schema, PPTX layout, entry catalog |
-| [biomech](biomech) | `c85ffb9` | Biomechanics simulation domain layer — 筋肉/骨/皮膚/内臓. Pure Clojure. kotoba-lang capability. |
-| [freeboard](freeboard) | `11510d5` | Apple-Freeform-style infinite-canvas board — clj brain + kami-render(wgpu) + kasane import (ADR-2606280200) |
-| [swarm-choreo](swarm-choreo) | `fe69e71` | Governed, precomputed multi-agent choreography (drone light shows) over ROS 2 — kotoba-lang |
 
 ## Removed duplicates (JUN-649)
 
@@ -88,3 +77,14 @@ Moved with their provenance (`imports.json`) and local changes:
 | kami-eizo-grade | `f960c23` | kotoba `lib/kotoba.kamiEizoGrade` |
 | kami-mangaka-page | `555e18a` | kotoba `lib/kotoba.kamiMangakaPage` |
 | kami-mangaka-reader | `01823ab` | kotoba `lib/kotoba.kamiMangakaReader` |
+| kami-vehicle | `50d5e29` | kotoba `lib/kotoba.kamiVehicle` |
+| biomech | `c85ffb9` | kotoba `lib/kotoba.biomech` |
+| freeboard | `11510d5` | kotoba `lib/kotoba.freeboard` |
+| kami-engine-animation | `33ac2ab` | kotoba `lib/kotoba.kamiEngineAnimation` |
+| kami-engine-modeling | `c514bc8` | kotoba `lib/kotoba.kamiEngineModeling` |
+| kami-flow | `9e8d356` | kotoba `lib/kotoba.kamiFlow` |
+| kami-gen-hybrid | `4082aa2` | kotoba `lib/kotoba.kamiGenHybrid` |
+| kami-gen-ml3d | `e7388b6` | kotoba `lib/kotoba.kamiGenMl3d` |
+| kami-gen-procedural | `ec78fba` | kotoba `lib/kotoba.kamiGenProcedural` |
+| kami-web | `2c4064b` | kotoba `lib/kotoba.kamiWeb` |
+| swarm-choreo | `fe69e71` | kotoba `lib/kotoba.swarmChoreo` |

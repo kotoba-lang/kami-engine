@@ -75,16 +75,15 @@ These decisions apply to all work in this repository:
 | `kami-physics/` | `kami.physics.runtime` backend router (`rigid-2d`, `vehicle`, `cae`) over `kotoba-lang/physics` |
 | `kami-clj-play/games/`, `kami-clj-play3d/games/` | kami-clj reference games (`logic.cljk`, `scene.edn`, `author.cljk`) |
 | `packages/kami-game-scene/resources/game_scene/`, `kami-live/data/`, `fixtures/` | scene/game catalog EDN, URDF, CSV, YAML, WGSL fixtures for adapter conformance |
-| `kami-genesis/` | WGSL step shaders for the Genesis/Isaac-compat physics target |
 | `kami-text/` | fonts and the macOS emoji raster helper |
 | `kami-app-sip-clj/`, `kami-mangaka-reader-clj/dist/`, `kami-clj-host/demo/` | built web artifacts and demos |
-| `kami-flow/graph/` | graph-ingest assets for `graph.etzhayyim.com` |
 | `kami-web/`, `kami-ui-sdk/`, `kami-engine-guest/`, `kami-mangaka-*-clj/` | pointer READMEs only — the code moved to its own repo; do not restore a nested tree. Exception: `kami-mangaka-reader-clj/` has no README and keeps only its built `dist/` (`reader.js`, `manifest.edn`) |
 | `kami-engine-sdk` | gitlink (no `.gitmodules`); the SDK is a separate repo |
 | `hermes/` | resident-bot profiles for this repo |
 | `scripts/native/`, `scripts/native_gates.py` | the CI gates: Kotoba programs for the WIT, adapter-registry and guest-lint checks, and the Python stager that runs them with Amu |
 | `scripts/` | CLJK reference oracle for those gates (`wit_test.cljk`, `check_adapter_registry.cljk`, `guest_lint.cljk`), task runner (`run-task.cljk` + `scripts/tasks.edn`) |
 | `docs/migration-ledger.json`, `docs/migration-ledger.md` | the migration ledger (JUN-641): every tracked file classified, each unit's namespace dependencies and upstream kotoba libraries, the Amu blockers and the port waves; the `.md` is the reviewable summary |
+| moved to kotoba `lib/` (JUN-649) | the WGSL in `kami-genesis/` is `lib/kotoba.kamiNvCompat/genesis/`, `kami-flow/graph/` is `lib/kotoba.kamiFlow/graph/`; moved packages are listed at the end of `packages/README.md` |
 | `docs/migration-placement.json` | where each unit goes (JUN-649): this repository or kotoba `lib/`, with the reason, duplicates and splits; hand-written, merged into the ledger |
 | `scripts/migration_ledger.py`, `scripts/amu_capability_probe.py`, `scripts/placement_consumers.py` | generate or check the ledger; probe which CLJK constructs the pinned Amu CLI admits; survey who requires each unit across the local checkouts |
 | `docs/evidence/` | dated oracle-vs-native measurements and Amu capability probes |

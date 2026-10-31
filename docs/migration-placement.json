@@ -61,7 +61,8 @@
   },
   "kami-engine:kami-flow": {
    "to": "kotoba",
-   "reason": "graph-ingest assets (semiconductor coverage data) of KAMI Flow; moves with packages/kami-flow"
+   "reason": "graph-ingest assets (semiconductor coverage data) of KAMI Flow; moves with packages/kami-flow",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiFlow/graph/ (JUN-649)"
   },
   "kami-engine:kami-game-scene": {
    "to": "kami-engine",
@@ -80,7 +81,8 @@
   },
   "kami-engine:kami-genesis": {
    "to": "kotoba",
-   "reason": "WGSL step shaders for the Genesis/Isaac-compatible physics target: robotics simulation, which is not a game; belongs beside kotoba.kamiNvCompat"
+   "reason": "WGSL step shaders for the Genesis/Isaac-compatible physics target: robotics simulation, which is not a game; belongs beside kotoba.kamiNvCompat",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiNvCompat/genesis/ (JUN-649)"
   },
   "kami-engine:kami-live": {
    "to": "kami-engine",
@@ -141,7 +143,8 @@
   },
   "kami-engine:packages/biomech": {
    "to": "kotoba",
-   "reason": "biomechanics simulation; not a game"
+   "reason": "biomechanics simulation; not a game",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.biomech (JUN-649)"
   },
   "kami-engine:packages/cad": {
    "to": "kotoba",
@@ -155,7 +158,8 @@
   },
   "kami-engine:packages/freeboard": {
    "to": "kotoba",
-   "reason": "infinite-canvas board (Freeform-like); not a game"
+   "reason": "infinite-canvas board (Freeform-like); not a game",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.freeboard (JUN-649)"
   },
   "kami-engine:packages/kami-app": {
    "to": "kami-engine",
@@ -243,7 +247,8 @@
   },
   "kami-engine:packages/kami-engine-animation": {
    "to": "kotoba",
-   "reason": "animation evaluation (owner's kotoba list); non-game consumer com-junkawasaki/root probes. kami-gameplay keeps depending on it from kami-engine"
+   "reason": "animation evaluation (owner's kotoba list); non-game consumer com-junkawasaki/root probes. kami-gameplay keeps depending on it from kami-engine",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineAnimation (JUN-649)"
   },
   "kami-engine:packages/kami-engine-cae-solver": {
    "to": "kotoba",
@@ -274,7 +279,8 @@
   },
   "kami-engine:packages/kami-engine-modeling": {
    "to": "kotoba",
-   "reason": "polygon editing engine; non-game consumer com-junkawasaki/root maturity probes"
+   "reason": "polygon editing engine; non-game consumer com-junkawasaki/root maturity probes",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiEngineModeling (JUN-649)"
   },
   "kami-engine:packages/kami-engine-motor": {
    "to": "kotoba",
@@ -320,7 +326,8 @@
   },
   "kami-engine:packages/kami-flow": {
    "to": "kotoba",
-   "reason": "KAMI Flow is a semiconductor design pipeline (RTL to GDSII, over kotoba.rtl / pnr / dft / power / yield); not a game"
+   "reason": "KAMI Flow is a semiconductor design pipeline (RTL to GDSII, over kotoba.rtl / pnr / dft / power / yield); not a game",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiFlow (JUN-649)"
   },
   "kami-engine:packages/kami-game-scene": {
    "to": "kami-engine",
@@ -328,15 +335,18 @@
   },
   "kami-engine:packages/kami-gen-hybrid": {
    "to": "kotoba",
-   "reason": "3D character generation; avatars (VRM) are used outside games"
+   "reason": "3D character generation; avatars (VRM) are used outside games",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiGenHybrid (JUN-649)"
   },
   "kami-engine:packages/kami-gen-ml3d": {
    "to": "kotoba",
-   "reason": "photo/text to 3D generation; not game-specific"
+   "reason": "photo/text to 3D generation; not game-specific",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiGenMl3d (JUN-649)"
   },
   "kami-engine:packages/kami-gen-procedural": {
    "to": "kotoba",
-   "reason": "procedural character pipeline; not game-specific"
+   "reason": "procedural character pipeline; not game-specific",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiGenProcedural (JUN-649)"
   },
   "kami-engine:packages/kami-genre-base-systems": {
    "to": "kami-engine",
@@ -426,7 +436,8 @@
   },
   "kami-engine:packages/kami-vehicle": {
    "to": "kotoba",
-   "reason": "soft-body vehicle physics; consumers include kotoba.kamiCadImport and biomech, both in kotoba, so leaving it here would make kotoba depend on kami-engine"
+   "reason": "soft-body vehicle physics; consumers include kotoba.kamiCadImport and biomech, both in kotoba, so leaving it here would make kotoba depend on kami-engine",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiVehicle (JUN-649)"
   },
   "kami-engine:packages/kami-vehicle-scene": {
    "to": "kami-engine",
@@ -434,11 +445,13 @@
   },
   "kami-engine:packages/kami-web": {
    "to": "kotoba",
-   "reason": "kotoba.web.* (document, render IR, math) is a web rendering library; render IR is in the owner's kotoba list"
+   "reason": "kotoba.web.* (document, render IR, math) is a web rendering library; render IR is in the owner's kotoba list",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.kamiWeb (JUN-649)"
   },
   "kami-engine:packages/swarm-choreo": {
    "to": "kotoba",
-   "reason": "drone light-show choreography; not a game"
+   "reason": "drone light-show choreography; not a game",
+   "done": "moved 2026-10-31 to kotoba lib/kotoba.swarmChoreo (JUN-649)"
   },
   "kami-engine:scripts": {
    "to": "kami-engine",
