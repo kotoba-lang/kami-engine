@@ -3,8 +3,8 @@
   "files": {
     "deps.edn": {
       "imported-sha256": "f725786e2aac9462f21b5aa1a84a3a992a668776c942cb272880e571b62263f7",
-      "sha256": "50e63857a5f1689f8db739b420f7ac5302d14cfa671231c9f0375fac0dda5ff0",
-      "reason": "Git dependencies on kami-* repositories that are bundled here (kami-vehicle) become local roots so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :lint): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
+      "sha256": "0d669e23881ff3dfddfdf116cfb5a264b77825c187332cd4cbe7eb1fc0ffc3d8",
+      "reason": "The dependency on kami-vehicle names the kotoba monorepo's lib/kotoba.kamiVehicle, where it now lives (JUN-649), so the same namespaces are not loaded twice. The other sections are unchanged. JVM-only Maven dependencies and aliases are removed (alias :test reduced to :extra-paths, alias :lint): the official CD/CI path is Amu selfhost and Kotoba native, and any other runner is an oracle that is not part of the package."
     }
   }
 }
