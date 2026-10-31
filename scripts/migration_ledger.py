@@ -13,10 +13,10 @@ namespace dependencies and external libraries, and derives the port order
 
 The Amu blockers (class e) are not guessed: BLOCKERS below records what the
 pinned Amu CLI refused when the probe sources in
-docs/evidence/amu-capability-probe-20261101.json were run against it. The
-atom blockers are split by the port they need (JUN-731): the rewrite rules and
-their measured corpus are docs/port-rewrite-rules.md and
-docs/evidence/port-rewrite-rules-20261101.json.
+docs/evidence/amu-capability-probe-20261101b.json were run against it. The
+atom blockers (JUN-731) and the keyword map blockers (kwmap/*, JUN-732) are
+split by the port they need: the rewrite rules are docs/port-rewrite-rules.md,
+the atom ones measured in docs/evidence/port-rewrite-rules-20261101.json.
 """
 
 import argparse
@@ -48,32 +48,84 @@ CLASSES = {
 # changed: amu PR #1750 admits a keyword-keyed literal as a closed record, so
 # let-map and fn-returns-map now run; the other blockers' probes refuse as
 # before. `detect` is a regex over a CLJK file with its comments and string
-# contents removed.
+# contents removed; the kwmap/* blockers are read by kwmap_patterns() instead.
+# amu-capability-probe-20261101b.json re-ran every probe at the same pin with the
+# same results, filed under the kwmap/* blockers, and added probes for the
+# blockers they did not cover (JUN-732).
 BLOCKERS = {
     "multi-module": {
         "refusal": "E6002 required module ... is missing from the explicit source paths",
         "what": "a source that requires another namespace; the CLI compiles one self-contained file",
         "issues": ["AWAI-50", "JUN-384"],
     },
-    "keyword-map-literal": {
-        "refusal": "E2127 assoc of an absent key / lookup of an absent key; E2104 a literal passed to an unannotated "
-                   "parameter or where a declared record is expected, get with a default, contains?, dissoc, if arms with "
-                   "different keys, map over a vector of literals; E2101 merge / update; E2105 mixed key kinds; "
-                   "E2133 {}; E2128 a fn value; E2102 nil",
-        "what": "a keyword map literal such as {:a 1}. Since amu c2186d7 (PR #1750) it is a closed record: (:k m), get "
-                "and assoc of a present key, nesting, loop/recur, an unannotated defn result and :f64 values are admitted; "
-                "the record cannot gain or lose keys and cannot cross an unannotated parameter. Still flagged on any "
-                "keyword literal, because whether a file stays inside the admitted subset depends on how the map flows "
-                "between functions, which a regex cannot decide (see the JUN-728 note below)",
-        "issues": ["JUN-728"],
-        # JUN-728: kept as every keyword literal. A narrower detect would have to
-        # prove that no literal reaches a refused use (an unannotated parameter,
-        # get with a default, contains?, dissoc/merge/update, an absent key, {} or
-        # nil): that is type flow, not syntax. A pattern scan for the refused uses
-        # left 9 of the 391 files at kami e42d222, and those still pass maps
-        # between functions, look them up by a runtime keyword (palette tables),
-        # destructure them or build ex-info data, so dropping them would under-count.
-        "detect": r"\{\s*:",
+    # JUN-732 split the former single keyword-map-literal blocker (391 files at
+    # 25c3cc6, any `{:`) by the representation a port needs; the rewrites are
+    # the "Keyword maps" section of docs/port-rewrite-rules.md. They are read by
+    # kwmap_patterns() over files that contain a keyword map literal; a keyword
+    # map that is only a local fixed-shape record, a constant table read by a
+    # literal key, or ex-info data is admitted and is no blocker.
+    "kwmap/def-literal": {
+        "refusal": "E2124 def value must be an integer, string, keyword or vector literal",
+        "what": "a top-level def of a keyword map holding f64 or bool values, or of a vector of maps; port as a "
+                "defrecord built by ->Rec in the def (f64 fields are admitted) or a defn- thunk",
+        "issues": ["JUN-734"],
+    },
+    "kwmap/table-runtime-key": {
+        "refusal": "E2127 lookup of an absent key; E2104 contains? / get with a default on a record",
+        "what": "a top-level keyword-map table looked up by a runtime key ((get T k), (T k)) or iterated (keys, vals, "
+                "seq, reduce-kv); port as (typed-map-new [:map :keyword V]) with V a scalar, [:ref R] or [:fn ..]",
+        "issues": ["JUN-735"],
+    },
+    "kwmap/runtime-key": {
+        "refusal": "E2127 assoc / lookup of an absent key; E2104 for a non-literal key on a record",
+        "what": "assoc/update/dissoc/contains? with a non-literal key, into {}, zipmap, group-by, frequencies, keys/vals, "
+                "hash-map, keyword: a map keyed at run time; port as [:map :i64|:keyword [:ref R]] (iterating a keyword-keyed "
+                "typed map and more than 31 entries are not admitted yet)",
+        "issues": ["JUN-735"],
+    },
+    "kwmap/param-row": {
+        "refusal": "E2104 a literal passed to an unannotated parameter; E2119 a {:keys ..} parameter; E2179 [:ref] to another namespace",
+        "what": "a map read through a parameter ((:k p), {:keys ..} destructuring) or a literal passed to another "
+                "namespace's fn; port as a defrecord and [:ref :ns/R] parameters (:ns the file's own), built with ->R / map->R",
+        "issues": ["JUN-733"],
+    },
+    "kwmap/row-op": {
+        "refusal": "E2101 merge / merge-with / update / update-in / assoc-in / get-in; E2104 dissoc / select-keys on a record",
+        "what": "a map that grows, shrinks or is reached by a path; port as nested assoc on a declared record",
+        "issues": ["JUN-733"],
+    },
+    "kwmap/empty": {
+        "refusal": "E2133 {}",
+        "what": "an empty map literal {}; port as (typed-map-new [:map K V]) or a full record",
+        "issues": ["JUN-733"],
+    },
+    "kwmap/nil-field": {
+        "refusal": "E2102 unknown symbol 'nil'",
+        "what": "a keyword map field (or an assoc) holding nil; port as an [:option T] record field",
+        "issues": ["JUN-733"],
+    },
+    "kwmap/option-default": {
+        "refusal": "E2104 get with a default / (:k m d) on a record; E2119 :or in a {:keys ..} parameter; E2101 merge",
+        "what": "an option map with defaults ((get m :k d), (:k m d), (or (:k m) d), :or, (merge {defaults} m)); port as a "
+                "defrecord with [:option T] fields read by option-or, or a typed map read by (get m k d)",
+        "issues": ["JUN-733"],
+    },
+    "kwmap/dynamic": {
+        "refusal": "E2101 read-string / slurp / spit / pprint / walk; E2104 an f64 inside a :document",
+        "what": "EDN read or written, or a shape inspected at run time (map?, coll?, postwalk); port as :document and the "
+                "document ops; an f64 in a document is not admitted yet",
+        "issues": ["JUN-735"],
+    },
+    "kwmap/fn-value": {
+        "refusal": "E2128 a fn value in a map; E2124 for a def",
+        "what": "a fn, #(..), partial or comp as a keyword map value; port as [:map :keyword [:fn ..]] with fn-ref / invoke, "
+                "or a case on the key",
+        "issues": ["JUN-732"],
+    },
+    "kwmap/variadic-assoc": {
+        "refusal": "E2103 wrong number of arguments to 'assoc': expected 3",
+        "what": "(assoc m k1 v1 k2 v2 ..); port as nested assoc, one key each",
+        "issues": ["JUN-734"],
     },
     "f64-generic-arith": {
         "refusal": "E2104 type mismatch in '*': expected :i64; E2101 for f64->i64",
@@ -85,6 +137,20 @@ BLOCKERS = {
         "refusal": "E1005 unsupported reader syntax '#'",
         "what": "a regex literal #\"...\"",
         "issues": ["AWAI-47"],
+    },
+    "fn-literal": {
+        "refusal": "E1005 unsupported reader syntax '#'",
+        "what": "an anonymous fn literal #(..); port as (fn [x] ..) where the context types the parameter (an annotated "
+                "fn literal parameter is E2139). amu refactor rule g (fnlit, amu acf8e1d24) did this rewrite on the hosted "
+                "route and left amu with it (157355127); the native CLI has no refactor command",
+        "issues": ["JUN-651"],
+        "detect": r"#\(",
+    },
+    "auto-resolved-keyword": {
+        "refusal": "E1005 unsupported reader syntax ':'",
+        "what": "an auto-resolved keyword ::k or ::alias/k; port as the fully qualified :ns/k",
+        "issues": ["JUN-732"],
+        "detect": r"(?<![\w:])::[A-Za-z_*!?<>=+\-]",
     },
     "dispatch-forms": {
         "refusal": "E2003 unsupported top-level form 'defmulti' / 'defprotocol'; E2101 for reify",
@@ -301,10 +367,199 @@ def atom_written_in_iteration(code):
     return any(write.search(form_at(code, m.start())) for m in ITERATION.finditer(code))
 
 
+# JUN-732: a small reader over strip_code output (strings are "" and regex
+# literals "REGEX"), enough to tell how a keyword map is used. A node is
+# (kind, items, pos); atoms are token strings.
+TOKEN = re.compile(r'#\{|#\(|#js|#_|\^|[()\[\]{}]|"[^"]*"|\\x|[^\s()\[\]{},"]+')
+OPEN = {"(": (")", "list"), "[": ("]", "vec"), "{": ("}", "map"), "#{": ("}", "set"), "#(": (")", "fnlit")}
+
+
+def read_forms(code):
+    toks = [(m.group(0), m.start()) for m in TOKEN.finditer(code)]
+    i = 0
+
+    def rd():
+        nonlocal i
+        t, p = toks[i]
+        i += 1
+        if t in OPEN:
+            close, kind = OPEN[t]
+            items = []
+            while i < len(toks) and toks[i][0] != close:
+                x = rd()
+                if x is not None:
+                    items.append(x)
+            i += 1
+            return (kind, items, p)
+        if t == "#js":
+            return ("js", [rd()], p) if i < len(toks) else None
+        if t == "#_":
+            if i < len(toks):
+                rd()
+            return None
+        if t == "^":
+            if i < len(toks):
+                rd()
+            return rd() if i < len(toks) else None
+        return None if t in (")", "]", "}") else t
+
+    out = []
+    while i < len(toks):
+        x = rd()
+        if x is not None:
+            out.append(x)
+    return out
+
+
+def is_node(x, *kinds):
+    return isinstance(x, tuple) and (not kinds or x[0] in kinds)
+
+
+def is_kw(x):
+    return isinstance(x, str) and x.startswith(":")
+
+
+def is_sym(x):
+    return (isinstance(x, str) and x not in ("nil", "true", "false")
+            and re.match(r"^[A-Za-z_*!?<>=+\-][\w*!?<>=+\-'./]*$", x) is not None)
+
+
+def is_name(x, names):
+    return isinstance(x, str) and x in names
+
+
+def is_kwmap(x):
+    return is_node(x, "map") and len(x[1]) >= 2 and all(is_kw(k) for k in x[1][0::2])
+
+
+def head(x):
+    return x[1][0] if is_node(x, "list", "fnlit") and x[1] and isinstance(x[1][0], str) else None
+
+
+def walk(x, parents=()):
+    yield x, parents
+    if is_node(x):
+        for c in x[1]:
+            yield from walk(c, parents + (x,))
+
+
+def contains_node(x, pred):
+    return any(pred(y) for y, _ in walk(x))
+
+
+# The former keyword-map-literal detection: the kwmap/* blockers are read only
+# in files that hold a keyword map literal.
+KWMAP_LITERAL = r"\{\s*:"
+FLOAT = re.compile(r"^-?\d+\.\d")
+ITER_HEADS = {"reduce", "reduce-kv", "loop", "swap!", "doseq", "iterate", "dotimes", "for"}
+ROW_OPS = {"assoc", "dissoc", "merge", "update", "update-in", "assoc-in", "select-keys", "merge-with"}
+RUNTIME_COLL = {"zipmap", "group-by", "frequencies", "reduce-kv", "keys", "vals", "index-by", "update-vals",
+                "update-keys", "sorted-map", "hash-map", "array-map", "keyword"}
+TABLE_READ = {"keys", "vals", "reduce-kv", "seq"}
+EDN_IO = {"edn/read-string", "clojure.edn/read-string", "read-string", "slurp", "spit", "pp/pprint", "pprint",
+          "edn/read", "clojure.edn/read", "pr-str", "prn-str", "load-edn", "read-edn"}
+SHAPE_TESTS = {"map?", "coll?", "postwalk", "prewalk", "walk/postwalk", "walk/prewalk", "w/postwalk",
+               "clojure.walk/postwalk", "clojure.walk/prewalk", "sequential?", "vector?", "keyword?"}
+CORE_NS = ("clojure.", "str/", "string/", "set/", "math/", "Math/", "js/", "edn/", "pp/", "walk/", "w/", "s/", "t/", "test/")
+
+
+def refused_def_value(v):
+    """A def value the native checker refuses (E2124): a vector of maps, or a
+    map holding an f64, a bool, or a vector of floats or forms."""
+    if is_node(v, "vec"):
+        return True
+    return contains_node(v, lambda y: (isinstance(y, str) and (FLOAT.match(y) or y in ("true", "false")))
+                         or (is_node(y, "vec") and any(is_node(z) or FLOAT.match(str(z)) for z in y[1])))
+
+
+def fn_params(x):
+    """Parameter vectors of a defn/fn node (single and multi-arity)."""
+    out = []
+    for y in x[1][1:4]:
+        if is_node(y, "vec"):
+            out.append(y)
+            break
+    out += [y[1][0] for y in x[1] if is_node(y, "list") and y[1] and is_node(y[1][0], "vec")]
+    return out
+
+
+def kwmap_patterns(code):
+    """The kwmap/* blockers (without the prefix) a CLJK file needs (JUN-732)."""
+    forms = read_forms(code)
+    found = set()
+    tables = set()
+    for f in forms:
+        if head(f) in ("def", "defonce") and len(f[1]) >= 3:
+            v = f[1][-1]
+            if is_kwmap(v) or (is_node(v, "vec") and v[1] and all(is_kwmap(y) for y in v[1])):
+                tables.add(f[1][1])
+                if refused_def_value(v):
+                    found.add("def-literal")
+    for x, par in walk(("list", forms, 0)):
+        if not is_node(x):
+            continue
+        h = head(x)
+        a = x[1][1:] if h else []
+        threaded = bool(h and par and len(par[-1][1]) > 1 and par[-1][1][1] is not x)
+        if threaded and head(par[-1]) in ("->", "some->", "cond->", "doto"):
+            a = ["%THREAD%"] + a
+        elif threaded and head(par[-1]) in ("->>", "some->>", "cond->>"):
+            a = a + ["%THREAD%"]
+        if ((h == "get" and len(a) >= 2 and is_name(a[0], tables) and not is_kw(a[1]))
+                or (h in tables and a and not is_kw(a[0]))
+                or (h in TABLE_READ and a and is_name(a[0], tables))):
+            found.add("table-runtime-key")
+        if h in ("assoc", "update", "dissoc", "contains?") and len(a) >= 2:
+            if any(not is_kw(k) for k in (a[1::2] if h == "assoc" else a[1:2])):
+                found.add("runtime-key")
+        if h in RUNTIME_COLL or (h == "into" and a and is_node(a[0], "map") and not a[0][1]):
+            found.add("runtime-key")
+        if h == "assoc" and len(a) > 3:
+            found.add("variadic-assoc")
+        if h in ("update", "update-in", "merge", "merge-with", "dissoc", "select-keys", "assoc-in", "get-in"):
+            found.add("row-op")
+        if ((h in ("merge", "merge-with") and a and is_kwmap(a[0]))
+                or (h == "get" and len(a) == 3 and is_kw(a[1]))
+                or (is_kw(h) and len(a) == 2)
+                or (h == "or" and a and is_kw(head(a[0])))):
+            found.add("option-default")
+        if h in EDN_IO or h in SHAPE_TESTS:
+            found.add("dynamic")
+        if h and "/" in h and not h.startswith(CORE_NS) and any(is_kwmap(y) for y in a):
+            found.add("param-row")
+        if h in ("defn", "defn-", "fn") or x[0] == "fnlit":
+            for pv in fn_params(x):
+                if any(is_node(q, "map") for q in pv[1]):
+                    found.add("param-row")
+                    if any(is_node(q, "map") and ":or" in q[1] for q in pv[1]):
+                        found.add("option-default")
+                names = {q for q in pv[1] if is_sym(q) and q != "&"}
+                if names and h in ("defn", "defn-", "fn") and pv in x[1]:
+                    body = x[1][x[1].index(pv) + 1:]
+                    if any(contains_node(b, lambda y: is_node(y, "list") and len(y[1]) >= 2 and is_kw(y[1][0])
+                                         and is_name(y[1][1], names)) for b in body):
+                        found.add("param-row")
+        if x[0] == "map":
+            if not x[1]:
+                found.add("empty")
+            elif is_kwmap(x):
+                vals = x[1][1::2]
+                if "nil" in vals:
+                    found.add("nil-field")
+                if any(is_node(v) and (v[0] == "fnlit" or head(v) in ("fn", "fn-ref", "partial", "comp")) for v in vals):
+                    found.add("fn-value")
+        if h == "assoc" and len(a) >= 3 and "nil" in a[2::2]:
+            found.add("nil-field")
+    return found
+
+
 def blockers_of(code, reqs):
     found = []
+    kwmap = kwmap_patterns(code) if re.search(KWMAP_LITERAL, code) else set()
     for bid, b in BLOCKERS.items():
-        if bid == "atom-local-iteration":
+        if bid.startswith("kwmap/"):
+            hit = bid[len("kwmap/"):] in kwmap
+        elif bid == "atom-local-iteration":
             hit = atom_written_in_iteration(code)
         elif bid == "atom-escape":
             hit = (re.search(b["detect"], code) is not None
@@ -494,7 +749,7 @@ def build(kotoba, rev):
         "inputs": {
             "kotoba-lib": {"repo": "kotoba-lang/kotoba", "rev": rev},
             "amu-probe": {"repo": "kotoba-lang/amu", "rev": "c2186d762e200205540f4ef9ca2b3ae66c4fc770",
-                          "evidence": "docs/evidence/amu-capability-probe-20261101.json"},
+                          "evidence": "docs/evidence/amu-capability-probe-20261101b.json"},
         },
         "classes": CLASSES,
         "counts": {"tracked": len(files), "class": dict(sorted(counts.items())),

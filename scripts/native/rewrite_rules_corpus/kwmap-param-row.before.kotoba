@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-refusal: E2104
+
+(defn f [m] :i64 (:a m))
+(defn main [] :i64 (f {:a 1}))

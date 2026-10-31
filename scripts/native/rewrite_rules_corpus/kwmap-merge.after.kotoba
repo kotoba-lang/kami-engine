@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-value: 2
+
+(defn main [] :i64 (:b (assoc {:a 1 :b 0} :b 2)))

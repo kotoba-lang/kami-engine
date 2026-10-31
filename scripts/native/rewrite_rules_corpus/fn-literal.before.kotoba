@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-refusal: E1005
+
+(defn main [] :i64 (reduce + 0 (map #(+ % 1) [1 2])))

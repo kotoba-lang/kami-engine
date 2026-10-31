@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-refusal: E2104
+
+(defn- spawn [st tag] (let [id (:next st)] (-> st (assoc-in [:ents id] {:tag tag :x 0 :y 0}) (update :next inc))))
+(defn- despawn [st id] (update st :ents dissoc id))
+(defn main [] :i64 (count (:ents (despawn (spawn (spawn {:ents {} :next 1} "a") "b") 1))))

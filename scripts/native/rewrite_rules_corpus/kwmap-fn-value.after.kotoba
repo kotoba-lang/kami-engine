@@ -1,0 +1,9 @@
+(ns probe)
+;; expect-value: 10
+
+(defn- inc1 [x :i64] :i64 (+ x 1))
+(defn- dbl [x :i64] :i64 (* x 2))
+(def handlers (typed-map-new [:map :keyword [:fn [[:i64] :i64]]] :inc (fn-ref inc1) :dbl (fn-ref dbl)))
+(defn- run [k :keyword x :i64] :i64
+  (option-match [:option [:fn [[:i64] :i64]]] (typed-map-get [:map :keyword [:fn [[:i64] :i64]]] handlers k) x f (invoke f x)))
+(defn main [] :i64 (run :dbl 5))

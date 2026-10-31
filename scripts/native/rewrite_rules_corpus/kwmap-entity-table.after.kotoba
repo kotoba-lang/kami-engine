@@ -1,0 +1,12 @@
+(ns probe)
+;; expect-value: 1
+
+(defrecord Ent [tag :string x :i64 y :i64])
+(defrecord St [ents [:map :i64 [:ref :probe/Ent]] next :i64])
+(defn- spawn [st [:ref :probe/St] tag :string] [:ref :probe/St]
+  (let [id (:next st)]
+    (assoc (assoc st :ents (assoc (:ents st) id (->Ent tag 0 0))) :next (+ id 1))))
+(defn- despawn [st [:ref :probe/St] id :i64] [:ref :probe/St]
+  (assoc st :ents (dissoc (:ents st) id)))
+(defn main [] :i64
+  (count (:ents (despawn (spawn (spawn (->St (typed-map-new [:map :i64 [:ref :probe/Ent]]) 1) "a") "b") 1))))

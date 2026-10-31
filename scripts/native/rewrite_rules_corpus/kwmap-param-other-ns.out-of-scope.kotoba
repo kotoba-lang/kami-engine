@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-refusal: E2179
+
+(defrecord P [a :i64])
+(defn f [m [:ref :other/P]] :i64 (:a m))
+(defn main [] :i64 (f (->P 1)))

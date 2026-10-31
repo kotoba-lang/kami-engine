@@ -1,0 +1,4 @@
+(ns probe)
+;; expect-refusal: E2101
+
+(defn main [] :i64 (:b (merge {:a 1 :b 0} {:b 2})))

@@ -1,0 +1,5 @@
+(ns probe)
+;; expect-refusal: E2102
+
+(defn- sub-idle [] {:state :idle :timer 0 :kind nil})
+(defn main [] :i64 (if (= :idle (:state (sub-idle))) 1 0))

@@ -1,0 +1,14 @@
+(ns probe)
+;; expect-value: 880
+
+(defrecord Audio [wave :string freq :i64 to :i64])
+(defrecord Skill [label :string element :keyword audio [:ref :probe/Audio]])
+(def skills
+  (typed-map-new [:map :keyword [:ref :probe/Skill]]
+    :fireball (->Skill "Fireball" :fire (->Audio "sawtooth" 180 620))
+    :ice-lance (->Skill "Ice Lance" :ice (->Audio "triangle" 880 1320))))
+(defn- skill-freq [id :keyword] :i64
+  (option-match [:option [:ref :probe/Skill]] (typed-map-get [:map :keyword [:ref :probe/Skill]] skills id)
+    0
+    s (:freq (:audio s))))
+(defn main [] :i64 (skill-freq :ice-lance))

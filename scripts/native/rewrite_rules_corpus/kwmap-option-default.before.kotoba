@@ -1,0 +1,6 @@
+(ns probe)
+;; expect-refusal: E2119
+
+(defn- tween-value [{:keys [from to duration] :or {from 0 to 100 duration 300}} elapsed]
+  (let [t (min elapsed duration)] {:v (+ from (quot (* (- to from) t) duration)) :done? (>= t duration)}))
+(defn main [] :i64 (:v (tween-value {:duration 200} 100)))
